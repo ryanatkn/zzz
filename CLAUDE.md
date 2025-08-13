@@ -52,10 +52,10 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     │   ├── hex/                      # Hex game implementation
     │   │   ├── behaviors.zig         # Entity behavior updates
     │   │   ├── borders.zig           # Border rendering system
-    │   │   ├── combat.zig            # Combat system (bullets, damage)
+    │   │   ├── combat.zig            # Combat system with bullet pool
     │   │   ├── constants.zig         # Game constants and configuration
     │   │   ├── controls.zig          # Control mapping and handling
-    │   │   ├── effects.zig           # Visual effects system
+    │   │   ├── effects.zig           # Visual effects system with AoE
     │   │   ├── entities.zig          # Zone-based world and entity system
     │   │   ├── game.zig              # Main game state management
     │   │   ├── game_data.zon         # Data-driven zone configuration
@@ -64,8 +64,9 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     │   │   ├── loader.zig            # ZON data loading and parsing
     │   │   ├── main.zig              # Game entry point and loop
     │   │   ├── physics.zig           # Collision detection and physics
-    │   │   ├── player.zig            # Player controller and movement
-    │   │   └── portals.zig           # Portal system for zone travel
+    │   │   ├── player.zig            # Player controller with modifiers
+    │   │   ├── portals.zig           # Portal system for zone travel
+    │   │   └── spells.zig            # Spell system (8 slots, cooldowns)
     │   ├── browser/                  # Browser/menu system
     │   │   ├── browser.zig           # Main browser coordinator
     │   │   ├── renderer.zig          # Browser UI renderer
@@ -75,6 +76,7 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     │   ├── routes/                   # Browser pages (SvelteKit-style)
     │   │   ├── +layout.zig           # Root layout
     │   │   ├── +page.zig             # Home page
+    │   │   ├── character/            # Character sheet page
     │   │   ├── settings/             # Settings pages
     │   │   └── stats/                # Statistics pages
     │   ├── shaders/                  # HLSL shader sources
@@ -117,14 +119,18 @@ $ zig build --help       # Show all build options
 
 ## Quick Start
 
-**Controls:** Mouse/WASD movement, right-click fire, Space pause, R respawn, ESC quit
+**Core Controls:**
+- **Movement:** WASD + Shift (walk) + Ctrl+mouse
+- **Combat:** Left-click shoot (burst/rhythm), Right-click cast spell  
+- **Spells:** 1-4, Q, E, R, F select slots
+- **System:** Space pause, R respawn, Y reset, ESC quit
 
-**Features:**
-- Procedural distance-field rendering for all shapes
-- GPU-accelerated visual effects system
-- Zone-based world with portal travel between areas
-- Data-driven configuration via ZON files
-- Complete gameplay: combat, lifestones, unit AI
+**Key Features:**
+- **Combat System:** 6-bullet pool with 2/sec recharge, burst & rhythm modes
+- **Spell System:** 8 slots, targeted/self-cast, visual AoE indicators
+- **Effects:** GPU-accelerated particles with gameplay integration
+- **World:** Zone-based travel with persistent lifestone checkpoints
+- **Rendering:** Pure procedural generation, no texture assets
 
 ## GPU Performance Strategy
 
@@ -156,7 +162,10 @@ $ zig build --help       # Show all build options
 - ✅ Complete GPU rendering pipeline with camera system
 - ✅ HLSL shaders for procedural shapes and effects
 - ✅ Zone-based world with portal travel system
-- ✅ Full gameplay loop with combat and respawn mechanics
+- ✅ Advanced combat with burst/rhythm shooting mechanics
+- ✅ 8-slot spell system with cooldowns and AoE effects
+- ✅ Full gameplay loop with lifestone persistence
+- ✅ Character sheet and system menu browser
 - ✅ Data-driven zone configuration via ZON files
 
 **Key Success Factors:**
@@ -178,7 +187,21 @@ $ zig build --help       # Show all build options
 - Each zone has its own camera mode and scale settings
 - Units renamed from "enemies" for flexible AI (friendly/neutral/hostile)
 - Camera-aware movement bounds (fixed mode only)
-- Persistent state across death/respawn cycles
+- Persistent lifestone attunement across sessions
+
+**Combat System:**
+- **Bullet Pool:** 6 bullets max, 2/sec recharge rate
+- **Shooting Modes:** Hold for rhythm (150ms intervals), click for burst
+- **Bullet Lifetime:** 4-second travel limit (upgradeable)
+- **Future:** Multi-shot, damage, range upgrades
+
+**Spell System:**
+- **8 Spell Slots:** Mapped to 1-4, Q, E, R, F keys
+- **Targeting:** Click to cast at location, Ctrl+click for self-cast
+- **Current Spells:**
+  - **Lull:** 150-radius AoE, reduces aggro to 20% for 12 seconds
+  - **Blink:** 200-unit teleport (dungeon only), 3-second cooldown
+- **Visual Feedback:** Area indicators show exact effect zones
 
 ## Technical Implementation
 
@@ -186,6 +209,7 @@ $ zig build --help       # Show all build options
 - Batch draw calls, minimize render passes and state changes
 - Use procedural vertex generation (SV_VertexID) to reduce bandwidth
 - Distance field shaders for anti-aliased shapes without textures
+- Visual effects use additive blending for performance
 
 **SDL3 GPU Critical Requirements:**
 - Vertex shaders: `register(b[n], space1)` for uniform buffers
@@ -193,11 +217,19 @@ $ zig build --help       # Show all build options
 - Avoid float4 arrays in HLSL cbuffers (use individual floats)
 - Screen→NDC coordinate conversion with aspect ratio correction
 
+**System Architecture:**
+- **Input System:** Unified helpers for modifiers (Ctrl, Shift)
+- **Spell System:** Modular with per-spell cooldowns and effects
+- **Combat System:** Bullet pool with recharge mechanics
+- **Effect System:** 256 simultaneous effects with lifecycle management
+- **Browser System:** SvelteKit-style routing for UI pages
+
 **Development Principles:**
 - Procedural generation over static assets
 - Camera system integration for all rendering
 - Modular architecture with clean component separation
 - Zone-based world design with travel metaphors
+- Constants extracted for easy tuning and upgrades
 
 ## Notes to LLMs
 

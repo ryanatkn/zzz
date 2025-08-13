@@ -19,6 +19,7 @@ pub const EffectType = enum {
     portal_inner, // Faster, smaller inner aura around portals
     lifestone_glow, // Gentle glow around lifestones
     lifestone_inner, // Faster inner aura inside lifestone glow
+    lull_area, // Area of effect indicator for Lull spell
 };
 
 pub const Effect = struct {
@@ -135,6 +136,11 @@ pub const Effect = struct {
                 const pulse = getPulse(elapsed, 2.8, 1.5); // Much faster speed (2.8 vs 0.7), phase offset
                 return self.radius * (0.88 + pulse * 0.24); // 88% to 112% size (more variation)
             },
+            .lull_area => {
+                // Stable area indicator with subtle pulse to show it's active
+                const pulse = getPulse(elapsed, 1.0, 0.0);
+                return self.radius * (0.98 + pulse * 0.04); // 98% to 102% size - very subtle
+            },
         }
     }
 
@@ -192,6 +198,13 @@ pub const Effect = struct {
                 // Faster, lower intensity inner aura
                 const pulse = getPulse(elapsed, 2.8, 1.5); // Same fast speed as radius
                 return (0.38 + pulse * 0.08) * self.intensity; // 0.18 to 0.26 range (lower max, min ~1 when scaled)
+            },
+            .lull_area => {
+                // More visible area indicator
+                const pulse = getPulse(elapsed, 1.0, 0.0);
+                // Fade in over first 0.5 seconds
+                const fade_in = @min(1.0, elapsed / 0.5);
+                return (0.35 + pulse * 0.10) * self.intensity * fade_in; // 0.35 to 0.45 range - much more visible
             },
         }
     }
@@ -280,6 +293,15 @@ pub const Effect = struct {
                     .r = @as(u8, @intFromFloat(@min(255.0, 80.0 * intensity))),
                     .g = @as(u8, @intFromFloat(@min(255.0, 240.0 * intensity))),
                     .b = @as(u8, @intFromFloat(@min(255.0, 255.0 * intensity))),
+                    .a = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
+                };
+            },
+            .lull_area => {
+                // Brighter purple/blue for better visibility
+                return Color{
+                    .r = @as(u8, @intFromFloat(@min(255.0, 140.0 * intensity))),
+                    .g = @as(u8, @intFromFloat(@min(255.0, 100.0 * intensity))),
+                    .b = @as(u8, @intFromFloat(@min(255.0, 240.0 * intensity))),
                     .a = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
                 };
             },
@@ -412,6 +434,11 @@ pub const EffectSystem = struct {
     pub fn addLifestoneInnerEffectOnly(self: *Self, pos: Vec2, lifestone_radius: f32) void {
         // Add only the inner effect for newly attuned lifestones
         self.addLifestoneGlowEffectParts(pos, lifestone_radius, false, true);
+    }
+    
+    pub fn addLullAreaEffect(self: *Self, pos: Vec2, radius: f32, duration: f32) void {
+        // Add visible area indicator for Lull spell
+        self.addEffect(pos, radius, .lull_area, duration);
     }
 
     fn addLifestoneGlowEffectParts(self: *Self, pos: Vec2, lifestone_radius: f32, add_outer: bool, attuned: bool) void {

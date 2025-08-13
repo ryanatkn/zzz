@@ -7,6 +7,7 @@ const settings_page = @import("../routes/settings/+page.zig");
 const settings_video_page = @import("../routes/settings/video/+page.zig");
 const settings_audio_page = @import("../routes/settings/audio/+page.zig");
 const stats_page = @import("../routes/stats/+page.zig");
+const character_page = @import("../routes/character/+page.zig");
 
 pub const Router = struct {
     allocator: std.mem.Allocator,
@@ -89,6 +90,14 @@ pub const Router = struct {
             
             // Load stats page
             self.current_page = try stats_page.create(self.allocator);
+        } else if (std.mem.eql(u8, path, "/character")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Load character page
+            self.current_page = try character_page.create(self.allocator);
         } else {
             // Default to index for unknown paths
             // Load root layout

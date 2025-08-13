@@ -11,16 +11,93 @@ const Vec2 = types.Vec2;
 const World = entities.World;
 const Player = entities.Player;
 
-pub fn fireBullet(world: *World, target_pos: Vec2) void {
-    if (!world.player.alive) return;
+// Bullet pool constants
+const BULLET_POOL_SIZE = 6; // Even number for rhythm mode
+const BULLET_RECHARGE_RATE = 2.0; // Bullets per second (full recharge in 3s)
+const BULLET_FIRE_COOLDOWN = 0.15; // 150ms between shots for rhythm
+
+pub const BulletPool = struct {
+    max_bullets: u8,
+    current_bullets: u8,
+    recharge_rate: f32,      // Bullets per second
+    recharge_accumulator: f32,
+    fire_cooldown: f32,      // Min time between shots
+    cooldown_remaining: f32,
+    
+    pub fn init() BulletPool {
+        return .{
+            .max_bullets = BULLET_POOL_SIZE,
+            .current_bullets = BULLET_POOL_SIZE,
+            .recharge_rate = BULLET_RECHARGE_RATE,
+            .recharge_accumulator = 0,
+            .fire_cooldown = BULLET_FIRE_COOLDOWN,
+            .cooldown_remaining = 0,
+        };
+    }
+    
+    pub fn canFire(self: *const BulletPool) bool {
+        return self.current_bullets > 0 and self.cooldown_remaining <= 0;
+    }
+    
+    pub fn fire(self: *BulletPool) void {
+        if (self.canFire()) {
+            self.current_bullets -= 1;
+            self.cooldown_remaining = self.fire_cooldown;
+        }
+    }
+    
+    pub fn update(self: *BulletPool, deltaTime: f32) void {
+        // Update cooldown
+        if (self.cooldown_remaining > 0) {
+            self.cooldown_remaining -= deltaTime;
+        }
+        
+        // Recharge bullets
+        if (self.current_bullets < self.max_bullets) {
+            self.recharge_accumulator += self.recharge_rate * deltaTime;
+            while (self.recharge_accumulator >= 1.0 and self.current_bullets < self.max_bullets) {
+                self.current_bullets += 1;
+                self.recharge_accumulator -= 1.0;
+            }
+        } else {
+            self.recharge_accumulator = 0;
+        }
+    }
+    
+    // Future: Upgrades can modify these values
+    pub fn upgradeCapacity(self: *BulletPool, amount: u8) void {
+        self.max_bullets += amount;
+        self.current_bullets = @min(self.current_bullets + amount, self.max_bullets);
+    }
+    
+    pub fn upgradeRechargeRate(self: *BulletPool, multiplier: f32) void {
+        self.recharge_rate *= multiplier;
+    }
+    
+    // Future: Multi-shot modifier
+    pub fn getBulletsPerShot(self: *const BulletPool) u8 {
+        _ = self;
+        return 1; // Future: Can be upgraded to 2+ for multi-shot
+    }
+};
+
+pub fn fireBullet(world: *World, target_pos: Vec2, pool: *BulletPool) bool {
+    if (!world.player.alive) return false;
+    if (!pool.canFire()) return false;
 
     if (world.findInactiveBullet()) |bullet| {
         behaviors.fireBullet(bullet, world.player.pos, target_pos);
+        pool.fire();
+        
+        // Future: Bullet travel distance upgrade
+        // bullet.max_distance = getUpgradedBulletDistance();
+        return true;
     }
+    return false;
 }
 
-pub fn fireBulletAtMouse(world: *World, mouse_pos: Vec2) void {
-    fireBullet(world, mouse_pos);
+pub fn fireBulletAtMouse(world: *World, mouse_pos: Vec2, pool: *BulletPool) bool {
+    return fireBullet(world, mouse_pos, pool);
 }
 
 pub fn respawnPlayer(game_state: anytype) void {

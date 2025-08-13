@@ -30,11 +30,12 @@ zig build clean-shaders             # Clean rebuild shaders
 - **Math Utilities**: Optimized vector math and collision helpers
 
 ### Hex Game Showcase (src/hex/)
-- **Movement**: Mouse hold-to-move + WASD direct control
-- **Combat**: Right-click projectile firing with collision detection  
+- **Movement**: WASD direct control + Shift to walk + Ctrl+mouse movement
+- **Combat**: Left-click shooting with burst/rhythm mechanics  
+- **Spells**: 8-slot spell system with targeted/self-cast modes
 - **World**: Zone-based travel system with portals between areas
-- **Respawn**: Lifestone checkpoints and R key instant respawn
-- **Effects**: GPU-accelerated visual effects system
+- **Respawn**: Lifestone checkpoints with persistent attunement
+- **Effects**: GPU-accelerated visual effects with AoE indicators
 
 ### Technical Highlights
 - **GPU-First**: SDL3 GPU API with Vulkan/D3D12 backends
@@ -45,22 +46,43 @@ zig build clean-shaders             # Clean rebuild shaders
 
 ## Game Controls
 
-### Movement & Actions
-- **Hold Left Mouse**: Move toward cursor
+### Movement
 - **WASD**: Direct movement
-- **Right Click**: Fire projectile
-- **Space**: Pause game
-- **R**: Respawn at lifestone
-- **Backtick (`)**: Open browser/menu
-- **ESC**: Quit
+- **Shift + Move**: Walk mode (slower)
+- **Ctrl + Left-click**: Move to mouse position
+
+### Combat
+- **Left-click**: Fire bullets (burst/rhythm mode)
+  - Hold for automatic rhythm shooting
+  - Click for burst shots
+  - 6-bullet pool with 2/sec recharge
+- **Right-click**: Cast active spell at target
+- **Ctrl + Right-click**: Self-cast active spell
+
+### Spells
+- **Number Keys 1-4**: Select spell slots 1-4
+- **Q, E, R, F**: Select spell slots 5-8
+  - **Slot 1 - Lull**: Reduces enemy aggro by 80% in target area (12s)
+  - **Slot 2 - Blink**: Teleport to location (dungeon only)
+  - **Slots 3-8**: Available for future spells
+
+### System
+- **Space**: Pause/unpause game
+- **R**: Respawn when dead (spell slot 7 when alive)
+- **T**: Reset current zone units
+- **Y**: Full game reset (including lifestones)
+- **Backtick (`)**: Open system menu/character sheet
+- **ESC**: Quit game
+- **Mouse Wheel**: Zoom in/out
 
 ### Visual Elements
 - **Blue Circle**: Player character
-- **Red Circles**: Enemy units
+- **Red Circles**: Enemy units (bright = aggro, dim = passive)
 - **Green Rectangles**: Solid obstacles
 - **Orange Rectangles**: Deadly hazards
 - **Purple Circles**: Zone portals
 - **Cyan Circles**: Lifestone checkpoints
+- **Purple/Blue Areas**: Spell effect zones (Lull)
 
 ## Project Structure
 
@@ -80,12 +102,19 @@ dealt/
 │   │   ├── game_renderer.zig    # Game-specific rendering
 │   │   ├── entities.zig         # Entity system
 │   │   ├── behaviors.zig        # Entity behaviors
+│   │   ├── combat.zig           # Combat & bullet pool system
+│   │   ├── spells.zig           # Spell system implementation
 │   │   ├── physics.zig          # Collision detection
+│   │   ├── player.zig           # Player controller
+│   │   ├── effects.zig          # Visual effects system
 │   │   └── game_data.zon        # Zone configuration
 │   ├── browser/                 # Browser/menu system
 │   │   └── browser.zig          # Menu implementation
-│   ├── routes/                  # Menu pages
-│   │   └── +page.zig            # Page definitions
+│   ├── routes/                  # Menu pages (SvelteKit-style)
+│   │   ├── +page.zig            # Home page
+│   │   ├── character/           # Character sheet
+│   │   ├── settings/            # Settings pages
+│   │   └── stats/               # Statistics
 │   ├── shaders/                 # HLSL shaders
 │   │   ├── source/              # Shader sources
 │   │   └── compiled/            # Platform bytecode

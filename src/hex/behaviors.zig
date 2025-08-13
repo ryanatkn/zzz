@@ -29,13 +29,19 @@ pub fn updatePlayer(player: *Player, vel: Vec2, dt: f32, use_screen_bounds: bool
 
 // Update unit - chase player or return home
 pub fn updateUnit(unit: *Unit, player_pos: Vec2, player_alive: bool, dt: f32) void {
+    updateUnitWithAggroMod(unit, player_pos, player_alive, dt, 1.0);
+}
+
+// Update unit with aggro modifier (for spell effects)
+pub fn updateUnitWithAggroMod(unit: *Unit, player_pos: Vec2, player_alive: bool, dt: f32, aggro_multiplier: f32) void {
     var velocity = Vec2{ .x = 0, .y = 0 };
 
     if (player_alive) {
         const dx_player = player_pos.x - unit.pos.x;
         const dy_player = player_pos.y - unit.pos.y;
         const dist_sq_to_player = dx_player * dx_player + dy_player * dy_player;
-        const aggro_range_sq = constants.UNIT_AGGRO_RANGE * constants.UNIT_AGGRO_RANGE;
+        const effective_aggro_range = unit.aggro_range * aggro_multiplier;
+        const aggro_range_sq = effective_aggro_range * effective_aggro_range;
         const min_dist_sq = (unit.radius + constants.PLAYER_RADIUS) * (unit.radius + constants.PLAYER_RADIUS);
 
         if (dist_sq_to_player < aggro_range_sq and dist_sq_to_player > min_dist_sq) {
@@ -89,6 +95,13 @@ pub fn updateBullet(bullet: *Bullet, dt: f32) void {
 
     bullet.pos.x += bullet.vel.x * dt;
     bullet.pos.y += bullet.vel.y * dt;
+    
+    // Update lifetime
+    bullet.lifetime -= dt;
+    if (bullet.lifetime <= 0) {
+        bullet.active = false;
+        return;
+    }
 
     // Deactivate if off screen
     if (bullet.pos.x < 0 or bullet.pos.x > constants.SCREEN_WIDTH or
@@ -111,6 +124,7 @@ pub fn fireBullet(bullet: *Bullet, source_pos: Vec2, target_pos: Vec2) void {
         bullet.vel.x = (direction.x / length) * constants.BULLET_SPEED;
         bullet.vel.y = (direction.y / length) * constants.BULLET_SPEED;
         bullet.active = true;
+        bullet.lifetime = bullet.max_lifetime; // Reset lifetime to max
     }
 }
 

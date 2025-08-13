@@ -14,17 +14,28 @@ const Player = entities.Player;
 const Zone = entities.Zone;
 const InputState = input.InputState;
 
+const WALK_SPEED_MULT = 0.25; // Walking speed is 1/4 of normal
+
 pub fn updatePlayer(player: *Player, input_state: *const InputState, zone: *const Zone, cam: *const camera.Camera, deltaTime: f32) void {
     if (!player.alive) return;
 
     var keyboard_velocity = Vec2{ .x = 0, .y = 0 };
     var mouse_velocity = Vec2{ .x = 0, .y = 0 };
+    
+    // Check modifiers
+    const is_walking = input_state.isShiftHeld();
+    const ctrl_held = input_state.isCtrlHeld();
+    
+    // Speed modifier for walking
+    const speed_mult: f32 = if (is_walking) WALK_SPEED_MULT else 1.0;
+    const move_speed = constants.PLAYER_SPEED * speed_mult;
 
     const movement = input_state.getMovementVector();
-    keyboard_velocity.x = movement.x * constants.PLAYER_SPEED;
-    keyboard_velocity.y = movement.y * constants.PLAYER_SPEED;
+    keyboard_velocity.x = movement.x * move_speed;
+    keyboard_velocity.y = movement.y * move_speed;
 
-    if (input_state.isLeftMouseHeld()) {
+    // Only allow mouse movement when Ctrl is held
+    if (ctrl_held and input_state.isLeftMouseHeld()) {
         const world_mouse_pos = input_state.getWorldMousePos(cam);
         const dx = world_mouse_pos.x - player.pos.x;
         const dy = world_mouse_pos.y - player.pos.y;
@@ -35,13 +46,13 @@ pub fn updatePlayer(player: *Player, input_state: *const InputState, zone: *cons
             const distance = @sqrt(distance_sq);
             const dir_x = dx / distance;
             const dir_y = dy / distance;
-            mouse_velocity.x = dir_x * constants.PLAYER_SPEED;
-            mouse_velocity.y = dir_y * constants.PLAYER_SPEED;
+            mouse_velocity.x = dir_x * move_speed;
+            mouse_velocity.y = dir_y * move_speed;
         }
     }
 
     var velocity: Vec2 = undefined;
-    if (input_state.isLeftMouseHeld() and (mouse_velocity.x != 0 or mouse_velocity.y != 0)) {
+    if (ctrl_held and input_state.isLeftMouseHeld() and (mouse_velocity.x != 0 or mouse_velocity.y != 0)) {
         velocity = mouse_velocity;
     } else {
         velocity = keyboard_velocity;

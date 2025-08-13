@@ -41,6 +41,7 @@ pub const Unit = struct {
     color: Color,
     alive: bool,
     active: bool,
+    aggro_range: f32, // Base aggro detection range
 
     pub fn init(x: f32, y: f32, radius: f32) Unit {
         return .{
@@ -51,6 +52,7 @@ pub const Unit = struct {
             .color = constants.COLOR_UNIT_DEFAULT,
             .alive = true,
             .active = true,
+            .aggro_range = 200.0, // Default aggro range
         };
     }
 };
@@ -84,6 +86,8 @@ pub const Bullet = struct {
     radius: f32,
     color: Color,
     active: bool,
+    lifetime: f32,       // Time remaining before bullet expires
+    max_lifetime: f32,   // Maximum lifetime (can be upgraded)
 
     pub fn init() Bullet {
         return .{
@@ -92,6 +96,8 @@ pub const Bullet = struct {
             .radius = constants.BULLET_RADIUS,
             .color = constants.COLOR_BULLET,
             .active = false,
+            .lifetime = 0,
+            .max_lifetime = 4.0, // 4 seconds base duration - future: upgrade this stat
         };
     }
 };
@@ -228,6 +234,14 @@ pub const Zone = struct {
         self.units = self.original_units;
         self.unit_count = self.original_unit_count;
     }
+    
+    pub fn resetLifestones(self: *Zone) void {
+        // Reset all lifestones to unattuned state
+        for (0..self.lifestone_count) |i| {
+            self.lifestones[i].attuned = false;
+            self.lifestones[i].color = constants.COLOR_LIFESTONE_UNATTUNED;
+        }
+    }
 };
 
 // World state - contains all game zones and entities
@@ -287,6 +301,7 @@ pub const World = struct {
         // Reset all zones to their original state
         for (0..self.zones.len) |i| {
             self.zones[i].resetUnitsToOriginal();
+            self.zones[i].resetLifestones();
         }
         // Clear all bullets
         for (0..MAX_BULLETS) |i| {

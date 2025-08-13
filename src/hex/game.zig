@@ -15,6 +15,7 @@ const effects = @import("effects.zig");
 const browser = @import("../browser/browser.zig");
 const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
+const spells = @import("spells.zig");
 
 const Vec2 = types.Vec2;
 const World = entities.World;
@@ -28,6 +29,12 @@ pub const GameState = struct {
 
     // Visual effects system
     effect_system: effects.EffectSystem,
+    
+    // Spell system
+    spell_system: spells.SpellSystem,
+    
+    // Bullet pool for burst/rhythm shooting
+    bullet_pool: combat.BulletPool,
 
     // Browser system for system menu
     browser_system: ?browser.Browser,
@@ -45,6 +52,8 @@ pub const GameState = struct {
             .game_paused = false,
             .quit_requested = false,
             .effect_system = effects.EffectSystem.init(),
+            .spell_system = spells.SpellSystem.init(),
+            .bullet_pool = combat.BulletPool.init(),
             .browser_system = null,
             .iris_wipe_active = false,
             .iris_wipe_start_time = 0,
@@ -142,6 +151,13 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     if (world.player.alive) {
         player_controller.updatePlayer(&world.player, input_state, world.getCurrentZone(), cam, deltaTime);
+        
+        // Handle continuous shooting on left-click hold (rhythm mode)
+        // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
+        if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and game_state.bullet_pool.canFire()) {
+            const world_mouse_pos = input_state.getWorldMousePos(cam);
+            _ = combat.fireBulletAtMouse(world, world_mouse_pos, &game_state.bullet_pool);
+        }
     }
 
     for (0..entities.MAX_BULLETS) |i| {
@@ -155,7 +171,8 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
         if (!unit.active or !unit.alive) continue;
 
         const old_pos = unit.pos;
-        behaviors.updateUnit(unit, world.player.pos, world.player.alive, deltaTime);
+        const aggro_mod = game_state.spell_system.getAggroMultiplierForUnit(unit.pos);
+        behaviors.updateUnitWithAggroMod(unit, world.player.pos, world.player.alive, deltaTime, aggro_mod);
 
         for (0..zone.obstacle_count) |j| {
             const obstacle = &zone.obstacles[j];
@@ -176,6 +193,12 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     // Update visual effects
     game_state.effect_system.update();
+    
+    // Update spell system
+    game_state.spell_system.update(deltaTime);
+    
+    // Update bullet pool
+    game_state.bullet_pool.update(deltaTime);
 }
 
 pub fn checkCollisions(game_state: *GameState) void {
@@ -216,7 +239,7 @@ pub fn checkCollisions(game_state: *GameState) void {
 pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void {
     if (game_state.world.player.alive and !game_state.game_paused) {
         const world_mouse_pos = game_state.input_state.getWorldMousePos(cam);
-        combat.fireBulletAtMouse(&game_state.world, world_mouse_pos);
+        _ = combat.fireBulletAtMouse(&game_state.world, world_mouse_pos, &game_state.bullet_pool);
     }
 }
 

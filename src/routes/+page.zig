@@ -49,6 +49,15 @@ const IndexPage = struct {
             link_width,
             link_height
         ));
+        
+        try links.append(page.createLink(
+            "Character",
+            "/character",
+            center_x - link_width / 2.0,
+            start_y + (link_height + link_spacing) * 2,
+            link_width,
+            link_height
+        ));
     }
     
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {

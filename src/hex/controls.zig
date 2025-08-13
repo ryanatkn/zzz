@@ -8,6 +8,7 @@ const game_controller = @import("game.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
+const spells = @import("spells.zig");
 
 const Vec2 = types.Vec2;
 const GameState = game_controller.GameState;
@@ -46,9 +47,6 @@ pub fn handleSDLEvent(
                         game_hud.toggle();
                     }
                 },
-                c.sdl.SDL_SCANCODE_R => { // R key - respawn/reset
-                    game_controller.handleRespawn(game_state);
-                },
                 c.sdl.SDL_SCANCODE_SPACE => { // Space key - pause toggle
                     game_state.togglePause();
                 },
@@ -58,22 +56,21 @@ pub fn handleSDLEvent(
                 c.sdl.SDL_SCANCODE_Y => { // Y key - full game reset
                     game_state.resetGame();
                 },
-                // Effect testing hotkeys
-                c.sdl.SDL_SCANCODE_0 => { // 0 - Player spawn effect
-                    game_state.effect_system.addPlayerSpawnEffect(game_state.world.player.pos, game_state.world.player.radius);
+                // Spell slot keybindings (1-4 number keys)
+                c.sdl.SDL_SCANCODE_1, c.sdl.SDL_SCANCODE_2, c.sdl.SDL_SCANCODE_3, c.sdl.SDL_SCANCODE_4 => {
+                    const slot = event.key.scancode - c.sdl.SDL_SCANCODE_1;
+                    game_state.spell_system.setActiveSlot(slot);
                 },
-                c.sdl.SDL_SCANCODE_9 => { // 9 - Portal travel effect
-                    game_state.effect_system.addPortalTravelEffect(game_state.world.player.pos, game_state.world.player.radius);
+                c.sdl.SDL_SCANCODE_Q => game_state.spell_system.setActiveSlot(4),
+                c.sdl.SDL_SCANCODE_E => game_state.spell_system.setActiveSlot(5),
+                c.sdl.SDL_SCANCODE_R => { // R key - respawn or spell slot 6
+                    if (!game_state.world.player.alive) {
+                        game_controller.handleRespawn(game_state);
+                    } else {
+                        game_state.spell_system.setActiveSlot(6);
+                    }
                 },
-                c.sdl.SDL_SCANCODE_8 => { // 8 - Portal ripple effect
-                    game_state.effect_system.addPortalRippleEffect(game_state.world.player.pos, game_state.world.player.radius * 2.0);
-                },
-                c.sdl.SDL_SCANCODE_7 => { // 7 - Lifestone glow effect (attuned)
-                    game_state.effect_system.addLifestoneGlowEffect(game_state.world.player.pos, game_state.world.player.radius * 1.5, true);
-                },
-                c.sdl.SDL_SCANCODE_6 => { // 6 - Lifestone glow effect (not attuned)
-                    game_state.effect_system.addLifestoneGlowEffect(game_state.world.player.pos, game_state.world.player.radius * 1.5, false);
-                },
+                c.sdl.SDL_SCANCODE_F => game_state.spell_system.setActiveSlot(7),
                 else => {},
             }
         },
@@ -89,10 +86,26 @@ pub fn handleSDLEvent(
                 c.sdl.SDL_BUTTON_LEFT => {
                     if (!game_state.world.player.alive) {
                         game_controller.handleRespawn(game_state);
+                    } else {
+                        // Left-click shoots unless Ctrl is held
+                        if (!game_state.input_state.isCtrlHeld()) {
+                            game_controller.handleFireBullet(game_state, &game_renderer.camera);
+                        }
                     }
                 },
                 c.sdl.SDL_BUTTON_RIGHT => {
-                    game_controller.handleFireBullet(game_state, &game_renderer.camera);
+                    // Right-click casts spell (self-cast if Ctrl held)
+                    if (game_state.world.player.alive) {
+                        const ctrl_held = game_state.input_state.isCtrlHeld();
+                        const world_mouse_pos = game_state.input_state.getWorldMousePos(&game_renderer.camera);
+                        _ = game_state.spell_system.castActiveSpell(
+                            &game_state.world.player,
+                            game_state.world.getCurrentZone(),
+                            world_mouse_pos,
+                            &game_state.effect_system,
+                            ctrl_held  // self_cast parameter
+                        );
+                    }
                 },
                 else => {},
             }
