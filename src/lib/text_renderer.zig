@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("c.zig");
 const types = @import("types.zig");
+const persistent_text = @import("persistent_text.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -33,11 +34,19 @@ const TextTexture = struct {
     }
 };
 
-// Queued text draw command
+// Queued text draw command (IMMEDIATE MODE)
 const TextDrawCommand = struct {
     texture: TextTexture,    // Texture containing rendered text
     position: Vec2,          // Screen position to draw at
     color: Color,           // Text color (applied to texture)
+};
+
+// Persistent text draw command (PERSISTENT MODE)
+const PersistentTextDrawCommand = struct {
+    texture: TextTexture,    // Persistent texture (not released this frame)
+    position: Vec2,          // Screen position to draw at
+    color: Color,           // Text color (applied to texture)
+    is_cached: bool,        // True if this was a cache hit
 };
 
 // Text renderer - handles all text-specific GPU operations
@@ -54,8 +63,9 @@ pub const TextRenderer = struct {
     text_pipeline: ?*c.sdl.SDL_GPUGraphicsPipeline,
     text_sampler: ?*c.sdl.SDL_GPUSampler,
 
-    // Text rendering queue
-    text_draw_queue: std.ArrayList(TextDrawCommand),
+    // Text rendering queues
+    text_draw_queue: std.ArrayList(TextDrawCommand),         // Immediate mode queue
+    persistent_text_queue: std.ArrayList(PersistentTextDrawCommand), // Persistent mode queue
 
     const Self = @This();
 
@@ -70,6 +80,7 @@ pub const TextRenderer = struct {
             .text_pipeline = null,
             .text_sampler = null,
             .text_draw_queue = std.ArrayList(TextDrawCommand).init(allocator),
+            .persistent_text_queue = std.ArrayList(PersistentTextDrawCommand).init(allocator),
         };
 
         try self.loadTextShaders();
@@ -87,6 +98,7 @@ pub const TextRenderer = struct {
         if (self.text_ps) |shader| c.sdl.SDL_ReleaseGPUShader(self.device, shader);
         
         self.text_draw_queue.deinit();
+        self.persistent_text_queue.deinit();
     }
 
     pub fn updateScreenSize(self: *Self, width: f32, height: f32) void {
@@ -94,7 +106,8 @@ pub const TextRenderer = struct {
         self.screen_height = height;
     }
 
-    // Queue a texture-based text for drawing
+    // Queue a texture-based text for drawing (IMMEDIATE MODE)
+    // Texture will be released after this frame
     pub fn queueTextTexture(
         self: *Self,
         texture: *c.sdl.SDL_GPUTexture,
@@ -125,6 +138,51 @@ pub const TextRenderer = struct {
             std.log.warn("Text sampler not initialized, cannot queue text texture", .{});
         }
     }
+    
+    // Queue persistent text for drawing (PERSISTENT MODE)
+    // Uses persistent texture system to avoid recreating textures every frame
+    pub fn queuePersistentText(
+        self: *Self,
+        text: []const u8,
+        position: Vec2,
+        font_manager: anytype,
+        font_category: anytype,
+        font_size: f32,
+        color: Color
+    ) !void {
+        if (persistent_text.getGlobalPersistentTextSystem()) |persistent_system| {
+            if (try persistent_system.getOrCreateTexture(text, font_manager, font_category, font_size, color)) |handle| {
+                // Queue the persistent texture for rendering (but don't release it)
+                const text_texture = TextTexture{
+                    .texture = handle.texture,
+                    .sampler = handle.sampler,
+                    .width = handle.width,
+                    .height = handle.height,
+                };
+                
+                const cmd = PersistentTextDrawCommand{
+                    .texture = text_texture,
+                    .position = position,
+                    .color = color,
+                    .is_cached = handle.is_cached,
+                };
+                
+                try self.persistent_text_queue.append(cmd);
+                
+                const log = std.log.scoped(.text_renderer_persistent);
+                if (handle.is_cached) {
+                    log.debug("Queued cached persistent text: '{s}'", .{text});
+                } else {
+                    log.info("Queued new persistent text: '{s}' ({}x{})", .{ text, handle.width, handle.height });
+                }
+            }
+        } else {
+            // Fallback to immediate mode if persistent system not available
+            std.log.warn("Persistent text system not available, falling back to immediate mode", .{});
+            // Note: This would require the font_manager to create a texture immediately
+            // For now, we'll just log the warning
+        }
+    }
 
     // Draw all queued text (call during render pass)
     pub fn drawQueuedText(
@@ -132,47 +190,71 @@ pub const TextRenderer = struct {
         cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
         render_pass: *c.sdl.SDL_GPURenderPass
     ) void {
-        if (self.text_draw_queue.items.len == 0) {
+        const immediate_count = self.text_draw_queue.items.len;
+        const persistent_count = self.persistent_text_queue.items.len;
+        const total_count = immediate_count + persistent_count;
+        
+        if (total_count == 0) {
             return;
         }
         
         const log = std.log.scoped(.text_renderer);
-        log.info("=== DRAWING {} QUEUED TEXT TEXTURES ===", .{self.text_draw_queue.items.len});
+        log.info("=== DRAWING {} TEXT TEXTURES ({} immediate, {} persistent) ===", .{ total_count, immediate_count, persistent_count });
         
-        // Draw each queued text texture as a textured quad
+        // Draw immediate mode text first (these textures will be released)
         for (self.text_draw_queue.items, 0..) |cmd, cmd_index| {
-            log.info("Drawing text texture {} as textured quad: {}x{} at ({}, {})", .{ 
+            log.debug("Drawing immediate text {} as textured quad: {}x{} at ({}, {})", .{ 
                 cmd_index, cmd.texture.width, cmd.texture.height, cmd.position.x, cmd.position.y 
             });
             
-            // Get the size of the text texture
             const size = Vec2{
                 .x = @as(f32, @floatFromInt(cmd.texture.width)),
                 .y = @as(f32, @floatFromInt(cmd.texture.height)),
             };
             
-            // Draw the textured quad with the actual texture
             self.drawTexturedQuad(
                 cmd_buffer, 
                 render_pass, 
-                cmd.texture.texture,  // The actual SDL texture 
-                cmd.texture.sampler,  // The sampler for the texture
+                cmd.texture.texture,
+                cmd.texture.sampler,
                 cmd.position, 
                 size, 
                 cmd.color
             );
-            
-            log.info("  ✓ Successfully drew text as textured quad", .{});
         }
         
-        log.info("Drew {} text textures as textured quads", .{self.text_draw_queue.items.len});
+        // Draw persistent mode text (these textures are kept alive)
+        for (self.persistent_text_queue.items, 0..) |cmd, cmd_index| {
+            const cache_status = if (cmd.is_cached) "cached" else "new";
+            log.debug("Drawing persistent text {} ({s}) as textured quad: {}x{} at ({}, {})", .{ 
+                cmd_index, cache_status, cmd.texture.width, cmd.texture.height, cmd.position.x, cmd.position.y 
+            });
+            
+            const size = Vec2{
+                .x = @as(f32, @floatFromInt(cmd.texture.width)),
+                .y = @as(f32, @floatFromInt(cmd.texture.height)),
+            };
+            
+            self.drawTexturedQuad(
+                cmd_buffer, 
+                render_pass, 
+                cmd.texture.texture,
+                cmd.texture.sampler,
+                cmd.position, 
+                size, 
+                cmd.color
+            );
+        }
         
-        // Release textures after drawing and clear queue for next frame
+        log.info("Drew {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
+        
+        // Release immediate mode textures and clear both queues
         for (self.text_draw_queue.items) |cmd| {
-            // Release the GPU texture after drawing is complete
             c.sdl.SDL_ReleaseGPUTexture(self.device, cmd.texture.texture);
         }
         self.text_draw_queue.clearRetainingCapacity();
+        // Note: Persistent textures are NOT released - they're managed by the persistent system
+        self.persistent_text_queue.clearRetainingCapacity();
     }
 
     // Load text shaders

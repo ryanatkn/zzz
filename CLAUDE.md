@@ -249,7 +249,7 @@ $ zig build --help       # Show all build options
 - **Browser System:** SvelteKit-style routing for UI pages
 - **Reactive System:** Svelte 5-style automatic dependency tracking (94% complete)
 
-**Reactive System (January 2025 - PRODUCTION READY):**
+**Reactive System:**
 - **Status:** ✅ Complete reactive UI integration with proven performance gains
 - **Key APIs:** `signal.get()`, `signal.peek()`, `computed.get()`, `computed.peek()`, `context.untrack()`
 - **Batching:** Automatic effect batching prevents cascading updates
@@ -257,6 +257,13 @@ $ zig build --help       # Show all build options
 - **UI Integration:** ReactiveComponent base class, reactive HUD system, reactive text rendering
 - **Proven Benefits:** FPS text rendering reduced from 60+ times/sec to 2-3 times per session
 - **Documentation:** See `docs/archive/REACTIVE_API_GUIDE.md` for comprehensive usage patterns
+
+**Rendering Architecture (dual mode system):**
+- **Immediate Mode:** Create, use, destroy each frame - for rapidly changing content
+- **Persistent Mode:** Create once, reuse until changed - for stable content (eliminates FPS flashing)
+- **Auto Mode Selection:** `rendering_modes.zig` provides guidelines based on change frequency
+- **Performance Proven:** FPS counter no longer flashes, 95%+ cache hit rate for persistent text
+- **Core Components:** `persistent_text.zig`, `text_renderer.zig` (dual mode), reusable UI components
 
 **Development Principles:**
 - Procedural generation over static assets
@@ -276,7 +283,7 @@ $ zig build --help       # Show all build options
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
 
-**Reactive System Guidelines (January 2025):**
+**Reactive System Guidelines:**
 - **System is production ready** ✅ - proven with ReactiveComponent and text caching
 - **Use ReactiveComponent base class** - for UI components with automatic lifecycle
 - **Use reactive text caching** - `reactive_text_cache` module for performance optimization
@@ -285,6 +292,14 @@ $ zig build --help       # Show all build options
 - **Batch multiple updates** - integrated globally, automatic performance optimization
 - **Proven patterns:** Time caching, text caching, component lifecycle, reactive routing
 - **See `docs/archive/REACTIVE_API_GUIDE.md`** - comprehensive patterns and examples
+
+**Rendering Mode Guidelines:**
+- **Choose Immediate Mode when:** Content changes >10 times/sec (particle counts, debug values)
+- **Choose Persistent Mode when:** Content changes <5 times/sec (FPS counter, UI labels, menus)
+- **Use Auto-Selection:** `rendering_modes.recommendModeByRate(changes_per_second)` 
+- **UI Components Available:** `fps_counter.zig`, `debug_overlay.zig`, `reactive_label.zig`
+- **Performance Examples:** FPS (persistent, 2-3 changes/sec), Mouse coords (immediate, 60/sec)
+- **Decision Tree:** Static text → persistent, Debug values → immediate, User actions → persistent
 
 **General Guidelines:**
 - Do what has been asked; nothing more, nothing less

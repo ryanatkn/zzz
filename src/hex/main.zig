@@ -26,6 +26,7 @@ const reactive_context = @import("../lib/reactive/context.zig");
 const reactive_batch = @import("../lib/reactive/batch.zig");
 const reactive_time = @import("../lib/reactive/time.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
+const persistent_text = @import("../lib/persistent_text.zig");
 
 const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
 const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));
@@ -98,6 +99,9 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 
     // Initialize renderer
     game_renderer = try GameRenderer.init(global_allocator, window);
+    
+    // Initialize persistent text system (needs GPU device from renderer)
+    try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.gpu.device);
 
     // Initialize game state
     game_state = GameState.init();
@@ -160,6 +164,12 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
     if (fully_initialized) {
         if (!DEBUG_MODE) {
             game_state.deinitHud();
+            
+            // CRITICAL: Clean up persistent text system BEFORE game_renderer.deinit()
+            // This ensures GPU textures are released before the GPU device is destroyed
+            persistent_text.deinitGlobalPersistentTextSystem(global_allocator);
+            
+            // Now safe to deinitialize the renderer and GPU device
             game_renderer.deinit();
             loader.deinit(); // Clean up ZON data memory
             

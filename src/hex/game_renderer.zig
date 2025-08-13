@@ -255,8 +255,9 @@ pub const GameRenderer = struct {
         }
     }
 
-    // Simple HUD rendering with reactive text caching
+    // FPS rendering using PERSISTENT MODE to eliminate flashing
     pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
+        
         // Use white color for FPS display
         const WHITE = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
         
@@ -268,38 +269,27 @@ pub const GameRenderer = struct {
         var fps_buf: [32]u8 = undefined;
         const fps_text = std.fmt.bufPrintZ(&fps_buf, "FPS: {d}", .{fps}) catch "FPS: ??";
         
-        // Check reactive text cache first
-        if (!reactive_text_cache.shouldRenderText(fps_text)) {
-            // Cache hit - text hasn't changed, skip expensive rendering
-            const log = std.log.scoped(.fps_cache);
-            log.debug("FPS text cache hit: '{s}' - skipping render", .{fps_text});
-            // The actual texture is still queued from last render
-            return;
-        }
-        
-        // Try surface-based TTF text rendering
+        // Use persistent text rendering to eliminate flashing
         if (self.font_manager) |fm| {
-            const log = std.log.scoped(.fps_ttf);
-            log.info("=== RENDERING FPS WITH SURFACE-BASED TTF (cache miss) ===", .{});
-            log.info("  Text: '{s}'", .{fps_text});
-            log.info("  Position: ({d}, {d})", .{ fps_x, fps_y });
+            const log = std.log.scoped(.fps_persistent);
+            log.debug("Queuing FPS text for persistent rendering: '{s}'", .{fps_text});
             
-            // Render text to texture using new surface-based method
-            const text_result = fm.renderTextToTexture(fps_text, .sans, 48.0, WHITE, self.gpu.device) catch |err| {
-                log.err("Failed to render FPS text to texture: {}", .{err});
+            // Queue using persistent mode - texture will be cached and reused
+            self.gpu.text_renderer.queuePersistentText(
+                fps_text,
+                .{ .x = fps_x, .y = fps_y },
+                fm,
+                .sans,
+                48.0,
+                WHITE
+            ) catch |err| {
+                log.err("Failed to queue persistent FPS text: {}", .{err});
                 // Fall back to geometric rendering
                 self.drawFPSGeometric(cmd_buffer, render_pass, fps);
                 return;
             };
-            // Note: Texture will be released by the text renderer after drawing
             
-            log.info("  ✓ Text texture created: {}x{}", .{ text_result.width, text_result.height });
-            
-            // Cache the rendered text to avoid re-rendering
-            reactive_text_cache.cacheRenderedText(fps_text, text_result.width, text_result.height);
-            
-            // Queue the text for rendering using simple texture draw
-            self.gpu.queueTextTexture(text_result.texture, .{ .x = fps_x, .y = fps_y }, text_result.width, text_result.height, WHITE);
+            log.debug("✓ FPS text queued for persistent rendering", .{});
         } else {
             // No font manager, use geometric fallback
             self.drawFPSGeometric(cmd_buffer, render_pass, fps);
