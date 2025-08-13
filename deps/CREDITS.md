@@ -25,6 +25,19 @@ The SDL and SDL_ttf libraries themselves are:
   - Repository: https://github.com/libsdl-org/SDL_ttf
   - License: zlib license
 
+## Current Versions
+
+- **SDL**: main
+  - Repository: https://github.com/libsdl-org/SDL.git
+  - Commit: 29cff6e2645cd7d637c502af11a9e3cf8063ccdf
+  - Last Updated: 2025-08-13 17:55:50 UTC
+
+- **SDL_ttf**: main
+  - Repository: https://github.com/libsdl-org/SDL_ttf.git
+  - Commit: 67eced52533771474d38e38c348eba7c1fc2bbea
+  - Last Updated: 2025-08-13 17:55:50 UTC
+
+
 ## Note
 
 The source code in deps/SDL and deps/SDL_ttf has been kept unmodified from the original repositories to maintain compatibility and ease of updates. Only the build configuration files have been modified.

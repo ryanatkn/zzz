@@ -346,6 +346,9 @@ vendor_dependency() {
     
     log_step "Updating $name to $version"
     
+    # Check for API changes before updating
+    check_api_changes "$name"
+    
     # Create backup if directory exists
     if [[ -d "$target_dir" ]]; then
         if backup_dependency "$name"; then
@@ -380,12 +383,25 @@ vendor_dependency() {
         return 1
     fi
     
-    # Record version before cleaning
-    record_version "$name" || {
+    # Record version before cleaning (create a modified record function for temp dir)
+    local commit_hash=""
+    if [[ -d "$temp_dir/.git" ]]; then
+        commit_hash=$(get_git_commit "$temp_dir")
+    fi
+    
+    cat > "$temp_dir/.version" << EOF
+Repository: ${DEPS[$name]}
+Version: ${VERSIONS[$name]}
+Commit: ${commit_hash}
+Updated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+Updated-By: $(whoami)@$(hostname)
+EOF
+
+    if [[ $? -ne 0 ]]; then
         log_error "Failed to record version for $name"
         rm -rf "$temp_dir"
         return 1
-    }
+    fi
     
     # Clean the dependency in temp location
     if ! (cd "$(dirname "$temp_dir")" && clean_dependency "$(basename "$temp_dir")"); then
@@ -563,6 +579,111 @@ dry_run() {
     fi
     
     return 0
+}
+
+# Update CREDITS.md with dependency information
+update_credits() {
+    local credits_file="deps/CREDITS.md"
+    local temp_credits="/tmp/credits_$$"
+    
+    log_step "Updating CREDITS.md"
+    
+    cat > "$temp_credits" << 'EOF'
+# SDL Vendoring Credits
+
+## SDL Build Configuration
+
+The Zig build configuration for SDL in `deps/SDL/build.zig` and `deps/SDL/build.zig.zon` is based on work by:
+
+- **Carl Åstholm** (castholm)
+  - Repository: https://github.com/castholm/SDL
+  - License: MIT
+  - © 2024 Carl Åstholm
+
+This build configuration has been adapted for the Dealt project with the following modifications:
+- Disabled Wayland and KMS/DRM video drivers for simplified vendoring
+- Disabled joystick and haptic subsystems per project requirements
+- Added dummy implementations for unsupported subsystems
+- Fixed missing configuration values for xkbcommon and X11 extensions
+
+## SDL and SDL_ttf
+
+The SDL and SDL_ttf libraries themselves are:
+- **SDL**: Copyright (C) 1997-2024 Sam Lantinga and contributors
+  - Repository: https://github.com/libsdl-org/SDL
+  - License: zlib license
+- **SDL_ttf**: Copyright (C) 1997-2024 Sam Lantinga and contributors
+  - Repository: https://github.com/libsdl-org/SDL_ttf
+  - License: zlib license
+
+## Current Versions
+
+EOF
+
+    # Add current version information
+    for dep in "${!DEPS[@]}"; do
+        local target_dir="deps/$dep"
+        if [[ -f "$target_dir/.version" ]]; then
+            local version=$(grep "Version:" "$target_dir/.version" 2>/dev/null | cut -d' ' -f2)
+            local commit=$(grep "Commit:" "$target_dir/.version" 2>/dev/null | cut -d' ' -f2)
+            local updated=$(grep "Updated:" "$target_dir/.version" 2>/dev/null | cut -d' ' -f2-)
+            
+            cat >> "$temp_credits" << EOF
+- **$dep**: $version
+  - Repository: ${DEPS[$dep]}
+  - Commit: $commit
+  - Last Updated: $updated
+
+EOF
+        fi
+    done
+    
+    cat >> "$temp_credits" << 'EOF'
+
+## Note
+
+The source code in deps/SDL and deps/SDL_ttf has been kept unmodified from the original repositories to maintain compatibility and ease of updates. Only the build configuration files have been modified.
+EOF
+
+    # Only update if content has changed
+    if [[ ! -f "$credits_file" ]] || ! diff -q "$temp_credits" "$credits_file" >/dev/null 2>&1; then
+        mv "$temp_credits" "$credits_file"
+        log_success "Updated CREDITS.md"
+    else
+        rm -f "$temp_credits"
+        log_debug "CREDITS.md unchanged"
+    fi
+}
+
+# Check for potential API breaking changes (simplified detection)
+check_api_changes() {
+    local name=$1
+    local target_dir="deps/$name"
+    
+    if [[ ! -d "$target_dir" ]]; then
+        return 0  # No existing version to compare
+    fi
+    
+    # Look for version indicators that might suggest breaking changes
+    if [[ -f "$target_dir/.version" ]]; then
+        local old_version=$(grep "Version:" "$target_dir/.version" 2>/dev/null | cut -d' ' -f2)
+        local new_version="${VERSIONS[$name]}"
+        
+        if [[ "$old_version" != "$new_version" ]]; then
+            log_warn "Version change detected for $name: $old_version → $new_version"
+            
+            # Simple heuristic for major version changes
+            if [[ "$old_version" =~ ^v?([0-9]+) ]] && [[ "$new_version" =~ ^v?([0-9]+) ]]; then
+                local old_major="${BASH_REMATCH[1]}"
+                if [[ "$new_version" =~ ^v?([0-9]+) ]]; then
+                    local new_major="${BASH_REMATCH[1]}"
+                    if [[ "$old_major" != "$new_major" ]]; then
+                        log_warn "⚠ Major version change detected! Please review for breaking changes."
+                    fi
+                fi
+            fi
+        fi
+    fi
 }
 
 # ============================================================================
@@ -758,6 +879,12 @@ EOF
         printf "│ %-16s │ %-12s │\n" "$dep" "${VERSIONS[$dep]}"
     done
     echo "└──────────────────┴──────────────┘"
+    
+    # Update CREDITS.md if any dependencies were updated
+    if [[ $updated_count -gt 0 ]]; then
+        echo ""
+        update_credits
+    fi
     
     # Only show next steps if we actually updated something
     if [[ $updated_count -gt 0 ]]; then

@@ -1,5 +1,7 @@
 # Dealt - SDL3 Game Engine with Hex Game Implementation
 
+
+
 A GPU-accelerated game engine built with Zig, SDL3 GPU API, and HLSL shaders, featuring the Hex 2D action RPG as a reference implementation.
 
 Performance is a top priority, and we dont care about backwards compat - always try to get to the final best code.
@@ -244,7 +246,7 @@ $ zig build --help       # Show all build options
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
 - Do what has been asked; nothing more, nothing less
-- Prefer `rg` and never `sed`
+- Prefer `rg` and never `sed` (Bash(rg ...))
 - NEVER create files unless they're absolutely necessary for achieving your goal
 - ALWAYS prefer editing an existing file to creating a new one
 - NEVER proactively create documentation files (*.md) or README files unless explicitly requested

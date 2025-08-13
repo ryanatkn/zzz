@@ -4,8 +4,7 @@
     .fingerprint = 0x715d11386ff0d100,
     .minimum_zig_version = "0.14.1",
     .dependencies = .{
-        .sdl = .{ .path = "deps/SDL" },
-        .sdl_ttf = .{ .path = "deps/SDL_ttf" },
+        // No external dependencies - all libraries built from vendored source
     },
     .paths = .{
         "build.zig",
