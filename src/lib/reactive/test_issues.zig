@@ -254,7 +254,11 @@ test "issue: diamond dependency double update" {
     
     // Change source
     std.debug.print("Changing source from 1 to 2...\n", .{});
-    source.set(2);
+    batch_mod.batch(struct {
+        fn update() void {
+            TestData.src.set(2);
+        }
+    }.update);
     
     // Access sum to trigger computation
     _ = sum.get();
@@ -298,9 +302,8 @@ test "issue: no way to read without tracking" {
         fn run() void {
             _ = TestData.tracked_ref.get(); // Should create dependency
             
-            // TODO: Need a way to read without tracking
-            // _ = TestData.untracked_ref.peek(); // Should NOT create dependency
-            _ = TestData.untracked_ref.get(); // Currently creates dependency
+            // Use peek to read without tracking dependency
+            _ = TestData.untracked_ref.peek(); // Should NOT create dependency
             
             TestData.counter.call();
         }
@@ -318,13 +321,13 @@ test "issue: no way to read without tracking" {
     try effect_counter.expect(1);
     effect_counter.reset();
     
-    // Change untracked signal - should NOT trigger (but currently does)
+    // Change untracked signal - should NOT trigger
     std.debug.print("Changing untracked signal...\n", .{});
     untracked.set(20);
     std.debug.print("Effect ran {} times (should be 0 for untracked)\n", .{effect_counter.count});
     
-    // ISSUE: Currently triggers because we can't read without tracking
-    // try effect_counter.expect(0); // This would fail
+    // Should not trigger since we used peek() instead of get()
+    try effect_counter.expect(0);
 }
 
 // Issue 5: Excessive recomputation in chains

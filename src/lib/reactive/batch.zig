@@ -92,10 +92,17 @@ pub const BatchManager = struct {
     
     /// Flush all pending effects and signals
     pub fn flushBatch(self: *Self) void {
+        // Temporarily disable batching during flush to avoid infinite recursion
+        const was_batching = self.is_batching;
+        self.is_batching = false;
+        
         // Run all queued effects
         for (self.pending_effects.items) |eff| {
             eff.run();
         }
+        
+        // Restore batching state
+        self.is_batching = was_batching;
         
         // Clear queues
         self.pending_effects.clearRetainingCapacity();

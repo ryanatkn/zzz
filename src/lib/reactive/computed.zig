@@ -1,6 +1,7 @@
 const std = @import("std");
 const signal = @import("signal.zig");
 const context = @import("context.zig");
+const batch_mod = @import("batch.zig");
 
 /// A computed signal that automatically updates when its dependencies change
 /// Implements lazy evaluation with automatic dependency tracking (Svelte 5 $derived)
@@ -68,6 +69,26 @@ pub fn Computed(comptime T: type) type {
             
             // Recompute if dirty (lazy pull)
             if (self.is_dirty and !self.is_computing) {
+                const old_value = self.cached_value;
+                self.recompute();
+                
+                // Only notify if the value actually changed after recompute
+                if (!std.meta.eql(old_value, self.cached_value)) {
+                    // Update signal value to match computed value
+                    self.signal.value = self.cached_value;
+                    self.signal.version +%= 1;
+                    // Don't call notifyObservers here as this would cause infinite recursion
+                    // The tracking dependency above will handle notifications
+                }
+            }
+            
+            return self.cached_value;
+        }
+        
+        /// Get the current computed value without tracking dependency
+        pub fn peek(self: *Self) T {
+            // Recompute if dirty (lazy pull) but don't track
+            if (self.is_dirty and !self.is_computing) {
                 self.recompute();
             }
             
@@ -76,14 +97,60 @@ pub fn Computed(comptime T: type) type {
         
         /// Called when a dependency changes (push notification)
         fn onDependencyChange(self: *Self) void {
-            // Mark as dirty but don't recompute yet (lazy)
-            self.is_dirty = true;
+            // Use a simple approach: only notify if we weren't already dirty
+            // This prevents duplicate notifications in diamond dependency scenarios
+            if (!self.is_dirty) {
+                self.is_dirty = true;
+                self.signal.is_dirty = true;
+                self.signal.version +%= 1;
+                
+                // Notify observers that we might have changed
+                // Effects will be batched automatically if batching is active
+                self.signal.notifyObservers();
+            }
+        }
+        
+        /// Check if value changed and notify observers only if it did
+        fn checkAndNotifyIfChanged(self: *Self) void {
+            if (self.is_computing) return; // Prevent recursion
             
-            // Notify our own observers that we might have changed
-            // Don't set the value, just notify (to avoid unnecessary updates)
-            self.signal.version +%= 1;
-            self.signal.is_dirty = true;
-            self.signal.notifyObservers();
+            self.is_computing = true;
+            defer self.is_computing = false;
+            
+            // Store old value
+            const old_value = self.cached_value;
+            
+            // Recompute with dependency tracking
+            const ctx = context.getContext();
+            if (ctx) |reactive_ctx| {
+                reactive_ctx.startTracking(&self.observer) catch {
+                    // If tracking fails, compute without tracking
+                    self.cached_value = self.compute_fn();
+                    self.is_dirty = false;
+                    return;
+                };
+                defer reactive_ctx.stopTracking();
+                
+                // Compute new value
+                const new_value = self.compute_fn();
+                self.cached_value = new_value;
+                
+                // Only notify if value actually changed
+                if (!std.meta.eql(old_value, new_value)) {
+                    self.signal.set(new_value);
+                }
+            } else {
+                // No reactive context, compute directly
+                const new_value = self.compute_fn();
+                self.cached_value = new_value;
+                
+                // Only notify if value actually changed
+                if (!std.meta.eql(old_value, new_value)) {
+                    self.signal.set(new_value);
+                }
+            }
+            
+            self.is_dirty = false;
         }
         
         /// Cleanup when computed is destroyed
@@ -117,7 +184,10 @@ pub fn Computed(comptime T: type) type {
                 // Only update if value actually changed
                 if (!std.meta.eql(self.cached_value, new_value)) {
                     self.cached_value = new_value;
-                    self.signal.set(new_value);
+                    // Update the signal value directly without triggering notifications
+                    // Notifications were already sent by onDependencyChange()
+                    self.signal.value = new_value;
+                    self.signal.version +%= 1;
                 }
             } else {
                 // No reactive context, compute directly

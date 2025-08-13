@@ -13,6 +13,7 @@ const portals = @import("portals.zig");
 const camera = @import("../lib/camera.zig");
 const effects = @import("effects.zig");
 const hud = @import("../hud/hud.zig");
+const reactive_hud = @import("../hud/reactive_hud.zig");
 const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
@@ -36,8 +37,8 @@ pub const GameState = struct {
     // Bullet pool for burst/rhythm shooting
     bullet_pool: combat.BulletPool,
 
-    // HUD system for system menu
-    hud_system: ?hud.Hud,
+    // HUD system for system menu (reactive)
+    hud_system: ?reactive_hud.ReactiveHud,
 
     // Iris wipe effect for resurrection
     iris_wipe_active: bool,
@@ -61,7 +62,7 @@ pub const GameState = struct {
     }
 
     pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
-        self.hud_system = try hud.Hud.init(allocator, renderer_ptr);
+        self.hud_system = try reactive_hud.ReactiveHud.init(allocator, renderer_ptr);
     }
 
     pub fn deinitHud(self: *Self) void {
@@ -141,7 +142,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     if (game_state.hud_system) |*h| {
         h.update(deltaTime);
         // Don't update game when HUD is open
-        if (h.is_open) return;
+        if (h.is_open()) return;
     }
     
     if (game_state.game_paused) return;

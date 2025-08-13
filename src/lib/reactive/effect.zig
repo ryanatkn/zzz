@@ -1,6 +1,7 @@
 const std = @import("std");
 const signal = @import("signal.zig");
 const context = @import("context.zig");
+const batch_mod = @import("batch.zig");
 
 /// An effect that automatically runs when its dependencies change
 /// Implements Svelte 5's $effect with automatic dependency tracking
@@ -86,7 +87,16 @@ pub const Effect = struct {
     
     /// Called when a dependency changes
     fn onDependencyChange(self: *Effect) void {
-        // Re-run the effect
+        // Check if batching is active
+        if (batch_mod.getGlobalBatcher()) |batcher| {
+            if (batcher.isBatching()) {
+                // Queue the effect to run at batch end
+                batcher.queueEffect(self);
+                return;
+            }
+        }
+        
+        // No batching, run immediately
         self.run();
     }
     

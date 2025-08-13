@@ -1,5 +1,6 @@
 const std = @import("std");
 const context = @import("context.zig");
+const batch_mod = @import("batch.zig");
 
 /// A reactive signal that holds a value and notifies observers when changed
 /// Inspired by Solid.js and Svelte 5 signals with automatic dependency tracking
@@ -48,6 +49,11 @@ pub fn Signal(comptime T: type) type {
             return self.value;
         }
         
+        /// Get the current value without tracking dependency
+        pub fn peek(self: *const Self) T {
+            return self.value;
+        }
+        
         /// Set a new value and notify all observers
         pub fn set(self: *Self, new_value: T) void {
             const old_value = self.value;
@@ -90,6 +96,12 @@ pub fn Signal(comptime T: type) type {
         
         /// Notify all observers of changes
         pub fn notifyObservers(self: *Self) void {
+            // Always notify observers, but effects will handle batching themselves
+            self.notifyObserversImmediate();
+        }
+        
+        /// Immediate notification without batch checking
+        pub fn notifyObserversImmediate(self: *Self) void {
             // Make a copy to avoid issues if observers modify the list
             var observers_copy = self.observers.clone() catch {
                 // If we can't clone, notify directly (less safe but functional)
@@ -143,7 +155,6 @@ pub fn signal(allocator: std.mem.Allocator, comptime T: type, initial_value: T) 
 /// Batch multiple signal updates to prevent cascading effects
 pub fn batch(batch_fn: *const fn () void) void {
     // Batching is now handled by batch.zig
-    const batch_mod = @import("batch.zig");
     batch_mod.batch(batch_fn);
 }
 

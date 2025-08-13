@@ -10,6 +10,7 @@ const borders = @import("borders.zig");
 const constants = @import("constants.zig");
 const effects = @import("effects.zig");
 const fonts = @import("../lib/fonts.zig");
+const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -254,7 +255,7 @@ pub const GameRenderer = struct {
         }
     }
 
-    // Simple HUD rendering
+    // Simple HUD rendering with reactive text caching
     pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
         // Use white color for FPS display
         const WHITE = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
@@ -267,10 +268,19 @@ pub const GameRenderer = struct {
         var fps_buf: [32]u8 = undefined;
         const fps_text = std.fmt.bufPrintZ(&fps_buf, "FPS: {d}", .{fps}) catch "FPS: ??";
         
+        // Check reactive text cache first
+        if (!reactive_text_cache.shouldRenderText(fps_text)) {
+            // Cache hit - text hasn't changed, skip expensive rendering
+            const log = std.log.scoped(.fps_cache);
+            log.debug("FPS text cache hit: '{s}' - skipping render", .{fps_text});
+            // The actual texture is still queued from last render
+            return;
+        }
+        
         // Try surface-based TTF text rendering
         if (self.font_manager) |fm| {
             const log = std.log.scoped(.fps_ttf);
-            log.info("=== RENDERING FPS WITH SURFACE-BASED TTF ===", .{});
+            log.info("=== RENDERING FPS WITH SURFACE-BASED TTF (cache miss) ===", .{});
             log.info("  Text: '{s}'", .{fps_text});
             log.info("  Position: ({d}, {d})", .{ fps_x, fps_y });
             
@@ -284,6 +294,9 @@ pub const GameRenderer = struct {
             // Note: Texture will be released by the text renderer after drawing
             
             log.info("  ✓ Text texture created: {}x{}", .{ text_result.width, text_result.height });
+            
+            // Cache the rendered text to avoid re-rendering
+            reactive_text_cache.cacheRenderedText(fps_text, text_result.width, text_result.height);
             
             // Queue the text for rendering using simple texture draw
             self.gpu.queueTextTexture(text_result.texture, .{ .x = fps_x, .y = fps_y }, text_result.width, text_result.height, WHITE);

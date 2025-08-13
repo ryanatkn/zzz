@@ -21,6 +21,12 @@ const player_controller = @import("player.zig");
 const portals = @import("portals.zig");
 const controls = @import("controls.zig");
 
+// Reactive system imports
+const reactive_context = @import("../lib/reactive/context.zig");
+const reactive_batch = @import("../lib/reactive/batch.zig");
+const reactive_time = @import("../lib/reactive/time.zig");
+const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
+
 const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
 const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));
 const Vec2 = types.Vec2;
@@ -83,6 +89,12 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
         fully_initialized = true;
         return c.sdl.SDL_APP_CONTINUE;
     }
+
+    // Initialize reactive system
+    try reactive_context.initContext(global_allocator);
+    try reactive_batch.initGlobalBatcher(global_allocator);
+    try reactive_time.initGlobalTime(global_allocator, .Second);
+    try reactive_text_cache.initGlobalTextCache(global_allocator);
 
     // Initialize renderer
     game_renderer = try GameRenderer.init(global_allocator, window);
@@ -150,6 +162,12 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
             game_state.deinitHud();
             game_renderer.deinit();
             loader.deinit(); // Clean up ZON data memory
+            
+            // Clean up reactive system
+            reactive_text_cache.deinitGlobalTextCache(global_allocator);
+            reactive_time.deinitGlobalTime();
+            reactive_batch.deinitGlobalBatcher(global_allocator);
+            reactive_context.deinitContext(global_allocator);
         }
         c.sdl.SDL_DestroyWindow(window);
         fully_initialized = false;
@@ -158,15 +176,15 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
 
 // Game loop functions
 fn runGameLoop() !void {
+    // Tick reactive time system (updates frame count and time signals)
+    reactive_time.tickGlobalTime();
+
     // Calculate delta time
     const current_time = c.sdl.SDL_GetPerformanceCounter();
     const frequency = c.sdl.SDL_GetPerformanceFrequency();
     const delta_ticks = current_time - last_time;
     const deltaTime: f32 = @as(f32, @floatFromInt(delta_ticks)) / @as(f32, @floatFromInt(frequency));
     last_time = current_time;
-
-    // Update HUD system
-    game_hud.updateFPS(current_time, frequency);
 
     // Update camera before game logic (for correct mouse coordinate transformation)
     game_renderer.updateCamera(&game_state.world);
@@ -193,7 +211,8 @@ fn renderGame() !void {
 
     // Draw HUD
     if (game_hud.visible) {
-        game_renderer.drawFPS(cmd_buffer, render_pass, game_hud.fps_counter);
+        const fps = reactive_time.getFPS();
+        game_renderer.drawFPS(cmd_buffer, render_pass, fps);
     }
     
     // Draw all queued text (TTF text that was queued during frame)

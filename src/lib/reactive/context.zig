@@ -190,6 +190,22 @@ pub fn withTracking(
     }
 }
 
+/// Execute a function without tracking dependencies
+pub fn untrack(comptime T: type, untrack_fn: *const fn () T) T {
+    const ctx = getContext();
+    if (ctx) |reactive_ctx| {
+        // Temporarily disable tracking by clearing current observer
+        const saved_observer = reactive_ctx.current_observer;
+        reactive_ctx.current_observer = null;
+        defer reactive_ctx.current_observer = saved_observer;
+        
+        return untrack_fn();
+    } else {
+        // No context, just run the function
+        return untrack_fn();
+    }
+}
+
 /// Helper to create a dependency from a signal-like object
 pub fn createDependency(
     comptime T: type,
