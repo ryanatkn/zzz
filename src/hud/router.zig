@@ -7,6 +7,7 @@ const settings_page = @import("../menu/settings/+page.zig");
 const settings_video_page = @import("../menu/settings/video/+page.zig");
 const settings_audio_page = @import("../menu/settings/audio/+page.zig");
 const settings_fonts_page = @import("../menu/settings/fonts/+page.zig");
+const settings_fonts_save_page = @import("../menu/settings/fonts/save/+page.zig");
 const stats_page = @import("../menu/stats/+page.zig");
 
 pub const Router = struct {
@@ -90,6 +91,14 @@ pub const Router = struct {
             
             // Load fonts settings page
             self.current_page = try settings_fonts_page.create(self.allocator);
+        } else if (std.mem.eql(u8, path, "/settings/fonts/save")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Load fonts save page
+            self.current_page = try settings_fonts_save_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/stats")) {
             // Load root layout
             const layout = try root_layout.create(self.allocator);

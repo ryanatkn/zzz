@@ -40,44 +40,6 @@ pub const available_fonts = [_]FontFamily{
         },
     },
     .{
-        .name = "Fira Code",
-        .category = .mono,
-        .variants = &[_]FontVariant{
-            .{ .path = "static/fonts/Fira_Code/static/FiraCode-Light.ttf", .weight = 300, .italic = false },
-            .{ .path = "static/fonts/Fira_Code/static/FiraCode-Regular.ttf", .weight = 400, .italic = false },
-            .{ .path = "static/fonts/Fira_Code/static/FiraCode-Medium.ttf", .weight = 500, .italic = false },
-            .{ .path = "static/fonts/Fira_Code/static/FiraCode-SemiBold.ttf", .weight = 600, .italic = false },
-            .{ .path = "static/fonts/Fira_Code/static/FiraCode-Bold.ttf", .weight = 700, .italic = false },
-        },
-    },
-    .{
-        .name = "Fira Mono",
-        .category = .mono,
-        .variants = &[_]FontVariant{
-            .{ .path = "static/fonts/Fira_Mono/FiraMono-Regular.ttf", .weight = 400, .italic = false },
-            .{ .path = "static/fonts/Fira_Mono/FiraMono-Medium.ttf", .weight = 500, .italic = false },
-            .{ .path = "static/fonts/Fira_Mono/FiraMono-Bold.ttf", .weight = 700, .italic = false },
-        },
-    },
-    .{
-        .name = "Google Sans Code",
-        .category = .mono,
-        .variants = &[_]FontVariant{
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-Light.ttf", .weight = 300, .italic = false },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-LightItalic.ttf", .weight = 300, .italic = true },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-Regular.ttf", .weight = 400, .italic = false },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-Italic.ttf", .weight = 400, .italic = true },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-Medium.ttf", .weight = 500, .italic = false },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-MediumItalic.ttf", .weight = 500, .italic = true },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-SemiBold.ttf", .weight = 600, .italic = false },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-SemiBoldItalic.ttf", .weight = 600, .italic = true },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-Bold.ttf", .weight = 700, .italic = false },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-BoldItalic.ttf", .weight = 700, .italic = true },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-ExtraBold.ttf", .weight = 800, .italic = false },
-            .{ .path = "static/fonts/Google_Sans_Code/static/GoogleSansCode-ExtraBoldItalic.ttf", .weight = 800, .italic = true },
-        },
-    },
-    .{
         .name = "DM Sans",
         .category = .sans,
         .variants = &[_]FontVariant{
@@ -102,63 +64,6 @@ pub const available_fonts = [_]FontFamily{
         },
     },
     .{
-        .name = "Fira Sans",
-        .category = .sans,
-        .variants = &[_]FontVariant{
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-Thin.ttf", .weight = 100, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-ThinItalic.ttf", .weight = 100, .italic = true },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-ExtraLight.ttf", .weight = 200, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-ExtraLightItalic.ttf", .weight = 200, .italic = true },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-Light.ttf", .weight = 300, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-LightItalic.ttf", .weight = 300, .italic = true },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-Regular.ttf", .weight = 400, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-Italic.ttf", .weight = 400, .italic = true },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-Medium.ttf", .weight = 500, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-MediumItalic.ttf", .weight = 500, .italic = true },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-SemiBold.ttf", .weight = 600, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-SemiBoldItalic.ttf", .weight = 600, .italic = true },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-Bold.ttf", .weight = 700, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-BoldItalic.ttf", .weight = 700, .italic = true },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-ExtraBold.ttf", .weight = 800, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-ExtraBoldItalic.ttf", .weight = 800, .italic = true },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-Black.ttf", .weight = 900, .italic = false },
-            .{ .path = "static/fonts/Fira_Sans/FiraSans-BlackItalic.ttf", .weight = 900, .italic = true },
-        },
-    },
-    .{
-        .name = "Noto Sans",
-        .category = .sans,
-        .variants = &[_]FontVariant{
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-Thin.ttf", .weight = 100, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-ThinItalic.ttf", .weight = 100, .italic = true },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-ExtraLight.ttf", .weight = 200, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-ExtraLightItalic.ttf", .weight = 200, .italic = true },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-Light.ttf", .weight = 300, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-LightItalic.ttf", .weight = 300, .italic = true },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-Regular.ttf", .weight = 400, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-Italic.ttf", .weight = 400, .italic = true },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-Medium.ttf", .weight = 500, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-MediumItalic.ttf", .weight = 500, .italic = true },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-SemiBold.ttf", .weight = 600, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-SemiBoldItalic.ttf", .weight = 600, .italic = true },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-Bold.ttf", .weight = 700, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-BoldItalic.ttf", .weight = 700, .italic = true },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-ExtraBold.ttf", .weight = 800, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-ExtraBoldItalic.ttf", .weight = 800, .italic = true },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-Black.ttf", .weight = 900, .italic = false },
-            .{ .path = "static/fonts/Noto_Sans/static/NotoSans-BlackItalic.ttf", .weight = 900, .italic = true },
-        },
-    },
-    .{
-        .name = "Nunito Sans",
-        .category = .sans,
-        .variants = &[_]FontVariant{
-            // Using the variable font for now, can expand to static if needed
-            .{ .path = "static/fonts/Nunito_Sans/NunitoSans-VariableFont_YTLC,opsz,wdth,wght.ttf", .weight = 400, .italic = false },
-            .{ .path = "static/fonts/Nunito_Sans/NunitoSans-Italic-VariableFont_YTLC,opsz,wdth,wght.ttf", .weight = 400, .italic = true },
-        },
-    },
-    .{
         .name = "DM Serif Display",
         .category = .serif_display,
         .variants = &[_]FontVariant{
@@ -177,7 +82,7 @@ pub const available_fonts = [_]FontFamily{
 };
 
 pub const FontSettings = struct {
-    mono_family: []const u8 = "Fira Code",
+    mono_family: []const u8 = "DM Mono",
     mono_weight: i32 = 400,
     mono_italic: bool = false,
     
