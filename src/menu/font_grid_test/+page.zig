@@ -6,6 +6,7 @@ const renderer_display = @import("../../lib/font/renderer_display.zig");
 const font_types = @import("../../lib/font/font_types.zig");
 const types = @import("../../lib/core/types.zig");
 const renderer_interface = @import("../../lib/font/renderers/renderer_interface.zig");
+const log_throttle = @import("../../lib/debug/log_throttle.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -57,7 +58,7 @@ pub const FontGridTestPage = struct {
         
         // Initialize multi-strategy renderer
         self.multi_renderer = MultiStrategyRenderer.init(allocator) catch |err| {
-            std.log.err("Failed to initialize multi-strategy renderer: {}", .{err});
+            log_throttle.logError("font_grid_init", "Failed to initialize multi-strategy renderer: {}", .{err});
             self.test_status = "Renderer init failed";
             return;
         };
@@ -70,14 +71,14 @@ pub const FontGridTestPage = struct {
         // Immediately run test suite with medium font size
         const test_font_size = self.font_sizes[1]; // 24pt
         const results = self.runTestSuite(allocator, test_font_size) catch |err| {
-            std.log.err("Failed to run test suite: {}", .{err});
+            log_throttle.logError("font_grid_test", "Failed to run test suite: {}", .{err});
             self.test_status = "Test suite failed";
             return;
         };
         
         // Create display textures for all results
         self.createDisplayTextures(results) catch |err| {
-            std.log.err("Failed to create display textures: {}", .{err});
+            log_throttle.logError("font_grid_display", "Failed to create display textures: {}", .{err});
             self.test_status = "Display creation failed";
             return;
         };
@@ -86,7 +87,7 @@ pub const FontGridTestPage = struct {
         self.test_status = "Ready - All renderers active";
         
         // Log success
-        std.log.info("Font grid test auto-initialized with {} renderers", .{results.len});
+        log_throttle.logOnce("font_grid_success", "Font grid test auto-initialized with {} renderers", .{results.len});
     }
     
     // Create GPU textures for display from render results
@@ -96,7 +97,7 @@ pub const FontGridTestPage = struct {
         for (results) |result| {
             if (result.result) |render_result| {
                 _ = self.display.?.createDisplayTexture(render_result, result.strategy) catch |err| {
-                    std.log.warn("Failed to create display texture for {s}: {}", .{result.strategy.getName(), err});
+                    log_throttle.logPeriodic("display_texture_fail", 5000, "Failed to create display texture for {s}: {}", .{result.strategy.getName(), err});
                     continue;
                 };
             }
@@ -198,6 +199,20 @@ pub const FontGridTestPage = struct {
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
         const grid_page: *const FontGridTestPage = @fieldParentPtr("base", self);
 
+        // Safety check: Don't render if not properly initialized
+        if (!grid_page.initialized and !grid_page.auto_initialized) {
+            try links.append(page.createLink("Font Grid Test - Initializing...", "", 50, 20, 400, 40));
+            return;
+        }
+
+        // Validate font_sizes before using them
+        for (grid_page.font_sizes) |size| {
+            if (std.math.isNan(size) or std.math.isInf(size) or size <= 0 or size > 200) {
+                try links.append(page.createLink("Font Grid Test - Invalid Configuration", "", 50, 20, 400, 40));
+                return;
+            }
+        }
+
         const screen_width = 1920.0;
         const screen_height = 1080.0;
 
@@ -217,7 +232,7 @@ pub const FontGridTestPage = struct {
         // Size labels across top
         for (grid_page.font_sizes, 0..) |size, i| {
             const x = start_x + @as(f32, @floatFromInt(i)) * (cell_width + spacing);
-            var buffer: [32]u8 = undefined;
+            var buffer: [32]u8 = [_]u8{0} ** 32;  // Initialize to zeros
             const label = try std.fmt.bufPrint(&buffer, "{d}pt", .{size});
 
             try links.append(page.createLink(label, "", x, start_y - 30, cell_width, 25));
@@ -248,16 +263,19 @@ pub const FontGridTestPage = struct {
                 // Cell background
                 try links.append(page.createLink("[Render Test]", "", x, y, cell_width, cell_height));
                 
-                // Strategy and size info
-                var info_buffer: [64]u8 = undefined;
+                // Strategy and size info  
+                var info_buffer: [64]u8 = [_]u8{0} ** 64;  // Initialize to zeros
                 const info_text = try std.fmt.bufPrint(&info_buffer, "{s} {d}pt", .{strategy.getName(), size});
-                try links.append(page.createLink(info_text, "", x + 5, y + 5, cell_width - 10, 20));
+                // Validate UTF-8 before using
+                if (std.unicode.utf8ValidateSlice(info_text)) {
+                    try links.append(page.createLink(info_text, "", x + 5, y + 5, cell_width - 10, 20));
+                }
 
                 // Quality tier indication (static for now)
                 const quality_tier = strategy.getQualityTier();
                 const perf_tier = strategy.getPerformanceTier();
                 
-                var tier_buffer: [32]u8 = undefined;
+                var tier_buffer: [32]u8 = [_]u8{0} ** 32;  // Initialize to zeros
                 const tier_text = try std.fmt.bufPrint(&tier_buffer, "Q{d} P{d}", .{quality_tier, perf_tier});
                 try links.append(page.createLink(tier_text, "", x + 5, y + cell_height - 20, 60, 15));
                 
@@ -273,15 +291,15 @@ pub const FontGridTestPage = struct {
         try links.append(page.createLink("STATISTICS", "", 50, stats_y, 200, 30));
 
         // Performance metrics
-        var stats_buffer: [128]u8 = undefined;
+        var stats_buffer: [128]u8 = [_]u8{0} ** 128;  // Initialize to zeros
         const total_cells = strategies.len * grid_page.font_sizes.len;
-        const stats_text = try std.fmt.bufPrint(&stats_buffer, "Total combinations: {d} ({d} strategies × {d} sizes)", .{total_cells, strategies.len, grid_page.font_sizes.len});
+        const stats_text = try std.fmt.bufPrint(&stats_buffer, "Total combinations: {d} ({d} strategies x {d} sizes)", .{total_cells, strategies.len, grid_page.font_sizes.len});
         try links.append(page.createLink(stats_text, "", 50, stats_y + 40, 500, 25));
 
         try links.append(page.createLink("Status: Ready for testing", "", 50, stats_y + 70, 400, 25));
 
         // Status display
-        var status_buffer: [128]u8 = undefined;
+        var status_buffer: [128]u8 = [_]u8{0} ** 128;  // Initialize to zeros
         const status_text = try std.fmt.bufPrint(&status_buffer, "Status: {s}", .{grid_page.test_status});
         try links.append(page.createLink(status_text, "", 50, stats_y + 100, 400, 25));
         
@@ -374,10 +392,10 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
         .display = null,
         .initialized = false,
         .auto_initialized = false,
-        .test_text = undefined,
-        .font_sizes = undefined,
+        .test_text = "Test",
+        .font_sizes = [_]f32{ 16, 24, 48 },
         .last_test_results = null,
-        .test_status = undefined,
+        .test_status = "Not initialized",
     };
     return &grid_page.base;
 }

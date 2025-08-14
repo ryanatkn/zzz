@@ -5,6 +5,7 @@ const bitmap_simple = @import("renderers/bitmap_simple.zig");
 const debug_ascii = @import("renderers/debug_ascii.zig");
 const oversampling = @import("renderers/oversampling.zig");
 const scanline = @import("renderers/scanline.zig");
+const log_throttle = @import("../debug/log_throttle.zig");
 
 const GlyphOutline = font_types.GlyphOutline;
 const TextRenderer = renderer_interface.TextRenderer;
@@ -118,11 +119,13 @@ pub const MultiStrategyRenderer = struct {
             try self.comparison_results.append(multi_result);
         }
 
-        // Test scanline renderer if available
-        if (self.scanline_iface) |*scanline_iface| {
-            const multi_result = self.renderWithStrategy(scanline_iface, .scanline_antialiased, outline, font_size);
-            try self.comparison_results.append(multi_result);
-        } else {
+        // TODO: Re-enable scanline renderer once invalid UTF-8 output is fixed
+        // Test scanline renderer if available - TEMPORARILY DISABLED due to invalid UTF-8 output
+        // if (self.scanline_iface) |*scanline_iface| {
+        //     const multi_result = self.renderWithStrategy(scanline_iface, .scanline_antialiased, outline, font_size);
+        //     try self.comparison_results.append(multi_result);
+        // } else {
+        if (true) { // TODO: Remove this once scanline renderer is fixed
             // Add placeholder for failed scanline renderer
             try self.comparison_results.append(MultiRenderResult{
                 .strategy = .scanline_antialiased,

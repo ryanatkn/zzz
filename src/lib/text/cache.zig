@@ -14,8 +14,13 @@ pub const PersistentTextSystem = struct {
 
     // Rendering resources
     sampler: ?*c.sdl.SDL_GPUSampler,
+    
+    // Circuit breaker to prevent infinite loops
+    recent_failures: u32,
+    last_failure_check: i64,
 
     const Self = @This();
+    const max_failures_per_second = 100; // Stop after 100 failures in 1 second
 
     const PersistentTexture = struct {
         texture: *c.sdl.SDL_GPUTexture,
@@ -39,6 +44,8 @@ pub const PersistentTextSystem = struct {
             .device = device,
             .textures = std.AutoHashMap(u64, PersistentTexture).init(allocator),
             .sampler = null,
+            .recent_failures = 0,
+            .last_failure_check = std.time.milliTimestamp(),
         };
 
         try self.createSampler();
@@ -63,6 +70,24 @@ pub const PersistentTextSystem = struct {
     /// Get or create a persistent texture for the given text content
     /// Returns existing texture if content hasn't changed, or creates new one
     pub fn getOrCreateTexture(self: *Self, text: []const u8, font_manager: anytype, font_category: anytype, font_size: f32, color: types.Color) !?PersistentTextureHandle {
+        // Validate UTF-8 before processing
+        if (!std.unicode.utf8ValidateSlice(text)) {
+            log_throttle.logError("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});
+            return null;
+        }
+        
+        // Circuit breaker: Check if we're hitting too many failures
+        const now = std.time.milliTimestamp();
+        if (now - self.last_failure_check > 1000) {
+            // Reset counter every second
+            self.recent_failures = 0;
+            self.last_failure_check = now;
+        } else if (self.recent_failures > max_failures_per_second) {
+            // Too many failures, stop trying
+            log_throttle.logError("circuit_breaker", "Circuit breaker triggered: too many texture creation failures", .{});
+            return null;
+        }
+        
         const content_hash = self.hashText(text);
         const current_time = @as(u64, @intCast(std.time.milliTimestamp()));
 
@@ -88,6 +113,7 @@ pub const PersistentTextSystem = struct {
 
         const text_result = font_manager.renderTextToTexture(text, font_category, font_size, color) catch |err| {
             log_throttle.logError("texture_error", "Failed to create persistent texture for text: {}", .{err});
+            self.recent_failures += 1;
             return null;
         };
 
