@@ -109,6 +109,27 @@ const IndexPage = struct {
             nav_width,
             nav_height
         ));
+        
+        // Test panel for font debugging - black background with various glyphs
+        const test_y = 600.0;
+        
+        // Black background panel
+        try links.append(page.createLink("", "", 100, test_y, 1720, 200));
+        
+        // Panel header
+        try links.append(page.createLink("FONT TEST PANEL", "", 100, test_y - 30, 300, 25));
+        
+        // Row 1: Full ASCII uppercase alphabet
+        try links.append(page.createLink("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "", 150, test_y + 20, 1620, 40));
+        
+        // Row 2: Lowercase alphabet  
+        try links.append(page.createLink("abcdefghijklmnopqrstuvwxyz", "", 150, test_y + 60, 1620, 40));
+        
+        // Row 3: Numbers and common symbols
+        try links.append(page.createLink("0123456789 !@#$%^&*()[]{}+-=<>?/", "", 150, test_y + 100, 1620, 40));
+        
+        // Row 4: Mixed case pangram to test kerning and spacing
+        try links.append(page.createLink("The Quick Brown Fox Jumps Over The Lazy Dog 1234567890", "", 150, test_y + 140, 1620, 40));
     }
     
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {

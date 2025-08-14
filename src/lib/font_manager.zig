@@ -226,25 +226,57 @@ pub const FontManager = struct {
                 const glyph_x = @as(i32, @intFromFloat(glyph.position.x));
                 const glyph_y = @as(i32, @intFromFloat(glyph.position.y));
                 
-                const rasterized = try rasterizer.rasterizeGlyph(glyph.codepoint, 0, 0);
-                defer rasterizer.allocator.free(rasterized.bitmap);
+                // Get the bitmap from the atlas cache instead of re-rasterizing
+                const cached_bitmap = self.atlas.getCachedBitmap(glyph_info) orelse {
+                    // Fallback: only rasterize if not in cache (shouldn't happen)
+                    log.warn("Glyph not in cache, falling back to rasterization for codepoint {}", .{glyph.codepoint});
+                    const rasterized = try rasterizer.rasterizeGlyph(glyph.codepoint, 0, 0);
+                    defer rasterizer.allocator.free(rasterized.bitmap);
+                    
+                    // Still use the rasterized data but log this shouldn't happen
+                    var py: u32 = 0;
+                    while (py < glyph_info.height) : (py += 1) {
+                        var px: u32 = 0;
+                        while (px < glyph_info.width) : (px += 1) {
+                            const dst_x = glyph_x + @as(i32, @intCast(px));
+                            const dst_y = glyph_y + @as(i32, @intCast(py));
+                            
+                            if (dst_x >= 0 and dst_x < width and dst_y >= 0 and dst_y < height) {
+                                const src_idx = py * glyph_info.width + px;
+                                const dst_idx = (@as(usize, @intCast(dst_y)) * width + @as(usize, @intCast(dst_x))) * 4;
+                                
+                                if (src_idx < rasterized.bitmap.len) {
+                                    const alpha = rasterized.bitmap[src_idx];
+                                    bitmap[dst_idx + 0] = color.r;
+                                    bitmap[dst_idx + 1] = color.g;
+                                    bitmap[dst_idx + 2] = color.b;
+                                    bitmap[dst_idx + 3] = alpha;
+                                }
+                            }
+                        }
+                    }
+                    continue;
+                };
                 
+                // Use the cached bitmap directly
                 var py: u32 = 0;
-                while (py < rasterized.height) : (py += 1) {
+                while (py < glyph_info.height) : (py += 1) {
                     var px: u32 = 0;
-                    while (px < rasterized.width) : (px += 1) {
-                        const dst_x = @as(i32, @intCast(px)) + glyph_x;
-                        const dst_y = @as(i32, @intCast(py)) + glyph_y;
+                    while (px < glyph_info.width) : (px += 1) {
+                        const dst_x = glyph_x + @as(i32, @intCast(px));
+                        const dst_y = glyph_y + @as(i32, @intCast(py));
                         
                         if (dst_x >= 0 and dst_x < width and dst_y >= 0 and dst_y < height) {
-                            const src_idx = py * rasterized.width + px;
+                            const src_idx = py * glyph_info.width + px;
                             const dst_idx = (@as(usize, @intCast(dst_y)) * width + @as(usize, @intCast(dst_x))) * 4;
                             
-                            const alpha = rasterized.bitmap[src_idx];
-                            bitmap[dst_idx + 0] = color.r;
-                            bitmap[dst_idx + 1] = color.g;
-                            bitmap[dst_idx + 2] = color.b;
-                            bitmap[dst_idx + 3] = alpha;
+                            if (src_idx < cached_bitmap.len) {
+                                const alpha = cached_bitmap[src_idx];
+                                bitmap[dst_idx + 0] = color.r;
+                                bitmap[dst_idx + 1] = color.g;
+                                bitmap[dst_idx + 2] = color.b;
+                                bitmap[dst_idx + 3] = alpha;
+                            }
                         }
                     }
                 }

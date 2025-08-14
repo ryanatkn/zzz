@@ -334,10 +334,14 @@ pub const FontRasterizer = struct {
     }
     
     fn scanlineRender(self: *FontRasterizer, edges: []Edge, bitmap: []u8, width: u32, height: u32) void {
+        // Pre-allocate active edges array once, reuse for all scanlines
+        var active_edges = std.ArrayList(ActiveEdge).init(self.allocator);
+        defer active_edges.deinit();
+        
         var y: u32 = 0;
         while (y < height) : (y += 1) {
-            var active_edges = std.ArrayList(ActiveEdge).init(self.allocator);
-            defer active_edges.deinit();
+            // Clear the array for reuse instead of creating new
+            active_edges.clearRetainingCapacity();
             
             const y_float = @as(f32, @floatFromInt(y)) + 0.5;
             

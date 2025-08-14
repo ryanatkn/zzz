@@ -13,6 +13,7 @@ pub const GlyphInfo = struct {
     bearing_y: i32,
     advance: f32,
     atlas_index: u32,
+    bitmap: ?[]u8,  // Store the actual bitmap data for reuse
 };
 
 pub const AtlasTexture = struct {
@@ -48,7 +49,20 @@ pub const FontAtlas = struct {
             c.sdl.SDL_ReleaseGPUTexture(self.gpu_device, atlas.texture);
         }
         self.atlases.deinit();
+        
+        // Free all cached bitmaps
+        var iter = self.glyph_cache.iterator();
+        while (iter.next()) |entry| {
+            if (entry.value_ptr.bitmap) |bitmap| {
+                self.allocator.free(bitmap);
+            }
+        }
         self.glyph_cache.deinit();
+    }
+    
+    pub fn getCachedBitmap(self: *FontAtlas, info: GlyphInfo) ?[]u8 {
+        _ = self;  // Not needed, but kept for potential future use
+        return info.bitmap;
     }
     
     fn createNewAtlas(self: *FontAtlas) !*AtlasTexture {
@@ -95,9 +109,11 @@ pub const FontAtlas = struct {
         }
         
         const rasterized = try rasterizer.rasterizeGlyph(codepoint, 0, 0);
-        defer rasterizer.allocator.free(rasterized.bitmap);
+        // Don't free the bitmap yet - we'll store it in the cache
         
         if (rasterized.width == 0 or rasterized.height == 0) {
+            // For empty glyphs, we can free immediately since we don't need to store
+            rasterizer.allocator.free(rasterized.bitmap);
             const info = GlyphInfo{
                 .texture_x = 0,
                 .texture_y = 0,
@@ -107,10 +123,18 @@ pub const FontAtlas = struct {
                 .bearing_y = rasterized.bearing_y,
                 .advance = rasterized.advance,
                 .atlas_index = 0,
+                .bitmap = null,
             };
             try self.glyph_cache.put(cache_key, info);
             return info;
         }
+        
+        // Store a copy of the bitmap for reuse
+        const bitmap_copy = try self.allocator.alloc(u8, rasterized.bitmap.len);
+        @memcpy(bitmap_copy, rasterized.bitmap);
+        
+        // Now we can free the original
+        rasterizer.allocator.free(rasterized.bitmap);
         
         var atlas = if (self.atlases.items.len > 0) 
             &self.atlases.items[self.atlases.items.len - 1]
@@ -135,7 +159,7 @@ pub const FontAtlas = struct {
         
         try self.uploadGlyphToAtlas(
             atlas.texture,
-            rasterized.bitmap,
+            bitmap_copy,
             rasterized.width,
             rasterized.height,
             texture_x,
@@ -154,6 +178,7 @@ pub const FontAtlas = struct {
             .bearing_y = rasterized.bearing_y,
             .advance = rasterized.advance,
             .atlas_index = @intCast(self.atlases.items.len - 1),
+            .bitmap = bitmap_copy,  // Store the bitmap copy
         };
         
         try self.glyph_cache.put(cache_key, info);
