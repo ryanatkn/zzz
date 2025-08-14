@@ -13,7 +13,7 @@ $ zig version
 0.14.1
 ```
 
-Dependencies: SDL3 (vendored), SDL_ttf (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation)
+Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation)
 
 ## Design Philosophy
 
@@ -110,7 +110,6 @@ Dependencies: SDL3 (vendored), SDL_ttf (vendored), SDL_shadercross (HLSL→SPIRV
 
 **Vendored Libraries:**
 - **SDL3**: Complete SDL3 library built from vendored source
-- **SDL_ttf**: TTF font rendering with FreeType integration  
 - **Zero External Packages**: No `apt install` or `sudo` requirements
 
 **Key Features:**

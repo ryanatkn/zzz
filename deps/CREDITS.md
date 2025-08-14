@@ -15,15 +15,14 @@ This build configuration has been adapted for the Dealt project with the followi
 - Added dummy implementations for unsupported subsystems
 - Fixed missing configuration values for xkbcommon and X11 extensions
 
-## SDL and SDL_ttf
+## SDL
 
-The SDL and SDL_ttf libraries themselves are:
+The SDL library itself is:
 - **SDL**: Copyright (C) 1997-2024 Sam Lantinga and contributors
   - Repository: https://github.com/libsdl-org/SDL
   - License: zlib license
-- **SDL_ttf**: Copyright (C) 1997-2024 Sam Lantinga and contributors
-  - Repository: https://github.com/libsdl-org/SDL_ttf
-  - License: zlib license
+
+**Text Rendering**: Pure Zig implementation using distance field techniques (no external font dependencies)
 
 ## Current Versions
 
@@ -32,12 +31,10 @@ The SDL and SDL_ttf libraries themselves are:
   - Commit: 29cff6e2645cd7d637c502af11a9e3cf8063ccdf
   - Last Updated: 2025-08-13 17:55:50 UTC
 
-- **SDL_ttf**: main
-  - Repository: https://github.com/libsdl-org/SDL_ttf.git
-  - Commit: 67eced52533771474d38e38c348eba7c1fc2bbea
-  - Last Updated: 2025-08-13 17:55:50 UTC
 
 
 ## Note
 
-The source code in deps/SDL and deps/SDL_ttf has been kept unmodified from the original repositories to maintain compatibility and ease of updates. Only the build configuration files have been modified.
+The source code in deps/SDL has been kept unmodified from the original repository to maintain compatibility and ease of updates. Only the build configuration files have been modified.
+
+Text rendering is implemented using pure Zig distance field techniques, eliminating the need for external font libraries.

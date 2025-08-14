@@ -10,24 +10,20 @@ set -e  # Exit on error
 
 declare -A DEPS=(
     ["SDL"]="https://github.com/libsdl-org/SDL.git"
-    ["SDL_ttf"]="https://github.com/libsdl-org/SDL_ttf.git"
 )
 
 declare -A VERSIONS=(
     ["SDL"]="main"
-    ["SDL_ttf"]="main" 
 )
 
 # Files to keep from existing installations (to preserve local modifications)
 declare -A PRESERVE_FILES=(
     ["SDL"]="build.zig build.zig.zon"
-    ["SDL_ttf"]="build.zig build.zig.zon"
 )
 
 # Files to remove from fresh clones (incompatible with our build)
 declare -A REMOVE_FILES=(
     ["SDL"]=""
-    ["SDL_ttf"]=""
 )
 
 # Patches to apply (if any)
@@ -39,7 +35,6 @@ declare -A PATCHES=(
 # SHA256 hashes for version verification (updated during successful clone)
 declare -A SHA_HASHES=(
     ["SDL"]=""
-    ["SDL_ttf"]=""
 )
 
 # ============================================================================
@@ -606,14 +601,11 @@ This build configuration has been adapted for the Dealt project with the followi
 - Added dummy implementations for unsupported subsystems
 - Fixed missing configuration values for xkbcommon and X11 extensions
 
-## SDL and SDL_ttf
+## SDL
 
-The SDL and SDL_ttf libraries themselves are:
+The SDL library itself is:
 - **SDL**: Copyright (C) 1997-2024 Sam Lantinga and contributors
   - Repository: https://github.com/libsdl-org/SDL
-  - License: zlib license
-- **SDL_ttf**: Copyright (C) 1997-2024 Sam Lantinga and contributors
-  - Repository: https://github.com/libsdl-org/SDL_ttf
   - License: zlib license
 
 ## Current Versions
@@ -642,7 +634,7 @@ EOF
 
 ## Note
 
-The source code in deps/SDL and deps/SDL_ttf has been kept unmodified from the original repositories to maintain compatibility and ease of updates. Only the build configuration files have been modified.
+The source code in deps/SDL has been kept unmodified from the original repository to maintain compatibility and ease of updates. Only the build configuration files have been modified.
 EOF
 
     # Only update if content has changed
