@@ -4,30 +4,43 @@ const text_renderer = @import("../text_renderer.zig");
 const font_manager = @import("../font_manager.zig");
 const fonts = @import("../fonts.zig");
 const drawing = @import("../drawing.zig");
+const font_config = @import("../font_config.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
 const Rectangle = drawing.Rectangle;
 
-/// Standard menu text configurations
+/// Standard menu text configurations using dynamic font config
 pub const MenuTextStyles = struct {
     pub const button = struct {
-        pub const font_size = 16.0;
+        pub fn font_size() f32 {
+            return font_config.getGlobalConfig().buttonFontSize();
+        }
         pub const normal_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
         pub const hovered_color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
-        pub const char_width = 10.0; // Approximate width per character
+        pub fn char_width() f32 {
+            return font_config.getGlobalConfig().buttonCharWidth();
+        }
     };
     
     pub const navigation = struct {
-        pub const font_size = 14.0;
+        pub fn font_size() f32 {
+            return font_config.getGlobalConfig().navigationFontSize();
+        }
         pub const color = Color{ .r = 180, .g = 190, .b = 200, .a = 255 };
-        pub const char_width = 8.0;
+        pub fn char_width() f32 {
+            return font_config.getGlobalConfig().navigationCharWidth();
+        }
     };
     
     pub const header = struct {
-        pub const font_size = 20.0;
+        pub fn font_size() f32 {
+            return font_config.getGlobalConfig().headerFontSize();
+        }
         pub const color = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
-        pub const char_width = 12.0;
+        pub fn char_width() f32 {
+            return font_config.getGlobalConfig().headerCharWidth();
+        }
     };
 };
 
@@ -57,7 +70,7 @@ pub const MenuTextRenderer = struct {
         const style = MenuTextStyles.button;
         const text_color = if (is_hovered) style.hovered_color else style.normal_color;
         
-        const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width, style.font_size);
+        const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
         
         const log = std.log.scoped(.menu_text);
         log.info("Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{
@@ -69,7 +82,7 @@ pub const MenuTextRenderer = struct {
             text_pos,
             self.font_manager,
             .sans,
-            style.font_size,
+            style.font_size(),
             text_color
         ) catch |err| {
             log.warn("Failed to queue button text '{s}': {}", .{ text, err });
@@ -95,7 +108,7 @@ pub const MenuTextRenderer = struct {
             position,
             self.font_manager,
             .sans,
-            style.font_size,
+            style.font_size(),
             style.color
         ) catch |err| {
             log.warn("Failed to queue navigation text '{s}': {}", .{ text, err });
@@ -106,14 +119,14 @@ pub const MenuTextRenderer = struct {
     pub fn queueHeaderText(self: *Self, text: []const u8, rect: Rectangle) void {
         const style = MenuTextStyles.header;
         
-        const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width, style.font_size);
+        const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
         
         self.text_renderer.queuePersistentText(
             text,
             text_pos,
             self.font_manager,
             .sans,
-            style.font_size,
+            style.font_size(),
             style.color
         ) catch |err| {
             const log = std.log.scoped(.menu_text);
@@ -145,7 +158,8 @@ pub const TextUtils = struct {
     }
     
     /// Get button rectangle that fits text with standard padding
-    pub fn getButtonRectForText(text: []const u8, position: Vec2, char_width: f32) Rectangle {
+    pub fn getButtonRectForText(text: []const u8, position: Vec2) Rectangle {
+        const char_width = font_config.getGlobalConfig().buttonCharWidth();
         const text_width = estimateTextWidth(text, char_width);
         return drawing.Sizes.button(position, text_width);
     }

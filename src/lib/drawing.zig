@@ -3,6 +3,7 @@ const c = @import("c.zig");
 const types = @import("types.zig");
 const colors = @import("colors.zig");
 const simple_gpu_renderer = @import("simple_gpu_renderer.zig");
+const font_config = @import("font_config.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -206,11 +207,14 @@ pub fn drawProgressBar(
 /// Common rectangle patterns for UI elements
 pub const UIRects = struct {
     /// Create a button-sized rectangle with standard padding
+    /// Now uses font configuration for proper scaling
     pub fn button(pos: Vec2, text_width: f32) Rectangle {
-        const padding = 10.0;
+        const config = font_config.getGlobalConfig();
+        const padding = config.buttonPadding();
+        const height = config.buttonHeight();
         return Rectangle{
             .position = pos,
-            .size = Vec2{ .x = text_width + padding * 2, .y = 30.0 },
+            .size = Vec2{ .x = text_width + padding * 2, .y = height },
         };
     }
     

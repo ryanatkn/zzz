@@ -47,8 +47,8 @@ pub const UnifiedTextRenderer = struct {
             .button => self.menu_text_renderer.queueButtonText(text, rect, is_hovered),
             .navigation => {
                 const pos = drawing.getCenteredTextPos(rect, text, 
-                    menu_text.MenuTextStyles.navigation.char_width, 
-                    menu_text.MenuTextStyles.navigation.font_size);
+                    menu_text.MenuTextStyles.navigation.char_width(), 
+                    menu_text.MenuTextStyles.navigation.font_size());
                 self.menu_text_renderer.queueNavigationText(text, pos);
             },
             .header => self.menu_text_renderer.queueHeaderText(text, rect),

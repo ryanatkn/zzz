@@ -278,7 +278,7 @@ pub const GameRenderer = struct {
             .{ .x = fps_x, .y = fps_y },
             self.font_manager,
             .sans,
-            48.0,  // Restored original size - rounding fix should work for both sizes
+            @import("../lib/font_config.zig").getGlobalConfig().fpsFontSize(),
             WHITE
         ) catch |err| {
             log.err("Failed to queue persistent FPS text: {}", .{err});
