@@ -167,6 +167,7 @@ pub const TextRenderer = struct {
                 .texture = text_texture,
                 .position = position,
                 .color = color,
+                .use_sdf = false, // Font grid test uses bitmap textures
             };
 
             self.text_draw_queue.append(cmd) catch |err| {

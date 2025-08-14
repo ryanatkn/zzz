@@ -51,10 +51,19 @@ pub const FontGridTestPage = struct {
 
     // Auto-initialize the multi-strategy renderer system immediately
     pub fn autoInitialize(self: *FontGridTestPage, allocator: std.mem.Allocator, device: *c.sdl.SDL_GPUDevice) void {
-        if (self.auto_initialized) return;
+        std.log.info("DEBUG: autoInitialize function called!", .{});
+        
+        if (self.auto_initialized) {
+            std.log.info("DEBUG: Already auto-initialized, returning early", .{});
+            return;
+        }
+        
+        std.log.info("DEBUG: Starting auto-initialization process...", .{});
         
         self.auto_initialized = true;
         self.test_status = "Initializing renderers...";
+        
+        log_throttle.logInfo("font_grid_start", "Starting font grid test auto-initialization", .{});
         
         // Initialize multi-strategy renderer
         self.multi_renderer = MultiStrategyRenderer.init(allocator) catch |err| {
@@ -63,18 +72,28 @@ pub const FontGridTestPage = struct {
             return;
         };
         
+        log_throttle.logInfo("font_grid_renderer_ok", "Multi-strategy renderer initialized successfully", .{});
+        
         // Initialize display system
         self.display = RendererDisplay.init(allocator, device);
         
+        log_throttle.logInfo("font_grid_display_ok", "Renderer display system initialized successfully", .{});
+        
+        // Mark as initialized now that core systems are ready
+        self.initialized = true;
         self.test_status = "Running test suite...";
         
         // Immediately run test suite with medium font size
         const test_font_size = self.font_sizes[1]; // 24pt
+        log_throttle.logInfo("font_grid_test_start", "Running test suite with font size {}pt", .{test_font_size});
+        
         const results = self.runTestSuite(allocator, test_font_size) catch |err| {
             log_throttle.logError("font_grid_test", "Failed to run test suite: {}", .{err});
             self.test_status = "Test suite failed";
             return;
         };
+        
+        log_throttle.logInfo("font_grid_results", "Test suite completed with {} results", .{results.len});
         
         // Create display textures for all results
         self.createDisplayTextures(results) catch |err| {
@@ -83,25 +102,38 @@ pub const FontGridTestPage = struct {
             return;
         };
         
-        self.initialized = true;
+        log_throttle.logInfo("font_grid_textures", "Display textures created successfully", .{});
+        
         self.test_status = "Ready - All renderers active";
         
         // Log success
-        log_throttle.logOnce("font_grid_success", "Font grid test auto-initialized with {} renderers", .{results.len});
+        log_throttle.logInfo("font_grid_success", "Font grid test auto-initialized with {} renderers", .{results.len});
     }
     
     // Create GPU textures for display from render results
     fn createDisplayTextures(self: *FontGridTestPage, results: []MultiRenderResult) !void {
         if (self.display == null) return error.DisplayNotInitialized;
         
+        log_throttle.logInfo("display_texture_start", "Creating display textures for {} results", .{results.len});
+        
+        var success_count: usize = 0;
         for (results) |result| {
             if (result.result) |render_result| {
+                log_throttle.logInfo("create_texture", "Creating texture for strategy {s}: {}x{} bitmap", .{result.strategy.getName(), render_result.width, render_result.height});
+                
                 _ = self.display.?.createDisplayTexture(render_result, result.strategy) catch |err| {
-                    log_throttle.logPeriodic("display_texture_fail", 5000, "Failed to create display texture for {s}: {}", .{result.strategy.getName(), err});
+                    log_throttle.logError("display_texture_fail", "Failed to create display texture for {s}: {}", .{result.strategy.getName(), err});
                     continue;
                 };
+                
+                success_count += 1;
+                log_throttle.logInfo("texture_success", "Successfully created texture for {s}", .{result.strategy.getName()});
+            } else {
+                log_throttle.logInfo("texture_skip", "Skipping {s}: no render result", .{result.strategy.getName()});
             }
         }
+        
+        log_throttle.logInfo("display_texture_complete", "Created {} display textures from {} results", .{success_count, results.len});
     }
 
     pub fn isGridPage(self: *const FontGridTestPage) bool {
@@ -116,7 +148,7 @@ pub const FontGridTestPage = struct {
         }
         
         // Create a simple test glyph outline (rectangle)
-        const test_outline = try self.createTestGlyphOutline(allocator);
+        var test_outline = try self.createTestGlyphOutline(allocator);
         defer test_outline.deinit(allocator);
         
         // Test with all strategies
@@ -135,12 +167,14 @@ pub const FontGridTestPage = struct {
     fn createTestGlyphOutline(self: *FontGridTestPage, allocator: std.mem.Allocator) !GlyphOutline {
         _ = self;
         
-        // Create a simple rectangular contour
+        // Create a simple rectangular contour using proper TTF units
+        // Use full 0-1000 range for clear visibility at all font sizes
         const points = try allocator.alloc(Point, 4);
-        points[0] = Point{ .x = 100, .y = 100 }; // Bottom-left
-        points[1] = Point{ .x = 700, .y = 100 }; // Bottom-right  
-        points[2] = Point{ .x = 700, .y = 800 }; // Top-right
-        points[3] = Point{ .x = 100, .y = 800 }; // Top-left
+        // Counter-clockwise winding for positive fill (standard TTF convention)
+        points[0] = Point{ .x = 100, .y = 100 };   // Bottom-left
+        points[1] = Point{ .x = 100, .y = 900 };   // Top-left  
+        points[2] = Point{ .x = 700, .y = 900 };   // Top-right
+        points[3] = Point{ .x = 700, .y = 100 };   // Bottom-right
         
         const on_curve = try allocator.alloc(bool, 4);
         on_curve[0] = true;
@@ -154,13 +188,16 @@ pub const FontGridTestPage = struct {
             .on_curve = on_curve,
         };
         
+        // Add debug logging to verify glyph creation
+        log_throttle.logInfo("test_glyph_created", "Created test glyph: {}x{} rectangle ({}x{} units)", .{600, 800, 700-100, 900-100});
+        
         return GlyphOutline{
             .contours = contours,
             .bounds = font_types.GlyphBounds{
                 .x_min = 100,
                 .y_min = 100,
                 .x_max = 700,
-                .y_max = 800,
+                .y_max = 900,
             },
             .metrics = font_types.GlyphMetrics{
                 .advance_width = 800,

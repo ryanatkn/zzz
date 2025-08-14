@@ -1,6 +1,7 @@
 const std = @import("std");
 const font_types = @import("../font_types.zig");
 const renderer_interface = @import("renderer_interface.zig");
+const log_throttle = @import("../../debug/log_throttle.zig");
 
 const Point = font_types.Point;
 const Contour = font_types.Contour;
@@ -47,6 +48,8 @@ pub const DebugAsciiRenderer = struct {
     fn renderGlyph(ctx: *anyopaque, allocator: std.mem.Allocator, outline: GlyphOutline, font_size: f32) anyerror!RenderResult {
         const self: *DebugAsciiRenderer = @ptrCast(@alignCast(ctx));
         const start_time = std.time.microTimestamp();
+
+        log_throttle.logInfo("debug_ascii_start", "DebugAsciiRenderer: rendering glyph at {}pt", .{font_size});
 
         // Fixed ASCII grid size for consistency
         const ascii_width: u32 = 16;

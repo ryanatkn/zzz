@@ -95,26 +95,67 @@ pub const BrowserRenderer = struct {
         self.base_renderer.gpu.drawBlendedRect(cmd_buffer, render_pass, .{ .x = 0, .y = 0 }, .{ .x = screen_width, .y = screen_height }, overlay_color);
     }
 
-    pub fn renderPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
-        // Check if this is the font-grid-test page and handle special rendering
+    /// Render custom GPU content for pages that need direct rendering
+    /// This is called from the reactive HUD system after normal page rendering
+    pub fn renderPageContent(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page) !void {
+        // Fast path for special pages needing GPU rendering
         if (std.mem.eql(u8, current_page.path, "/font-grid-test")) {
-            try self.renderFontGridTestPage(cmd_buffer, render_pass, current_page, links);
-        } else {
-            // Regular page rendering
-            try current_page.render(links);
+            std.log.info("DEBUG: Rendering custom GPU content for font-grid-test", .{});
+            try self.renderFontGridTestContent(cmd_buffer, render_pass, current_page);
         }
+        // Add other special pages here as needed
+    }
+    
+    /// Render font grid test custom content (separated from link rendering)
+    fn renderFontGridTestContent(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page) !void {
+        // Cast to FontGridTestPage to access font test functionality
+        const grid_page: *font_grid_test_page.FontGridTestPage = @constCast(@fieldParentPtr("base", current_page));
+        
+        std.log.info("DEBUG: Grid page cast successful, checking auto-init status...", .{});
+        
+        // Auto-initialize the multi-strategy renderer system if needed
+        if (!grid_page.isAutoInitialized()) {
+            std.log.info("DEBUG: Auto-initialization needed, calling autoInitialize...", .{});
+            grid_page.autoInitialize(self.base_renderer.allocator, self.base_renderer.gpu.device);
+            std.log.info("DEBUG: autoInitialize call completed", .{});
+        } else {
+            std.log.info("DEBUG: Grid page already auto-initialized", .{});
+        }
+
+        // Render strategy comparison grid using actual GPU textures
+        try self.renderStrategyComparison(cmd_buffer, render_pass, grid_page);
+    }
+
+    /// DEPRECATED: Legacy method for backward compatibility - will be removed
+    pub fn renderPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+        std.log.warn("DEPRECATED: renderPage called - use renderPageContent instead", .{});
+        
+        // First render the page content normally
+        try current_page.render(links);
+        
+        // Then render any custom GPU content
+        try self.renderPageContent(cmd_buffer, render_pass, current_page);
     }
 
     fn renderFontGridTestPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+        // DEBUG: Add immediate logging to see if this function is called
+        std.log.info("DEBUG: renderFontGridTestPage called!", .{});
+        
         // First, let the page render its basic UI elements (headers, navigation)
         try current_page.render(links);
 
         // Cast to FontGridTestPage to access new functionality
         const grid_page: *font_grid_test_page.FontGridTestPage = @fieldParentPtr("base", current_page);
         
+        std.log.info("DEBUG: Grid page cast successful, checking auto-init status...", .{});
+        
         // Auto-initialize the multi-strategy renderer system if needed
         if (!grid_page.isAutoInitialized()) {
+            std.log.info("DEBUG: Auto-initialization needed, calling autoInitialize...", .{});
             grid_page.autoInitialize(self.base_renderer.allocator, self.base_renderer.gpu.device);
+            std.log.info("DEBUG: autoInitialize call completed", .{});
+        } else {
+            std.log.info("DEBUG: Grid page already auto-initialized", .{});
         }
 
         // Render strategy comparison grid using actual GPU textures
@@ -221,7 +262,7 @@ pub const BrowserRenderer = struct {
     }
     
     /// Render the strategy comparison grid showing actual rendered output
-    fn renderStrategyComparison(self: *BrowserRenderer, _: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, grid_page: *const font_grid_test_page.FontGridTestPage) !void {
+    fn renderStrategyComparison(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, grid_page: *const font_grid_test_page.FontGridTestPage) !void {
         
         // Get available strategies and render each one's texture
         const strategies = [_]renderer_interface.RenderStrategy{
@@ -247,24 +288,23 @@ pub const BrowserRenderer = struct {
             // Get display texture for this strategy
             if (grid_page.getDisplayTexture(strategy)) |texture| {
                 // Render the texture showing the actual font rendering output
-                try self.renderTexture(render_pass, texture, x, y, cell_width, cell_height);
+                try self.renderTexture(cmd_buffer, render_pass, texture, x, y, cell_width, cell_height);
             }
         }
     }
     
     /// Render a GPU texture at specified position and size
-    fn renderTexture(self: *BrowserRenderer, render_pass: *c.sdl.SDL_GPURenderPass, texture: *c.sdl.SDL_GPUTexture, x: f32, y: f32, width: f32, height: f32) !void {
+    fn renderTexture(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, texture: *c.sdl.SDL_GPUTexture, x: f32, y: f32, width: f32, height: f32) !void {
         // Use the game renderer's text system to display the texture
         // This shows the actual rendered font output from each strategy
         self.base_renderer.gpu.text_renderer.queueTextTexture(
             texture,
-            null, // Use default sampler
+            .{ .x = x, .y = y },
             @as(u32, @intFromFloat(width)),
             @as(u32, @intFromFloat(height)), 
-            .{ .x = x, .y = y },
-            types.Color.white(),
+            types.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
         );
         
-        try self.base_renderer.gpu.text_renderer.drawQueuedText(render_pass);
+        self.base_renderer.gpu.text_renderer.drawQueuedText(cmd_buffer, render_pass);
     }
 };

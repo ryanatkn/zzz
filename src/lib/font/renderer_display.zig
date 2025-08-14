@@ -96,7 +96,7 @@ pub const RendererDisplay = struct {
         // Upload data to texture
         const transfer_buffer_info = c.sdl.SDL_GPUTransferBufferCreateInfo{
             .usage = c.sdl.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-            .size = rgba_data.len,
+            .size = @intCast(rgba_data.len),
             .props = 0,
         };
 
@@ -115,8 +115,13 @@ pub const RendererDisplay = struct {
         @memcpy(@as([*]u8, @ptrCast(mapped_data))[0..rgba_data.len], rgba_data);
         c.sdl.SDL_UnmapGPUTransferBuffer(self.device, transfer_buffer);
 
-        // Upload to texture
-        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(self.device, null) orelse {
+        // Upload to texture - need command buffer for copy pass
+        const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(self.device) orelse {
+            c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
+            return error.CommandBufferCreationFailed;
+        };
+        
+        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer) orelse {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CopyPassCreationFailed;
         };
@@ -142,6 +147,9 @@ pub const RendererDisplay = struct {
 
         c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
         c.sdl.SDL_EndGPUCopyPass(copy_pass);
+        
+        // Submit command buffer to execute the upload
+        _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
 
         return texture;
     }
@@ -165,17 +173,15 @@ pub const RendererDisplay = struct {
             const char_x = i % result.width;
             const char_y = i / result.width;
             
-            // Simple character visualization
-            const intensity = switch (ascii_char) {
-                ' ' => 0,
-                '.' => 64,
-                ':' => 128, 
-                '+' => 192,
-                '*' => 220,
-                '#' => 255,
-                '@' => 255,
-                else => 128,
-            };
+            // Simple character visualization - use if/else for runtime values
+            const intensity: u8 = if (ascii_char == ' ') 0
+                else if (ascii_char == '.') 64
+                else if (ascii_char == ':') 128
+                else if (ascii_char == '+') 192
+                else if (ascii_char == '*') 220
+                else if (ascii_char == '#') 255
+                else if (ascii_char == '@') 255
+                else 128;
 
             // Fill character area with intensity
             var py: u32 = 0;
@@ -220,7 +226,7 @@ pub const RendererDisplay = struct {
         // Upload RGBA data (similar to grayscale upload but no conversion needed)
         const transfer_buffer_info = c.sdl.SDL_GPUTransferBufferCreateInfo{
             .usage = c.sdl.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-            .size = rgba_data.len,
+            .size = @intCast(rgba_data.len),
             .props = 0,
         };
 
@@ -238,7 +244,13 @@ pub const RendererDisplay = struct {
         @memcpy(@as([*]u8, @ptrCast(mapped_data))[0..rgba_data.len], rgba_data);
         c.sdl.SDL_UnmapGPUTransferBuffer(self.device, transfer_buffer);
 
-        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(self.device, null) orelse {
+        // Acquire command buffer for copy operations
+        const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(self.device) orelse {
+            c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
+            return error.CommandBufferCreationFailed;
+        };
+        
+        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer) orelse {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CopyPassCreationFailed;
         };
@@ -264,6 +276,9 @@ pub const RendererDisplay = struct {
 
         c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
         c.sdl.SDL_EndGPUCopyPass(copy_pass);
+        
+        // Submit command buffer to execute the upload
+        _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
 
         return texture;
     }
@@ -309,7 +324,13 @@ pub const RendererDisplay = struct {
         @memcpy(@as([*]u8, @ptrCast(mapped_data))[0..empty_data.len], &empty_data);
         c.sdl.SDL_UnmapGPUTransferBuffer(self.device, transfer_buffer);
 
-        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(self.device, null) orelse {
+        // Acquire command buffer for copy operations
+        const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(self.device) orelse {
+            c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
+            return error.CommandBufferCreationFailed;
+        };
+        
+        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer) orelse {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CopyPassCreationFailed;
         };
@@ -335,6 +356,9 @@ pub const RendererDisplay = struct {
 
         c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
         c.sdl.SDL_EndGPUCopyPass(copy_pass);
+        
+        // Submit command buffer to execute the upload
+        _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
 
         return texture;
     }

@@ -28,8 +28,8 @@ pub const MultiStrategyRenderer = struct {
     // Individual renderers
     simple_renderer: bitmap_simple.SimpleBitmapRenderer,
     debug_renderer: debug_ascii.DebugAsciiRenderer,
-    oversample_2x_renderer: oversampling.OversamplingRenderer,
-    oversample_4x_renderer: oversampling.OversamplingRenderer,
+    oversample_2x_renderer: bitmap_simple.SimpleBitmapRenderer,
+    oversample_4x_renderer: bitmap_simple.SimpleBitmapRenderer,
     scanline_renderer: ?scanline.AntialiasedScanlineRenderer, // Optional - may fail to initialize
 
     // Renderer interfaces
@@ -43,18 +43,24 @@ pub const MultiStrategyRenderer = struct {
     comparison_results: std.ArrayList(MultiRenderResult),
 
     pub fn init(allocator: std.mem.Allocator) !MultiStrategyRenderer {
-        // Initialize all renderers
+        // Initialize basic renderers for immediate connection test
         var simple_renderer = bitmap_simple.create();
         var debug_renderer = debug_ascii.create();
-        var oversample_2x_renderer = oversampling.create2x();
-        var oversample_4x_renderer = oversampling.create4x();
+        
+        // TODO: Re-enable after fixing compilation errors
+        // var oversample_2x_renderer = oversampling.create2x();
+        // var oversample_4x_renderer = oversampling.create4x();
+        // Temporary placeholders with correct types
+        var oversample_2x_renderer = simple_renderer; // Will be replaced with proper OversamplingRenderer
+        var oversample_4x_renderer = simple_renderer; // Will be replaced with proper OversamplingRenderer
         
         // Try to initialize scanline renderer (may fail)
-        var scanline_renderer: ?scanline.AntialiasedScanlineRenderer = null;
-        var scanline_iface: ?TextRenderer = null;
+        const scanline_renderer: ?scanline.AntialiasedScanlineRenderer = null;
+        const scanline_iface: ?TextRenderer = null;
         
-        scanline_renderer = scanline.create(allocator);
-        scanline_iface = scanline_renderer.?.asRenderer();
+        // TODO: Re-enable after fixing compilation errors
+        // scanline_renderer = scanline.create(allocator);
+        // scanline_iface = scanline_renderer.?.asRenderer();
 
         return MultiStrategyRenderer{
             .allocator = allocator,
@@ -102,15 +108,16 @@ pub const MultiStrategyRenderer = struct {
         }
         self.comparison_results.clearRetainingCapacity();
 
-        // Define strategies to test
+        // Define strategies to test (temporarily reduced for immediate fix)
         const strategies = [_]struct {
             strategy: RenderStrategy,
             renderer: *TextRenderer,
         }{
             .{ .strategy = .simple_bitmap, .renderer = &self.simple_iface },
             .{ .strategy = .debug_ascii, .renderer = &self.debug_iface },
-            .{ .strategy = .oversampling_2x, .renderer = &self.oversample_2x_iface },
-            .{ .strategy = .oversampling_4x, .renderer = &self.oversample_4x_iface },
+            // TODO: Re-enable once compilation errors are fixed
+            // .{ .strategy = .oversampling_2x, .renderer = &self.oversample_2x_iface },
+            // .{ .strategy = .oversampling_4x, .renderer = &self.oversample_4x_iface },
         };
 
         // Test each strategy

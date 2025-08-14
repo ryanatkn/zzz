@@ -1,6 +1,7 @@
 const std = @import("std");
 const font_types = @import("../font_types.zig");
 const renderer_interface = @import("renderer_interface.zig");
+const log_throttle = @import("../../debug/log_throttle.zig");
 
 const Point = font_types.Point;
 const Contour = font_types.Contour;
@@ -45,11 +46,15 @@ pub const SimpleBitmapRenderer = struct {
         const self: *SimpleBitmapRenderer = @ptrCast(@alignCast(ctx));
         const start_time = std.time.microTimestamp();
 
+        log_throttle.logInfo("simple_bitmap_start", "SimpleBitmapRenderer: rendering glyph at {}pt", .{font_size});
+
         // Calculate render bounds based on outline bounds and font size
         const scale = font_size / 1000.0; // TTF units to pixels (assuming 1000 units per EM)
         
         const bounds_width = @as(f32, @floatFromInt(outline.bounds.width())) * scale;
         const bounds_height = @as(f32, @floatFromInt(outline.bounds.height())) * scale;
+        
+        log_throttle.logInfo("simple_bitmap_bounds", "Glyph bounds: {}x{} TTF units, {}x{} pixels (scale={})", .{outline.bounds.width(), outline.bounds.height(), bounds_width, bounds_height, scale});
         
         // Add padding for safety
         const padding = 2.0;
@@ -117,6 +122,8 @@ pub const SimpleBitmapRenderer = struct {
         
         // Calculate quality score (simple bitmap gets medium score)
         const quality_score = 60.0; // Fixed score for simple bitmap
+        
+        log_throttle.logInfo("simple_bitmap_result", "SimpleBitmapRenderer: rendered {}x{} bitmap", .{width, height});
         
         return RenderResult{
             .bitmap = bitmap,
