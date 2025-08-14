@@ -22,7 +22,7 @@ pub const MenuTextStyles = struct {
             return font_config.getGlobalConfig().buttonCharWidth();
         }
     };
-    
+
     pub const navigation = struct {
         pub fn font_size() f32 {
             return font_config.getGlobalConfig().navigationFontSize();
@@ -32,7 +32,7 @@ pub const MenuTextStyles = struct {
             return font_config.getGlobalConfig().navigationCharWidth();
         }
     };
-    
+
     pub const header = struct {
         pub fn font_size() f32 {
             return font_config.getGlobalConfig().headerFontSize();
@@ -48,16 +48,16 @@ pub const MenuTextStyles = struct {
 pub const MenuTextRenderer = struct {
     text_renderer: *text_renderer.TextRenderer,
     font_manager: *font_manager.FontManager,
-    
+
     const Self = @This();
-    
+
     pub fn init(renderer: *text_renderer.TextRenderer, fm: *font_manager.FontManager) Self {
         return Self{
             .text_renderer = renderer,
             .font_manager = fm,
         };
     }
-    
+
     /// Queue button text centered within a rectangle
     pub fn queueButtonText(self: *Self, text: []const u8, rect: Rectangle, is_hovered: bool) void {
         // Skip empty text to prevent crashes
@@ -65,28 +65,19 @@ pub const MenuTextRenderer = struct {
             log_throttle.logDebug("empty_button", "Skipping empty button text", .{});
             return;
         }
-        
+
         const style = MenuTextStyles.button;
         const text_color = if (is_hovered) style.hovered_color else style.normal_color;
-        
+
         const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
-        
-        log_throttle.logDebug("queue_button", "Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{
-            text, text_pos.x, text_pos.y, rect.size.x, rect.size.y
-        });
-        
-        self.text_renderer.queuePersistentText(
-            text,
-            text_pos,
-            self.font_manager,
-            .sans,
-            style.font_size(),
-            text_color
-        ) catch |err| {
+
+        log_throttle.logDebug("queue_button", "Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{ text, text_pos.x, text_pos.y, rect.size.x, rect.size.y });
+
+        self.text_renderer.queuePersistentText(text, text_pos, self.font_manager, .sans, style.font_size(), text_color) catch |err| {
             log_throttle.logError("button_error", "Failed to queue button text '{s}': {}", .{ text, err });
         };
     }
-    
+
     /// Queue navigation text (like address bar path)
     pub fn queueNavigationText(self: *Self, text: []const u8, position: Vec2) void {
         // Skip empty text to prevent crashes
@@ -94,51 +85,30 @@ pub const MenuTextRenderer = struct {
             log_throttle.logDebug("empty_nav", "Skipping empty navigation text", .{});
             return;
         }
-        
+
         const style = MenuTextStyles.navigation;
-        
+
         // Debug logging disabled to reduce spam
-        
-        self.text_renderer.queuePersistentText(
-            text,
-            position,
-            self.font_manager,
-            .sans,
-            style.font_size(),
-            style.color
-        ) catch |err| {
+
+        self.text_renderer.queuePersistentText(text, position, self.font_manager, .sans, style.font_size(), style.color) catch |err| {
             log_throttle.logError("nav_error", "Failed to queue navigation text '{s}': {}", .{ text, err });
         };
     }
-    
+
     /// Queue header text centered within a rectangle
     pub fn queueHeaderText(self: *Self, text: []const u8, rect: Rectangle) void {
         const style = MenuTextStyles.header;
-        
+
         const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
-        
-        self.text_renderer.queuePersistentText(
-            text,
-            text_pos,
-            self.font_manager,
-            .sans,
-            style.font_size(),
-            style.color
-        ) catch |err| {
+
+        self.text_renderer.queuePersistentText(text, text_pos, self.font_manager, .sans, style.font_size(), style.color) catch |err| {
             log_throttle.logError("header_error", "Failed to queue header text '{s}': {}", .{ text, err });
         };
     }
-    
+
     /// Queue text at a specific position with custom style
     pub fn queueCustomText(self: *Self, text: []const u8, position: Vec2, font_size: f32, color: Color) void {
-        self.text_renderer.queuePersistentText(
-            text,
-            position,
-            self.font_manager,
-            .sans,
-            font_size,
-            color
-        ) catch |err| {
+        self.text_renderer.queuePersistentText(text, position, self.font_manager, .sans, font_size, color) catch |err| {
             log_throttle.logError("custom_error", "Failed to queue custom text '{s}': {}", .{ text, err });
         };
     }
@@ -150,38 +120,38 @@ pub const TextUtils = struct {
     pub fn estimateTextWidth(text: []const u8, char_width: f32) f32 {
         return @as(f32, @floatFromInt(text.len)) * char_width;
     }
-    
+
     /// Get button rectangle that fits text with standard padding
     pub fn getButtonRectForText(text: []const u8, position: Vec2) Rectangle {
         const char_width = font_config.getGlobalConfig().buttonCharWidth();
         const text_width = estimateTextWidth(text, char_width);
         return drawing.Sizes.button(position, text_width);
     }
-    
+
     /// Check if text fits within a given width
     pub fn textFitsWidth(text: []const u8, width: f32, char_width: f32) bool {
         return estimateTextWidth(text, char_width) <= width;
     }
-    
+
     /// Truncate text to fit within a given width (adds "..." if truncated)
     pub fn truncateTextToFit(allocator: std.mem.Allocator, text: []const u8, width: f32, char_width: f32) ![]const u8 {
         if (textFitsWidth(text, width, char_width)) {
             return text; // Return original if it fits
         }
-        
+
         const ellipsis = "...";
         const ellipsis_width = estimateTextWidth(ellipsis, char_width);
         const available_width = width - ellipsis_width;
-        
+
         if (available_width <= 0) {
             return ellipsis; // Can't fit anything, just return ellipsis
         }
-        
+
         const max_chars = @as(usize, @intFromFloat(available_width / char_width));
         if (max_chars == 0) {
             return ellipsis;
         }
-        
+
         const truncated_text = text[0..@min(max_chars, text.len)];
         return try std.fmt.allocPrint(allocator, "{s}{s}", .{ truncated_text, ellipsis });
     }
@@ -194,11 +164,11 @@ pub const PerformanceAnalysis = struct {
     /// - High reuse potential (same buttons, labels)
     /// - Predictable memory usage
     pub const recommended_mode = "persistent";
-    
+
     /// Expected cache hit rate for menu text
     /// Most menu text is static, leading to excellent cache efficiency
     pub const expected_cache_hit_rate = 0.90;
-    
+
     /// Memory usage per text element
     /// Typical button text ~= width*height*4 bytes (RGBA)
     /// Average button "Settings" at 16pt ~= 80x16 pixels = 5KB

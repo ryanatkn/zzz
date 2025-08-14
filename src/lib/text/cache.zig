@@ -11,12 +11,12 @@ pub const PersistentTextSystem = struct {
     allocator: std.mem.Allocator,
     device: *c.sdl.SDL_GPUDevice,
     textures: std.AutoHashMap(u64, PersistentTexture),
-    
+
     // Rendering resources
     sampler: ?*c.sdl.SDL_GPUSampler,
-    
+
     const Self = @This();
-    
+
     const PersistentTexture = struct {
         texture: *c.sdl.SDL_GPUTexture,
         width: u32,
@@ -24,7 +24,7 @@ pub const PersistentTextSystem = struct {
         content_hash: u64,
         last_used: u64,
         is_valid: bool,
-        
+
         pub fn deinit(self: *PersistentTexture, device: *c.sdl.SDL_GPUDevice) void {
             if (self.is_valid) {
                 c.sdl.SDL_ReleaseGPUTexture(device, self.texture);
@@ -32,7 +32,7 @@ pub const PersistentTextSystem = struct {
             }
         }
     };
-    
+
     pub fn init(allocator: std.mem.Allocator, device: *c.sdl.SDL_GPUDevice) !Self {
         var self = Self{
             .allocator = allocator,
@@ -40,12 +40,12 @@ pub const PersistentTextSystem = struct {
             .textures = std.AutoHashMap(u64, PersistentTexture).init(allocator),
             .sampler = null,
         };
-        
+
         try self.createSampler();
-        
+
         return self;
     }
-    
+
     pub fn deinit(self: *Self) void {
         // Release all persistent textures
         var iterator = self.textures.iterator();
@@ -53,33 +53,26 @@ pub const PersistentTextSystem = struct {
             entry.value_ptr.deinit(self.device);
         }
         self.textures.deinit();
-        
+
         // Release sampler
         if (self.sampler) |sampler| {
             c.sdl.SDL_ReleaseGPUSampler(self.device, sampler);
         }
     }
-    
+
     /// Get or create a persistent texture for the given text content
     /// Returns existing texture if content hasn't changed, or creates new one
-    pub fn getOrCreateTexture(
-        self: *Self, 
-        text: []const u8,
-        font_manager: anytype,
-        font_category: anytype,
-        font_size: f32,
-        color: types.Color
-    ) !?PersistentTextureHandle {
+    pub fn getOrCreateTexture(self: *Self, text: []const u8, font_manager: anytype, font_category: anytype, font_size: f32, color: types.Color) !?PersistentTextureHandle {
         const content_hash = self.hashText(text);
         const current_time = @as(u64, @intCast(std.time.milliTimestamp()));
-        
+
         // Check if we already have a valid texture for this content
         if (self.textures.getPtr(content_hash)) |existing| {
             if (existing.is_valid) {
                 existing.last_used = current_time;
-                
+
                 log_throttle.logDebug("cache_hit", "Using persistent texture for '{s}' ({}x{})", .{ text, existing.width, existing.height });
-                
+
                 return PersistentTextureHandle{
                     .texture = existing.texture,
                     .sampler = self.sampler.?,
@@ -89,15 +82,15 @@ pub const PersistentTextSystem = struct {
                 };
             }
         }
-        
+
         // Create new texture
         log_throttle.logInfo("create_texture", "Creating new persistent texture for '{s}'", .{text});
-        
+
         const text_result = font_manager.renderTextToTexture(text, font_category, font_size, color) catch |err| {
             log_throttle.logError("texture_error", "Failed to create persistent texture for text: {}", .{err});
             return null;
         };
-        
+
         // Store the persistent texture
         const persistent = PersistentTexture{
             .texture = text_result.texture,
@@ -107,11 +100,11 @@ pub const PersistentTextSystem = struct {
             .last_used = current_time,
             .is_valid = true,
         };
-        
+
         try self.textures.put(content_hash, persistent);
-        
+
         log_throttle.logInfo("texture_created", "Created persistent texture: {}x{}", .{ text_result.width, text_result.height });
-        
+
         return PersistentTextureHandle{
             .texture = text_result.texture,
             .sampler = self.sampler.?,
@@ -120,7 +113,7 @@ pub const PersistentTextSystem = struct {
             .is_cached = false,
         };
     }
-    
+
     /// Check if a texture exists for the given text (without creating it)
     pub fn hasTexture(self: *Self, text: []const u8) bool {
         const content_hash = self.hashText(text);
@@ -129,24 +122,24 @@ pub const PersistentTextSystem = struct {
         }
         return false;
     }
-    
+
     /// Invalidate a specific text texture (call when you know content will change)
     pub fn invalidateTexture(self: *Self, text: []const u8) void {
         const content_hash = self.hashText(text);
         if (self.textures.getPtr(content_hash)) |existing| {
             existing.deinit(self.device);
             _ = self.textures.remove(content_hash);
-            
+
             log_throttle.logInfo("invalidate", "Invalidated persistent texture for '{s}'", .{text});
         }
     }
-    
+
     /// Clean up old textures that haven't been used recently
     pub fn cleanup(self: *Self, max_age_ms: u64) void {
         const current_time = @as(u64, @intCast(std.time.milliTimestamp()));
         var to_remove = std.ArrayList(u64).init(self.allocator);
         defer to_remove.deinit();
-        
+
         var iterator = self.textures.iterator();
         while (iterator.next()) |entry| {
             const age = current_time - entry.value_ptr.last_used;
@@ -155,21 +148,21 @@ pub const PersistentTextSystem = struct {
                 to_remove.append(entry.key_ptr.*) catch continue;
             }
         }
-        
+
         for (to_remove.items) |hash| {
             _ = self.textures.remove(hash);
         }
-        
+
         if (to_remove.items.len > 0) {
             log_throttle.logInfo("cleanup", "Cleaned up {} old persistent textures", .{to_remove.items.len});
         }
     }
-    
+
     /// Get statistics about the persistent texture system
     pub fn getStats(self: *Self) PersistentTextStats {
         var valid_count: u32 = 0;
         var total_memory: u64 = 0;
-        
+
         var iterator = self.textures.iterator();
         while (iterator.next()) |entry| {
             if (entry.value_ptr.is_valid) {
@@ -178,20 +171,20 @@ pub const PersistentTextSystem = struct {
                 total_memory += @as(u64, entry.value_ptr.width) * entry.value_ptr.height * 4;
             }
         }
-        
+
         return PersistentTextStats{
             .texture_count = valid_count,
             .estimated_memory_bytes = total_memory,
         };
     }
-    
+
     fn hashText(self: *Self, text: []const u8) u64 {
         _ = self;
         var hasher = std.hash.Fnv1a_64.init();
         hasher.update(text);
         return hasher.final();
     }
-    
+
     fn createSampler(self: *Self) !void {
         const sampler_info = c.sdl.SDL_GPUSamplerCreateInfo{
             .min_filter = c.sdl.SDL_GPU_FILTER_LINEAR,
@@ -208,7 +201,7 @@ pub const PersistentTextSystem = struct {
             .enable_anisotropy = false,
             .enable_compare = false,
         };
-        
+
         self.sampler = c.sdl.SDL_CreateGPUSampler(self.device, &sampler_info);
         if (self.sampler == null) {
             return error.SamplerCreationFailed;
@@ -236,11 +229,11 @@ var global_persistent_text_system: ?*PersistentTextSystem = null;
 
 pub fn initGlobalPersistentTextSystem(allocator: std.mem.Allocator, device: *c.sdl.SDL_GPUDevice) !void {
     if (global_persistent_text_system != null) return;
-    
+
     const system = try allocator.create(PersistentTextSystem);
     system.* = try PersistentTextSystem.init(allocator, device);
     global_persistent_text_system = system;
-    
+
     log_throttle.logInfo("init_system", "Initialized global persistent text system", .{});
 }
 
@@ -249,7 +242,7 @@ pub fn deinitGlobalPersistentTextSystem(allocator: std.mem.Allocator) void {
         system.deinit();
         allocator.destroy(system);
         global_persistent_text_system = null;
-        
+
         log_throttle.logInfo("deinit_system", "Deinitialized global persistent text system", .{});
     }
 }
@@ -264,7 +257,7 @@ pub const RenderingMode = enum {
     /// Textures are created, used once, then immediately released
     /// Examples: particle counts, frame-based debug info
     immediate,
-    
+
     /// Use for text that changes occasionally or stays the same
     /// Textures are kept alive until content changes
     /// Examples: FPS counter, UI labels, menu text

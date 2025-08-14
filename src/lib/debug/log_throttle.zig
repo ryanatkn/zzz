@@ -4,7 +4,7 @@ const builtin = @import("builtin");
 /// Logging throttle helper to reduce per-frame spam while preserving important information
 pub const LogThrottle = struct {
     const Self = @This();
-    
+
     const LogEntry = struct {
         key: []const u8,
         first_seen: i64,
@@ -12,15 +12,15 @@ pub const LogThrottle = struct {
         count: u32,
         last_value: ?[]const u8, // For change detection
     };
-    
+
     entries: std.AutoHashMap(u64, LogEntry),
     allocator: std.mem.Allocator,
     start_time: i64,
-    
-    // Configuration  
+
+    // Configuration
     summary_interval_ms: i64 = 30000, // Summary every 30 seconds (reduced spam)
-    first_time_delay_ms: i64 = 1000,  // Allow first occurrences for 1 second
-    
+    first_time_delay_ms: i64 = 1000, // Allow first occurrences for 1 second
+
     pub fn init(allocator: std.mem.Allocator) Self {
         return Self{
             .entries = std.AutoHashMap(u64, LogEntry).init(allocator),
@@ -28,7 +28,7 @@ pub const LogThrottle = struct {
             .start_time = std.time.milliTimestamp(),
         };
     }
-    
+
     pub fn deinit(self: *Self) void {
         var iter = self.entries.iterator();
         while (iter.next()) |entry| {
@@ -41,19 +41,19 @@ pub const LogThrottle = struct {
         }
         self.entries.deinit();
     }
-    
+
     /// Hash a log key for consistent deduplication
     fn hashKey(key: []const u8) u64 {
         return std.hash_map.hashString(key);
     }
-    
+
     /// Check if a log message should be emitted or throttled
     pub fn shouldLog(self: *Self, key: []const u8, value: ?[]const u8) bool {
         const now = std.time.milliTimestamp();
         const key_hash = hashKey(key);
-        
+
         const result = self.entries.getOrPut(key_hash) catch return true; // On error, allow logging
-        
+
         if (!result.found_existing) {
             // First time seeing this key - always log if we're in early startup
             const age_ms = now - self.start_time;
@@ -78,10 +78,10 @@ pub const LogThrottle = struct {
                 return false; // Throttle new events after startup
             }
         }
-        
+
         const entry = result.value_ptr;
         entry.count += 1;
-        
+
         // Check if value changed (always log changes)
         if (value) |new_val| {
             if (entry.last_value) |old_val| {
@@ -99,17 +99,17 @@ pub const LogThrottle = struct {
                 return true;
             }
         }
-        
+
         // Check if enough time has passed for a summary
         const time_since_last = now - entry.last_logged;
         if (time_since_last >= self.summary_interval_ms) {
             entry.last_logged = now;
             return true;
         }
-        
+
         return false;
     }
-    
+
     /// Get summary information for a throttled key
     pub fn getSummary(self: *Self, key: []const u8) ?struct { count: u32, age_ms: i64 } {
         const key_hash = hashKey(key);
@@ -122,7 +122,7 @@ pub const LogThrottle = struct {
         }
         return null;
     }
-    
+
     /// Clear all throttled entries (useful for testing or reset)
     pub fn reset(self: *Self) void {
         var iter = self.entries.iterator();
@@ -135,29 +135,27 @@ pub const LogThrottle = struct {
         self.entries.clearAndFree();
         self.start_time = std.time.milliTimestamp();
     }
-    
+
     /// Print summary of all throttled logs (useful for debugging)
     pub fn printSummary(self: *Self) void {
         const now = std.time.milliTimestamp();
         std.log.info("=== LogThrottle Summary ===", .{});
-        
+
         var iter = self.entries.iterator();
         var total_suppressed: u32 = 0;
         var active_keys: u32 = 0;
-        
+
         while (iter.next()) |entry| {
             const age_ms = now - entry.value_ptr.first_seen;
             const suppressed = entry.value_ptr.count - 1; // -1 because first occurrence was logged
-            
+
             if (suppressed > 0) {
-                std.log.info("  {s}: {} occurrences, {} suppressed ({}ms ago)", .{
-                    entry.value_ptr.key, entry.value_ptr.count, suppressed, age_ms
-                });
+                std.log.info("  {s}: {} occurrences, {} suppressed ({}ms ago)", .{ entry.value_ptr.key, entry.value_ptr.count, suppressed, age_ms });
                 total_suppressed += suppressed;
             }
             active_keys += 1;
         }
-        
+
         std.log.info("Total: {} keys tracked, {} logs suppressed", .{ active_keys, total_suppressed });
         std.log.info("==========================", .{});
     }
@@ -188,7 +186,7 @@ pub fn logInfo(comptime key: []const u8, comptime fmt: []const u8, args: anytype
     if (global_throttle) |throttle| {
         var buffer: [256]u8 = undefined;
         const message = std.fmt.bufPrint(&buffer, fmt, args) catch "format error";
-        
+
         if (throttle.shouldLog(key, message)) {
             if (throttle.getSummary(key)) |summary| {
                 if (summary.count > 1) {

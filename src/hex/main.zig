@@ -105,7 +105,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 
     // Initialize renderer
     game_renderer = try GameRenderer.init(global_allocator, window);
-    
+
     // Initialize debug logging throttle system
     try log_throttle.initGlobal(global_allocator);
 
@@ -173,21 +173,21 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
     if (fully_initialized) {
         if (!DEBUG_MODE) {
             game_state.deinitHud();
-            
+
             // CRITICAL: Clean up persistent text system BEFORE game_renderer.deinit()
             // This ensures GPU textures are released before the GPU device is destroyed
             persistent_text.deinitGlobalPersistentTextSystem(global_allocator);
-            
+
             // Now safe to deinitialize the renderer and GPU device
             game_renderer.deinit();
             loader.deinit(); // Clean up ZON data memory
-            
+
             // Clean up reactive system
             reactive_text_cache.deinitGlobalTextCache(global_allocator);
             reactive_time.deinitGlobalTime();
             reactive_batch.deinitGlobalBatcher(global_allocator);
             reactive_context.deinitContext(global_allocator);
-            
+
             // Clean up debug logging system
             log_throttle.deinitGlobal(global_allocator);
         }
@@ -202,7 +202,7 @@ var frame_counter: u32 = 0;
 fn runGameLoop() !void {
     // Tick reactive time system (updates frame count and time signals)
     reactive_time.tickGlobalTime();
-    
+
     // Print logging summary every 10 seconds (at 60 FPS = 600 frames)
     frame_counter += 1;
     if (frame_counter % 600 == 0) {
@@ -244,7 +244,7 @@ fn renderGame() !void {
         const fps = reactive_time.getFPS();
         game_renderer.drawFPS(cmd_buffer, render_pass, fps);
     }
-    
+
     // Render HUD overlay if open
     if (game_state.hud_system) |*hud_sys| {
         try hud_sys.render(cmd_buffer, render_pass);

@@ -17,37 +17,37 @@ pub const SimpleHistory = struct {
             .stack_size = 1,
             .current_index = 0,
         };
-        
+
         // Initialize with root path
         hist.paths[0][0] = '/';
         hist.path_lens[0] = 1;
-        
+
         return hist;
     }
 
     pub fn navigate(self: *SimpleHistory, path: []const u8) !void {
         if (path.len >= MAX_PATH_LEN) return error.PathTooLong;
-        
+
         // Remove any forward history
         self.stack_size = self.current_index + 1;
-        
+
         // Don't add if it's the same as current
         if (self.stack_size > 0) {
             const current = self.getCurrentPath();
             if (std.mem.eql(u8, current, path)) return;
         }
-        
+
         // Add new path
         if (self.stack_size >= MAX_HISTORY) {
             // Shift everything down
             for (1..MAX_HISTORY) |i| {
-                @memcpy(&self.paths[i-1], &self.paths[i]);
-                self.path_lens[i-1] = self.path_lens[i];
+                @memcpy(&self.paths[i - 1], &self.paths[i]);
+                self.path_lens[i - 1] = self.path_lens[i];
             }
             self.stack_size = MAX_HISTORY - 1;
             self.current_index = self.stack_size;
         }
-        
+
         const idx = self.stack_size;
         @memcpy(self.paths[idx][0..path.len], path);
         self.path_lens[idx] = path.len;

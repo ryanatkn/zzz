@@ -49,7 +49,6 @@ const EffectUniforms = extern struct {
     // Total: 64 bytes
 };
 
-
 pub const SimpleGPURenderer = struct {
     allocator: std.mem.Allocator,
     device: *c.sdl.SDL_GPUDevice,
@@ -72,7 +71,7 @@ pub const SimpleGPURenderer = struct {
 
     // Text rendering
     text_renderer: TextRenderer,
-    
+
     // Vector graphics rendering
     vector_renderer: gpu_vector_renderer.GPUVectorRenderer,
 
@@ -88,24 +87,21 @@ pub const SimpleGPURenderer = struct {
         // Try different backends to work around NVIDIA Vulkan driver issues
         // Priority: 1) OpenGL first 2) Software 3) Auto-select as last resort
         const backends = [_]?[*:0]const u8{
-            "opengl",               // Force OpenGL backend first
-            "software",             // Software fallback
-            null,                   // Auto-select (usually Vulkan) as last resort
+            "opengl", // Force OpenGL backend first
+            "software", // Software fallback
+            null, // Auto-select (usually Vulkan) as last resort
         };
-        
+
         var device: ?*c.sdl.SDL_GPUDevice = null;
         var backend_used: []const u8 = "unknown";
-        
+
         for (backends) |backend_name| {
             const name_str = if (backend_name) |name| std.mem.span(name) else "auto-select";
             std.debug.print("Trying GPU backend: {s}\n", .{name_str});
-            
-            device = c.sdl.SDL_CreateGPUDevice(
-                c.sdl.SDL_GPU_SHADERFORMAT_SPIRV | c.sdl.SDL_GPU_SHADERFORMAT_DXIL, 
-                true, // Enable debug mode for better error reporting
-                backend_name
-            );
-            
+
+            device = c.sdl.SDL_CreateGPUDevice(c.sdl.SDL_GPU_SHADERFORMAT_SPIRV | c.sdl.SDL_GPU_SHADERFORMAT_DXIL, true, // Enable debug mode for better error reporting
+                backend_name);
+
             if (device != null) {
                 backend_used = name_str;
                 break;
@@ -114,7 +110,7 @@ pub const SimpleGPURenderer = struct {
                 std.debug.print("Failed to create GPU device with {s}: {s}\n", .{ name_str, err });
             }
         }
-        
+
         const final_device = device orelse {
             std.debug.print("Failed to create GPU device\n", .{});
             return error.GPUDeviceCreationFailed;
@@ -149,7 +145,7 @@ pub const SimpleGPURenderer = struct {
 
         try self.createShaders();
         try self.createPipelines();
-        
+
         // Initialize text renderer
         self.text_renderer = try TextRenderer.init(self.device, allocator, self.screen_width, self.screen_height);
         self.vector_renderer = gpu_vector_renderer.GPUVectorRenderer.init(allocator, self.device, self.screen_width, self.screen_height);
@@ -164,7 +160,7 @@ pub const SimpleGPURenderer = struct {
         // Clean up text renderer
         self.text_renderer.deinit();
         self.vector_renderer.deinit();
-        
+
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.circle_pipeline);
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.rect_pipeline);
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.effect_pipeline);
@@ -293,7 +289,6 @@ pub const SimpleGPURenderer = struct {
             std.debug.print("Failed to create effect fragment shader\n", .{});
             return error.FragmentShaderFailed;
         };
-
 
         std.debug.print("Simple GPU shaders loaded successfully\n", .{});
     }
@@ -432,10 +427,8 @@ pub const SimpleGPURenderer = struct {
             return error.PipelineCreationFailed;
         };
 
-
         std.debug.print("Simple graphics pipelines created successfully!\n", .{});
     }
-    
 
     // Begin frame and get command buffer ready for rendering
     pub fn beginFrame(self: *Self, window: *c.sdl.SDL_Window) !*c.sdl.SDL_GPUCommandBuffer {
@@ -445,7 +438,7 @@ pub const SimpleGPURenderer = struct {
         _ = c.sdl.SDL_GetWindowSize(window, &window_w, &window_h);
         self.screen_width = @floatFromInt(window_w);
         self.screen_height = @floatFromInt(window_h);
-        
+
         // Update text renderer screen size
         self.text_renderer.updateScreenSize(self.screen_width, self.screen_height);
         self.vector_renderer.updateScreenSize(self.screen_width, self.screen_height);
@@ -457,8 +450,7 @@ pub const SimpleGPURenderer = struct {
 
         return cmd_buffer;
     }
-    
-    
+
     // Start a render pass with the given background color
     pub fn beginRenderPass(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, window: *c.sdl.SDL_Window, bg_color: Color) !*c.sdl.SDL_GPURenderPass {
         _ = self;
@@ -546,7 +538,7 @@ pub const SimpleGPURenderer = struct {
 
         // Push uniform data BEFORE binding pipeline
         c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(CircleUniforms));
-        
+
         // Use circle pipeline which has alpha blending enabled
         c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.circle_pipeline);
         c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for quad
@@ -605,100 +597,53 @@ pub const SimpleGPURenderer = struct {
     pub fn drawPixel(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, x: f32, y: f32, color: Color) void {
         self.drawRect(cmd_buffer, render_pass, Vec2{ .x = x, .y = y }, Vec2{ .x = 1.0, .y = 1.0 }, color);
     }
-    
+
     // Vector graphics drawing methods
-    
+
     /// Draw a vector path as a filled shape
-    pub fn drawVectorPath(
-        self: *Self,
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
-        render_pass: *c.sdl.SDL_GPURenderPass,
-        path: *const gpu_vector_renderer.vector_path.VectorPath,
-        color: Color
-    ) !void {
+    pub fn drawVectorPath(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, path: *const gpu_vector_renderer.vector_path.VectorPath, color: Color) !void {
         try self.vector_renderer.drawPath(self, cmd_buffer, render_pass, path, color);
     }
-    
+
     /// Draw a quadratic bezier curve
-    pub fn drawQuadraticCurve(
-        self: *Self,
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
-        render_pass: *c.sdl.SDL_GPURenderPass,
-        curve: gpu_vector_renderer.QuadraticCurve,
-        color: Color,
-        stroke_width: f32
-    ) !void {
+    pub fn drawQuadraticCurve(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, curve: gpu_vector_renderer.QuadraticCurve, color: Color, stroke_width: f32) !void {
         try self.vector_renderer.drawQuadraticCurve(self, cmd_buffer, render_pass, curve, color, stroke_width);
     }
-    
+
     /// Draw a polygon (filled or outline)
-    pub fn drawPolygon(
-        self: *Self,
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
-        render_pass: *c.sdl.SDL_GPURenderPass,
-        points: []const Vec2,
-        color: Color,
-        filled: bool
-    ) !void {
+    pub fn drawPolygon(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, points: []const Vec2, color: Color, filled: bool) !void {
         try self.vector_renderer.drawPolygon(self, cmd_buffer, render_pass, points, color, filled);
     }
-    
+
     /// Draw a circle using vector graphics (higher quality than distance field circles)
-    pub fn drawVectorCircle(
-        self: *Self,
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
-        render_pass: *c.sdl.SDL_GPURenderPass,
-        center: Vec2,
-        radius: f32,
-        color: Color,
-        segments: u32
-    ) !void {
+    pub fn drawVectorCircle(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, center: Vec2, radius: f32, color: Color, segments: u32) !void {
         var circle_path = try gpu_vector_renderer.VectorUtils.createCircle(self.vector_renderer.allocator, center, radius, segments);
         defer circle_path.deinit();
-        
+
         try self.vector_renderer.drawPath(self, cmd_buffer, render_pass, &circle_path, color);
     }
-    
+
     /// Draw a rounded rectangle using vector graphics
-    pub fn drawVectorRoundedRect(
-        self: *Self,
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
-        render_pass: *c.sdl.SDL_GPURenderPass,
-        pos: Vec2,
-        size: Vec2,
-        color: Color
-    ) !void {
+    pub fn drawVectorRoundedRect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, size: Vec2, color: Color) !void {
         var rect_path = try gpu_vector_renderer.VectorUtils.createRectangle(self.vector_renderer.allocator, pos, size);
         defer rect_path.deinit();
-        
+
         try self.vector_renderer.drawPath(self, cmd_buffer, render_pass, &rect_path, color);
     }
-    
+
     /// Set tessellation quality for vector graphics
     pub fn setVectorQuality(self: *Self, quality: enum { fast, medium, high, ultra }) void {
         self.vector_renderer.setTessellationQuality(quality);
     }
 
     // Queue a texture-based text for drawing
-    pub fn queueTextTexture(
-        self: *Self,
-        texture: *c.sdl.SDL_GPUTexture,
-        position: Vec2,
-        width: u32,
-        height: u32,
-        color: Color
-    ) void {
+    pub fn queueTextTexture(self: *Self, texture: *c.sdl.SDL_GPUTexture, position: Vec2, width: u32, height: u32, color: Color) void {
         self.text_renderer.queueTextTexture(texture, position, width, height, color);
     }
 
     // Draw all queued text (call during render pass)
-    pub fn drawQueuedText(
-        self: *Self,
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
-        render_pass: *c.sdl.SDL_GPURenderPass
-    ) void {
+    pub fn drawQueuedText(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
         // Delegate to text renderer for proper textured rendering
         self.text_renderer.drawQueuedText(cmd_buffer, render_pass);
     }
-
 };

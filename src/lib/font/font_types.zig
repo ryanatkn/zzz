@@ -11,15 +11,15 @@ const std = @import("std");
 pub const Point = struct {
     x: f32,
     y: f32,
-    
+
     pub fn init(x: f32, y: f32) Point {
         return .{ .x = x, .y = y };
     }
-    
+
     pub fn scale(self: Point, factor: f32) Point {
         return .{ .x = self.x * factor, .y = self.y * factor };
     }
-    
+
     pub fn translate(self: Point, dx: f32, dy: f32) Point {
         return .{ .x = self.x + dx, .y = self.y + dy };
     }
@@ -29,7 +29,7 @@ pub const Point = struct {
 pub const Contour = struct {
     points: []Point,
     on_curve: []bool,
-    
+
     pub fn deinit(self: *Contour, allocator: std.mem.Allocator) void {
         allocator.free(self.points);
         allocator.free(self.on_curve);
@@ -41,7 +41,7 @@ pub const GlyphOutline = struct {
     contours: []Contour,
     bounds: GlyphBounds,
     metrics: GlyphMetrics,
-    
+
     pub fn deinit(self: *GlyphOutline, allocator: std.mem.Allocator) void {
         for (self.contours) |*contour| {
             contour.deinit(allocator);
@@ -56,11 +56,11 @@ pub const GlyphBounds = struct {
     y_min: i16,
     x_max: i16,
     y_max: i16,
-    
+
     pub fn width(self: GlyphBounds) u16 {
         return @intCast(@as(i32, self.x_max) - @as(i32, self.x_min));
     }
-    
+
     pub fn height(self: GlyphBounds) u16 {
         return @intCast(@as(i32, self.y_max) - @as(i32, self.y_min));
     }
@@ -70,7 +70,7 @@ pub const GlyphBounds = struct {
 pub const GlyphMetrics = struct {
     advance_width: u16,
     left_side_bearing: i16,
-    
+
     pub fn getAdvance(self: GlyphMetrics) f32 {
         return @floatFromInt(self.advance_width);
     }
@@ -87,16 +87,16 @@ pub const Edge = struct {
     y0: f32,
     x1: f32,
     y1: f32,
-    
+
     // Winding direction (-1 or +1)
     winding: i32,
-    
+
     // Fixed-point versions for precision (16.16 format)
     fx0: i32,
     fy0: i32,
     fx1: i32,
     fy1: i32,
-    
+
     pub fn init(x0: f32, y0: f32, x1: f32, y1: f32, winding: i32) Edge {
         return .{
             .x0 = x0,
@@ -111,15 +111,15 @@ pub const Edge = struct {
             .fy1 = @intFromFloat(y1 * 65536.0),
         };
     }
-    
+
     pub fn isHorizontal(self: Edge) bool {
         return self.y0 == self.y1;
     }
-    
+
     pub fn minY(self: Edge) f32 {
         return @min(self.y0, self.y1);
     }
-    
+
     pub fn maxY(self: Edge) f32 {
         return @max(self.y0, self.y1);
     }
@@ -133,7 +133,7 @@ pub const RasterizedGlyph = struct {
     bearing_x: i32,
     bearing_y: i32,
     advance: i32,
-    
+
     pub fn deinit(self: *RasterizedGlyph, allocator: std.mem.Allocator) void {
         allocator.free(self.bitmap);
     }
@@ -154,7 +154,7 @@ pub const FontWeight = enum(u16) {
     bold = 700,
     extra_bold = 800,
     black = 900,
-    
+
     pub fn fromInt(value: u16) FontWeight {
         return switch (value) {
             100 => .thin,
@@ -185,7 +185,7 @@ pub const FontCategory = enum {
     serif,
     display,
     handwriting,
-    
+
     pub fn toString(self: FontCategory) []const u8 {
         return switch (self) {
             .mono => "mono",
@@ -199,11 +199,11 @@ pub const FontCategory = enum {
 
 /// Rendering quality/method selection
 pub const RenderingMethod = enum {
-    bitmap,      // Basic bitmap rendering
-    sdf,         // Signed Distance Field
+    bitmap, // Basic bitmap rendering
+    sdf, // Signed Distance Field
     oversampled, // 2x or 4x oversampling
-    cached,      // Pre-rendered cache
-    
+    cached, // Pre-rendered cache
+
     pub fn toString(self: RenderingMethod) []const u8 {
         return switch (self) {
             .bitmap => "bitmap",
@@ -222,7 +222,7 @@ pub const RenderingMethod = enum {
 pub const FillRule = enum {
     non_zero,
     even_odd,
-    
+
     pub fn shouldFill(self: FillRule, winding: i32) bool {
         return switch (self) {
             .non_zero => winding != 0,
@@ -300,7 +300,7 @@ test "Point operations" {
     const scaled = p.scale(2);
     try std.testing.expectEqual(@as(f32, 20), scaled.x);
     try std.testing.expectEqual(@as(f32, 40), scaled.y);
-    
+
     const translated = p.translate(5, -5);
     try std.testing.expectEqual(@as(f32, 15), translated.x);
     try std.testing.expectEqual(@as(f32, 15), translated.y);
@@ -317,7 +317,7 @@ test "Fill rule logic" {
     try std.testing.expectEqual(true, FillRule.non_zero.shouldFill(1));
     try std.testing.expectEqual(true, FillRule.non_zero.shouldFill(-1));
     try std.testing.expectEqual(false, FillRule.non_zero.shouldFill(0));
-    
+
     try std.testing.expectEqual(true, FillRule.even_odd.shouldFill(1));
     try std.testing.expectEqual(false, FillRule.even_odd.shouldFill(2));
     try std.testing.expectEqual(true, FillRule.even_odd.shouldFill(3));

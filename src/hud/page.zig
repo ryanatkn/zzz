@@ -9,7 +9,7 @@ pub const Link = struct {
 
 pub const RenderSlot = struct {
     render_fn: *const fn (links: *std.ArrayList(Link)) anyerror!void,
-    
+
     pub fn render(self: *const RenderSlot, links: *std.ArrayList(Link)) !void {
         try self.render_fn(links);
     }
@@ -37,7 +37,7 @@ pub const Layout = struct {
     pub fn render(self: *const Layout, links: *std.ArrayList(Link), slot: *const RenderSlot) !void {
         try self.vtable.render(self, links, slot);
     }
-    
+
     pub fn destroy(self: *Layout, allocator: std.mem.Allocator) void {
         self.vtable.destroy(self, allocator);
     }
@@ -71,7 +71,7 @@ pub const Page = struct {
     pub fn render(self: *const Page, links: *std.ArrayList(Link)) !void {
         try self.vtable.render(self, links);
     }
-    
+
     pub fn destroy(self: *Page, allocator: std.mem.Allocator) void {
         self.vtable.destroy(self, allocator);
     }

@@ -20,13 +20,13 @@ pub const LabelStyle = struct {
     background_color: ?Color,
     padding: Vec2,
     alignment: TextAlignment,
-    
+
     pub const TextAlignment = enum {
         left,
         center,
         right,
     };
-    
+
     pub const default = LabelStyle{
         .font_size = 24.0,
         .color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
@@ -34,7 +34,7 @@ pub const LabelStyle = struct {
         .padding = Vec2{ .x = 0, .y = 0 },
         .alignment = .left,
     };
-    
+
     pub const button = LabelStyle{
         .font_size = 18.0,
         .color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
@@ -42,7 +42,7 @@ pub const LabelStyle = struct {
         .padding = Vec2{ .x = 8, .y = 4 },
         .alignment = .center,
     };
-    
+
     pub const title = LabelStyle{
         .font_size = 36.0,
         .color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
@@ -50,7 +50,7 @@ pub const LabelStyle = struct {
         .padding = Vec2{ .x = 0, .y = 10 },
         .alignment = .center,
     };
-    
+
     pub const small = LabelStyle{
         .font_size = 14.0,
         .color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 },
@@ -64,20 +64,20 @@ pub const LabelStyle = struct {
 pub const TextContent = union(enum) {
     /// Static text that never changes
     static: []const u8,
-    
+
     /// Dynamic text from a reactive signal
     signal: *signal.Signal([]const u8),
-    
+
     /// Derived text from reactive dependencies
     derived: *derived.Derived([]const u8),
-    
+
     /// Text formatted from multiple values
     formatted: FormattedText,
-    
+
     pub const FormattedText = struct {
         format_string: []const u8,
         values: []const FormattedValue,
-        
+
         pub const FormattedValue = union(enum) {
             int_signal: *signal.Signal(i64),
             uint_signal: *signal.Signal(u64),
@@ -91,7 +91,7 @@ pub const TextContent = union(enum) {
             static_bool: bool,
         };
     };
-    
+
     pub fn getChangeFrequency(self: *const TextContent) f32 {
         return switch (self.*) {
             .static => 0.0, // Never changes
@@ -118,41 +118,36 @@ pub const ReactiveLabelData = struct {
     position: Vec2,
     style: LabelStyle,
     content: TextContent,
-    
+
     // Reactive signals
     is_visible: *signal.Signal(bool),
     needs_update: *signal.Signal(bool),
     last_text: *signal.Signal([]const u8),
-    
+
     // Derived values
     current_text: *derived.Derived([]const u8),
     rendering_mode: rendering_modes.RenderingMode,
-    
+
     // Cache for text allocation
     cached_text: ?[]const u8,
-    
+
     const Self = @This();
-    
-    pub fn init(
-        allocator: std.mem.Allocator,
-        position: Vec2,
-        style: LabelStyle,
-        content: TextContent
-    ) !Self {
+
+    pub fn init(allocator: std.mem.Allocator, position: Vec2, style: LabelStyle, content: TextContent) !Self {
         // Create reactive signals
         const is_visible_signal = try allocator.create(signal.Signal(bool));
         is_visible_signal.* = try signal.Signal(bool).init(allocator, true);
-        
+
         const needs_update_signal = try allocator.create(signal.Signal(bool));
         needs_update_signal.* = try signal.Signal(bool).init(allocator, true);
-        
+
         const last_text_signal = try allocator.create(signal.Signal([]const u8));
         last_text_signal.* = try signal.Signal([]const u8).init(allocator, "");
-        
+
         // Determine rendering mode based on content change frequency
         const change_freq = content.getChangeFrequency();
         const mode_profile = rendering_modes.recommendModeByRate(change_freq);
-        
+
         var self = Self{
             .allocator = allocator,
             .position = position,
@@ -165,24 +160,21 @@ pub const ReactiveLabelData = struct {
             .rendering_mode = mode_profile.recommended_mode,
             .cached_text = null,
         };
-        
+
         // Create derived text value
         self.current_text = try self.createCurrentTextDerived();
-        
-        log_throttle.logInfo("create_label", "Created reactive label with {s} mode (changes: {d:.2}/sec)", .{
-            @tagName(self.rendering_mode), 
-            change_freq
-        });
-        
+
+        log_throttle.logInfo("create_label", "Created reactive label with {s} mode (changes: {d:.2}/sec)", .{ @tagName(self.rendering_mode), change_freq });
+
         return self;
     }
-    
+
     fn createCurrentTextDerived(self: *Self) !*derived.Derived([]const u8) {
         const SelfRef = struct {
             var label_ref: *ReactiveLabelData = undefined;
         };
         SelfRef.label_ref = self;
-        
+
         return try derived.derived(self.allocator, []const u8, struct {
             fn compute() []const u8 {
                 const label = SelfRef.label_ref;
@@ -190,29 +182,29 @@ pub const ReactiveLabelData = struct {
             }
         }.compute);
     }
-    
+
     fn computeText(self: *Self) ![]const u8 {
         // Free previous cached text
         if (self.cached_text) |old_text| {
             self.allocator.free(old_text);
             self.cached_text = null;
         }
-        
+
         const text = switch (self.content) {
             .static => |static_text| try self.allocator.dupe(u8, static_text),
             .signal => |text_signal| try self.allocator.dupe(u8, text_signal.get()),
             .derived => |text_derived| try self.allocator.dupe(u8, text_derived.get()),
             .formatted => |fmt| try self.formatText(fmt),
         };
-        
+
         self.cached_text = text;
         return text;
     }
-    
+
     fn formatText(self: *Self, fmt: TextContent.FormattedText) ![]const u8 {
         var values = std.ArrayList(std.fmt.FormatArg).init(self.allocator);
         defer values.deinit();
-        
+
         for (fmt.values) |value| {
             const format_arg = switch (value) {
                 .int_signal => |sig| std.fmt.FormatArg{ .int = sig.get() },
@@ -228,97 +220,78 @@ pub const ReactiveLabelData = struct {
             };
             try values.append(format_arg);
         }
-        
+
         // Note: This is a simplified implementation - real formatting would need proper argument handling
         return try std.fmt.allocPrint(self.allocator, fmt.format_string, .{});
     }
-    
+
     pub fn setVisible(self: *Self, visible: bool) void {
         self.is_visible.set(visible);
     }
-    
+
     pub fn setPosition(self: *Self, position: Vec2) void {
         self.position = position;
         self.needs_update.set(true);
     }
-    
+
     pub fn updateContent(self: *Self, new_content: TextContent) void {
         self.content = new_content;
-        
+
         // Update rendering mode based on new content characteristics
         const change_freq = new_content.getChangeFrequency();
         const mode_profile = rendering_modes.recommendModeByRate(change_freq);
         self.rendering_mode = mode_profile.recommended_mode;
-        
+
         self.needs_update.set(true);
-        
+
         log_throttle.logDebug("content_update", "Label content updated, new mode: {s}", .{@tagName(self.rendering_mode)});
     }
-    
+
     pub fn render(self: *Self, renderer: *text_renderer.TextRenderer, font_manager: anytype, font_category: anytype) !void {
         if (!self.is_visible.peek()) return;
-        
+
         // Get current text (this will trigger reactive computation if needed)
         const text = self.current_text.get();
-        
+
         // Check if text has actually changed
         const last_text = self.last_text.peek();
         const text_changed = !std.mem.eql(u8, text, last_text);
-        
+
         if (text_changed) {
             self.last_text.set(text);
-            
+
             log_throttle.logInfo("text_change", "Label text changed: '{s}' -> '{s}'", .{ last_text, text });
         }
-        
+
         // Calculate effective position based on alignment
         const effective_position = self.calculateAlignedPosition(text);
-        
+
         // Render based on the determined mode
         switch (self.rendering_mode) {
             .immediate => {
                 // Use immediate mode for frequently changing content
-                const text_result = font_manager.renderTextToTexture(
-                    text, 
-                    font_category, 
-                    self.style.font_size, 
-                    self.style.color, 
-                    renderer.device
-                ) catch |err| {
+                const text_result = font_manager.renderTextToTexture(text, font_category, self.style.font_size, self.style.color, renderer.device) catch |err| {
                     log_throttle.logError("render_error", "Failed to render immediate label text: {}", .{err});
                     return;
                 };
-                
-                renderer.queueTextTexture(
-                    text_result.texture,
-                    effective_position,
-                    text_result.width,
-                    text_result.height,
-                    self.style.color
-                );
+
+                renderer.queueTextTexture(text_result.texture, effective_position, text_result.width, text_result.height, self.style.color);
             },
             .persistent => {
                 // Use persistent mode for stable content
-                try renderer.queuePersistentText(
-                    text,
-                    effective_position,
-                    font_manager,
-                    font_category,
-                    self.style.font_size,
-                    self.style.color
-                );
+                try renderer.queuePersistentText(text, effective_position, font_manager, font_category, self.style.font_size, self.style.color);
             },
         }
-        
+
         // Render background if specified
         if (self.style.background_color) |bg_color| {
             // Background rendering available via drawing.zig utilities if needed
             _ = bg_color;
         }
-        
+
         self.needs_update.set(false);
     }
-    
+
     fn calculateAlignedPosition(self: *Self, text: []const u8) Vec2 {
         // For now, just return the base position
         // Real implementation would calculate text width and adjust based on alignment
@@ -328,17 +301,17 @@ pub const ReactiveLabelData = struct {
             .y = self.position.y + self.style.padding.y,
         };
     }
-    
+
     pub fn deinit(self: *Self) void {
         // Free cached text
         if (self.cached_text) |text| {
             self.allocator.free(text);
         }
-        
+
         // Clean up derived value
         self.current_text.deinit();
         self.allocator.destroy(self.current_text);
-        
+
         // Clean up signals
         self.is_visible.deinit();
         self.allocator.destroy(self.is_visible);
@@ -347,38 +320,35 @@ pub const ReactiveLabelData = struct {
         self.last_text.deinit();
         self.allocator.destroy(self.last_text);
     }
-    
+
     // Component vtable implementation
     fn onMount(state: *anyopaque) !void {
         _ = state;
         log_throttle.logInfo("mount", "Reactive label component mounted", .{});
     }
-    
+
     fn onUnmount(state: *anyopaque) void {
         _ = state;
         log_throttle.logInfo("unmount", "Reactive label component unmounted", .{});
     }
-    
+
     fn onRender(state: *anyopaque) !void {
         const self = @as(*ReactiveLabelData, @ptrCast(@alignCast(state)));
-        
-        log_throttle.logDebug("reactive_render", "Reactive label render triggered - visible: {}, needs update: {}", .{ 
-            self.is_visible.peek(), 
-            self.needs_update.peek() 
-        });
+
+        log_throttle.logDebug("reactive_render", "Reactive label render triggered - visible: {}, needs update: {}", .{ self.is_visible.peek(), self.needs_update.peek() });
     }
-    
+
     fn shouldRender(state: *anyopaque) bool {
         const self = @as(*ReactiveLabelData, @ptrCast(@alignCast(state)));
         return self.is_visible.peek() and self.needs_update.peek();
     }
-    
+
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
         const self = @as(*ReactiveLabelData, @ptrCast(@alignCast(state)));
         self.deinit();
         allocator.destroy(self);
     }
-    
+
     pub const vtable = ReactiveComponent.ComponentVTable{
         .onMount = ReactiveLabelData.onMount,
         .onUnmount = ReactiveLabelData.onUnmount,
@@ -392,53 +362,43 @@ pub const ReactiveLabelData = struct {
 pub const ReactiveLabel = struct {
     component: *ReactiveComponent,
     allocator: std.mem.Allocator,
-    
+
     const Self = @This();
-    
-    pub fn init(
-        allocator: std.mem.Allocator,
-        position: Vec2,
-        style: LabelStyle,
-        content: TextContent
-    ) !Self {
+
+    pub fn init(allocator: std.mem.Allocator, position: Vec2, style: LabelStyle, content: TextContent) !Self {
         const label_data = try ReactiveLabelData.init(allocator, position, style, content);
-        
-        const component = try createComponent(
-            ReactiveLabelData,
-            allocator,
-            label_data,
-            ReactiveLabelData.vtable
-        );
-        
+
+        const component = try createComponent(ReactiveLabelData, allocator, label_data, ReactiveLabelData.vtable);
+
         try component.mount();
-        
+
         return Self{
             .component = component,
             .allocator = allocator,
         };
     }
-    
+
     pub fn deinit(self: *Self) void {
         self.component.deinit();
     }
-    
+
     pub fn getLabelData(self: *Self) *ReactiveLabelData {
         return @as(*ReactiveLabelData, @ptrCast(@alignCast(self.component.state)));
     }
-    
+
     // Convenience methods
     pub fn setVisible(self: *Self, visible: bool) void {
         self.getLabelData().setVisible(visible);
     }
-    
+
     pub fn setPosition(self: *Self, position: Vec2) void {
         self.getLabelData().setPosition(position);
     }
-    
+
     pub fn updateContent(self: *Self, new_content: TextContent) void {
         self.getLabelData().updateContent(new_content);
     }
-    
+
     pub fn render(self: *Self, renderer: *text_renderer.TextRenderer, font_manager: anytype, font_category: anytype) !void {
         try self.getLabelData().render(renderer, font_manager, font_category);
     }
@@ -446,30 +406,15 @@ pub const ReactiveLabel = struct {
 
 /// Helper functions for creating common label types
 pub fn createStaticLabel(allocator: std.mem.Allocator, text: []const u8, position: Vec2, style: LabelStyle) !ReactiveLabel {
-    return ReactiveLabel.init(
-        allocator,
-        position,
-        style,
-        TextContent{ .static = text }
-    );
+    return ReactiveLabel.init(allocator, position, style, TextContent{ .static = text });
 }
 
 pub fn createSignalLabel(allocator: std.mem.Allocator, text_signal: *signal.Signal([]const u8), position: Vec2, style: LabelStyle) !ReactiveLabel {
-    return ReactiveLabel.init(
-        allocator,
-        position,
-        style,
-        TextContent{ .signal = text_signal }
-    );
+    return ReactiveLabel.init(allocator, position, style, TextContent{ .signal = text_signal });
 }
 
 pub fn createDerivedLabel(allocator: std.mem.Allocator, text_derived: *derived.Derived([]const u8), position: Vec2, style: LabelStyle) !ReactiveLabel {
-    return ReactiveLabel.init(
-        allocator,
-        position,
-        style,
-        TextContent{ .derived = text_derived }
-    );
+    return ReactiveLabel.init(allocator, position, style, TextContent{ .derived = text_derived });
 }
 
 /// Common label presets
@@ -487,20 +432,20 @@ pub fn createSmallLabel(allocator: std.mem.Allocator, text: []const u8, position
 
 test "reactive label creation and basic operations" {
     const allocator = std.testing.allocator;
-    
+
     // Test static label
     var static_label = try createTitle(allocator, "Test Title", Vec2{ .x = 100, .y = 200 });
     defer static_label.deinit();
-    
+
     const label_data = static_label.getLabelData();
-    
+
     // Test visibility toggle
     static_label.setVisible(false);
     try std.testing.expectEqual(false, label_data.is_visible.peek());
-    
+
     static_label.setVisible(true);
     try std.testing.expectEqual(true, label_data.is_visible.peek());
-    
+
     // Test position setting
     const new_pos = Vec2{ .x = 300, .y = 400 };
     static_label.setPosition(new_pos);
@@ -520,12 +465,12 @@ pub const PerformanceAnalysis = struct {
     /// - Excellent cache efficiency
     /// - Minimal memory overhead
     pub const static_label_recommendation = rendering_modes.recommendModeByRate(0.0);
-    
+
     /// Signal-based labels are good for persistent mode:
     /// - Changes based on user actions or events
     /// - Good cache hit rate for stable content
     pub const signal_label_recommendation = rendering_modes.recommendModeByRate(5.0);
-    
+
     /// Derived labels depend on their dependencies:
     /// - Change frequency varies based on inputs
     /// - System automatically selects appropriate mode

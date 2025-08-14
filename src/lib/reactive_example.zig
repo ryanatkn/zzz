@@ -6,28 +6,28 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     // Initialize reactive system
     try reactive.init(allocator);
     defer reactive.deinit(allocator);
-    
+
     // Create reactive state ($state in Svelte 5)
     var count = try reactive.signal(allocator, i32, 0);
     defer count.deinit();
-    
+
     var multiplier = try reactive.signal(allocator, i32, 2);
     defer multiplier.deinit();
-    
+
     // Store signals for compute functions
     const State = struct {
         var count_ref: *reactive.Signal(i32) = undefined;
         var multiplier_ref: *reactive.Signal(i32) = undefined;
         var result_ref: *reactive.Derived(i32) = undefined;
     };
-    
+
     State.count_ref = &count;
     State.multiplier_ref = &multiplier;
-    
+
     // Create derived state ($derived in Svelte 5)
     // Automatically tracks count and multiplier
     var result = try reactive.derived(allocator, i32, struct {
@@ -40,9 +40,9 @@ pub fn main() !void {
         result.deinit();
         allocator.destroy(result);
     }
-    
+
     State.result_ref = result;
-    
+
     // Create an effect ($effect in Svelte 5)
     // Automatically re-runs when any dependency changes
     const logger = try reactive.createEffect(allocator, struct {
@@ -56,18 +56,18 @@ pub fn main() !void {
         }
     }.log);
     defer allocator.destroy(logger);
-    
+
     // Initial state logged by effect
     std.debug.print("\n--- Automatic Dependency Tracking Demo ---\n", .{});
-    
+
     // Change count - effect automatically re-runs
     std.debug.print("\nSetting count to 5...\n", .{});
     count.set(5);
-    
+
     // Change multiplier - effect automatically re-runs
     std.debug.print("\nSetting multiplier to 3...\n", .{});
     multiplier.set(3);
-    
+
     // Batch multiple changes
     std.debug.print("\nBatching multiple updates...\n", .{});
     reactive.batch(struct {
@@ -76,7 +76,7 @@ pub fn main() !void {
             State.multiplier_ref.set(4);
         }
     }.update);
-    
+
     // Watch a specific signal
     const watcher = try reactive.watchSignal(allocator, i32, &count, struct {
         fn onCountChange(value: i32) void {
@@ -84,10 +84,10 @@ pub fn main() !void {
         }
     }.onCountChange);
     defer allocator.destroy(watcher);
-    
+
     std.debug.print("\nSetting count to 20 (watcher will trigger)...\n", .{});
     count.set(20);
-    
+
     std.debug.print("\n--- Demo Complete ---\n", .{});
 }
 
@@ -99,7 +99,7 @@ test "reactive example" {
     // 3. Effects that re-run on dependency changes
     // 4. Batching for efficiency
     // 5. Signal watchers for specific tracking
-    
+
     // This is similar to Svelte 5:
     // let count = $state(0);
     // let multiplier = $state(2);
@@ -107,6 +107,6 @@ test "reactive example" {
     // $effect(() => {
     //     console.log(`Count: ${count}, Multiplier: ${multiplier}, Result: ${result}`);
     // });
-    
+
     try main();
 }

@@ -11,16 +11,16 @@ const CubicCurve = vector_path.CubicCurve;
 pub const TessellationConfig = struct {
     /// Maximum number of segments per curve (prevents infinite subdivision)
     max_segments: u32 = 64,
-    
+
     /// Minimum number of segments per curve (ensures minimum quality)
     min_segments: u32 = 2,
-    
+
     /// Maximum distance from true curve (in pixels) for adaptive tessellation
     tolerance: f32 = 0.5,
-    
+
     /// Angle threshold for adaptive tessellation (in radians)
     angle_tolerance: f32 = 0.1,
-    
+
     /// Whether to use adaptive tessellation or fixed step size
     adaptive: bool = true,
 };
@@ -29,7 +29,7 @@ pub const TessellationConfig = struct {
 pub const TessellatedSegment = struct {
     start: Vec2,
     end: Vec2,
-    
+
     /// Parameter range this segment covers on the original curve
     t_start: f32,
     t_end: f32,
@@ -38,7 +38,7 @@ pub const TessellatedSegment = struct {
 /// Result of tessellating a curve
 pub const TessellationResult = struct {
     segments: std.ArrayList(TessellatedSegment),
-    
+
     pub fn deinit(self: *TessellationResult) void {
         self.segments.deinit();
     }
@@ -53,13 +53,13 @@ pub fn tessellateQuadratic(
     var result = TessellationResult{
         .segments = std.ArrayList(TessellatedSegment).init(allocator),
     };
-    
+
     if (config.adaptive) {
         try tessellateQuadraticAdaptive(curve, &result.segments, config, 0.0, 1.0, 0);
     } else {
         try tessellateQuadraticFixed(curve, &result.segments, config);
     }
-    
+
     return result;
 }
 
@@ -72,13 +72,13 @@ pub fn tessellrateCubic(
     var result = TessellationResult{
         .segments = std.ArrayList(TessellatedSegment).init(allocator),
     };
-    
+
     if (config.adaptive) {
         try tessellrateCubicAdaptive(curve, &result.segments, config, 0.0, 1.0, 0);
     } else {
         try tessellrateCubicFixed(curve, &result.segments, config);
     }
-    
+
     return result;
 }
 
@@ -90,18 +90,18 @@ fn tessellateQuadraticFixed(
 ) !void {
     const num_segments = calculateFixedSegments(curve.length(), config);
     const step = 1.0 / @as(f32, @floatFromInt(num_segments));
-    
+
     var t: f32 = 0;
     while (t < 1.0 - step * 0.5) {
         const next_t = @min(t + step, 1.0);
-        
+
         try segments.append(TessellatedSegment{
             .start = curve.evaluate(t),
             .end = curve.evaluate(next_t),
             .t_start = t,
             .t_end = next_t,
         });
-        
+
         t = next_t;
     }
 }
@@ -114,18 +114,18 @@ fn tessellrateCubicFixed(
 ) !void {
     const num_segments = calculateFixedSegments(curve.length(), config);
     const step = 1.0 / @as(f32, @floatFromInt(num_segments));
-    
+
     var t: f32 = 0;
     while (t < 1.0 - step * 0.5) {
         const next_t = @min(t + step, 1.0);
-        
+
         try segments.append(TessellatedSegment{
             .start = curve.evaluate(t),
             .end = curve.evaluate(next_t),
             .t_start = t,
             .t_end = next_t,
         });
-        
+
         t = next_t;
     }
 }
@@ -137,10 +137,10 @@ fn calculateFixedSegments(curve_length: f32, config: TessellationConfig) u32 {
     // More segments for tighter tolerance
     const segments_per_unit = 1.0 / @max(0.1, config.tolerance);
     const segments_from_length = @as(u32, @intFromFloat(@ceil(curve_length * segments_per_unit / 2.0)));
-    
+
     // For very short curves, ensure minimum quality
     const min_for_length = if (curve_length < 2.0) 4 else config.min_segments;
-    
+
     return @min(@max(segments_from_length, min_for_length), config.max_segments);
 }
 
@@ -163,12 +163,12 @@ fn tessellateQuadraticAdaptive(
         });
         return;
     }
-    
+
     const start_point = curve.evaluate(t_start);
     const end_point = curve.evaluate(t_end);
     const mid_t = (t_start + t_end) * 0.5;
     const mid_point = curve.evaluate(mid_t);
-    
+
     // Check if the curve segment is flat enough
     if (isFlatEnough(start_point, mid_point, end_point, config.tolerance)) {
         try segments.append(TessellatedSegment{
@@ -203,12 +203,12 @@ fn tessellrateCubicAdaptive(
         });
         return;
     }
-    
+
     const start_point = curve.evaluate(t_start);
     const end_point = curve.evaluate(t_end);
     const mid_t = (t_start + t_end) * 0.5;
     const mid_point = curve.evaluate(mid_t);
-    
+
     // Check if the curve segment is flat enough
     if (isFlatEnough(start_point, mid_point, end_point, config.tolerance)) {
         try segments.append(TessellatedSegment{
@@ -230,27 +230,27 @@ fn isFlatEnough(start: Vec2, mid: Vec2, end: Vec2, tolerance: f32) bool {
     // Calculate the distance from the midpoint to the line connecting start and end
     const line_vec = maths.vec2_subtract(end, start);
     const line_length_sq = maths.vec2_lengthSquared(line_vec);
-    
+
     if (line_length_sq < 0.001) {
         // Degenerate case: start and end are very close
         return true;
     }
-    
+
     // Use perpendicular distance calculation for better accuracy
     // This is more numerically stable than projection
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const line_length = @sqrt(line_length_sq);
-    
+
     // Calculate perpendicular distance from mid to line
     // Using the formula: |ax + by + c| / sqrt(a^2 + b^2)
     const distance = @abs(dy * mid.x - dx * mid.y + end.x * start.y - end.y * start.x) / line_length;
-    
+
     // For curves, also check the parametric deviation
     // This ensures we don't miss sharp turns
     const param_mid = maths.vec2_multiply(maths.vec2_add(start, end), 0.5);
     const param_deviation = maths.vec2_length(maths.vec2_subtract(mid, param_mid));
-    
+
     return distance <= tolerance and param_deviation <= tolerance * 2.0;
 }
 
@@ -258,11 +258,11 @@ fn isFlatEnough(start: Vec2, mid: Vec2, end: Vec2, tolerance: f32) bool {
 fn angleChangeSmall(p1: Vec2, p2: Vec2, p3: Vec2, angle_tolerance: f32) bool {
     const v1 = maths.vec2_normalize(maths.vec2_subtract(p2, p1));
     const v2 = maths.vec2_normalize(maths.vec2_subtract(p3, p2));
-    
+
     // Calculate the angle between the vectors using dot product
     const dot = maths.vec2_dot(v1, v2);
     const angle = std.math.acos(@max(-1.0, @min(1.0, dot)));
-    
+
     return angle <= angle_tolerance;
 }
 
@@ -281,7 +281,7 @@ pub fn segmentsToEdges(
     segments: []const TessellatedSegment,
 ) !std.ArrayList(Edge) {
     var edges = std.ArrayList(Edge).init(allocator);
-    
+
     for (segments) |segment| {
         // Skip horizontal edges (they don't contribute to filling)
         if (@abs(segment.start.y - segment.end.y) > 0.001) {
@@ -294,7 +294,7 @@ pub fn segmentsToEdges(
             });
         }
     }
-    
+
     return edges;
 }
 
@@ -308,7 +308,7 @@ pub const QualityPresets = struct {
         .angle_tolerance = 0.2,
         .adaptive = true,
     };
-    
+
     /// Balanced quality and performance
     pub const medium = TessellationConfig{
         .max_segments = 32,
@@ -317,7 +317,7 @@ pub const QualityPresets = struct {
         .angle_tolerance = 0.1,
         .adaptive = true,
     };
-    
+
     /// High quality tessellation for final output
     pub const high = TessellationConfig{
         .max_segments = 64,
@@ -326,7 +326,7 @@ pub const QualityPresets = struct {
         .angle_tolerance = 0.05,
         .adaptive = true,
     };
-    
+
     /// Maximum quality for print/vector output
     pub const ultra = TessellationConfig{
         .max_segments = 128,
@@ -347,7 +347,7 @@ pub fn recommendConfigForScale(scale: f32) TessellationConfig {
         return TessellationConfig{
             .max_segments = 256,
             .min_segments = 16,
-            .tolerance = 0.05,  // Very tight tolerance
+            .tolerance = 0.05, // Very tight tolerance
             .angle_tolerance = 0.01,
             .adaptive = true,
         };
@@ -377,7 +377,7 @@ pub fn tessellateContour(
     config: TessellationConfig,
 ) !std.ArrayList(TessellatedSegment) {
     var all_segments = std.ArrayList(TessellatedSegment).init(allocator);
-    
+
     for (contour.segments.items) |segment| {
         switch (segment) {
             .line => |line| {
@@ -392,18 +392,18 @@ pub fn tessellateContour(
             .quadratic => |quad| {
                 var result = try tessellateQuadratic(allocator, quad, config);
                 defer result.deinit();
-                
+
                 try all_segments.appendSlice(result.segments.items);
             },
             .cubic => |cubic| {
                 var result = try tessellrateCubic(allocator, cubic, config);
                 defer result.deinit();
-                
+
                 try all_segments.appendSlice(result.segments.items);
             },
         }
     }
-    
+
     return all_segments;
 }
 
@@ -414,16 +414,16 @@ pub fn pathToEdges(
     config: TessellationConfig,
 ) !std.ArrayList(Edge) {
     var all_edges = std.ArrayList(Edge).init(allocator);
-    
+
     for (path.contours.items) |*contour| {
         var segments = try tessellateContour(allocator, contour, config);
         defer segments.deinit();
-        
+
         var edges = try segmentsToEdges(allocator, segments.items);
         defer edges.deinit();
-        
+
         try all_edges.appendSlice(edges.items);
     }
-    
+
     return all_edges;
 }

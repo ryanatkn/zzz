@@ -3,10 +3,9 @@ const persistent_text = @import("text/cache.zig");
 const text_renderer = @import("text/renderer.zig");
 
 /// Rendering Mode Guidelines for the Dealt Game Engine
-/// 
+///
 /// This module provides clear guidance on when to use immediate mode vs persistent mode
 /// rendering, with helper functions to make the right choice easy for developers.
-
 /// Rendering modes available in the engine
 pub const RenderingMode = enum {
     /// IMMEDIATE MODE - Create, use, destroy each frame
@@ -15,7 +14,7 @@ pub const RenderingMode = enum {
     /// - Higher GPU memory allocation/deallocation overhead
     /// - Use for content that changes constantly
     immediate,
-    
+
     /// PERSISTENT MODE - Create once, reuse until changed
     /// - Textures are cached and reused across frames
     /// - Textures are only recreated when content changes
@@ -29,19 +28,19 @@ pub const ChangeFrequency = enum {
     /// Changes multiple times per frame (>60 fps)
     /// Example: Mouse position, particle counts
     per_frame,
-    
-    /// Changes several times per second (1-60 fps)  
+
+    /// Changes several times per second (1-60 fps)
     /// Example: Health bars during combat, timer countdown
     frequent,
-    
+
     /// Changes occasionally (once per few seconds)
     /// Example: FPS counter, current weapon, score
     occasional,
-    
+
     /// Changes rarely (user actions, scene changes)
     /// Example: Menu labels, player name, settings
     rare,
-    
+
     /// Static content that never or almost never changes
     /// Example: Title text, fixed UI labels
     static,
@@ -117,42 +116,42 @@ pub const UseCases = struct {
         .cpu_overhead = .low,
         .reasoning = "FPS typically changes 1-3 times per second, perfect for caching",
     };
-    
+
     pub const menu_labels = PerformanceProfile{
         .recommended_mode = .persistent,
         .memory_impact = .low,
         .cpu_overhead = .low,
         .reasoning = "Menu text is static, cache once and reuse",
     };
-    
+
     pub const health_bar = PerformanceProfile{
         .recommended_mode = .immediate,
         .memory_impact = .low,
         .cpu_overhead = .medium,
         .reasoning = "Health changes frequently during combat, caching ineffective",
     };
-    
+
     pub const particle_count = PerformanceProfile{
         .recommended_mode = .immediate,
         .memory_impact = .low,
         .cpu_overhead = .high,
         .reasoning = "Changes every frame, immediate mode only viable option",
     };
-    
+
     pub const ui_buttons = PerformanceProfile{
         .recommended_mode = .persistent,
         .memory_impact = .medium,
         .cpu_overhead = .low,
         .reasoning = "Button text is static, hover states can be handled separately",
     };
-    
+
     pub const debug_info = PerformanceProfile{
         .recommended_mode = .immediate,
         .memory_impact = .low,
         .cpu_overhead = .high,
         .reasoning = "Debug values change frequently, not worth caching",
     };
-    
+
     pub const score_display = PerformanceProfile{
         .recommended_mode = .persistent,
         .memory_impact = .low,
@@ -162,20 +161,10 @@ pub const UseCases = struct {
 };
 
 /// Helper functions for common rendering patterns
-
 /// Render text using the recommended mode based on change frequency
-pub fn renderTextWithAutoMode(
-    renderer: *text_renderer.TextRenderer,
-    text: []const u8,
-    position: @import("types.zig").Vec2,
-    font_manager: anytype,
-    font_category: anytype,
-    font_size: f32,
-    color: @import("types.zig").Color,
-    changes_per_second: f32
-) !void {
+pub fn renderTextWithAutoMode(renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("types.zig").Vec2, font_manager: anytype, font_category: anytype, font_size: f32, color: @import("types.zig").Color, changes_per_second: f32) !void {
     const profile = recommendModeByRate(changes_per_second);
-    
+
     switch (profile.recommended_mode) {
         .immediate => {
             // Create texture immediately and queue for this frame
@@ -190,16 +179,7 @@ pub fn renderTextWithAutoMode(
 }
 
 /// Render text with explicit mode choice
-pub fn renderTextExplicitMode(
-    renderer: *text_renderer.TextRenderer,
-    text: []const u8,
-    position: @import("types.zig").Vec2,
-    font_manager: anytype,
-    font_category: anytype,
-    font_size: f32,
-    color: @import("types.zig").Color,
-    mode: RenderingMode
-) !void {
+pub fn renderTextExplicitMode(renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("types.zig").Vec2, font_manager: anytype, font_category: anytype, font_size: f32, color: @import("types.zig").Color, mode: RenderingMode) !void {
     switch (mode) {
         .immediate => {
             const text_result = try font_manager.renderTextToTexture(text, font_category, font_size, color, renderer.device);
@@ -214,7 +194,7 @@ pub fn renderTextExplicitMode(
 /// Get performance advice for a specific use case
 pub fn getPerformanceAdvice(content_type: []const u8) ?PerformanceProfile {
     const content_lower = std.ascii.lowerString(content_type);
-    
+
     if (std.mem.eql(u8, content_lower, "fps")) return UseCases.fps_counter;
     if (std.mem.eql(u8, content_lower, "menu")) return UseCases.menu_labels;
     if (std.mem.eql(u8, content_lower, "health")) return UseCases.health_bar;
@@ -222,7 +202,7 @@ pub fn getPerformanceAdvice(content_type: []const u8) ?PerformanceProfile {
     if (std.mem.eql(u8, content_lower, "button")) return UseCases.ui_buttons;
     if (std.mem.eql(u8, content_lower, "debug")) return UseCases.debug_info;
     if (std.mem.eql(u8, content_lower, "score")) return UseCases.score_display;
-    
+
     return null;
 }
 
@@ -230,7 +210,7 @@ pub fn getPerformanceAdvice(content_type: []const u8) ?PerformanceProfile {
 pub fn logModeRecommendation(content_type: []const u8, changes_per_second: f32) void {
     const profile = recommendModeByRate(changes_per_second);
     const log = std.log.scoped(.rendering_modes);
-    
+
     log.info("Rendering recommendation for '{s}':", .{content_type});
     log.info("  Changes per second: {d:.2}", .{changes_per_second});
     log.info("  Recommended mode: {s}", .{@tagName(profile.recommended_mode)});
@@ -248,7 +228,7 @@ pub const QuickReference = struct {
         "Health/mana bars during combat (frequent updates)",
         "Timer countdowns (changes multiple times per second)",
     };
-    
+
     pub const persistent_mode_examples = [_][]const u8{
         "FPS counter (changes 1-3 times per second)",
         "Menu labels and buttons (static text)",
@@ -257,7 +237,7 @@ pub const QuickReference = struct {
         "UI status messages (changes on events)",
         "Settings values (user-triggered changes only)",
     };
-    
+
     pub const decision_tree = [_][]const u8{
         "1. Does the text content change more than 10 times per second?",
         "   → YES: Use immediate mode",
@@ -265,7 +245,7 @@ pub const QuickReference = struct {
         "",
         "2. Does the content change based on user actions or game events?",
         "   → YES: Use persistent mode (cache will be efficient)",
-        "   → NO: Continue to step 3", 
+        "   → NO: Continue to step 3",
         "",
         "3. Is this debug/development information?",
         "   → YES: Use immediate mode (simpler, values change often)",
@@ -277,10 +257,10 @@ test "rendering mode recommendations" {
     // Test various change frequencies
     const fps_profile = recommendModeByRate(2.0);
     try std.testing.expectEqual(RenderingMode.persistent, fps_profile.recommended_mode);
-    
+
     const particle_profile = recommendModeByRate(60.0);
     try std.testing.expectEqual(RenderingMode.immediate, particle_profile.recommended_mode);
-    
+
     const menu_profile = recommendModeByRate(0.01);
     try std.testing.expectEqual(RenderingMode.persistent, menu_profile.recommended_mode);
 }

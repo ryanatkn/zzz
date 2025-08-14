@@ -30,10 +30,10 @@ pub const GameState = struct {
 
     // Visual effects system
     effect_system: effects.EffectSystem,
-    
+
     // Spell system
     spell_system: spells.SpellSystem,
-    
+
     // Bullet pool for burst/rhythm shooting
     bullet_pool: combat.BulletPool,
 
@@ -148,7 +148,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
         // Don't update game when HUD is open
         if (h.is_open()) return;
     }
-    
+
     if (game_state.game_paused) return;
 
     const world = &game_state.world;
@@ -156,7 +156,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     if (world.player.alive) {
         player_controller.updatePlayer(&world.player, input_state, world.getCurrentZone(), cam, deltaTime);
-        
+
         // Handle continuous shooting on left-click hold (rhythm mode)
         // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
         if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and game_state.bullet_pool.canFire()) {
@@ -198,10 +198,10 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     // Update visual effects
     game_state.effect_system.update();
-    
+
     // Update spell system
     game_state.spell_system.update(deltaTime);
-    
+
     // Update bullet pool
     game_state.bullet_pool.update(deltaTime);
 }

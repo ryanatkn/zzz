@@ -21,7 +21,7 @@ pub fn printCoverageMap(
     codepoint: u32,
 ) void {
     log.info("Coverage map for '{}' ({}x{}):", .{ @as(u8, @intCast(codepoint)), width, height });
-    
+
     // Print top border
     var border: [256]u8 = undefined;
     var border_len: usize = 0;
@@ -34,18 +34,18 @@ pub fn printCoverageMap(
     border[border_len] = '+';
     border_len += 1;
     log.info("{s}", .{border[0..border_len]});
-    
+
     // Print each row
     for (0..@min(height, 40)) |y| {
         var line: [256]u8 = undefined;
         var line_len: usize = 0;
         line[line_len] = '|';
         line_len += 1;
-        
+
         for (0..@min(width, 80)) |x| {
             const idx = y * width + x;
             const coverage = bitmap[idx];
-            
+
             // Map coverage to ASCII intensity
             const char: u8 = if (coverage == 0)
                 ' '
@@ -59,16 +59,16 @@ pub fn printCoverageMap(
                 '#'
             else
                 '@';
-            
+
             line[line_len] = char;
             line_len += 1;
         }
-        
+
         line[line_len] = '|';
         line_len += 1;
         log.info("{s}", .{line[0..line_len]});
     }
-    
+
     // Print bottom border
     log.info("{s}", .{border[0..border_len]});
 }
@@ -84,7 +84,7 @@ pub fn printBitmapStats(
     var total_coverage: u64 = 0;
     var min_coverage: u8 = 255;
     var max_coverage: u8 = 0;
-    
+
     for (bitmap) |pixel| {
         if (pixel > 0) {
             non_zero += 1;
@@ -93,23 +93,23 @@ pub fn printBitmapStats(
             max_coverage = @max(max_coverage, pixel);
         }
     }
-    
+
     const total_pixels = width * height;
     const coverage_percent = if (total_pixels > 0)
         @as(f32, @floatFromInt(non_zero)) * 100.0 / @as(f32, @floatFromInt(total_pixels))
     else
         0.0;
-    
+
     const avg_coverage = if (non_zero > 0)
         @as(f32, @floatFromInt(total_coverage)) / @as(f32, @floatFromInt(non_zero))
     else
         0.0;
-    
+
     log.info("Bitmap stats for '{}' ({}x{}):", .{ @as(u8, @intCast(codepoint)), width, height });
     log.info("  Pixels filled: {}/{} ({d:.1}%)", .{ non_zero, total_pixels, coverage_percent });
     log.info("  Coverage range: {}-{}", .{ min_coverage, max_coverage });
     log.info("  Average coverage: {d:.1}", .{avg_coverage});
-    
+
     // Check for common issues
     if (coverage_percent < 10) {
         log.warn("  WARNING: Very low coverage - possible rendering issue", .{});
@@ -122,13 +122,13 @@ pub fn printBitmapStats(
 /// Print edge list for debugging
 pub fn printEdges(edges: []const edge_builder.Edge, max_edges: usize) void {
     log.info("Edge list ({} edges):", .{edges.len});
-    
+
     for (edges[0..@min(edges.len, max_edges)], 0..) |edge, i| {
         log.info("  Edge {}: ({d:.2}, {d:.2}) -> ({d:.2}, {d:.2}) winding={}", .{
             i, edge.x0, edge.y0, edge.x1, edge.y1, edge.winding,
         });
     }
-    
+
     if (edges.len > max_edges) {
         log.info("  ... and {} more edges", .{edges.len - max_edges});
     }
@@ -149,7 +149,7 @@ pub fn printOutline(outline: glyph_extractor.GlyphOutline) void {
         outline.bounds.height(),
     });
     log.info("  Advance: {d:.2}", .{outline.metrics.advance_width});
-    
+
     for (outline.contours, 0..) |contour, i| {
         var on_curve: u32 = 0;
         var off_curve: u32 = 0;
@@ -177,29 +177,29 @@ pub fn compareBitmaps(
         log.warn("Bitmaps have different sizes: {} vs {}", .{ bitmap1.len, bitmap2.len });
         return 0.0;
     }
-    
+
     var differences: u32 = 0;
     var total_diff: u64 = 0;
-    
+
     for (bitmap1, bitmap2) |p1, p2| {
         if (p1 != p2) {
             differences += 1;
             total_diff += @abs(@as(i32, p1) - @as(i32, p2));
         }
     }
-    
+
     const similarity = 100.0 - (@as(f32, @floatFromInt(differences)) * 100.0 / @as(f32, @floatFromInt(bitmap1.len)));
     const avg_diff = if (differences > 0)
         @as(f32, @floatFromInt(total_diff)) / @as(f32, @floatFromInt(differences))
     else
         0.0;
-    
+
     log.info("Bitmap comparison:", .{});
     log.info("  Size: {}x{} ({} pixels)", .{ width, height, bitmap1.len });
     log.info("  Differences: {} pixels", .{differences});
     log.info("  Similarity: {d:.1}%", .{similarity});
     log.info("  Average difference: {d:.1}", .{avg_diff});
-    
+
     return similarity;
 }
 
@@ -213,12 +213,12 @@ pub fn saveBitmapToPGM(
 ) !void {
     const file = try std.fs.cwd().createFile(filename, .{});
     defer file.close();
-    
+
     // Write PGM header
     const header = try std.fmt.allocPrint(allocator, "P2\n{} {}\n255\n", .{ width, height });
     defer allocator.free(header);
     try file.writeAll(header);
-    
+
     // Write pixel data
     for (0..height) |y| {
         for (0..width) |x| {
@@ -229,7 +229,7 @@ pub fn saveBitmapToPGM(
         }
         try file.writeAll("\n");
     }
-    
+
     log.info("Saved bitmap to {s}", .{filename});
 }
 
@@ -239,12 +239,12 @@ pub fn saveBitmapToPGM(
 
 /// Quality metrics for rendered text
 pub const QualityMetrics = struct {
-    coverage_percent: f32,      // Percentage of pixels with non-zero coverage
-    edge_sharpness: f32,       // Sharpness of edges (0-100)
-    contrast_ratio: f32,       // Contrast between text and background
-    kerning_consistency: f32,  // Consistency of character spacing
-    subpixel_accuracy: f32,    // Accuracy of subpixel positioning
-    overall_score: f32,        // Combined quality score (0-100)
+    coverage_percent: f32, // Percentage of pixels with non-zero coverage
+    edge_sharpness: f32, // Sharpness of edges (0-100)
+    contrast_ratio: f32, // Contrast between text and background
+    kerning_consistency: f32, // Consistency of character spacing
+    subpixel_accuracy: f32, // Accuracy of subpixel positioning
+    overall_score: f32, // Combined quality score (0-100)
 };
 
 /// Analyze bitmap data for quality metrics
@@ -257,32 +257,32 @@ pub fn analyzeBitmap(
     var edge_pixels: u32 = 0;
     var min_value: u8 = 255;
     var max_value: u8 = 0;
-    
+
     // First pass: basic statistics
     for (bitmap) |pixel| {
         if (pixel > 0) coverage_count += 1;
         if (pixel < min_value) min_value = pixel;
         if (pixel > max_value) max_value = pixel;
     }
-    
+
     // Calculate coverage percentage
     const total_pixels = width * height;
     const coverage_percent = if (total_pixels > 0)
         @as(f32, @floatFromInt(coverage_count)) / @as(f32, @floatFromInt(total_pixels)) * 100.0
     else
         0.0;
-    
+
     // Second pass: edge detection
     for (0..height) |y| {
         for (0..width) |x| {
             const idx = y * width + x;
             const current = bitmap[idx];
-            
+
             // Check if this is an edge pixel
             if (current > 0 and current < 255) {
                 // Check neighbors
                 var is_edge = false;
-                
+
                 if (x > 0) {
                     const left = bitmap[idx - 1];
                     if (@abs(@as(i32, current) - @as(i32, left)) > 50) is_edge = true;
@@ -299,32 +299,32 @@ pub fn analyzeBitmap(
                     const bottom = bitmap[idx + width];
                     if (@abs(@as(i32, current) - @as(i32, bottom)) > 50) is_edge = true;
                 }
-                
+
                 if (is_edge) edge_pixels += 1;
             }
         }
     }
-    
+
     // Calculate edge sharpness (fewer intermediate values = sharper)
-    const edge_sharpness = if (coverage_count > 0) 
+    const edge_sharpness = if (coverage_count > 0)
         100.0 - (@as(f32, @floatFromInt(edge_pixels)) / @as(f32, @floatFromInt(coverage_count)) * 100.0)
     else
         0.0;
-    
+
     // Calculate contrast ratio
     const contrast_ratio = @as(f32, max_value - min_value) / 255.0 * 100.0;
-    
+
     // Placeholder for advanced metrics
-    const kerning_consistency = 75.0;  // TODO: Implement actual kerning analysis
-    const subpixel_accuracy = 80.0;    // TODO: Implement subpixel analysis
-    
+    const kerning_consistency = 75.0; // TODO: Implement actual kerning analysis
+    const subpixel_accuracy = 80.0; // TODO: Implement subpixel analysis
+
     // Calculate overall score
     const overall_score = (coverage_percent * 0.2 +
-                          edge_sharpness * 0.3 +
-                          contrast_ratio * 0.2 +
-                          kerning_consistency * 0.15 +
-                          subpixel_accuracy * 0.15);
-    
+        edge_sharpness * 0.3 +
+        contrast_ratio * 0.2 +
+        kerning_consistency * 0.15 +
+        subpixel_accuracy * 0.15);
+
     return QualityMetrics{
         .coverage_percent = coverage_percent,
         .edge_sharpness = edge_sharpness,
@@ -345,7 +345,7 @@ pub fn generateQualityReport(metrics: QualityMetrics, font_size: f32, method: []
     log.info("Kerning: {d:.1}%", .{metrics.kerning_consistency});
     log.info("Subpixel: {d:.1}%", .{metrics.subpixel_accuracy});
     log.info("Overall Score: {d:.1}/100", .{metrics.overall_score});
-    
+
     // Quality assessment
     const assessment = if (metrics.overall_score >= 80)
         "EXCELLENT"
@@ -355,7 +355,7 @@ pub fn generateQualityReport(metrics: QualityMetrics, font_size: f32, method: []
         "FAIR"
     else
         "POOR";
-    
+
     log.info("Assessment: {s}", .{assessment});
 }
 

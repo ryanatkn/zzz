@@ -37,7 +37,7 @@ pub const Router = struct {
             p.destroy(self.allocator);
             self.current_page = null;
         }
-        
+
         for (self.current_layouts.items) |layout| {
             layout.deinit(self.allocator);
             layout.destroy(self.allocator);
@@ -55,7 +55,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load root page
             self.current_page = try root_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/settings")) {
@@ -63,7 +63,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load settings page
             self.current_page = try settings_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/settings/video")) {
@@ -71,9 +71,9 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Could add settings layout here if we had one
-            
+
             // Load video settings page
             self.current_page = try settings_video_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/settings/audio")) {
@@ -81,9 +81,9 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Could add settings layout here if we had one
-            
+
             // Load audio settings page
             self.current_page = try settings_audio_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/settings/fonts")) {
@@ -91,7 +91,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load fonts settings page
             self.current_page = try settings_fonts_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/settings/fonts/save")) {
@@ -99,7 +99,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load fonts save page
             self.current_page = try settings_fonts_save_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/stats")) {
@@ -107,7 +107,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load stats page
             self.current_page = try stats_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/font-test")) {
@@ -115,7 +115,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load font test page
             self.current_page = try font_test_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/font-grid-test")) {
@@ -123,7 +123,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load font grid test page
             self.current_page = try font_grid_test_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/vector-test")) {
@@ -131,7 +131,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load vector test page
             self.current_page = try vector_test_page.create(self.allocator);
         } else {
@@ -140,7 +140,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load root page
             self.current_page = try root_page.create(self.allocator);
         }
@@ -157,7 +157,7 @@ pub const Router = struct {
 
     pub fn renderWithLayouts(self: *const Router, links: *std.ArrayList(page.Link)) !void {
         if (self.current_page == null) return;
-        
+
         // For now, just render the page directly without layout composition
         // A full implementation would compose layouts
         try self.current_page.?.render(links);

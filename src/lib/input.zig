@@ -97,11 +97,11 @@ pub const InputState = struct {
 
         return velocity;
     }
-    
+
     pub fn isCtrlHeld(self: *const Self) bool {
         return self.isKeyDown(c.sdl.SDL_SCANCODE_LCTRL) or self.isKeyDown(c.sdl.SDL_SCANCODE_RCTRL);
     }
-    
+
     pub fn isShiftHeld(self: *const Self) bool {
         return self.isKeyDown(c.sdl.SDL_SCANCODE_LSHIFT) or self.isKeyDown(c.sdl.SDL_SCANCODE_RSHIFT);
     }

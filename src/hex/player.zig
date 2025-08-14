@@ -21,11 +21,11 @@ pub fn updatePlayer(player: *Player, input_state: *const InputState, zone: *cons
 
     var keyboard_velocity = Vec2{ .x = 0, .y = 0 };
     var mouse_velocity = Vec2{ .x = 0, .y = 0 };
-    
+
     // Check modifiers
     const is_walking = input_state.isShiftHeld();
     const ctrl_held = input_state.isCtrlHeld();
-    
+
     // Speed modifier for walking
     const speed_mult: f32 = if (is_walking) WALK_SPEED_MULT else 1.0;
     const move_speed = constants.PLAYER_SPEED * speed_mult;

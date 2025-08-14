@@ -26,7 +26,7 @@ pub fn handleSDLEvent(
         const handled = try hud_sys.handleEvent(event.*);
         if (handled) return c.sdl.SDL_APP_CONTINUE;
     }
-    
+
     switch (event.type) {
         c.sdl.SDL_EVENT_QUIT => {
             game_state.requestQuit();
@@ -98,12 +98,7 @@ pub fn handleSDLEvent(
                     if (game_state.world.player.alive) {
                         const ctrl_held = game_state.input_state.isCtrlHeld();
                         const world_mouse_pos = game_state.input_state.getWorldMousePos(&game_renderer.camera);
-                        _ = game_state.spell_system.castActiveSpell(
-                            &game_state.world.player,
-                            game_state.world.getCurrentZone(),
-                            world_mouse_pos,
-                            &game_state.effect_system,
-                            ctrl_held  // self_cast parameter
+                        _ = game_state.spell_system.castActiveSpell(&game_state.world.player, game_state.world.getCurrentZone(), world_mouse_pos, &game_state.effect_system, ctrl_held // self_cast parameter
                         );
                     }
                 },

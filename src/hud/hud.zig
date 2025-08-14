@@ -27,7 +27,7 @@ pub const Hud = struct {
             .hovered_link = null,
             .allocator = allocator,
         };
-        
+
         // Initialize font system
         const log = std.log.scoped(.hud);
         log.info("Initializing HUD font system...", .{});
@@ -36,7 +36,7 @@ pub const Hud = struct {
 
         // Initialize with home page
         try hud_sys.router.navigate("/");
-        
+
         return hud_sys;
     }
 
@@ -61,7 +61,7 @@ pub const Hud = struct {
         switch (event.type) {
             c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
                 const button_event = event.button;
-                
+
                 switch (button_event.button) {
                     c.sdl.SDL_BUTTON_X1 => { // Back button
                         if (self.history.back()) {
@@ -81,33 +81,35 @@ pub const Hud = struct {
                             const link = self.links.items[link_index];
                             try self.navigateTo(link.path);
                         }
-                        
+
                         // Check navigation bar buttons
                         const screen_height = 1080.0; // TODO: Get from renderer
                         const bar_y = screen_height * 0.1;
                         const button_margin = 50.0;
-                        
+
                         const mouse_x = button_event.x;
                         const mouse_y = button_event.y;
-                        
+
                         // Back button bounds (circle at button_margin, bar_y with radius 15)
                         if (mouse_x >= button_margin - 15 and mouse_x <= button_margin + 15 and
-                            mouse_y >= bar_y - 15 and mouse_y <= bar_y + 15) {
+                            mouse_y >= bar_y - 15 and mouse_y <= bar_y + 15)
+                        {
                             if (self.history.back()) {
                                 try self.router.navigate(self.history.getCurrentPath());
                             }
                             return true;
                         }
-                        
+
                         // Forward button bounds (circle at button_margin + 40, bar_y with radius 15)
                         if (mouse_x >= button_margin + 25 and mouse_x <= button_margin + 55 and
-                            mouse_y >= bar_y - 15 and mouse_y <= bar_y + 15) {
+                            mouse_y >= bar_y - 15 and mouse_y <= bar_y + 15)
+                        {
                             if (self.history.forward()) {
                                 try self.router.navigate(self.history.getCurrentPath());
                             }
                             return true;
                         }
-                        
+
                         return true;
                     },
                     else => {},
@@ -117,14 +119,15 @@ pub const Hud = struct {
                 const motion_event = event.motion;
                 const mouse_x = motion_event.x;
                 const mouse_y = motion_event.y;
-                
+
                 // Check which link is hovered
                 self.hovered_link = null;
                 for (self.links.items, 0..) |link, i| {
-                    if (mouse_x >= link.bounds.position.x and 
+                    if (mouse_x >= link.bounds.position.x and
                         mouse_x <= link.bounds.position.x + link.bounds.size.x and
-                        mouse_y >= link.bounds.position.y and 
-                        mouse_y <= link.bounds.position.y + link.bounds.size.y) {
+                        mouse_y >= link.bounds.position.y and
+                        mouse_y <= link.bounds.position.y + link.bounds.size.y)
+                    {
                         self.hovered_link = i;
                         break;
                     }
@@ -154,7 +157,7 @@ pub const Hud = struct {
 
     pub fn update(self: *Hud, dt: f32) void {
         if (!self.is_open) return;
-        
+
         if (self.router.getCurrentPage()) |current_page| {
             current_page.update(dt);
         }
@@ -169,13 +172,7 @@ pub const Hud = struct {
         // Render navigation bar
         const can_go_back = self.history.current_index > 0;
         const can_go_forward = self.history.current_index < self.history.stack_size - 1;
-        try self.renderer.renderNavigationBar(
-            cmd_buffer,
-            render_pass,
-            self.history.getCurrentPath(),
-            can_go_back,
-            can_go_forward
-        );
+        try self.renderer.renderNavigationBar(cmd_buffer, render_pass, self.history.getCurrentPath(), can_go_back, can_go_forward);
 
         // Clear links for this frame
         self.links.clearRetainingCapacity();

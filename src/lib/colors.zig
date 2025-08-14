@@ -95,11 +95,11 @@ pub fn toHSV(color: Color) HSV {
     const g = @as(f32, @floatFromInt(color.g)) / 255.0;
     const b = @as(f32, @floatFromInt(color.b)) / 255.0;
     const a = @as(f32, @floatFromInt(color.a)) / 255.0;
-    
+
     const max_val = @max(@max(r, g), b);
     const min_val = @min(@min(r, g), b);
     const delta = max_val - min_val;
-    
+
     var h: f32 = 0.0;
     if (delta != 0.0) {
         if (max_val == r) {
@@ -110,10 +110,10 @@ pub fn toHSV(color: Color) HSV {
             h = 60.0 * (((r - g) / delta) + 4.0);
         }
     }
-    
+
     const s = if (max_val == 0.0) 0.0 else delta / max_val;
     const v = max_val;
-    
+
     return HSV{ .h = h, .s = s, .v = v, .a = a };
 }
 
@@ -122,25 +122,37 @@ pub fn fromHSV(hsv: HSV) Color {
     const c = hsv.v * hsv.s;
     const x = c * (1.0 - @abs(@mod(hsv.h / 60.0, 2.0) - 1.0));
     const m = hsv.v - c;
-    
+
     var r: f32 = 0.0;
     var g: f32 = 0.0;
     var b: f32 = 0.0;
-    
+
     if (hsv.h >= 0.0 and hsv.h < 60.0) {
-        r = c; g = x; b = 0.0;
+        r = c;
+        g = x;
+        b = 0.0;
     } else if (hsv.h >= 60.0 and hsv.h < 120.0) {
-        r = x; g = c; b = 0.0;
+        r = x;
+        g = c;
+        b = 0.0;
     } else if (hsv.h >= 120.0 and hsv.h < 180.0) {
-        r = 0.0; g = c; b = x;
+        r = 0.0;
+        g = c;
+        b = x;
     } else if (hsv.h >= 180.0 and hsv.h < 240.0) {
-        r = 0.0; g = x; b = c;
+        r = 0.0;
+        g = x;
+        b = c;
     } else if (hsv.h >= 240.0 and hsv.h < 300.0) {
-        r = x; g = 0.0; b = c;
+        r = x;
+        g = 0.0;
+        b = c;
     } else if (hsv.h >= 300.0 and hsv.h < 360.0) {
-        r = c; g = 0.0; b = x;
+        r = c;
+        g = 0.0;
+        b = x;
     }
-    
+
     return Color{
         .r = @intFromFloat((r + m) * 255.0),
         .g = @intFromFloat((g + m) * 255.0),

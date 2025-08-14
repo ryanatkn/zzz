@@ -9,28 +9,28 @@ pub const Shape = union(enum) {
     circle: Circle,
     rectangle: Rectangle,
     point: Point,
-    
+
     pub const Circle = struct {
         center: Vec2,
         radius: f32,
     };
-    
+
     pub const Rectangle = struct {
         position: Vec2,
         size: Vec2,
-        
+
         pub fn center(self: Rectangle) Vec2 {
             return Vec2{
                 .x = self.position.x + self.size.x / 2.0,
                 .y = self.position.y + self.size.y / 2.0,
             };
         }
-        
+
         pub fn contains(self: Rectangle, point: Vec2) bool {
             return maths.vec2_isWithinRect(point, self.position, self.size);
         }
     };
-    
+
     pub const Point = struct {
         position: Vec2,
     };
@@ -69,10 +69,10 @@ pub fn circleRectangle(circle: Shape.Circle, rect: Shape.Rectangle) bool {
     // Find closest point on rectangle to circle center
     const closest_x = std.math.clamp(circle.center.x, rect.position.x, rect.position.x + rect.size.x);
     const closest_y = std.math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
-    
+
     const closest_point = Vec2{ .x = closest_x, .y = closest_y };
     const distance_sq = maths.distanceSquared(circle.center, closest_point);
-    
+
     return distance_sq <= circle.radius * circle.radius;
 }
 
@@ -84,9 +84,9 @@ pub fn circlePoint(circle: Shape.Circle, point: Shape.Point) bool {
 /// Rectangle-rectangle collision detection (AABB)
 pub fn rectangleRectangle(r1: Shape.Rectangle, r2: Shape.Rectangle) bool {
     return r1.position.x < r2.position.x + r2.size.x and
-           r1.position.x + r1.size.x > r2.position.x and
-           r1.position.y < r2.position.y + r2.size.y and
-           r1.position.y + r1.size.y > r2.position.y;
+        r1.position.x + r1.size.x > r2.position.x and
+        r1.position.y < r2.position.y + r2.size.y and
+        r1.position.y + r1.size.y > r2.position.y;
 }
 
 /// Rectangle-point collision detection
@@ -144,19 +144,19 @@ pub fn checkCollisionDetailed(shape1: Shape, shape2: Shape) CollisionResult {
 fn circleCircleDetailed(c1: Shape.Circle, c2: Shape.Circle) CollisionResult {
     const distance = maths.distance(c1.center, c2.center);
     const radius_sum = c1.radius + c2.radius;
-    
+
     if (distance > radius_sum) {
         return CollisionResult{ .collided = false };
     }
-    
+
     const penetration = radius_sum - distance;
-    const normal = if (distance > 0.001) 
-        maths.direction(c1.center, c2.center) 
-    else 
+    const normal = if (distance > 0.001)
+        maths.direction(c1.center, c2.center)
+    else
         Vec2{ .x = 1, .y = 0 }; // Default normal if centers overlap
-    
+
     const contact_point = maths.add(c1.center, maths.multiply(normal, c1.radius - penetration / 2.0));
-    
+
     return CollisionResult{
         .collided = true,
         .penetration_depth = penetration,
@@ -169,19 +169,19 @@ fn circleRectangleDetailed(circle: Shape.Circle, rect: Shape.Rectangle) Collisio
     const closest_x = std.math.clamp(circle.center.x, rect.position.x, rect.position.x + rect.size.x);
     const closest_y = std.math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
     const closest_point = Vec2{ .x = closest_x, .y = closest_y };
-    
+
     const distance = maths.distance(circle.center, closest_point);
-    
+
     if (distance > circle.radius) {
         return CollisionResult{ .collided = false };
     }
-    
+
     const penetration = circle.radius - distance;
     const normal = if (distance > 0.001)
         maths.direction(closest_point, circle.center)
     else
         Vec2{ .x = 0, .y = -1 }; // Default normal from top of rectangle
-    
+
     return CollisionResult{
         .collided = true,
         .penetration_depth = penetration,
@@ -192,17 +192,17 @@ fn circleRectangleDetailed(circle: Shape.Circle, rect: Shape.Rectangle) Collisio
 
 fn circlePointDetailed(circle: Shape.Circle, point: Shape.Point) CollisionResult {
     const distance = maths.distance(circle.center, point.position);
-    
+
     if (distance > circle.radius) {
         return CollisionResult{ .collided = false };
     }
-    
+
     const penetration = circle.radius - distance;
     const normal = if (distance > 0.001)
         maths.direction(point.position, circle.center)
     else
         Vec2{ .x = 1, .y = 0 };
-    
+
     return CollisionResult{
         .collided = true,
         .penetration_depth = penetration,
@@ -215,23 +215,23 @@ fn rectangleRectangleDetailed(r1: Shape.Rectangle, r2: Shape.Rectangle) Collisio
     if (!rectangleRectangle(r1, r2)) {
         return CollisionResult{ .collided = false };
     }
-    
+
     // Calculate overlap amounts
     const overlap_x = @min(r1.position.x + r1.size.x, r2.position.x + r2.size.x) - @max(r1.position.x, r2.position.x);
     const overlap_y = @min(r1.position.y + r1.size.y, r2.position.y + r2.size.y) - @max(r1.position.y, r2.position.y);
-    
+
     // Use minimum overlap as penetration depth
     const penetration = @min(overlap_x, overlap_y);
-    
+
     // Normal points from r1 to r2 along minimum separation axis
-    const normal = if (overlap_x < overlap_y) 
+    const normal = if (overlap_x < overlap_y)
         Vec2{ .x = if (r1.center().x < r2.center().x) @as(f32, -1) else 1, .y = 0 }
     else
         Vec2{ .x = 0, .y = if (r1.center().y < r2.center().y) @as(f32, -1) else 1 };
-    
+
     const contact_x = @max(r1.position.x, r2.position.x) + overlap_x / 2.0;
     const contact_y = @max(r1.position.y, r2.position.y) + overlap_y / 2.0;
-    
+
     return CollisionResult{
         .collided = true,
         .penetration_depth = penetration,
@@ -244,22 +244,19 @@ fn rectanglePointDetailed(rect: Shape.Rectangle, point: Shape.Point) CollisionRe
     if (!rect.contains(point.position)) {
         return CollisionResult{ .collided = false };
     }
-    
+
     // Calculate distances to each edge
     const left_dist = point.position.x - rect.position.x;
     const right_dist = (rect.position.x + rect.size.x) - point.position.x;
     const top_dist = point.position.y - rect.position.y;
     const bottom_dist = (rect.position.y + rect.size.y) - point.position.y;
-    
+
     // Find minimum distance (penetration depth)
     const min_dist = @min(@min(left_dist, right_dist), @min(top_dist, bottom_dist));
-    
+
     // Normal points away from closest edge
-    const normal = if (min_dist == left_dist) Vec2{ .x = -1, .y = 0 }
-                  else if (min_dist == right_dist) Vec2{ .x = 1, .y = 0 }
-                  else if (min_dist == top_dist) Vec2{ .x = 0, .y = -1 }
-                  else Vec2{ .x = 0, .y = 1 };
-    
+    const normal = if (min_dist == left_dist) Vec2{ .x = -1, .y = 0 } else if (min_dist == right_dist) Vec2{ .x = 1, .y = 0 } else if (min_dist == top_dist) Vec2{ .x = 0, .y = -1 } else Vec2{ .x = 0, .y = 1 };
+
     return CollisionResult{
         .collided = true,
         .penetration_depth = min_dist,
@@ -271,11 +268,11 @@ fn rectanglePointDetailed(rect: Shape.Rectangle, point: Shape.Point) CollisionRe
 fn pointPointDetailed(p1: Shape.Point, p2: Shape.Point) CollisionResult {
     const distance = maths.distance(p1.position, p2.position);
     const tolerance = 0.001;
-    
+
     if (distance > tolerance) {
         return CollisionResult{ .collided = false };
     }
-    
+
     return CollisionResult{
         .collided = true,
         .penetration_depth = tolerance - distance,
@@ -288,22 +285,22 @@ fn pointPointDetailed(p1: Shape.Point, p2: Shape.Point) CollisionResult {
 pub const CollisionBatch = struct {
     shapes: []Shape,
     allocator: std.mem.Allocator,
-    
+
     pub fn init(allocator: std.mem.Allocator, capacity: usize) !CollisionBatch {
         return CollisionBatch{
             .shapes = try allocator.alloc(Shape, capacity),
             .allocator = allocator,
         };
     }
-    
+
     pub fn deinit(self: *CollisionBatch) void {
         self.allocator.free(self.shapes);
     }
-    
+
     /// Check all pairwise collisions
     pub fn checkAllCollisions(self: *const CollisionBatch, results: []bool) void {
         std.debug.assert(results.len >= self.shapes.len * self.shapes.len);
-        
+
         for (self.shapes, 0..) |shape1, i| {
             for (self.shapes, 0..) |shape2, j| {
                 if (i != j) {
@@ -314,11 +311,11 @@ pub const CollisionBatch = struct {
             }
         }
     }
-    
+
     /// Check collision against a single shape
     pub fn checkAgainstShape(self: *const CollisionBatch, target: Shape, results: []bool) void {
         std.debug.assert(results.len >= self.shapes.len);
-        
+
         for (self.shapes, 0..) |shape, i| {
             results[i] = checkCollision(shape, target);
         }
@@ -333,17 +330,17 @@ pub const SpatialGrid = struct {
     allocator: std.mem.Allocator,
     width: usize,
     height: usize,
-    
+
     pub fn init(allocator: std.mem.Allocator, bounds: Shape.Rectangle, grid_size: f32) !SpatialGrid {
         const width = @as(usize, @intFromFloat(@ceil(bounds.size.x / grid_size)));
         const height = @as(usize, @intFromFloat(@ceil(bounds.size.y / grid_size)));
         const total_cells = width * height;
-        
+
         const cells = try allocator.alloc(std.ArrayList(usize), total_cells);
         for (cells) |*cell| {
             cell.* = std.ArrayList(usize).init(allocator);
         }
-        
+
         return SpatialGrid{
             .grid_size = grid_size,
             .bounds = bounds,
@@ -353,18 +350,18 @@ pub const SpatialGrid = struct {
             .height = height,
         };
     }
-    
+
     pub fn deinit(self: *SpatialGrid) void {
         for (self.cells) |*cell| {
             cell.deinit();
         }
         self.allocator.free(self.cells);
     }
-    
+
     fn getCellIndex(self: *const SpatialGrid, x: usize, y: usize) usize {
         return y * self.width + x;
     }
-    
+
     fn worldToGrid(self: *const SpatialGrid, world_pos: Vec2) struct { x: usize, y: usize } {
         const relative_x = world_pos.x - self.bounds.position.x;
         const relative_y = world_pos.y - self.bounds.position.y;
@@ -372,13 +369,13 @@ pub const SpatialGrid = struct {
         const grid_y = @as(usize, @intFromFloat(@max(0, @min(@as(f32, @floatFromInt(self.height - 1)), relative_y / self.grid_size))));
         return .{ .x = grid_x, .y = grid_y };
     }
-    
+
     pub fn clear(self: *SpatialGrid) void {
         for (self.cells) |*cell| {
             cell.clearRetainingCapacity();
         }
     }
-    
+
     pub fn addShape(self: *SpatialGrid, shape_index: usize, shape: Shape) !void {
         // Add shape to all cells it overlaps
         const min_pos = switch (shape) {
@@ -386,16 +383,16 @@ pub const SpatialGrid = struct {
             .rectangle => |r| r.position,
             .point => |p| p.position,
         };
-        
+
         const max_pos = switch (shape) {
             .circle => |c| Vec2{ .x = c.center.x + c.radius, .y = c.center.y + c.radius },
             .rectangle => |r| Vec2{ .x = r.position.x + r.size.x, .y = r.position.y + r.size.y },
             .point => |p| p.position,
         };
-        
+
         const min_grid = self.worldToGrid(min_pos);
         const max_grid = self.worldToGrid(max_pos);
-        
+
         var y = min_grid.y;
         while (y <= max_grid.y) : (y += 1) {
             var x = min_grid.x;
@@ -405,35 +402,35 @@ pub const SpatialGrid = struct {
             }
         }
     }
-    
+
     pub fn getNeighbors(self: *const SpatialGrid, shape: Shape, neighbors: *std.ArrayList(usize)) !void {
         neighbors.clearRetainingCapacity();
-        
+
         const center = switch (shape) {
             .circle => |c| c.center,
             .rectangle => |r| r.center(),
             .point => |p| p.position,
         };
-        
+
         const grid_pos = self.worldToGrid(center);
         const cell_index = self.getCellIndex(grid_pos.x, grid_pos.y);
-        
+
         // Add all shapes in the same cell
         for (self.cells[cell_index].items) |shape_index| {
             try neighbors.append(shape_index);
         }
-        
+
         // Also check adjacent cells for shapes that might overlap
         const adjacent_offsets = [_]struct { dx: i32, dy: i32 }{
             .{ .dx = -1, .dy = -1 }, .{ .dx = 0, .dy = -1 }, .{ .dx = 1, .dy = -1 },
-            .{ .dx = -1, .dy = 0 },                         .{ .dx = 1, .dy = 0 },
-            .{ .dx = -1, .dy = 1 },  .{ .dx = 0, .dy = 1 },  .{ .dx = 1, .dy = 1 },
+            .{ .dx = -1, .dy = 0 },  .{ .dx = 1, .dy = 0 },  .{ .dx = -1, .dy = 1 },
+            .{ .dx = 0, .dy = 1 },   .{ .dx = 1, .dy = 1 },
         };
-        
+
         for (adjacent_offsets) |offset| {
             const adj_x = @as(i32, @intCast(grid_pos.x)) + offset.dx;
             const adj_y = @as(i32, @intCast(grid_pos.y)) + offset.dy;
-            
+
             if (adj_x >= 0 and adj_x < self.width and adj_y >= 0 and adj_y < self.height) {
                 const adj_cell_index = self.getCellIndex(@intCast(adj_x), @intCast(adj_y));
                 for (self.cells[adj_cell_index].items) |shape_index| {

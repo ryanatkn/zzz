@@ -86,8 +86,8 @@ pub const Bullet = struct {
     radius: f32,
     color: Color,
     active: bool,
-    lifetime: f32,       // Time remaining before bullet expires
-    max_lifetime: f32,   // Maximum lifetime (can be upgraded)
+    lifetime: f32, // Time remaining before bullet expires
+    max_lifetime: f32, // Maximum lifetime (can be upgraded)
 
     pub fn init() Bullet {
         return .{
@@ -234,7 +234,7 @@ pub const Zone = struct {
         self.units = self.original_units;
         self.unit_count = self.original_unit_count;
     }
-    
+
     pub fn resetLifestones(self: *Zone) void {
         // Reset all lifestones to unattuned state
         for (0..self.lifestone_count) |i| {

@@ -3,19 +3,19 @@ const font_config = @import("../../../lib/font/config.zig");
 
 pub fn saveSettings(allocator: std.mem.Allocator, settings: font_config.FontSettings) !void {
     const config_path = "font_settings.json";
-    
+
     // Create JSON object
     var json_buf = std.ArrayList(u8).init(allocator);
     defer json_buf.deinit();
-    
+
     try json_buf.appendSlice(
         \\{
         \\  "fonts": {
         \\    "mono": {
         \\
     );
-    
-    try std.fmt.format(json_buf.writer(), 
+
+    try std.fmt.format(json_buf.writer(),
         \\      "family": "{s}",
         \\      "weight": {d},
         \\      "italic": {any}
@@ -63,13 +63,13 @@ pub fn saveSettings(allocator: std.mem.Allocator, settings: font_config.FontSett
         settings.heading_size,
         settings.body_size,
     });
-    
+
     // Write to file
     const file = try std.fs.cwd().createFile(config_path, .{});
     defer file.close();
-    
+
     try file.writeAll(json_buf.items);
-    
+
     const log = std.log.scoped(.font_settings);
     log.info("Font settings saved to {s}", .{config_path});
 }
@@ -77,7 +77,7 @@ pub fn saveSettings(allocator: std.mem.Allocator, settings: font_config.FontSett
 pub fn exportConfig(allocator: std.mem.Allocator, settings: font_config.FontSettings) ![]const u8 {
     // Generate a Zig configuration snippet
     var config_buf = std.ArrayList(u8).init(allocator);
-    
+
     try std.fmt.format(config_buf.writer(),
         \\// Font Configuration for Dealt/Hex
         \\// Generated on {d}
@@ -125,6 +125,6 @@ pub fn exportConfig(allocator: std.mem.Allocator, settings: font_config.FontSett
         settings.heading_size,
         settings.body_size,
     });
-    
+
     return config_buf.toOwnedSlice();
 }

@@ -19,11 +19,11 @@ const BULLET_FIRE_COOLDOWN = 0.15; // 150ms between shots for rhythm
 pub const BulletPool = struct {
     max_bullets: u8,
     current_bullets: u8,
-    recharge_rate: f32,      // Bullets per second
+    recharge_rate: f32, // Bullets per second
     recharge_accumulator: f32,
-    fire_cooldown: f32,      // Min time between shots
+    fire_cooldown: f32, // Min time between shots
     cooldown_remaining: f32,
-    
+
     pub fn init() BulletPool {
         return .{
             .max_bullets = BULLET_POOL_SIZE,
@@ -34,24 +34,24 @@ pub const BulletPool = struct {
             .cooldown_remaining = 0,
         };
     }
-    
+
     pub fn canFire(self: *const BulletPool) bool {
         return self.current_bullets > 0 and self.cooldown_remaining <= 0;
     }
-    
+
     pub fn fire(self: *BulletPool) void {
         if (self.canFire()) {
             self.current_bullets -= 1;
             self.cooldown_remaining = self.fire_cooldown;
         }
     }
-    
+
     pub fn update(self: *BulletPool, deltaTime: f32) void {
         // Update cooldown
         if (self.cooldown_remaining > 0) {
             self.cooldown_remaining -= deltaTime;
         }
-        
+
         // Recharge bullets
         if (self.current_bullets < self.max_bullets) {
             self.recharge_accumulator += self.recharge_rate * deltaTime;
@@ -63,17 +63,17 @@ pub const BulletPool = struct {
             self.recharge_accumulator = 0;
         }
     }
-    
+
     // Future: Upgrades can modify these values
     pub fn upgradeCapacity(self: *BulletPool, amount: u8) void {
         self.max_bullets += amount;
         self.current_bullets = @min(self.current_bullets + amount, self.max_bullets);
     }
-    
+
     pub fn upgradeRechargeRate(self: *BulletPool, multiplier: f32) void {
         self.recharge_rate *= multiplier;
     }
-    
+
     // Future: Multi-shot modifier
     pub fn getBulletsPerShot(self: *const BulletPool) u8 {
         _ = self;
@@ -88,7 +88,7 @@ pub fn fireBullet(world: *World, target_pos: Vec2, pool: *BulletPool) bool {
     if (world.findInactiveBullet()) |bullet| {
         behaviors.fireBullet(bullet, world.player.pos, target_pos);
         pool.fire();
-        
+
         // Future: Bullet travel distance upgrade
         // bullet.max_distance = getUpgradedBulletDistance();
         return true;

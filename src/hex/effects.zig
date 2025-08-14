@@ -435,7 +435,7 @@ pub const EffectSystem = struct {
         // Add only the inner effect for newly attuned lifestones
         self.addLifestoneGlowEffectParts(pos, lifestone_radius, false, true);
     }
-    
+
     pub fn addLullAreaEffect(self: *Self, pos: Vec2, radius: f32, duration: f32) void {
         // Add visible area indicator for Lull spell
         self.addEffect(pos, radius, .lull_area, duration);

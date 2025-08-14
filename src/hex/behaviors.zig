@@ -95,7 +95,7 @@ pub fn updateBullet(bullet: *Bullet, dt: f32) void {
 
     bullet.pos.x += bullet.vel.x * dt;
     bullet.pos.y += bullet.vel.y * dt;
-    
+
     // Update lifetime
     bullet.lifetime -= dt;
     if (bullet.lifetime <= 0) {

@@ -7,41 +7,41 @@ const std = @import("std");
 pub const FontConfig = struct {
     /// Base font size that other sizes are derived from
     /// Users can adjust this for their preference/display
-    base_size: f32 = 16.0,  // Changed to match original button size
-    
+    base_size: f32 = 16.0, // Changed to match original button size
+
     /// Scaling factors for different UI elements (relative to base_size)
     /// Test various font sizes with bitmap rendering (SDF disabled)
-    button_text: f32 = 1.0,      // 16pt - test standard button text
-    header_text: f32 = 1.5,      // 24pt - test larger headers
-    navigation_text: f32 = 0.875,  // 14pt - test smaller navigation
-    fps_counter: f32 = 1.25,     // 20pt - test readable performance metrics
-    debug_text: f32 = 0.75,      // 12pt - test smallest readable text
-    
+    button_text: f32 = 1.0, // 16pt - test standard button text
+    header_text: f32 = 1.5, // 24pt - test larger headers
+    navigation_text: f32 = 0.875, // 14pt - test smaller navigation
+    fps_counter: f32 = 1.25, // 20pt - test readable performance metrics
+    debug_text: f32 = 0.75, // 12pt - test smallest readable text
+
     /// Calculate actual font size for buttons
     pub fn buttonFontSize(self: FontConfig) f32 {
         return self.base_size * self.button_text;
     }
-    
+
     /// Calculate actual font size for headers
     pub fn headerFontSize(self: FontConfig) f32 {
         return self.base_size * self.header_text;
     }
-    
+
     /// Calculate actual font size for navigation
     pub fn navigationFontSize(self: FontConfig) f32 {
         return self.base_size * self.navigation_text;
     }
-    
+
     /// Calculate actual font size for FPS counter
     pub fn fpsFontSize(self: FontConfig) f32 {
         return self.base_size * self.fps_counter;
     }
-    
+
     /// Calculate actual font size for debug text
     pub fn debugFontSize(self: FontConfig) f32 {
         return self.base_size * self.debug_text;
     }
-    
+
     /// Calculate button height based on font size
     /// Ensures text fits comfortably with padding
     pub fn buttonHeight(self: FontConfig) f32 {
@@ -50,29 +50,29 @@ pub const FontConfig = struct {
         // Increased multiplier for 48pt text debugging
         return font_size * 1.8 + self.buttonPadding() * 2;
     }
-    
+
     /// Calculate button padding based on font size
     pub fn buttonPadding(self: FontConfig) f32 {
         return self.base_size * 0.4;
     }
-    
+
     /// Estimate character width for a given font size
     /// This is approximate - actual width varies by font and character
     pub fn estimateCharWidth(_: FontConfig, font_size: f32) f32 {
         // Approximate: character width is about 0.6x the font size for proportional fonts
         return font_size * 0.6;
     }
-    
+
     /// Get character width for button text
     pub fn buttonCharWidth(self: FontConfig) f32 {
         return self.estimateCharWidth(self.buttonFontSize());
     }
-    
+
     /// Get character width for header text
     pub fn headerCharWidth(self: FontConfig) f32 {
         return self.estimateCharWidth(self.headerFontSize());
     }
-    
+
     /// Get character width for navigation text
     pub fn navigationCharWidth(self: FontConfig) f32 {
         return self.estimateCharWidth(self.navigationFontSize());
@@ -85,17 +85,17 @@ pub const FontPresets = struct {
     pub const small = FontConfig{
         .base_size = 12.0,
     };
-    
+
     /// Medium preset - balanced default (matches original design)
     pub const medium = FontConfig{
         .base_size = 16.0,
     };
-    
+
     /// Large preset - better readability
     pub const large = FontConfig{
         .base_size = 20.0,
     };
-    
+
     /// Extra large preset - accessibility
     pub const extra_large = FontConfig{
         .base_size = 24.0,
@@ -132,18 +132,18 @@ pub fn setPreset(preset: enum { small, medium, large, extra_large }) void {
 
 /// Font categories for semantic font selection
 pub const FontCategory = enum {
-    mono,          // Monospace fonts for code
-    sans,          // Sans-serif for UI
+    mono, // Monospace fonts for code
+    sans, // Sans-serif for UI
     serif_display, // Serif for titles/headers
-    serif_text,    // Serif for body text
+    serif_text, // Serif for body text
 };
 
 pub const FontVariant = struct {
     path: []const u8,
-    weight: i32,      // 100-900 (100=Thin, 400=Regular, 700=Bold, 900=Black)
+    weight: i32, // 100-900 (100=Thin, 400=Regular, 700=Bold, 900=Black)
     italic: bool,
     condensed: enum { normal, semi, condensed, extra } = .normal,
-    optical_size: ?i32 = null,  // For fonts with optical size variants
+    optical_size: ?i32 = null, // For fonts with optical size variants
 };
 
 pub const FontFamily = struct {
@@ -206,19 +206,19 @@ pub const FontSettings = struct {
     mono_family: []const u8 = "DM Mono",
     mono_weight: i32 = 400,
     mono_italic: bool = false,
-    
+
     sans_family: []const u8 = "DM Sans",
     sans_weight: i32 = 400,
     sans_italic: bool = false,
-    
+
     serif_display_family: []const u8 = "DM Serif Display",
     serif_display_weight: i32 = 400,
     serif_display_italic: bool = false,
-    
+
     serif_text_family: []const u8 = "DM Serif Text",
     serif_text_weight: i32 = 400,
     serif_text_italic: bool = false,
-    
+
     default_size: f32 = 16.0,
     ui_size: f32 = 14.0,
     code_size: f32 = 13.0,
@@ -239,24 +239,24 @@ pub fn findFontFamily(name: []const u8) ?*const FontFamily {
 /// Find a specific font variant
 pub fn findFontVariant(family_name: []const u8, weight: i32, italic: bool) ?*const FontVariant {
     const family = findFontFamily(family_name) orelse return null;
-    
+
     for (family.variants) |*variant| {
         if (variant.weight == weight and variant.italic == italic) {
             return variant;
         }
     }
-    
+
     // Fallback to regular weight if exact match not found
     for (family.variants) |*variant| {
         if (variant.weight == 400 and variant.italic == italic) {
             return variant;
         }
     }
-    
+
     // Ultimate fallback to first variant
     if (family.variants.len > 0) {
         return &family.variants[0];
     }
-    
+
     return null;
 }

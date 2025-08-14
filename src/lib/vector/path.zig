@@ -20,12 +20,12 @@ pub const QuadraticCurve = struct {
     pub fn evaluate(self: QuadraticCurve, t: f32) Vec2 {
         const one_minus_t = 1.0 - t;
         return Vec2{
-            .x = one_minus_t * one_minus_t * self.start.x + 
-                 2.0 * one_minus_t * t * self.control.x + 
-                 t * t * self.end.x,
-            .y = one_minus_t * one_minus_t * self.start.y + 
-                 2.0 * one_minus_t * t * self.control.y + 
-                 t * t * self.end.y,
+            .x = one_minus_t * one_minus_t * self.start.x +
+                2.0 * one_minus_t * t * self.control.x +
+                t * t * self.end.x,
+            .y = one_minus_t * one_minus_t * self.start.y +
+                2.0 * one_minus_t * t * self.control.y +
+                t * t * self.end.y,
         };
     }
 
@@ -33,10 +33,10 @@ pub const QuadraticCurve = struct {
     pub fn derivative(self: QuadraticCurve, t: f32) Vec2 {
         const one_minus_t = 1.0 - t;
         return Vec2{
-            .x = 2.0 * one_minus_t * (self.control.x - self.start.x) + 
-                 2.0 * t * (self.end.x - self.control.x),
-            .y = 2.0 * one_minus_t * (self.control.y - self.start.y) + 
-                 2.0 * t * (self.end.y - self.control.y),
+            .x = 2.0 * one_minus_t * (self.control.x - self.start.x) +
+                2.0 * t * (self.end.x - self.control.x),
+            .y = 2.0 * one_minus_t * (self.control.y - self.start.y) +
+                2.0 * t * (self.end.y - self.control.y),
         };
     }
 
@@ -46,7 +46,7 @@ pub const QuadraticCurve = struct {
         const steps = 10;
         var total_length: f32 = 0;
         var prev_point = self.start;
-        
+
         var i: u32 = 1;
         while (i <= steps) : (i += 1) {
             const t = @as(f32, @floatFromInt(i)) / @as(f32, @floatFromInt(steps));
@@ -54,7 +54,7 @@ pub const QuadraticCurve = struct {
             total_length += maths.vec2_length(maths.vec2_subtract(point, prev_point));
             prev_point = point;
         }
-        
+
         return total_length;
     }
 
@@ -68,7 +68,7 @@ pub const QuadraticCurve = struct {
         // Check extrema of the curve (where derivative = 0)
         // For quadratic: derivative = 2(1-t)(control-start) + 2t(end-control)
         // Setting to 0 and solving for t
-        
+
         // X extrema
         const dx_start = self.control.x - self.start.x;
         const dx_end = self.end.x - self.control.x;
@@ -117,13 +117,13 @@ pub const CubicCurve = struct {
 
         return Vec2{
             .x = one_minus_t_cb * self.start.x +
-                 3.0 * one_minus_t_sq * t * self.control1.x +
-                 3.0 * one_minus_t * t_sq * self.control2.x +
-                 t_cb * self.end.x,
+                3.0 * one_minus_t_sq * t * self.control1.x +
+                3.0 * one_minus_t * t_sq * self.control2.x +
+                t_cb * self.end.x,
             .y = one_minus_t_cb * self.start.y +
-                 3.0 * one_minus_t_sq * t * self.control1.y +
-                 3.0 * one_minus_t * t_sq * self.control2.y +
-                 t_cb * self.end.y,
+                3.0 * one_minus_t_sq * t * self.control1.y +
+                3.0 * one_minus_t * t_sq * self.control2.y +
+                t_cb * self.end.y,
         };
     }
 };
@@ -181,7 +181,7 @@ pub const PathSegment = union(enum) {
                 const steps = 20;
                 var total_length: f32 = 0;
                 var prev_point = cubic.start;
-                
+
                 var i: u32 = 1;
                 while (i <= steps) : (i += 1) {
                     const t = @as(f32, @floatFromInt(i)) / @as(f32, @floatFromInt(steps));
@@ -189,7 +189,7 @@ pub const PathSegment = union(enum) {
                     total_length += maths.vec2_length(maths.vec2_subtract(point, prev_point));
                     prev_point = point;
                 }
-                
+
                 break :blk total_length;
             },
         };
@@ -227,13 +227,7 @@ pub const Contour = struct {
         else
             Vec2{ .x = 0, .y = 0 };
 
-        try self.segments.append(.{ 
-            .quadratic = QuadraticCurve{ 
-                .start = start, 
-                .control = control, 
-                .end = end 
-            } 
-        });
+        try self.segments.append(.{ .quadratic = QuadraticCurve{ .start = start, .control = control, .end = end } });
     }
 
     pub fn addCubic(self: *Contour, control1: Vec2, control2: Vec2, end: Vec2) !void {
@@ -242,14 +236,7 @@ pub const Contour = struct {
         else
             Vec2{ .x = 0, .y = 0 };
 
-        try self.segments.append(.{ 
-            .cubic = CubicCurve{ 
-                .start = start, 
-                .control1 = control1, 
-                .control2 = control2, 
-                .end = end 
-            } 
-        });
+        try self.segments.append(.{ .cubic = CubicCurve{ .start = start, .control1 = control1, .control2 = control2, .end = end } });
     }
 
     pub fn close(self: *Contour) void {
@@ -466,26 +453,20 @@ pub const TTFUtils = struct {
                 try contour.addLine(Vec2{ .x = x, .y = y });
             } else if (!prev_on_curve and is_on_curve) {
                 // Previous point was control point, this is end point
-                try contour.addQuadratic(
-                    Vec2{ .x = prev_x, .y = prev_y },
-                    Vec2{ .x = x, .y = y }
-                );
+                try contour.addQuadratic(Vec2{ .x = prev_x, .y = prev_y }, Vec2{ .x = x, .y = y });
             } else if (!prev_on_curve and !is_on_curve) {
                 // Two consecutive control points - create implicit on-curve point
                 const mid_x = (prev_x + x) * 0.5;
                 const mid_y = (prev_y + y) * 0.5;
-                
-                try contour.addQuadratic(
-                    Vec2{ .x = prev_x, .y = prev_y },
-                    Vec2{ .x = mid_x, .y = mid_y }
-                );
-                
+
+                try contour.addQuadratic(Vec2{ .x = prev_x, .y = prev_y }, Vec2{ .x = mid_x, .y = mid_y });
+
                 prev_x = mid_x;
                 prev_y = mid_y;
                 prev_on_curve = true;
                 continue;
             }
-            
+
             prev_x = x;
             prev_y = y;
             prev_on_curve = is_on_curve;

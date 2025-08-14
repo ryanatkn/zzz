@@ -136,7 +136,7 @@ pub fn vec2_isWithinCircle(point: Vec2, center: Vec2, radius: f32) bool {
 
 pub fn vec2_isWithinRect(point: Vec2, rect_pos: Vec2, rect_size: Vec2) bool {
     return point.x >= rect_pos.x and point.x <= rect_pos.x + rect_size.x and
-           point.y >= rect_pos.y and point.y <= rect_pos.y + rect_size.y;
+        point.y >= rect_pos.y and point.y <= rect_pos.y + rect_size.y;
 }
 
 pub fn vec2_clampToCircle(point: Vec2, center: Vec2, radius: f32) Vec2 {
@@ -167,4 +167,3 @@ pub fn vec2_screenToWorld(screen_pos: Vec2, camera_pos: Vec2, camera_scale: f32,
     const unscaled_pos = vec2_divide(relative_pos, camera_scale);
     return vec2_add(camera_pos, unscaled_pos);
 }
-

@@ -9,7 +9,7 @@ pub const GlyphOutline = struct {
     contours: []Contour,
     bounds: GlyphBounds,
     metrics: GlyphMetrics,
-    
+
     pub fn deinit(self: GlyphOutline, allocator: std.mem.Allocator) void {
         for (self.contours) |contour| {
             allocator.free(contour.points);
@@ -37,11 +37,11 @@ pub const GlyphBounds = struct {
     y_min: f32,
     x_max: f32,
     y_max: f32,
-    
+
     pub fn width(self: GlyphBounds) f32 {
         return self.x_max - self.x_min;
     }
-    
+
     pub fn height(self: GlyphBounds) f32 {
         return self.y_max - self.y_min;
     }
@@ -58,7 +58,7 @@ pub const GlyphExtractor = struct {
     allocator: std.mem.Allocator,
     parser: *ttf_parser.TTFParser,
     scale: f32,
-    
+
     pub fn init(allocator: std.mem.Allocator, parser: *ttf_parser.TTFParser, scale: f32) GlyphExtractor {
         return .{
             .allocator = allocator,
@@ -66,7 +66,7 @@ pub const GlyphExtractor = struct {
             .scale = scale,
         };
     }
-    
+
     /// Extract outline for a specific codepoint
     pub fn extractGlyph(self: *GlyphExtractor, codepoint: u32) !GlyphOutline {
         const glyph_id = try self.parser.getGlyphIndex(codepoint);
@@ -75,10 +75,10 @@ pub const GlyphExtractor = struct {
             log.info("Using missing glyph outline for codepoint {}", .{codepoint});
             return self.createMissingGlyphOutline();
         }
-        
+
         return self.extractGlyphById(glyph_id);
     }
-    
+
     /// Extract outline for a glyph ID
     pub fn extractGlyphById(self: *GlyphExtractor, glyph_id: u16) !GlyphOutline {
         const glyph_offset = self.parser.getGlyphOffset(glyph_id) catch |err| switch (err) {
@@ -91,47 +91,47 @@ pub const GlyphExtractor = struct {
                 return self.createMissingGlyphOutline();
             },
         };
-        
+
         log_throttle.logDebug("glyph_offset", "Got glyph_offset={} for glyph_id={}", .{ glyph_offset, glyph_id });
-        
+
         const glyf_offset = self.parser.glyf_offset orelse return error.NoGlyfTable;
         const glyph_data_offset = glyf_offset + glyph_offset;
-        
+
         if (glyph_data_offset + 10 > self.parser.data.len) {
             return self.createMissingGlyphOutline();
         }
-        
+
         const num_contours = std.mem.readInt(i16, self.parser.data[glyph_data_offset..][0..2], .big);
-        
+
         if (num_contours < 0) {
             return self.extractCompositeGlyph(glyph_data_offset);
         }
-        
+
         return self.extractSimpleGlyph(glyph_data_offset, num_contours, glyph_id);
     }
-    
+
     /// Extract a simple (non-composite) glyph
     fn extractSimpleGlyph(self: *GlyphExtractor, glyph_offset: usize, num_contours: i16, glyph_id: u16) !GlyphOutline {
         log_throttle.logDebug("simple_glyph", "Extracting simple glyph_id={}, num_contours={}", .{ glyph_id, num_contours });
-        
+
         // Handle empty glyphs (like space)
         if (num_contours == 0) {
             log.info("Creating empty glyph outline for glyph_id={}", .{glyph_id});
             return self.createEmptyGlyphOutline(glyph_id);
         }
-        
+
         // Read bounding box
-        const x_min = std.mem.readInt(i16, self.parser.data[glyph_offset + 2..][0..2], .big);
-        const y_min = std.mem.readInt(i16, self.parser.data[glyph_offset + 4..][0..2], .big);
-        const x_max = std.mem.readInt(i16, self.parser.data[glyph_offset + 6..][0..2], .big);
-        const y_max = std.mem.readInt(i16, self.parser.data[glyph_offset + 8..][0..2], .big);
-        
+        const x_min = std.mem.readInt(i16, self.parser.data[glyph_offset + 2 ..][0..2], .big);
+        const y_min = std.mem.readInt(i16, self.parser.data[glyph_offset + 4 ..][0..2], .big);
+        const x_max = std.mem.readInt(i16, self.parser.data[glyph_offset + 6 ..][0..2], .big);
+        const y_max = std.mem.readInt(i16, self.parser.data[glyph_offset + 8 ..][0..2], .big);
+
         var data_offset = glyph_offset + 10;
-        
+
         // Read contour endpoints
         var contour_ends = try self.allocator.alloc(u16, @intCast(num_contours));
         defer self.allocator.free(contour_ends);
-        
+
         var total_points: u16 = 0;
         for (0..@intCast(num_contours)) |i| {
             if (data_offset + 2 > self.parser.data.len) return error.InvalidGlyph;
@@ -139,22 +139,22 @@ pub const GlyphExtractor = struct {
             data_offset += 2;
             total_points = contour_ends[i] + 1;
         }
-        
+
         // Skip instructions
         const instruction_length = std.mem.readInt(u16, self.parser.data[data_offset..][0..2], .big);
         data_offset += 2 + instruction_length;
-        
+
         // Read flags
         var flags = try self.allocator.alloc(u8, total_points);
         defer self.allocator.free(flags);
-        
+
         var i: u16 = 0;
         while (i < total_points) {
             if (data_offset >= self.parser.data.len) return error.InvalidGlyph;
             const flag = self.parser.data[data_offset];
             data_offset += 1;
             flags[i] = flag;
-            
+
             if (flag & 0x08 != 0) { // Repeat flag
                 if (data_offset >= self.parser.data.len) return error.InvalidGlyph;
                 const repeat_count = self.parser.data[data_offset];
@@ -167,11 +167,11 @@ pub const GlyphExtractor = struct {
             }
             i += 1;
         }
-        
+
         // Read X coordinates
         var x_coords = try self.allocator.alloc(i16, total_points);
         defer self.allocator.free(x_coords);
-        
+
         var current_x: i16 = 0;
         for (0..total_points) |j| {
             const flag = flags[j];
@@ -192,11 +192,11 @@ pub const GlyphExtractor = struct {
             }
             x_coords[j] = current_x;
         }
-        
+
         // Read Y coordinates
         var y_coords = try self.allocator.alloc(i16, total_points);
         defer self.allocator.free(y_coords);
-        
+
         var current_y: i16 = 0;
         for (0..total_points) |j| {
             const flag = flags[j];
@@ -217,14 +217,14 @@ pub const GlyphExtractor = struct {
             }
             y_coords[j] = current_y;
         }
-        
+
         // Build contours
         var contours = try self.allocator.alloc(Contour, @intCast(num_contours));
         for (0..@intCast(num_contours)) |contour_idx| {
             const end_index = contour_ends[contour_idx];
             const start_index = if (contour_idx == 0) 0 else contour_ends[contour_idx - 1] + 1;
             const num_points = end_index - start_index + 1;
-            
+
             var points = try self.allocator.alloc(Point, num_points);
             for (0..num_points) |p| {
                 const idx = start_index + p;
@@ -234,16 +234,16 @@ pub const GlyphExtractor = struct {
                     .on_curve = (flags[idx] & 0x01) != 0,
                 };
             }
-            
+
             contours[contour_idx] = .{
                 .points = points,
                 .closed = true,
             };
         }
-        
+
         // Get metrics
         const metrics = try self.parser.getGlyphMetrics(glyph_id);
-        
+
         return GlyphOutline{
             .contours = contours,
             .bounds = .{
@@ -258,19 +258,19 @@ pub const GlyphExtractor = struct {
             },
         };
     }
-    
+
     /// Extract a composite glyph
     fn extractCompositeGlyph(self: *GlyphExtractor, glyph_offset: usize) !GlyphOutline {
         _ = glyph_offset;
         // TODO: Implement composite glyph extraction
         return self.createMissingGlyphOutline();
     }
-    
+
     /// Create outline for empty glyph (like space)
     fn createEmptyGlyphOutline(self: *GlyphExtractor, glyph_id: u16) !GlyphOutline {
         // Get metrics for the empty glyph
         const metrics = try self.parser.getGlyphMetrics(glyph_id);
-        
+
         return GlyphOutline{
             .contours = &[_]Contour{}, // Empty slice - no contours
             .bounds = .{
@@ -285,23 +285,23 @@ pub const GlyphExtractor = struct {
             },
         };
     }
-    
+
     /// Create outline for missing glyph (usually a box)
     fn createMissingGlyphOutline(self: *GlyphExtractor) !GlyphOutline {
         const size = 0.5 * self.scale * 1000; // Assume 1000 units per em
-        
+
         var points = try self.allocator.alloc(Point, 4);
         points[0] = .{ .x = 0.1 * size, .y = 0.1 * size, .on_curve = true };
         points[1] = .{ .x = 0.9 * size, .y = 0.1 * size, .on_curve = true };
         points[2] = .{ .x = 0.9 * size, .y = 0.9 * size, .on_curve = true };
         points[3] = .{ .x = 0.1 * size, .y = 0.9 * size, .on_curve = true };
-        
+
         var contours = try self.allocator.alloc(Contour, 1);
         contours[0] = .{
             .points = points,
             .closed = true,
         };
-        
+
         return GlyphOutline{
             .contours = contours,
             .bounds = .{

@@ -30,16 +30,16 @@ pub const MultiTextRenderer = struct {
     text_renderer: *text_renderer.TextRenderer,
     font_manager: *font_manager.FontManager,
     primitives: text_primitives.TextPrimitives,
-    
+
     // Grid storage
     grid_cells: std.ArrayList(GridCell),
-    
+
     // Performance tracking
     total_render_time_us: u64,
     cells_rendered: u32,
-    
+
     const Self = @This();
-    
+
     pub fn init(
         allocator: std.mem.Allocator,
         device: *c.sdl.SDL_GPUDevice,
@@ -57,7 +57,7 @@ pub const MultiTextRenderer = struct {
             .cells_rendered = 0,
         };
     }
-    
+
     pub fn deinit(self: *Self) void {
         for (self.grid_cells.items) |*cell| {
             if (cell.texture) |texture| {
@@ -66,7 +66,7 @@ pub const MultiTextRenderer = struct {
         }
         self.grid_cells.deinit();
     }
-    
+
     /// Create a comparison grid with all methods and sizes
     pub fn createComparisonGrid(
         self: *Self,
@@ -82,7 +82,7 @@ pub const MultiTextRenderer = struct {
             }
         }
         self.grid_cells.clearRetainingCapacity();
-        
+
         // All rendering methods to test
         const methods = [_]RenderMethod{
             .bitmap,
@@ -91,18 +91,18 @@ pub const MultiTextRenderer = struct {
             .sdf,
             .cached,
         };
-        
+
         // Calculate cell size based on largest expected text
         const max_font_size = font_sizes[font_sizes.len - 1];
         const cell_width = max_font_size * @as(f32, @floatFromInt(test_text.len)) * 0.6 + 20;
         const cell_height = max_font_size * 1.5 + 10;
-        
+
         // Create grid
         for (methods, 0..) |method, method_idx| {
             for (font_sizes, 0..) |size, size_idx| {
                 const x = start_pos.x + @as(f32, @floatFromInt(size_idx)) * (cell_width + cell_spacing.x);
                 const y = start_pos.y + @as(f32, @floatFromInt(method_idx)) * (cell_height + cell_spacing.y);
-                
+
                 const cell = GridCell{
                     .text = test_text,
                     .texture = null,
@@ -113,17 +113,17 @@ pub const MultiTextRenderer = struct {
                     .stats = null,
                     .visible = true,
                 };
-                
+
                 try self.grid_cells.append(cell);
             }
         }
     }
-    
+
     /// Render all visible cells in the grid
     pub fn renderGrid(self: *Self, render_pass: *c.sdl.SDL_GPURenderPass) !void {
         const start_time = std.time.microTimestamp();
         self.cells_rendered = 0;
-        
+
         // First pass: Create textures for cells that need them
         for (self.grid_cells.items) |*cell| {
             if (cell.visible and cell.texture == null) {
@@ -133,21 +133,21 @@ pub const MultiTextRenderer = struct {
                     cell.method,
                     Color.white(),
                 );
-                
+
                 cell.stats = try self.primitives.calculateTextStats(
                     cell.texture.?,
                     cell.text,
                 );
-                
+
                 self.cells_rendered += 1;
             }
         }
-        
+
         // Second pass: Batch render all textures
         for (self.grid_cells.items) |cell| {
             if (cell.visible and cell.texture != null) {
                 const texture = cell.texture.?;
-                
+
                 // Queue the text for rendering
                 self.text_renderer.queueTextTexture(
                     texture.texture,
@@ -159,37 +159,37 @@ pub const MultiTextRenderer = struct {
                 );
             }
         }
-        
+
         // Draw all queued text
         try self.text_renderer.drawQueuedText(render_pass);
-        
+
         self.total_render_time_us = @intCast(std.time.microTimestamp() - start_time);
     }
-    
+
     /// Render quality indicators below each cell
     pub fn renderQualityIndicators(
         self: *Self,
         render_pass: *c.sdl.SDL_GPURenderPass,
     ) !void {
         _ = render_pass;
-        
+
         for (self.grid_cells.items) |cell| {
             if (cell.visible and cell.stats != null) {
                 const stats = cell.stats.?;
-                
+
                 // Create quality indicator text
                 var buffer: [64]u8 = undefined;
                 const quality_text = try std.fmt.bufPrint(&buffer, "{d:.0}%", .{stats.coverage_percent});
-                
+
                 // Determine color based on quality
                 const quality_color = text_primitives.TextPrimitives.getQualityColor(stats.coverage_percent);
-                
+
                 // Render quality indicator below cell
                 const indicator_pos = Vec2{
                     .x = cell.position.x,
                     .y = cell.position.y + cell.size.y - 15,
                 };
-                
+
                 // Create small indicator texture
                 const indicator = try self.primitives.createTextTexture(
                     quality_text,
@@ -198,7 +198,7 @@ pub const MultiTextRenderer = struct {
                     quality_color,
                 );
                 defer indicator.deinit(self.device);
-                
+
                 self.text_renderer.queueTextTexture(
                     indicator.texture,
                     null,
@@ -210,13 +210,13 @@ pub const MultiTextRenderer = struct {
             }
         }
     }
-    
+
     /// Get statistics for the entire grid
     pub fn getGridStats(self: *Self) GridStats {
         var total_coverage: f32 = 0;
         var total_sharpness: f32 = 0;
         var count: u32 = 0;
-        
+
         for (self.grid_cells.items) |cell| {
             if (cell.stats) |stats| {
                 total_coverage += stats.coverage_percent;
@@ -224,7 +224,7 @@ pub const MultiTextRenderer = struct {
                 count += 1;
             }
         }
-        
+
         return GridStats{
             .avg_coverage = if (count > 0) total_coverage / @as(f32, @floatFromInt(count)) else 0,
             .avg_sharpness = if (count > 0) total_sharpness / @as(f32, @floatFromInt(count)) else 0,
@@ -232,7 +232,7 @@ pub const MultiTextRenderer = struct {
             .cells_rendered = self.cells_rendered,
         };
     }
-    
+
     /// Clear all cached textures
     pub fn clearCache(self: *Self) void {
         for (self.grid_cells.items) |*cell| {
