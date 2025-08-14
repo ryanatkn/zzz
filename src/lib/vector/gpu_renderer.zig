@@ -1,8 +1,8 @@
 const std = @import("std");
-const c = @import("c.zig");
-const types = @import("types.zig");
-const vector_path = @import("vector_path.zig");
-const curve_tessellation = @import("curve_tessellation.zig");
+const c = @import("../c.zig");
+const types = @import("../types.zig");
+const vector_path = @import("path.zig");
+const curve_tessellation = @import("../font/curve_tessellation.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

@@ -3,8 +3,8 @@ const std = @import("std");
 const c = @import("c.zig");
 
 const types = @import("types.zig");
-const TextRenderer = @import("text_renderer.zig").TextRenderer;
-const gpu_vector_renderer = @import("gpu_vector_renderer.zig");
+const TextRenderer = @import("text/renderer.zig").TextRenderer;
+const gpu_vector_renderer = @import("vector/gpu_renderer.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

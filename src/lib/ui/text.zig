@@ -2,8 +2,8 @@ const std = @import("std");
 const types = @import("../types.zig");
 const reactive = @import("../reactive.zig");
 const component = @import("component.zig");
-const text_renderer = @import("../text_renderer.zig");
-const font_config = @import("../font_config.zig");
+const text_renderer = @import("../text/renderer.zig");
+const font_config = @import("../font/config.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

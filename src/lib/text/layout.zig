@@ -1,7 +1,7 @@
 const std = @import("std");
-const types = @import("types.zig");
-const font_atlas = @import("font_atlas.zig");
-const rasterizer_core = @import("rasterizer_core.zig");
+const types = @import("../types.zig");
+const font_atlas = @import("../font/font_atlas.zig");
+const rasterizer_core = @import("../font/rasterizer_core.zig");
 
 const Vec2 = types.Vec2;
 

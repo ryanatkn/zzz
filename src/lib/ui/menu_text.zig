@@ -1,9 +1,9 @@
 const std = @import("std");
 const types = @import("../types.zig");
-const text_renderer = @import("../text_renderer.zig");
-const font_manager = @import("../font_manager.zig");
+const text_renderer = @import("../text/renderer.zig");
+const font_manager = @import("../font/manager.zig");
 const drawing = @import("../drawing.zig");
-const font_config = @import("../font_config.zig");
+const font_config = @import("../font/config.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

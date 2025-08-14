@@ -1,7 +1,7 @@
 const std = @import("std");
-const c = @import("c.zig");
-const types = @import("types.zig");
-const persistent_text = @import("persistent_text.zig");
+const c = @import("../c.zig");
+const types = @import("../types.zig");
+const persistent_text = @import("cache.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -328,8 +328,8 @@ pub const TextRenderer = struct {
 
     // Load text shaders
     fn loadTextShaders(self: *Self) !void {
-        const text_vs_spv = @embedFile("../shaders/compiled/vulkan/text_vs.spv");
-        const text_ps_spv = @embedFile("../shaders/compiled/vulkan/text_ps.spv");
+        const text_vs_spv = @embedFile("../../shaders/compiled/vulkan/text_vs.spv");
+        const text_ps_spv = @embedFile("../../shaders/compiled/vulkan/text_ps.spv");
 
         const text_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
             .code_size = text_vs_spv.len,
@@ -374,8 +374,8 @@ pub const TextRenderer = struct {
 
     // Load SDF text shaders
     fn loadSDFTextShaders(self: *Self) !void {
-        const text_sdf_vs_spv = @embedFile("../shaders/compiled/vulkan/text_sdf_vs.spv");
-        const text_sdf_ps_spv = @embedFile("../shaders/compiled/vulkan/text_sdf_ps.spv");
+        const text_sdf_vs_spv = @embedFile("../../shaders/compiled/vulkan/text_sdf_vs.spv");
+        const text_sdf_ps_spv = @embedFile("../../shaders/compiled/vulkan/text_sdf_ps.spv");
 
         const text_sdf_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
             .code_size = text_sdf_vs_spv.len,

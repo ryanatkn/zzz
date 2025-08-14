@@ -3,7 +3,7 @@ const c = @import("c.zig");
 const types = @import("types.zig");
 const colors = @import("colors.zig");
 const simple_gpu_renderer = @import("simple_gpu_renderer.zig");
-const font_config = @import("font_config.zig");
+const font_config = @import("font/config.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

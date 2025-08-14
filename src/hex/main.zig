@@ -26,7 +26,7 @@ const reactive_context = @import("../lib/reactive/context.zig");
 const reactive_batch = @import("../lib/reactive/batch.zig");
 const reactive_time = @import("../lib/reactive/time.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
-const persistent_text = @import("../lib/persistent_text.zig");
+const persistent_text = @import("../lib/text/cache.zig");
 
 const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
 const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));

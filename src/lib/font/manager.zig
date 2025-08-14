@@ -1,11 +1,11 @@
 const std = @import("std");
-const c = @import("c.zig");
-const types = @import("types.zig");
+const c = @import("../c.zig");
+const types = @import("../types.zig");
 const ttf_parser = @import("ttf_parser.zig");
 const rasterizer_core = @import("rasterizer_core.zig");
 const font_atlas = @import("font_atlas.zig");
-const text_layout = @import("text_layout.zig");
-const font_config = @import("font_config.zig");
+const text_layout = @import("../text/layout.zig");
+const font_config = @import("config.zig");
 
 const log = std.log.scoped(.pure_font_manager);
 

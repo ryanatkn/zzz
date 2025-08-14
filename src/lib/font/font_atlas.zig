@@ -1,8 +1,8 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("../c.zig");
 const rasterizer_core = @import("rasterizer_core.zig");
-const sdf_renderer = @import("sdf_renderer.zig");
-const vector_path = @import("vector_path.zig");
+const sdf_renderer = @import("../text/sdf_renderer.zig");
+const vector_path = @import("../vector/path.zig");
 
 const log = std.log.scoped(.font_atlas);
 

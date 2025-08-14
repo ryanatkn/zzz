@@ -1,6 +1,6 @@
 const std = @import("std");
-const persistent_text = @import("persistent_text.zig");
-const text_renderer = @import("text_renderer.zig");
+const persistent_text = @import("text/cache.zig");
+const text_renderer = @import("text/renderer.zig");
 
 /// Rendering Mode Guidelines for the Dealt Game Engine
 /// 

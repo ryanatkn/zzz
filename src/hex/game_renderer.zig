@@ -9,7 +9,7 @@ const camera = @import("../lib/camera.zig");
 const borders = @import("borders.zig");
 const constants = @import("constants.zig");
 const effects = @import("effects.zig");
-const font_manager = @import("../lib/font_manager.zig");
+const font_manager = @import("../lib/font/manager.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 
 const Vec2 = types.Vec2;
@@ -278,7 +278,7 @@ pub const GameRenderer = struct {
             .{ .x = fps_x, .y = fps_y },
             self.font_manager,
             .sans,
-            @import("../lib/font_config.zig").getGlobalConfig().fpsFontSize(),
+            @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(),
             WHITE
         ) catch |err| {
             log.err("Failed to queue persistent FPS text: {}", .{err});

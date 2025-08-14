@@ -1,7 +1,7 @@
 const std = @import("std");
 const page = @import("../../hud/page.zig");
-const multi_text_renderer = @import("../../lib/multi_text_renderer.zig");
-const text_primitives = @import("../../lib/text_primitives.zig");
+const multi_text_renderer = @import("../../lib/text/multi_renderer.zig");
+const text_primitives = @import("../../lib/text/primitives.zig");
 const types = @import("../../lib/types.zig");
 
 const Vec2 = types.Vec2;

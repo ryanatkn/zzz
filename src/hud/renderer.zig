@@ -4,8 +4,8 @@ const types = @import("../lib/types.zig");
 const lib_renderer = @import("../lib/renderer.zig");
 const game_renderer = @import("../hex/game_renderer.zig");
 const page = @import("page.zig");
-const font_config = @import("../lib/font_config.zig");
-const text_renderer = @import("../lib/text_renderer.zig");
+const font_config = @import("../lib/font/config.zig");
+const text_renderer = @import("../lib/text/renderer.zig");
 const menu_text = @import("../lib/ui/menu_text.zig");
 const drawing = @import("../lib/drawing.zig");
 

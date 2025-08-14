@@ -1,7 +1,7 @@
 const std = @import("std");
-const c = @import("c.zig");
-const types = @import("types.zig");
-const reactive_text_cache = @import("reactive/text_cache.zig");
+const c = @import("../c.zig");
+const types = @import("../types.zig");
+const reactive_text_cache = @import("../reactive/text_cache.zig");
 
 /// Persistent text texture system that maintains texture handles across frames
 /// Unlike the immediate mode text renderer, this system keeps textures alive

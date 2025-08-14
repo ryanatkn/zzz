@@ -1,5 +1,5 @@
 const std = @import("std");
-const font_config = @import("../../../lib/font_config.zig");
+const font_config = @import("../../../lib/font/config.zig");
 
 pub fn saveSettings(allocator: std.mem.Allocator, settings: font_config.FontSettings) !void {
     const config_path = "font_settings.json";

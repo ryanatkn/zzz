@@ -1,6 +1,6 @@
 const std = @import("std");
 const page = @import("../../../hud/page.zig");
-const font_config = @import("../../../lib/font_config.zig");
+const font_config = @import("../../../lib/font/config.zig");
 
 const FontsInfoPage = struct {
     base: page.Page,
