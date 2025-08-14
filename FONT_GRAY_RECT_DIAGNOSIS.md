@@ -1,10 +1,10 @@
-# Font Gray Rectangle Bug - Diagnosis Summary
+# Font Gray Rectangle Bug - FIXED ✅
 
 ## Current Status
 - **Rasterization works**: Glyphs are correctly rasterized with proper non-zero pixel counts
 - **Caching works**: Bitmaps are cached and reused successfully  
 - **Performance improved**: 2x speedup from fixes
-- **Visual bug remains**: All text appears as solid gray rectangles
+- **Visual bug FIXED**: Text now renders correctly with proper alpha blending
 
 ## Evidence Gathered
 
@@ -40,33 +40,22 @@ The atlas uploads single-channel (R8_UNORM) data but the shader might expect RGB
 2. **Texture Coordinates**: UV coordinates might be wrong, causing all glyphs to sample the same solid area
 3. **Blend Mode**: Alpha blending might be disabled or configured incorrectly
 
-## Recommended Fix
+## Applied Fix ✅
 
-### Step 1: Unify Texture Formats
-Change atlas to use RGBA format to match the rest of the pipeline:
-```zig
-// In font_atlas.zig line 71
-.format = c.sdl.SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,  // Was R8_UNORM
-```
+### Step 1: Unified Texture Formats ✅
+Changed atlas to use RGBA format to match the rest of the pipeline:
+- Updated `font_atlas.zig` line 71 to use `SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM`
 
-### Step 2: Update Upload Logic
-Expand single-channel bitmap to RGBA during upload:
-```zig
-// When uploading to atlas, convert R8 to RGBA
-for (bitmap) |alpha| {
-    rgba_buffer[i*4 + 0] = 255;  // R
-    rgba_buffer[i*4 + 1] = 255;  // G  
-    rgba_buffer[i*4 + 2] = 255;  // B
-    rgba_buffer[i*4 + 3] = alpha; // A
-}
-```
+### Step 2: Updated Upload Logic ✅
+Expanded single-channel bitmap to RGBA during upload:
+- Converted R8 bitmap to RGBA in `uploadGlyphToAtlas()` 
+- Set RGB to white (255) and alpha from the bitmap
+- Fixed buffer size calculation for RGBA format
 
-### Step 3: Verify Shader
-Check that the text shader samples the alpha channel correctly:
-```hlsl
-float4 texColor = texture.Sample(sampler, uv);
-outputColor = float4(color.rgb, color.a * texColor.a);  // Use alpha channel
-```
+### Step 3: Verified Shader ✅
+Updated text shader to properly sample the alpha channel:
+- Simplified shader to only use alpha channel for coverage
+- Removed fallback logic that was causing issues
 
 ## Testing Strategy
 
@@ -75,8 +64,14 @@ outputColor = float4(color.rgb, color.a * texColor.a);  // Use alpha channel
 3. **Test shader**: Use a solid color texture to verify shader works
 4. **Compare formats**: Test both R8 and RGBA formats to see difference
 
-## Files to Check
-- `src/lib/font_atlas.zig` - Texture format and upload
-- `src/shaders/source/text.hlsl` - How alpha is sampled
-- `src/lib/text_renderer.zig` - Blend mode configuration
-- `src/lib/simple_gpu_renderer.zig` - Text rendering pipeline setup
+## Files Modified
+- ✅ `src/lib/font_atlas.zig` - Changed texture format to RGBA, fixed upload logic
+- ✅ `src/shaders/source/text.hlsl` - Simplified alpha sampling
+- ✅ `src/menu/font_test/+page.zig` - Created comprehensive font test page
+- ✅ `src/lib/text_measurement.zig` - Added text measurement utilities
+
+## Additional Improvements
+- Created dedicated font test page at `/font-test` for debugging
+- Added text measurement utilities for calculating dimensions without rendering
+- Fixed buffer size calculations to prevent Vulkan validation errors
+- Improved shader to use simplified alpha channel sampling

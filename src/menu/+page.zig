@@ -110,6 +110,16 @@ const IndexPage = struct {
             nav_height
         ));
         
+        // Add font test link
+        try links.append(page.createLink(
+            "Font Test",
+            "/font-test",
+            nav_center_x - nav_width / 2.0,
+            nav_y - nav_height - 20,
+            nav_width,
+            nav_height
+        ));
+        
         // Test panel for font debugging - black background with various glyphs
         const test_y = 600.0;
         

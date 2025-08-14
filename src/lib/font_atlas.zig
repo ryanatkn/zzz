@@ -223,7 +223,7 @@ pub const FontAtlas = struct {
         const texture_transfer_info = c.sdl.SDL_GPUTextureTransferInfo{
             .transfer_buffer = transfer_buffer,
             .offset = 0,
-            .pixels_per_row = width,
+            .pixels_per_row = width, // Width in pixels, not bytes
             .rows_per_layer = height,
         };
         

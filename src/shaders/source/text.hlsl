@@ -73,26 +73,15 @@ float4 ps_main(VertexOutput input) : SV_Target {
     // Sample the font atlas texture
     float4 atlas_sample = font_atlas.Sample(atlas_sampler, input.texcoord);
     
-    // SDL_ttf renders text in different ways depending on the function used
-    // Try sampling from different channels to find where the glyph data is
-    float coverage = atlas_sample.a; // Try alpha channel first
-    
-    // If alpha is not useful, try grayscale approaches
-    if (coverage < 0.1) {
-        // Try red channel as grayscale
-        coverage = atlas_sample.r;
-        
-        // If it looks like white background with black text, invert it
-        if (coverage > 0.9) {
-            coverage = 1.0 - coverage;
-        }
-    }
+    // The atlas now stores white text with alpha in the alpha channel
+    // So we just need the alpha value for coverage
+    float coverage = atlas_sample.a;
     
     // Apply text color with coverage
     float4 final_color = input.color;
     final_color.a *= coverage;
     
-    // Discard very transparent pixels
+    // Discard very transparent pixels for performance
     if (final_color.a < 0.01) {
         discard;
     }
