@@ -108,6 +108,42 @@ pub const FontRasterizer = struct {
             try self.rasterizeSimpleGlyph(glyph_data_offset, num_contours, bitmap, width, height, -scaled_x_min + 1, -scaled_y_min + 1);
         }
         
+        // Debug output for specific glyphs
+        if (codepoint == 'A' or codepoint == '0' or codepoint == 'F') {
+            var non_zero: u32 = 0;
+            var total_value: u32 = 0;
+            for (bitmap) |pixel| {
+                if (pixel != 0) non_zero += 1;
+                total_value += pixel;
+            }
+            
+            // Check if we're filling entire rows
+            var filled_rows: u32 = 0;
+            var y_check: u32 = 0;
+            while (y_check < height) : (y_check += 1) {
+                var row_filled = true;
+                var x_check: u32 = 0;
+                while (x_check < width) : (x_check += 1) {
+                    if (bitmap[y_check * width + x_check] == 0) {
+                        row_filled = false;
+                        break;
+                    }
+                }
+                if (row_filled) filled_rows += 1;
+            }
+            
+            log.warn("Glyph '{}': {}/{} pixels filled, {} fully filled rows out of {} rows", 
+                     .{@as(u8, @intCast(codepoint)), non_zero, bitmap.len, filled_rows, height});
+            
+            // Show a sample row from the middle
+            if (height > 2) {
+                const mid_y = height / 2;
+                const row_start = mid_y * width;
+                const row_end = @min(row_start + width, bitmap.len);
+                log.warn("  Middle row (y={}): {any}", .{mid_y, bitmap[row_start..@min(row_start + 10, row_end)]});
+            }
+        }
+        
         return RasterizedGlyph{
             .bitmap = bitmap,
             .width = width,
@@ -237,13 +273,16 @@ pub const FontRasterizer = struct {
                 const y = y_coords[point_index];
                 
                 if (prev_on_curve and on_curve) {
-                    try edges.append(Edge{
-                        .x0 = prev_x,
-                        .y0 = prev_y,
-                        .x1 = x,
-                        .y1 = y,
-                        .winding = if (prev_y < y) 1 else -1,
-                    });
+                    // Skip horizontal edges (they don't affect scanline fill)
+                    if (@abs(prev_y - y) > 0.001) {
+                        try edges.append(Edge{
+                            .x0 = prev_x,
+                            .y0 = prev_y,
+                            .x1 = x,
+                            .y1 = y,
+                            .winding = if (prev_y < y) 1 else -1,
+                        });
+                    }
                 } else if (prev_on_curve and !on_curve) {
                 } else if (!prev_on_curve and on_curve) {
                     const control_x = prev_x;
@@ -264,7 +303,7 @@ pub const FontRasterizer = struct {
                         const qx = one_minus_t * one_minus_t * last_qx + 2.0 * one_minus_t * t * control_x + t * t * x;
                         const qy = one_minus_t * one_minus_t * last_qy + 2.0 * one_minus_t * t * control_y + t * t * y;
                         
-                        if (t > 0) {
+                        if (t > 0 and @abs(last_qy - qy) > 0.001) {
                             try edges.append(Edge{
                                 .x0 = last_qx,
                                 .y0 = last_qy,
@@ -305,7 +344,7 @@ pub const FontRasterizer = struct {
                         const qx = one_minus_t * one_minus_t * last_qx + 2.0 * one_minus_t * t * control_x + t * t * mid_x;
                         const qy = one_minus_t * one_minus_t * last_qy + 2.0 * one_minus_t * t * control_y + t * t * mid_y;
                         
-                        if (t > 0) {
+                        if (t > 0 and @abs(last_qy - qy) > 0.001) {
                             try edges.append(Edge{
                                 .x0 = last_qx,
                                 .y0 = last_qy,
@@ -337,6 +376,11 @@ pub const FontRasterizer = struct {
         // Pre-allocate active edges array once, reuse for all scanlines
         var active_edges = std.ArrayList(ActiveEdge).init(self.allocator);
         defer active_edges.deinit();
+        
+        // Debug: count edges
+        if (width * height < 2000) { // Only for small glyphs
+            log.warn("Scanline render: {} edges for {}x{} bitmap", .{edges.len, width, height});
+        }
         
         var y: u32 = 0;
         while (y < height) : (y += 1) {
@@ -373,14 +417,24 @@ pub const FontRasterizer = struct {
             var x: u32 = 0;
             var edge_index: usize = 0;
             
+            // Debug for small glyphs - check middle scanline
+            if (width * height < 500 and y == height / 2) {
+                log.warn("  Scanline {}/{}: {} active edges", .{y, height, active_edges.items.len});
+                for (active_edges.items, 0..) |edge, i| {
+                    log.warn("    Edge {}: x={d:.1}, winding={}", .{i, edge.x, edge.winding});
+                }
+            }
+            
             while (x < width) : (x += 1) {
                 const x_float = @as(f32, @floatFromInt(x)) + 0.5;
                 
+                // Process all edges at or before this x position
                 while (edge_index < active_edges.items.len and active_edges.items[edge_index].x <= x_float) {
                     winding_number += active_edges.items[edge_index].winding;
                     edge_index += 1;
                 }
                 
+                // Fill pixel if winding number is non-zero (inside shape)
                 if (winding_number != 0) {
                     bitmap[y * width + x] = 255;
                 }

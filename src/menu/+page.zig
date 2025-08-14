@@ -113,8 +113,8 @@ const IndexPage = struct {
         // Test panel for font debugging - black background with various glyphs
         const test_y = 600.0;
         
-        // Black background panel
-        try links.append(page.createLink("", "", 100, test_y, 1720, 200));
+        // Skip the black background panel - it might be causing rendering issues
+        // try links.append(page.createLink("", "", 100, test_y, 1720, 200));
         
         // Panel header
         try links.append(page.createLink("FONT TEST PANEL", "", 100, test_y - 30, 300, 25));
@@ -130,6 +130,10 @@ const IndexPage = struct {
         
         // Row 4: Mixed case pangram to test kerning and spacing
         try links.append(page.createLink("The Quick Brown Fox Jumps Over The Lazy Dog 1234567890", "", 150, test_y + 140, 1620, 40));
+        
+        // Single large letter test for debugging
+        try links.append(page.createLink("A", "", 850, 400, 100, 100));
+        try links.append(page.createLink("SINGLE LETTER TEST", "", 750, 370, 300, 25));
     }
     
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
