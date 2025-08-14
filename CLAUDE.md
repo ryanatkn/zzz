@@ -320,6 +320,23 @@ $ zig build --help       # Show all build options
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
 
+**Debug Logging Guidelines:**
+- **CRITICAL**: Use log throttling to prevent spam - see `src/lib/debug/log_throttle.zig`
+- **Available Throttle Methods**:
+  - `logOnce()` - Log message only once ever
+  - `logPeriodic()` - Log at most once per time period (e.g., every 5 seconds)
+  - `logOnChange()` - Log only when value changes
+  - `logThrottled()` - General throttling with customizable rate
+- **Usage Pattern**:
+  ```zig
+  const log_throttle = @import("../debug/log_throttle.zig");
+  // Instead of: std.log.info("Processing glyph {}", .{glyph_id});
+  // Use: log_throttle.logPeriodic("glyph_process", 5000, "Processing glyph {}", .{glyph_id});
+  ```
+- **Why This Matters**: Font system can generate 500,000+ log lines in 2 minutes without throttling
+- **Already Converted**: text/renderer.zig, text/cache.zig, fps_counter.zig, menu_text.zig, game_renderer.zig
+- **Needs Conversion**: Font grid test system, HUD modules, any new diagnostic code
+
 **Library Import Guidelines:**
 - **Capability-based imports**: Import from specific capability directories
 - **Core modules** (`core/`): types, maths, colors, viewport, result, pool, id

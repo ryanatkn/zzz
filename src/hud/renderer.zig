@@ -8,7 +8,10 @@ const font_config = @import("../lib/font/config.zig");
 const text_renderer = @import("../lib/text/renderer.zig");
 const menu_text = @import("../lib/ui/menu_text.zig");
 const drawing = @import("../lib/rendering/drawing.zig");
-const multi_text_renderer = @import("../lib/text/multi_renderer.zig");
+const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
+const multi_strategy_renderer = @import("../lib/font/multi_strategy_renderer.zig");
+const renderer_display = @import("../lib/font/renderer_display.zig");
+const renderer_interface = @import("../lib/font/renderers/renderer_interface.zig");
 
 const Color = types.Color;
 const Vec2 = types.Vec2;
@@ -49,14 +52,12 @@ const FontGridConfig = struct {
 pub const BrowserRenderer = struct {
     base_renderer: *game_renderer.GameRenderer,
 
-    // Font grid test renderer for special diagnostic page
-    font_grid_renderer: ?multi_text_renderer.MultiTextRenderer,
+    // Font grid test configuration
     font_grid_config: FontGridConfig,
 
     pub fn init(base_renderer: *game_renderer.GameRenderer) BrowserRenderer {
         return .{
             .base_renderer = base_renderer,
-            .font_grid_renderer = null,
             .font_grid_config = FontGridConfig.default(),
         };
     }
@@ -68,32 +69,18 @@ pub const BrowserRenderer = struct {
         log.info("HUD using main game's FontManager and TextRenderer - no separate initialization needed", .{});
     }
 
-    pub fn deinitFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) void {
-        _ = allocator;
-        // Clean up font grid renderer if it exists
-        self.cleanupFontGridRenderer();
+    pub fn deinitFonts(_: *BrowserRenderer, _: std.mem.Allocator) void {
         // No separate font manager or text renderer to clean up - using main game's
     }
 
-    /// Clean up the font grid renderer and set it to null
-    fn cleanupFontGridRenderer(self: *BrowserRenderer) void {
-        if (self.font_grid_renderer) |*renderer| {
-            renderer.deinit();
-            self.font_grid_renderer = null;
-        }
-    }
-
     /// Clean up all resources (call this when destroying the BrowserRenderer)
-    pub fn deinit(self: *BrowserRenderer) void {
-        self.cleanupFontGridRenderer();
+    pub fn deinit(_: *BrowserRenderer) void {
+        // No cleanup needed - using shared resources
     }
 
     /// Update font grid configuration (useful for testing different setups)
     pub fn setFontGridConfig(self: *BrowserRenderer, config: FontGridConfig) void {
         self.font_grid_config = config;
-
-        // Reset the renderer to force recreation with new config
-        self.cleanupFontGridRenderer();
     }
 
     pub fn renderOverlay(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
@@ -122,26 +109,16 @@ pub const BrowserRenderer = struct {
         // First, let the page render its basic UI elements (headers, navigation)
         try current_page.render(links);
 
-        // Initialize the font grid renderer if not already done
-        if (self.font_grid_renderer == null) {
-            self.font_grid_renderer = multi_text_renderer.MultiTextRenderer.init(self.base_renderer.allocator, self.base_renderer.gpu.device, &self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
-
-            // Create the comparison grid using configuration
-            try self.font_grid_renderer.?.createComparisonGrid(
-                self.font_grid_config.test_text,
-                self.font_grid_config.font_sizes,
-                self.font_grid_config.start_pos,
-                self.font_grid_config.cell_spacing,
-            );
+        // Cast to FontGridTestPage to access new functionality
+        const grid_page: *font_grid_test_page.FontGridTestPage = @fieldParentPtr("base", current_page);
+        
+        // Auto-initialize the multi-strategy renderer system if needed
+        if (!grid_page.isAutoInitialized()) {
+            grid_page.autoInitialize(self.base_renderer.allocator, self.base_renderer.gpu.device);
         }
 
-        // Render the comparison grid
-        try self.font_grid_renderer.?.renderGrid(render_pass);
-
-        // Render quality indicators
-        try self.font_grid_renderer.?.renderQualityIndicators(render_pass);
-
-        _ = cmd_buffer;
+        // Render strategy comparison grid using actual GPU textures
+        try self.renderStrategyComparison(cmd_buffer, render_pass, grid_page);
     }
 
     pub fn renderLinks(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, links: []const page.Link, hovered_link: ?usize) !void {
@@ -241,5 +218,53 @@ pub const BrowserRenderer = struct {
                 self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x + size / 2 - thickness, .y = y + thickness }, .{ .x = thickness, .y = size / 2 }, color);
             },
         }
+    }
+    
+    /// Render the strategy comparison grid showing actual rendered output
+    fn renderStrategyComparison(self: *BrowserRenderer, _: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, grid_page: *const font_grid_test_page.FontGridTestPage) !void {
+        
+        // Get available strategies and render each one's texture
+        const strategies = [_]renderer_interface.RenderStrategy{
+            .simple_bitmap,
+            .debug_ascii, 
+            .oversampling_2x,
+            .oversampling_4x,
+            .scanline_antialiased,
+        };
+        
+        // Grid layout parameters
+        const start_x = 150.0;
+        const start_y = 200.0;
+        const cell_width = 140.0;
+        const cell_height = 100.0;
+        const spacing = 10.0;
+        
+        // Render each strategy's output as a texture
+        for (strategies, 0..) |strategy, row| {
+            const x = start_x;
+            const y = start_y + @as(f32, @floatFromInt(row)) * (cell_height + spacing);
+            
+            // Get display texture for this strategy
+            if (grid_page.getDisplayTexture(strategy)) |texture| {
+                // Render the texture showing the actual font rendering output
+                try self.renderTexture(render_pass, texture, x, y, cell_width, cell_height);
+            }
+        }
+    }
+    
+    /// Render a GPU texture at specified position and size
+    fn renderTexture(self: *BrowserRenderer, render_pass: *c.sdl.SDL_GPURenderPass, texture: *c.sdl.SDL_GPUTexture, x: f32, y: f32, width: f32, height: f32) !void {
+        // Use the game renderer's text system to display the texture
+        // This shows the actual rendered font output from each strategy
+        self.base_renderer.gpu.text_renderer.queueTextTexture(
+            texture,
+            null, // Use default sampler
+            @as(u32, @intFromFloat(width)),
+            @as(u32, @intFromFloat(height)), 
+            .{ .x = x, .y = y },
+            types.Color.white(),
+        );
+        
+        try self.base_renderer.gpu.text_renderer.drawQueuedText(render_pass);
     }
 };

@@ -1,63 +1,171 @@
 const std = @import("std");
 const c = @import("../../lib/platform/sdl.zig");
 const page = @import("../../hud/page.zig");
-const multi_text_renderer = @import("../../lib/text/multi_renderer.zig");
-const text_primitives = @import("../../lib/text/primitives.zig");
-const text_renderer = @import("../../lib/text/renderer.zig");
-const font_manager = @import("../../lib/font/manager.zig");
+const multi_strategy_renderer = @import("../../lib/font/multi_strategy_renderer.zig");
+const renderer_display = @import("../../lib/font/renderer_display.zig");
+const font_types = @import("../../lib/font/font_types.zig");
 const types = @import("../../lib/core/types.zig");
+const renderer_interface = @import("../../lib/font/renderers/renderer_interface.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
+const MultiStrategyRenderer = multi_strategy_renderer.MultiStrategyRenderer;
+const MultiRenderResult = multi_strategy_renderer.MultiRenderResult;
+const RendererDisplay = renderer_display.RendererDisplay;
+const RenderStrategy = renderer_interface.RenderStrategy;
+const GlyphOutline = font_types.GlyphOutline;
+const Point = font_types.Point;
+const Contour = font_types.Contour;
 
-const FontGridTestPage = struct {
+pub const FontGridTestPage = struct {
     base: page.Page,
-    multi_renderer: ?multi_text_renderer.MultiTextRenderer,
+    multi_renderer: ?MultiStrategyRenderer,
+    display: ?RendererDisplay,
     initialized: bool,
-
+    auto_initialized: bool, // Track if we've done the auto-init
+    
     // Test configuration
     test_text: []const u8,
-    font_sizes: [11]f32,
+    font_sizes: [3]f32,
+    
+    // Test results from last run
+    last_test_results: ?[]MultiRenderResult,
+    test_status: []const u8, // Status message for display
 
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
         const grid_page: *FontGridTestPage = @fieldParentPtr("base", self);
 
         // Initialize test configuration
-        grid_page.test_text = "Ag123@";
-        grid_page.font_sizes = [_]f32{ 8, 10, 12, 14, 16, 20, 24, 32, 48, 64, 72 };
+        grid_page.test_text = "Test";
+        grid_page.font_sizes = [_]f32{ 16, 24, 48 };
         grid_page.initialized = false;
+        grid_page.auto_initialized = false;
         grid_page.multi_renderer = null;
+        grid_page.display = null;
+        grid_page.last_test_results = null;
+        grid_page.test_status = "Not initialized";
 
         _ = allocator;
     }
 
-    // Initialization method to be called by renderer with proper context
-    pub fn initializeRenderer(self: *FontGridTestPage, allocator: std.mem.Allocator, device: *c.sdl.SDL_GPUDevice, tr: *text_renderer.TextRenderer, font_mgr: *font_manager.FontManager) !void {
-        if (self.initialized) return;
-
-        self.multi_renderer = multi_text_renderer.MultiTextRenderer.init(allocator, device, tr, font_mgr);
-
-        // Create comparison grid
-        const start_pos = Vec2{ .x = 150.0, .y = 120.0 };
-        const cell_spacing = Vec2{ .x = 10.0, .y = 10.0 };
-
-        try self.multi_renderer.?.createComparisonGrid(
-            self.test_text,
-            &self.font_sizes,
-            start_pos,
-            cell_spacing,
-        );
-
+    // Auto-initialize the multi-strategy renderer system immediately
+    pub fn autoInitialize(self: *FontGridTestPage, allocator: std.mem.Allocator, device: *c.sdl.SDL_GPUDevice) void {
+        if (self.auto_initialized) return;
+        
+        self.auto_initialized = true;
+        self.test_status = "Initializing renderers...";
+        
+        // Initialize multi-strategy renderer
+        self.multi_renderer = MultiStrategyRenderer.init(allocator) catch |err| {
+            std.log.err("Failed to initialize multi-strategy renderer: {}", .{err});
+            self.test_status = "Renderer init failed";
+            return;
+        };
+        
+        // Initialize display system
+        self.display = RendererDisplay.init(allocator, device);
+        
+        self.test_status = "Running test suite...";
+        
+        // Immediately run test suite with medium font size
+        const test_font_size = self.font_sizes[1]; // 24pt
+        const results = self.runTestSuite(allocator, test_font_size) catch |err| {
+            std.log.err("Failed to run test suite: {}", .{err});
+            self.test_status = "Test suite failed";
+            return;
+        };
+        
+        // Create display textures for all results
+        self.createDisplayTextures(results) catch |err| {
+            std.log.err("Failed to create display textures: {}", .{err});
+            self.test_status = "Display creation failed";
+            return;
+        };
+        
         self.initialized = true;
+        self.test_status = "Ready - All renderers active";
+        
+        // Log success
+        std.log.info("Font grid test auto-initialized with {} renderers", .{results.len});
+    }
+    
+    // Create GPU textures for display from render results
+    fn createDisplayTextures(self: *FontGridTestPage, results: []MultiRenderResult) !void {
+        if (self.display == null) return error.DisplayNotInitialized;
+        
+        for (results) |result| {
+            if (result.result) |render_result| {
+                _ = self.display.?.createDisplayTexture(render_result, result.strategy) catch |err| {
+                    std.log.warn("Failed to create display texture for {s}: {}", .{result.strategy.getName(), err});
+                    continue;
+                };
+            }
+        }
     }
 
     pub fn isGridPage(self: *const FontGridTestPage) bool {
         _ = self;
         return true;
     }
-
-    pub fn getMultiRenderer(self: *FontGridTestPage) ?*multi_text_renderer.MultiTextRenderer {
-        return if (self.multi_renderer) |*mr| mr else null;
+    
+    // Test all rendering strategies with a simple test shape
+    pub fn runTestSuite(self: *FontGridTestPage, allocator: std.mem.Allocator, font_size: f32) ![]MultiRenderResult {
+        if (!self.initialized or self.multi_renderer == null) {
+            return error.NotInitialized;
+        }
+        
+        // Create a simple test glyph outline (rectangle)
+        const test_outline = try self.createTestGlyphOutline(allocator);
+        defer test_outline.deinit(allocator);
+        
+        // Test with all strategies
+        const results = try self.multi_renderer.?.renderWithAllStrategies(test_outline, font_size);
+        
+        // Store results for display
+        if (self.last_test_results) |old_results| {
+            allocator.free(old_results);
+        }
+        self.last_test_results = results;
+        
+        return results;
+    }
+    
+    // Create a simple rectangular test glyph for testing
+    fn createTestGlyphOutline(self: *FontGridTestPage, allocator: std.mem.Allocator) !GlyphOutline {
+        _ = self;
+        
+        // Create a simple rectangular contour
+        const points = try allocator.alloc(Point, 4);
+        points[0] = Point{ .x = 100, .y = 100 }; // Bottom-left
+        points[1] = Point{ .x = 700, .y = 100 }; // Bottom-right  
+        points[2] = Point{ .x = 700, .y = 800 }; // Top-right
+        points[3] = Point{ .x = 100, .y = 800 }; // Top-left
+        
+        const on_curve = try allocator.alloc(bool, 4);
+        on_curve[0] = true;
+        on_curve[1] = true;
+        on_curve[2] = true;
+        on_curve[3] = true;
+        
+        const contours = try allocator.alloc(Contour, 1);
+        contours[0] = Contour{
+            .points = points,
+            .on_curve = on_curve,
+        };
+        
+        return GlyphOutline{
+            .contours = contours,
+            .bounds = font_types.GlyphBounds{
+                .x_min = 100,
+                .y_min = 100,
+                .x_max = 700,
+                .y_max = 800,
+            },
+            .metrics = font_types.GlyphMetrics{
+                .advance_width = 800,
+                .left_side_bearing = 100,
+            },
+        };
     }
 
     fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
@@ -66,8 +174,20 @@ const FontGridTestPage = struct {
         if (grid_page.multi_renderer) |*renderer| {
             renderer.deinit();
         }
-
-        _ = allocator;
+        
+        if (grid_page.display) |*display| {
+            display.deinit();
+        }
+        
+        if (grid_page.last_test_results) |results| {
+            // Free individual results
+            for (results) |result| {
+                if (result.result) |render_result| {
+                    render_result.deinit(allocator);
+                }
+            }
+            allocator.free(results);
+        }
     }
 
     fn update(self: *page.Page, dt: f32) void {
@@ -103,43 +223,47 @@ const FontGridTestPage = struct {
             try links.append(page.createLink(label, "", x, start_y - 30, cell_width, 25));
         }
 
-        // Row headers (rendering methods)
-        const methods = [_]struct { name: []const u8, desc: []const u8 }{
-            .{ .name = "Bitmap", .desc = "Direct rasterization" },
-            .{ .name = "2x AA", .desc = "2x oversampling" },
-            .{ .name = "4x AA", .desc = "4x oversampling" },
-            .{ .name = "SDF", .desc = "Distance field" },
-            .{ .name = "Cached", .desc = "Persistent cache" },
+        // Row headers (rendering strategies)
+        const strategies = [_]RenderStrategy{
+            .simple_bitmap,
+            .debug_ascii,
+            .oversampling_2x,
+            .oversampling_4x,
+            .scanline_antialiased,
         };
 
-        for (methods, 0..) |method, row| {
+        for (strategies, 0..) |strategy, row| {
             const y = start_y + @as(f32, @floatFromInt(row)) * (cell_height + spacing);
 
-            // Method name
-            try links.append(page.createLink(method.name, "", 20, y + 15, 100, 30));
+            // Strategy name
+            try links.append(page.createLink(strategy.getName(), "", 20, y + 15, 100, 30));
         }
 
-        // Grid cells - each shows the test text rendered with specific method/size
-        for (methods, 0..) |_, row| {
+        // Grid cells - show rendering strategy results
+        for (strategies, 0..) |strategy, row| {
             for (grid_page.font_sizes, 0..) |size, col| {
                 const x = start_x + @as(f32, @floatFromInt(col)) * (cell_width + spacing);
                 const y = start_y + @as(f32, @floatFromInt(row)) * (cell_height + spacing);
 
-                // Cell background (for visual separation)
-                // Text will be rendered by multi_renderer in actual implementation
-                try links.append(page.createLink(grid_page.test_text, "", x, y, cell_width, cell_height));
+                // Cell background
+                try links.append(page.createLink("[Render Test]", "", x, y, cell_width, cell_height));
+                
+                // Strategy and size info
+                var info_buffer: [64]u8 = undefined;
+                const info_text = try std.fmt.bufPrint(&info_buffer, "{s} {d}pt", .{strategy.getName(), size});
+                try links.append(page.createLink(info_text, "", x + 5, y + 5, cell_width - 10, 20));
 
-                // Quality indicator placeholder
-                var quality_buffer: [32]u8 = undefined;
-                const quality = calculateQualityEstimate(size, row);
-                const quality_text = try std.fmt.bufPrint(&quality_buffer, "{d}%", .{quality});
-
-                // Color based on quality
-                const color_indicator = if (quality >= 80) "+" else if (quality >= 60) "~" else "X";
-
-                try links.append(page.createLink(quality_text, "", x, y + cell_height - 20, 40, 15));
-
-                try links.append(page.createLink(color_indicator, "", x + 45, y + cell_height - 20, 20, 15));
+                // Quality tier indication (static for now)
+                const quality_tier = strategy.getQualityTier();
+                const perf_tier = strategy.getPerformanceTier();
+                
+                var tier_buffer: [32]u8 = undefined;
+                const tier_text = try std.fmt.bufPrint(&tier_buffer, "Q{d} P{d}", .{quality_tier, perf_tier});
+                try links.append(page.createLink(tier_text, "", x + 5, y + cell_height - 20, 60, 15));
+                
+                // Status indicator
+                const status = if (strategy == .scanline_antialiased) "?" else "+";
+                try links.append(page.createLink(status, "", x + cell_width - 25, y + cell_height - 20, 20, 15));
             }
         }
 
@@ -149,21 +273,35 @@ const FontGridTestPage = struct {
         try links.append(page.createLink("STATISTICS", "", 50, stats_y, 200, 30));
 
         // Performance metrics
-        try links.append(page.createLink("Total cells: 55 (5 methods × 11 sizes)", "", 50, stats_y + 40, 400, 25));
+        var stats_buffer: [128]u8 = undefined;
+        const total_cells = strategies.len * grid_page.font_sizes.len;
+        const stats_text = try std.fmt.bufPrint(&stats_buffer, "Total combinations: {d} ({d} strategies × {d} sizes)", .{total_cells, strategies.len, grid_page.font_sizes.len});
+        try links.append(page.createLink(stats_text, "", 50, stats_y + 40, 500, 25));
 
-        try links.append(page.createLink("Render time: <measuring>", "", 50, stats_y + 70, 400, 25));
+        try links.append(page.createLink("Status: Ready for testing", "", 50, stats_y + 70, 400, 25));
 
-        try links.append(page.createLink("Avg quality: <calculating>", "", 50, stats_y + 100, 400, 25));
+        // Status display
+        var status_buffer: [128]u8 = undefined;
+        const status_text = try std.fmt.bufPrint(&status_buffer, "Status: {s}", .{grid_page.test_status});
+        try links.append(page.createLink(status_text, "", 50, stats_y + 100, 400, 25));
+        
+        // Test controls
+        try links.append(page.createLink("Re-run Tests", "", 50, stats_y + 130, 150, 40));
+        try links.append(page.createLink("Export Results", "", 220, stats_y + 130, 150, 40));
 
         // Legend
         const legend_x = 1400.0;
-        try links.append(page.createLink("QUALITY LEGEND", "", legend_x, start_y, 200, 30));
+        try links.append(page.createLink("LEGEND", "", legend_x, start_y, 200, 30));
 
-        try links.append(page.createLink("+ 80-100% Good", "", legend_x, start_y + 40, 200, 25));
+        try links.append(page.createLink("+ Working", "", legend_x, start_y + 40, 200, 25));
 
-        try links.append(page.createLink("~ 60-79% Fair", "", legend_x, start_y + 70, 200, 25));
+        try links.append(page.createLink("? Unknown/Testing", "", legend_x, start_y + 70, 200, 25));
 
-        try links.append(page.createLink("X 0-59% Poor", "", legend_x, start_y + 100, 200, 25));
+        try links.append(page.createLink("X Failed/Error", "", legend_x, start_y + 100, 200, 25));
+        
+        // Quality tiers
+        try links.append(page.createLink("Q1=Low Q2=Med Q3=High", "", legend_x, start_y + 140, 200, 25));
+        try links.append(page.createLink("P1=Fast P2=Med P3=Slow", "", legend_x, start_y + 170, 200, 25));
 
         // Test text samples
         try links.append(page.createLink("TEST SAMPLES", "", legend_x, start_y + 150, 200, 30));
@@ -193,30 +331,28 @@ const FontGridTestPage = struct {
         allocator.destroy(grid_page);
     }
 
-    // Helper function to estimate quality based on size and method
-    fn calculateQualityEstimate(font_size: f32, method_index: usize) u32 {
-        // Rough estimates for demonstration
-        const base_quality: f32 = switch (method_index) {
-            0 => 70.0, // Bitmap
-            1 => 80.0, // 2x AA
-            2 => 90.0, // 4x AA
-            3 => 85.0, // SDF
-            4 => 75.0, // Cached
-            else => 50.0,
-        };
-
-        // Adjust based on font size
-        const size_factor: f32 = if (font_size < 12)
-            0.5
-        else if (font_size < 24)
-            0.8
-        else if (font_size < 48)
-            1.0
-        else
-            1.1;
-
-        const quality = base_quality * size_factor;
-        return @min(100, @as(u32, @intFromFloat(quality)));
+    // Get initialization status for display
+    pub fn getInitStatus(self: *const FontGridTestPage) []const u8 {
+        return self.test_status;
+    }
+    
+    // Get count of available strategies
+    pub fn getStrategyCount(self: *const FontGridTestPage) usize {
+        _ = self;
+        return 5;
+    }
+    
+    // Get display texture for a specific strategy (for rendering)
+    pub fn getDisplayTexture(self: *const FontGridTestPage, strategy: RenderStrategy) ?*c.sdl.SDL_GPUTexture {
+        if (self.display) |display| {
+            return display.getDisplayTexture(strategy);
+        }
+        return null;
+    }
+    
+    // Check if auto-initialization has been attempted
+    pub fn isAutoInitialized(self: *const FontGridTestPage) bool {
+        return self.auto_initialized;
     }
 };
 
@@ -235,9 +371,13 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
             .title = "Font Grid Test",
         },
         .multi_renderer = null,
+        .display = null,
         .initialized = false,
+        .auto_initialized = false,
         .test_text = undefined,
         .font_sizes = undefined,
+        .last_test_results = null,
+        .test_status = undefined,
     };
     return &grid_page.base;
 }
