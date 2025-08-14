@@ -2,9 +2,10 @@ const std = @import("std");
 const c = @import("c.zig");
 const fonts = @import("fonts.zig");
 const simple_gpu_renderer = @import("simple_gpu_renderer.zig");
+const font_manager = @import("font_manager.zig");
 
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
-const FontManager = fonts.FontManager;
+const FontManager = font_manager.FontManager;
 
 /// Common error types for resource initialization
 pub const ResourceError = error{
@@ -28,7 +29,7 @@ pub const RendererResources = struct {
     }
 };
 
-/// Initialize common renderer resources (GPU + FontManager)
+/// Initialize common renderer resources (GPU + PureFontManager)
 pub fn initRendererResources(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) ResourceError!RendererResources {
     var gpu = SimpleGPURenderer.init(allocator, window) catch |err| {
         const log = std.log.scoped(.resource_manager);
@@ -36,25 +37,26 @@ pub fn initRendererResources(allocator: std.mem.Allocator, window: *c.sdl.SDL_Wi
         return ResourceError.RendererInitFailed;
     };
     
-    var font_manager = allocator.create(FontManager) catch {
+    // Use pure Zig font implementation
+    const fm = allocator.create(FontManager) catch {
         gpu.deinit();
         return ResourceError.OutOfMemory;
     };
     
-    font_manager.* = FontManager.init(allocator, gpu.device) catch |err| {
+    fm.* = FontManager.init(allocator, gpu.device) catch |err| {
         const log = std.log.scoped(.resource_manager);
         log.err("Failed to initialize FontManager: {}", .{err});
-        allocator.destroy(font_manager);
+        allocator.destroy(fm);
         gpu.deinit();
         return ResourceError.FontManagerInitFailed;
     };
     
     const log = std.log.scoped(.resource_manager);
-    log.info("Renderer resources initialized successfully - GPU: {*}, FontManager: {*}", .{ &gpu, font_manager });
+    log.info("Renderer resources initialized with Pure Zig font implementation", .{});
     
     return RendererResources{
         .gpu = gpu,
-        .font_manager = font_manager,
+        .font_manager = fm,
         .allocator = allocator,
     };
 }
@@ -66,25 +68,25 @@ pub const SharedFontManager = struct {
     ref_count: u32,
     
     pub fn init(allocator: std.mem.Allocator, device: *c.sdl.SDL_GPUDevice) ResourceError!*SharedFontManager {
-        var shared = allocator.create(SharedFontManager) catch {
+        const shared = allocator.create(SharedFontManager) catch {
             return ResourceError.OutOfMemory;
         };
         
-        var font_manager = allocator.create(FontManager) catch {
+        const fm = allocator.create(FontManager) catch {
             allocator.destroy(shared);
             return ResourceError.OutOfMemory;
         };
         
-        font_manager.* = FontManager.init(allocator, device) catch |err| {
+        fm.* = FontManager.init(allocator, device) catch |err| {
             const log = std.log.scoped(.resource_manager);
             log.err("Failed to initialize shared FontManager: {}", .{err});
-            allocator.destroy(font_manager);
+            allocator.destroy(fm);
             allocator.destroy(shared);
             return ResourceError.FontManagerInitFailed;
         };
         
         shared.* = SharedFontManager{
-            .font_manager = font_manager,
+            .font_manager = fm,
             .allocator = allocator,
             .ref_count = 1,
         };
@@ -288,7 +290,7 @@ pub const ResourceLifecycle = struct {
         };
         
         // Initialize renderer resources
-        var renderer_resources = allocator.create(RendererResources) catch {
+        const renderer_resources = allocator.create(RendererResources) catch {
             game_resources.cleanup();
             return ResourceError.OutOfMemory;
         };

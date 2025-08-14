@@ -9,7 +9,7 @@ const camera = @import("../lib/camera.zig");
 const borders = @import("borders.zig");
 const constants = @import("constants.zig");
 const effects = @import("effects.zig");
-const fonts = @import("../lib/fonts.zig");
+const font_manager = @import("../lib/font_manager.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 
 const Vec2 = types.Vec2;
@@ -19,33 +19,32 @@ const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 pub const GameRenderer = struct {
     gpu: SimpleGPURenderer,
     camera: camera.Camera,
-    font_manager: ?*fonts.FontManager,
+    font_manager: *font_manager.FontManager,
     allocator: std.mem.Allocator,
 
     pub fn init(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) !GameRenderer {
         var renderer = GameRenderer{
             .gpu = try SimpleGPURenderer.init(allocator, window),
             .camera = camera.Camera.init(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT),
-            .font_manager = null,
+            .font_manager = undefined,
             .allocator = allocator,
         };
         
-        // Initialize font manager for TTF text rendering
-        renderer.font_manager = try allocator.create(fonts.FontManager);
-        renderer.font_manager.?.* = try fonts.FontManager.init(allocator, renderer.gpu.device);
-        
         const log = std.log.scoped(.game_renderer);
-        log.info("GameRenderer initialized with font_manager: {*}", .{renderer.font_manager});
+        
+        // Initialize Pure Zig font manager
+        log.info("Initializing Pure Zig font backend", .{});
+        renderer.font_manager = try allocator.create(font_manager.FontManager);
+        renderer.font_manager.* = try font_manager.FontManager.init(allocator, renderer.gpu.device);
+        
+        log.info("GameRenderer initialized with Pure Zig font backend", .{});
         
         return renderer;
     }
 
     pub fn deinit(self: *GameRenderer) void {
-        if (self.font_manager) |fm| {
-            fm.deinit();
-            self.allocator.destroy(fm);
-            self.font_manager = null;
-        }
+        self.font_manager.deinit();
+        self.allocator.destroy(self.font_manager);
         self.gpu.deinit();
     }
 
@@ -270,30 +269,25 @@ pub const GameRenderer = struct {
         const fps_text = std.fmt.bufPrintZ(&fps_buf, "FPS: {d}", .{fps}) catch "FPS: ??";
         
         // Use persistent text rendering to eliminate flashing
-        if (self.font_manager) |fm| {
-            const log = std.log.scoped(.fps_persistent);
-            log.debug("Queuing FPS text for persistent rendering: '{s}'", .{fps_text});
-            
-            // Queue using persistent mode - texture will be cached and reused
-            self.gpu.text_renderer.queuePersistentText(
-                fps_text,
-                .{ .x = fps_x, .y = fps_y },
-                fm,
-                .sans,
-                48.0,
-                WHITE
-            ) catch |err| {
-                log.err("Failed to queue persistent FPS text: {}", .{err});
-                // Fall back to geometric rendering
-                self.drawFPSGeometric(cmd_buffer, render_pass, fps);
-                return;
-            };
-            
-            log.debug("✓ FPS text queued for persistent rendering", .{});
-        } else {
-            // No font manager, use geometric fallback
+        const log = std.log.scoped(.fps_persistent);
+        log.debug("Queuing FPS text for persistent rendering: '{s}'", .{fps_text});
+        
+        // Queue using persistent mode - texture will be cached and reused
+        self.gpu.text_renderer.queuePersistentText(
+            fps_text,
+            .{ .x = fps_x, .y = fps_y },
+            self.font_manager,
+            .sans,
+            48.0,
+            WHITE
+        ) catch |err| {
+            log.err("Failed to queue persistent FPS text: {}", .{err});
+            // Fall back to geometric rendering
             self.drawFPSGeometric(cmd_buffer, render_pass, fps);
-        }
+            return;
+        };
+        
+        log.debug("✓ FPS text queued for persistent rendering", .{});
     }
     
     fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {

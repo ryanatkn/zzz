@@ -80,16 +80,14 @@ pub const BrowserRenderer = struct {
             );
             
             // Render the link text using shared menu text utility with main game renderers
-            if (self.base_renderer.font_manager) |fm| {
-                // Debug logging disabled to reduce spam
-                
-                var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, fm);
-                const link_rect = drawing.Rectangle{
-                    .position = link.bounds.position,
-                    .size = link.bounds.size,
-                };
-                menu_text_renderer.queueButtonText(link.text, link_rect, is_hovered);
-            }
+            // Debug logging disabled to reduce spam
+            
+            var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
+            const link_rect = drawing.Rectangle{
+                .position = link.bounds.position,
+                .size = link.bounds.size,
+            };
+            menu_text_renderer.queueButtonText(link.text, link_rect, is_hovered);
         }
     }
 
@@ -188,13 +186,11 @@ pub const BrowserRenderer = struct {
         );
         
         // Queue the path text for rendering using shared utility with main game renderers
-        if (self.base_renderer.font_manager) |fm| {
-            var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, fm);
-            menu_text_renderer.queueNavigationText(
-                current_path, 
-                .{ .x = address_x + 10, .y = bar_y + button_margin + 15 }
-            );
-        }
+        var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
+        menu_text_renderer.queueNavigationText(
+            current_path, 
+            .{ .x = address_x + 10, .y = bar_y + button_margin + 15 }
+        );
     }
 
     const ArrowDirection = enum { Left, Right };

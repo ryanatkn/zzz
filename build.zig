@@ -18,12 +18,7 @@ pub fn build(b: *std.Build) void {
     const sdl3 = buildSDL3(b, target, optimize);
     exe.addIncludePath(b.path("deps/SDL/include"));
     
-    // Build SDL_ttf library inline  
-    const sdl_ttf = buildSDL_ttf(b, target, optimize);
-    exe.addIncludePath(b.path("deps/SDL_ttf/include"));
-    
-    // Link libraries in correct order (SDL_ttf depends on SDL3)
-    exe.linkLibrary(sdl_ttf);
+    // Link SDL3
     exe.linkLibrary(sdl3);
     
     exe.linkLibC();
@@ -537,52 +532,3 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     return sdl3;
 }
 
-// Build SDL_ttf static library from vendored sources
-fn buildSDL_ttf(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Step.Compile {
-    const sdl_ttf = b.addStaticLibrary(.{
-        .name = "SDL3_ttf",
-        .target = target,
-        .optimize = optimize,
-    });
-
-    // SDL_ttf source files
-    const ttf_files = [_][]const u8{
-        "deps/SDL_ttf/src/SDL_ttf.c",
-        "deps/SDL_ttf/src/SDL_hashtable.c",
-        "deps/SDL_ttf/src/SDL_hashtable_ttf.c",
-        "deps/SDL_ttf/src/SDL_gpu_textengine.c",
-        "deps/SDL_ttf/src/SDL_renderer_textengine.c", 
-        "deps/SDL_ttf/src/SDL_surface_textengine.c",
-    };
-
-    // Add source files (disable advanced features for simplicity)
-    sdl_ttf.addCSourceFiles(.{
-        .files = &ttf_files,
-        .flags = &[_][]const u8{
-            "-DTTF_USE_HARFBUZZ=0",
-            "-DTTF_USE_SDF=0",
-        },
-    });
-
-    // Include paths
-    sdl_ttf.addIncludePath(b.path("deps/SDL_ttf/include"));
-    sdl_ttf.addIncludePath(b.path("deps/SDL_ttf/src"));
-    sdl_ttf.addIncludePath(b.path("deps/SDL/include")); // SDL3 headers
-
-    // Link system libraries with optional detection
-    if (target.result.os.tag == .linux) {
-        if (hasSystemLibrary("freetype2")) {
-            sdl_ttf.linkSystemLibrary("freetype2");
-            // Add FreeType include paths (use addIncludePath to avoid -isystem vs -I conflicts)
-            sdl_ttf.addIncludePath(.{ .cwd_relative = "/usr/include/freetype2" });
-            sdl_ttf.addIncludePath(.{ .cwd_relative = "/usr/include/libpng16" });
-        } else {
-            // Could add basic bitmap font fallback here
-            std.log.warn("FreeType not found, TTF support may be limited", .{});
-        }
-        sdl_ttf.linkSystemLibrary("m");
-    }
-
-    sdl_ttf.linkLibC();
-    return sdl_ttf;
-}

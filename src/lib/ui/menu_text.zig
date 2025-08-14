@@ -1,6 +1,7 @@
 const std = @import("std");
 const types = @import("../types.zig");
 const text_renderer = @import("../text_renderer.zig");
+const font_manager = @import("../font_manager.zig");
 const fonts = @import("../fonts.zig");
 const drawing = @import("../drawing.zig");
 
@@ -33,11 +34,11 @@ pub const MenuTextStyles = struct {
 /// Menu text utility for consistent text rendering in UI elements
 pub const MenuTextRenderer = struct {
     text_renderer: *text_renderer.TextRenderer,
-    font_manager: *fonts.FontManager,
+    font_manager: *font_manager.FontManager,
     
     const Self = @This();
     
-    pub fn init(renderer: *text_renderer.TextRenderer, fm: *fonts.FontManager) Self {
+    pub fn init(renderer: *text_renderer.TextRenderer, fm: *font_manager.FontManager) Self {
         return Self{
             .text_renderer = renderer,
             .font_manager = fm,

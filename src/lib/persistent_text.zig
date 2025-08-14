@@ -94,7 +94,7 @@ pub const PersistentTextSystem = struct {
         const log = std.log.scoped(.persistent_text);
         log.info("Creating new persistent texture for '{s}'", .{text});
         
-        const text_result = font_manager.renderTextToTexture(text, font_category, font_size, color, self.device) catch |err| {
+        const text_result = font_manager.renderTextToTexture(text, font_category, font_size, color) catch |err| {
             log.err("Failed to create persistent texture for text: {}", .{err});
             return null;
         };
