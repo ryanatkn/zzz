@@ -2,6 +2,7 @@ const std = @import("std");
 const c = @import("../c.zig");
 const types = @import("../types.zig");
 const reactive_text_cache = @import("../reactive/text_cache.zig");
+const log_throttle = @import("../debug/log_throttle.zig");
 
 /// Persistent text texture system that maintains texture handles across frames
 /// Unlike the immediate mode text renderer, this system keeps textures alive
@@ -77,8 +78,7 @@ pub const PersistentTextSystem = struct {
             if (existing.is_valid) {
                 existing.last_used = current_time;
                 
-                const log = std.log.scoped(.persistent_text);
-                log.debug("Using persistent texture for '{s}' ({}x{})", .{ text, existing.width, existing.height });
+                log_throttle.logDebug("cache_hit", "Using persistent texture for '{s}' ({}x{})", .{ text, existing.width, existing.height });
                 
                 return PersistentTextureHandle{
                     .texture = existing.texture,
@@ -91,11 +91,10 @@ pub const PersistentTextSystem = struct {
         }
         
         // Create new texture
-        const log = std.log.scoped(.persistent_text);
-        log.info("Creating new persistent texture for '{s}'", .{text});
+        log_throttle.logInfo("create_texture", "Creating new persistent texture for '{s}'", .{text});
         
         const text_result = font_manager.renderTextToTexture(text, font_category, font_size, color) catch |err| {
-            log.err("Failed to create persistent texture for text: {}", .{err});
+            log_throttle.logError("texture_error", "Failed to create persistent texture for text: {}", .{err});
             return null;
         };
         
@@ -111,7 +110,7 @@ pub const PersistentTextSystem = struct {
         
         try self.textures.put(content_hash, persistent);
         
-        log.info("Created persistent texture: {}x{}", .{ text_result.width, text_result.height });
+        log_throttle.logInfo("texture_created", "Created persistent texture: {}x{}", .{ text_result.width, text_result.height });
         
         return PersistentTextureHandle{
             .texture = text_result.texture,
@@ -138,8 +137,7 @@ pub const PersistentTextSystem = struct {
             existing.deinit(self.device);
             _ = self.textures.remove(content_hash);
             
-            const log = std.log.scoped(.persistent_text);
-            log.debug("Invalidated persistent texture for '{s}'", .{text});
+            log_throttle.logInfo("invalidate", "Invalidated persistent texture for '{s}'", .{text});
         }
     }
     
@@ -163,8 +161,7 @@ pub const PersistentTextSystem = struct {
         }
         
         if (to_remove.items.len > 0) {
-            const log = std.log.scoped(.persistent_text);
-            log.info("Cleaned up {} old persistent textures", .{to_remove.items.len});
+            log_throttle.logInfo("cleanup", "Cleaned up {} old persistent textures", .{to_remove.items.len});
         }
     }
     
@@ -244,8 +241,7 @@ pub fn initGlobalPersistentTextSystem(allocator: std.mem.Allocator, device: *c.s
     system.* = try PersistentTextSystem.init(allocator, device);
     global_persistent_text_system = system;
     
-    const log = std.log.scoped(.persistent_text);
-    log.info("Initialized global persistent text system", .{});
+    log_throttle.logInfo("init_system", "Initialized global persistent text system", .{});
 }
 
 pub fn deinitGlobalPersistentTextSystem(allocator: std.mem.Allocator) void {
@@ -254,8 +250,7 @@ pub fn deinitGlobalPersistentTextSystem(allocator: std.mem.Allocator) void {
         allocator.destroy(system);
         global_persistent_text_system = null;
         
-        const log = std.log.scoped(.persistent_text);
-        log.info("Deinitialized global persistent text system", .{});
+        log_throttle.logInfo("deinit_system", "Deinitialized global persistent text system", .{});
     }
 }
 

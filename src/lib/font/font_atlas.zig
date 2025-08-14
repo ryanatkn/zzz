@@ -3,6 +3,7 @@ const c = @import("../c.zig");
 const rasterizer_core = @import("rasterizer_core.zig");
 const sdf_renderer = @import("../text/sdf_renderer.zig");
 const vector_path = @import("../vector/path.zig");
+const log_throttle = @import("../debug/log_throttle.zig");
 
 const log = std.log.scoped(.font_atlas);
 
@@ -128,8 +129,7 @@ pub const FontAtlas = struct {
         const rasterized = try rasterizer.rasterizeGlyph(codepoint, 0, 0);
         // Don't free the bitmap yet - we'll store it in the cache
         
-        const raster_log = std.log.scoped(.font_atlas_raster);
-        raster_log.info("Rasterized glyph '{}' (U+{X:0>4}): {}x{} pixels, {} bytes", .{
+        log_throttle.logDebug("rasterize", "Rasterized glyph '{}' (U+{X:0>4}): {}x{} pixels, {} bytes", .{
             codepoint, codepoint, rasterized.width, rasterized.height, rasterized.bitmap.len
         });
         

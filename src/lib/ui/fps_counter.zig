@@ -8,6 +8,7 @@ const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent
 const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
+const log_throttle = @import("../debug/log_throttle.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -125,8 +126,7 @@ pub const FPSCounterData = struct {
             self.current_fps.set(new_fps);
             self.last_update_time.set(@as(u64, @intCast(std.time.milliTimestamp())));
             
-            const log = std.log.scoped(.fps_counter);
-            log.debug("FPS counter updated: {} -> {}", .{ old_fps, new_fps });
+            log_throttle.logInfo("fps_change", "FPS counter updated: {} -> {}", .{ old_fps, new_fps });
         }
     }
     
@@ -152,8 +152,7 @@ pub const FPSCounterData = struct {
             self.color
         );
         
-        const log = std.log.scoped(.fps_counter);
-        log.debug("FPS counter rendered: '{s}' at ({d}, {d})", .{ fps_text, self.position.x, self.position.y });
+        log_throttle.logDebug("render", "FPS counter rendered: '{s}' at ({d:.1}, {d:.1})", .{ fps_text, self.position.x, self.position.y });
     }
     
     pub fn deinit(self: *Self) void {
@@ -175,22 +174,19 @@ pub const FPSCounterData = struct {
     // Component vtable implementation
     fn onMount(state: *anyopaque) !void {
         _ = state;
-        const log = std.log.scoped(.fps_counter);
-        log.info("FPS counter component mounted", .{});
+        log_throttle.logInfo("mount", "FPS counter component mounted", .{});
     }
     
     fn onUnmount(state: *anyopaque) void {
         _ = state;
-        const log = std.log.scoped(.fps_counter);
-        log.info("FPS counter component unmounted", .{});
+        log_throttle.logInfo("unmount", "FPS counter component unmounted", .{});
     }
     
     fn onRender(state: *anyopaque) !void {
         const self = @as(*FPSCounterData, @ptrCast(@alignCast(state)));
         
         // This is called when reactive dependencies change
-        const log = std.log.scoped(.fps_counter);
-        log.debug("FPS counter render triggered - FPS: {}, visible: {}", .{ 
+        log_throttle.logDebug("reactive_render", "FPS counter render triggered - FPS: {}, visible: {}", .{ 
             self.current_fps.peek(), 
             self.is_visible.peek() 
         });

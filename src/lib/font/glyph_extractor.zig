@@ -1,5 +1,6 @@
 const std = @import("std");
 const ttf_parser = @import("ttf_parser.zig");
+const log_throttle = @import("../debug/log_throttle.zig");
 
 const log = std.log.scoped(.glyph_extractor);
 
@@ -69,7 +70,9 @@ pub const GlyphExtractor = struct {
     /// Extract outline for a specific codepoint
     pub fn extractGlyph(self: *GlyphExtractor, codepoint: u32) !GlyphOutline {
         const glyph_id = try self.parser.getGlyphIndex(codepoint);
+        log_throttle.logDebug("glyph_extract", "Extracting codepoint {} ('{c}'): glyph_id={}", .{ codepoint, if (codepoint < 127) @as(u8, @intCast(codepoint)) else '?', glyph_id });
         if (glyph_id == 0 and codepoint != 0) {
+            log.info("Using missing glyph outline for codepoint {}", .{codepoint});
             return self.createMissingGlyphOutline();
         }
         
@@ -78,9 +81,18 @@ pub const GlyphExtractor = struct {
     
     /// Extract outline for a glyph ID
     pub fn extractGlyphById(self: *GlyphExtractor, glyph_id: u16) !GlyphOutline {
-        const glyph_offset = self.parser.getGlyphOffset(glyph_id) catch {
-            return self.createMissingGlyphOutline();
+        const glyph_offset = self.parser.getGlyphOffset(glyph_id) catch |err| switch (err) {
+            error.EmptyGlyph => {
+                log_throttle.logInfo("empty_glyph", "Empty glyph for glyph_id={}, creating empty outline", .{glyph_id});
+                return self.createEmptyGlyphOutline(glyph_id);
+            },
+            else => {
+                log.info("Failed to get glyph offset for glyph_id={} ({}), using missing glyph", .{ glyph_id, err });
+                return self.createMissingGlyphOutline();
+            },
         };
+        
+        log_throttle.logDebug("glyph_offset", "Got glyph_offset={} for glyph_id={}", .{ glyph_offset, glyph_id });
         
         const glyf_offset = self.parser.glyf_offset orelse return error.NoGlyfTable;
         const glyph_data_offset = glyf_offset + glyph_offset;
@@ -100,6 +112,14 @@ pub const GlyphExtractor = struct {
     
     /// Extract a simple (non-composite) glyph
     fn extractSimpleGlyph(self: *GlyphExtractor, glyph_offset: usize, num_contours: i16, glyph_id: u16) !GlyphOutline {
+        log_throttle.logDebug("simple_glyph", "Extracting simple glyph_id={}, num_contours={}", .{ glyph_id, num_contours });
+        
+        // Handle empty glyphs (like space)
+        if (num_contours == 0) {
+            log.info("Creating empty glyph outline for glyph_id={}", .{glyph_id});
+            return self.createEmptyGlyphOutline(glyph_id);
+        }
+        
         // Read bounding box
         const x_min = std.mem.readInt(i16, self.parser.data[glyph_offset + 2..][0..2], .big);
         const y_min = std.mem.readInt(i16, self.parser.data[glyph_offset + 4..][0..2], .big);
@@ -244,6 +264,26 @@ pub const GlyphExtractor = struct {
         _ = glyph_offset;
         // TODO: Implement composite glyph extraction
         return self.createMissingGlyphOutline();
+    }
+    
+    /// Create outline for empty glyph (like space)
+    fn createEmptyGlyphOutline(self: *GlyphExtractor, glyph_id: u16) !GlyphOutline {
+        // Get metrics for the empty glyph
+        const metrics = try self.parser.getGlyphMetrics(glyph_id);
+        
+        return GlyphOutline{
+            .contours = &[_]Contour{}, // Empty slice - no contours
+            .bounds = .{
+                .x_min = 0,
+                .y_min = 0,
+                .x_max = 0,
+                .y_max = 0,
+            },
+            .metrics = .{
+                .advance_width = @as(f32, @floatFromInt(metrics.advance_width)) * self.scale,
+                .left_side_bearing = @as(f32, @floatFromInt(metrics.left_side_bearing)) * self.scale,
+            },
+        };
     }
     
     /// Create outline for missing glyph (usually a box)

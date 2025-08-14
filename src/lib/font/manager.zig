@@ -116,6 +116,7 @@ pub const FontManager = struct {
                 
                 const rasterizer = try self.allocator.create(rasterizer_core.RasterizerCore);
                 rasterizer.* = rasterizer_core.RasterizerCore.init(self.allocator, font.parser, size, 96);
+                //rasterizer.setDebugMode(true);  // Enable debug mode - disabled for now
                 try font.rasterizers.put(size_key, rasterizer);
                 
                 return font.id;
@@ -139,6 +140,7 @@ pub const FontManager = struct {
         const size_key = @as(u32, @intFromFloat(size * 100));
         const rasterizer = try self.allocator.create(rasterizer_core.RasterizerCore);
         rasterizer.* = rasterizer_core.RasterizerCore.init(self.allocator, parser_ptr, size, 96);
+        //rasterizer.setDebugMode(true);  // Enable debug mode - disabled for now
         try rasterizers.put(size_key, rasterizer);
         
         const font_id = self.next_font_id;

@@ -160,7 +160,7 @@ const FontGridTestPage = struct {
                 const quality_text = try std.fmt.bufPrint(&quality_buffer, "{d}%", .{quality});
                 
                 // Color based on quality
-                const color_indicator = if (quality >= 80) "✓" else if (quality >= 60) "~" else "✗";
+                const color_indicator = if (quality >= 80) "+" else if (quality >= 60) "~" else "X";
                 
                 try links.append(page.createLink(
                     quality_text,
@@ -213,7 +213,7 @@ const FontGridTestPage = struct {
         ));
         
         try links.append(page.createLink(
-            "✓ 80-100% Good",
+            "+ 80-100% Good",
             "",
             legend_x, start_y + 40, 200, 25
         ));
@@ -225,7 +225,7 @@ const FontGridTestPage = struct {
         ));
         
         try links.append(page.createLink(
-            "✗ 0-59% Poor",
+            "X 0-59% Poor",
             "",
             legend_x, start_y + 100, 200, 25
         ));

@@ -7,6 +7,7 @@ const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent
 const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
+const log_throttle = @import("../debug/log_throttle.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -128,8 +129,7 @@ pub const DebugOverlayData = struct {
         try self.values.append(debug_value);
         self.values_changed.set(true);
         
-        const log = std.log.scoped(.debug_overlay);
-        log.info("Added debug value '{s}' with {s} mode (changes: {d:.2}/sec)", .{
+        log_throttle.logInfo("add_debug_value", "Added debug value '{s}' with {s} mode (changes: {d:.2}/sec)", .{
             key, 
             @tagName(recommended_mode.recommended_mode), 
             change_frequency
@@ -170,8 +170,7 @@ pub const DebugOverlayData = struct {
     pub fn render(self: *Self, renderer: *text_renderer.TextRenderer, font_manager: anytype, font_category: anytype) !void {
         if (!self.is_visible.peek() or self.values.items.len == 0) return;
         
-        const log = std.log.scoped(.debug_overlay);
-        log.debug("Rendering debug overlay with {} values", .{self.values.items.len});
+        log_throttle.logDebug("render_overlay", "Rendering debug overlay with {} values", .{self.values.items.len});
         
         // Render background if specified
         if (self.background_color) |bg_color| {
@@ -201,7 +200,7 @@ pub const DebugOverlayData = struct {
                         self.color, 
                         renderer.device
                     ) catch |err| {
-                        log.err("Failed to render debug text '{}': {}", .{ formatted_text, err });
+                        log_throttle.logError("render_error", "Failed to render debug text '{}': {}", .{ formatted_text, err });
                         continue;
                     };
                     
@@ -213,7 +212,7 @@ pub const DebugOverlayData = struct {
                         self.color
                     );
                     
-                    log.debug("Rendered immediate debug text: '{s}'", .{formatted_text});
+                    log_throttle.logDebug("render_immediate", "Rendered immediate debug text: '{s}'", .{formatted_text});
                 },
                 .persistent => {
                     // Use persistent mode for slowly changing values
@@ -226,7 +225,7 @@ pub const DebugOverlayData = struct {
                         self.color
                     );
                     
-                    log.debug("Queued persistent debug text: '{s}'", .{formatted_text});
+                    log_throttle.logDebug("queue_persistent", "Queued persistent debug text: '{s}'", .{formatted_text});
                 },
             }
         }
@@ -277,21 +276,18 @@ pub const DebugOverlayData = struct {
     // Component vtable implementation
     fn onMount(state: *anyopaque) !void {
         _ = state;
-        const log = std.log.scoped(.debug_overlay);
-        log.info("Debug overlay component mounted", .{});
+        log_throttle.logInfo("mount", "Debug overlay component mounted", .{});
     }
     
     fn onUnmount(state: *anyopaque) void {
         _ = state;
-        const log = std.log.scoped(.debug_overlay);
-        log.info("Debug overlay component unmounted", .{});
+        log_throttle.logInfo("unmount", "Debug overlay component unmounted", .{});
     }
     
     fn onRender(state: *anyopaque) !void {
         const self = @as(*DebugOverlayData, @ptrCast(@alignCast(state)));
         
-        const log = std.log.scoped(.debug_overlay);
-        log.debug("Debug overlay render triggered - {} values, visible: {}", .{ 
+        log_throttle.logDebug("reactive_render", "Debug overlay render triggered - {} values, visible: {}", .{ 
             self.values.items.len, 
             self.is_visible.peek() 
         });

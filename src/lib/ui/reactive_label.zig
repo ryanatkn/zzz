@@ -8,6 +8,7 @@ const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
 const effect = @import("../reactive/effect.zig");
+const log_throttle = @import("../debug/log_throttle.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -168,8 +169,7 @@ pub const ReactiveLabelData = struct {
         // Create derived text value
         self.current_text = try self.createCurrentTextDerived();
         
-        const log = std.log.scoped(.reactive_label);
-        log.info("Created reactive label with {s} mode (changes: {d:.2}/sec)", .{
+        log_throttle.logInfo("create_label", "Created reactive label with {s} mode (changes: {d:.2}/sec)", .{
             @tagName(self.rendering_mode), 
             change_freq
         });
@@ -252,8 +252,7 @@ pub const ReactiveLabelData = struct {
         
         self.needs_update.set(true);
         
-        const log = std.log.scoped(.reactive_label);
-        log.debug("Label content updated, new mode: {s}", .{@tagName(self.rendering_mode)});
+        log_throttle.logDebug("content_update", "Label content updated, new mode: {s}", .{@tagName(self.rendering_mode)});
     }
     
     pub fn render(self: *Self, renderer: *text_renderer.TextRenderer, font_manager: anytype, font_category: anytype) !void {
@@ -269,8 +268,7 @@ pub const ReactiveLabelData = struct {
         if (text_changed) {
             self.last_text.set(text);
             
-            const log = std.log.scoped(.reactive_label);
-            log.debug("Label text changed: '{s}' -> '{s}'", .{ last_text, text });
+            log_throttle.logInfo("text_change", "Label text changed: '{s}' -> '{s}'", .{ last_text, text });
         }
         
         // Calculate effective position based on alignment
@@ -287,8 +285,7 @@ pub const ReactiveLabelData = struct {
                     self.style.color, 
                     renderer.device
                 ) catch |err| {
-                    const log = std.log.scoped(.reactive_label);
-                    log.err("Failed to render immediate label text: {}", .{err});
+                    log_throttle.logError("render_error", "Failed to render immediate label text: {}", .{err});
                     return;
                 };
                 
@@ -354,21 +351,18 @@ pub const ReactiveLabelData = struct {
     // Component vtable implementation
     fn onMount(state: *anyopaque) !void {
         _ = state;
-        const log = std.log.scoped(.reactive_label);
-        log.info("Reactive label component mounted", .{});
+        log_throttle.logInfo("mount", "Reactive label component mounted", .{});
     }
     
     fn onUnmount(state: *anyopaque) void {
         _ = state;
-        const log = std.log.scoped(.reactive_label);
-        log.info("Reactive label component unmounted", .{});
+        log_throttle.logInfo("unmount", "Reactive label component unmounted", .{});
     }
     
     fn onRender(state: *anyopaque) !void {
         const self = @as(*ReactiveLabelData, @ptrCast(@alignCast(state)));
         
-        const log = std.log.scoped(.reactive_label);
-        log.debug("Reactive label render triggered - visible: {}, needs update: {}", .{ 
+        log_throttle.logDebug("reactive_render", "Reactive label render triggered - visible: {}, needs update: {}", .{ 
             self.is_visible.peek(), 
             self.needs_update.peek() 
         });

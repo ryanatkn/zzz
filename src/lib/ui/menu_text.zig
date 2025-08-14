@@ -4,6 +4,7 @@ const text_renderer = @import("../text/renderer.zig");
 const font_manager = @import("../font/manager.zig");
 const drawing = @import("../drawing.zig");
 const font_config = @import("../font/config.zig");
+const log_throttle = @import("../debug/log_throttle.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -61,8 +62,7 @@ pub const MenuTextRenderer = struct {
     pub fn queueButtonText(self: *Self, text: []const u8, rect: Rectangle, is_hovered: bool) void {
         // Skip empty text to prevent crashes
         if (text.len == 0) {
-            const log = std.log.scoped(.menu_text);
-            log.debug("Skipping empty button text", .{});
+            log_throttle.logDebug("empty_button", "Skipping empty button text", .{});
             return;
         }
         
@@ -71,8 +71,7 @@ pub const MenuTextRenderer = struct {
         
         const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
         
-        const log = std.log.scoped(.menu_text);
-        log.info("Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{
+        log_throttle.logDebug("queue_button", "Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{
             text, text_pos.x, text_pos.y, rect.size.x, rect.size.y
         });
         
@@ -84,7 +83,7 @@ pub const MenuTextRenderer = struct {
             style.font_size(),
             text_color
         ) catch |err| {
-            log.warn("Failed to queue button text '{s}': {}", .{ text, err });
+            log_throttle.logError("button_error", "Failed to queue button text '{s}': {}", .{ text, err });
         };
     }
     
@@ -92,14 +91,12 @@ pub const MenuTextRenderer = struct {
     pub fn queueNavigationText(self: *Self, text: []const u8, position: Vec2) void {
         // Skip empty text to prevent crashes
         if (text.len == 0) {
-            const log = std.log.scoped(.menu_text);
-            log.debug("Skipping empty navigation text", .{});
+            log_throttle.logDebug("empty_nav", "Skipping empty navigation text", .{});
             return;
         }
         
         const style = MenuTextStyles.navigation;
         
-        const log = std.log.scoped(.menu_text);
         // Debug logging disabled to reduce spam
         
         self.text_renderer.queuePersistentText(
@@ -110,7 +107,7 @@ pub const MenuTextRenderer = struct {
             style.font_size(),
             style.color
         ) catch |err| {
-            log.warn("Failed to queue navigation text '{s}': {}", .{ text, err });
+            log_throttle.logError("nav_error", "Failed to queue navigation text '{s}': {}", .{ text, err });
         };
     }
     
@@ -128,8 +125,7 @@ pub const MenuTextRenderer = struct {
             style.font_size(),
             style.color
         ) catch |err| {
-            const log = std.log.scoped(.menu_text);
-            log.warn("Failed to queue header text '{s}': {}", .{ text, err });
+            log_throttle.logError("header_error", "Failed to queue header text '{s}': {}", .{ text, err });
         };
     }
     
@@ -143,8 +139,7 @@ pub const MenuTextRenderer = struct {
             font_size,
             color
         ) catch |err| {
-            const log = std.log.scoped(.menu_text);
-            log.warn("Failed to queue custom text '{s}': {}", .{ text, err });
+            log_throttle.logError("custom_error", "Failed to queue custom text '{s}': {}", .{ text, err });
         };
     }
 };

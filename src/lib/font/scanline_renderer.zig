@@ -115,37 +115,39 @@ pub const ScanlineRenderer = struct {
         var last_x: f32 = 0;
         
         for (active_edges) |edge| {
-            const x_start = @max(0, last_x);
-            const x_end = @min(@as(f32, @floatFromInt(width)), edge.x);
-            
-            // Fill pixels between last_x and edge.x if winding != 0
-            if (winding_number != 0 and x_end > x_start) {
-                const start_pixel = @as(u32, @intFromFloat(@floor(x_start)));
-                const end_pixel = @min(width, @as(u32, @intFromFloat(@ceil(x_end))));
+            // Fill pixels between last_x and edge.x if we're inside (winding != 0)
+            if (winding_number != 0) {
+                const x_start = @max(0, last_x);
+                const x_end = @min(@as(f32, @floatFromInt(width)), edge.x);
                 
-                for (start_pixel..end_pixel) |x| {
-                    const idx = y * width + x;
-                    if (idx < bitmap.len) {
-                        if (self.config.antialiasing) {
-                            // Calculate coverage
-                            const pixel_start = @as(f32, @floatFromInt(x));
-                            const pixel_end = pixel_start + 1.0;
-                            const covered_start = @max(x_start, pixel_start);
-                            const covered_end = @min(x_end, pixel_end);
-                            const coverage = @max(0, covered_end - covered_start);
-                            
-                            if (coverage > self.config.coverage_threshold) {
-                                const value = @as(u8, @intFromFloat(@min(255, coverage * 255)));
-                                bitmap[idx] = @max(bitmap[idx], value);
+                if (x_end > x_start) {
+                    const start_pixel = @as(u32, @intFromFloat(@floor(x_start)));
+                    const end_pixel = @min(width, @as(u32, @intFromFloat(@ceil(x_end))));
+                    
+                    for (start_pixel..end_pixel) |x| {
+                        const idx = y * width + x;
+                        if (idx < bitmap.len) {
+                            if (self.config.antialiasing) {
+                                // Calculate coverage
+                                const pixel_start = @as(f32, @floatFromInt(x));
+                                const pixel_end = pixel_start + 1.0;
+                                const covered_start = @max(x_start, pixel_start);
+                                const covered_end = @min(x_end, pixel_end);
+                                const coverage = @max(0, covered_end - covered_start);
+                                
+                                if (coverage > self.config.coverage_threshold) {
+                                    const value = @as(u8, @intFromFloat(@min(255, coverage * 255)));
+                                    bitmap[idx] = @max(bitmap[idx], value);
+                                }
+                            } else {
+                                bitmap[idx] = 255;
                             }
-                        } else {
-                            bitmap[idx] = 255;
                         }
                     }
                 }
             }
             
-            // Update winding number
+            // Update winding number AFTER filling
             winding_number += edge.winding;
             last_x = edge.x;
         }

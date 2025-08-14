@@ -28,6 +28,9 @@ const reactive_time = @import("../lib/reactive/time.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 const persistent_text = @import("../lib/text/cache.zig");
 
+// Debug system imports
+const log_throttle = @import("../lib/debug/log_throttle.zig");
+
 const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
 const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));
 const Vec2 = types.Vec2;
@@ -39,6 +42,9 @@ const Hud = hud.Hud;
 
 // Test mode for debugging - change to enable debug tests
 const DEBUG_MODE = false; // Set to true to run debug tests instead of game
+
+// Font test mode - automatically show font grid test on startup
+const FONT_TEST_MODE = true; // Set to true to automatically show font diagnostics
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -100,6 +106,9 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     // Initialize renderer
     game_renderer = try GameRenderer.init(global_allocator, window);
     
+    // Initialize debug logging throttle system
+    try log_throttle.initGlobal(global_allocator);
+
     // Initialize persistent text system (needs GPU device from renderer)
     try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.gpu.device);
 
@@ -120,7 +129,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     game_state.effect_system.refreshAmbientEffects(&game_state.world);
 
     // Initialize HUD system
-    try game_state.initHud(global_allocator, &game_renderer);
+    try game_state.initHud(global_allocator, &game_renderer, FONT_TEST_MODE);
 
     // Show window after initialization
     _ = c.sdl.SDL_ShowWindow(window);
@@ -178,16 +187,27 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
             reactive_time.deinitGlobalTime();
             reactive_batch.deinitGlobalBatcher(global_allocator);
             reactive_context.deinitContext(global_allocator);
+            
+            // Clean up debug logging system
+            log_throttle.deinitGlobal(global_allocator);
         }
         c.sdl.SDL_DestroyWindow(window);
         fully_initialized = false;
     }
 }
 
+var frame_counter: u32 = 0;
+
 // Game loop functions
 fn runGameLoop() !void {
     // Tick reactive time system (updates frame count and time signals)
     reactive_time.tickGlobalTime();
+    
+    // Print logging summary every 10 seconds (at 60 FPS = 600 frames)
+    frame_counter += 1;
+    if (frame_counter % 600 == 0) {
+        log_throttle.printGlobalSummary();
+    }
 
     // Calculate delta time
     const current_time = c.sdl.SDL_GetPerformanceCounter();

@@ -11,6 +11,7 @@ const constants = @import("constants.zig");
 const effects = @import("effects.zig");
 const font_manager = @import("../lib/font/manager.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
+const log_throttle = @import("../lib/debug/log_throttle.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -30,14 +31,12 @@ pub const GameRenderer = struct {
             .allocator = allocator,
         };
         
-        const log = std.log.scoped(.game_renderer);
-        
         // Initialize Pure Zig font manager
-        log.info("Initializing Pure Zig font backend", .{});
+        log_throttle.logInfo("init_font", "Initializing Pure Zig font backend", .{});
         renderer.font_manager = try allocator.create(font_manager.FontManager);
         renderer.font_manager.* = try font_manager.FontManager.init(allocator, renderer.gpu.device);
         
-        log.info("GameRenderer initialized with Pure Zig font backend", .{});
+        log_throttle.logInfo("init_complete", "GameRenderer initialized with Pure Zig font backend", .{});
         
         return renderer;
     }
@@ -269,8 +268,7 @@ pub const GameRenderer = struct {
         const fps_text = std.fmt.bufPrintZ(&fps_buf, "FPS: {d}", .{fps}) catch "FPS: ??";
         
         // Use persistent text rendering to eliminate flashing
-        const log = std.log.scoped(.fps_persistent);
-        log.debug("Queuing FPS text for persistent rendering: '{s}'", .{fps_text});
+        log_throttle.logDebug("queue_fps", "Queuing FPS text for persistent rendering: '{s}'", .{fps_text});
         
         // Queue using persistent mode - texture will be cached and reused
         self.gpu.text_renderer.queuePersistentText(
@@ -281,13 +279,13 @@ pub const GameRenderer = struct {
             @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(),
             WHITE
         ) catch |err| {
-            log.err("Failed to queue persistent FPS text: {}", .{err});
+            log_throttle.logError("fps_error", "Failed to queue persistent FPS text: {}", .{err});
             // Fall back to geometric rendering
             self.drawFPSGeometric(cmd_buffer, render_pass, fps);
             return;
         };
         
-        log.debug("✓ FPS text queued for persistent rendering", .{});
+        log_throttle.logDebug("fps_queued", "✓ FPS text queued for persistent rendering", .{});
     }
     
     fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
