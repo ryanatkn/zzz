@@ -13,16 +13,51 @@ const multi_text_renderer = @import("../lib/text/multi_renderer.zig");
 const Color = types.Color;
 const Vec2 = types.Vec2;
 
+/// Configuration for font grid test rendering
+const FontGridConfig = struct {
+    test_text: []const u8 = "Ag123@",
+    font_sizes: []const f32 = &[_]f32{ 8, 10, 12, 14, 16, 20, 24, 32, 48, 64, 72 },
+    start_pos: Vec2 = Vec2{ .x = 150.0, .y = 120.0 },
+    cell_spacing: Vec2 = Vec2{ .x = 10.0, .y = 10.0 },
+    
+    /// Create default configuration
+    pub fn default() FontGridConfig {
+        return FontGridConfig{};
+    }
+    
+    /// Create configuration optimized for small screens
+    pub fn compact() FontGridConfig {
+        return FontGridConfig{
+            .test_text = "Ag@",
+            .font_sizes = &[_]f32{ 10, 12, 16, 20, 24, 32, 48 }, // Fewer sizes
+            .start_pos = Vec2{ .x = 100.0, .y = 100.0 },
+            .cell_spacing = Vec2{ .x = 5.0, .y = 5.0 }, // Tighter spacing
+        };
+    }
+    
+    /// Create configuration for detailed analysis
+    pub fn detailed() FontGridConfig {
+        return FontGridConfig{
+            .test_text = "AaBbCc123@#",
+            .font_sizes = &[_]f32{ 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 56, 64, 72 },
+            .start_pos = Vec2{ .x = 50.0, .y = 80.0 },
+            .cell_spacing = Vec2{ .x = 8.0, .y = 8.0 },
+        };
+    }
+};
+
 pub const BrowserRenderer = struct {
     base_renderer: *game_renderer.GameRenderer,
     
     // Font grid test renderer for special diagnostic page
     font_grid_renderer: ?multi_text_renderer.MultiTextRenderer,
+    font_grid_config: FontGridConfig,
     
     pub fn init(base_renderer: *game_renderer.GameRenderer) BrowserRenderer {
         return .{
             .base_renderer = base_renderer,
             .font_grid_renderer = null,
+            .font_grid_config = FontGridConfig.default(),
         };
     }
     
@@ -36,10 +71,29 @@ pub const BrowserRenderer = struct {
     pub fn deinitFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) void {
         _ = allocator;
         // Clean up font grid renderer if it exists
+        self.cleanupFontGridRenderer();
+        // No separate font manager or text renderer to clean up - using main game's
+    }
+    
+    /// Clean up the font grid renderer and set it to null
+    fn cleanupFontGridRenderer(self: *BrowserRenderer) void {
         if (self.font_grid_renderer) |*renderer| {
             renderer.deinit();
+            self.font_grid_renderer = null;
         }
-        // No separate font manager or text renderer to clean up - using main game's
+    }
+    
+    /// Clean up all resources (call this when destroying the BrowserRenderer)
+    pub fn deinit(self: *BrowserRenderer) void {
+        self.cleanupFontGridRenderer();
+    }
+
+    /// Update font grid configuration (useful for testing different setups)
+    pub fn setFontGridConfig(self: *BrowserRenderer, config: FontGridConfig) void {
+        self.font_grid_config = config;
+        
+        // Reset the renderer to force recreation with new config
+        self.cleanupFontGridRenderer();
     }
 
     pub fn renderOverlay(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
@@ -83,17 +137,12 @@ pub const BrowserRenderer = struct {
                 self.base_renderer.font_manager
             );
             
-            // Create the comparison grid
-            const test_text = "Ag123@";
-            const font_sizes = [_]f32{ 8, 10, 12, 14, 16, 20, 24, 32, 48, 64, 72 };
-            const start_pos = Vec2{ .x = 150.0, .y = 120.0 };
-            const cell_spacing = Vec2{ .x = 10.0, .y = 10.0 };
-            
+            // Create the comparison grid using configuration
             try self.font_grid_renderer.?.createComparisonGrid(
-                test_text,
-                &font_sizes,
-                start_pos,
-                cell_spacing,
+                self.font_grid_config.test_text,
+                self.font_grid_config.font_sizes,
+                self.font_grid_config.start_pos,
+                self.font_grid_config.cell_spacing,
             );
         }
         
