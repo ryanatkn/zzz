@@ -1,7 +1,10 @@
 const std = @import("std");
+const c = @import("../../lib/c.zig");
 const page = @import("../../hud/page.zig");
 const multi_text_renderer = @import("../../lib/text/multi_renderer.zig");
 const text_primitives = @import("../../lib/text/primitives.zig");
+const text_renderer = @import("../../lib/text/renderer.zig");
+const font_manager = @import("../../lib/font/manager.zig");
 const types = @import("../../lib/types.zig");
 
 const Vec2 = types.Vec2;
@@ -26,6 +29,40 @@ const FontGridTestPage = struct {
         grid_page.multi_renderer = null;
         
         _ = allocator;
+    }
+    
+    // Initialization method to be called by renderer with proper context
+    pub fn initializeRenderer(self: *FontGridTestPage, allocator: std.mem.Allocator, device: *c.sdl.SDL_GPUDevice, tr: *text_renderer.TextRenderer, font_mgr: *font_manager.FontManager) !void {
+        if (self.initialized) return;
+        
+        self.multi_renderer = multi_text_renderer.MultiTextRenderer.init(
+            allocator,
+            device,
+            tr,
+            font_mgr
+        );
+        
+        // Create comparison grid
+        const start_pos = Vec2{ .x = 150.0, .y = 120.0 };
+        const cell_spacing = Vec2{ .x = 10.0, .y = 10.0 };
+        
+        try self.multi_renderer.?.createComparisonGrid(
+            self.test_text,
+            &self.font_sizes,
+            start_pos,
+            cell_spacing,
+        );
+        
+        self.initialized = true;
+    }
+    
+    pub fn isGridPage(self: *const FontGridTestPage) bool {
+        _ = self;
+        return true;
+    }
+    
+    pub fn getMultiRenderer(self: *FontGridTestPage) ?*multi_text_renderer.MultiTextRenderer {
+        return if (self.multi_renderer) |*mr| mr else null;
     }
     
     fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {

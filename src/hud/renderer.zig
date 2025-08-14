@@ -8,15 +8,21 @@ const font_config = @import("../lib/font/config.zig");
 const text_renderer = @import("../lib/text/renderer.zig");
 const menu_text = @import("../lib/ui/menu_text.zig");
 const drawing = @import("../lib/drawing.zig");
+const multi_text_renderer = @import("../lib/text/multi_renderer.zig");
 
 const Color = types.Color;
+const Vec2 = types.Vec2;
 
 pub const BrowserRenderer = struct {
     base_renderer: *game_renderer.GameRenderer,
     
+    // Font grid test renderer for special diagnostic page
+    font_grid_renderer: ?multi_text_renderer.MultiTextRenderer,
+    
     pub fn init(base_renderer: *game_renderer.GameRenderer) BrowserRenderer {
         return .{
             .base_renderer = base_renderer,
+            .font_grid_renderer = null,
         };
     }
     
@@ -28,8 +34,11 @@ pub const BrowserRenderer = struct {
     }
     
     pub fn deinitFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) void {
-        _ = self;
         _ = allocator;
+        // Clean up font grid renderer if it exists
+        if (self.font_grid_renderer) |*renderer| {
+            renderer.deinit();
+        }
         // No separate font manager or text renderer to clean up - using main game's
     }
 
@@ -52,13 +61,49 @@ pub const BrowserRenderer = struct {
     }
 
     pub fn renderPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
-        _ = self;
-        _ = cmd_buffer;
-        _ = render_pass;
-        
-        // Let the page render its content
-        // TODO: Add page background rendering when rectangle support is added
+        // Check if this is the font-grid-test page and handle special rendering
+        if (std.mem.eql(u8, current_page.path, "/font-grid-test")) {
+            try self.renderFontGridTestPage(cmd_buffer, render_pass, current_page, links);
+        } else {
+            // Regular page rendering
+            try current_page.render(links);
+        }
+    }
+    
+    fn renderFontGridTestPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+        // First, let the page render its basic UI elements (headers, navigation)
         try current_page.render(links);
+        
+        // Initialize the font grid renderer if not already done
+        if (self.font_grid_renderer == null) {
+            self.font_grid_renderer = multi_text_renderer.MultiTextRenderer.init(
+                self.base_renderer.allocator,
+                self.base_renderer.gpu.device,
+                &self.base_renderer.gpu.text_renderer,
+                self.base_renderer.font_manager
+            );
+            
+            // Create the comparison grid
+            const test_text = "Ag123@";
+            const font_sizes = [_]f32{ 8, 10, 12, 14, 16, 20, 24, 32, 48, 64, 72 };
+            const start_pos = Vec2{ .x = 150.0, .y = 120.0 };
+            const cell_spacing = Vec2{ .x = 10.0, .y = 10.0 };
+            
+            try self.font_grid_renderer.?.createComparisonGrid(
+                test_text,
+                &font_sizes,
+                start_pos,
+                cell_spacing,
+            );
+        }
+        
+        // Render the comparison grid
+        try self.font_grid_renderer.?.renderGrid(render_pass);
+        
+        // Render quality indicators
+        try self.font_grid_renderer.?.renderQualityIndicators(render_pass);
+        
+        _ = cmd_buffer;
     }
 
     pub fn renderLinks(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, links: []const page.Link, hovered_link: ?usize) !void {

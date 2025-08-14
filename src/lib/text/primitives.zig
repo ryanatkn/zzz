@@ -3,6 +3,7 @@ const c = @import("../c.zig");
 const types = @import("../types.zig");
 const font_manager = @import("../font/manager.zig");
 const font_config = @import("../font/config.zig");
+const font_debug = @import("../font/font_debug.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -35,9 +36,26 @@ pub const TextTexture = struct {
 pub const TextStats = struct {
     coverage_percent: f32,      // Percentage of pixels with coverage
     edge_sharpness: f32,       // Edge quality metric
+    contrast_ratio: f32,       // Contrast between text and background
     kerning_consistency: f32,  // Spacing consistency
+    subpixel_accuracy: f32,    // Accuracy of subpixel positioning  
+    overall_score: f32,        // Combined quality score (0-100)
     render_time_us: u64,       // Time to render in microseconds
     cache_hit: bool,           // Whether this was cached
+    
+    /// Convert from font_debug QualityMetrics
+    pub fn fromQualityMetrics(metrics: font_debug.QualityMetrics, render_time: u64, is_cached: bool) TextStats {
+        return TextStats{
+            .coverage_percent = metrics.coverage_percent,
+            .edge_sharpness = metrics.edge_sharpness,
+            .contrast_ratio = metrics.contrast_ratio,
+            .kerning_consistency = metrics.kerning_consistency,
+            .subpixel_accuracy = metrics.subpixel_accuracy,
+            .overall_score = metrics.overall_score,
+            .render_time_us = render_time,
+            .cache_hit = is_cached,
+        };
+    }
 };
 
 /// Core text primitive operations
@@ -134,28 +152,77 @@ pub const TextPrimitives = struct {
         return try self.createBitmapText(text, font_size, color);
     }
     
-    /// Calculate text quality metrics
+    /// Calculate text quality metrics with improved estimation
+    /// TODO: For real bitmap analysis, use `analyzeTexturePixels` when GPU->CPU readback is implemented
     pub fn calculateTextStats(self: *Self, texture: TextTexture, text: []const u8) !TextStats {
         _ = self;
-        _ = text;
         
-        // Placeholder metrics
-        // TODO: Implement actual quality analysis
+        // Enhanced quality estimation based on texture properties and known rendering characteristics
+        const base_coverage = switch (texture.method) {
+            .bitmap => 75.0,
+            .sdf => 85.0,
+            .oversampled_2x => 80.0,
+            .oversampled_4x => 90.0,
+            .cached => 75.0,
+        };
+        
+        // Size-dependent quality adjustments (based on known font rendering issues)
+        const size_factor: f32 = if (texture.font_size < 12.0)
+            0.5  // Small sizes are problematic
+        else if (texture.font_size < 16.0)
+            0.7  // Still issues but better
+        else if (texture.font_size < 24.0)
+            0.9  // Generally good
+        else if (texture.font_size <= 48.0)
+            1.0  // Optimal range
+        else
+            0.95; // Very large sizes might have minor issues
+        
+        const coverage_percent = base_coverage * size_factor;
+        
+        // Edge sharpness based on method and size
+        const base_sharpness = switch (texture.method) {
+            .bitmap => 70.0,
+            .sdf => 90.0,
+            .oversampled_2x => 80.0,
+            .oversampled_4x => 85.0,
+            .cached => 70.0,
+        };
+        const edge_sharpness = base_sharpness * size_factor;
+        
+        // Contrast estimation
+        const contrast_ratio = if (texture.font_size < 12.0)
+            60.0  // Poor contrast at small sizes
+        else
+            85.0; // Good contrast at readable sizes
+            
+        // Kerning consistency (text length affects this)
+        const text_length = @as(f32, @floatFromInt(text.len));
+        const kerning_consistency = if (text_length > 10)
+            75.0  // Longer text may have kerning issues
+        else
+            85.0; // Short text generally consistent
+            
+        // Subpixel accuracy based on size  
+        const subpixel_accuracy = if (texture.font_size < 16.0)
+            50.0  // Poor subpixel positioning at small sizes
+        else
+            80.0; // Better at larger sizes
+            
+        // Calculate overall score
+        const overall_score = (coverage_percent * 0.25 +
+                               edge_sharpness * 0.25 +
+                               contrast_ratio * 0.20 +
+                               kerning_consistency * 0.15 +
+                               subpixel_accuracy * 0.15);
+        
         return TextStats{
-            .coverage_percent = switch (texture.method) {
-                .bitmap => 75.0,
-                .sdf => 85.0,
-                .oversampled_2x => 80.0,
-                .oversampled_4x => 90.0,
-                .cached => 75.0,
-            },
-            .edge_sharpness = switch (texture.font_size) {
-                0...12 => 40.0,
-                13...24 => 70.0,
-                25...48 => 85.0,
-                else => 95.0,
-            },
-            .kerning_consistency = 80.0,
+            .coverage_percent = @min(100.0, coverage_percent),
+            .edge_sharpness = @min(100.0, edge_sharpness),
+            .contrast_ratio = @min(100.0, contrast_ratio),
+            .kerning_consistency = @min(100.0, kerning_consistency),
+            .subpixel_accuracy = @min(100.0, subpixel_accuracy),
+            .overall_score = @min(100.0, overall_score),
             .render_time_us = texture.render_time_us,
             .cache_hit = texture.method == .cached,
         };
@@ -177,5 +244,19 @@ pub const TextPrimitives = struct {
             .oversampled_4x => "4x AA",
             .cached => "Cached",
         };
+    }
+    
+    /// Future method for real bitmap pixel analysis (requires GPU->CPU texture readback)
+    /// This would use font_debug.analyzeBitmap for accurate quality metrics
+    fn analyzeTexturePixels(self: *Self, texture: TextTexture) !font_debug.QualityMetrics {
+        _ = self;
+        _ = texture;
+        // TODO: Implement SDL_DownloadFromGPUTexture equivalent
+        // 1. Create CPU transfer buffer
+        // 2. Copy GPU texture to CPU buffer
+        // 3. Extract bitmap pixel data
+        // 4. Call font_debug.analyzeBitmap(bitmap, width, height)
+        // 5. Return real quality metrics
+        return error.NotImplemented;
     }
 };
