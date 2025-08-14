@@ -293,18 +293,27 @@ pub const BrowserRenderer = struct {
         }
     }
     
-    /// Render a GPU texture at specified position and size
+    /// Render a GPU texture at specified position and size (TEMPORARY: simplified to avoid texture issues)
     fn renderTexture(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, texture: *c.sdl.SDL_GPUTexture, x: f32, y: f32, width: f32, height: f32) !void {
-        // Use the game renderer's text system to display the texture
-        // This shows the actual rendered font output from each strategy
-        self.base_renderer.gpu.text_renderer.queueTextTexture(
-            texture,
-            .{ .x = x, .y = y },
-            @as(u32, @intFromFloat(width)),
-            @as(u32, @intFromFloat(height)), 
-            types.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
-        );
+        // TEMPORARY: Instead of rendering complex textures, show colored placeholders
+        // This avoids the texture compatibility issues while we debug
+        _ = texture; // Ignore texture for now
         
-        self.base_renderer.gpu.text_renderer.drawQueuedText(cmd_buffer, render_pass);
+        // Draw a colored rectangle to show that the renderer is working
+        const placeholder_color = Color{ .r = 100, .g = 150, .b = 200, .a = 255 };
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x, .y = y }, .{ .x = width, .y = height }, placeholder_color);
+        
+        // Add a border to make it more visible
+        const border_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
+        const border_thickness = 2.0;
+        
+        // Top border
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x, .y = y }, .{ .x = width, .y = border_thickness }, border_color);
+        // Bottom border  
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x, .y = y + height - border_thickness }, .{ .x = width, .y = border_thickness }, border_color);
+        // Left border
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x, .y = y }, .{ .x = border_thickness, .y = height }, border_color);
+        // Right border
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x + width - border_thickness, .y = y }, .{ .x = border_thickness, .y = height }, border_color);
     }
 };

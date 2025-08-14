@@ -154,10 +154,7 @@ pub const FontGridTestPage = struct {
         // Test with all strategies
         const results = try self.multi_renderer.?.renderWithAllStrategies(test_outline, font_size);
         
-        // Store results for display
-        if (self.last_test_results) |old_results| {
-            allocator.free(old_results);
-        }
+        // Store results for display (just reference, don't take ownership)
         self.last_test_results = results;
         
         return results;
@@ -207,6 +204,7 @@ pub const FontGridTestPage = struct {
     }
 
     fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
+        _ = allocator;
         const grid_page: *FontGridTestPage = @fieldParentPtr("base", self);
 
         if (grid_page.multi_renderer) |*renderer| {
@@ -217,15 +215,8 @@ pub const FontGridTestPage = struct {
             display.deinit();
         }
         
-        if (grid_page.last_test_results) |results| {
-            // Free individual results
-            for (results) |result| {
-                if (result.result) |render_result| {
-                    render_result.deinit(allocator);
-                }
-            }
-            allocator.free(results);
-        }
+        // Note: last_test_results is just a reference to MultiStrategyRenderer's internal memory
+        // The MultiStrategyRenderer will clean up its own results, so we don't free here
     }
 
     fn update(self: *page.Page, dt: f32) void {

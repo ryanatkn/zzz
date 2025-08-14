@@ -108,6 +108,13 @@ pub const PersistentTextSystem = struct {
             }
         }
 
+        // Validate UTF-8 before attempting texture creation
+        if (!std.unicode.utf8ValidateSlice(text)) {
+            log_throttle.logError("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});
+            self.recent_failures += 1;
+            return null;
+        }
+
         // Create new texture
         log_throttle.logInfo("create_texture", "Creating new persistent texture for '{s}'", .{text});
 
