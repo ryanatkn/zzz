@@ -128,6 +128,11 @@ pub const FontAtlas = struct {
         const rasterized = try rasterizer.rasterizeGlyph(codepoint, 0, 0);
         // Don't free the bitmap yet - we'll store it in the cache
         
+        const raster_log = std.log.scoped(.font_atlas_raster);
+        raster_log.info("Rasterized glyph '{}' (U+{X:0>4}): {}x{} pixels, {} bytes", .{
+            codepoint, codepoint, rasterized.width, rasterized.height, rasterized.bitmap.len
+        });
+        
         if (rasterized.width == 0 or rasterized.height == 0) {
             // For empty glyphs, we can free immediately since we don't need to store
             rasterizer.allocator.free(rasterized.bitmap);

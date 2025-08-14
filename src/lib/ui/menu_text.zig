@@ -60,7 +60,9 @@ pub const MenuTextRenderer = struct {
         const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width, style.font_size);
         
         const log = std.log.scoped(.menu_text);
-        // Debug logging disabled to reduce spam
+        log.info("Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{
+            text, text_pos.x, text_pos.y, rect.size.x, rect.size.y
+        });
         
         self.text_renderer.queuePersistentText(
             text,
