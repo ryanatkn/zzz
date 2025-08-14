@@ -10,6 +10,7 @@ const settings_fonts_page = @import("../menu/settings/fonts/+page.zig");
 const settings_fonts_save_page = @import("../menu/settings/fonts/save/+page.zig");
 const stats_page = @import("../menu/stats/+page.zig");
 const font_test_page = @import("../menu/font_test/+page.zig");
+const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
 const vector_test_page = @import("../menu/vector_test/+page.zig");
 
 pub const Router = struct {
@@ -117,6 +118,14 @@ pub const Router = struct {
             
             // Load font test page
             self.current_page = try font_test_page.create(self.allocator);
+        } else if (std.mem.eql(u8, path, "/font-grid-test")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Load font grid test page
+            self.current_page = try font_grid_test_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/vector-test")) {
             // Load root layout
             const layout = try root_layout.create(self.allocator);

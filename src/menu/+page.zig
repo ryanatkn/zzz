@@ -110,11 +110,20 @@ const IndexPage = struct {
             nav_height
         ));
         
-        // Add font test link
+        // Add font test links
         try links.append(page.createLink(
             "Font Test",
             "/font-test",
-            nav_center_x - nav_width / 2.0,
+            nav_center_x - nav_width - nav_spacing - 20,
+            nav_y - nav_height - 20,
+            nav_width,
+            nav_height
+        ));
+        
+        try links.append(page.createLink(
+            "Font Grid Test",
+            "/font-grid-test",
+            nav_center_x + nav_spacing + 20,
             nav_y - nav_height - 20,
             nav_width,
             nav_height

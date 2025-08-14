@@ -1,6 +1,6 @@
 const std = @import("std");
 const c = @import("c.zig");
-const font_rasterizer = @import("font_rasterizer.zig");
+const rasterizer_core = @import("rasterizer_core.zig");
 const sdf_renderer = @import("sdf_renderer.zig");
 const vector_path = @import("vector_path.zig");
 
@@ -114,7 +114,7 @@ pub const FontAtlas = struct {
     
     pub fn getOrRasterizeGlyph(
         self: *FontAtlas,
-        rasterizer: *font_rasterizer.FontRasterizer,
+        rasterizer: *rasterizer_core.RasterizerCore,
         codepoint: u32,
         font_id: u32,
         size: u32

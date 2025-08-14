@@ -131,10 +131,17 @@ fn tessellrateCubicFixed(
 }
 
 /// Calculate number of segments for fixed tessellation based on curve length
+/// Enhanced with better adaptive segment calculation
 fn calculateFixedSegments(curve_length: f32, config: TessellationConfig) u32 {
-    // Aim for approximately 1 segment per 2 pixels of curve length
-    const segments_from_length = @as(u32, @intFromFloat(@ceil(curve_length / 2.0)));
-    return @min(@max(segments_from_length, config.min_segments), config.max_segments);
+    // Use tolerance-based calculation for better quality
+    // More segments for tighter tolerance
+    const segments_per_unit = 1.0 / @max(0.1, config.tolerance);
+    const segments_from_length = @as(u32, @intFromFloat(@ceil(curve_length * segments_per_unit / 2.0)));
+    
+    // For very short curves, ensure minimum quality
+    const min_for_length = if (curve_length < 2.0) 4 else config.min_segments;
+    
+    return @min(@max(segments_from_length, min_for_length), config.max_segments);
 }
 
 /// Adaptive tessellation for quadratic curves using recursive subdivision
@@ -218,6 +225,7 @@ fn tessellrateCubicAdaptive(
 }
 
 /// Check if a curve segment is flat enough to be approximated by a line
+/// Enhanced with FreeType-inspired deviation calculation
 fn isFlatEnough(start: Vec2, mid: Vec2, end: Vec2, tolerance: f32) bool {
     // Calculate the distance from the midpoint to the line connecting start and end
     const line_vec = maths.vec2_subtract(end, start);
@@ -228,15 +236,22 @@ fn isFlatEnough(start: Vec2, mid: Vec2, end: Vec2, tolerance: f32) bool {
         return true;
     }
     
-    // Project the midpoint onto the line
-    const to_mid = maths.vec2_subtract(mid, start);
-    const projection_factor = maths.vec2_dot(to_mid, line_vec) / line_length_sq;
-    const projection = maths.vec2_add(start, maths.vec2_multiply(line_vec, projection_factor));
+    // Use perpendicular distance calculation for better accuracy
+    // This is more numerically stable than projection
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const line_length = @sqrt(line_length_sq);
     
-    // Calculate distance from midpoint to its projection on the line
-    const distance = maths.vec2_length(maths.vec2_subtract(mid, projection));
+    // Calculate perpendicular distance from mid to line
+    // Using the formula: |ax + by + c| / sqrt(a^2 + b^2)
+    const distance = @abs(dy * mid.x - dx * mid.y + end.x * start.y - end.y * start.x) / line_length;
     
-    return distance <= tolerance;
+    // For curves, also check the parametric deviation
+    // This ensures we don't miss sharp turns
+    const param_mid = maths.vec2_multiply(maths.vec2_add(start, end), 0.5);
+    const param_deviation = maths.vec2_length(maths.vec2_subtract(mid, param_mid));
+    
+    return distance <= tolerance and param_deviation <= tolerance * 2.0;
 }
 
 /// Check if the angle change is small enough (for angle-based tessellation)
@@ -323,15 +338,35 @@ pub const QualityPresets = struct {
 };
 
 /// Get recommended tessellation config based on scale
+/// Enhanced algorithm inspired by FreeType's adaptive tessellation
 pub fn recommendConfigForScale(scale: f32) TessellationConfig {
-    if (scale < 0.5) {
-        return QualityPresets.fast;
+    // For very small scales (< 12pt), we need MORE segments, not fewer
+    // This counter-intuitive approach ensures smooth curves at small sizes
+    if (scale < 0.3) {
+        // Tiny fonts need maximum quality to avoid artifacts
+        return TessellationConfig{
+            .max_segments = 256,
+            .min_segments = 16,
+            .tolerance = 0.05,  // Very tight tolerance
+            .angle_tolerance = 0.01,
+            .adaptive = true,
+        };
+    } else if (scale < 0.5) {
+        // Small fonts still need high quality
+        return TessellationConfig{
+            .max_segments = 128,
+            .min_segments = 8,
+            .tolerance = 0.1,
+            .angle_tolerance = 0.02,
+            .adaptive = true,
+        };
     } else if (scale < 1.0) {
-        return QualityPresets.medium;
-    } else if (scale < 2.0) {
         return QualityPresets.high;
-    } else {
+    } else if (scale < 2.0) {
         return QualityPresets.ultra;
+    } else {
+        // Large fonts can use slightly lower quality
+        return QualityPresets.high;
     }
 }
 

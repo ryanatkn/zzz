@@ -47,7 +47,7 @@ const TextTexture = struct {
 
     fn deinit(self: TextTexture, device: *c.sdl.SDL_GPUDevice) void {
         // Note: Don't release sampler here - it's shared across all text renders
-        // Note: Don't release texture here - it's managed by fonts.zig
+        // Note: Don't release texture here - it's managed by font_manager.zig
         _ = device;
         _ = self;
     }

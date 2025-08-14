@@ -1,7 +1,7 @@
 const std = @import("std");
-const fonts = @import("../../../lib/fonts.zig");
+const font_config = @import("../../../lib/font_config.zig");
 
-pub fn saveSettings(allocator: std.mem.Allocator, settings: fonts.FontSettings) !void {
+pub fn saveSettings(allocator: std.mem.Allocator, settings: font_config.FontSettings) !void {
     const config_path = "font_settings.json";
     
     // Create JSON object
@@ -74,7 +74,7 @@ pub fn saveSettings(allocator: std.mem.Allocator, settings: fonts.FontSettings) 
     log.info("Font settings saved to {s}", .{config_path});
 }
 
-pub fn exportConfig(allocator: std.mem.Allocator, settings: fonts.FontSettings) ![]const u8 {
+pub fn exportConfig(allocator: std.mem.Allocator, settings: font_config.FontSettings) ![]const u8 {
     // Generate a Zig configuration snippet
     var config_buf = std.ArrayList(u8).init(allocator);
     
@@ -82,7 +82,7 @@ pub fn exportConfig(allocator: std.mem.Allocator, settings: fonts.FontSettings) 
         \\// Font Configuration for Dealt/Hex
         \\// Generated on {d}
         \\
-        \\pub const font_config = fonts.FontSettings{{
+        \\pub const font_settings = font_config.FontSettings{{
         \\    .mono_family = "{s}",
         \\    .mono_weight = {d},
         \\    .mono_italic = {any},

@@ -4,10 +4,9 @@ const types = @import("../lib/types.zig");
 const lib_renderer = @import("../lib/renderer.zig");
 const game_renderer = @import("../hex/game_renderer.zig");
 const page = @import("page.zig");
-const fonts = @import("../lib/fonts.zig");
+const font_config = @import("../lib/font_config.zig");
 const text_renderer = @import("../lib/text_renderer.zig");
 const menu_text = @import("../lib/ui/menu_text.zig");
-const unified_text_renderer = @import("../lib/unified_text_renderer.zig");
 const drawing = @import("../lib/drawing.zig");
 
 const Color = types.Color;
@@ -80,16 +79,13 @@ pub const BrowserRenderer = struct {
                 link_color
             );
             
-            // Render the link text using unified text renderer
-            var unified_renderer = unified_text_renderer.UnifiedTextRenderer.init(
-                &self.base_renderer.gpu.text_renderer, 
-                self.base_renderer.font_manager
-            );
+            // Render the link text using menu text renderer directly
             const link_rect = drawing.Rectangle{
                 .position = link.bounds.position,
                 .size = link.bounds.size,
             };
-            unified_renderer.renderMenuText(link.text, link_rect, .button, is_hovered);
+            var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
+            menu_renderer.queueButtonText(link.text, link_rect, is_hovered);
         }
     }
 

@@ -1,7 +1,7 @@
 const std = @import("std");
 const types = @import("types.zig");
 const font_atlas = @import("font_atlas.zig");
-const font_rasterizer = @import("font_rasterizer.zig");
+const rasterizer_core = @import("rasterizer_core.zig");
 
 const Vec2 = types.Vec2;
 
@@ -57,12 +57,12 @@ pub const LayoutOptions = struct {
 pub const TextLayoutEngine = struct {
     allocator: std.mem.Allocator,
     atlas: *font_atlas.FontAtlas,
-    rasterizer: *font_rasterizer.FontRasterizer,
+    rasterizer: *rasterizer_core.RasterizerCore,
     
     pub fn init(
         allocator: std.mem.Allocator,
         atlas: *font_atlas.FontAtlas,
-        rasterizer: *font_rasterizer.FontRasterizer
+        rasterizer: *rasterizer_core.RasterizerCore
     ) TextLayoutEngine {
         return TextLayoutEngine{
             .allocator = allocator,

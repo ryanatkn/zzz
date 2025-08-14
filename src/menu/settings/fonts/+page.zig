@@ -1,17 +1,17 @@
 const std = @import("std");
 const page = @import("../../../hud/page.zig");
-const fonts = @import("../../../lib/fonts.zig");
+const font_config = @import("../../../lib/font_config.zig");
 
 const FontsInfoPage = struct {
     base: page.Page,
-    current_settings: fonts.FontSettings = .{},
+    current_settings: font_config.FontSettings = .{},
     
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
         _ = allocator;
         const fonts_page: *FontsInfoPage = @fieldParentPtr("base", self);
         
         // Initialize with default settings
-        fonts_page.current_settings = fonts.FontSettings{};
+        fonts_page.current_settings = font_config.FontSettings{};
     }
     
     fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {

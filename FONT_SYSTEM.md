@@ -3,13 +3,35 @@
 ## Overview
 Pure Zig TTF font rendering system integrated with SDL3 GPU API. No external font libraries (SDL_ttf, FreeType, etc.) are used.
 
-## Current Status: ⚠️ PARTIALLY WORKING - Text Visible but Quality Issues
+For reference of freetype see ./.ss/freetype.
+Feel free to look for whatever you need there including algorithms,
+but please be sure to credit any sources when writing algorithms from references.
+LMK if you want additional references besides freetype.
 
-### Latest Session Findings
-Text is now **visible and somewhat legible** but **"almost unreadable"** at many sizes:
-- ✅ **Fonts render**: No longer completely invisible 
-- ⚠️ **Poor quality**: Significant rasterization artifacts
-- ❌ **Not production ready**: Text quality insufficient for actual use
+## Current Status: ✅ REFACTORED - Clean Architecture with Quality Issues Remaining
+
+### Latest Improvements (2025-08-14)
+
+#### ✅ Architecture Refactoring (Completed)
+Successfully refactored 848-line monolithic font_rasterizer.zig into clean modular architecture:
+- ✅ **Modular Components**: Split into focused modules (~200 lines each)
+  - `glyph_extractor.zig` - TTF glyph outline extraction
+  - `edge_builder.zig` - Outline to edge conversion  
+  - `scanline_renderer.zig` - Scanline rendering algorithm
+  - `font_debug.zig` - Debug utilities + quality analysis
+  - `rasterizer_core.zig` - Main coordination interface
+  - `font_types.zig` - Shared type definitions
+- ✅ **Consolidated Configuration**: Merged fonts.zig and font_config.zig
+- ✅ **Test Infrastructure**: Created integration tests, moved tests/ to dedicated directory
+- ✅ **Build System**: All modules compile successfully, no import errors
+- ✅ **Code Quality**: Fixed format string errors, eliminated redundant abstractions
+
+#### ⚠️ Rendering Quality Issues (Still Present)
+While architecture is now clean, core font rendering quality issues remain:
+- **Small font sizes**: Still garbled/corrupted (12pt-16pt)
+- **Coverage calculation**: Area-based algorithm implemented but needs debugging
+- **Subpixel precision**: 16.16 fixed-point arithmetic insufficient
+- **Rasterization core**: Scanline algorithm producing poor output
 
 ### Critical Fixes Applied
 1. **SDF Pipeline Issues**: Fixed validation errors and added null checks
@@ -26,7 +48,7 @@ fps_counter: f32 = 1.25,     // 20pt - partially readable
 debug_text: f32 = 0.75,      // 12pt - almost unreadable
 ```
 
-### ✅ Working Components
+### ✅ Working Components (Modular Architecture)
 
 1. **TTF Parser** (`src/lib/ttf_parser.zig`)
    - Reads TTF file headers (head, hhea, loca, glyf tables)
@@ -34,11 +56,12 @@ debug_text: f32 = 0.75,      // 12pt - almost unreadable
    - Handles both simple and composite glyphs
    - Properly parses contour points and curve data
 
-2. **Font Rasterizer** (`src/lib/font_rasterizer.zig`)
-   - Converts TTF outlines to bitmaps
-   - Quadratic Bezier curve tessellation
-   - Scanline rasterization algorithm
-   - Generates coverage values for anti-aliasing
+2. **Glyph Processing Pipeline** (Modularized)
+   - **Glyph Extractor** (`src/lib/glyph_extractor.zig`) - TTF outline extraction
+   - **Edge Builder** (`src/lib/edge_builder.zig`) - Outline to edge conversion
+   - **Scanline Renderer** (`src/lib/scanline_renderer.zig`) - Rasterization algorithm
+   - **Rasterizer Core** (`src/lib/rasterizer_core.zig`) - Pipeline coordination
+   - **Font Types** (`src/lib/font_types.zig`) - Shared data structures
 
 3. **Font Atlas** (`src/lib/font_atlas.zig`)
    - Dynamic glyph packing into texture atlas
@@ -143,34 +166,61 @@ The font system issues were resolved through systematic debugging:
   - 16pt and below: Precision errors cause garbling
   - Root cause: Integer truncation of sub-pixel positions
 
-## 🔴 Current Critical Issues
+## ✅ Improvements Implemented
 
-### Rasterization Quality Problems
-The font rasterizer produces poor quality output with significant artifacts:
+### Area-Based Coverage Calculation
+Implemented FreeType-inspired exact coverage calculation:
 
-1. **Partial Pixel Coverage**
-   - Log: "72/294 pixels filled, 0 fully filled rows"
-   - Many pixels only partially covered, leading to faint/broken text
-   - Anti-aliasing coverage calculations need refinement
+1. **Cell-Based Coverage** (Credit: FreeType ftgrays.c)
+   - Each pixel tracked as a cell with coverage and area
+   - Fixed-point arithmetic (8.8 format) for precision
+   - Proper winding number handling for overlapping regions
 
-2. **Scanline Rendering Errors**
-   - Multiple edge detection warnings in logs
-   - Complex edges being incorrectly processed
-   - Winding number calculation may have bugs
+2. **Enhanced Edge Processing**
+   - 16.16 fixed-point representation for subpixel accuracy
+   - Better edge sorting and active edge management
+   - Diagonal edge coverage calculation support
 
-3. **Sub-pixel Precision Still Inadequate**
-   - Despite improvements, still losing precision
-   - Small fonts (12-14pt) are "almost unreadable"
-   - Edge positions truncated incorrectly
+3. **Improved Curve Tessellation**
+   - Adaptive quality based on font size (counter-intuitively MORE segments for small sizes)
+   - Enhanced flatness detection using perpendicular distance
+   - Parametric deviation checking for sharp turns
 
-4. **SDF Pipeline Unused**
-   - SDF shaders compile but textures are bitmap, not distance fields
-   - Need proper SDF texture generation from font outlines
-   - SDF could solve quality issues for small/large sizes
+4. **Debug Visualization**
+   - ASCII art coverage visualization for debugging
+   - Coverage intensity mapping (. : + * #)
+   - Per-glyph statistics and analysis
 
 ## 📋 Next Steps (Priority Order)
 
-### 1. Immediate Quality Improvements
+### 1. Module Organization (High Priority)
+**Extract font/text modules to dedicated directory** - Current font modules are scattered in `src/lib/`:
+```
+Proposed Structure:
+src/lib/font/          or    src/lib/text/
+├── types.zig                ├── types.zig
+├── parser.zig               ├── font_parser.zig  
+├── glyph_extractor.zig      ├── glyph.zig
+├── edge_builder.zig         ├── rasterizer.zig
+├── scanline_renderer.zig    ├── atlas.zig
+├── rasterizer_core.zig      ├── renderer.zig
+├── font_debug.zig           ├── debug.zig
+├── font_config.zig          └── config.zig
+├── font_atlas.zig           
+├── font_manager.zig         
+└── multi_text_renderer.zig  
+```
+
+**Benefits:**
+- ✅ Clear module boundaries and ownership
+- ✅ Easier to isolate font rendering bugs
+- ✅ Reduced cognitive load in main `src/lib/` directory
+- ✅ Natural place for font-specific tests and documentation
+- ✅ Preparation for font rendering grid test implementation
+
+**Recommended approach:** Start with `src/lib/font/` for core font processing, keep text rendering in main lib for now.
+
+### 2. Immediate Quality Improvements
 - **Debug scanline rasterizer**: Add visual debugging to see exact pixel fills
 - **Fix coverage calculation**: Ensure proper anti-aliasing coverage values
 - **Test different fonts**: Some TTF files may rasterize better than others
@@ -213,14 +263,30 @@ The current implementation has the **architecture right** but **rasterization wr
 
 Consider this a **rasterization quality bug** rather than a system design issue.
 
-### Files Modified
+### Current Font Module Distribution (Needs Consolidation)
 
-- `src/lib/text_renderer.zig` - Main text rendering pipeline
-- `src/lib/font_rasterizer.zig` - TTF to bitmap conversion
-- `src/shaders/source/text.hlsl` - Text rendering shaders
+**Core Modules** (should move to `src/lib/font/`):
+- `src/lib/ttf_parser.zig` - TTF file parsing
+- `src/lib/glyph_extractor.zig` - TTF outline extraction
+- `src/lib/edge_builder.zig` - Outline to edge conversion
+- `src/lib/scanline_renderer.zig` - Rasterization algorithm
+- `src/lib/rasterizer_core.zig` - Pipeline coordination
+- `src/lib/font_types.zig` - Shared data structures
+- `src/lib/font_debug.zig` - Debug utilities + quality analysis
+- `src/lib/font_config.zig` - Font configuration + definitions
 - `src/lib/font_atlas.zig` - Glyph texture atlas management
-- `src/lib/unified_text_renderer.zig` - Unified text interface
-- `src/lib/texture_debug.zig` - Debug texture generation
+- `src/lib/font_manager.zig` - Font loading and management
+
+**Text Rendering** (could move to `src/lib/text/`):
+- `src/lib/text_renderer.zig` - Main text rendering pipeline
+- `src/lib/persistent_text.zig` - Text caching system
+- `src/lib/text_layout.zig` - Text layout engine
+- `src/lib/text_primitives.zig` - Text rendering primitives
+- `src/lib/multi_text_renderer.zig` - Comparison rendering
+
+**Shaders**:
+- `src/shaders/source/text.hlsl` - Text rendering shaders
+- `src/shaders/source/text_sdf.hlsl` - SDF text shaders
 
 ### Testing Results
 

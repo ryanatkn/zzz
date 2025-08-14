@@ -3,7 +3,7 @@ const types = @import("../types.zig");
 const reactive = @import("../reactive.zig");
 const component = @import("component.zig");
 const text_renderer = @import("../text_renderer.zig");
-const fonts = @import("../fonts.zig");
+const font_config = @import("../font_config.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

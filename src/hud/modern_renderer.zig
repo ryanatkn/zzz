@@ -234,7 +234,7 @@ pub const ModernHUDRenderer = struct {
                     position: Vec2, 
                     font_size: f32, 
                     color: Color, 
-                    font_category: @import("../lib/fonts.zig").FontCategory
+                    font_category: @import("../lib/font_config.zig").FontCategory
                 ) !void {
                     // Use the unified text system (no more yellow debug colors!)
                     if (self.base.font_manager) |fm| {

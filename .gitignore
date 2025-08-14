@@ -9,3 +9,5 @@ zig-out/
 # Temporary files
 *.tmp
 .tmp*
+
+.zz

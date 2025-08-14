@@ -1,6 +1,6 @@
 const std = @import("std");
 const c = @import("c.zig");
-const fonts = @import("fonts.zig");
+const font_config = @import("font_config.zig");
 const simple_gpu_renderer = @import("simple_gpu_renderer.zig");
 const font_manager = @import("font_manager.zig");
 

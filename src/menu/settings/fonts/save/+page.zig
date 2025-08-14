@@ -1,6 +1,6 @@
 const std = @import("std");
 const page = @import("../../../../hud/page.zig");
-const fonts = @import("../../../../lib/fonts.zig");
+const font_config = @import("../../../../lib/font_config.zig");
 const save_mod = @import("../save.zig");
 
 const SavePage = struct {
@@ -12,7 +12,7 @@ const SavePage = struct {
         const save_page: *SavePage = @fieldParentPtr("base", self);
         
         // Attempt to save settings
-        const settings = fonts.FontSettings{};
+        const settings = font_config.FontSettings{};
         save_mod.saveSettings(allocator, settings) catch |err| {
             save_page.error_msg = switch (err) {
                 error.AccessDenied => "Access denied to save file",

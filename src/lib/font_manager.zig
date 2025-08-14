@@ -2,10 +2,10 @@ const std = @import("std");
 const c = @import("c.zig");
 const types = @import("types.zig");
 const ttf_parser = @import("ttf_parser.zig");
-const font_rasterizer = @import("font_rasterizer.zig");
+const rasterizer_core = @import("rasterizer_core.zig");
 const font_atlas = @import("font_atlas.zig");
 const text_layout = @import("text_layout.zig");
-const fonts = @import("fonts.zig");
+const font_config = @import("font_config.zig");
 
 const log = std.log.scoped(.pure_font_manager);
 
@@ -14,13 +14,13 @@ pub const LoadedFont = struct {
     path: []const u8,
     data: []u8,
     parser: *ttf_parser.TTFParser,
-    rasterizers: std.AutoHashMap(u32, *font_rasterizer.FontRasterizer),
+    rasterizers: std.AutoHashMap(u32, *rasterizer_core.RasterizerCore),
 };
 
 pub const FontManager = struct {
     allocator: std.mem.Allocator,
     gpu_device: *c.sdl.SDL_GPUDevice,
-    settings: fonts.FontSettings,
+    settings: font_config.FontSettings,
     loaded_fonts: std.ArrayList(LoadedFont),
     atlas: font_atlas.FontAtlas,
     layout_engine: ?text_layout.TextLayoutEngine,
@@ -30,7 +30,7 @@ pub const FontManager = struct {
         return FontManager{
             .allocator = allocator,
             .gpu_device = gpu_device,
-            .settings = fonts.FontSettings{},
+            .settings = font_config.FontSettings{},
             .loaded_fonts = std.ArrayList(LoadedFont).init(allocator),
             .atlas = try font_atlas.FontAtlas.init(allocator, gpu_device, 1024),
             .layout_engine = null,
@@ -53,7 +53,7 @@ pub const FontManager = struct {
         self.atlas.deinit();
     }
     
-    pub fn loadFont(self: *FontManager, category: fonts.FontCategory, size: f32) !u32 {
+    pub fn loadFont(self: *FontManager, category: font_config.FontCategory, size: f32) !u32 {
         const family_name = switch (category) {
             .mono => self.settings.mono_family,
             .sans => self.settings.sans_family,
@@ -75,8 +75,8 @@ pub const FontManager = struct {
             .serif_text => self.settings.serif_text_italic,
         };
         
-        var font_family: ?fonts.FontFamily = null;
-        for (fonts.available_fonts) |family| {
+        var font_family: ?font_config.FontFamily = null;
+        for (font_config.available_fonts) |family| {
             if (std.mem.eql(u8, family.name, family_name)) {
                 font_family = family;
                 break;
@@ -88,7 +88,7 @@ pub const FontManager = struct {
             return error.FontFamilyNotFound;
         }
         
-        var best_variant: ?fonts.FontVariant = null;
+        var best_variant: ?font_config.FontVariant = null;
         var best_score: i32 = std.math.maxInt(i32);
         
         for (font_family.?.variants) |variant| {
@@ -114,8 +114,8 @@ pub const FontManager = struct {
                     return font.id;
                 }
                 
-                const rasterizer = try self.allocator.create(font_rasterizer.FontRasterizer);
-                rasterizer.* = font_rasterizer.FontRasterizer.init(self.allocator, font.parser, size, 96);
+                const rasterizer = try self.allocator.create(rasterizer_core.RasterizerCore);
+                rasterizer.* = rasterizer_core.RasterizerCore.init(self.allocator, font.parser, size, 96);
                 try font.rasterizers.put(size_key, rasterizer);
                 
                 return font.id;
@@ -135,10 +135,10 @@ pub const FontManager = struct {
         const parser_ptr = try self.allocator.create(ttf_parser.TTFParser);
         parser_ptr.* = try ttf_parser.TTFParser.init(self.allocator, data);
         
-        var rasterizers = std.AutoHashMap(u32, *font_rasterizer.FontRasterizer).init(self.allocator);
+        var rasterizers = std.AutoHashMap(u32, *rasterizer_core.RasterizerCore).init(self.allocator);
         const size_key = @as(u32, @intFromFloat(size * 100));
-        const rasterizer = try self.allocator.create(font_rasterizer.FontRasterizer);
-        rasterizer.* = font_rasterizer.FontRasterizer.init(self.allocator, parser_ptr, size, 96);
+        const rasterizer = try self.allocator.create(rasterizer_core.RasterizerCore);
+        rasterizer.* = rasterizer_core.RasterizerCore.init(self.allocator, parser_ptr, size, 96);
         try rasterizers.put(size_key, rasterizer);
         
         const font_id = self.next_font_id;
@@ -167,7 +167,7 @@ pub const FontManager = struct {
     pub fn renderTextToTexture(
         self: *FontManager,
         text: []const u8,
-        category: fonts.FontCategory,
+        category: font_config.FontCategory,
         size: f32,
         color: types.Color,
     ) !struct {
