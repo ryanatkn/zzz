@@ -7,6 +7,7 @@ cbuffer RectUniforms : register(b0, space1) {
     float rect_color_g;      // HLSL array packing issues that
     float rect_color_b;      // caused color channel corruption
     float rect_color_a;      // Alpha channel
+    float _padding;          // 16-byte alignment padding like CircleUniforms
 };
 
 // Vertex shader input (just vertex ID)

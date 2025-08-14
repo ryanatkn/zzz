@@ -47,20 +47,60 @@ pub const FontGridTestPage = struct {
         const link_width = 300.0;
         const link_spacing = 20.0;
 
+        // Header text
+        var current_y: f32 = start_y - 100.0;
+        
+        // Individual renderer tests
         try links.append(page.createLink(
-            "Font Test (Simplified)",
+            "Simple Bitmap Renderer",
             "/font_test_simple",
             center_x - link_width / 2.0,
-            start_y,
+            current_y,
             link_width,
             link_height
         ));
+        current_y += link_height + link_spacing;
 
+        try links.append(page.createLink(
+            "Oversampling Renderer", 
+            "/font_test_oversampling",
+            center_x - link_width / 2.0,
+            current_y,
+            link_width,
+            link_height
+        ));
+        current_y += link_height + link_spacing;
+
+
+        try links.append(page.createLink(
+            "Debug ASCII Renderer",
+            "/font_test_ascii",
+            center_x - link_width / 2.0,
+            current_y,
+            link_width,
+            link_height
+        ));
+        current_y += link_height + link_spacing;
+
+        // Comparison test
+        current_y += link_spacing;
+        try links.append(page.createLink(
+            "Compare All Renderers",
+            "/font_test_comparison",
+            center_x - link_width / 2.0,
+            current_y,
+            link_width,
+            link_height
+        ));
+        current_y += link_height + link_spacing;
+
+        // Back button
+        current_y += link_spacing;
         try links.append(page.createLink(
             "Back to Menu",
             "/",
             center_x - link_width / 2.0,
-            start_y + (link_height + link_spacing) * 2,
+            current_y,
             link_width,
             link_height
         ));
@@ -84,7 +124,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
                 .destroy = FontGridTestPage.destroy,
             },
             .path = "/font_grid_test",
-            .title = "Font Grid Test (Simplified)",
+            .title = "Font Renderer Test Suite",
         },
         .renderer = undefined, // Will be set in init
         .initialized = false,

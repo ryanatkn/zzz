@@ -13,13 +13,13 @@ const Color = types.Color;
 const CircleUniforms = extern struct {
     screen_size: [2]f32, // 8 bytes
     circle_center: [2]f32, // 8 bytes
-    circle_radius: f32, // 4 bytes
+    circle_size: [2]f32, // 8 bytes (use [0] for radius, [1] unused)
     circle_color_r: f32, // 4 bytes
     circle_color_g: f32, // 4 bytes
     circle_color_b: f32, // 4 bytes
     circle_color_a: f32, // 4 bytes
     _padding: f32, // 4 bytes (16-byte alignment)
-    // Total: 40 bytes
+    // Total: 44 bytes (exactly matches RectUniforms)
 };
 
 // Rectangle uniform buffer - color components split to avoid HLSL array packing issues
@@ -31,7 +31,8 @@ const RectUniforms = extern struct {
     rect_color_g: f32, // 4 bytes
     rect_color_b: f32, // 4 bytes
     rect_color_a: f32, // 4 bytes
-    // Total: 40 bytes
+    _padding: f32, // 4 bytes (16-byte alignment like CircleUniforms)
+    // Total: 44 bytes
 };
 
 // Effect uniform buffer for GPU-based visual effects
@@ -485,7 +486,7 @@ pub const SimpleGPURenderer = struct {
         const uniform_data = CircleUniforms{
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
             .circle_center = [2]f32{ pos.x, pos.y },
-            .circle_radius = radius,
+            .circle_size = [2]f32{ radius, 0.0 },
             .circle_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
             .circle_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
             .circle_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
@@ -503,6 +504,8 @@ pub const SimpleGPURenderer = struct {
 
     // Draw a single rectangle
     pub fn drawRect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, size: Vec2, color: Color) void {
+        // Removed debug logging for white rectangles investigation
+        
         // Prepare uniform data - swap R and B for BGR swapchain format
         const uniform_data = RectUniforms{
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
@@ -512,9 +515,12 @@ pub const SimpleGPURenderer = struct {
             .rect_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
             .rect_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
             .rect_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            ._padding = 0.0,
         };
 
-        // Push uniform data BEFORE binding pipeline (critical for SDL3 GPU)
+        // Debug logging removed - uniform data validated as correct
+        
+        // Push uniform data BEFORE binding pipeline (critical for SDL3 GPU) 
         c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(RectUniforms));
 
         // Bind pipeline and draw
@@ -528,7 +534,7 @@ pub const SimpleGPURenderer = struct {
         const uniform_data = CircleUniforms{
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
             .circle_center = [2]f32{ pos.x + size.x / 2.0, pos.y + size.y / 2.0 }, // Center of rectangle
-            .circle_radius = @max(size.x, size.y) * 2.0, // Very large radius to cover the rectangle
+            .circle_size = [2]f32{ @max(size.x, size.y) * 2.0, 0.0 }, // Very large radius to cover the rectangle
             .circle_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
             .circle_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
             .circle_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
@@ -645,5 +651,10 @@ pub const SimpleGPURenderer = struct {
     pub fn drawQueuedText(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
         // Delegate to text renderer for proper textured rendering
         self.text_renderer.drawQueuedText(cmd_buffer, render_pass);
+    }
+
+    // Debug function to test texture pipeline
+    pub fn debugTestTexturePipeline(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
+        try self.text_renderer.debugTestTexturePipeline(cmd_buffer, render_pass);
     }
 };

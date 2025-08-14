@@ -7,6 +7,37 @@ const bitmap_utils = @import("../image/bitmap.zig");
 
 const log = std.log.scoped(.rasterizer_core);
 
+/// Simple point-in-polygon test using winding number algorithm
+fn isPointInsideGlyph(test_x: f32, test_y: f32, contours: []const glyph_extractor.Contour) bool {
+    var winding_number: i32 = 0;
+
+    for (contours) |contour| {
+        if (contour.points.len < 3) continue; // Need at least 3 points for a polygon
+
+        for (contour.points, 0..) |_, i| {
+            const next_i = (i + 1) % contour.points.len;
+            const p1 = contour.points[i];
+            const p2 = contour.points[next_i];
+
+            // Ray casting algorithm - check if ray from test point crosses edge
+            if ((p1.y <= test_y and test_y < p2.y) or (p2.y <= test_y and test_y < p1.y)) {
+                const t = (test_y - p1.y) / (p2.y - p1.y);
+                const intersection_x = p1.x + t * (p2.x - p1.x);
+
+                if (intersection_x > test_x) {
+                    if (p1.y < p2.y) {
+                        winding_number += 1;
+                    } else {
+                        winding_number -= 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return winding_number != 0;
+}
+
 /// Result of rasterizing a glyph
 pub const RasterizedGlyph = struct {
     bitmap: []u8,
@@ -94,16 +125,32 @@ pub const RasterizerCore = struct {
         errdefer self.allocator.free(bitmap);
         @memset(bitmap, 0);
 
-        // Simplified rasterization - using basic shape filling
+        // Simple bitmap rasterization using point-in-polygon test
         _ = subpixel_x;
         _ = subpixel_y;
 
-        // Placeholder bitmap rendering - filled with test pattern
-        @memset(bitmap, 128); // Gray test pattern
+        // Calculate transform from bitmap coordinates to TTF coordinates
+        const offset_x = bounds.x_min - 1.0;
+        const offset_y = bounds.y_min - 1.0;
 
-        // Debug mode placeholder
+        // Rasterize each pixel
+        for (0..height) |y| {
+            for (0..width) |x| {
+                const pixel_x = @as(f32, @floatFromInt(x)) + offset_x;
+                // Flip Y coordinate: TTF uses bottom-up, screen uses top-down
+                const pixel_y = bounds.y_max - (@as(f32, @floatFromInt(y)) + offset_y);
+                
+                // Test if point is inside glyph using simple winding number
+                const inside = isPointInsideGlyph(pixel_x, pixel_y, outline.contours);
+                
+                const bitmap_idx = y * width + x;
+                bitmap[bitmap_idx] = if (inside) 255 else 0; // Pure black/white
+            }
+        }
+
+        // Debug mode 
         if (self.debug_mode) {
-            log.debug("Rasterizing glyph {d}x{d}", .{ width, height });
+            log.debug("Rasterized glyph using point-in-polygon: {}x{}", .{ width, height });
         }
 
         return RasterizedGlyph{

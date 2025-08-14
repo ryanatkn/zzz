@@ -110,7 +110,8 @@ pub const SimpleBitmapRenderer = struct {
                 
                 // Convert to TTF coordinate space
                 const ttf_x = pixel_x / scale;
-                const ttf_y = pixel_y / scale;
+                // Flip Y coordinate: TTF uses bottom-up, screen uses top-down
+                const ttf_y = (@as(f32, @floatFromInt(outline.bounds.y_max)) - pixel_y) / scale;
 
                 // Test if point is inside glyph using winding number
                 const inside = isPointInside(Point{ .x = ttf_x, .y = ttf_y }, outline.contours);

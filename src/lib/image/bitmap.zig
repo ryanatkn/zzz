@@ -135,13 +135,30 @@ pub const Convert = struct {
     pub fn grayscaleToRGBA(allocator: std.mem.Allocator, grayscale_data: []const u8, width: u32, height: u32) ![]u8 {
         const rgba_data = try allocator.alloc(u8, width * height * 4);
         
+        // DEBUG: Check what grayscale values we're getting
+        var min_val: u8 = 255;
+        var max_val: u8 = 0;
+        var non_zero_count: u32 = 0;
+        
+        for (grayscale_data) |gray_value| {
+            min_val = @min(min_val, gray_value);
+            max_val = @max(max_val, gray_value);
+            if (gray_value > 0) non_zero_count += 1;
+        }
+        
+        if (grayscale_data.len > 0) {
+            std.debug.print("DEBUG RGBA: {}x{} bitmap - min:{} max:{} non_zero:{}/{} pixels\n", 
+                .{width, height, min_val, max_val, non_zero_count, grayscale_data.len});
+        }
+        
         for (grayscale_data, 0..) |gray_value, i| {
             const rgba_idx = i * 4;
-            // White text on transparent background
-            rgba_data[rgba_idx + 0] = 255; // R
-            rgba_data[rgba_idx + 1] = 255; // G  
-            rgba_data[rgba_idx + 2] = 255; // B
-            rgba_data[rgba_idx + 3] = gray_value; // A (coverage as alpha)
+            // DEBUG: Use grayscale value in all channels to test texture sampling
+            // If we see gray patterns instead of white rectangles, texture sampling works
+            rgba_data[rgba_idx + 0] = gray_value; // R - grayscale for debugging
+            rgba_data[rgba_idx + 1] = gray_value; // G - grayscale for debugging  
+            rgba_data[rgba_idx + 2] = gray_value; // B - grayscale for debugging
+            rgba_data[rgba_idx + 3] = 255; // A - full alpha for debugging
         }
         
         return rgba_data;

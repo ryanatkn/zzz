@@ -1,8 +1,8 @@
 // Circle rendering with distance field anti-aliasing
 cbuffer CircleUniforms : register(b0, space1) {
     float2 screen_size;      // Screen dimensions for NDC conversion
-    float2 circle_center;    // Circle position in screen coordinates
-    float circle_radius;     // Circle radius in pixels
+    float2 circle_center;    // Circle position in screen coordinates  
+    float2 circle_size;      // Use size[0] as radius, size[1] unused
     float circle_color_r;    // Color components split to avoid
     float circle_color_g;    // HLSL array packing issues that
     float circle_color_b;    // caused color channel corruption
@@ -53,7 +53,7 @@ VertexOutput vs_main(VertexInput input) {
     );
     
     // Convert radius from screen pixels to NDC space with aspect correction
-    float ndc_radius = (circle_radius / screen_size.y) * 2.0; // Use Y for consistent scaling
+    float ndc_radius = (circle_size.x / screen_size.y) * 2.0; // Use Y for consistent scaling
     float2 aspect_correction = float2(1.0 / aspect_ratio, 1.0); // Compress X for circular shape
     
     // Generate final position: center + scaled quad corner
