@@ -62,12 +62,8 @@ pub const GameState = struct {
         };
     }
 
-    pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer, font_test_mode: bool) !void {
-        if (font_test_mode) {
-            self.hud_system = try reactive_hud.ReactiveHud.initWithOptions(allocator, renderer_ptr, true);
-        } else {
-            self.hud_system = try reactive_hud.ReactiveHud.init(allocator, renderer_ptr);
-        }
+    pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
+        self.hud_system = try reactive_hud.ReactiveHud.init(allocator, renderer_ptr);
     }
 
     pub fn deinitHud(self: *Self) void {

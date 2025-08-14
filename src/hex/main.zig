@@ -43,8 +43,6 @@ const Hud = hud.Hud;
 // Test mode for debugging - change to enable debug tests
 const DEBUG_MODE = false; // Set to true to run debug tests instead of game
 
-// Font test mode - automatically show font grid test on startup
-const FONT_TEST_MODE = true; // Set to true to automatically show font diagnostics
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -129,7 +127,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     game_state.effect_system.refreshAmbientEffects(&game_state.world);
 
     // Initialize HUD system
-    try game_state.initHud(global_allocator, &game_renderer, FONT_TEST_MODE);
+    try game_state.initHud(global_allocator, &game_renderer);
 
     // Show window after initialization
     _ = c.sdl.SDL_ShowWindow(window);

@@ -123,7 +123,8 @@ pub const BrowserRenderer = struct {
 
     /// DEPRECATED: Legacy method for backward compatibility - will be removed
     pub fn renderPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
-        std.log.warn("DEPRECATED: renderPage called - use renderPageContent instead", .{});
+        const log_throttle = @import("../lib/debug/log_throttle.zig");
+        log_throttle.logInfo("deprecated_renderPage", "DEPRECATED: renderPage called - use renderPageContent instead", .{});
         
         // First render the page content normally
         try current_page.render(links);

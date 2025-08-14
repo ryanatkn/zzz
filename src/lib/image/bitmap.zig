@@ -146,19 +146,14 @@ pub const Convert = struct {
             if (gray_value > 0) non_zero_count += 1;
         }
         
-        if (grayscale_data.len > 0) {
-            std.debug.print("DEBUG RGBA: {}x{} bitmap - min:{} max:{} non_zero:{}/{} pixels\n", 
-                .{width, height, min_val, max_val, non_zero_count, grayscale_data.len});
-        }
         
         for (grayscale_data, 0..) |gray_value, i| {
             const rgba_idx = i * 4;
-            // DEBUG: Use grayscale value in all channels to test texture sampling
-            // If we see gray patterns instead of white rectangles, texture sampling works
-            rgba_data[rgba_idx + 0] = gray_value; // R - grayscale for debugging
-            rgba_data[rgba_idx + 1] = gray_value; // G - grayscale for debugging  
-            rgba_data[rgba_idx + 2] = gray_value; // B - grayscale for debugging
-            rgba_data[rgba_idx + 3] = 255; // A - full alpha for debugging
+            // Convert grayscale to RGBA format for GPU texture
+            rgba_data[rgba_idx + 0] = 255;       // R - white
+            rgba_data[rgba_idx + 1] = 255;       // G - white  
+            rgba_data[rgba_idx + 2] = 255;       // B - white
+            rgba_data[rgba_idx + 3] = gray_value; // A - use grayscale as alpha
         }
         
         return rgba_data;

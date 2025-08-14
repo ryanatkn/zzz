@@ -9,11 +9,7 @@ const settings_audio_page = @import("../menu/settings/audio/+page.zig");
 const settings_fonts_page = @import("../menu/settings/fonts/+page.zig");
 const settings_fonts_save_page = @import("../menu/settings/fonts/save/+page.zig");
 const stats_page = @import("../menu/stats/+page.zig");
-const font_test_page = @import("../menu/font_test/+page.zig");
 const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
-const font_test_oversampling_page = @import("../menu/font_test_oversampling/+page.zig");
-const font_test_ascii_page = @import("../menu/font_test_ascii/+page.zig");
-const font_test_comparison_page = @import("../menu/font_test_comparison/+page.zig");
 const vector_test_page = @import("../menu/vector_test/+page.zig");
 
 pub const Router = struct {
@@ -113,14 +109,6 @@ pub const Router = struct {
 
             // Load stats page
             self.current_page = try stats_page.create(self.allocator);
-        } else if (std.mem.eql(u8, path, "/font-test")) {
-            // Load root layout
-            const layout = try root_layout.create(self.allocator);
-            try layout.init(self.allocator);
-            try self.current_layouts.append(layout);
-
-            // Load font test page
-            self.current_page = try font_test_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/font-grid-test")) {
             // Load root layout
             const layout = try root_layout.create(self.allocator);
@@ -129,30 +117,6 @@ pub const Router = struct {
 
             // Load font grid test page
             self.current_page = try font_grid_test_page.create(self.allocator);
-        } else if (std.mem.eql(u8, path, "/font_test_oversampling")) {
-            // Load root layout
-            const layout = try root_layout.create(self.allocator);
-            try layout.init(self.allocator);
-            try self.current_layouts.append(layout);
-
-            // Load oversampling test page
-            self.current_page = try font_test_oversampling_page.create(self.allocator);
-        } else if (std.mem.eql(u8, path, "/font_test_ascii")) {
-            // Load root layout
-            const layout = try root_layout.create(self.allocator);
-            try layout.init(self.allocator);
-            try self.current_layouts.append(layout);
-
-            // Load ASCII test page
-            self.current_page = try font_test_ascii_page.create(self.allocator);
-        } else if (std.mem.eql(u8, path, "/font_test_comparison")) {
-            // Load root layout
-            const layout = try root_layout.create(self.allocator);
-            try layout.init(self.allocator);
-            try self.current_layouts.append(layout);
-
-            // Load comparison test page
-            self.current_page = try font_test_comparison_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/vector-test")) {
             // Load root layout
             const layout = try root_layout.create(self.allocator);

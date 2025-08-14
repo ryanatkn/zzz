@@ -43,8 +43,14 @@ pub const FontAtlas = struct {
     padding: u32,
     default_render_mode: RenderMode,
     sdf_generator: ?sdf_renderer.SDFGenerator,
+    
+    // Performance optimization fields
+    max_memory_bytes: usize,
+    current_memory_bytes: usize,
+    lru_order: std.ArrayList(u64), // Track access order for LRU eviction
 
     pub fn init(allocator: std.mem.Allocator, gpu_device: *c.sdl.SDL_GPUDevice, atlas_size: u32) !FontAtlas {
+        const max_memory = atlas_size * atlas_size * 4; // 4 atlases max by default
         return FontAtlas{
             .allocator = allocator,
             .gpu_device = gpu_device,
@@ -54,6 +60,9 @@ pub const FontAtlas = struct {
             .padding = 1, // Reduced padding for better packing
             .default_render_mode = .bitmap, // Start with bitmap rendering
             .sdf_generator = null, // Initialize SDF generator when needed
+            .max_memory_bytes = max_memory,
+            .current_memory_bytes = 0,
+            .lru_order = std.ArrayList(u64).init(allocator),
         };
     }
 
@@ -76,6 +85,7 @@ pub const FontAtlas = struct {
             }
         }
         self.glyph_cache.deinit();
+        self.lru_order.deinit();
     }
 
     pub fn getCachedBitmap(self: *FontAtlas, info: GlyphInfo) ?[]u8 {
@@ -117,6 +127,8 @@ pub const FontAtlas = struct {
         const cache_key = (@as(u64, font_id) << 32) | (@as(u64, size) << 16) | @as(u64, codepoint);
 
         if (self.glyph_cache.get(cache_key)) |info| {
+            // Update LRU order on cache hit
+            self.updateLRUOrder(cache_key);
             return info;
         }
 
@@ -199,7 +211,13 @@ pub const FontAtlas = struct {
             .render_mode = self.default_render_mode,
         };
 
+        // Check memory limit before adding new glyph
+        const bitmap_size = if (final_bitmap.len > 0) final_bitmap.len else 0;
+        try self.ensureMemoryLimit(bitmap_size);
+        
+        self.current_memory_bytes += bitmap_size;
         try self.glyph_cache.put(cache_key, info);
+        try self.lru_order.append(cache_key);
         return info;
     }
 
@@ -266,5 +284,64 @@ pub const FontAtlas = struct {
         }
         self.atlases.clearRetainingCapacity();
         self.glyph_cache.clearRetainingCapacity();
+        self.lru_order.clearRetainingCapacity();
+        self.current_memory_bytes = 0;
+    }
+    
+    /// Update LRU order when glyph is accessed
+    fn updateLRUOrder(self: *FontAtlas, cache_key: u64) void {
+        // Find and remove the key from its current position
+        for (self.lru_order.items, 0..) |key, i| {
+            if (key == cache_key) {
+                _ = self.lru_order.orderedRemove(i);
+                break;
+            }
+        }
+        // Add to end (most recently used)
+        self.lru_order.append(cache_key) catch {
+            // If append fails, just log and continue - LRU tracking is best effort
+            log_throttle.logDebug("lru_append", "Failed to update LRU order for glyph key {}", .{cache_key});
+        };
+    }
+    
+    /// Ensure memory usage stays within limits by evicting LRU glyphs
+    fn ensureMemoryLimit(self: *FontAtlas, needed_bytes: usize) !void {
+        while (self.current_memory_bytes + needed_bytes > self.max_memory_bytes and self.lru_order.items.len > 0) {
+            const oldest_key = self.lru_order.orderedRemove(0);
+            
+            if (self.glyph_cache.get(oldest_key)) |info| {
+                if (info.bitmap) |bitmap| {
+                    self.current_memory_bytes -= bitmap.len;
+                    self.allocator.free(bitmap);
+                }
+                _ = self.glyph_cache.remove(oldest_key);
+                log_throttle.logDebug("evict_glyph", "Evicted glyph key {} to free memory", .{oldest_key});
+            }
+        }
+    }
+    
+    /// Pre-generate commonly used glyphs for better performance
+    pub fn pregenerateCommonGlyphs(self: *FontAtlas, rasterizer: *rasterizer_core.RasterizerCore, font_id: u32, size: u32) !void {
+        // ASCII printable characters (space through tilde)
+        const common_chars = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+        
+        log_throttle.logOnce("pregenerate", "Pre-generating {} common glyphs for font {} size {}", .{ common_chars.len, font_id, size });
+        
+        for (common_chars) |char| {
+            const codepoint = @as(u32, @intCast(char));
+            _ = self.getOrRasterizeGlyph(rasterizer, codepoint, font_id, size) catch |err| {
+                log_throttle.logDebug("pregenerate_fail", "Failed to pregenerate glyph '{}': {}", .{ char, err });
+                continue;
+            };
+        }
+    }
+    
+    /// Get memory usage statistics
+    pub fn getMemoryStats(self: *FontAtlas) struct { used: usize, max: usize, glyphs: usize } {
+        return .{
+            .used = self.current_memory_bytes,
+            .max = self.max_memory_bytes,
+            .glyphs = self.glyph_cache.count(),
+        };
     }
 };

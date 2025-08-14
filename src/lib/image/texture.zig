@@ -17,10 +17,7 @@ pub const Texture = struct {
 
 /// Create GPU texture from grayscale bitmap data
 pub fn createFromBitmap(device: *c.sdl.SDL_GPUDevice, allocator: std.mem.Allocator, bitmap: []const u8, width: u32, height: u32) !Texture {
-    std.debug.print("DEBUG TEXTURE: createFromBitmap called - {}x{} ({} bytes)\n", .{width, height, bitmap.len});
-    
     if (width == 0 or height == 0) {
-        std.debug.print("DEBUG TEXTURE: Invalid dimensions {}x{}\n", .{width, height});
         return error.InvalidDimensions;
     }
 
@@ -29,7 +26,6 @@ pub fn createFromBitmap(device: *c.sdl.SDL_GPUDevice, allocator: std.mem.Allocat
     const rgba_data = try bitmap_utils.Convert.grayscaleToRGBA(allocator, bitmap, width, height);
     defer allocator.free(rgba_data);
 
-    std.debug.print("DEBUG TEXTURE: Converted to RGBA, creating GPU texture\n", .{});
     return try createFromRGBA(device, rgba_data, width, height);
 }
 
@@ -131,29 +127,3 @@ pub fn createWhite(device: *c.sdl.SDL_GPUDevice) !Texture {
     return try createFromRGBA(device, &white_rgba, 1, 1);
 }
 
-/// Create a debug checkerboard texture for testing texture sampling
-pub fn createDebugCheckerboard(device: *c.sdl.SDL_GPUDevice) !Texture {
-    const width = 4;
-    const height = 4;
-    var rgba_data: [width * height * 4]u8 = undefined;
-    
-    for (0..height) |y| {
-        for (0..width) |x| {
-            const idx = (y * width + x) * 4;
-            const is_black = (x + y) % 2 == 0;
-            if (is_black) {
-                rgba_data[idx + 0] = 0;   // R
-                rgba_data[idx + 1] = 0;   // G
-                rgba_data[idx + 2] = 0;   // B
-                rgba_data[idx + 3] = 255; // A
-            } else {
-                rgba_data[idx + 0] = 255; // R
-                rgba_data[idx + 1] = 255; // G
-                rgba_data[idx + 2] = 255; // B
-                rgba_data[idx + 3] = 255; // A
-            }
-        }
-    }
-    
-    return try createFromRGBA(device, &rgba_data, width, height);
-}

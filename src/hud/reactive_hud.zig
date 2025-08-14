@@ -41,10 +41,10 @@ pub const ReactiveHudData = struct {
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Self {
-        return Self.initWithOptions(allocator, base_renderer, false);
+        return Self.initWithOptions(allocator, base_renderer);
     }
 
-    pub fn initWithOptions(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer, font_test_mode: bool) !Self {
+    pub fn initWithOptions(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Self {
         // Create reactive signals
         const is_open_signal = try allocator.create(signal.Signal(bool));
         is_open_signal.* = try signal.Signal(bool).init(allocator, false);
@@ -83,17 +83,8 @@ pub const ReactiveHudData = struct {
         try self.renderer.initFonts(allocator);
         log.info("Reactive HUD font system initialized", .{});
 
-        // Initialize with appropriate page based on mode
-        if (font_test_mode) {
-            try self.router.navigate("/font-grid-test");
-            // Set path signal and history without triggering reset
-            current_path_signal.set("/font-grid-test");
-            _ = self.history.navigate("/font-grid-test") catch {};
-            // Open HUD in font test mode
-            is_open_signal.set(true);
-        } else {
-            try self.router.navigate("/");
-        }
+        // Initialize with home page
+        try self.router.navigate("/");
 
         return self;
     }
@@ -266,11 +257,11 @@ pub const ReactiveHud = struct {
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Self {
-        return Self.initWithOptions(allocator, base_renderer, false);
+        return Self.initWithOptions(allocator, base_renderer);
     }
 
-    pub fn initWithOptions(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer, font_test_mode: bool) !Self {
-        const hud_data = try ReactiveHudData.initWithOptions(allocator, base_renderer, font_test_mode);
+    pub fn initWithOptions(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Self {
+        const hud_data = try ReactiveHudData.initWithOptions(allocator, base_renderer);
 
         const component = try createComponent(ReactiveHudData, allocator, hud_data, ReactiveHudData.vtable);
 

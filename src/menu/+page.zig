@@ -96,10 +96,8 @@ const IndexPage = struct {
 
         try links.append(page.createLink("Statistics", "/stats", nav_center_x + nav_spacing / 2.0, nav_y, nav_width, nav_height));
 
-        // Add font test links
-        try links.append(page.createLink("Font Test", "/font-test", nav_center_x - nav_width - nav_spacing - 20, nav_y - nav_height - 20, nav_width, nav_height));
-
-        try links.append(page.createLink("Font Grid Test", "/font-grid-test", nav_center_x + nav_spacing + 20, nav_y - nav_height - 20, nav_width, nav_height));
+        // Add font test link
+        try links.append(page.createLink("Font Test", "/font-grid-test", nav_center_x, nav_y - nav_height - 20, nav_width, nav_height));
 
         // Test panel for font debugging - black background with various glyphs
         const test_y = 600.0;

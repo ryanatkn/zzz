@@ -150,8 +150,8 @@ pub const TextRenderer = struct {
     pub fn debugTestTexturePipeline(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
         const texture_utils = @import("../image/texture.zig");
         
-        // Create debug texture
-        const debug_texture = try texture_utils.createDebugCheckerboard(self.device);
+        // Create simple white texture for testing
+        const debug_texture = try texture_utils.createWhiteTexture(self.device);
         defer debug_texture.deinit(self.device);
         
         // Use our text sampler
@@ -192,10 +192,10 @@ pub const TextRenderer = struct {
             };
 
             self.text_draw_queue.append(cmd) catch |err| {
-                std.log.err("Failed to queue text texture: {}", .{err});
+                log_throttle.logError("queue_text_texture", "Failed to queue text texture: {}", .{err});
             };
         } else {
-            std.log.warn("Text sampler not initialized, cannot queue text texture", .{});
+            log_throttle.logInfo("text_sampler_not_init", "Text sampler not initialized, cannot queue text texture", .{});
         }
     }
 
@@ -230,7 +230,7 @@ pub const TextRenderer = struct {
             }
         } else {
             // Fallback to immediate mode if persistent system not available
-            std.log.warn("Persistent text system not available, falling back to immediate mode", .{});
+            log_throttle.logInfo("persistent_fallback", "Persistent text system not available, falling back to immediate mode", .{});
             // Note: This would require the font_manager to create a texture immediately
             // For now, we'll just log the warning
         }
