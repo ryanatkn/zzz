@@ -258,8 +258,8 @@ pub const FontRasterizer = struct {
             .bitmap = bitmap,
             .width = width,
             .height = height,
-            .bearing_x = @intFromFloat(scaled_x_min - 1),
-            .bearing_y = @intFromFloat(scaled_y_max + 1),
+            .bearing_x = @intFromFloat(@round(scaled_x_min - 1)),
+            .bearing_y = @intFromFloat(@round(scaled_y_max + 1)),
             .advance = @as(f32, @floatFromInt(metrics.advance_width)) * self.scale,
         };
     }

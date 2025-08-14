@@ -2,20 +2,7 @@
 // Compile with: dxc -T vs_6_0 -E vs_main text.hlsl -Fo text_vs.dxil
 // Compile with: dxc -T ps_6_0 -E ps_main text.hlsl -Fo text_ps.dxil
 
-// Text rendering uniforms  
-cbuffer TextUniforms : register(b0, space1) {
-    float2 screen_size;      // Screen dimensions for NDC conversion
-    float2 text_position;    // Text position in screen coordinates
-    float2 text_size;        // Text size in pixels
-    float text_color_r;      // Color components split to avoid
-    float text_color_g;      // HLSL array packing issues
-    float text_color_b;      
-    float text_color_a;      // Alpha channel
-    float time;              // Animation time
-    float _padding0, _padding1, _padding2; // Pad to 16-byte alignment
-};
-
-// Font texture atlas with combined sampler
+// Font texture atlas with combined sampler (shared by both shaders)
 Texture2D<float4> font_atlas : register(t0, space2);
 SamplerState atlas_sampler : register(s0, space2);
 
@@ -29,6 +16,19 @@ struct VertexOutput {
     float4 position : SV_Position;
     float2 texcoord : TEXCOORD0;
     float4 color : COLOR0;
+};
+
+// Text rendering uniforms (vertex shader only)
+cbuffer TextUniforms : register(b0, space1) {
+    float2 screen_size;      // Screen dimensions for NDC conversion
+    float2 text_position;    // Text position in screen coordinates
+    float2 text_size;        // Text size in pixels
+    float text_color_r;      // Color components split to avoid
+    float text_color_g;      // HLSL array packing issues
+    float text_color_b;      
+    float text_color_a;      // Alpha channel
+    float time;              // Animation time
+    float _padding0, _padding1, _padding2; // Pad to 16-byte alignment
 };
 
 // Generate textured quad vertices procedurally
@@ -73,8 +73,7 @@ float4 ps_main(VertexOutput input) : SV_Target {
     // Sample the font atlas texture
     float4 atlas_sample = font_atlas.Sample(atlas_sampler, input.texcoord);
     
-    // The atlas now stores white text with alpha in the alpha channel
-    // So we just need the alpha value for coverage
+    // Individual text textures use R8G8B8A8_UNORM format with coverage in alpha channel
     float coverage = atlas_sample.a;
     
     // Apply text color with coverage

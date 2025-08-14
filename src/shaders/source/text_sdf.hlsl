@@ -2,7 +2,23 @@
 // Compile with: dxc -T vs_6_0 -E vs_main text_sdf.hlsl -Fo text_sdf_vs.dxil
 // Compile with: dxc -T ps_6_0 -E ps_main text_sdf.hlsl -Fo text_sdf_ps.dxil
 
-// SDF text rendering uniforms  
+// SDF texture atlas with combined sampler (shared by both shaders)
+Texture2D<float4> sdf_atlas : register(t0, space2);
+SamplerState atlas_sampler : register(s0, space2);
+
+// Vertex shader input (just vertex ID for procedural generation)
+struct VertexInput {
+    uint vertex_id : SV_VertexID;
+};
+
+// Vertex to pixel shader
+struct VertexOutput {
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+    float4 color : COLOR0;
+};
+
+// SDF text rendering uniforms (vertex shader only)
 cbuffer SDFTextUniforms : register(b0, space1) {
     float2 screen_size;      // Screen dimensions for NDC conversion
     float2 text_position;    // Text position in screen coordinates
@@ -17,22 +33,6 @@ cbuffer SDFTextUniforms : register(b0, space1) {
     float smoothing;         // Anti-aliasing smoothing factor
     float time;              // Animation time
     float _padding0, _padding1, _padding2; // Pad to 16-byte alignment
-};
-
-// SDF texture atlas with combined sampler
-Texture2D<float4> sdf_atlas : register(t0, space2);
-SamplerState atlas_sampler : register(s0, space2);
-
-// Vertex shader input (just vertex ID for procedural generation)
-struct VertexInput {
-    uint vertex_id : SV_VertexID;
-};
-
-// Vertex to pixel shader
-struct VertexOutput {
-    float4 position : SV_Position;
-    float2 texcoord : TEXCOORD0;
-    float4 color : COLOR0;
 };
 
 // Generate textured quad vertices procedurally

@@ -223,8 +223,8 @@ pub const FontManager = struct {
                 
                 if (glyph_info.width == 0 or glyph_info.height == 0) continue;
                 
-                const glyph_x = @as(i32, @intFromFloat(glyph.position.x));
-                const glyph_y = @as(i32, @intFromFloat(glyph.position.y));
+                const glyph_x = @as(i32, @intFromFloat(@round(glyph.position.x)));
+                const glyph_y = @as(i32, @intFromFloat(@round(glyph.position.y)));
                 
                 // Get the bitmap from the atlas cache instead of re-rasterizing
                 const cached_bitmap = self.atlas.getCachedBitmap(glyph_info) orelse {
