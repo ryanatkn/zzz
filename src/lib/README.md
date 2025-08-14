@@ -60,21 +60,25 @@ Low-level SDL3 GPU rendering implementation:
 
 #### Font and Text Rendering Subsystem
 Comprehensive pure Zig font rendering system:
-- **TTF Parser** (`ttf_parser.zig`) - TTF file format parsing
-- **Font Rasterizer** (`font_rasterizer.zig`) - Glyph bitmap generation
-- **Font Atlas** (`font_atlas.zig`) - GPU texture atlas management
-- **Text Renderer** (`text_renderer.zig`) - Dual-mode text rendering (bitmap/SDF)
-- **Font Manager** (`font_manager.zig`) - Font loading and management
-- **Text Layout** (`text_layout.zig`) - Advanced text positioning and alignment
+- **Font Processing** (`font/`) - Low-level font operations
+  - **TTF Parser** (`font/ttf_parser.zig`) - TTF file format parsing
+  - **Rasterizer Core** (`font/rasterizer_core.zig`) - Glyph bitmap generation
+  - **Font Atlas** (`font/font_atlas.zig`) - GPU texture atlas management
+  - **Font Manager** (`font/manager.zig`) - Font loading and management
+- **Text Rendering** (`text/`) - High-level text operations
+  - **Text Renderer** (`text/renderer.zig`) - Dual-mode text rendering (bitmap/SDF)
+  - **Text Layout** (`text/layout.zig`) - Advanced text positioning and alignment
 
 #### Vector Graphics System
 GPU-accelerated vector graphics with mathematical precision:
-- **Vector Paths** (`vector_path.zig`) - Bezier curve primitives and operations
-- **Curve Tessellation** (`curve_tessellation.zig`) - Adaptive curve-to-line conversion
-- **GPU Vector Renderer** (`gpu_vector_renderer.zig`) - GPU-accelerated vector drawing
-- **SDF Renderer** (`sdf_renderer.zig`) - Signed Distance Field generation
-- **Glyph Cache** (`glyph_cache.zig`) - Advanced LRU caching system
-- **Font Metrics** (`font_metrics.zig`) - Comprehensive text measurement
+- **Vector Graphics** (`vector/`) - Mathematical curve operations
+  - **Vector Paths** (`vector/path.zig`) - Bezier curve primitives and operations  
+  - **GPU Vector Renderer** (`vector/gpu_renderer.zig`) - GPU-accelerated vector drawing
+  - **Glyph Cache** (`vector/glyph_cache.zig`) - Advanced LRU caching system
+- **Font Supporting Systems**
+  - **Curve Tessellation** (`font/curve_tessellation.zig`) - Adaptive curve-to-line conversion
+  - **SDF Renderer** (`text/sdf_renderer.zig`) - Signed Distance Field generation
+  - **Font Metrics** (`font/font_metrics.zig`) - Comprehensive text measurement
 
 ```zig
 // Vector graphics usage
