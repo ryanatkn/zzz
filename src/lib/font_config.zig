@@ -9,11 +9,12 @@ pub const FontConfig = struct {
     base_size: f32 = 16.0,  // Changed to match original button size
     
     /// Scaling factors for different UI elements (relative to base_size)
-    button_text: f32 = 1.0,      // Buttons use base size (16pt)
-    header_text: f32 = 1.25,     // Headers are 25% larger (20pt)
-    navigation_text: f32 = 0.875, // Navigation is slightly smaller (14pt)
-    fps_counter: f32 = 3.0,      // FPS counter is much larger (48pt when base is 16pt)
-    debug_text: f32 = 0.875,     // Debug overlays are smaller (14pt)
+    /// TEMPORARY DEBUG: All text at 48pt for debugging font rendering issues
+    button_text: f32 = 3.0,      // DEBUG: 48pt (was 1.0)
+    header_text: f32 = 3.0,      // DEBUG: 48pt (was 1.25)
+    navigation_text: f32 = 3.0,  // DEBUG: 48pt (was 0.875)
+    fps_counter: f32 = 3.0,      // Already 48pt
+    debug_text: f32 = 3.0,       // DEBUG: 48pt (was 0.875)
     
     /// Calculate actual font size for buttons
     pub fn buttonFontSize(self: FontConfig) f32 {
@@ -45,7 +46,8 @@ pub const FontConfig = struct {
     pub fn buttonHeight(self: FontConfig) f32 {
         const font_size = self.buttonFontSize();
         // Height = font size * line height multiplier + vertical padding
-        return font_size * 1.5 + self.buttonPadding() * 2;
+        // Increased multiplier for 48pt text debugging
+        return font_size * 1.8 + self.buttonPadding() * 2;
     }
     
     /// Calculate button padding based on font size
