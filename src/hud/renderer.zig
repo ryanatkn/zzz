@@ -9,9 +9,7 @@ const text_renderer = @import("../lib/text/renderer.zig");
 const menu_text = @import("../lib/ui/menu_text.zig");
 const drawing = @import("../lib/rendering/drawing.zig");
 const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
-const multi_strategy_renderer = @import("../lib/font/multi_strategy_renderer.zig");
-const renderer_display = @import("../lib/font/renderer_display.zig");
-const renderer_interface = @import("../lib/font/renderers/renderer_interface.zig");
+const bitmap_simple = @import("../lib/font/renderers/bitmap_simple.zig");
 
 const Color = types.Color;
 const Vec2 = types.Vec2;
@@ -112,9 +110,9 @@ pub const BrowserRenderer = struct {
         const grid_page: *font_grid_test_page.FontGridTestPage = @constCast(@fieldParentPtr("base", current_page));
         
         // Check font grid test auto-initialization status
-        if (!grid_page.isAutoInitialized()) {
+        if (!grid_page.initialized) {
             // Auto-initialize font grid test
-            grid_page.autoInitialize(self.base_renderer.allocator, self.base_renderer.gpu.device);
+            // autoInitialize removed - using simplified font test page
         } else {
             // Font grid test already initialized
         }
@@ -142,9 +140,9 @@ pub const BrowserRenderer = struct {
         const grid_page: *font_grid_test_page.FontGridTestPage = @fieldParentPtr("base", current_page);
         
         // Check auto-initialization status
-        if (!grid_page.isAutoInitialized()) {
+        if (!grid_page.initialized) {
             // Auto-initialize if needed
-            grid_page.autoInitialize(self.base_renderer.allocator, self.base_renderer.gpu.device);
+            // autoInitialize removed - using simplified font test page
         } else {
             // Grid page already initialized
         }
@@ -254,34 +252,19 @@ pub const BrowserRenderer = struct {
     
     /// Render the strategy comparison grid showing actual rendered output
     fn renderStrategyComparison(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, grid_page: *const font_grid_test_page.FontGridTestPage) !void {
-        
-        // Get available strategies and render each one's texture
-        const strategies = [_]renderer_interface.RenderStrategy{
-            .simple_bitmap,
-            .debug_ascii, 
-            .oversampling_2x,
-            .oversampling_4x,
-            .scanline_antialiased,
-        };
+        // Simplified font grid test - removed complex multi-strategy rendering
+        // This is now a placeholder function
+        _ = grid_page;
         
         // Grid layout parameters
         const start_x = 150.0;
         const start_y = 200.0;
         const cell_width = 140.0;
         const cell_height = 100.0;
-        const spacing = 10.0;
         
-        // Render each strategy's output as a texture
-        for (strategies, 0..) |strategy, row| {
-            const x = start_x;
-            const y = start_y + @as(f32, @floatFromInt(row)) * (cell_height + spacing);
-            
-            // Get display texture for this strategy
-            if (grid_page.getDisplayTexture(strategy)) |texture| {
-                // Render the texture showing the actual font rendering output
-                try self.renderTexture(cmd_buffer, render_pass, texture, x, y, cell_width, cell_height);
-            }
-        }
+        // Just show a placeholder message
+        const gray_color = Color{ .r = 77, .g = 77, .b = 77, .a = 204 }; // 0.3 and 0.8 as u8 values
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = start_x, .y = start_y }, .{ .x = cell_width * 3, .y = cell_height }, gray_color);
     }
     
     /// Render a GPU texture at specified position and size (TEMPORARY: simplified to avoid texture issues)

@@ -1,16 +1,83 @@
 const std = @import("std");
 const testing = std.testing;
-const test_helpers = @import("test_helpers.zig");
+const bitmap_utils = @import("../image/bitmap.zig");
 const font_types = @import("font_types.zig");
 const bitmap_simple = @import("renderers/bitmap_simple.zig");
 const debug_ascii = @import("renderers/debug_ascii.zig");
 const oversampling = @import("renderers/oversampling.zig");
-const multi_strategy = @import("multi_strategy_renderer.zig");
 
-const BitmapVisualizer = test_helpers.BitmapVisualizer;
-const TestData = test_helpers.TestData;
-const Assertions = test_helpers.Assertions;
-const Benchmark = test_helpers.Benchmark;
+const BitmapVisualizer = bitmap_utils.Visualizer;
+const Assertions = bitmap_utils.Assertions;
+
+/// Test data generators for font testing
+const TestData = struct {
+    /// Create a simple rectangular glyph outline for testing
+    fn createRectangleOutline(allocator: std.mem.Allocator, x: i32, y: i32, width: i32, height: i32) !font_types.GlyphOutline {
+        const points = try allocator.alloc(font_types.Point, 4);
+        
+        // Counter-clockwise winding
+        points[0] = .{ .x = @floatFromInt(x), .y = @floatFromInt(y) };
+        points[1] = .{ .x = @floatFromInt(x), .y = @floatFromInt(y + height) };
+        points[2] = .{ .x = @floatFromInt(x + width), .y = @floatFromInt(y + height) };
+        points[3] = .{ .x = @floatFromInt(x + width), .y = @floatFromInt(y) };
+        
+        const on_curve = try allocator.alloc(bool, 4);
+        @memset(on_curve, true);
+        
+        const contours = try allocator.alloc(font_types.Contour, 1);
+        contours[0] = .{
+            .points = points,
+            .on_curve = on_curve,
+        };
+        
+        return font_types.GlyphOutline{
+            .contours = contours,
+            .bounds = .{
+                .x_min = @intCast(x),
+                .y_min = @intCast(y),
+                .x_max = @intCast(x + width),
+                .y_max = @intCast(y + height),
+            },
+            .metrics = .{
+                .advance_width = @intCast(width + 10),
+                .left_side_bearing = @intCast(x),
+            },
+        };
+    }
+    
+    /// Create a triangle outline for testing
+    fn createTriangleOutline(allocator: std.mem.Allocator) !font_types.GlyphOutline {
+        const points = try allocator.alloc(font_types.Point, 3);
+        
+        // Simple triangle
+        points[0] = .{ .x = 50, .y = 100 };
+        points[1] = .{ .x = 100, .y = 200 };
+        points[2] = .{ .x = 150, .y = 100 };
+        
+        const on_curve = try allocator.alloc(bool, 3);
+        @memset(on_curve, true);
+        
+        const contours = try allocator.alloc(font_types.Contour, 1);
+        contours[0] = .{
+            .points = points,
+            .on_curve = on_curve,
+        };
+        
+        return font_types.GlyphOutline{
+            .contours = contours,
+            .bounds = .{
+                .x_min = 50,
+                .y_min = 100,
+                .x_max = 150,
+                .y_max = 200,
+            },
+            .metrics = .{
+                .advance_width = 200,
+                .left_side_bearing = 50,
+            },
+        };
+    }
+};
 
 test "simple bitmap renderer - rectangle" {
     const allocator = testing.allocator;

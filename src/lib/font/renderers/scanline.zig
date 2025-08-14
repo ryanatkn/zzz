@@ -2,8 +2,7 @@ const std = @import("std");
 const font_types = @import("../font_types.zig");
 const glyph_extractor = @import("../glyph_extractor.zig");
 const renderer_interface = @import("renderer_interface.zig");
-const edge_builder = @import("../edge_builder.zig");
-const scanline_renderer = @import("../scanline_renderer.zig");
+// edge_builder and scanline_renderer removed - using simplified bitmap rendering
 
 const Point = font_types.Point;
 const Contour = font_types.Contour;

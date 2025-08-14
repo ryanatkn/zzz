@@ -2,13 +2,11 @@ const std = @import("std");
 const c = @import("../platform/sdl.zig");
 const types = @import("../core/types.zig");
 const renderer_interface = @import("renderers/renderer_interface.zig");
-const multi_strategy_renderer = @import("multi_strategy_renderer.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
 const RenderResult = renderer_interface.RenderResult;
 const RenderStrategy = renderer_interface.RenderStrategy;
-const MultiRenderResult = multi_strategy_renderer.MultiRenderResult;
 
 /// Display utilities for renderer output debugging
 pub const RendererDisplay = struct {

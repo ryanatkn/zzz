@@ -3,7 +3,7 @@ const testing = std.testing;
 
 const rasterizer_core = @import("../src/lib/rasterizer_core.zig");
 const ttf_parser = @import("../src/lib/ttf_parser.zig");
-const font_debug = @import("../src/lib/font_debug.zig");
+const bitmap_utils = @import("../src/lib/image/bitmap.zig");
 
 test "font rasterizer integration test" {
     // Test basic functionality with a simple mock

@@ -2,7 +2,7 @@ const std = @import("std");
 const font_types = @import("../font_types.zig");
 const renderer_interface = @import("renderer_interface.zig");
 const log_throttle = @import("../../debug/log_throttle.zig");
-const bitmap_utils = @import("../../core/bitmap.zig");
+const bitmap_utils = @import("../../image/bitmap.zig");
 
 const Point = font_types.Point;
 const Contour = font_types.Contour;

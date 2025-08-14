@@ -1,11 +1,52 @@
 const std = @import("std");
 const testing = std.testing;
 const font_types = @import("font_types.zig");
-const test_helpers = @import("test_helpers.zig");
+const bitmap_utils = @import("../image/bitmap.zig");
 
-const BitmapVisualizer = test_helpers.BitmapVisualizer;
-const TestData = test_helpers.TestData;
-const Assertions = test_helpers.Assertions;
+const BitmapVisualizer = bitmap_utils.Visualizer;
+const TestPatterns = bitmap_utils.TestPatterns;
+
+/// Test data generators for font testing (duplicated for this test file)
+const TestData = struct {
+    /// Create a simple rectangular glyph outline for testing
+    fn createRectangleOutline(allocator: std.mem.Allocator, x: i32, y: i32, width: i32, height: i32) !font_types.GlyphOutline {
+        const points = try allocator.alloc(font_types.Point, 4);
+        
+        // Counter-clockwise winding
+        points[0] = .{ .x = @floatFromInt(x), .y = @floatFromInt(y) };
+        points[1] = .{ .x = @floatFromInt(x), .y = @floatFromInt(y + height) };
+        points[2] = .{ .x = @floatFromInt(x + width), .y = @floatFromInt(y + height) };
+        points[3] = .{ .x = @floatFromInt(x + width), .y = @floatFromInt(y) };
+        
+        const on_curve = try allocator.alloc(bool, 4);
+        @memset(on_curve, true);
+        
+        const contours = try allocator.alloc(font_types.Contour, 1);
+        contours[0] = .{
+            .points = points,
+            .on_curve = on_curve,
+        };
+        
+        return font_types.GlyphOutline{
+            .contours = contours,
+            .bounds = .{
+                .x_min = @intCast(x),
+                .y_min = @intCast(y),
+                .x_max = @intCast(x + width),
+                .y_max = @intCast(y + height),
+            },
+            .metrics = .{
+                .advance_width = @intCast(width + 10),
+                .left_side_bearing = @intCast(x),
+            },
+        };
+    }
+    
+    /// Create a test bitmap with a checkerboard pattern
+    fn createCheckerboard(allocator: std.mem.Allocator, width: u32, height: u32, square_size: u32) ![]u8 {
+        return TestPatterns.createCheckerboard(allocator, width, height, square_size);
+    }
+};
 
 // Simplified point-in-polygon test
 fn isPointInside(point: font_types.Point, contours: []const font_types.Contour) bool {

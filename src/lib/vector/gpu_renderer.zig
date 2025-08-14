@@ -2,7 +2,7 @@ const std = @import("std");
 const c = @import("../platform/sdl.zig");
 const types = @import("../core/types.zig");
 const vector_path = @import("path.zig");
-const curve_tessellation = @import("../font/curve_tessellation.zig");
+// curve_tessellation functionality removed - using simplified rendering
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -23,8 +23,7 @@ pub const GPUVectorRenderer = struct {
     vector_ps: ?*c.sdl.SDL_GPUShader,
     vector_pipeline: ?*c.sdl.SDL_GPUGraphicsPipeline,
 
-    // Tessellation configuration
-    tessellation_config: curve_tessellation.TessellationConfig,
+    // Simplified rendering - no tessellation configuration needed
 
     // Vertex data for batching
     vertex_buffer: std.ArrayList(Vec2),
@@ -41,7 +40,7 @@ pub const GPUVectorRenderer = struct {
             .vector_vs = null,
             .vector_ps = null,
             .vector_pipeline = null,
-            .tessellation_config = curve_tessellation.QualityPresets.medium,
+            // tessellation_config removed - using simplified rendering
             .vertex_buffer = std.ArrayList(Vec2).init(allocator),
             .color_buffer = std.ArrayList(Color).init(allocator),
         };
@@ -64,12 +63,9 @@ pub const GPUVectorRenderer = struct {
 
     /// Set tessellation quality for curve rendering
     pub fn setTessellationQuality(self: *Self, quality: enum { fast, medium, high, ultra }) void {
-        self.tessellation_config = switch (quality) {
-            .fast => curve_tessellation.QualityPresets.fast,
-            .medium => curve_tessellation.QualityPresets.medium,
-            .high => curve_tessellation.QualityPresets.high,
-            .ultra => curve_tessellation.QualityPresets.ultra,
-        };
+        _ = self;
+        _ = quality;
+        // Quality settings removed - using simplified rendering
     }
 
     /// Draw a vector path as filled shape
@@ -101,20 +97,11 @@ pub const GPUVectorRenderer = struct {
         self.vertex_buffer.clearRetainingCapacity();
         self.color_buffer.clearRetainingCapacity();
 
-        // Tessellate the curve
-        var tessellator = curve_tessellation.CurveTessellator.init(self.allocator, self.tessellation_config);
-        defer tessellator.deinit();
-
-        const line_segments = try tessellator.tessellateQuadratic(curve);
-        defer self.allocator.free(line_segments);
-
-        // Convert to vertex data
-        for (line_segments) |segment| {
-            try self.vertex_buffer.append(segment.start);
-            try self.vertex_buffer.append(segment.end);
-            try self.color_buffer.append(color);
-            try self.color_buffer.append(color);
-        }
+        // Simplified curve rendering - just draw straight line approximation
+        try self.vertex_buffer.append(curve.start);
+        try self.vertex_buffer.append(curve.end);
+        try self.color_buffer.append(color);
+        try self.color_buffer.append(color);
 
         // Render as thick lines
         try self.renderAsThickLines(simple_gpu_renderer, cmd_buffer, render_pass, stroke_width);
@@ -155,8 +142,8 @@ pub const GPUVectorRenderer = struct {
     fn tessellateContour(self: *Self, contour: *const vector_path.Contour, color: Color) !void {
         if (contour.points.items.len < 2) return;
 
-        var tessellator = curve_tessellation.CurveTessellator.init(self.allocator, self.tessellation_config);
-        defer tessellator.deinit();
+        // Simplified curve rendering - no tessellation needed
+        // tessellator removed - using simplified rendering
 
         // Process each segment in the contour
         var i: usize = 0;
@@ -184,15 +171,11 @@ pub const GPUVectorRenderer = struct {
                     .end = end,
                 };
 
-                const line_segments = try tessellator.tessellateQuadratic(curve);
-                defer self.allocator.free(line_segments);
-
-                for (line_segments) |segment| {
-                    try self.vertex_buffer.append(segment.start);
-                    try self.vertex_buffer.append(segment.end);
-                    try self.color_buffer.append(color);
-                    try self.color_buffer.append(color);
-                }
+                // Simplified curve rendering - just draw straight line approximation
+                try self.vertex_buffer.append(curve.start);
+                try self.vertex_buffer.append(curve.end);
+                try self.color_buffer.append(color);
+                try self.color_buffer.append(color);
 
                 i += 2; // Skip the control point and end point
             } else {
