@@ -42,20 +42,40 @@ Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation)
     ├── .git [...]
     ├── .zig-cache [...]
     ├── src/                          # Source code directory
-    │   ├── lib/                      # Engine library (shared components)
+    │   ├── lib/                      # Engine library (capability-based organization)
     │   │   ├── README.md             # Engine architecture documentation
-    │   │   ├── c.zig                 # SDL3 C bindings
-    │   │   ├── camera.zig            # Camera system (fixed/follow modes)
-    │   │   ├── colors.zig            # Centralized color system with utilities
-    │   │   ├── collision.zig         # Generic collision system
-    │   │   ├── drawing.zig           # High-level drawing utilities for UI
-    │   │   ├── input.zig             # Input handling interface
-    │   │   ├── maths.zig             # Math utilities with vec2_ prefixed functions
-    │   │   ├── renderer.zig          # Renderer interface abstraction
-    │   │   ├── resource_manager.zig  # Unified resource initialization patterns
-    │   │   ├── simple_gpu_renderer.zig # Low-level GPU rendering with transparency
-    │   │   ├── history.zig           # Navigation history utility
-    │   │   └── types.zig             # Core data types (Vec2, Color, etc)
+    │   │   ├── core/                 # Fundamental types and utilities
+    │   │   │   ├── types.zig         # Core data types (Vec2, Color, Rectangle)
+    │   │   │   ├── maths.zig         # Math utilities with vec2_ prefixed functions
+    │   │   │   ├── colors.zig        # Centralized color system with utilities
+    │   │   │   ├── collections.zig   # Navigation history and state management
+    │   │   │   ├── viewport.zig      # Viewport interface for dependency inversion
+    │   │   │   ├── result.zig        # Result(T, E) error handling pattern
+    │   │   │   ├── pool.zig          # Object and resource pooling utilities
+    │   │   │   └── id.zig            # ID generation and handle management
+    │   │   ├── platform/             # System integration and platform abstraction
+    │   │   │   ├── sdl.zig           # SDL3 C bindings
+    │   │   │   ├── input.zig         # Input handling interface
+    │   │   │   ├── window.zig        # Window and GPU device management
+    │   │   │   └── resources.zig     # Resource initialization patterns
+    │   │   ├── rendering/            # Graphics pipeline capabilities
+    │   │   │   ├── interface.zig     # Renderer interface abstraction
+    │   │   │   ├── gpu.zig           # Low-level GPU rendering with transparency
+    │   │   │   ├── shaders.zig       # Shader compilation and management
+    │   │   │   ├── camera.zig        # Camera system (fixed/follow modes)
+    │   │   │   ├── modes.zig         # Rendering mode selection (immediate/persistent)
+    │   │   │   └── drawing.zig       # High-level drawing utilities for UI
+    │   │   ├── physics/              # Collision and spatial systems
+    │   │   │   ├── collision.zig     # Generic collision detection
+    │   │   │   └── shapes.zig        # Shape definitions (circle, rect, line, point)
+    │   │   ├── reactive/             # Svelte 5 reactive system implementation
+    │   │   ├── font/                 # TTF parsing and rasterization
+    │   │   ├── text/                 # Text rendering and layout
+    │   │   ├── vector/               # GPU-accelerated vector graphics
+    │   │   ├── ui/                   # Reactive UI components
+    │   │   ├── debug/                # Debug and development utilities
+    │   │   ├── reactive.zig          # Reactive system barrel export
+    │   │   └── ui.zig                # UI system barrel export
     │   ├── hex/                      # Hex game implementation
     │   │   ├── behaviors.zig         # Entity behavior updates
     │   │   ├── borders.zig           # Border rendering system
@@ -282,6 +302,13 @@ $ zig build --help       # Show all build options
 - Zone-based world design with travel metaphors
 - Constants extracted for easy tuning and upgrades
 
+**Workflow with root TODO_*.md docs:**
+- **Active docs** should be placed in root directory with `TODO_*.md` prefix for high visibility
+- **Permanent docs** (README.md, CLAUDE.md) remains unprefixed in root
+- **Completed todo docs** should be moved to `docs/archive/` with `TODO_` stripped
+- **Always commit todo docs** to git both during work and when archiving
+- This workflow ensures active work is visible while maintaining a historical record of completed todos
+
 ## Notes to LLMs
 
 - Game is fully functional - focus on performance and gameplay improvements
@@ -293,14 +320,22 @@ $ zig build --help       # Show all build options
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
 
-**Shared Module Guidelines:**
-- **Always use shared modules** from `src/lib/` for common operations
-- **colors.zig**: Use for all color definitions and utilities (darken, lighten, HSV)
-- **drawing.zig**: Use for UI panels, buttons, overlays, and consistent styling
-- **maths.zig**: Use vec2_* prefixed functions (no legacy compatibility)
-- **collision.zig**: Use Shape enum and generic collision system
-- **resource_manager.zig**: Use for renderer and font manager initialization
-- **Apply DRY principles** - prefer shared utilities over duplicate code
+**Library Import Guidelines:**
+- **Capability-based imports**: Import from specific capability directories
+- **Core modules** (`core/`): types, maths, colors, viewport, result, pool, id
+- **Platform modules** (`platform/`): sdl, input, window, resources
+- **Rendering modules** (`rendering/`): interface, gpu, shaders, camera, modes, drawing
+- **Physics modules** (`physics/`): collision, shapes
+- **Barrel imports**: Use `reactive.zig` and `ui.zig` for complete subsystems
+- **Apply DRY principles**: Prefer shared utilities over duplicate code
+- **Import examples**:
+  ```zig
+  const types = @import("../lib/core/types.zig");
+  const input = @import("../lib/platform/input.zig");
+  const camera = @import("../lib/rendering/camera.zig");
+  const collision = @import("../lib/physics/collision.zig");
+  const reactive = @import("../lib/reactive.zig"); // Barrel import
+  ```
 
 **Reactive System Guidelines:**
 - **System is production ready** ✅ - full Svelte 5 compliance with proven performance

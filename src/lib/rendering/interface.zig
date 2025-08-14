@@ -1,4 +1,4 @@
-// Dealt Engine - Renderer Interface
+// Dealt - Renderer Interface
 // Common interface for drawing operations that can be implemented by different renderers
 
 const std = @import("std");

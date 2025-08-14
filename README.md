@@ -1,6 +1,7 @@
-# Dealt - SDL3 Game Engine with Hex Example Game
+# Dealt
 
-A GPU-accelerated game engine built with Zig, SDL3 GPU API, and HLSL shaders. Featuring the Hex 2D action RPG as a showcase implementation with pure algorithmic graphics and no texture assets.
+A GPU-accelerated game engine built with Zig, SDL3 and its GPU API, and HLSL shaders.
+Includes the Hex 2D action RPG as a showcase implementation with procedurally generated assets.
 
 ## Quick Start
 
@@ -18,20 +19,19 @@ zig build clean-shaders             # Clean rebuild shaders
 
 ## Architecture
 
-**Dealt Engine** provides the core SDL3 framework and rendering infrastructure in `src/lib/`, while **Hex** demonstrates the engine capabilities as a complete game implementation in `src/hex/`.
+**Dealt** provides the core SDL3 framework and rendering infrastructure in `src/lib/` with a capability-based organization, while **Hex** demonstrates the engine capabilities as a complete game implementation in `src/hex/`.
 
 ## Features
 
 ### Engine Capabilities (src/lib/)
-- **SDL3 GPU API**: Cross-platform rendering with Vulkan/D3D12
-- **Camera System**: Fixed and follow modes with smooth transitions
-- **Shared Module Architecture**: DRY principles with centralized utilities
-- **Input Handling**: Unified keyboard/mouse input processing
-- **Renderer Interface**: Clean abstraction for drawing operations
-- **Navigation History**: Reusable browser-style navigation system
-- **Math Utilities**: Comprehensive vec2 operations and collision detection
-- **Color Management**: HSV conversion, darken/lighten utilities
-- **Resource Management**: Unified initialization patterns
+- **Core Primitives**: Types, math, colors, viewport, result handling, object pools, ID generation
+- **Platform Layer**: SDL3 integration, input handling, window management, resource loading
+- **Rendering System**: GPU backend, camera, shaders, drawing utilities, render modes
+- **Physics System**: Collision detection, shape definitions (circle, rectangle, line, point)
+- **Reactive UI**: Complete Svelte 5 implementation with signals, effects, and derived state
+- **Font & Text**: Pure Zig TTF parsing, rasterization, SDF rendering, layout
+- **Vector Graphics**: GPU-accelerated Bezier curves, path rendering, glyph caching
+- **Component System**: Reactive UI components with automatic lifecycle management
 
 ### Hex Game Showcase (src/hex/)
 - **Movement**: WASD direct control + Shift to walk + Ctrl+mouse movement
@@ -94,13 +94,36 @@ zig build clean-shaders             # Clean rebuild shaders
 ```
 dealt/
 ├── src/
-│   ├── lib/                     # Engine library (shared components)
-│   │   ├── camera.zig           # Camera system
-│   │   ├── input.zig            # Input handling
-│   │   ├── maths.zig            # Math utilities
-│   │   ├── renderer.zig         # Renderer interface
-│   │   ├── simple_gpu_renderer.zig # GPU backend
-│   │   └── types.zig            # Core data types
+│   ├── lib/                     # Engine library (capability-based organization)
+│   │   ├── core/                # Fundamental types and utilities
+│   │   │   ├── types.zig        # Vec2, Color, Rectangle types
+│   │   │   ├── maths.zig        # Vector math operations
+│   │   │   ├── colors.zig       # Color manipulation utilities
+│   │   │   ├── viewport.zig     # Viewport interface for decoupling
+│   │   │   ├── result.zig       # Result(T,E) error handling
+│   │   │   ├── pool.zig         # Object and resource pooling
+│   │   │   └── id.zig           # ID generation and management
+│   │   ├── platform/            # System integration layer
+│   │   │   ├── sdl.zig          # SDL3 C bindings
+│   │   │   ├── input.zig        # Input state management
+│   │   │   ├── window.zig       # Window and GPU device
+│   │   │   └── resources.zig    # Resource initialization
+│   │   ├── rendering/           # Graphics pipeline
+│   │   │   ├── interface.zig    # Renderer abstraction
+│   │   │   ├── gpu.zig          # GPU backend implementation
+│   │   │   ├── shaders.zig      # Shader management
+│   │   │   ├── camera.zig       # Camera system
+│   │   │   ├── modes.zig        # Render mode selection
+│   │   │   └── drawing.zig      # High-level drawing utils
+│   │   ├── physics/             # Collision and spatial systems
+│   │   │   ├── collision.zig    # Collision detection
+│   │   │   └── shapes.zig       # Shape definitions
+│   │   ├── reactive/            # Reactive system (Svelte 5)
+│   │   ├── font/                # Font processing
+│   │   ├── text/                # Text rendering
+│   │   ├── vector/              # Vector graphics
+│   │   ├── ui/                  # UI components
+│   │   └── debug/               # Debug utilities
 │   ├── hex/                     # Hex game implementation
 │   │   ├── main.zig             # Game entry point
 │   │   ├── game.zig             # Game state management
@@ -135,10 +158,11 @@ For complete technical documentation and development guidelines, see **[CLAUDE.m
 ## Documentation
 
 ### Engine Documentation
-- [Engine Architecture](./src/lib/README.md) - Engine/game separation and usage
+- [Engine Architecture](./src/lib/README.md) - Capability-based organization and usage
 - [Entity System](./src/docs/ecs.md) - Entity storage and update patterns
 - [GPU API Reference](./src/docs/gpu.md) - SDL3 GPU API usage
 - [Shader Compilation](./src/docs/shader_compilation.md) - HLSL workflow
+- [Reactive System](./src/lib/reactive.zig) - Svelte 5 implementation docs
 
 ## Building from Source
 
@@ -168,11 +192,19 @@ The Dealt engine is designed for creating new games. To start a new game:
 Example structure:
 ```zig
 // src/mygame/main.zig
-const lib = struct {
-    const types = @import("../lib/types.zig");
-    const camera = @import("../lib/camera.zig");
-    const renderer = @import("../lib/renderer.zig");
-};
+const std = @import("std");
+
+// Import from capability directories
+const types = @import("../lib/core/types.zig");
+const maths = @import("../lib/core/maths.zig");
+const input = @import("../lib/platform/input.zig");
+const camera = @import("../lib/rendering/camera.zig");
+const renderer = @import("../lib/rendering/interface.zig");
+const collision = @import("../lib/physics/collision.zig");
+
+// Or use barrel imports for subsystems
+const reactive = @import("../lib/reactive.zig");
+const ui = @import("../lib/ui.zig");
 
 // Your game implementation using engine components
 ```
@@ -215,11 +247,12 @@ const lib = struct {
 
 ## Contributing
 
-Contributions are welcome! The engine prioritizes:
-- Performance over backward compatibility
-- Procedural generation over asset loading
-- Clean architecture and separation of concerns
-- GPU-first rendering approaches
+Issues and discussions are welcome, but reviewing code is time consuming,
+so I will likely reject many well-meaning PRs, and re-implement if I agree with the idea.
+So if you don't mind the rejection and just care about getting the change in,
+PRs are very much encouraged! They are excellent for concrete discussion.
+Not every PR needs an issue but it's usually
+preferred to reference one or more issues and discussions.
 
 ## License
 
