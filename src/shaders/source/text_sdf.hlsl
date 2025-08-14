@@ -2,7 +2,7 @@
 // Compile with: dxc -T vs_6_0 -E vs_main text_sdf.hlsl -Fo text_sdf_vs.dxil
 // Compile with: dxc -T ps_6_0 -E ps_main text_sdf.hlsl -Fo text_sdf_ps.dxil
 
-// SDF texture atlas with combined sampler (shared by both shaders)
+// SDF texture atlas with combined sampler (fragment shader only)
 Texture2D<float4> sdf_atlas : register(t0, space2);
 SamplerState atlas_sampler : register(s0, space2);
 
@@ -16,6 +16,7 @@ struct VertexOutput {
     float4 position : SV_Position;
     float2 texcoord : TEXCOORD0;
     float4 color : COLOR0;
+    float2 sdf_params : TEXCOORD1; // x = sdf_range, y = smoothing
 };
 
 // SDF text rendering uniforms (vertex shader only)
@@ -69,6 +70,7 @@ VertexOutput vs_main(VertexInput input) {
     output.position = float4(ndc_pos, 0.0, 1.0);
     output.texcoord = tex_corner; // Use texture coordinates 0-1 for full texture
     output.color = float4(text_color_r, text_color_g, text_color_b, text_color_a);
+    output.sdf_params = float2(sdf_range, smoothing); // Pass SDF parameters to fragment shader
     
     return output;
 }
@@ -79,6 +81,10 @@ float4 ps_main(VertexOutput input) : SV_Target {
     
     // Extract distance from SDF (single channel for now - use red channel)
     float distance = sdf_sample.r - 0.5;
+    
+    // Get SDF parameters passed from vertex shader
+    float sdf_range = input.sdf_params.x;
+    float smoothing = input.sdf_params.y;
     
     // Scale distance by SDF range for proper anti-aliasing
     float screen_distance = distance * sdf_range;

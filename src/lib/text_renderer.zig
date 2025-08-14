@@ -58,6 +58,7 @@ const TextDrawCommand = struct {
     texture: TextTexture,    // Texture containing rendered text
     position: Vec2,          // Screen position to draw at
     color: Color,           // Text color (applied to texture)
+    use_sdf: bool,          // Whether to use SDF rendering for this text
 };
 
 // Persistent text draw command (PERSISTENT MODE)
@@ -66,6 +67,7 @@ const PersistentTextDrawCommand = struct {
     position: Vec2,          // Screen position to draw at
     color: Color,           // Text color (applied to texture)
     is_cached: bool,        // True if this was a cache hit
+    use_sdf: bool,          // Whether to use SDF rendering for this text
 };
 
 // Text renderer - handles all text-specific GPU operations
@@ -94,6 +96,14 @@ pub const TextRenderer = struct {
     persistent_text_queue: std.ArrayList(PersistentTextDrawCommand), // Persistent mode queue
 
     const Self = @This();
+
+    // Determine whether to use SDF rendering based on font size
+    fn shouldUseSDF(font_size: f32) bool {
+        // Use SDF for very small fonts where bitmap quality is poor
+        // Also use SDF for very large fonts where scalability is important
+        // Fixed SDF validation issues - safe to re-enable
+        return font_size <= 14.0 or font_size >= 64.0;
+    }
 
     pub fn init(device: *c.sdl.SDL_GPUDevice, allocator: std.mem.Allocator, screen_width: f32, screen_height: f32) !Self {
         var self = Self{
@@ -199,6 +209,7 @@ pub const TextRenderer = struct {
                     .position = position,
                     .color = color,
                     .is_cached = handle.is_cached,
+                    .use_sdf = shouldUseSDF(font_size),
                 };
                 
                 try self.persistent_text_queue.append(cmd);
@@ -246,15 +257,27 @@ pub const TextRenderer = struct {
                 .y = @as(f32, @floatFromInt(cmd.texture.height)),
             };
             
-            self.drawTexturedQuad(
-                cmd_buffer, 
-                render_pass, 
-                cmd.texture.texture,
-                cmd.texture.sampler,
-                cmd.position, 
-                size, 
-                cmd.color
-            );
+            if (cmd.use_sdf) {
+                self.drawSDFTexturedQuad(
+                    cmd_buffer, 
+                    render_pass, 
+                    cmd.texture.texture,
+                    cmd.texture.sampler,
+                    cmd.position, 
+                    size, 
+                    cmd.color
+                );
+            } else {
+                self.drawTexturedQuad(
+                    cmd_buffer, 
+                    render_pass, 
+                    cmd.texture.texture,
+                    cmd.texture.sampler,
+                    cmd.position, 
+                    size, 
+                    cmd.color
+                );
+            }
         }
         
         // Draw persistent mode text (these textures are kept alive)
@@ -269,15 +292,27 @@ pub const TextRenderer = struct {
                 .y = @as(f32, @floatFromInt(cmd.texture.height)),
             };
             
-            self.drawTexturedQuad(
-                cmd_buffer, 
-                render_pass, 
-                cmd.texture.texture,
-                cmd.texture.sampler,
-                cmd.position, 
-                size, 
-                cmd.color
-            );
+            if (cmd.use_sdf) {
+                self.drawSDFTexturedQuad(
+                    cmd_buffer, 
+                    render_pass, 
+                    cmd.texture.texture,
+                    cmd.texture.sampler,
+                    cmd.position, 
+                    size, 
+                    cmd.color
+                );
+            } else {
+                self.drawTexturedQuad(
+                    cmd_buffer, 
+                    render_pass, 
+                    cmd.texture.texture,
+                    cmd.texture.sampler,
+                    cmd.position, 
+                    size, 
+                    cmd.color
+                );
+            }
         }
         
         log.info("Drew {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
@@ -546,26 +581,80 @@ pub const TextRenderer = struct {
         size: Vec2, 
         color: Color
     ) void {
-        // Prepare uniform data for text shader
-        const uniform_data = TextUniforms{
-            .screen_size = [2]f32{ self.screen_width, self.screen_height },
-            .text_position = [2]f32{ position.x, position.y },
-            .text_size = [2]f32{ size.x, size.y },
-            .text_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
-            .text_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
-            .text_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
-            .text_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
-            .time = 0.0, // Time for future text animations
-            ._padding = [3]f32{ 0.0, 0.0, 0.0 },
-        };
+        self.drawTexturedQuadInternal(cmd_buffer, render_pass, texture, sampler, position, size, color, false);
+    }
+
+    // Draw an SDF textured quad for text rendering
+    fn drawSDFTexturedQuad(
+        self: *Self, 
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, 
+        render_pass: *c.sdl.SDL_GPURenderPass, 
+        texture: *c.sdl.SDL_GPUTexture,
+        sampler: *c.sdl.SDL_GPUSampler,
+        position: Vec2, 
+        size: Vec2, 
+        color: Color
+    ) void {
+        self.drawTexturedQuadInternal(cmd_buffer, render_pass, texture, sampler, position, size, color, true);
+    }
+
+    // Internal implementation for both bitmap and SDF text rendering
+    fn drawTexturedQuadInternal(
+        self: *Self, 
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, 
+        render_pass: *c.sdl.SDL_GPURenderPass, 
+        texture: *c.sdl.SDL_GPUTexture,
+        sampler: *c.sdl.SDL_GPUSampler,
+        position: Vec2, 
+        size: Vec2, 
+        color: Color,
+        use_sdf: bool
+    ) void {
+        if (use_sdf and self.text_sdf_pipeline != null) {
+            // Prepare SDF uniform data
+            const sdf_uniform_data = SDFTextUniforms{
+                .screen_size = [2]f32{ self.screen_width, self.screen_height },
+                .text_position = [2]f32{ position.x, position.y },
+                .text_size = [2]f32{ size.x, size.y },
+                .text_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
+                .text_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
+                .text_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
+                .text_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+                .sdf_range = 4.0,         // Distance field range
+                .smoothing = 0.5,         // Anti-aliasing smoothing factor  
+                .time = 0.0,              // Animation time
+                ._padding0 = 0.0,
+                ._padding1 = 0.0,
+                ._padding2 = 0.0,
+            };
+            
+            // Push SDF uniform data
+            c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &sdf_uniform_data, @sizeOf(SDFTextUniforms));
+            
+            // Bind SDF text pipeline (safe because we checked null above)
+            c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.text_sdf_pipeline);
+        } else {
+            // Prepare bitmap uniform data
+            const uniform_data = TextUniforms{
+                .screen_size = [2]f32{ self.screen_width, self.screen_height },
+                .text_position = [2]f32{ position.x, position.y },
+                .text_size = [2]f32{ size.x, size.y },
+                .text_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
+                .text_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
+                .text_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
+                .text_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+                .time = 0.0, // Time for future text animations
+                ._padding = [3]f32{ 0.0, 0.0, 0.0 },
+            };
+            
+            // Push bitmap uniform data
+            c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(TextUniforms));
+            
+            // Bind bitmap text pipeline
+            c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.text_pipeline);
+        }
         
-        // Push uniform data BEFORE binding pipeline (critical for SDL3 GPU)
-        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(TextUniforms));
-        
-        // Bind text pipeline
-        c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.text_pipeline);
-        
-        // Bind texture and sampler for fragment shader
+        // Bind texture and sampler for fragment shader (same for both)
         const texture_sampler_binding = c.sdl.SDL_GPUTextureSamplerBinding{
             .texture = texture,
             .sampler = sampler,

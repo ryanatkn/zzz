@@ -2,7 +2,7 @@
 // Compile with: dxc -T vs_6_0 -E vs_main text.hlsl -Fo text_vs.dxil
 // Compile with: dxc -T ps_6_0 -E ps_main text.hlsl -Fo text_ps.dxil
 
-// Font texture atlas with combined sampler (shared by both shaders)
+// Font texture atlas with combined sampler (fragment shader only)
 Texture2D<float4> font_atlas : register(t0, space2);
 SamplerState atlas_sampler : register(s0, space2);
 
@@ -18,7 +18,7 @@ struct VertexOutput {
     float4 color : COLOR0;
 };
 
-// Text rendering uniforms (vertex shader only)
+// Text rendering uniforms (vertex shader only - colors passed through VertexOutput)
 cbuffer TextUniforms : register(b0, space1) {
     float2 screen_size;      // Screen dimensions for NDC conversion
     float2 text_position;    // Text position in screen coordinates

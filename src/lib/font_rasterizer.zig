@@ -27,6 +27,15 @@ pub const ActiveEdge = struct {
     winding: i32,
 };
 
+// Helper functions for cleaner type conversions
+fn floorToU32(value: f32) u32 {
+    return @as(u32, @intFromFloat(@floor(value)));
+}
+
+fn roundToI32(value: f32) i32 {
+    return @as(i32, @intFromFloat(@round(value)));
+}
+
 pub const FontRasterizer = struct {
     allocator: std.mem.Allocator,
     parser: *ttf_parser.TTFParser,
@@ -36,47 +45,22 @@ pub const FontRasterizer = struct {
     font_metrics: font_metrics.FontMetrics,
     
     pub fn init(allocator: std.mem.Allocator, parser: *ttf_parser.TTFParser, point_size: f32, dpi: f32) FontRasterizer {
-        const head = parser.head orelse {
-            // Fallback to reasonable defaults if head table is missing
-            const fallback_scale = point_size / 1000.0; // Assume 1000 units per em
-            return FontRasterizer{
-                .allocator = allocator,
-                .parser = parser,
-                .scale = fallback_scale,
-                .tessellation_config = curve_tessellation.recommendConfigForScale(fallback_scale),
-                .font_metrics = font_metrics.FontMetrics.init(1000, 800, -200, 100, fallback_scale),
-            };
-        };
-        
+        // Calculate scale with fallback defaults
+        const units_per_em = if (parser.head) |head| head.units_per_em else 1000;
         const pixels_per_em = (point_size * dpi) / 72.0;
-        const scale = pixels_per_em / @as(f32, @floatFromInt(head.units_per_em));
+        const scale = pixels_per_em / @as(f32, @floatFromInt(units_per_em));
         
-        // Create font metrics from head table
-        const hhea = parser.hhea orelse {
-            // Fallback metrics if hhea table is missing
-            const ascender = @as(i16, @intFromFloat(@as(f32, @floatFromInt(head.units_per_em)) * 0.8));
-            const descender = @as(i16, @intFromFloat(@as(f32, @floatFromInt(head.units_per_em)) * -0.2));
-            return FontRasterizer{
-                .allocator = allocator,
-                .parser = parser,
-                .scale = scale,
-                .tessellation_config = curve_tessellation.recommendConfigForScale(scale),
-                .font_metrics = font_metrics.FontMetrics.init(head.units_per_em, ascender, descender, 100, scale),
-            };
-        };
+        // Get metrics with fallbacks
+        const ascender = if (parser.hhea) |hhea| hhea.ascender else @as(i16, @intFromFloat(@as(f32, @floatFromInt(units_per_em)) * 0.8));
+        const descender = if (parser.hhea) |hhea| hhea.descender else @as(i16, @intFromFloat(@as(f32, @floatFromInt(units_per_em)) * -0.2));
+        const line_gap = if (parser.hhea) |hhea| hhea.line_gap else 100;
         
         return FontRasterizer{
             .allocator = allocator,
             .parser = parser,
             .scale = scale,
             .tessellation_config = curve_tessellation.recommendConfigForScale(scale),
-            .font_metrics = font_metrics.FontMetrics.init(
-                head.units_per_em,
-                hhea.ascender,
-                hhea.descender,
-                hhea.line_gap,
-                scale
-            ),
+            .font_metrics = font_metrics.FontMetrics.init(units_per_em, ascender, descender, line_gap, scale),
         };
     }
     
@@ -140,15 +124,43 @@ pub const FontRasterizer = struct {
                 winding += active_edge.winding;
                 
                 if (winding == 0 and x_start != null) {
-                    // Fill span from x_start to current x
-                    const start_x = @as(u32, @intFromFloat(@max(0, @min(@as(f32, @floatFromInt(width - 1)), x_start.?))));
-                    const end_x = @as(u32, @intFromFloat(@max(0, @min(@as(f32, @floatFromInt(width - 1)), active_edge.x))));
+                    // Fill span from x_start to current x with sub-pixel precision
+                    const x_left = @max(0, @min(@as(f32, @floatFromInt(width - 1)), x_start.?));
+                    const x_right = @max(0, @min(@as(f32, @floatFromInt(width - 1)), active_edge.x));
                     
-                    var fill_x = start_x;
-                    while (fill_x <= end_x and fill_x < width) : (fill_x += 1) {
-                        const pixel_index = y * width + fill_x;
+                    const start_pixel = floorToU32(x_left);
+                    const end_pixel = floorToU32(x_right);
+                    
+                    if (start_pixel == end_pixel) {
+                        // Single pixel span - use coverage based on span width
+                        const coverage = @min(1.0, x_right - x_left);
+                        const pixel_index = y * width + start_pixel;
                         if (pixel_index < bitmap.len) {
-                            bitmap[pixel_index] = 255;
+                            const current_coverage = @as(f32, @floatFromInt(bitmap[pixel_index])) / 255.0;
+                            const new_coverage = @min(1.0, current_coverage + coverage);
+                            bitmap[pixel_index] = @as(u8, @intFromFloat(new_coverage * 255.0));
+                        }
+                    } else {
+                        // Multi-pixel span with sub-pixel coverage at edges
+                        var fill_x = start_pixel;
+                        while (fill_x <= end_pixel and fill_x < width) : (fill_x += 1) {
+                            var coverage: f32 = 1.0;
+                            
+                            if (fill_x == start_pixel) {
+                                // Left edge - partial coverage
+                                coverage = 1.0 - (x_left - @floor(x_left));
+                            } else if (fill_x == end_pixel) {
+                                // Right edge - partial coverage  
+                                coverage = x_right - @floor(x_right);
+                            }
+                            // Middle pixels get full coverage (1.0)
+                            
+                            const pixel_index = y * width + fill_x;
+                            if (pixel_index < bitmap.len) {
+                                const current_coverage = @as(f32, @floatFromInt(bitmap[pixel_index])) / 255.0;
+                                const new_coverage = @min(1.0, current_coverage + coverage);
+                                bitmap[pixel_index] = @as(u8, @intFromFloat(new_coverage * 255.0));
+                            }
                         }
                     }
                     x_start = null;
@@ -196,8 +208,9 @@ pub const FontRasterizer = struct {
         const scaled_x_max = @as(f32, @floatFromInt(x_max)) * self.scale + subpixel_x;
         const scaled_y_max = @as(f32, @floatFromInt(y_max)) * self.scale + subpixel_y;
         
-        const width = @as(u32, @intFromFloat(@ceil(scaled_x_max - scaled_x_min))) + 2;
-        const height = @as(u32, @intFromFloat(@ceil(scaled_y_max - scaled_y_min))) + 2;
+        // Use better precision for bitmap dimensions to avoid truncation  
+        const width = floorToU32(@ceil(scaled_x_max - scaled_x_min)) + 2;
+        const height = floorToU32(@ceil(scaled_y_max - scaled_y_min)) + 2;
         
         if (width <= 2 or height <= 2) {
             // Don't allocate for empty glyphs - use a static empty slice
@@ -258,8 +271,8 @@ pub const FontRasterizer = struct {
             .bitmap = bitmap,
             .width = width,
             .height = height,
-            .bearing_x = @intFromFloat(@round(scaled_x_min - 1)),
-            .bearing_y = @intFromFloat(@round(scaled_y_max + 1)),
+            .bearing_x = roundToI32(scaled_x_min - 1),
+            .bearing_y = roundToI32(scaled_y_max + 1),
             .advance = @as(f32, @floatFromInt(metrics.advance_width)) * self.scale,
         };
     }

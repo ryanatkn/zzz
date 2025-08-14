@@ -9,12 +9,12 @@ pub const FontConfig = struct {
     base_size: f32 = 16.0,  // Changed to match original button size
     
     /// Scaling factors for different UI elements (relative to base_size)
-    /// TEMPORARY DEBUG: All text at 48pt for debugging font rendering issues
-    button_text: f32 = 3.0,      // DEBUG: 48pt (was 1.0)
-    header_text: f32 = 3.0,      // DEBUG: 48pt (was 1.25)
-    navigation_text: f32 = 3.0,  // DEBUG: 48pt (was 0.875)
-    fps_counter: f32 = 3.0,      // Already 48pt
-    debug_text: f32 = 3.0,       // DEBUG: 48pt (was 0.875)
+    /// Test various font sizes with bitmap rendering (SDF disabled)
+    button_text: f32 = 1.0,      // 16pt - test standard button text
+    header_text: f32 = 1.5,      // 24pt - test larger headers
+    navigation_text: f32 = 0.875,  // 14pt - test smaller navigation
+    fps_counter: f32 = 1.25,     // 20pt - test readable performance metrics
+    debug_text: f32 = 0.75,      // 12pt - test smallest readable text
     
     /// Calculate actual font size for buttons
     pub fn buttonFontSize(self: FontConfig) f32 {
