@@ -163,8 +163,6 @@ pub const SDFGenerator = struct {
         scale: f32, 
         offset: Vec2
     ) !void {
-        const size = @as(f32, @floatFromInt(self.config.texture_size));
-        
         var y: u32 = 0;
         while (y < self.config.texture_size) : (y += 1) {
             var x: u32 = 0;
@@ -495,7 +493,6 @@ pub const SDFUtils = struct {
     
     /// Calculate optimal SDF range based on glyph complexity
     pub fn calculateOptimalRange(path: *const VectorPath, texture_size: u32) f32 {
-        const bbox = path.boundingBox() orelse return 4.0;
         
         // Calculate path complexity (number of segments)
         var segment_count: u32 = 0;

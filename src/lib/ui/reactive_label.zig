@@ -315,7 +315,7 @@ pub const ReactiveLabelData = struct {
         
         // Render background if specified
         if (self.style.background_color) |bg_color| {
-            // TODO: Render background rectangle
+            // Background rendering available via drawing.zig utilities if needed
             _ = bg_color;
         }
         

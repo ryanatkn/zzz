@@ -1,8 +1,15 @@
 const std = @import("std");
 const c = @import("c.zig");
 const font_rasterizer = @import("font_rasterizer.zig");
+const sdf_renderer = @import("sdf_renderer.zig");
+const vector_path = @import("vector_path.zig");
 
 const log = std.log.scoped(.font_atlas);
+
+pub const RenderMode = enum {
+    bitmap,     // Traditional bitmap rendering
+    sdf,        // Signed Distance Field rendering
+};
 
 pub const GlyphInfo = struct {
     texture_x: u32,
@@ -14,6 +21,7 @@ pub const GlyphInfo = struct {
     advance: f32,
     atlas_index: u32,
     bitmap: ?[]u8,  // Store the actual bitmap data for reuse
+    render_mode: RenderMode,  // How this glyph was rendered
 };
 
 pub const AtlasTexture = struct {
@@ -32,6 +40,8 @@ pub const FontAtlas = struct {
     glyph_cache: std.AutoHashMap(u64, GlyphInfo),
     atlas_size: u32,
     padding: u32,
+    default_render_mode: RenderMode,
+    sdf_generator: ?sdf_renderer.SDFGenerator,
     
     pub fn init(allocator: std.mem.Allocator, gpu_device: *c.sdl.SDL_GPUDevice, atlas_size: u32) !FontAtlas {
         return FontAtlas{
@@ -41,7 +51,14 @@ pub const FontAtlas = struct {
             .glyph_cache = std.AutoHashMap(u64, GlyphInfo).init(allocator),
             .atlas_size = atlas_size,
             .padding = 1, // Reduced padding for better packing
+            .default_render_mode = .bitmap, // Start with bitmap rendering
+            .sdf_generator = null, // Initialize SDF generator when needed
         };
+    }
+    
+    pub fn enableSDF(self: *FontAtlas, config: sdf_renderer.SDFConfig) void {
+        self.sdf_generator = sdf_renderer.SDFGenerator.init(self.allocator, config);
+        self.default_render_mode = .sdf;
     }
     
     pub fn deinit(self: *FontAtlas) void {
@@ -124,14 +141,24 @@ pub const FontAtlas = struct {
                 .advance = rasterized.advance,
                 .atlas_index = 0,
                 .bitmap = null,
+                .render_mode = self.default_render_mode,
             };
             try self.glyph_cache.put(cache_key, info);
             return info;
         }
         
-        // Store a copy of the bitmap for reuse
-        const bitmap_copy = try self.allocator.alloc(u8, rasterized.bitmap.len);
-        @memcpy(bitmap_copy, rasterized.bitmap);
+        // Process glyph based on rendering mode
+        var final_bitmap: []u8 = undefined;
+        if (self.default_render_mode == .sdf and self.sdf_generator != null) {
+            // Future: Convert bitmap to SDF using distance transform
+            // For now, fall back to bitmap mode
+            final_bitmap = try self.allocator.alloc(u8, rasterized.bitmap.len);
+            @memcpy(final_bitmap, rasterized.bitmap);
+        } else {
+            // Standard bitmap processing
+            final_bitmap = try self.allocator.alloc(u8, rasterized.bitmap.len);
+            @memcpy(final_bitmap, rasterized.bitmap);
+        }
         
         // Now we can free the original
         rasterizer.allocator.free(rasterized.bitmap);
@@ -159,7 +186,7 @@ pub const FontAtlas = struct {
         
         try self.uploadGlyphToAtlas(
             atlas.texture,
-            bitmap_copy,
+            final_bitmap,
             rasterized.width,
             rasterized.height,
             texture_x,
@@ -178,7 +205,8 @@ pub const FontAtlas = struct {
             .bearing_y = rasterized.bearing_y,
             .advance = rasterized.advance,
             .atlas_index = @intCast(self.atlases.items.len - 1),
-            .bitmap = bitmap_copy,  // Store the bitmap copy
+            .bitmap = final_bitmap,  // Store the processed bitmap
+            .render_mode = self.default_render_mode,
         };
         
         try self.glyph_cache.put(cache_key, info);

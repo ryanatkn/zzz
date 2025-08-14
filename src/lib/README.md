@@ -16,6 +16,11 @@ The `src/lib/` directory contains the engine-level components that are shared ac
 - Mathematical utilities (`maths.zig`)
 - Low-level GPU renderer (`simple_gpu_renderer.zig`)
 - Renderer interface for drawing operations (`renderer.zig`)
+- Font and text rendering subsystem (`font_*.zig`, `text_*.zig`)
+- Vector graphics and curve primitives (`vector_*.zig`, `curve_*.zig`, `gpu_vector_renderer.zig`)
+- Reactive UI components (`ui/`, `reactive/`)
+- Collision detection and physics (`collision.zig`)
+- Resource management utilities (`resource_manager.zig`)
 
 **Game Layer (`src/hex/` and similar):**
 - Game-specific logic (entities, behaviors, combat)
@@ -51,6 +56,32 @@ Low-level SDL3 GPU rendering implementation:
 - Procedural vertex generation
 - Distance field rendering for anti-aliased shapes
 - Buffer management and command submission
+- Vector graphics integration with unified API
+
+#### Font and Text Rendering Subsystem
+Comprehensive pure Zig font rendering system:
+- **TTF Parser** (`ttf_parser.zig`) - TTF file format parsing
+- **Font Rasterizer** (`font_rasterizer.zig`) - Glyph bitmap generation
+- **Font Atlas** (`font_atlas.zig`) - GPU texture atlas management
+- **Text Renderer** (`text_renderer.zig`) - Dual-mode text rendering (bitmap/SDF)
+- **Font Manager** (`font_manager.zig`) - Font loading and management
+- **Text Layout** (`text_layout.zig`) - Advanced text positioning and alignment
+
+#### Vector Graphics System
+GPU-accelerated vector graphics with mathematical precision:
+- **Vector Paths** (`vector_path.zig`) - Bezier curve primitives and operations
+- **Curve Tessellation** (`curve_tessellation.zig`) - Adaptive curve-to-line conversion
+- **GPU Vector Renderer** (`gpu_vector_renderer.zig`) - GPU-accelerated vector drawing
+- **SDF Renderer** (`sdf_renderer.zig`) - Signed Distance Field generation
+- **Glyph Cache** (`glyph_cache.zig`) - Advanced LRU caching system
+- **Font Metrics** (`font_metrics.zig`) - Comprehensive text measurement
+
+```zig
+// Vector graphics usage
+try renderer.drawQuadraticCurve(cmd_buffer, render_pass, curve, color, 2.0);
+try renderer.drawVectorCircle(cmd_buffer, render_pass, center, radius, color, 32);
+renderer.setVectorQuality(.high);
+```
 
 ## Usage Guidelines
 

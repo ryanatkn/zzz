@@ -4,6 +4,7 @@ const c = @import("c.zig");
 
 const types = @import("types.zig");
 const TextRenderer = @import("text_renderer.zig").TextRenderer;
+const gpu_vector_renderer = @import("gpu_vector_renderer.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -71,6 +72,9 @@ pub const SimpleGPURenderer = struct {
 
     // Text rendering
     text_renderer: TextRenderer,
+    
+    // Vector graphics rendering
+    vector_renderer: gpu_vector_renderer.GPUVectorRenderer,
 
     // Current frame data
     screen_width: f32,
@@ -138,6 +142,7 @@ pub const SimpleGPURenderer = struct {
             .effect_ps = undefined,
             .effect_pipeline = undefined,
             .text_renderer = undefined,
+            .vector_renderer = undefined,
             .screen_width = 1920.0,
             .screen_height = 1080.0,
         };
@@ -147,6 +152,7 @@ pub const SimpleGPURenderer = struct {
         
         // Initialize text renderer
         self.text_renderer = try TextRenderer.init(self.device, allocator, self.screen_width, self.screen_height);
+        self.vector_renderer = gpu_vector_renderer.GPUVectorRenderer.init(allocator, self.device, self.screen_width, self.screen_height);
 
         // Show window now that GPU is set up
         _ = c.sdl.SDL_ShowWindow(window);
@@ -157,6 +163,7 @@ pub const SimpleGPURenderer = struct {
     pub fn deinit(self: *Self) void {
         // Clean up text renderer
         self.text_renderer.deinit();
+        self.vector_renderer.deinit();
         
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.circle_pipeline);
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.rect_pipeline);
@@ -441,6 +448,7 @@ pub const SimpleGPURenderer = struct {
         
         // Update text renderer screen size
         self.text_renderer.updateScreenSize(self.screen_width, self.screen_height);
+        self.vector_renderer.updateScreenSize(self.screen_width, self.screen_height);
 
         // Acquire command buffer
         const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(self.device) orelse {
@@ -596,6 +604,79 @@ pub const SimpleGPURenderer = struct {
     // Draw pixel (fallback for HUD text - draw as tiny rectangle)
     pub fn drawPixel(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, x: f32, y: f32, color: Color) void {
         self.drawRect(cmd_buffer, render_pass, Vec2{ .x = x, .y = y }, Vec2{ .x = 1.0, .y = 1.0 }, color);
+    }
+    
+    // Vector graphics drawing methods
+    
+    /// Draw a vector path as a filled shape
+    pub fn drawVectorPath(
+        self: *Self,
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
+        render_pass: *c.sdl.SDL_GPURenderPass,
+        path: *const gpu_vector_renderer.vector_path.VectorPath,
+        color: Color
+    ) !void {
+        try self.vector_renderer.drawPath(self, cmd_buffer, render_pass, path, color);
+    }
+    
+    /// Draw a quadratic bezier curve
+    pub fn drawQuadraticCurve(
+        self: *Self,
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
+        render_pass: *c.sdl.SDL_GPURenderPass,
+        curve: gpu_vector_renderer.QuadraticCurve,
+        color: Color,
+        stroke_width: f32
+    ) !void {
+        try self.vector_renderer.drawQuadraticCurve(self, cmd_buffer, render_pass, curve, color, stroke_width);
+    }
+    
+    /// Draw a polygon (filled or outline)
+    pub fn drawPolygon(
+        self: *Self,
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
+        render_pass: *c.sdl.SDL_GPURenderPass,
+        points: []const Vec2,
+        color: Color,
+        filled: bool
+    ) !void {
+        try self.vector_renderer.drawPolygon(self, cmd_buffer, render_pass, points, color, filled);
+    }
+    
+    /// Draw a circle using vector graphics (higher quality than distance field circles)
+    pub fn drawVectorCircle(
+        self: *Self,
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
+        render_pass: *c.sdl.SDL_GPURenderPass,
+        center: Vec2,
+        radius: f32,
+        color: Color,
+        segments: u32
+    ) !void {
+        var circle_path = try gpu_vector_renderer.VectorUtils.createCircle(self.vector_renderer.allocator, center, radius, segments);
+        defer circle_path.deinit();
+        
+        try self.vector_renderer.drawPath(self, cmd_buffer, render_pass, &circle_path, color);
+    }
+    
+    /// Draw a rounded rectangle using vector graphics
+    pub fn drawVectorRoundedRect(
+        self: *Self,
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
+        render_pass: *c.sdl.SDL_GPURenderPass,
+        pos: Vec2,
+        size: Vec2,
+        color: Color
+    ) !void {
+        var rect_path = try gpu_vector_renderer.VectorUtils.createRectangle(self.vector_renderer.allocator, pos, size);
+        defer rect_path.deinit();
+        
+        try self.vector_renderer.drawPath(self, cmd_buffer, render_pass, &rect_path, color);
+    }
+    
+    /// Set tessellation quality for vector graphics
+    pub fn setVectorQuality(self: *Self, quality: enum { fast, medium, high, ultra }) void {
+        self.vector_renderer.setTessellationQuality(quality);
     }
 
     // Queue a texture-based text for drawing

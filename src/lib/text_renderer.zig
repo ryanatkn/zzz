@@ -6,7 +6,7 @@ const persistent_text = @import("persistent_text.zig");
 const Vec2 = types.Vec2;
 const Color = types.Color;
 
-// Text rendering uniforms
+// Text rendering uniforms (for bitmap text)
 const TextUniforms = extern struct {
     screen_size: [2]f32,      // Screen dimensions for NDC conversion
     text_position: [2]f32,    // Text position in screen coordinates
@@ -17,6 +17,25 @@ const TextUniforms = extern struct {
     text_color_a: f32,        // Alpha channel
     time: f32,                // Animation time
     _padding: [3]f32,         // Pad to 16-byte alignment
+};
+
+// SDF text rendering uniforms
+const SDFTextUniforms = extern struct {
+    screen_size: [2]f32,      // Screen dimensions for NDC conversion
+    text_position: [2]f32,    // Text position in screen coordinates
+    text_size: [2]f32,        // Text size in pixels
+    text_color_r: f32,        // Color components split to avoid
+    text_color_g: f32,        // HLSL array packing issues
+    text_color_b: f32,        
+    text_color_a: f32,        // Alpha channel
+    
+    // SDF-specific parameters
+    sdf_range: f32,           // Distance field range (typically 4.0)
+    smoothing: f32,           // Anti-aliasing smoothing factor
+    time: f32,                // Animation time
+    _padding0: f32,
+    _padding1: f32,
+    _padding2: f32,
 };
 
 // Text texture wrapper
@@ -57,10 +76,17 @@ pub const TextRenderer = struct {
     screen_width: f32,
     screen_height: f32,
 
-    // Text-specific shaders and pipeline
+    // Bitmap text shaders and pipeline
     text_vs: ?*c.sdl.SDL_GPUShader,
     text_ps: ?*c.sdl.SDL_GPUShader,
     text_pipeline: ?*c.sdl.SDL_GPUGraphicsPipeline,
+    
+    // SDF text shaders and pipeline
+    text_sdf_vs: ?*c.sdl.SDL_GPUShader,
+    text_sdf_ps: ?*c.sdl.SDL_GPUShader,
+    text_sdf_pipeline: ?*c.sdl.SDL_GPUGraphicsPipeline,
+    
+    // Shared resources
     text_sampler: ?*c.sdl.SDL_GPUSampler,
 
     // Text rendering queues
@@ -78,13 +104,18 @@ pub const TextRenderer = struct {
             .text_vs = null,
             .text_ps = null,
             .text_pipeline = null,
+            .text_sdf_vs = null,
+            .text_sdf_ps = null,
+            .text_sdf_pipeline = null,
             .text_sampler = null,
             .text_draw_queue = std.ArrayList(TextDrawCommand).init(allocator),
             .persistent_text_queue = std.ArrayList(PersistentTextDrawCommand).init(allocator),
         };
 
         try self.loadTextShaders();
+        try self.loadSDFTextShaders();
         try self.createTextPipeline();
+        try self.createSDFTextPipeline();
         try self.createTextSampler();
 
         return self;
@@ -94,8 +125,11 @@ pub const TextRenderer = struct {
         // Cleanup text resources
         if (self.text_sampler) |sampler| c.sdl.SDL_ReleaseGPUSampler(self.device, sampler);
         if (self.text_pipeline) |pipeline| c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, pipeline);
+        if (self.text_sdf_pipeline) |pipeline| c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, pipeline);
         if (self.text_vs) |shader| c.sdl.SDL_ReleaseGPUShader(self.device, shader);
         if (self.text_ps) |shader| c.sdl.SDL_ReleaseGPUShader(self.device, shader);
+        if (self.text_sdf_vs) |shader| c.sdl.SDL_ReleaseGPUShader(self.device, shader);
+        if (self.text_sdf_ps) |shader| c.sdl.SDL_ReleaseGPUShader(self.device, shader);
         
         self.text_draw_queue.deinit();
         self.persistent_text_queue.deinit();
@@ -303,6 +337,54 @@ pub const TextRenderer = struct {
         }
     }
 
+    // Load SDF text shaders
+    fn loadSDFTextShaders(self: *Self) !void {
+        const text_sdf_vs_spv = @embedFile("../shaders/compiled/vulkan/text_sdf_vs.spv");
+        const text_sdf_ps_spv = @embedFile("../shaders/compiled/vulkan/text_sdf_ps.spv");
+
+        const text_sdf_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
+            .code_size = text_sdf_vs_spv.len,
+            .code = @ptrCast(text_sdf_vs_spv.ptr),
+            .entrypoint = "vs_main",
+            .format = c.sdl.SDL_GPU_SHADERFORMAT_SPIRV,
+            .stage = c.sdl.SDL_GPU_SHADERSTAGE_VERTEX,
+            .num_samplers = 0,
+            .num_storage_textures = 0,
+            .num_storage_buffers = 0,
+            .num_uniform_buffers = 1, // SDF text shader uses uniforms
+        };
+
+        self.text_sdf_vs = c.sdl.SDL_CreateGPUShader(self.device, &text_sdf_vs_info);
+        if (self.text_sdf_vs == null) {
+            std.debug.print("Failed to create SDF text vertex shader: {s}\n", .{c.sdl.SDL_GetError()});
+            return error.SDFTextVertexShaderFailed;
+        }
+
+        const text_sdf_ps_info = c.sdl.SDL_GPUShaderCreateInfo{
+            .code_size = text_sdf_ps_spv.len,
+            .code = @ptrCast(text_sdf_ps_spv.ptr),
+            .entrypoint = "ps_main",
+            .format = c.sdl.SDL_GPU_SHADERFORMAT_SPIRV,
+            .stage = c.sdl.SDL_GPU_SHADERSTAGE_FRAGMENT,
+            .num_samplers = 1, // Fragment shader uses sampler for SDF texture
+            .num_storage_textures = 0,
+            .num_storage_buffers = 0,
+            .num_uniform_buffers = 0,
+        };
+
+        if (self.text_sdf_vs != null) {
+            self.text_sdf_ps = c.sdl.SDL_CreateGPUShader(self.device, &text_sdf_ps_info);
+            if (self.text_sdf_ps == null) {
+                std.debug.print("Failed to create SDF text fragment shader: {s}\n", .{c.sdl.SDL_GetError()});
+                return error.SDFTextFragmentShaderFailed;
+            }
+        } else {
+            self.text_sdf_ps = null;
+        }
+        
+        std.debug.print("✓ SDF text shaders loaded successfully\n", .{});
+    }
+
     // Create text rendering pipeline
     fn createTextPipeline(self: *Self) !void {
         if (self.text_vs == null or self.text_ps == null) {
@@ -364,6 +446,68 @@ pub const TextRenderer = struct {
         std.debug.print("✓ Text pipeline created successfully\n", .{});
     }
 
+    // Create SDF text rendering pipeline
+    fn createSDFTextPipeline(self: *Self) !void {
+        if (self.text_sdf_vs == null or self.text_sdf_ps == null) {
+            std.debug.print("SDF text shaders not loaded, skipping SDF pipeline creation\n", .{});
+            // This is not an error - SDF support is optional
+            return;
+        }
+
+        const sdf_text_create_info = c.sdl.SDL_GPUGraphicsPipelineCreateInfo{
+            .target_info = .{
+                .num_color_targets = 1,
+                .color_target_descriptions = &[_]c.sdl.SDL_GPUColorTargetDescription{
+                    .{
+                        .format = c.sdl.SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, // Common swapchain format
+                        .blend_state = .{
+                            .src_color_blendfactor = c.sdl.SDL_GPU_BLENDFACTOR_ONE,
+                            .dst_color_blendfactor = c.sdl.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+                            .color_blend_op = c.sdl.SDL_GPU_BLENDOP_ADD,
+                            .src_alpha_blendfactor = c.sdl.SDL_GPU_BLENDFACTOR_ONE,
+                            .dst_alpha_blendfactor = c.sdl.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+                            .alpha_blend_op = c.sdl.SDL_GPU_BLENDOP_ADD,
+                            .color_write_mask = c.sdl.SDL_GPU_COLORCOMPONENT_R | c.sdl.SDL_GPU_COLORCOMPONENT_G | c.sdl.SDL_GPU_COLORCOMPONENT_B | c.sdl.SDL_GPU_COLORCOMPONENT_A,
+                            .enable_blend = true,
+                        },
+                    },
+                },
+                .has_depth_stencil_target = false,
+                .depth_stencil_format = c.sdl.SDL_GPU_TEXTUREFORMAT_D32_FLOAT,
+            },
+            .vertex_input_state = .{
+                .num_vertex_attributes = 0,
+                .vertex_attributes = null,
+                .num_vertex_buffers = 0,
+                .vertex_buffer_descriptions = null,
+            },
+            .primitive_type = c.sdl.SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+            .rasterizer_state = .{
+                .fill_mode = c.sdl.SDL_GPU_FILLMODE_FILL,
+                .cull_mode = c.sdl.SDL_GPU_CULLMODE_NONE,
+                .front_face = c.sdl.SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE,
+                .depth_bias_constant_factor = 0.0,
+                .depth_bias_clamp = 0.0,
+                .depth_bias_slope_factor = 0.0,
+                .enable_depth_bias = false,
+            },
+            .multisample_state = .{
+                .sample_count = c.sdl.SDL_GPU_SAMPLECOUNT_1,
+                .sample_mask = 0,
+            },
+            .vertex_shader = self.text_sdf_vs.?,
+            .fragment_shader = self.text_sdf_ps.?,
+        };
+
+        self.text_sdf_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &sdf_text_create_info);
+        if (self.text_sdf_pipeline == null) {
+            std.debug.print("Failed to create SDF text graphics pipeline: {s}\n", .{c.sdl.SDL_GetError()});
+            return error.SDFTextPipelineCreationFailed;
+        }
+
+        std.debug.print("✓ SDF text pipeline created successfully\n", .{});
+    }
+
     // Create sampler for text textures
     fn createTextSampler(self: *Self) !void {
         const sampler_info = c.sdl.SDL_GPUSamplerCreateInfo{
@@ -411,7 +555,7 @@ pub const TextRenderer = struct {
             .text_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
             .text_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
             .text_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
-            .time = 0.0, // TODO: Add actual time if needed for animations
+            .time = 0.0, // Time for future text animations
             ._padding = [3]f32{ 0.0, 0.0, 0.0 },
         };
         

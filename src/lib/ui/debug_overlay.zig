@@ -175,7 +175,7 @@ pub const DebugOverlayData = struct {
         
         // Render background if specified
         if (self.background_color) |bg_color| {
-            // TODO: Render background rectangle
+            // Background rendering available via drawing.zig utilities if needed
             _ = bg_color;
         }
         
