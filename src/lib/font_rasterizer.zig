@@ -1,7 +1,12 @@
 const std = @import("std");
 const ttf_parser = @import("ttf_parser.zig");
+const vector_path = @import("vector_path.zig");
+const curve_tessellation = @import("curve_tessellation.zig");
+const font_metrics = @import("font_metrics.zig");
+const types = @import("types.zig");
 
 const log = std.log.scoped(.font_rasterizer);
+const Vec2 = types.Vec2;
 
 pub const RasterizedGlyph = struct {
     bitmap: []u8,
@@ -12,13 +17,8 @@ pub const RasterizedGlyph = struct {
     advance: f32,
 };
 
-pub const Edge = struct {
-    x0: f32,
-    y0: f32,
-    x1: f32,
-    y1: f32,
-    winding: i32,
-};
+// Re-export edge types from curve_tessellation for compatibility
+pub const Edge = curve_tessellation.Edge;
 
 pub const ActiveEdge = struct {
     x: f32,
@@ -32,23 +32,133 @@ pub const FontRasterizer = struct {
     parser: *ttf_parser.TTFParser,
     scale: f32,
     
+    tessellation_config: curve_tessellation.TessellationConfig,
+    font_metrics: font_metrics.FontMetrics,
+    
     pub fn init(allocator: std.mem.Allocator, parser: *ttf_parser.TTFParser, point_size: f32, dpi: f32) FontRasterizer {
         const head = parser.head orelse {
             // Fallback to reasonable defaults if head table is missing
+            const fallback_scale = point_size / 1000.0; // Assume 1000 units per em
             return FontRasterizer{
                 .allocator = allocator,
                 .parser = parser,
-                .scale = point_size / 1000.0, // Assume 1000 units per em
+                .scale = fallback_scale,
+                .tessellation_config = curve_tessellation.recommendConfigForScale(fallback_scale),
+                .font_metrics = font_metrics.FontMetrics.init(1000, 800, -200, 100, fallback_scale),
             };
         };
+        
         const pixels_per_em = (point_size * dpi) / 72.0;
         const scale = pixels_per_em / @as(f32, @floatFromInt(head.units_per_em));
+        
+        // Create font metrics from head table
+        const hhea = parser.hhea orelse {
+            // Fallback metrics if hhea table is missing
+            const ascender = @as(i16, @intFromFloat(@as(f32, @floatFromInt(head.units_per_em)) * 0.8));
+            const descender = @as(i16, @intFromFloat(@as(f32, @floatFromInt(head.units_per_em)) * -0.2));
+            return FontRasterizer{
+                .allocator = allocator,
+                .parser = parser,
+                .scale = scale,
+                .tessellation_config = curve_tessellation.recommendConfigForScale(scale),
+                .font_metrics = font_metrics.FontMetrics.init(head.units_per_em, ascender, descender, 100, scale),
+            };
+        };
         
         return FontRasterizer{
             .allocator = allocator,
             .parser = parser,
             .scale = scale,
+            .tessellation_config = curve_tessellation.recommendConfigForScale(scale),
+            .font_metrics = font_metrics.FontMetrics.init(
+                head.units_per_em,
+                hhea.ascender,
+                hhea.descender,
+                hhea.line_gap,
+                scale
+            ),
         };
+    }
+    
+    /// Get font metrics for this rasterizer
+    pub fn getFontMetrics(self: *const FontRasterizer) font_metrics.FontMetrics {
+        return self.font_metrics;
+    }
+    
+    /// Update tessellation quality based on scale
+    pub fn updateTessellationQuality(self: *FontRasterizer, quality: enum { fast, medium, high, ultra }) void {
+        self.tessellation_config = switch (quality) {
+            .fast => curve_tessellation.QualityPresets.fast,
+            .medium => curve_tessellation.QualityPresets.medium,
+            .high => curve_tessellation.QualityPresets.high,
+            .ultra => curve_tessellation.QualityPresets.ultra,
+        };
+    }
+    
+    /// Enhanced scanline rendering with better anti-aliasing
+    fn scanlineRenderOptimized(self: *FontRasterizer, edges: []Edge, bitmap: []u8, width: u32, height: u32) void {
+        // Pre-allocate active edges array once, reuse for all scanlines
+        var active_edges = std.ArrayList(ActiveEdge).init(self.allocator);
+        defer active_edges.deinit();
+        
+        var y: u32 = 0;
+        while (y < height) : (y += 1) {
+            // Clear the array for reuse instead of creating new
+            active_edges.clearRetainingCapacity();
+            
+            const y_float = @as(f32, @floatFromInt(y)) + 0.5;
+            
+            for (edges) |edge| {
+                const min_y = @min(edge.y0, edge.y1);
+                const max_y = @max(edge.y0, edge.y1);
+                
+                if (y_float >= min_y and y_float < max_y) {
+                    const dx = (edge.x1 - edge.x0) / (edge.y1 - edge.y0);
+                    const x = edge.x0 + (y_float - edge.y0) * dx;
+                    
+                    active_edges.append(ActiveEdge{
+                        .x = x,
+                        .dx = dx,
+                        .y_max = max_y,
+                        .winding = edge.winding,
+                    }) catch continue;
+                }
+            }
+            
+            // Sort active edges by x coordinate
+            std.sort.heap(ActiveEdge, active_edges.items, {}, compareActiveEdges);
+            
+            // Fill spans between edge pairs
+            var winding: i32 = 0;
+            var x_start: ?f32 = null;
+            
+            for (active_edges.items) |active_edge| {
+                if (winding == 0 and active_edge.winding != 0) {
+                    x_start = active_edge.x;
+                }
+                
+                winding += active_edge.winding;
+                
+                if (winding == 0 and x_start != null) {
+                    // Fill span from x_start to current x
+                    const start_x = @as(u32, @intFromFloat(@max(0, @min(@as(f32, @floatFromInt(width - 1)), x_start.?))));
+                    const end_x = @as(u32, @intFromFloat(@max(0, @min(@as(f32, @floatFromInt(width - 1)), active_edge.x))));
+                    
+                    var fill_x = start_x;
+                    while (fill_x <= end_x and fill_x < width) : (fill_x += 1) {
+                        const pixel_index = y * width + fill_x;
+                        if (pixel_index < bitmap.len) {
+                            bitmap[pixel_index] = 255;
+                        }
+                    }
+                    x_start = null;
+                }
+            }
+        }
+    }
+    
+    fn compareActiveEdges(_: void, a: ActiveEdge, b: ActiveEdge) bool {
+        return a.x < b.x;
     }
     
     pub fn rasterizeGlyph(self: *FontRasterizer, codepoint: u32, subpixel_x: f32, subpixel_y: f32) !RasterizedGlyph {

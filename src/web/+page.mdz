@@ -1,5 +1,6 @@
 # zz/web
 
+- downcompile to the web, every possible render target (DOM, canvas 2D and WebGL, WebGPU?)
 - render Mdz with Svelte, html, canvas, and webgl (via SDL3)
 
 ## todo
