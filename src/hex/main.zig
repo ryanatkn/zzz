@@ -44,7 +44,7 @@ const Hud = hud.Hud;
 const DEBUG_MODE = false; // Set to true to run debug tests instead of game
 
 // Font test mode - automatically show font grid test on startup
-const FONT_TEST_MODE = false; // Set to true to automatically show font diagnostics
+const FONT_TEST_MODE = true; // Set to true to automatically show font diagnostics
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};

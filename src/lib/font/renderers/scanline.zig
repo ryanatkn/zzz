@@ -1,5 +1,6 @@
 const std = @import("std");
 const font_types = @import("../font_types.zig");
+const glyph_extractor = @import("../glyph_extractor.zig");
 const renderer_interface = @import("renderer_interface.zig");
 const edge_builder = @import("../edge_builder.zig");
 const scanline_renderer = @import("../scanline_renderer.zig");
@@ -7,6 +8,7 @@ const scanline_renderer = @import("../scanline_renderer.zig");
 const Point = font_types.Point;
 const Contour = font_types.Contour;
 const GlyphOutline = font_types.GlyphOutline;
+const ExtractorGlyphOutline = glyph_extractor.GlyphOutline;
 const RenderResult = renderer_interface.RenderResult;
 const RendererMetrics = renderer_interface.RendererMetrics;
 const RendererConfig = renderer_interface.RendererConfig;
@@ -29,10 +31,11 @@ pub const AntialiasedScanlineRenderer = struct {
         // Configure edge builder for high quality
         const edge_config = EdgeBuildConfig{
             .tessellation_config = .{
-                .flatness_threshold = 0.5,
-                .max_subdivision_depth = 8,
-                .min_segments = 4,
+                .tolerance = 0.5,
                 .max_segments = 64,
+                .min_segments = 4,
+                .angle_tolerance = 0.1,
+                .adaptive = true,
             },
             .use_fixed_point = true,
             .min_edge_length = 0.1,
@@ -111,12 +114,12 @@ pub const AntialiasedScanlineRenderer = struct {
             };
         }
 
-        // Create a transformed outline for rendering
-        const transformed_outline = try self.createTransformedOutline(allocator, outline, scale, padding);
-        defer self.freeTransformedOutline(allocator, transformed_outline);
+        // Create a transformed outline for rendering and convert to extractor format
+        const extractor_outline = try self.convertToExtractorOutline(allocator, outline, scale, padding);
+        defer self.freeExtractorOutline(allocator, extractor_outline);
 
         // Build edges from the transformed outline
-        const edges = self.edge_builder.buildEdges(transformed_outline) catch |err| {
+        const edges = self.edge_builder.buildEdges(extractor_outline) catch |err| {
             self.last_error = "Failed to build edges from outline";
             return err;
         };
@@ -171,57 +174,61 @@ pub const AntialiasedScanlineRenderer = struct {
         };
     }
 
-    /// Create a transformed copy of the outline for rendering
-    fn createTransformedOutline(self: *AntialiasedScanlineRenderer, allocator: std.mem.Allocator, original: GlyphOutline, scale: f32, padding: f32) !GlyphOutline {
+    /// Convert font_types.GlyphOutline to glyph_extractor.GlyphOutline format with transformation
+    fn convertToExtractorOutline(self: *AntialiasedScanlineRenderer, allocator: std.mem.Allocator, original: GlyphOutline, scale: f32, padding: f32) !ExtractorGlyphOutline {
         _ = self;
         
         // Calculate transform parameters
         const transform_offset_x = padding - @as(f32, @floatFromInt(original.bounds.x_min)) * scale;
         const transform_offset_y = padding - @as(f32, @floatFromInt(original.bounds.y_min)) * scale;
 
-        // Copy contours with transformation
-        var transformed_contours = try allocator.alloc(Contour, original.contours.len);
+        // Convert contours to extractor format
+        var extractor_contours = try allocator.alloc(glyph_extractor.Contour, original.contours.len);
         
         for (original.contours, 0..) |contour, i| {
-            var transformed_points = try allocator.alloc(Point, contour.points.len);
-            var transformed_on_curve = try allocator.alloc(bool, contour.on_curve.len);
+            // Convert points to extractor format with transformation and on_curve info
+            var extractor_points = try allocator.alloc(glyph_extractor.Point, contour.points.len);
 
-            // Transform each point
             for (contour.points, 0..) |point, j| {
-                transformed_points[j] = Point{
+                extractor_points[j] = glyph_extractor.Point{
                     .x = point.x * scale + transform_offset_x,
                     .y = point.y * scale + transform_offset_y,
+                    .on_curve = contour.on_curve[j],
                 };
-                transformed_on_curve[j] = contour.on_curve[j];
             }
 
-            transformed_contours[i] = Contour{
-                .points = transformed_points,
-                .on_curve = transformed_on_curve,
+            extractor_contours[i] = glyph_extractor.Contour{
+                .points = extractor_points,
+                .closed = true, // TTF contours are always closed
             };
         }
 
-        // Create transformed bounds (not strictly needed for edge building but good to have)
-        const transformed_bounds = font_types.GlyphBounds{
-            .x_min = @intFromFloat(@floor(transform_offset_x)),
-            .y_min = @intFromFloat(@floor(transform_offset_y)),
-            .x_max = @intFromFloat(@ceil(transform_offset_x + @as(f32, @floatFromInt(original.bounds.width())) * scale)),
-            .y_max = @intFromFloat(@ceil(transform_offset_y + @as(f32, @floatFromInt(original.bounds.height())) * scale)),
+        // Create transformed bounds in extractor format
+        const extractor_bounds = glyph_extractor.GlyphBounds{
+            .x_min = transform_offset_x,
+            .y_min = transform_offset_y,
+            .x_max = transform_offset_x + @as(f32, @floatFromInt(original.bounds.width())) * scale,
+            .y_max = transform_offset_y + @as(f32, @floatFromInt(original.bounds.height())) * scale,
         };
 
-        return GlyphOutline{
-            .contours = transformed_contours,
-            .bounds = transformed_bounds,
-            .metrics = original.metrics,
+        // Convert metrics
+        const extractor_metrics = glyph_extractor.GlyphMetrics{
+            .advance_width = original.metrics.getAdvance() * scale,
+            .left_side_bearing = @as(f32, @floatFromInt(original.bounds.x_min)) * scale,
+        };
+
+        return ExtractorGlyphOutline{
+            .contours = extractor_contours,
+            .bounds = extractor_bounds,
+            .metrics = extractor_metrics,
         };
     }
 
-    /// Free a transformed outline
-    fn freeTransformedOutline(self: *AntialiasedScanlineRenderer, allocator: std.mem.Allocator, outline: GlyphOutline) void {
+    /// Free an extractor outline
+    fn freeExtractorOutline(self: *AntialiasedScanlineRenderer, allocator: std.mem.Allocator, outline: ExtractorGlyphOutline) void {
         _ = self;
         for (outline.contours) |contour| {
             allocator.free(contour.points);
-            allocator.free(contour.on_curve);
         }
         allocator.free(outline.contours);
     }

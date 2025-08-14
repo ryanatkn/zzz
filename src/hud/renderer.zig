@@ -100,7 +100,7 @@ pub const BrowserRenderer = struct {
     pub fn renderPageContent(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page) !void {
         // Fast path for special pages needing GPU rendering
         if (std.mem.eql(u8, current_page.path, "/font-grid-test")) {
-            std.log.info("DEBUG: Rendering custom GPU content for font-grid-test", .{});
+            // Font grid test page - custom GPU rendering
             try self.renderFontGridTestContent(cmd_buffer, render_pass, current_page);
         }
         // Add other special pages here as needed
@@ -111,15 +111,12 @@ pub const BrowserRenderer = struct {
         // Cast to FontGridTestPage to access font test functionality
         const grid_page: *font_grid_test_page.FontGridTestPage = @constCast(@fieldParentPtr("base", current_page));
         
-        std.log.info("DEBUG: Grid page cast successful, checking auto-init status...", .{});
-        
-        // Auto-initialize the multi-strategy renderer system if needed
+        // Check font grid test auto-initialization status
         if (!grid_page.isAutoInitialized()) {
-            std.log.info("DEBUG: Auto-initialization needed, calling autoInitialize...", .{});
+            // Auto-initialize font grid test
             grid_page.autoInitialize(self.base_renderer.allocator, self.base_renderer.gpu.device);
-            std.log.info("DEBUG: autoInitialize call completed", .{});
         } else {
-            std.log.info("DEBUG: Grid page already auto-initialized", .{});
+            // Font grid test already initialized
         }
 
         // Render strategy comparison grid using actual GPU textures
@@ -138,24 +135,18 @@ pub const BrowserRenderer = struct {
     }
 
     fn renderFontGridTestPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
-        // DEBUG: Add immediate logging to see if this function is called
-        std.log.info("DEBUG: renderFontGridTestPage called!", .{});
-        
         // First, let the page render its basic UI elements (headers, navigation)
         try current_page.render(links);
 
         // Cast to FontGridTestPage to access new functionality
         const grid_page: *font_grid_test_page.FontGridTestPage = @fieldParentPtr("base", current_page);
         
-        std.log.info("DEBUG: Grid page cast successful, checking auto-init status...", .{});
-        
-        // Auto-initialize the multi-strategy renderer system if needed
+        // Check auto-initialization status
         if (!grid_page.isAutoInitialized()) {
-            std.log.info("DEBUG: Auto-initialization needed, calling autoInitialize...", .{});
+            // Auto-initialize if needed
             grid_page.autoInitialize(self.base_renderer.allocator, self.base_renderer.gpu.device);
-            std.log.info("DEBUG: autoInitialize call completed", .{});
         } else {
-            std.log.info("DEBUG: Grid page already auto-initialized", .{});
+            // Grid page already initialized
         }
 
         // Render strategy comparison grid using actual GPU textures

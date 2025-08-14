@@ -20,7 +20,13 @@ pub const SimpleBitmapRenderer = struct {
 
     pub fn init() SimpleBitmapRenderer {
         return SimpleBitmapRenderer{
-            .config = RendererConfig{},
+            .config = RendererConfig{
+                .debug_mode = false,
+                .antialias_level = 1,
+                .max_glyph_size = 256,
+                .enable_profiling = true,
+                .cache_memory_budget = 1024 * 1024,
+            },
             .metrics = RendererMetrics{},
             .last_error = null,
         };
@@ -46,7 +52,7 @@ pub const SimpleBitmapRenderer = struct {
         const self: *SimpleBitmapRenderer = @ptrCast(@alignCast(ctx));
         const start_time = std.time.microTimestamp();
 
-        log_throttle.logInfo("simple_bitmap_start", "SimpleBitmapRenderer: rendering glyph at {}pt", .{font_size});
+        log_throttle.logDebug("simple_bitmap_start", "SimpleBitmapRenderer: rendering glyph at {}pt", .{font_size});
 
         // Calculate render bounds based on outline bounds and font size
         const scale = font_size / 1000.0; // TTF units to pixels (assuming 1000 units per EM)
@@ -54,7 +60,7 @@ pub const SimpleBitmapRenderer = struct {
         const bounds_width = @as(f32, @floatFromInt(outline.bounds.width())) * scale;
         const bounds_height = @as(f32, @floatFromInt(outline.bounds.height())) * scale;
         
-        log_throttle.logInfo("simple_bitmap_bounds", "Glyph bounds: {}x{} TTF units, {}x{} pixels (scale={})", .{outline.bounds.width(), outline.bounds.height(), bounds_width, bounds_height, scale});
+        log_throttle.logInfo("simple_bitmap_bounds", "Glyph bounds: {}x{} TTF units, {}x{} pixels (scale={d:.3})", .{outline.bounds.width(), outline.bounds.height(), bounds_width, bounds_height, scale});
         
         // Add padding for safety
         const padding = 2.0;
@@ -65,6 +71,8 @@ pub const SimpleBitmapRenderer = struct {
         const max_size = self.config.max_glyph_size;
         const width = @min(render_width, max_size);
         const height = @min(render_height, max_size);
+        
+        log_throttle.logDebug("simple_bitmap_render_size", "Calculated render size: {}x{} -> clamped to {}x{} (max_size={})", .{render_width, render_height, width, height, max_size});
 
         if (width == 0 or height == 0) {
             // Empty glyph
@@ -123,7 +131,7 @@ pub const SimpleBitmapRenderer = struct {
         // Calculate quality score (simple bitmap gets medium score)
         const quality_score = 60.0; // Fixed score for simple bitmap
         
-        log_throttle.logInfo("simple_bitmap_result", "SimpleBitmapRenderer: rendered {}x{} bitmap", .{width, height});
+        log_throttle.logDebug("simple_bitmap_result", "SimpleBitmapRenderer: rendered {}x{} bitmap", .{width, height});
         
         return RenderResult{
             .bitmap = bitmap,

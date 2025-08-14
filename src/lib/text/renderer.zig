@@ -204,7 +204,7 @@ pub const TextRenderer = struct {
                 if (handle.is_cached) {
                     log_throttle.logDebug("queue_cached_text", "Queued cached persistent text: '{s}'", .{text});
                 } else {
-                    log_throttle.logInfo("queue_new_text", "Queued new persistent text: '{s}' ({}x{})", .{ text, handle.width, handle.height });
+                    log_throttle.logDebug("queue_new_text", "Queued new persistent text: '{s}' ({}x{})", .{ text, handle.width, handle.height });
                 }
             }
         } else {
@@ -225,7 +225,7 @@ pub const TextRenderer = struct {
             return;
         }
 
-        log_throttle.logInfo("draw_text_start", "=== DRAWING {} TEXT TEXTURES ({} immediate, {} persistent) ===", .{ total_count, immediate_count, persistent_count });
+        log_throttle.logDebug("draw_text_start", "Drawing {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
 
         // Draw immediate mode text first (these textures will be released)
         for (self.text_draw_queue.items, 0..) |cmd, cmd_index| {
@@ -260,7 +260,7 @@ pub const TextRenderer = struct {
             }
         }
 
-        log_throttle.logInfo("draw_text_complete", "Drew {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
+        log_throttle.logDebug("draw_text_complete", "Drew {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
 
         // Release immediate mode textures and clear both queues
         for (self.text_draw_queue.items) |cmd| {

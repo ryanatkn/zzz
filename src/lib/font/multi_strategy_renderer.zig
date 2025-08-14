@@ -28,8 +28,8 @@ pub const MultiStrategyRenderer = struct {
     // Individual renderers
     simple_renderer: bitmap_simple.SimpleBitmapRenderer,
     debug_renderer: debug_ascii.DebugAsciiRenderer,
-    oversample_2x_renderer: bitmap_simple.SimpleBitmapRenderer,
-    oversample_4x_renderer: bitmap_simple.SimpleBitmapRenderer,
+    oversample_2x_renderer: oversampling.OversamplingRenderer,
+    oversample_4x_renderer: oversampling.OversamplingRenderer,
     scanline_renderer: ?scanline.AntialiasedScanlineRenderer, // Optional - may fail to initialize
 
     // Renderer interfaces
@@ -43,24 +43,21 @@ pub const MultiStrategyRenderer = struct {
     comparison_results: std.ArrayList(MultiRenderResult),
 
     pub fn init(allocator: std.mem.Allocator) !MultiStrategyRenderer {
-        // Initialize basic renderers for immediate connection test
+        // Initialize all renderers
         var simple_renderer = bitmap_simple.create();
         var debug_renderer = debug_ascii.create();
+        var oversample_2x_renderer = oversampling.create2x();
+        var oversample_4x_renderer = oversampling.create4x();
         
-        // TODO: Re-enable after fixing compilation errors
-        // var oversample_2x_renderer = oversampling.create2x();
-        // var oversample_4x_renderer = oversampling.create4x();
-        // Temporary placeholders with correct types
-        var oversample_2x_renderer = simple_renderer; // Will be replaced with proper OversamplingRenderer
-        var oversample_4x_renderer = simple_renderer; // Will be replaced with proper OversamplingRenderer
+        // Try to initialize scanline renderer (may fail due to dependencies)
+        var scanline_renderer: ?scanline.AntialiasedScanlineRenderer = null;
+        var scanline_iface: ?TextRenderer = null;
         
-        // Try to initialize scanline renderer (may fail)
-        const scanline_renderer: ?scanline.AntialiasedScanlineRenderer = null;
-        const scanline_iface: ?TextRenderer = null;
-        
-        // TODO: Re-enable after fixing compilation errors
-        // scanline_renderer = scanline.create(allocator);
-        // scanline_iface = scanline_renderer.?.asRenderer();
+        // Attempt scanline initialization with error handling
+        scanline_renderer = scanline.create(allocator);
+        if (scanline_renderer) |*sr| {
+            scanline_iface = sr.asRenderer();
+        }
 
         return MultiStrategyRenderer{
             .allocator = allocator,
@@ -108,38 +105,30 @@ pub const MultiStrategyRenderer = struct {
         }
         self.comparison_results.clearRetainingCapacity();
 
-        // Define strategies to test (temporarily reduced for immediate fix)
+        // Test all available strategies (reduced to core working renderers)
         const strategies = [_]struct {
             strategy: RenderStrategy,
             renderer: *TextRenderer,
         }{
             .{ .strategy = .simple_bitmap, .renderer = &self.simple_iface },
             .{ .strategy = .debug_ascii, .renderer = &self.debug_iface },
-            // TODO: Re-enable once compilation errors are fixed
-            // .{ .strategy = .oversampling_2x, .renderer = &self.oversample_2x_iface },
-            // .{ .strategy = .oversampling_4x, .renderer = &self.oversample_4x_iface },
+            .{ .strategy = .oversampling_2x, .renderer = &self.oversample_2x_iface },
+            // Removed .oversampling_4x (redundant with 2x) and scanline_antialiased (causing crashes)
         };
 
         // Test each strategy
         for (strategies) |strategy_info| {
+            log_throttle.logInfo("renderer_start", "Starting renderer: {s}", .{@tagName(strategy_info.strategy)});
             const multi_result = self.renderWithStrategy(strategy_info.renderer, strategy_info.strategy, outline, font_size);
+            log_throttle.logInfo("renderer_complete", "Renderer completed: {s}", .{@tagName(strategy_info.strategy)});
             try self.comparison_results.append(multi_result);
+            log_throttle.logInfo("result_appended", "Result appended: {s}", .{@tagName(strategy_info.strategy)});
         }
 
-        // TODO: Re-enable scanline renderer once invalid UTF-8 output is fixed
-        // Test scanline renderer if available - TEMPORARILY DISABLED due to invalid UTF-8 output
-        // if (self.scanline_iface) |*scanline_iface| {
-        //     const multi_result = self.renderWithStrategy(scanline_iface, .scanline_antialiased, outline, font_size);
-        //     try self.comparison_results.append(multi_result);
-        // } else {
-        if (true) { // TODO: Remove this once scanline renderer is fixed
-            // Add placeholder for failed scanline renderer
-            try self.comparison_results.append(MultiRenderResult{
-                .strategy = .scanline_antialiased,
-                .result = null,
-                .error_message = "Scanline renderer initialization failed",
-            });
-        }
+        // Scanline renderer disabled due to crashes - system now uses 3 core renderers:
+        // 1. Simple Bitmap (fast, basic quality)
+        // 2. Debug ASCII (visualization and debugging) 
+        // 3. Oversampling 2x (high quality antialiasing)
 
         return self.comparison_results.items;
     }

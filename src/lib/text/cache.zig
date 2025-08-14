@@ -115,8 +115,8 @@ pub const PersistentTextSystem = struct {
             return null;
         }
 
-        // Create new texture
-        log_throttle.logInfo("create_texture", "Creating new persistent texture for '{s}'", .{text});
+        // Create new texture (only log first few times to avoid spam)
+        log_throttle.logDebug("create_texture", "Creating new persistent texture for '{s}'", .{text});
 
         const text_result = font_manager.renderTextToTexture(text, font_category, font_size, color) catch |err| {
             log_throttle.logError("texture_error", "Failed to create persistent texture for text: {}", .{err});
@@ -136,7 +136,7 @@ pub const PersistentTextSystem = struct {
 
         try self.textures.put(content_hash, persistent);
 
-        log_throttle.logInfo("texture_created", "Created persistent texture: {}x{}", .{ text_result.width, text_result.height });
+        log_throttle.logDebug("texture_created", "Created persistent texture: {}x{}", .{ text_result.width, text_result.height });
 
         return PersistentTextureHandle{
             .texture = text_result.texture,

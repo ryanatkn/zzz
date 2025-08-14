@@ -156,53 +156,50 @@ pub const RendererDisplay = struct {
 
     /// Create special display texture for ASCII renderer output
     fn createAsciiDisplayTexture(self: *RendererDisplay, result: RenderResult) !*c.sdl.SDL_GPUTexture {
-        // ASCII renderer stores ASCII characters in bitmap
-        // We'll create a visual texture showing the ASCII art
+        // Debug ASCII renderer now stores grayscale values (0-255) instead of ASCII characters
+        // Treat it like a regular grayscale bitmap but with enhanced contrast for debugging
         
-        const char_width = 8;  // Pixels per ASCII character
-        const char_height = 12; 
-        const display_width = result.width * char_width;
-        const display_height = result.height * char_height;
-        
-        const rgba_data = try self.allocator.alloc(u8, display_width * display_height * 4);
+        if (result.width == 0 or result.height == 0) {
+            return try self.createEmptyTexture();
+        }
+
+        // Convert grayscale bitmap to RGBA for display with enhanced contrast
+        const rgba_data = try self.allocator.alloc(u8, result.width * result.height * 4);
         defer self.allocator.free(rgba_data);
-        @memset(rgba_data, 0);
 
-        // Render each ASCII character as pixels
-        for (result.bitmap, 0..) |ascii_char, i| {
-            const char_x = i % result.width;
-            const char_y = i / result.width;
+        for (result.bitmap, 0..) |gray_value, i| {
+            const rgba_idx = i * 4;
             
-            // Simple character visualization - use if/else for runtime values
-            const intensity: u8 = if (ascii_char == ' ') 0
-                else if (ascii_char == '.') 64
-                else if (ascii_char == ':') 128
-                else if (ascii_char == '+') 192
-                else if (ascii_char == '*') 220
-                else if (ascii_char == '#') 255
-                else if (ascii_char == '@') 255
-                else 128;
-
-            // Fill character area with intensity
-            var py: u32 = 0;
-            while (py < char_height) : (py += 1) {
-                var px: u32 = 0;
-                while (px < char_width) : (px += 1) {
-                    const pixel_x = char_x * char_width + px;
-                    const pixel_y = char_y * char_height + py;
-                    const pixel_idx = (pixel_y * display_width + pixel_x) * 4;
-                    
-                    if (pixel_idx + 3 < rgba_data.len) {
-                        rgba_data[pixel_idx + 0] = intensity; // R
-                        rgba_data[pixel_idx + 1] = intensity; // G
-                        rgba_data[pixel_idx + 2] = intensity; // B
-                        rgba_data[pixel_idx + 3] = if (intensity > 0) 255 else 0; // A
-                    }
-                }
+            // Enhanced contrast for debug visualization
+            const enhanced_value: u8 = if (gray_value == 0) 0
+                else if (gray_value < 64) 64    // Light coverage -> dark gray
+                else if (gray_value < 128) 128  // Medium coverage -> medium gray
+                else if (gray_value < 192) 192  // Heavy coverage -> light gray
+                else 255;                       // Full coverage -> white
+            
+            // Use different colors for different coverage levels for easier debugging
+            if (gray_value == 0) {
+                // Empty -> black/transparent
+                rgba_data[rgba_idx + 0] = 0;   // R
+                rgba_data[rgba_idx + 1] = 0;   // G
+                rgba_data[rgba_idx + 2] = 0;   // B
+                rgba_data[rgba_idx + 3] = 32;  // A (slight transparency)
+            } else if (gray_value < 128) {
+                // Light coverage -> blue tint
+                rgba_data[rgba_idx + 0] = 0;             // R
+                rgba_data[rgba_idx + 1] = enhanced_value / 2; // G
+                rgba_data[rgba_idx + 2] = enhanced_value;     // B
+                rgba_data[rgba_idx + 3] = 255;               // A
+            } else {
+                // Heavy coverage -> white
+                rgba_data[rgba_idx + 0] = enhanced_value; // R
+                rgba_data[rgba_idx + 1] = enhanced_value; // G  
+                rgba_data[rgba_idx + 2] = enhanced_value; // B
+                rgba_data[rgba_idx + 3] = 255;           // A
             }
         }
 
-        return try self.createTextureFromRGBA(rgba_data, display_width, display_height);
+        return try self.createTextureFromRGBA(rgba_data, result.width, result.height);
     }
 
     /// Create texture from RGBA data

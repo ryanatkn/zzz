@@ -303,11 +303,15 @@ $ zig build --help       # Show all build options
 - Constants extracted for easy tuning and upgrades
 
 **Workflow with root TODO_*.md docs:**
-- **Active docs** should be placed in root directory with `TODO_*.md` prefix for high visibility
-- **Permanent docs** (README.md, CLAUDE.md) remains unprefixed in root
-- **Completed todo docs** should be moved to `docs/archive/` with `TODO_` stripped
-- **Always commit todo docs** to git both during work and when archiving
-- This workflow ensures active work is visible while maintaining a historical record of completed todos
+- **Active TODO docs** should be placed in root directory with `TODO_*.md` prefix for high visibility
+- **Completed TODO docs** should be **updated in place** with completion status, not moved
+  - Update title: `# TODO: Task Name` → `# ✅ COMPLETED: Task Name`
+  - Add completion date and final status summary
+  - Keep file in root to show what major work has been accomplished
+- **Permanent docs** (README.md, CLAUDE.md) remain unprefixed in root
+- **Only archive to `docs/archive/`** when TODO docs become stale or superseded
+- **Always commit todo docs** to git both during work and after completion
+- This workflow ensures completed work remains visible while tracking major accomplishments
 
 ## Notes to LLMs
 

@@ -20,7 +20,13 @@ pub const OversamplingRenderer = struct {
 
     pub fn init(oversample_factor: u32) OversamplingRenderer {
         return OversamplingRenderer{
-            .config = RendererConfig{},
+            .config = RendererConfig{
+                .debug_mode = false,
+                .antialias_level = oversample_factor,
+                .max_glyph_size = 256,
+                .enable_profiling = true,
+                .cache_memory_budget = 1024 * 1024,
+            },
             .metrics = RendererMetrics{},
             .last_error = null,
             .oversample_factor = oversample_factor,
@@ -80,19 +86,32 @@ pub const OversamplingRenderer = struct {
             };
         }
 
-        // Calculate oversampled dimensions
-        const oversample_width = final_width * self.oversample_factor;
-        const oversample_height = final_height * self.oversample_factor;
+        // Calculate oversampled dimensions with overflow checking
+        const oversample_width = @as(u64, final_width) * @as(u64, self.oversample_factor);
+        const oversample_height = @as(u64, final_height) * @as(u64, self.oversample_factor);
+        
+        // Check for reasonable limits to prevent excessive memory usage
+        if (oversample_width > std.math.maxInt(u32) or oversample_height > std.math.maxInt(u32)) {
+            // Fall back to simple rendering if oversampling would be too large
+            return try self.renderSimple(allocator, outline, font_size, final_width, final_height, scale, padding);
+        }
+        
+        const oversample_width_u32 = @as(u32, @intCast(oversample_width));
+        const oversample_height_u32 = @as(u32, @intCast(oversample_height));
 
         // Prevent excessive memory usage
         const max_oversample_size = max_size * 2; // Allow up to 2x max size for oversampling
-        if (oversample_width > max_oversample_size or oversample_height > max_oversample_size) {
+        if (oversample_width_u32 > max_oversample_size or oversample_height_u32 > max_oversample_size) {
             // Fall back to simple rendering at target size
             return try self.renderSimple(allocator, outline, font_size, final_width, final_height, scale, padding);
         }
 
-        // Allocate oversampled bitmap
-        const oversample_bitmap = try allocator.alloc(u8, oversample_width * oversample_height);
+        // Allocate oversampled bitmap (check for overflow in total size)
+        const total_oversample_size = oversample_width * oversample_height;
+        if (total_oversample_size > std.math.maxInt(usize)) {
+            return try self.renderSimple(allocator, outline, font_size, final_width, final_height, scale, padding);
+        }
+        const oversample_bitmap = try allocator.alloc(u8, @intCast(total_oversample_size));
         defer allocator.free(oversample_bitmap);
         @memset(oversample_bitmap, 0);
 
@@ -103,9 +122,9 @@ pub const OversamplingRenderer = struct {
 
         // Render at oversampled resolution
         var y: u32 = 0;
-        while (y < oversample_height) : (y += 1) {
+        while (y < oversample_height_u32) : (y += 1) {
             var x: u32 = 0;
-            while (x < oversample_width) : (x += 1) {
+            while (x < oversample_width_u32) : (x += 1) {
                 const pixel_x = @as(f32, @floatFromInt(x)) - transform_offset_x;
                 const pixel_y = @as(f32, @floatFromInt(y)) - transform_offset_y;
                 
@@ -115,7 +134,7 @@ pub const OversamplingRenderer = struct {
 
                 const inside = isPointInside(Point{ .x = ttf_x, .y = ttf_y }, outline.contours);
                 
-                const bitmap_idx = y * oversample_width + x;
+                const bitmap_idx = y * oversample_width_u32 + x;
                 oversample_bitmap[bitmap_idx] = if (inside) 255 else 0;
             }
         }
@@ -138,8 +157,8 @@ pub const OversamplingRenderer = struct {
                         const sample_x = x * box_size + bx;
                         const sample_y = y * box_size + by;
                         
-                        if (sample_x < oversample_width and sample_y < oversample_height) {
-                            const sample_idx = sample_y * oversample_width + sample_x;
+                        if (sample_x < oversample_width_u32 and sample_y < oversample_height_u32) {
+                            const sample_idx = sample_y * oversample_width_u32 + sample_x;
                             sum += oversample_bitmap[sample_idx];
                         }
                     }
@@ -161,7 +180,7 @@ pub const OversamplingRenderer = struct {
         self.metrics.avg_render_time_us = self.metrics.total_render_time_us / self.metrics.glyphs_rendered;
         
         // Quality score based on oversampling level
-        const quality_score = switch (self.oversample_factor) {
+        const quality_score: f32 = switch (self.oversample_factor) {
             2 => 75.0,
             4 => 85.0,
             else => 70.0,

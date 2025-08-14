@@ -2,6 +2,7 @@ const std = @import("std");
 const font_types = @import("../font_types.zig");
 const renderer_interface = @import("renderer_interface.zig");
 const log_throttle = @import("../../debug/log_throttle.zig");
+const bitmap_utils = @import("../../core/bitmap.zig");
 
 const Point = font_types.Point;
 const Contour = font_types.Contour;
@@ -18,12 +19,18 @@ pub const DebugAsciiRenderer = struct {
     metrics: RendererMetrics,
     last_error: ?[]const u8,
     
-    // ASCII characters for different coverage levels
-    const COVERAGE_CHARS = [_]u8{ ' ', '.', ':', '+', '*', '#', '@' };
+    // Use standard grayscale values for coverage levels
+    const Coverage = bitmap_utils.Coverage;
 
     pub fn init() DebugAsciiRenderer {
         return DebugAsciiRenderer{
-            .config = RendererConfig{},
+            .config = RendererConfig{
+                .debug_mode = false,
+                .antialias_level = 1,
+                .max_glyph_size = 256,
+                .enable_profiling = true,
+                .cache_memory_budget = 1024 * 1024,
+            },
             .metrics = RendererMetrics{},
             .last_error = null,
         };
@@ -49,7 +56,17 @@ pub const DebugAsciiRenderer = struct {
         const self: *DebugAsciiRenderer = @ptrCast(@alignCast(ctx));
         const start_time = std.time.microTimestamp();
 
-        log_throttle.logInfo("debug_ascii_start", "DebugAsciiRenderer: rendering glyph at {}pt", .{font_size});
+        log_throttle.logDebug("debug_ascii_start", "DebugAsciiRenderer: rendering glyph at {}pt", .{font_size});
+        
+        // Add extensive safety checks
+        if (outline.contours.len == 0) {
+            log_throttle.logDebug("debug_ascii_empty", "No contours in outline", .{});
+        } else {
+            log_throttle.logDebug("debug_ascii_contours", "Processing {} contours", .{outline.contours.len});
+            for (outline.contours, 0..) |contour, contour_idx| {
+                log_throttle.logDebug("debug_ascii_contour_info", "Contour {}: {} points, on_curve len: {}", .{contour_idx, contour.points.len, contour.on_curve.len});
+            }
+        }
 
         // Fixed ASCII grid size for consistency
         const ascii_width: u32 = 16;
@@ -63,9 +80,9 @@ pub const DebugAsciiRenderer = struct {
         const scale_y = if (bounds_height > 0) @as(f32, @floatFromInt(ascii_height - 2)) / bounds_height else 1.0;
         const scale = @min(scale_x, scale_y);
 
-        // Allocate bitmap (we'll store ASCII chars as bytes)
+        // Allocate bitmap with standard grayscale values
         const bitmap = try allocator.alloc(u8, ascii_width * ascii_height);
-        @memset(bitmap, COVERAGE_CHARS[0]); // Fill with space
+        @memset(bitmap, Coverage.EMPTY); // Fill with empty (0)
 
         if (outline.contours.len == 0) {
             // Empty glyph - return spaces
@@ -90,7 +107,15 @@ pub const DebugAsciiRenderer = struct {
         const bounds_center_y = @as(f32, @floatFromInt(outline.bounds.y_min + outline.bounds.y_max)) / 2.0;
 
         // Render points and outline
-        for (outline.contours) |contour| {
+        for (outline.contours, 0..) |contour, contour_idx| {
+            // Safety check: ensure we have both points and on_curve data
+            if (contour.points.len == 0 or contour.on_curve.len == 0) {
+                log_throttle.logDebug("debug_ascii_skip", "Skipping contour {} with no points or on_curve data", .{contour_idx});
+                continue;
+            }
+            
+            log_throttle.logDebug("debug_ascii_process", "Processing contour {} with {} points", .{contour_idx, contour.points.len});
+            
             // Draw outline points
             for (contour.points, 0..) |point, i| {
                 // Transform point to ASCII grid space
@@ -103,16 +128,24 @@ pub const DebugAsciiRenderer = struct {
                 if (grid_x >= 0 and grid_x < ascii_width and grid_y >= 0 and grid_y < ascii_height) {
                     const bitmap_idx = @as(usize, @intCast(grid_y * @as(i32, @intCast(ascii_width)) + grid_x));
                     
-                    // Different characters for different point types
-                    if (contour.on_curve[i]) {
-                        bitmap[bitmap_idx] = COVERAGE_CHARS[5]; // '#' for on-curve points
+                    // Safety check: ensure on_curve array has enough elements
+                    if (i < contour.on_curve.len) {
+                        // Use grayscale values for different point types
+                        if (contour.on_curve[i]) {
+                            bitmap[bitmap_idx] = Coverage.FULL; // 255 for on-curve points
+                        } else {
+                            bitmap[bitmap_idx] = Coverage.HEAVY; // 192 for off-curve points
+                        }
                     } else {
-                        bitmap[bitmap_idx] = COVERAGE_CHARS[4]; // '*' for off-curve points
+                        // Fallback: assume on-curve if index out of bounds
+                        bitmap[bitmap_idx] = Coverage.FULL; // 255 for on-curve points
+                        log_throttle.logError("debug_ascii_bounds", "on_curve index {} out of bounds (len: {})", .{i, contour.on_curve.len});
                     }
                 }
             }
 
             // Draw lines between consecutive points
+            log_throttle.logDebug("debug_ascii_lines", "Drawing {} lines for contour {}", .{contour.points.len, contour_idx});
             for (contour.points, 0..) |_, i| {
                 const next_i = (i + 1) % contour.points.len;
                 const p1 = contour.points[i];
@@ -124,6 +157,7 @@ pub const DebugAsciiRenderer = struct {
 
         // Fill interior using simple point-in-polygon test
         if (self.config.debug_mode) {
+            log_throttle.logDebug("debug_ascii_fill", "Filling interior for debug visualization", .{});
             self.fillInterior(bitmap, ascii_width, ascii_height, outline.contours, bounds_center_x, bounds_center_y, center_x, center_y, scale);
         }
 
@@ -176,8 +210,8 @@ pub const DebugAsciiRenderer = struct {
                 const bitmap_idx = @as(usize, @intCast(grid_y * @as(i32, @intCast(width)) + grid_x));
                 
                 // Only draw line if not already a point marker
-                if (bitmap[bitmap_idx] == COVERAGE_CHARS[0]) {
-                    bitmap[bitmap_idx] = COVERAGE_CHARS[2]; // ':' for lines
+                if (bitmap[bitmap_idx] == Coverage.EMPTY) {
+                    bitmap[bitmap_idx] = Coverage.MEDIUM; // 128 for lines
                 }
             }
         }
@@ -193,7 +227,7 @@ pub const DebugAsciiRenderer = struct {
                 const bitmap_idx = y * width + x;
                 
                 // Skip if already drawn
-                if (bitmap[bitmap_idx] != COVERAGE_CHARS[0]) continue;
+                if (bitmap[bitmap_idx] != Coverage.EMPTY) continue;
                 
                 // Transform back to TTF space
                 const ttf_x = bounds_center_x + (@as(f32, @floatFromInt(x)) - center_x) / scale;
@@ -201,7 +235,7 @@ pub const DebugAsciiRenderer = struct {
                 
                 // Test if inside using simple winding number
                 if (isPointInside(Point{ .x = ttf_x, .y = ttf_y }, contours)) {
-                    bitmap[bitmap_idx] = COVERAGE_CHARS[1]; // '.' for interior
+                    bitmap[bitmap_idx] = Coverage.LIGHT; // 64 for interior
                 }
             }
         }
