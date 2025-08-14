@@ -1,28 +1,52 @@
 # Critical Font Renderer Fixes - Pure Zig Implementation
 
-## Current Status: 🔴 CRITICAL
-The pure Zig font renderer is experiencing severe issues:
-- **Performance**: Extremely slow rendering (likely 10-100x slower than needed)
-- **Visual Quality**: Text is nearly unreadable/unusable
-- **Stability**: Buggy behavior affecting usability
+## Current Status: 🟡 PARTIALLY WORKING (Updated: 2025-01-14)
 
-## Root Cause Analysis Needed
+### Progress Made ✅
+- **Fixed double rasterization bug** - 2x speedup achieved
+- **Fixed memory allocation storm** - 30% speedup, no per-scanline allocations
+- **Implemented proper glyph caching** - Bitmaps stored and reused
+- **All tests passing** - Font manager tests successful
+- **FPS numbers partially visible** - Some digits rendering correctly
 
-### 1. Performance Profiling 🔴 URGENT
-- [ ] Profile font loading time vs rendering time
-- [ ] Check if glyphs are being re-rasterized every frame (no caching?)
-- [ ] Verify texture atlas is actually being used
-- [ ] Check for excessive allocations in hot paths
-- [ ] Measure time spent in Bézier tessellation
-- [ ] Profile scanline rasterization performance
+### Critical Issues 🔴
+- **Gray Rectangle Bug**: Most glyphs render as solid gray blocks instead of letters
+- **Visual Quality**: Text mostly unreadable except some digits
+- **Texture Format Mismatch**: Atlas uses R8_UNORM, manager expects RGBA
 
-### 2. Visual Bug Investigation 🔴 URGENT
-- [ ] Screenshot the current text rendering output
-- [ ] Compare glyph metrics with reference implementation
-- [ ] Check coordinate system transformations (Y-flip issues?)
-- [ ] Verify proper anti-aliasing implementation
-- [ ] Test with different font sizes (scaling issues?)
-- [ ] Check alpha blending and premultiplication
+## Root Cause of Gray Rectangle Bug
+
+### Primary Suspects (In Order of Likelihood):
+1. **Scanline Rasterizer Filling Entire Bounds** 
+   - Winding rule implementation may be inverted
+   - All pixels inside bounding box being filled
+   - Edge sorting or active edge calculation wrong
+
+2. **Texture Format Mismatch**
+   - Atlas uploads as `R8_UNORM` (single channel alpha)
+   - Font manager creates `R8G8B8A8_UNORM` textures
+   - Cached bitmap is single-channel but treated as RGBA
+
+3. **Bitmap Corruption During Cache**
+   - Memory copy may be wrong size
+   - Stride/pitch issues when copying
+
+4. **Coordinate System Issues**
+   - Y-axis flip causing glyphs to be inverted
+   - Pixels written to wrong locations
+
+### Completed Optimizations ✅
+- [x] Fixed double rasterization (glyphs only rasterized once)
+- [x] Fixed memory allocation storm (reuse scanline buffers)
+- [x] Implemented bitmap caching in atlas
+- [x] Cache hit rate working (persistent text reused)
+
+### Visual Bug Investigation 🔴 URGENT
+- [ ] Add debug output to show first 100 bytes of rasterized bitmap
+- [ ] Count non-zero pixels in each glyph bitmap
+- [ ] Verify scanline winding number calculation
+- [ ] Check texture format consistency throughout pipeline
+- [ ] Test with a single large letter 'A' for debugging
 
 ### 3. Critical Implementation Fixes
 
@@ -63,9 +87,50 @@ The pure Zig font renderer is experiencing severe issues:
 - [ ] Implement proper mipmap generation
 - [ ] Add debug visualization for atlas layout
 
+## Immediate Next Steps (Gray Rectangle Fix)
+
+### Step 1: Add Debug Output to Rasterizer
+```zig
+// In font_rasterizer.zig after scanlineRender
+var non_zero: u32 = 0;
+var total_value: u32 = 0;
+for (bitmap) |pixel| {
+    if (pixel != 0) non_zero += 1;
+    total_value += pixel;
+}
+if (codepoint == 'A' or codepoint == '0') {
+    log.warn("Glyph '{}': {}/{} non-zero pixels, total value: {}", 
+             .{codepoint, non_zero, bitmap.len, total_value});
+    log.warn("First bytes: {any}", .{bitmap[0..@min(20, bitmap.len)]});
+}
+```
+
+### Step 2: Fix Texture Format Consistency
+Change atlas from R8_UNORM to match font_manager's RGBA:
+```zig
+// In font_atlas.zig
+.format = c.sdl.SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,  // Was R8_UNORM
+```
+
+### Step 3: Validate Scanline Logic
+Check if winding rule is inverted:
+```zig
+// In scanlineRender - try inverting the fill condition
+if (winding_number == 0) {  // Was != 0
+    bitmap[y * width + x] = 255;
+}
+```
+
+### Step 4: Test Single Glyph
+Focus debugging on one character:
+```zig
+// In menu +page.zig - add single large 'A' test
+try links.append(page.createLink("A", "", 850, 400, 100, 100));
+```
+
 ## Immediate Action Plan
 
-### Phase 1: Diagnostics (Day 1)
+### Phase 1: Debug Gray Rectangles (NOW)
 1. **Add Debug Output**
    ```zig
    // Add timing for each stage
