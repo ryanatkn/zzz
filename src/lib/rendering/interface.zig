@@ -2,8 +2,8 @@
 // Common interface for drawing operations that can be implemented by different renderers
 
 const std = @import("std");
-const c = @import("c.zig");
-const types = @import("types.zig");
+const c = @import("../platform/sdl.zig");
+const types = @import("../core/types.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

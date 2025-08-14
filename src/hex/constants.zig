@@ -1,4 +1,4 @@
-const colors = @import("../lib/colors.zig");
+const colors = @import("../lib/core/colors.zig");
 
 // Screen/Window dimensions
 pub const SCREEN_WIDTH = 1920.0;

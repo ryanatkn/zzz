@@ -352,3 +352,5 @@ $ zig build --help       # Show all build options
 - Documentation stays in root until work is entirely finished
 - Git history tracks incremental changes and progress
 - Root directory focuses on current priorities without premature archival
+- memorize this perspective: a scalable lib directory can look like, for a system that exposes all modules 
+  to all other modules without arbitrary restrictions.

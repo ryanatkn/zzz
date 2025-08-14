@@ -1,8 +1,8 @@
 const std = @import("std");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 const text_renderer = @import("../text/renderer.zig");
 const font_manager = @import("../font/manager.zig");
-const drawing = @import("../drawing.zig");
+const drawing = @import("../rendering/drawing.zig");
 const font_config = @import("../font/config.zig");
 const log_throttle = @import("../debug/log_throttle.zig");
 

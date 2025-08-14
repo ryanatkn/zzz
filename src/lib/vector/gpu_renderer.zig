@@ -1,6 +1,6 @@
 const std = @import("std");
-const c = @import("../c.zig");
-const types = @import("../types.zig");
+const c = @import("../platform/sdl.zig");
+const types = @import("../core/types.zig");
 const vector_path = @import("path.zig");
 const curve_tessellation = @import("../font/curve_tessellation.zig");
 

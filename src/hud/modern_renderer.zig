@@ -1,8 +1,8 @@
 const std = @import("std");
-const types = @import("../lib/types.zig");
+const types = @import("../lib/core/types.zig");
 const reactive = @import("../lib/reactive.zig");
 const ui = @import("../lib/ui.zig");
-const simple_gpu_renderer = @import("../lib/simple_gpu_renderer.zig");
+const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
 const page = @import("page.zig");
 
 const Vec2 = types.Vec2;

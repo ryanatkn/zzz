@@ -1,6 +1,6 @@
 const std = @import("std");
-const persistent_text = @import("text/cache.zig");
-const text_renderer = @import("text/renderer.zig");
+const persistent_text = @import("../text/cache.zig");
+const text_renderer = @import("../text/renderer.zig");
 
 /// Rendering Mode Guidelines for the Dealt Game Engine
 ///
@@ -162,7 +162,7 @@ pub const UseCases = struct {
 
 /// Helper functions for common rendering patterns
 /// Render text using the recommended mode based on change frequency
-pub fn renderTextWithAutoMode(renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("types.zig").Vec2, font_manager: anytype, font_category: anytype, font_size: f32, color: @import("types.zig").Color, changes_per_second: f32) !void {
+pub fn renderTextWithAutoMode(renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("../core/types.zig").Vec2, font_manager: anytype, font_category: anytype, font_size: f32, color: @import("../core/types.zig").Color, changes_per_second: f32) !void {
     const profile = recommendModeByRate(changes_per_second);
 
     switch (profile.recommended_mode) {
@@ -179,7 +179,7 @@ pub fn renderTextWithAutoMode(renderer: *text_renderer.TextRenderer, text: []con
 }
 
 /// Render text with explicit mode choice
-pub fn renderTextExplicitMode(renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("types.zig").Vec2, font_manager: anytype, font_category: anytype, font_size: f32, color: @import("types.zig").Color, mode: RenderingMode) !void {
+pub fn renderTextExplicitMode(renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("../core/types.zig").Vec2, font_manager: anytype, font_category: anytype, font_size: f32, color: @import("../core/types.zig").Color, mode: RenderingMode) !void {
     switch (mode) {
         .immediate => {
             const text_result = try font_manager.renderTextToTexture(text, font_category, font_size, color, renderer.device);

@@ -1,16 +1,17 @@
 const std = @import("std");
 
-const c = @import("../lib/c.zig");
+const c = @import("../lib/platform/sdl.zig");
 
-const types = @import("../lib/types.zig");
+const types = @import("../lib/core/types.zig");
 const entities = @import("entities.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
-const input = @import("../lib/input.zig");
+const input = @import("../lib/platform/input.zig");
 const player_controller = @import("player.zig");
 const combat = @import("combat.zig");
 const portals = @import("portals.zig");
-const camera = @import("../lib/camera.zig");
+const camera = @import("../lib/rendering/camera.zig");
+const viewport = @import("../lib/core/viewport.zig");
 const effects = @import("effects.zig");
 const hud = @import("../hud/hud.zig");
 const reactive_hud = @import("../hud/reactive_hud.zig");
@@ -160,7 +161,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
         // Handle continuous shooting on left-click hold (rhythm mode)
         // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
         if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and game_state.bullet_pool.canFire()) {
-            const world_mouse_pos = input_state.getWorldMousePos(cam);
+            const world_mouse_pos = input_state.getWorldMousePos(viewport.createViewport(cam));
             _ = combat.fireBulletAtMouse(world, world_mouse_pos, &game_state.bullet_pool);
         }
     }
@@ -243,7 +244,7 @@ pub fn checkCollisions(game_state: *GameState) void {
 
 pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void {
     if (game_state.world.player.alive and !game_state.game_paused) {
-        const world_mouse_pos = game_state.input_state.getWorldMousePos(cam);
+        const world_mouse_pos = game_state.input_state.getWorldMousePos(viewport.createViewport(cam));
         _ = combat.fireBulletAtMouse(&game_state.world, world_mouse_pos, &game_state.bullet_pool);
     }
 }

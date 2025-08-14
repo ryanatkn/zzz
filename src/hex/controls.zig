@@ -1,14 +1,15 @@
 const std = @import("std");
 
-const c = @import("../lib/c.zig");
+const c = @import("../lib/platform/sdl.zig");
 
-const types = @import("../lib/types.zig");
+const types = @import("../lib/core/types.zig");
 const constants = @import("constants.zig");
 const game_controller = @import("game.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
 const spells = @import("spells.zig");
+const viewport = @import("../lib/core/viewport.zig");
 
 const Vec2 = types.Vec2;
 const GameState = game_controller.GameState;
@@ -97,7 +98,7 @@ pub fn handleSDLEvent(
                     // Right-click casts spell (self-cast if Ctrl held)
                     if (game_state.world.player.alive) {
                         const ctrl_held = game_state.input_state.isCtrlHeld();
-                        const world_mouse_pos = game_state.input_state.getWorldMousePos(&game_renderer.camera);
+                        const world_mouse_pos = game_state.input_state.getWorldMousePos(viewport.createViewport(&game_renderer.camera));
                         _ = game_state.spell_system.castActiveSpell(&game_state.world.player, game_state.world.getCurrentZone(), world_mouse_pos, &game_state.effect_system, ctrl_held // self_cast parameter
                         );
                     }

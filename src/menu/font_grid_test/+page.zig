@@ -1,11 +1,11 @@
 const std = @import("std");
-const c = @import("../../lib/c.zig");
+const c = @import("../../lib/platform/sdl.zig");
 const page = @import("../../hud/page.zig");
 const multi_text_renderer = @import("../../lib/text/multi_renderer.zig");
 const text_primitives = @import("../../lib/text/primitives.zig");
 const text_renderer = @import("../../lib/text/renderer.zig");
 const font_manager = @import("../../lib/font/manager.zig");
-const types = @import("../../lib/types.zig");
+const types = @import("../../lib/core/types.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

@@ -1,7 +1,7 @@
 const std = @import("std");
 
 const entities = @import("entities.zig");
-const types = @import("../lib/types.zig");
+const types = @import("../lib/core/types.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

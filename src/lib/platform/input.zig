@@ -1,9 +1,9 @@
 const std = @import("std");
 
-const c = @import("c.zig");
+const c = @import("sdl.zig");
 
-const types = @import("types.zig");
-const camera = @import("camera.zig");
+const types = @import("../core/types.zig");
+const viewport = @import("../core/viewport.zig");
 
 const Vec2 = types.Vec2;
 
@@ -69,8 +69,8 @@ pub const InputState = struct {
         return self.mouse_pos;
     }
 
-    pub fn getWorldMousePos(self: *const Self, cam: *const camera.Camera) Vec2 {
-        return cam.screenToWorld(self.mouse_pos);
+    pub fn getWorldMousePos(self: *const Self, vp: viewport.Viewport) Vec2 {
+        return vp.screenToWorld(self.mouse_pos);
     }
 
     pub fn getMovementVector(self: *const Self) Vec2 {

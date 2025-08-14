@@ -1,12 +1,13 @@
 const std = @import("std");
 
-const types = @import("../lib/types.zig");
+const types = @import("../lib/core/types.zig");
 const entities = @import("entities.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
-const input = @import("../lib/input.zig");
-const maths = @import("../lib/maths.zig");
-const camera = @import("../lib/camera.zig");
+const input = @import("../lib/platform/input.zig");
+const maths = @import("../lib/core/maths.zig");
+const camera = @import("../lib/rendering/camera.zig");
+const viewport = @import("../lib/core/viewport.zig");
 const constants = @import("constants.zig");
 
 const Vec2 = types.Vec2;
@@ -36,7 +37,7 @@ pub fn updatePlayer(player: *Player, input_state: *const InputState, zone: *cons
 
     // Only allow mouse movement when Ctrl is held
     if (ctrl_held and input_state.isLeftMouseHeld()) {
-        const world_mouse_pos = input_state.getWorldMousePos(cam);
+        const world_mouse_pos = input_state.getWorldMousePos(viewport.createViewport(cam));
         const dx = world_mouse_pos.x - player.pos.x;
         const dy = world_mouse_pos.y - player.pos.y;
         const distance_sq = dx * dx + dy * dy;

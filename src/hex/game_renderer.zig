@@ -1,11 +1,11 @@
 const std = @import("std");
 
-const c = @import("../lib/c.zig");
+const c = @import("../lib/platform/sdl.zig");
 
 const entities = @import("entities.zig");
-const types = @import("../lib/types.zig");
-const simple_gpu_renderer = @import("../lib/simple_gpu_renderer.zig");
-const camera = @import("../lib/camera.zig");
+const types = @import("../lib/core/types.zig");
+const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
+const camera = @import("../lib/rendering/camera.zig");
 const borders = @import("borders.zig");
 const constants = @import("constants.zig");
 const effects = @import("effects.zig");

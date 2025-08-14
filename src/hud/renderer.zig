@@ -1,13 +1,13 @@
 const std = @import("std");
-const c = @import("../lib/c.zig");
-const types = @import("../lib/types.zig");
-const lib_renderer = @import("../lib/renderer.zig");
+const c = @import("../lib/platform/sdl.zig");
+const types = @import("../lib/core/types.zig");
+const lib_renderer = @import("../lib/rendering/interface.zig");
 const game_renderer = @import("../hex/game_renderer.zig");
 const page = @import("page.zig");
 const font_config = @import("../lib/font/config.zig");
 const text_renderer = @import("../lib/text/renderer.zig");
 const menu_text = @import("../lib/ui/menu_text.zig");
-const drawing = @import("../lib/drawing.zig");
+const drawing = @import("../lib/rendering/drawing.zig");
 const multi_text_renderer = @import("../lib/text/multi_renderer.zig");
 
 const Color = types.Color;

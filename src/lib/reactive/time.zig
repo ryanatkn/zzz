@@ -2,7 +2,7 @@ const std = @import("std");
 const signal = @import("signal.zig");
 const derived = @import("derived.zig");
 const effect = @import("effect.zig");
-const c = @import("../c.zig");
+const c = @import("../platform/sdl.zig");
 
 pub const TimeInterval = enum {
     Frame, // Every frame (~16ms at 60fps)

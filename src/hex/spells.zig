@@ -1,5 +1,5 @@
 const std = @import("std");
-const types = @import("../lib/types.zig");
+const types = @import("../lib/core/types.zig");
 const entities = @import("entities.zig");
 const effects = @import("effects.zig");
 const constants = @import("constants.zig");

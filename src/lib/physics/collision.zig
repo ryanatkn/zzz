@@ -1,40 +1,16 @@
 const std = @import("std");
-const types = @import("types.zig");
-const maths = @import("maths.zig");
+const types = @import("../core/types.zig");
+const maths = @import("../core/maths.zig");
+const shapes = @import("shapes.zig");
 
 const Vec2 = types.Vec2;
 
-/// Generic collision shape types
-pub const Shape = union(enum) {
-    circle: Circle,
-    rectangle: Rectangle,
-    point: Point,
-
-    pub const Circle = struct {
-        center: Vec2,
-        radius: f32,
-    };
-
-    pub const Rectangle = struct {
-        position: Vec2,
-        size: Vec2,
-
-        pub fn center(self: Rectangle) Vec2 {
-            return Vec2{
-                .x = self.position.x + self.size.x / 2.0,
-                .y = self.position.y + self.size.y / 2.0,
-            };
-        }
-
-        pub fn contains(self: Rectangle, point: Vec2) bool {
-            return maths.vec2_isWithinRect(point, self.position, self.size);
-        }
-    };
-
-    pub const Point = struct {
-        position: Vec2,
-    };
-};
+// Re-export shape types for backwards compatibility
+pub const Shape = shapes.Shape;
+pub const Circle = shapes.Circle;
+pub const Rectangle = shapes.Rectangle;
+pub const Point = shapes.Point;
+pub const LineSegment = shapes.LineSegment;
 
 /// Generic collision detection between any two shapes
 pub fn checkCollision(shape1: Shape, shape2: Shape) bool {
@@ -43,29 +19,33 @@ pub fn checkCollision(shape1: Shape, shape2: Shape) bool {
             .circle => |c2| circleCircle(c1, c2),
             .rectangle => |r2| circleRectangle(c1, r2),
             .point => |p2| circlePoint(c1, p2),
+            .line_segment => false, // Circle-line collision not implemented yet
         },
         .rectangle => |r1| switch (shape2) {
             .circle => |c2| circleRectangle(c2, r1), // Symmetric
             .rectangle => |r2| rectangleRectangle(r1, r2),
             .point => |p2| rectanglePoint(r1, p2),
+            .line_segment => false, // Rectangle-line collision not implemented yet
         },
         .point => |p1| switch (shape2) {
             .circle => |c2| circlePoint(c2, p1), // Symmetric
             .rectangle => |r2| rectanglePoint(r2, p1), // Symmetric
             .point => |p2| pointPoint(p1, p2),
+            .line_segment => false, // Point-line collision not implemented yet
         },
+        .line_segment => false, // Line segment collisions not implemented yet
     };
 }
 
 /// Circle-circle collision detection (optimized with squared distance)
-pub fn circleCircle(c1: Shape.Circle, c2: Shape.Circle) bool {
+pub fn circleCircle(c1: Circle, c2: Circle) bool {
     const distance_sq = maths.distanceSquared(c1.center, c2.center);
     const radius_sum = c1.radius + c2.radius;
     return distance_sq <= radius_sum * radius_sum;
 }
 
 /// Circle-rectangle collision detection
-pub fn circleRectangle(circle: Shape.Circle, rect: Shape.Rectangle) bool {
+pub fn circleRectangle(circle: Circle, rect: Rectangle) bool {
     // Find closest point on rectangle to circle center
     const closest_x = std.math.clamp(circle.center.x, rect.position.x, rect.position.x + rect.size.x);
     const closest_y = std.math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
@@ -77,12 +57,12 @@ pub fn circleRectangle(circle: Shape.Circle, rect: Shape.Rectangle) bool {
 }
 
 /// Circle-point collision detection
-pub fn circlePoint(circle: Shape.Circle, point: Shape.Point) bool {
+pub fn circlePoint(circle: Circle, point: Point) bool {
     return maths.distanceSquared(circle.center, point.position) <= circle.radius * circle.radius;
 }
 
 /// Rectangle-rectangle collision detection (AABB)
-pub fn rectangleRectangle(r1: Shape.Rectangle, r2: Shape.Rectangle) bool {
+pub fn rectangleRectangle(r1: Rectangle, r2: Rectangle) bool {
     return r1.position.x < r2.position.x + r2.size.x and
         r1.position.x + r1.size.x > r2.position.x and
         r1.position.y < r2.position.y + r2.size.y and
@@ -90,12 +70,12 @@ pub fn rectangleRectangle(r1: Shape.Rectangle, r2: Shape.Rectangle) bool {
 }
 
 /// Rectangle-point collision detection
-pub fn rectanglePoint(rect: Shape.Rectangle, point: Shape.Point) bool {
+pub fn rectanglePoint(rect: Rectangle, point: Point) bool {
     return rect.contains(point.position);
 }
 
 /// Point-point collision detection (exact match)
-pub fn pointPoint(p1: Shape.Point, p2: Shape.Point) bool {
+pub fn pointPoint(p1: Point, p2: Point) bool {
     return maths.vec2_isEqual(p1.position, p2.position, 0.001); // Small tolerance for floating point
 }
 

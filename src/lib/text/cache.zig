@@ -1,6 +1,6 @@
 const std = @import("std");
-const c = @import("../c.zig");
-const types = @import("../types.zig");
+const c = @import("../platform/sdl.zig");
+const types = @import("../core/types.zig");
 const reactive_text_cache = @import("../reactive/text_cache.zig");
 const log_throttle = @import("../debug/log_throttle.zig");
 

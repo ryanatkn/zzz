@@ -1,9 +1,9 @@
 const std = @import("std");
 
 const entities = @import("entities.zig");
-const types = @import("../lib/types.zig");
-const maths = @import("../lib/maths.zig");
-const collision = @import("../lib/collision.zig");
+const types = @import("../lib/core/types.zig");
+const maths = @import("../lib/core/maths.zig");
+const collision = @import("../lib/physics/collision.zig");
 
 const Vec2 = types.Vec2;
 

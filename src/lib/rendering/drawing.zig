@@ -1,9 +1,9 @@
 const std = @import("std");
-const c = @import("c.zig");
-const types = @import("types.zig");
-const colors = @import("colors.zig");
-const simple_gpu_renderer = @import("simple_gpu_renderer.zig");
-const font_config = @import("font/config.zig");
+const c = @import("../platform/sdl.zig");
+const types = @import("../core/types.zig");
+const colors = @import("../core/colors.zig");
+const simple_gpu_renderer = @import("gpu.zig");
+const font_config = @import("../font/config.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;

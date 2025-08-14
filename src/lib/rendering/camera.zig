@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const types = @import("types.zig");
+const types = @import("../core/types.zig");
 // Note: Camera should not import game-specific constants
 // Constants will be passed as parameters instead
 

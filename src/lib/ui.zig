@@ -209,7 +209,7 @@ pub const Theme = struct {
 pub const default_theme = Theme{};
 
 // Import types for convenience
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 const reactive = @import("../reactive.zig");
 
 // Tests

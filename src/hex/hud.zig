@@ -1,8 +1,8 @@
 const std = @import("std");
 
-const c = @import("../lib/c.zig");
+const c = @import("../lib/platform/sdl.zig");
 
-const types = @import("../lib/types.zig");
+const types = @import("../lib/core/types.zig");
 
 const Color = types.Color;
 

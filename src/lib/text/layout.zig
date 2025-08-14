@@ -1,5 +1,5 @@
 const std = @import("std");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 const font_atlas = @import("../font/font_atlas.zig");
 const rasterizer_core = @import("../font/rasterizer_core.zig");
 

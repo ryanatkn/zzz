@@ -1,5 +1,5 @@
 const std = @import("std");
-const types = @import("../lib/types.zig");
+const types = @import("../lib/core/types.zig");
 
 pub const Link = struct {
     text: []const u8,

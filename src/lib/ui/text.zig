@@ -1,5 +1,5 @@
 const std = @import("std");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 const reactive = @import("../reactive.zig");
 const component = @import("component.zig");
 const text_renderer = @import("../text/renderer.zig");
