@@ -313,8 +313,8 @@ $ zig build --help       # Show all build options
   - Run validation session to verify implementation matches design intent
   - Machine develops complete understanding of relevant codebase parts
   - Validate local file state against TODO documentation claims
-  - User verifies results, conclusions, and presented data
-  - Only then proceed to archive validated TODO files
+  - User and machine independently verify results, conclusions, and presented data
+  - Only after convening and getting user approval does the machine proceed to archive validated TODO files
 - **Permanent docs** (README.md, CLAUDE.md) remain unprefixed in root
 - **Only archive to `docs/archive/`** when TODO docs become stale, superseded, or fully validated as complete
 - **Always commit todo docs** to git both during work and after completion
