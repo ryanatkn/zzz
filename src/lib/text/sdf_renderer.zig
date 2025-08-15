@@ -1,10 +1,9 @@
 const std = @import("std");
-const types = @import("../core/types.zig");
 const math = @import("../math/mod.zig");
 const vector_path = @import("../vector/path.zig");
 const font_metrics = @import("../font/font_metrics.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 const VectorPath = vector_path.VectorPath;
 const Contour = vector_path.Contour;
 

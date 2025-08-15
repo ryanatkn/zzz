@@ -3,7 +3,7 @@ const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
 
 // Engine imports
-const types = @import("../lib/core/types.zig");
+const colors = @import("../lib/core/colors.zig");
 const input = @import("../lib/platform/input.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const math = @import("../lib/math/mod.zig");
@@ -32,8 +32,8 @@ const log_throttle = @import("../lib/debug/log_throttle.zig");
 
 const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
 const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 const HexWorld = @import("hex_world.zig").HexWorld;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const GameState = game_controller.GameState;

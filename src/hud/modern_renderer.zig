@@ -1,12 +1,13 @@
 const std = @import("std");
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
+const colors = @import("../lib/core/colors.zig");
 const reactive = @import("../lib/reactive.zig");
 const ui = @import("../lib/ui.zig");
 const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
 const page = @import("page.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 
 /// Modern reactive HUD renderer that uses the new UI component system
@@ -212,7 +213,7 @@ pub const ModernHUDRenderer = struct {
                 cmd_buffer: *anyopaque,
                 render_pass: *anyopaque,
                 
-                pub fn drawRect(self: @This(), bounds: types.Rectangle, color: Color) !void {
+                pub fn drawRect(self: @This(), bounds: math.Rectangle, color: Color) !void {
                     // Convert to base renderer call
                     try self.base.drawRect(
                         @ptrCast(self.cmd_buffer),
@@ -223,7 +224,7 @@ pub const ModernHUDRenderer = struct {
                     );
                 }
                 
-                pub fn drawRoundedRect(self: @This(), bounds: types.Rectangle, color: Color, radius: f32) !void {
+                pub fn drawRoundedRect(self: @This(), bounds: math.Rectangle, color: Color, radius: f32) !void {
                     // For now, fall back to regular rect (can be enhanced later)
                     _ = radius;
                     try self.drawRect(bounds, color);

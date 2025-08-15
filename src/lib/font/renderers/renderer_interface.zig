@@ -1,9 +1,10 @@
 const std = @import("std");
-const types = @import("../../core/types.zig");
+const math = @import("../../math/mod.zig");
+const colors = @import("../../core/colors.zig");
 const font_types = @import("../font_types.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 
 /// Result of rendering a single glyph
 pub const RenderResult = struct {

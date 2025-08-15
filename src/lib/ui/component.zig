@@ -1,10 +1,11 @@
 const std = @import("std");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
-const Rectangle = types.Rectangle;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
+const Rectangle = math.Rectangle;
 
 /// Base component properties that all UI components share
 pub const ComponentProps = struct {

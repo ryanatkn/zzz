@@ -1,10 +1,10 @@
 const std = @import("std");
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const hex_world = @import("hex_world.zig");
 const game_systems = @import("../lib/game/game.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 
 /// Hex-specific save data structure
 pub const HexSaveData = struct {

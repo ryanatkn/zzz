@@ -1,7 +1,8 @@
 const std = @import("std");
-const types = @import("../core/types.zig");
-pub const Vec2 = types.Vec2;
-const Color = types.Color;
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
+pub const Vec2 = math.Vec2;
+const Color = colors.Color;
 const BoundedArray = std.BoundedArray;
 const entity = @import("entity.zig");
 const EntityId = entity.EntityId;

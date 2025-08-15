@@ -1,5 +1,5 @@
 const std = @import("std");
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
 const effects = @import("effects.zig");
 const constants = @import("constants.zig");
 const components = @import("../lib/game/components.zig");
@@ -7,7 +7,7 @@ const entity = @import("../lib/game/entity.zig");
 const world_mod = @import("../lib/game/world.zig");
 const log_throttle = @import("../lib/debug/log_throttle.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 const Zone = @import("hex_world.zig").HexWorld.Zone;
 const HexWorld = @import("hex_world.zig").HexWorld;
 const EntityId = entity.EntityId;

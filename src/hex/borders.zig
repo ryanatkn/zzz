@@ -3,8 +3,8 @@ const math = std.math;
 
 const c = @import("../lib/platform/sdl.zig");
 
-const types = @import("../lib/core/types.zig");
-const Color = types.Color;
+const colors = @import("../lib/core/colors.zig");
+const Color = colors.Color;
 const constants = @import("constants.zig");
 
 // Border animation constants
@@ -82,11 +82,11 @@ pub const BorderSpec = struct {
     }
 
     pub fn getCurrentColor(self: *const BorderSpec) Color {
-        if (self.color_pair) |colors| {
+        if (self.color_pair) |color_pair| {
             const pulse = calculateAnimationPulse(self.pulse_freq orelse 4.0);
             const hue_cycle = calculateColorCycle();
             const intensity = 0.7 + pulse * 0.3;
-            return interpolateColor(colors, hue_cycle, intensity);
+            return interpolateColor(color_pair, hue_cycle, intensity);
         } else {
             return self.base_color;
         }

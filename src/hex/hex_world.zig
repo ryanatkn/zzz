@@ -1,12 +1,12 @@
 const std = @import("std");
-const types = @import("../lib/core/types.zig");
+const colors = @import("../lib/core/colors.zig");
 const math = @import("../lib/math/mod.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const constants = @import("constants.zig");
 const combat = @import("combat.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 const EntityId = ecs.EntityId;
 const World = ecs.World;
 const components = ecs.components;

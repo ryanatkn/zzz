@@ -3,7 +3,8 @@ const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
 
 const hex_world = @import("hex_world.zig");
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
+const colors = @import("../lib/core/colors.zig");
 const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
 const camera = @import("../lib/rendering/camera.zig");
 const borders = @import("borders.zig");
@@ -13,8 +14,8 @@ const font_manager = @import("../lib/font/manager.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 const log_throttle = @import("../lib/debug/log_throttle.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 
 pub const GameRenderer = struct {

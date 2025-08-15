@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
+const colors = @import("../lib/core/colors.zig");
 const lib_renderer = @import("../lib/rendering/interface.zig");
 const game_renderer = @import("../hex/game_renderer.zig");
 const page = @import("page.zig");
@@ -11,8 +12,8 @@ const drawing = @import("../lib/rendering/drawing.zig");
 const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
 const bitmap_simple = @import("../lib/font/renderers/bitmap_simple.zig");
 
-const Color = types.Color;
-const Vec2 = types.Vec2;
+const Color = colors.Color;
+const Vec2 = math.Vec2;
 
 /// Configuration for font grid test rendering
 const FontGridConfig = struct {

@@ -1,6 +1,6 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
-const types = @import("../core/types.zig");
+const colors = @import("../core/colors.zig");
 const ttf_parser = @import("ttf_parser.zig");
 const rasterizer_core = @import("rasterizer_core.zig");
 const font_atlas = @import("font_atlas.zig");
@@ -171,7 +171,7 @@ pub const FontManager = struct {
         text: []const u8,
         category: font_config.FontCategory,
         size: f32,
-        color: types.Color,
+        color: colors.Color,
     ) !struct {
         texture: *c.sdl.SDL_GPUTexture,
         width: u32,

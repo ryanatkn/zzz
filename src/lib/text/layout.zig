@@ -1,9 +1,9 @@
 const std = @import("std");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
 const font_atlas = @import("../font/font_atlas.zig");
 const rasterizer_core = @import("../font/rasterizer_core.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 
 pub const TextAlign = enum {
     left,

@@ -1,6 +1,6 @@
-const types = @import("types.zig");
+const math = @import("../math/mod.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 
 /// Viewport interface for screen-to-world coordinate conversion
 /// This breaks the circular dependency between platform/input and rendering/camera

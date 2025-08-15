@@ -2,7 +2,7 @@ const std = @import("std");
 
 const c = @import("../lib/platform/sdl.zig");
 
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const game_controller = @import("game.zig");
 const game_renderer_mod = @import("game_renderer.zig");
@@ -11,7 +11,7 @@ const combat = @import("combat.zig");
 const spells = @import("spells.zig");
 const viewport = @import("../lib/core/viewport.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 const GameState = game_controller.GameState;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const Hud = hud.Hud;

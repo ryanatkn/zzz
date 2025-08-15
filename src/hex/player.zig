@@ -1,6 +1,5 @@
 const std = @import("std");
 
-const types = @import("../lib/core/types.zig");
 const hex_world = @import("hex_world.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
@@ -10,7 +9,7 @@ const camera = @import("../lib/rendering/camera.zig");
 const viewport = @import("../lib/core/viewport.zig");
 const constants = @import("constants.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 const HexWorld = hex_world.HexWorld;
 const InputState = input.InputState;
 

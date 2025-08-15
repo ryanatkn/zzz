@@ -1,11 +1,12 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 const persistent_text = @import("cache.zig");
 const log_throttle = @import("../debug/log_throttle.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 
 // Text rendering uniforms (for bitmap text)
 const TextUniforms = extern struct {
@@ -160,7 +161,7 @@ pub const TextRenderer = struct {
         // Draw at fixed position for testing
         const position = Vec2{ .x = 50.0, .y = 50.0 };
         const size = Vec2{ .x = 100.0, .y = 100.0 };
-        const color = types.Color{ .r = 255, .g = 0, .b = 0, .a = 255 }; // Red tint
+        const color = colors.Color{ .r = 255, .g = 0, .b = 0, .a = 255 }; // Red tint
         
         std.debug.print("DEBUG: Testing texture pipeline with checkerboard at ({}, {}) size {}x{}\n", .{ position.x, position.y, size.x, size.y });
         

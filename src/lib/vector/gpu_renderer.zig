@@ -1,11 +1,12 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 const vector_path = @import("path.zig");
 // curve_tessellation functionality removed - using simplified rendering
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 const VectorPath = vector_path.VectorPath;
 const QuadraticCurve = vector_path.QuadraticCurve;
 const CubicCurve = vector_path.CubicCurve;

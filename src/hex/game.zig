@@ -2,7 +2,7 @@ const std = @import("std");
 
 const c = @import("../lib/platform/sdl.zig");
 
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
 const hex_world = @import("hex_world.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
@@ -24,7 +24,7 @@ const save_data = @import("save_data.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const log_throttle = @import("../lib/debug/log_throttle.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 const HexWorld = hex_world.HexWorld;
 const InputState = input.InputState;
 
@@ -436,7 +436,7 @@ pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void 
 }
 
 // Check lifestone collisions using ECS queries
-fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: types.Vec2, player_radius: f32) void {
+fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_radius: f32) void {
     const world = &game_state.world;
     const ecs_world = world.getECSWorldMut();
     var terrain_iter = @constCast(&ecs_world.terrains).iterator();

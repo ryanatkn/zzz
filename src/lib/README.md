@@ -12,8 +12,7 @@ The library is organized by **capability** rather than implementation details, p
 
 #### **Core (`core/`)**
 Fundamental data structures and utilities that everything else depends on:
-- **Types** (`core/types.zig`) - Vec2, Color, Rectangle and other basic types
-- **Math** (`math/mod.zig`) - Vector operations, distance calculations, transformations, geometric shapes  
+- **Math** (`math/mod.zig`) - Vec2, Rectangle, vector operations, distance calculations, transformations, geometric shapes  
 - **Colors** (`core/colors.zig`) - Color manipulation, HSV conversion, theming
 - **Collections** (`core/collections.zig`) - Navigation history and state management
 
@@ -63,11 +62,15 @@ Advanced feature modules that leverage the core capabilities:
 
 ### Key Components
 
-#### Core Types (`core/types.zig`)
+#### Math Types (`math/mod.zig`)
 ```zig
 pub const Vec2 = struct { x: f32, y: f32 };
-pub const Color = struct { r: u8, g: u8, b: u8, a: u8 };
 pub const Rectangle = struct { x: f32, y: f32, w: f32, h: f32 };
+```
+
+#### Color Types (`core/colors.zig`)
+```zig
+pub const Color = struct { r: u8, g: u8, b: u8, a: u8 };
 ```
 
 #### Renderer Interface (`rendering/interface.zig`)
@@ -145,7 +148,8 @@ const effect = createEffect(&counter, |c| {
 ### Engine Dependencies
 
 Games should primarily depend on:
-- `core/types.zig` for core data structures
+- `math/mod.zig` for Vec2, Rectangle and geometric operations
+- `core/colors.zig` for Color and color utilities
 - `rendering/camera.zig` for viewport management
 - `platform/input.zig` for user input handling
 - `rendering/interface.zig` for drawing interfaces
@@ -169,8 +173,8 @@ SDL3 GPU API (src/lib/platform/sdl.zig)
 ### From Game Code
 ```zig
 // Core utilities
-const types = @import("../lib/core/types.zig");
 const math = @import("../lib/math/mod.zig");
+const colors = @import("../lib/core/colors.zig");
 
 // Platform integration  
 const input = @import("../lib/platform/input.zig");
@@ -188,10 +192,10 @@ const ui = @import("../lib/ui.zig"); // Barrel import
 ### From Library Code
 ```zig
 // Within same capability
-const types = @import("types.zig"); // same directory
+const math = @import("../math/mod.zig"); // math utilities
 
 // Cross-capability dependencies
-const types = @import("../core/types.zig");
+const colors = @import("../core/colors.zig");
 const sdl = @import("../platform/sdl.zig");
 ```
 

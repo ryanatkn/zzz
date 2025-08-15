@@ -1,10 +1,10 @@
 const std = @import("std");
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
 
 pub const Link = struct {
     text: []const u8,
     path: []const u8,
-    bounds: types.Rectangle,
+    bounds: math.Rectangle,
 };
 
 pub const RenderSlot = struct {

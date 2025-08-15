@@ -1,10 +1,10 @@
 const std = @import("std");
 
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
 // Note: Camera should not import game-specific constants
 // Constants will be passed as parameters instead
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 
 // Camera-specific errors
 pub const CameraError = error{

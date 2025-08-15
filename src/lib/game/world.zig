@@ -2,7 +2,7 @@ const std = @import("std");
 const entity_mod = @import("entity.zig");
 const storage_mod = @import("storage.zig");
 const components = @import("components.zig");
-const types = @import("../core/types.zig");
+const colors = @import("../core/colors.zig");
 
 const EntityId = entity_mod.EntityId;
 const EntityAllocator = entity_mod.EntityAllocator;
@@ -193,9 +193,9 @@ pub const World = struct {
         
         // Create visual component
         const color = if (is_deadly) 
-            types.Color{ .r = 200, .g = 0, .b = 0, .a = 255 } // Red for deadly
+            colors.Color{ .r = 200, .g = 0, .b = 0, .a = 255 } // Red for deadly
         else 
-            types.Color{ .r = 100, .g = 100, .b = 100, .a = 255 }; // Gray for blocking
+            colors.Color{ .r = 100, .g = 100, .b = 100, .a = 255 }; // Gray for blocking
         try self.visuals.add(id, components.Visual.init(color));
         
         // Create terrain component with size information
@@ -219,9 +219,9 @@ pub const World = struct {
         
         // Create visual component with proper lifestone color
         const color = if (attuned) 
-            types.Color{ .r = 0, .g = 255, .b = 255, .a = 255 } // Cyan for attuned
+            colors.Color{ .r = 0, .g = 255, .b = 255, .a = 255 } // Cyan for attuned
         else 
-            types.Color{ .r = 128, .g = 128, .b = 255, .a = 255 }; // Light blue for unattuned
+            colors.Color{ .r = 128, .g = 128, .b = 255, .a = 255 }; // Light blue for unattuned
         try self.visuals.add(id, components.Visual.init(color));
         
         // Create terrain component as altar type
@@ -250,7 +250,7 @@ pub const World = struct {
         try self.transforms.add(id, components.Transform.init(pos, radius));
         
         // Create visual component with portal color (purple/magenta)
-        const color = types.Color{ .r = 255, .g = 0, .b = 255, .a = 255 }; // Magenta
+        const color = colors.Color{ .r = 255, .g = 0, .b = 255, .a = 255 }; // Magenta
         try self.visuals.add(id, components.Visual.init(color));
         
         // Create terrain component as door type (portals are like doors)

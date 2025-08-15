@@ -2,11 +2,12 @@ const std = @import("std");
 
 const c = @import("../lib/platform/sdl.zig");
 
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
+const colors = @import("../lib/core/colors.zig");
 const constants = @import("constants.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 
 pub const MAX_EFFECTS = 256; // Increased pool for multiple simultaneous effects
 

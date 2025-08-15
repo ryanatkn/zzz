@@ -1,13 +1,13 @@
 const std = @import("std");
 
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const effects = @import("effects.zig");
 const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 const HexWorld = @import("hex_world.zig").HexWorld;
 
 // Bullet pool constants

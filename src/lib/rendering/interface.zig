@@ -3,10 +3,11 @@
 
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 
 /// Basic drawing interface that all renderers should implement
 pub const RendererInterface = struct {

@@ -1,10 +1,11 @@
 const std = @import("std");
 
 const hex_world = @import("hex_world.zig");
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
+const colors = @import("../lib/core/colors.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 
 // Global arena for ZON data that persists for game lifetime
 var game_data_arena: ?std.heap.ArenaAllocator = null;

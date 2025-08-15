@@ -1,6 +1,5 @@
 const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
-const types = @import("../lib/core/types.zig");
 const history = @import("../lib/core/collections.zig");
 const router_mod = @import("router.zig");
 const game_renderer = @import("../hex/game_renderer.zig");

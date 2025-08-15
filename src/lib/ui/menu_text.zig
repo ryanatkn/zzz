@@ -1,13 +1,14 @@
 const std = @import("std");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 const text_renderer = @import("../text/renderer.zig");
 const font_manager = @import("../font/manager.zig");
 const drawing = @import("../rendering/drawing.zig");
 const font_config = @import("../font/config.zig");
 const log_throttle = @import("../debug/log_throttle.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 const Rectangle = drawing.Rectangle;
 
 /// Standard menu text configurations using dynamic font config

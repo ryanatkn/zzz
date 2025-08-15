@@ -67,7 +67,7 @@ pub fn createCenteredContainer(
     screen_units: *const ScreenUnits,
     padding: f32
 ) !*Component {
-    const size = types.Vec2{
+    const size = math.Vec2{
         .x = screen_units.vw(0.8), // 80% of screen width
         .y = screen_units.vh(0.8), // 80% of screen height
     };
@@ -88,8 +88,8 @@ pub fn createCenteredContainer(
 /// Create a horizontal button row
 pub fn createButtonRow(
     allocator: std.mem.Allocator,
-    position: types.Vec2,
-    size: types.Vec2,
+    position: math.Vec2,
+    size: math.Vec2,
     gap: f32
 ) !*Component {
     var props = try ComponentProps.init(allocator, position, size);
@@ -107,8 +107,8 @@ pub fn createButtonRow(
 /// Create a vertical text column
 pub fn createTextColumn(
     allocator: std.mem.Allocator,
-    position: types.Vec2,
-    size: types.Vec2,
+    position: math.Vec2,
+    size: math.Vec2,
     gap: f32
 ) !*Component {
     var props = try ComponentProps.init(allocator, position, size);
@@ -130,14 +130,14 @@ pub fn createNavMenu(
     buttons: []const struct { label: []const u8, handler: *const fn () void }
 ) !*Component {
     const menu_height = 60.0;
-    const position = types.Vec2{ .x = 0, .y = screen_units.screen_height.get() - menu_height };
-    const size = types.Vec2{ .x = screen_units.screen_width.get(), .y = menu_height };
+    const position = math.Vec2{ .x = 0, .y = screen_units.screen_height.get() - menu_height };
+    const size = math.Vec2{ .x = screen_units.screen_width.get(), .y = menu_height };
     
     var menu = try createButtonRow(allocator, position, size, 20.0);
     
     // Create buttons for the menu
     for (buttons) |button_def| {
-        const nav_button = try createSimpleButton(allocator, button_def.label, types.Vec2.ZERO, button_def.handler);
+        const nav_button = try createSimpleButton(allocator, button_def.label, math.Vec2.ZERO, button_def.handler);
         try menu.addChild(nav_button);
     }
     
@@ -147,12 +147,12 @@ pub fn createNavMenu(
 /// Theme system for consistent styling across the application
 pub const Theme = struct {
     // Colors
-    background: types.Color = types.Color{ .r = 30, .g = 30, .b = 30, .a = 255 },
-    surface: types.Color = types.Color{ .r = 50, .g = 50, .b = 50, .a = 255 },
-    primary: types.Color = types.Color{ .r = 100, .g = 150, .b = 255, .a = 255 },
-    secondary: types.Color = types.Color{ .r = 150, .g = 100, .b = 255, .a = 255 },
-    text: types.Color = types.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
-    text_secondary: types.Color = types.Color{ .r = 200, .g = 200, .b = 200, .a = 255 },
+    background: colors.Color = colors.Color{ .r = 30, .g = 30, .b = 30, .a = 255 },
+    surface: colors.Color = colors.Color{ .r = 50, .g = 50, .b = 50, .a = 255 },
+    primary: colors.Color = colors.Color{ .r = 100, .g = 150, .b = 255, .a = 255 },
+    secondary: colors.Color = colors.Color{ .r = 150, .g = 100, .b = 255, .a = 255 },
+    text: colors.Color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+    text_secondary: colors.Color = colors.Color{ .r = 200, .g = 200, .b = 200, .a = 255 },
     
     // Typography
     font_size_small: f32 = 12.0,
@@ -169,7 +169,7 @@ pub const Theme = struct {
     
     // Button styles
     button_height: f32 = 36.0,
-    button_padding: types.Vec2 = types.Vec2{ .x = 16, .y = 8 },
+    button_padding: math.Vec2 = math.Vec2{ .x = 16, .y = 8 },
     button_radius: f32 = 4.0,
     
     pub fn getTextStyle(self: *const Theme, size_category: enum { small, normal, large, title, heading }) TextStyle {
@@ -191,13 +191,13 @@ pub const Theme = struct {
     pub fn getButtonStyle(self: *const Theme) ButtonStyle {
         return ButtonStyle{
             .normal_color = self.surface,
-            .hover_color = types.Color{ .r = self.surface.r + 20, .g = self.surface.g + 20, .b = self.surface.b + 20, .a = 255 },
-            .pressed_color = types.Color{ .r = self.surface.r - 10, .g = self.surface.g - 10, .b = self.surface.b - 10, .a = 255 },
-            .disabled_color = types.Color{ .r = self.surface.r - 20, .g = self.surface.g - 20, .b = self.surface.b - 20, .a = 255 },
-            .border_normal = types.Color{ .r = 120, .g = 120, .b = 120, .a = 255 },
+            .hover_color = colors.Color{ .r = self.surface.r + 20, .g = self.surface.g + 20, .b = self.surface.b + 20, .a = 255 },
+            .pressed_color = colors.Color{ .r = self.surface.r - 10, .g = self.surface.g - 10, .b = self.surface.b - 10, .a = 255 },
+            .disabled_color = colors.Color{ .r = self.surface.r - 20, .g = self.surface.g - 20, .b = self.surface.b - 20, .a = 255 },
+            .border_normal = colors.Color{ .r = 120, .g = 120, .b = 120, .a = 255 },
             .border_hover = self.primary,
-            .border_pressed = types.Color{ .r = self.primary.r - 50, .g = self.primary.g - 50, .b = self.primary.b - 50, .a = 255 },
-            .border_disabled = types.Color{ .r = 60, .g = 60, .b = 60, .a = 255 },
+            .border_pressed = colors.Color{ .r = self.primary.r - 50, .g = self.primary.g - 50, .b = self.primary.b - 50, .a = 255 },
+            .border_disabled = colors.Color{ .r = 60, .g = 60, .b = 60, .a = 255 },
             .border_width = 1.0,
             .corner_radius = self.button_radius,
             .padding = self.button_padding,
@@ -209,7 +209,12 @@ pub const Theme = struct {
 pub const default_theme = Theme{};
 
 // Import types for convenience
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
+const types = struct {
+    pub const Vec2 = math.Vec2;
+    pub const Color = colors.Color;
+};
 const reactive = @import("../reactive.zig");
 
 // Tests
@@ -237,14 +242,14 @@ test "UI system integration" {
     defer container.destroy(allocator);
     
     // Add a title
-    var title = try createTitle(allocator, "Test Title", types.Vec2.ZERO, 24.0);
+    var title = try createTitle(allocator, "Test Title", math.Vec2.ZERO, 24.0);
     try container.addChild(title);
     
     // Add a button
     const TestHandler = struct {
         fn onClick() void {}
     };
-    var button = try createSimpleButton(allocator, "Test Button", types.Vec2.ZERO, TestHandler.onClick);
+    var button = try createSimpleButton(allocator, "Test Button", math.Vec2.ZERO, TestHandler.onClick);
     try container.addChild(button);
     
     // Verify structure

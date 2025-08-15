@@ -1,5 +1,5 @@
-const types = @import("../lib/core/types.zig");
-const Vec2 = types.Vec2;
+const math = @import("../lib/math/mod.zig");
+const Vec2 = math.Vec2;
 const game_systems = @import("../lib/game/game.zig");
 
 /// Hex-specific game events

@@ -1,6 +1,6 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
-const types = @import("../core/types.zig");
+const colors = @import("../core/colors.zig");
 const reactive_text_cache = @import("../reactive/text_cache.zig");
 const log_throttle = @import("../debug/log_throttle.zig");
 
@@ -69,7 +69,7 @@ pub const PersistentTextSystem = struct {
 
     /// Get or create a persistent texture for the given text content
     /// Returns existing texture if content hasn't changed, or creates new one
-    pub fn getOrCreateTexture(self: *Self, text: []const u8, font_manager: anytype, font_category: anytype, font_size: f32, color: types.Color) !?PersistentTextureHandle {
+    pub fn getOrCreateTexture(self: *Self, text: []const u8, font_manager: anytype, font_category: anytype, font_size: f32, color: colors.Color) !?PersistentTextureHandle {
         // Validate UTF-8 before processing
         if (!std.unicode.utf8ValidateSlice(text)) {
             log_throttle.logError("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});

@@ -4,7 +4,7 @@
 const std = @import("std");
 const ecs = @import("../lib/game/ecs.zig");
 const pools = @import("../lib/game/pools.zig");
-const types = @import("../lib/core/types.zig");
+const math = @import("../lib/math/mod.zig");
 
 const EntityId = ecs.EntityId;
 const World = ecs.World;
@@ -14,7 +14,7 @@ const Movement = ecs.Movement;
 const Unit = ecs.Unit;
 const Combat = ecs.Combat;
 const BulletPool = pools.BulletPool;
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 
 /// Extended world for the hex game with specialized pools
 pub const HexWorld = struct {

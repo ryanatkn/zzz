@@ -1,6 +1,6 @@
 const std = @import("std");
-const types = @import("../../core/types.zig");
-const Vec2 = types.Vec2;
+const math = @import("../../math/mod.zig");
+const Vec2 = math.Vec2;
 
 /// Common game event types that can be extended with custom events
 pub fn GameEvents(comptime CustomEvents: type) type {

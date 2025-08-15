@@ -1,9 +1,8 @@
 const std = @import("std");
-const types = @import("../core/types.zig");
 const math = @import("../math/mod.zig");
 const shapes = @import("shapes.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 
 // Re-export shape types for backwards compatibility
 pub const Shape = shapes.Shape;

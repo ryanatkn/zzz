@@ -1,12 +1,13 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 const text_primitives = @import("primitives.zig");
 const text_renderer = @import("renderer.zig");
 const font_manager = @import("../font/manager.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 const RenderMethod = text_primitives.RenderMethod;
 const TextTexture = text_primitives.TextTexture;
 const TextStats = text_primitives.TextStats;

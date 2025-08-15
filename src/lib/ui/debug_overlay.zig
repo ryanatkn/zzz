@@ -1,5 +1,6 @@
 const std = @import("std");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 const text_renderer = @import("../text/renderer.zig");
 const persistent_text = @import("../text/cache.zig");
 const rendering_modes = @import("../rendering/modes.zig");
@@ -9,8 +10,8 @@ const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
 const log_throttle = @import("../debug/log_throttle.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 
 /// Debug value that can be displayed in the overlay
 pub const DebugValue = struct {

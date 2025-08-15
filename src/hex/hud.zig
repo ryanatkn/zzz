@@ -2,9 +2,9 @@ const std = @import("std");
 
 const c = @import("../lib/platform/sdl.zig");
 
-const types = @import("../lib/core/types.zig");
+const colors = @import("../lib/core/colors.zig");
 
-const Color = types.Color;
+const Color = colors.Color;
 
 // HUD system now uses GPU-based rendering through the renderer
 // Old bitmap digit constants removed - see renderer.zig for current implementation

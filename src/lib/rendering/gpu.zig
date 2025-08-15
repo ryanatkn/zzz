@@ -2,12 +2,13 @@ const std = @import("std");
 
 const c = @import("../platform/sdl.zig");
 
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 const TextRenderer = @import("../text/renderer.zig").TextRenderer;
 const gpu_vector_renderer = @import("../vector/gpu_renderer.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 
 // Circle uniform buffer - color components split to avoid HLSL array packing issues
 const CircleUniforms = extern struct {

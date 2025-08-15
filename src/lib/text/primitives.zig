@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
+const colors = @import("../core/colors.zig");
 const font_manager = @import("../font/manager.zig");
 const font_config = @import("../font/config.zig");
 const bitmap_utils = @import("../image/bitmap.zig");
@@ -9,8 +10,8 @@ const sdf_renderer = @import("sdf_renderer.zig");
 const vector_path = @import("../vector/path.zig");
 const text_cache = @import("cache.zig");
 
-const Vec2 = types.Vec2;
-const Color = types.Color;
+const Vec2 = math.Vec2;
+const Color = colors.Color;
 
 /// Text rendering method enumeration
 pub const RenderMethod = enum {

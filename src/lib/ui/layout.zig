@@ -1,9 +1,9 @@
 const std = @import("std");
-const types = @import("../core/types.zig");
+const math = @import("../math/mod.zig");
 const reactive = @import("../reactive.zig");
 const component = @import("component.zig");
 
-const Vec2 = types.Vec2;
+const Vec2 = math.Vec2;
 const Component = component.Component;
 const ComponentProps = component.ComponentProps;
 const LayoutConstraints = component.LayoutConstraints;
