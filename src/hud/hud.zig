@@ -50,7 +50,11 @@ pub const Hud = struct {
         if (self.is_open) {
             // Reset to home when opening
             self.history = history.SimpleHistory.init();
-            self.router.navigate("/") catch unreachable;
+            self.router.navigate("/") catch |err| {
+                std.log.err("Failed to navigate to home page: {}", .{err});
+                // If navigation fails, keep HUD closed to prevent broken state
+                self.is_open = false;
+            };
         }
     }
 
@@ -82,8 +86,8 @@ pub const Hud = struct {
                         }
 
                         // Check navigation bar buttons
-                        const screen_height = 1080.0; // TODO: Get from renderer
-                        const bar_y = screen_height * 0.1;
+                        const screen_size = self.renderer.getScreenSize();
+                        const bar_y = screen_size.y * 0.1;
                         const button_margin = 50.0;
 
                         const mouse_x = button_event.x;

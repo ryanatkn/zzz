@@ -26,6 +26,9 @@ const Vec2 = math.Vec2;
 const HexWorld = hex_world.HexWorld;
 const InputState = input.InputState;
 
+// Module-level reference to current GameState for compute callbacks
+var current_game_state: ?*GameState = null;
+
 pub const GameState = struct {
     world: HexWorld,
     input_state: InputState,
@@ -84,6 +87,9 @@ pub const GameState = struct {
         );
         self.state_manager = manager;
 
+        // Set global reference for compute callbacks
+        current_game_state = self;
+
         // Register compute callbacks for expensive operations
         try self.registerComputeCallbacks();
 
@@ -96,6 +102,11 @@ pub const GameState = struct {
             manager.deinit();
             allocator.destroy(manager);
             self.state_manager = null;
+            
+            // Clear global reference
+            if (current_game_state == self) {
+                current_game_state = null;
+            }
         }
     }
 
@@ -144,19 +155,33 @@ pub const GameState = struct {
     }
 
     fn computeAllLifestonesAttuned(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
-        // TEMPORARY: Just return false for now since we need access to world state
-        // In a complete implementation, we'd store a reference to the GameState in the manager
-        try manager.cache.setBool("all_lifestones_attuned", false);
+        if (current_game_state) |game_state| {
+            const all_attuned = game_state.computeAllLifestonesAttunedForWorld();
+            try manager.cache.setBool("all_lifestones_attuned", all_attuned);
+        } else {
+            // Fallback if no game state available
+            try manager.cache.setBool("all_lifestones_attuned", false);
+        }
     }
 
     fn computeTotalLifestones(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
-        // TEMPORARY: Just return a reasonable number for now
-        try manager.cache.setInt("total_lifestones", 91); // Total from game_data.zon
+        if (current_game_state) |game_state| {
+            const total = game_state.computeTotalLifestonesForWorld();
+            try manager.cache.setInt("total_lifestones", @intCast(total));
+        } else {
+            // Fallback value from game_data.zon
+            try manager.cache.setInt("total_lifestones", 91);
+        }
     }
 
     fn computeTotalLifestonesAttuned(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
-        // TEMPORARY: Just return 0 for now
-        try manager.cache.setInt("total_lifestones_attuned", 0);
+        if (current_game_state) |game_state| {
+            const total_attuned = game_state.computeTotalAttunedLifestonesForWorld();
+            try manager.cache.setInt("total_lifestones_attuned", @intCast(total_attuned));
+        } else {
+            // Fallback value
+            try manager.cache.setInt("total_lifestones_attuned", 0);
+        }
     }
 
     pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
@@ -170,12 +195,12 @@ pub const GameState = struct {
         }
     }
 
-    pub fn travelToZone(self: *Self, destination_zone: usize) void {
+    pub fn travelToZone(self: *Self, destination_zone: usize) !void {
         if (destination_zone < self.world.zones.len) {
             self.world.current_zone = destination_zone;
             self.world.zones[destination_zone].resetUnits();
             // Clear bullets on zone travel - bullets are now ECS entities
-            // TODO: Destroy bullet entities when traveling to new zone
+            try self.world.clearAllProjectiles();
             // Clear ALL effects on zone travel to prevent persistence
             self.effect_system.clear();
             // Rebuild ambient effects for new zone
@@ -218,7 +243,9 @@ pub const GameState = struct {
 
         // Reset to starting zone
         if (self.world.current_zone != 0) {
-            self.travelToZone(0);
+            self.travelToZone(0) catch |err| {
+                std.log.err("Failed to travel to overworld during reset: {}", .{err});
+            };
         }
 
         // Reset all zones
@@ -296,6 +323,53 @@ pub const GameState = struct {
         }
 
         return total_lifestones > 0 and total_attuned == total_lifestones;
+    }
+
+    /// Get total number of lifestones in the world
+    pub fn computeTotalLifestonesForWorld(self: *const Self) usize {
+        var total_lifestones: usize = 0;
+
+        const ecs_world = self.world.getECSWorld();
+        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+
+            // Only count lifestones (altar terrain with interactable component)
+            if (terrain.terrain_type != .altar) continue;
+            if (!ecs_world.interactables.has(entity_id)) continue;
+
+            total_lifestones += 1;
+        }
+
+        return total_lifestones;
+    }
+
+    /// Get number of attuned lifestones in the world
+    pub fn computeTotalAttunedLifestonesForWorld(self: *const Self) usize {
+        var total_attuned: usize = 0;
+
+        const ecs_world = self.world.getECSWorld();
+        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+
+            // Only count lifestones (altar terrain with interactable component)
+            if (terrain.terrain_type != .altar) continue;
+            if (!ecs_world.interactables.has(entity_id)) continue;
+
+            // Check if lifestone is attuned (using attuned flag)
+            if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+                if (interactable.attuned) {
+                    total_attuned += 1;
+                }
+            }
+        }
+
+        return total_attuned;
     }
 };
 
@@ -470,7 +544,7 @@ fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_
                     if (game_state.state_manager) |manager| {
                         manager.emit(hex_events.lifestoneAttuned(
                             game_state.world.current_zone,
-                            0, // TODO: Get actual index from entity system
+                            entity_id.index, // Use EntityId index as unique identifier
                             transform.pos,
                         ));
                     }

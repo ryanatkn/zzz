@@ -87,3 +87,32 @@ pub fn createLink(text: []const u8, path: []const u8, x: f32, y: f32, width: f32
         },
     };
 }
+
+/// Create a link using normalized coordinates (0-1) that scale with screen size
+/// This is better than hardcoded coordinates for responsive design
+pub fn createResponsiveLink(text: []const u8, path: []const u8, norm_x: f32, norm_y: f32, norm_width: f32, norm_height: f32, screen_width: f32, screen_height: f32) Link {
+    return createLink(
+        text,
+        path,
+        norm_x * screen_width,
+        norm_y * screen_height,
+        norm_width * screen_width,
+        norm_height * screen_height,
+    );
+}
+
+/// Create a link using base 1920x1080 coordinates converted to current screen size
+/// This allows using existing coordinate values while being responsive
+pub fn createLinkFrom1080p(text: []const u8, path: []const u8, x_1080p: f32, y_1080p: f32, width_1080p: f32, height_1080p: f32, screen_width: f32, screen_height: f32) Link {
+    const constants = @import("../hex/constants.zig");
+    const scale_x = screen_width / constants.BASE_SCREEN_WIDTH;
+    const scale_y = screen_height / constants.BASE_SCREEN_HEIGHT;
+    return createLink(
+        text,
+        path,
+        x_1080p * scale_x,
+        y_1080p * scale_y,
+        width_1080p * scale_x,
+        height_1080p * scale_y,
+    );
+}

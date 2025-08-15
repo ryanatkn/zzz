@@ -170,8 +170,8 @@ pub const World = struct {
     pub fn getPlayer(self: *World) ?EntityId {
         var iter = self.player_inputs.iterator();
         while (iter.next()) |entry| {
-            if (self.isAlive(entry.entity)) {
-                return entry.entity;
+            if (self.isAlive(entry.key_ptr.*)) {
+                return entry.key_ptr.*;
             }
         }
         return null;

@@ -57,11 +57,12 @@ pub const FontGridTestPage = struct {
     }
 
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+        const constants = @import("../../hex/constants.zig");
+        const screen_width = constants.BASE_SCREEN_WIDTH;
+        const screen_height = constants.BASE_SCREEN_HEIGHT;
         _ = self;
 
         // Use full screen real estate for immediate visual demo
-        const screen_width = 1920.0;
-        const screen_height = 1080.0;
         const margin = 40.0;
         const header_height = 80.0;
         const content_width = screen_width - (margin * 2);

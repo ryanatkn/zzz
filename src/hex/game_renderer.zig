@@ -227,7 +227,7 @@ pub const GameRenderer = struct {
             const current_time = c.sdl.SDL_GetPerformanceCounter();
             const frequency = c.sdl.SDL_GetPerformanceFrequency();
             const elapsed_sec = @as(f32, @floatFromInt(current_time - game_state.iris_wipe_start_time)) / @as(f32, @floatFromInt(frequency));
-            const wipe_duration = borders.IRIS_WIPE_DURATION;
+            const wipe_duration = constants.IRIS_WIPE_DURATION;
 
             if (elapsed_sec < wipe_duration) {
                 const progress = elapsed_sec / wipe_duration; // 0.0 to 1.0
@@ -235,18 +235,18 @@ pub const GameRenderer = struct {
                 const eased_progress = 1.0 - (1.0 - progress) * (1.0 - progress) * (1.0 - progress) * (1.0 - progress); // Quartic ease-out
                 const shrink_factor = 1.0 - eased_progress; // 1.0 to 0.0 (shrinking with strong ease-out)
 
-                // Create iris wipe bands using existing game colors
+                // Create iris wipe bands using color constants
                 const wipe_colors = [_]Color{
-                    Color{ .r = 100, .g = 150, .b = 255, .a = 255 }, // BLUE_BRIGHT
-                    Color{ .r = 80, .g = 220, .b = 80, .a = 255 }, // GREEN_BRIGHT
-                    Color{ .r = 255, .g = 220, .b = 80, .a = 255 }, // YELLOW_BRIGHT
-                    Color{ .r = 255, .g = 180, .b = 80, .a = 255 }, // ORANGE_BRIGHT
-                    Color{ .r = 180, .g = 100, .b = 240, .a = 255 }, // PURPLE_BRIGHT
-                    Color{ .r = 0, .g = 200, .b = 200, .a = 255 }, // CYAN
+                    colors.BLUE_BRIGHT,
+                    colors.GREEN_BRIGHT,
+                    colors.YELLOW_BRIGHT,
+                    colors.ORANGE_BRIGHT,
+                    colors.PURPLE_BRIGHT,
+                    colors.CYAN,
                 };
 
                 for (wipe_colors) |wipe_color| {
-                    const max_width = borders.IRIS_WIPE_BAND_WIDTH;
+                    const max_width = constants.IRIS_WIPE_BAND_WIDTH;
                     const current_width = max_width * shrink_factor;
 
                     if (current_width > 0.5) { // Only render if visible
@@ -295,7 +295,7 @@ pub const GameRenderer = struct {
     pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
 
         // Use white color for FPS display
-        const WHITE = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+        const WHITE = colors.WHITE;
 
         // Position at top-left corner as requested (make it very visible)
         const fps_x = 100.0; // Left margin
@@ -347,7 +347,7 @@ pub const GameRenderer = struct {
     }
 
     fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
-        const WHITE = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
+        const WHITE_LIGHT = Color{ .r = 230, .g = 230, .b = 230, .a = 255 }; // Slightly off-white
         const fps_x = 1840.0;
         const fps_y = 1060.0;
 
@@ -357,11 +357,11 @@ pub const GameRenderer = struct {
 
         // Draw tens digit
         if (tens > 0) {
-            self.drawDigit(cmd_buffer, render_pass, @intCast(tens), fps_x, fps_y, WHITE);
+            self.drawDigit(cmd_buffer, render_pass, @intCast(tens), fps_x, fps_y, WHITE_LIGHT);
         }
 
         // Draw ones digit
-        self.drawDigit(cmd_buffer, render_pass, @intCast(ones), fps_x + 12.0, fps_y, WHITE);
+        self.drawDigit(cmd_buffer, render_pass, @intCast(ones), fps_x + 12.0, fps_y, WHITE_LIGHT);
     }
 
     // Draw a circle at screen position (for UI elements)

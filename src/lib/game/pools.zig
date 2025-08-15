@@ -32,13 +32,19 @@ pub const BulletPool = struct {
             .owners = undefined,
             .damages = undefined,
             .active = [_]bool{false} ** MAX_BULLETS,
-            .free_list = BoundedArray(u16, MAX_BULLETS).init(0) catch unreachable,
+            .free_list = BoundedArray(u16, MAX_BULLETS).init(0) catch |err| {
+                std.log.err("Failed to initialize BulletPool free list: {}", .{err});
+                @panic("BulletPool initialization failed");
+            },
             .active_count = 0,
         };
 
         // Initialize free list with all indices
         for (0..MAX_BULLETS) |i| {
-            pool.free_list.append(@intCast(i)) catch unreachable;
+            pool.free_list.append(@intCast(i)) catch |err| {
+                std.log.err("Failed to append to BulletPool free list at index {}: {}", .{ i, err });
+                @panic("BulletPool free list initialization failed");
+            };
         }
 
         return pool;

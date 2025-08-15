@@ -82,16 +82,23 @@ pub const BrowserRenderer = struct {
         self.font_grid_config = config;
     }
 
+    /// Get current screen dimensions from the GPU renderer
+    pub fn getScreenSize(self: *const BrowserRenderer) Vec2 {
+        return Vec2{
+            .x = self.base_renderer.gpu.screen_width,
+            .y = self.base_renderer.gpu.screen_height,
+        };
+    }
+
     pub fn renderOverlay(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
 
         // Render semi-transparent background using rectangles
         // Draw a dark overlay by rendering multiple dark rectangles
-        const screen_width = 1920.0;
-        const screen_height = 1080.0;
+        const screen_size = self.getScreenSize();
         const overlay_color = Color{ .r = 10, .g = 10, .b = 15, .a = 120 };
 
         // Use drawBlendedRect for transparent overlay
-        self.base_renderer.gpu.drawBlendedRect(cmd_buffer, render_pass, .{ .x = 0, .y = 0 }, .{ .x = screen_width, .y = screen_height }, overlay_color);
+        self.base_renderer.gpu.drawBlendedRect(cmd_buffer, render_pass, .{ .x = 0, .y = 0 }, screen_size, overlay_color);
     }
 
     /// Render custom GPU content for pages that need direct rendering
@@ -164,8 +171,9 @@ pub const BrowserRenderer = struct {
     }
 
     pub fn renderNavigationBar(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_path: []const u8, can_go_back: bool, can_go_forward: bool) !void {
-        const screen_width = 1920.0;
-        const screen_height = 1080.0;
+        const constants = @import("../hex/constants.zig");
+        const screen_width = constants.BASE_SCREEN_WIDTH;
+        const screen_height = constants.BASE_SCREEN_HEIGHT;
 
         const bar_height = 50.0;
         const bar_y = screen_height * 0.1 - bar_height / 2.0;

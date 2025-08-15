@@ -22,7 +22,9 @@ const IndexPage = struct {
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
         _ = self;
 
-        const screen_width = 1920.0; // TODO: Get from renderer
+        const constants = @import("../hex/constants.zig");
+        const screen_width = constants.BASE_SCREEN_WIDTH;
+        const screen_height = constants.BASE_SCREEN_HEIGHT;
 
         // Wide character layout - use full screen width
 
@@ -86,7 +88,7 @@ const IndexPage = struct {
         try links.append(page.createLink("Bullet lifetime: 4s", "", far_right_x, 500, combat_width, combat_height));
 
         // Bottom navigation
-        const nav_y = 850.0;
+        const nav_y = screen_height * 0.79; // 850/1080 ≈ 0.79
         const nav_width = 200.0;
         const nav_height = 50.0;
         const nav_spacing = 50.0;

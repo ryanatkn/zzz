@@ -198,7 +198,10 @@ pub const Effects = struct {
 
     pub fn init() Effects {
         return .{
-            .modifiers = BoundedArray(Modifier, 16).init(0) catch unreachable,
+            .modifiers = BoundedArray(Modifier, 16).init(0) catch |err| {
+                std.log.err("Failed to initialize Effects modifiers array: {}", .{err});
+                @panic("Effects component initialization failed");
+            },
         };
     }
 

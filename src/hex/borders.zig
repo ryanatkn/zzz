@@ -9,26 +9,10 @@ const constants = @import("constants.zig");
 
 // Border animation constants
 const ASPECT_RATIO = 16.0 / 9.0;
-const BORDER_PULSE_PAUSED = 1.5;
-const BORDER_PULSE_DEAD = 1.2;
 
 // Screen constants for border calculations
 const SCREEN_WIDTH = constants.SCREEN_WIDTH;
 const SCREEN_HEIGHT = constants.SCREEN_HEIGHT;
-
-// Iris wipe constants
-pub const IRIS_WIPE_DURATION = 2.5; // Increased from 1.5 seconds
-pub const IRIS_WIPE_BAND_COUNT = 6;
-pub const IRIS_WIPE_BAND_WIDTH = 30.0; // Increased from 12.0 pixels
-
-// Color constants for borders
-const BLUE_BRIGHT = Color{ .r = 100, .g = 150, .b = 255, .a = 255 };
-const GREEN_BRIGHT = Color{ .r = 80, .g = 220, .b = 80, .a = 255 };
-const PURPLE_BRIGHT = Color{ .r = 180, .g = 100, .b = 240, .a = 255 };
-const RED_BRIGHT = Color{ .r = 255, .g = 100, .b = 100, .a = 255 };
-const YELLOW_BRIGHT = Color{ .r = 255, .g = 220, .b = 80, .a = 255 };
-const ORANGE_BRIGHT = Color{ .r = 255, .g = 180, .b = 80, .a = 255 };
-const CYAN = Color{ .r = 0, .g = 200, .b = 200, .a = 255 };
 
 // Lifestone master colors - matches the attuned lifestone color
 const LIFESTONE_COLORS = BorderColorPair{
@@ -213,7 +197,7 @@ pub fn drawScreenBorder(game_state: anytype) void {
         const current_time = c.sdl.SDL_GetPerformanceCounter();
         const frequency = c.sdl.SDL_GetPerformanceFrequency();
         const elapsed_sec = @as(f32, @floatFromInt(current_time - game_state.iris_wipe_start_time)) / @as(f32, @floatFromInt(frequency));
-        const wipe_duration = IRIS_WIPE_DURATION;
+        const wipe_duration = constants.IRIS_WIPE_DURATION;
 
         if (elapsed_sec < wipe_duration) {
             const progress = elapsed_sec / wipe_duration; // 0.0 to 1.0
@@ -221,16 +205,16 @@ pub fn drawScreenBorder(game_state: anytype) void {
             const eased_progress = 1.0 - (1.0 - progress) * (1.0 - progress) * (1.0 - progress) * (1.0 - progress); // Quartic ease-out
             const shrink_factor = 1.0 - eased_progress; // 1.0 to 0.0 (shrinking with strong ease-out)
 
-            // Create iris wipe bands using existing game colors
+            // Create iris wipe bands using color constants
             const wipe_colors = [_]Color{
-                BLUE_BRIGHT,   GREEN_BRIGHT,  YELLOW_BRIGHT,
-                ORANGE_BRIGHT, PURPLE_BRIGHT, CYAN,
+                colors.BLUE_BRIGHT,   colors.GREEN_BRIGHT,  colors.YELLOW_BRIGHT,
+                colors.ORANGE_BRIGHT, colors.PURPLE_BRIGHT, colors.CYAN,
             };
-            comptime std.debug.assert(wipe_colors.len == IRIS_WIPE_BAND_COUNT);
+            comptime std.debug.assert(wipe_colors.len == constants.IRIS_WIPE_BAND_COUNT);
 
             for (0..wipe_colors.len) |i| {
                 const wipe_color = wipe_colors[i];
-                const max_width = IRIS_WIPE_BAND_WIDTH;
+                const max_width = constants.IRIS_WIPE_BAND_WIDTH;
                 const current_width = max_width * shrink_factor;
 
                 if (current_width > 0.5) { // Only render if visible
@@ -246,12 +230,12 @@ pub fn drawScreenBorder(game_state: anytype) void {
     // Game state borders (lower priority)
     if (game_state.isPaused()) {
         // Animated paused border: base 6px + 4px pulse amplitude
-        border_stack.pushAnimated(6.0, GOLD_YELLOW_COLORS, BORDER_PULSE_PAUSED, 4.0);
+        border_stack.pushAnimated(6.0, GOLD_YELLOW_COLORS, constants.BORDER_PULSE_PAUSED, 4.0);
     }
 
     if (!game_state.world.player.alive) {
         // Animated dead border: base 9px + 5px pulse amplitude
-        border_stack.pushAnimated(9.0, RED_COLORS, BORDER_PULSE_DEAD, 5.0);
+        border_stack.pushAnimated(9.0, RED_COLORS, constants.BORDER_PULSE_DEAD, 5.0);
     }
 
     // Lifestone master border - TEMPORARY improvement

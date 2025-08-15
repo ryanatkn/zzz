@@ -34,8 +34,14 @@ pub const HexSaveData = struct {
 
         pub fn init() ZoneSaveData {
             return .{
-                .lifestone_entities = std.BoundedArray(EntitySaveData, 32).init(0) catch unreachable,
-                .unit_entities = std.BoundedArray(EntitySaveData, 256).init(0) catch unreachable,
+                .lifestone_entities = std.BoundedArray(EntitySaveData, 32).init(0) catch |err| {
+                    std.log.err("Failed to initialize lifestone entities array: {}", .{err});
+                    @panic("ZoneSaveData lifestone initialization failed");
+                },
+                .unit_entities = std.BoundedArray(EntitySaveData, 256).init(0) catch |err| {
+                    std.log.err("Failed to initialize unit entities array: {}", .{err});
+                    @panic("ZoneSaveData unit initialization failed");
+                },
             };
         }
     };

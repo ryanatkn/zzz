@@ -20,10 +20,11 @@ const VectorTestPage = struct {
     }
 
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+        const constants = @import("../../hex/constants.zig");
+        const screen_width = constants.BASE_SCREEN_WIDTH;
+        const screen_height = constants.BASE_SCREEN_HEIGHT;
         _ = self;
 
-        const screen_width = 1920.0;
-        const screen_height = 1080.0;
 
         // Page header
         try links.append(page.createLink("VECTOR GRAPHICS TEST PAGE", "", 50, 50, 600, 60));

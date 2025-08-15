@@ -119,13 +119,17 @@ pub fn respawnPlayer(game_state: anytype) void {
 
     if (nearest) |result| {
         if (result.zone_index != world.current_zone) {
-            game_state.travelToZone(result.zone_index);
+            game_state.travelToZone(result.zone_index) catch |err| {
+                std.log.err("Failed to travel to zone {}: {}", .{ result.zone_index, err });
+            };
             log_throttle.logInfo("travel_to_lifestone", "Traveling to zone {} for nearest lifestone", .{result.zone_index});
         }
         respawn_pos = result.pos;
     } else {
         if (world.current_zone != 0) {
-            game_state.travelToZone(0);
+            game_state.travelToZone(0) catch |err| {
+                std.log.err("Failed to travel to overworld: {}", .{err});
+            };
             log_throttle.logInfo("no_lifestones", "No lifestones found, returning to overworld spawn", .{});
         }
         respawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };

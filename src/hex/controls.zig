@@ -125,14 +125,13 @@ pub fn handleSDLEvent(
         c.sdl.SDL_EVENT_MOUSE_WHEEL => {
             // Mouse wheel zoom
             const current_zone = game_state.world.getCurrentZoneMut();
-            const zoom_factor = 1.1; // 10% zoom per wheel tick
-
+            
             if (event.wheel.y > 0) {
                 // Zoom in (scroll up)
-                current_zone.camera_scale = @min(10.0, current_zone.camera_scale * zoom_factor);
+                current_zone.camera_scale = @min(constants.MAX_ZOOM, current_zone.camera_scale * constants.ZOOM_FACTOR);
             } else if (event.wheel.y < 0) {
                 // Zoom out (scroll down)
-                current_zone.camera_scale = @max(0.1, current_zone.camera_scale / zoom_factor);
+                current_zone.camera_scale = @max(constants.MIN_ZOOM, current_zone.camera_scale / constants.ZOOM_FACTOR);
             }
         },
         else => {},

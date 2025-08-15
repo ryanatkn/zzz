@@ -36,10 +36,11 @@ const SavePage = struct {
     }
 
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+        const constants = @import("../../../../hex/constants.zig");
+        const screen_width = constants.BASE_SCREEN_WIDTH;
+        const screen_height = constants.BASE_SCREEN_HEIGHT;
         const save_page: *const SavePage = @fieldParentPtr("base", self);
 
-        const screen_width = 1920.0;
-        const screen_height = 1080.0;
         const center_x = screen_width / 2.0;
         const start_y = screen_height * 0.4;
         const link_height = 40.0;

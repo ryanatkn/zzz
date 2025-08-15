@@ -682,4 +682,21 @@ pub const HexWorld = struct {
             }
         }
     }
+
+    /// Clear all projectile entities (used when traveling between zones)
+    pub fn clearAllProjectiles(self: *HexWorld) !void {
+        var projectiles_to_destroy = std.ArrayList(EntityId).init(self.world.allocator);
+        defer projectiles_to_destroy.deinit();
+
+        // Collect all projectile entity IDs
+        var iter = self.world.projectiles.iterator();
+        while (iter.next()) |entry| {
+            try projectiles_to_destroy.append(entry.key_ptr.*);
+        }
+
+        // Destroy all collected projectiles
+        for (projectiles_to_destroy.items) |entity_id| {
+            try self.world.destroyEntity(entity_id);
+        }
+    }
 };
