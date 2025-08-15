@@ -22,6 +22,11 @@ The SDL library itself is:
   - Repository: https://github.com/libsdl-org/SDL
   - License: zlib license
 
+## webref
+
+Machine-readable references of terms defined in web browser specifications -
+https://github.com/w3c/webref
+
 ## Current Versions
 
 - **webref**: main
