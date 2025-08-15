@@ -569,3 +569,44 @@ After types.zig elimination and aggressive cleanup, remaining opportunities:
 - ✅ **Simplified Data Loading**: Clean separation of data and logic
 - ✅ **Better Encapsulation**: HexWorld provides proper helper methods
 - ✅ **Clean Architecture**: Clear layers with no re-export confusion
+
+---
+
+## ✅ COMPLETED: Visual Effects Cleanup & Code Quality (December 2024)
+
+### Phase 12: Visual Effects Optimization ✅ COMPLETED
+
+#### Phase 12.1: Effect System Cleanup ✅ COMPLETED
+- [x] **Critical Visual Effect Reduction**: Dramatically reduced effect spam
+  - **Portal Effects**: From 3 layers per portal → 1 effect per portal (18 → 6 effects)
+  - **Lifestone Effects**: From 2 layers per lifestone → 1 effect per lifestone (26 → 13 effects)
+  - **Total Reduction**: 57% reduction in ambient effects (44+ → 19 effects)
+  - **Result**: Much cleaner visual experience, easier to see collision boundaries
+
+- [x] **Effect Type Cleanup**: Removed unused/redundant effect types
+  - Removed `.portal_middle` and `.portal_inner` effect types
+  - Simplified effect enum for maintainability
+  - Updated all color and animation code accordingly
+  - **Result**: Cleaner codebase with no dead effect types
+
+#### Phase 12.2: Collision System Analysis ✅ COMPLETED
+- [x] **Obstacle Collision Investigation**: Analyzed suspected circle/rectangle mismatch
+  - **Finding**: Collision detection was already correct
+  - **Physics**: Uses `terrain.size` for proper rectangle collision
+  - **Rendering**: Uses `terrain.size` for proper rectangle rendering
+  - **Conclusion**: No collision bug - system working as intended
+
+#### Phase 12.3: Debug Code Elimination ✅ COMPLETED
+- [x] **DEBUG_MODE Removal**: Cleaned up test/debug infrastructure
+  - Removed `DEBUG_MODE` constant and all related branching
+  - Streamlined main.zig execution path
+  - Removed unused `drawCircle` placeholder function
+  - Updated comments to remove "TEMPORARY" markers
+  - **Result**: Production-ready main.zig with no debug modes
+
+### **Phase 12 Technical Accomplishments**
+- ✅ **Visual Clarity**: 57% reduction in visual effect spam
+- ✅ **Code Quality**: Removed all debug/test infrastructure
+- ✅ **Performance**: Fewer effects means better rendering performance
+- ✅ **Maintainability**: Cleaner effect system with no unused types
+- ✅ **User Experience**: Much easier to see game boundaries and obstacles

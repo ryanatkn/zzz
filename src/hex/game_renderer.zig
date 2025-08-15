@@ -249,7 +249,7 @@ pub const GameRenderer = struct {
                     const max_width = constants.IRIS_WIPE_BAND_WIDTH;
                     const current_width = max_width * shrink_factor;
 
-                    if (current_width > 0.5) { // Only render if visible
+                    if (current_width > constants.VISIBILITY_THRESHOLD) { // Only render if visible
                         border_stack.pushStatic(current_width, wipe_color);
                     }
                 }
@@ -261,13 +261,13 @@ pub const GameRenderer = struct {
 
         // Game state borders (lower priority)
         if (game_state.isPaused()) {
-            // Animated paused border: base 6px + 4px pulse amplitude
-            border_stack.pushAnimated(6.0, borders.GOLD_YELLOW_COLORS, 1.5, 4.0);
+            // Animated paused border: base + pulse amplitude
+            border_stack.pushAnimated(constants.PAUSED_BORDER_BASE_WIDTH, borders.GOLD_YELLOW_COLORS, 1.5, constants.PAUSED_BORDER_PULSE_AMPLITUDE);
         }
 
         if (!game_state.world.getPlayerAlive()) {
-            // Animated dead border: base 9px + 5px pulse amplitude
-            border_stack.pushAnimated(9.0, borders.RED_COLORS, 1.2, 5.0);
+            // Animated dead border: base + pulse amplitude
+            border_stack.pushAnimated(constants.DEAD_BORDER_BASE_WIDTH, borders.RED_COLORS, 1.2, constants.DEAD_BORDER_PULSE_AMPLITUDE);
         }
 
         // Render all borders with automatic offset calculation based on current animated widths
@@ -298,8 +298,8 @@ pub const GameRenderer = struct {
         const WHITE = colors.WHITE;
 
         // Position at top-left corner as requested (make it very visible)
-        const fps_x = 100.0; // Left margin
-        const fps_y = 100.0; // Top margin
+        const fps_x = constants.FPS_POSITION_X; // Left margin
+        const fps_y = constants.FPS_POSITION_Y; // Top margin
 
         // Format FPS as string
         var fps_buf: [32]u8 = undefined;
@@ -348,8 +348,8 @@ pub const GameRenderer = struct {
 
     fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
         const WHITE_LIGHT = Color{ .r = 230, .g = 230, .b = 230, .a = 255 }; // Slightly off-white
-        const fps_x = 1840.0;
-        const fps_y = 1060.0;
+        const fps_x = constants.FPS_FALLBACK_X;
+        const fps_y = constants.FPS_FALLBACK_Y;
 
         // Simple 2-digit FPS display
         const tens = (fps / 10) % 10;
@@ -361,7 +361,7 @@ pub const GameRenderer = struct {
         }
 
         // Draw ones digit
-        self.drawDigit(cmd_buffer, render_pass, @intCast(ones), fps_x + 12.0, fps_y, WHITE_LIGHT);
+        self.drawDigit(cmd_buffer, render_pass, @intCast(ones), fps_x + constants.FPS_DIGIT_SPACING, fps_y, WHITE_LIGHT);
     }
 
 
@@ -386,9 +386,9 @@ pub const GameRenderer = struct {
         for (0..5) |row| {
             for (0..3) |col| {
                 if (pattern[row * 3 + col]) {
-                    const px = x + @as(f32, @floatFromInt(col)) * 2.0;
-                    const py = y + @as(f32, @floatFromInt(row)) * 2.0;
-                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = px, .y = py }, Vec2{ .x = 1.5, .y = 1.5 }, color);
+                    const px = x + @as(f32, @floatFromInt(col)) * constants.FPS_PIXEL_SIZE;
+                    const py = y + @as(f32, @floatFromInt(row)) * constants.FPS_PIXEL_SIZE;
+                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = px, .y = py }, Vec2{ .x = constants.FPS_DIGIT_PIXEL_SIZE, .y = constants.FPS_DIGIT_PIXEL_SIZE }, color);
                 }
             }
         }

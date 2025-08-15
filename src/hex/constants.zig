@@ -35,6 +35,8 @@ pub const UNIT_WALK_SPEED = UNIT_SPEED * 0.333; // 1/3 speed when returning home
 pub const UNIT_HOME_TOLERANCE = 2.0; // Distance tolerance for "at home" check
 pub const BULLET_SPEED = 400.0;
 pub const BULLET_RADIUS = 5.0;
+pub const BULLET_DAMAGE = 150.0; // One-shot kill damage
+pub const BULLET_LIFETIME = 4.0; // Bullet lifetime in seconds
 pub const PORTAL_SPAWN_OFFSET = 10.0; // Extra distance when spawning near portals
 
 // Camera/zoom constants
@@ -54,6 +56,26 @@ pub const CameraMode = enum {
     fixed,
     follow,
 };
+
+// UI/HUD positioning constants
+pub const FPS_POSITION_X = 100.0; // FPS display left margin
+pub const FPS_POSITION_Y = 100.0; // FPS display top margin
+pub const FPS_FALLBACK_X = 1840.0; // Fallback geometric FPS position
+pub const FPS_FALLBACK_Y = 1060.0; // Fallback geometric FPS position
+pub const FPS_DIGIT_SPACING = 12.0; // Spacing between FPS digits
+pub const FPS_PIXEL_SIZE = 2.0; // Size of each pixel in geometric FPS
+pub const FPS_DIGIT_PIXEL_SIZE = 1.5; // Size of individual digit pixels
+
+// Animation/visual constants
+pub const VISIBILITY_THRESHOLD = 0.5; // Minimum width for border visibility
+pub const PAUSED_BORDER_BASE_WIDTH = 6.0; // Base width of paused border
+pub const PAUSED_BORDER_PULSE_AMPLITUDE = 4.0; // Pulse amplitude for paused border
+pub const DEAD_BORDER_BASE_WIDTH = 9.0; // Base width of dead border  
+pub const DEAD_BORDER_PULSE_AMPLITUDE = 5.0; // Pulse amplitude for dead border
+
+// Player movement constants
+pub const WALK_SPEED_MULTIPLIER = 0.25; // Walking speed is 1/4 of normal
+pub const PLAYER_BOUNDARY_MARGIN = 10.0; // Extra margin for boundary checks
 
 // Color constants (imported from shared colors module)
 pub const COLOR_PLAYER_ALIVE = colors.PLAYER_ALIVE;

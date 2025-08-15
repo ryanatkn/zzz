@@ -12,7 +12,7 @@ const Vec2 = math.Vec2;
 const HexWorld = hex_world.HexWorld;
 const InputState = input.InputState;
 
-const WALK_SPEED_MULT = 0.25; // Walking speed is 1/4 of normal
+const WALK_SPEED_MULT = constants.WALK_SPEED_MULTIPLIER; // Walking speed is 1/4 of normal
 
 /// ECS-compatible player update function
 pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *const camera.Camera, deltaTime: f32) void {
@@ -73,7 +73,7 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
     // Apply screen bounds if needed
     if (use_screen_bounds) {
         // Keep player within screen bounds for fixed camera mode
-        const margin = player_radius + 10;
+        const margin = player_radius + constants.PLAYER_BOUNDARY_MARGIN;
         if (new_pos.x < margin) new_pos.x = margin;
         if (new_pos.y < margin) new_pos.y = margin;
         if (new_pos.x > constants.SCREEN_WIDTH - margin) new_pos.x = constants.SCREEN_WIDTH - margin;

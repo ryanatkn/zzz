@@ -228,3 +228,27 @@ The ECS migration is **fully complete** with a production-ready architecture tha
 - **Clean Game Data**: `game_data.zon` remains purely declarative
 - **Simple Defaults**: Units created with just position and radius (health=1.0 by default)
 - **Logic Separation**: Gameplay values defined in ECS components, not in data loader
+
+---
+
+## 🎮 Post-Migration Optimization (December 2024)
+
+### Visual System Cleanup ✅ COMPLETED
+- **Effect Spam Reduction**: Reduced ambient effects by 57% (44+ → 19 effects)
+  - Portal effects: 3 layers → 1 layer per portal
+  - Lifestone effects: 2 layers → 1 layer per lifestone
+  - Result: Much clearer visual feedback for collision boundaries
+- **Collision Analysis**: Verified obstacle collision system works correctly
+  - Physics uses `terrain.size` for proper rectangle collision
+  - Rendering uses `terrain.size` for proper rectangle visualization
+  - No circle/rectangle mismatch found
+
+### Code Quality Improvements ✅ COMPLETED
+- **Debug Infrastructure Removal**: Eliminated all test/debug code
+  - Removed `DEBUG_MODE` constant and branching
+  - Streamlined main.zig execution path
+  - Removed placeholder functions
+- **Effect System Simplification**: Cleaned up effect type enum
+  - Removed unused `.portal_middle` and `.portal_inner` types
+  - Simplified animation and color code
+  - Better maintainability
