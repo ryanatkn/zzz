@@ -126,21 +126,29 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         world.current_zone = old_zone;
     }
 
-    // Load units
+    // Load units as ECS entities
     if (data.units) |units| {
+        // Set current zone for entity creation
+        const old_zone = world.current_zone;
+        world.current_zone = zone_index;
+        
         for (units) |unit_data| {
-            const unit = entities.Unit.init(
-                unit_data.position.x,
-                unit_data.position.y,
+            // Create ECS unit entity (default to enemy type)
+            const unit_id = world.createUnit(
+                Vec2{ .x = unit_data.position.x, .y = unit_data.position.y },
                 unit_data.radius,
-            );
-            zone.units.append(unit) catch |err| {
-                std.log.err("Failed to add unit: {}", .{err});
-                return;
+                100.0, // Default health
+                .enemy, // Default unit type
+            ) catch |err| {
+                std.log.err("Failed to create unit entity: {}", .{err});
+                continue;
             };
-            zone.unit_count += 1;
-            // TODO: Store original unit data for reset functionality using ECS patterns
+            
+            _ = unit_id; // Unit created successfully as ECS entity
         }
+        
+        // Restore current zone
+        world.current_zone = old_zone;
     }
 
     // Load portals as ECS entities

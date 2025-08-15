@@ -22,10 +22,40 @@ pub fn checkCircleRectCollision(circle_pos: Vec2, circle_radius: f32, rect_pos: 
     return collision.checkCollision(circle, rect);
 }
 
-// Check player-unit collision
+// Check player-unit collision (legacy)
 pub fn checkPlayerUnitCollision(player_pos: Vec2, player_radius: f32, unit: *const entities.Unit) bool {
     if (!unit.active or !unit.alive) return false;
     return checkCircleCollision(player_pos, player_radius, unit.pos, unit.radius);
+}
+
+// ECS-based player-unit collision check
+pub fn checkPlayerUnitCollisionECS(world: *hex_world.HexWorld) bool {
+    const player_pos = world.getPlayerPos();
+    const player_radius = world.getPlayerRadius();
+    
+    // Query all units (sparse storage uses different iterator API)
+    var unit_iter = world.world.units.iterator();
+    while (unit_iter.next()) |entry| {
+        const unit_id = entry.key_ptr.*;
+        
+        // Skip if entity is not alive
+        if (!world.world.isAlive(unit_id)) continue;
+        
+        // Get unit transform
+        if (world.world.transforms.get(unit_id)) |transform| {
+            // Get unit health to check if alive
+            if (world.world.healths.get(unit_id)) |health| {
+                if (!health.alive) continue;
+                
+                // Check collision
+                if (checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
+                    return true;
+                }
+            }
+        }
+    }
+    
+    return false;
 }
 
 // Check bullet-unit collision

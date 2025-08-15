@@ -277,6 +277,70 @@ pub const GameState = struct {
     }
 };
 
+/// Update all units using ECS
+fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
+    const world = &game_state.world;
+    
+    // Get zone for obstacle collision checks (still using legacy obstacles)
+    const zone = world.getCurrentZoneMut();
+    
+    // Query all units from ECS system
+    var unit_iter = world.world.units.iterator();
+    while (unit_iter.next()) |entry| {
+        const unit_id = entry.key_ptr.*;
+        
+        // Skip if entity is not alive
+        if (!world.world.isAlive(unit_id)) continue;
+        
+        // Get components
+        if (world.world.transforms.get(unit_id)) |transform| {
+            if (world.world.healths.get(unit_id)) |health| {
+                if (!health.alive) continue;
+                
+                if (world.world.units.get(unit_id)) |unit_comp| {
+                    const old_pos = transform.pos;
+                    
+                    if (world.world.visuals.get(unit_id)) |visual| {
+                        const aggro_mod = game_state.spell_system.getAggroMultiplierForUnit(transform.pos);
+                        
+                        // Update unit AI behavior using ECS components
+                        behaviors.updateUnitWithAggroModECS(
+                            unit_comp,
+                            transform,
+                            visual,
+                            world.getPlayerPos(),
+                            world.getPlayerAlive(),
+                            deltaTime,
+                            aggro_mod
+                        );
+                    }
+                    
+                    // Check collision with obstacles (still using legacy obstacle system)
+                    for (0..zone.obstacle_count) |j| {
+                        const obstacle = &zone.obstacles.items[j];
+                        if (!obstacle.active) continue;
+
+                        if (physics.checkCircleRectCollision(transform.pos, transform.radius, obstacle.pos, obstacle.size)) {
+                            if (obstacle.is_deadly) {
+                                // Unit dies on deadly obstacle
+                                health.alive = false;
+                                // Update visual color to indicate death
+                                if (world.world.visuals.get(unit_id)) |visual| {
+                                    visual.color = constants.COLOR_DEAD;
+                                }
+                            } else {
+                                // Revert position for blocking obstacles
+                                transform.pos = old_pos;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: f32) void {
     // Update HUD system if open
     if (game_state.hud_system) |*h| {
@@ -309,32 +373,8 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
         std.log.err("Failed to update projectiles: {}", .{err});
     };
 
-    // Update units using ECS queries instead of zone arrays
-    // For now, fall back to old ArrayList approach until we can properly convert obstacles
-    const zone = world.getCurrentZoneMut();
-    for (0..zone.unit_count) |i| {
-        const unit = &zone.units.items[i];
-
-        if (!unit.active or !unit.alive) continue;
-
-        const old_pos = unit.pos;
-        const aggro_mod = game_state.spell_system.getAggroMultiplierForUnit(unit.pos);
-        behaviors.updateUnitWithAggroMod(unit, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
-
-        for (0..zone.obstacle_count) |j| {
-            const obstacle = &zone.obstacles.items[j];
-            if (!obstacle.active) continue;
-
-            if (physics.checkCircleRectCollision(unit.pos, unit.radius, obstacle.pos, obstacle.size)) {
-                if (obstacle.is_deadly) {
-                    combat.handleUnitDeathOnHazard(unit);
-                } else {
-                    unit.pos = old_pos;
-                }
-                break;
-            }
-        }
-    }
+    // Update units using ECS queries
+    updateUnitsECS(game_state, deltaTime);
 
     checkCollisions(game_state);
 
@@ -367,14 +407,12 @@ pub fn checkCollisions(game_state: *GameState) void {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
 
-    // Check player-unit collisions (player dies on contact)
-    for (0..zone.unit_count) |i| {
-        if (physics.checkPlayerUnitCollision(player_pos, player_radius, &zone.units.items[i])) {
-            // Player dies on unit contact
-            world.setPlayerAlive(false);
-            world.setPlayerColor(constants.COLOR_DEAD);
-            return;
-        }
+    // Check player-unit collisions (player dies on contact) - ECS version
+    if (physics.checkPlayerUnitCollisionECS(world)) {
+        // Player dies on unit contact
+        world.setPlayerAlive(false);
+        world.setPlayerColor(constants.COLOR_DEAD);
+        return;
     }
 
     for (0..zone.lifestone_count) |i| {

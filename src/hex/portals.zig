@@ -13,7 +13,6 @@ const effects = @import("effects.zig");
 const Vec2 = types.Vec2;
 const HexWorld = @import("hex_world.zig").HexWorld;
 const Portal = entities.Portal;
-const Player = entities.Player;
 
 pub fn handlePortalTravel(game_state: anytype, portal: *const Portal) void {
     const world = &game_state.world;

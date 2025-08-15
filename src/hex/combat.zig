@@ -10,7 +10,6 @@ const ecs = @import("../lib/game/ecs.zig");
 
 const Vec2 = types.Vec2;
 const HexWorld = @import("hex_world.zig").HexWorld;
-const Player = entities.Player;
 
 // Bullet pool constants
 const BULLET_POOL_SIZE = 6; // Even number for rhythm mode
@@ -142,13 +141,13 @@ pub fn respawnPlayer(game_state: anytype) void {
     std.debug.print("Player respawned!\n", .{});
 }
 
-pub fn handlePlayerDeath(player: *Player) void {
-    behaviors.killPlayer(player);
+pub fn handlePlayerDeath(world: *HexWorld) void {
+    world.setPlayerAlive(false);
     std.debug.print("Player died! Press R or click to respawn\n", .{});
 }
 
-pub fn handlePlayerDeathOnHazard(player: *Player) void {
-    behaviors.killPlayer(player);
+pub fn handlePlayerDeathOnHazard(world: *HexWorld) void {
+    world.setPlayerAlive(false);
     std.debug.print("Player died on hazard! Press R or click to respawn\n", .{});
 }
 

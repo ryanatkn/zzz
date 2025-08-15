@@ -164,13 +164,8 @@ pub const GameRenderer = struct {
             }
         }
 
-        // Draw units
-        for (0..zone.unit_count) |i| {
-            const unit = &zone.units.items[i];
-            if (unit.active) {
-                self.renderCircleEntity(cmd_buffer, render_pass, unit.pos, unit.radius, unit.color);
-            }
-        }
+        // Draw units (ECS version)
+        self.renderUnitsECS(cmd_buffer, render_pass, world);
 
         // Draw player (above units)
         const player_pos = world.getPlayerPosConst();
@@ -301,6 +296,37 @@ pub const GameRenderer = struct {
         };
 
         log_throttle.logDebug("fps_queued", "✓ FPS text queued for persistent rendering", .{});
+    }
+
+    fn renderUnitsECS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+        // Get the ECS world
+        const ecs_world = world.getECSWorld();
+        
+        // Iterate over all unit entities (cast away const for iterator access)
+        var units_storage = @constCast(&ecs_world.units);
+        var unit_iter = units_storage.iterator();
+        
+        while (unit_iter.next()) |entry| {
+            const unit_id = entry.key_ptr.*;
+            
+            // Skip if entity is not alive  
+            var ecs_world_mut = @constCast(ecs_world);
+            if (!ecs_world_mut.isAlive(unit_id)) continue;
+            
+            // Get unit transform and health
+            if (ecs_world.transforms.getConst(unit_id)) |transform| {
+                if (ecs_world.healths.getConst(unit_id)) |health| {
+                    if (!health.alive) continue;
+                    
+                    // Get visual component for color
+                    if (ecs_world.visuals.getConst(unit_id)) |visual| {
+                        if (visual.visible) {
+                            self.renderCircleEntity(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {

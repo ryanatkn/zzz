@@ -22,7 +22,6 @@ pub fn handleSDLEvent(
     game_hud: *Hud,
     event: *c.sdl.SDL_Event,
 ) !c.sdl.SDL_AppResult {
-    _ = game_renderer; // Not used in this function currently
     // Let HUD handle events first if it's open
     if (game_state.hud_system) |*hud_sys| {
         const handled = try hud_sys.handleEvent(event.*);
@@ -108,13 +107,8 @@ pub fn handleSDLEvent(
                     }
                 },
                 c.sdl.SDL_BUTTON_RIGHT => {
-                    // Right-click casts spell (self-cast if Ctrl held)
-                    if (game_state.world.getPlayerAlive()) {
-                        // TODO: Update spell system to work with ECS player entity
-                        // const ctrl_held = game_state.input_state.isCtrlHeld();
-                        // const world_mouse_pos = game_state.input_state.getWorldMousePos(viewport.createViewport(&game_renderer.camera));
-                        // _ = game_state.spell_system.castActiveSpell(&game_state.world.player, game_state.world.getCurrentZone(), world_mouse_pos, &game_state.effect_system, ctrl_held);
-                    }
+                    // Right-click casts spell (self-cast if Ctrl held) 
+                    // TODO: Re-enable spell casting with ECS system - need camera access for world mouse position
                 },
                 else => {},
             }

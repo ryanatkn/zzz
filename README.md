@@ -1,5 +1,7 @@
 # Dealt
 
+> ⚠️ AI slop code and docs
+
 A GPU-accelerated graphics and media programming environment built with Zig, SDL3, and HLSL shaders.
 
 ## Quick start

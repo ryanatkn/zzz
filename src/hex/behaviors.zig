@@ -6,27 +6,10 @@ const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
 
 const Vec2 = types.Vec2;
-const Player = entities.Player;
 const Unit = entities.Unit;
 const Bullet = entities.Bullet;
 const HexWorld = @import("hex_world.zig").HexWorld;
 
-// Update player based on input with camera-aware bounds
-pub fn updatePlayer(player: *Player, vel: Vec2, dt: f32, use_screen_bounds: bool) void {
-    if (!player.alive) return;
-
-    player.vel = vel;
-    player.pos.x += vel.x * dt;
-    player.pos.y += vel.y * dt;
-
-    // Apply bounds based on camera mode
-    if (use_screen_bounds) {
-        // Fixed camera (overworld) - keep player in visible area
-        player.pos.x = std.math.clamp(player.pos.x, player.radius, constants.SCREEN_WIDTH - player.radius);
-        player.pos.y = std.math.clamp(player.pos.y, player.radius, constants.SCREEN_HEIGHT - player.radius);
-    }
-    // Follow camera (dungeons) - no bounds, terrain collision handles this
-}
 
 // Update unit - chase player or return home
 pub fn updateUnit(unit: *Unit, player_pos: Vec2, player_alive: bool, dt: f32) void {
@@ -129,18 +112,6 @@ pub fn fireBullet(bullet: *Bullet, source_pos: Vec2, target_pos: Vec2) void {
     }
 }
 
-// Kill player
-pub fn killPlayer(player: *Player) void {
-    player.alive = false;
-    player.color = constants.COLOR_DEAD;
-}
-
-// Respawn player at position
-pub fn respawnPlayer(player: *Player, pos: Vec2) void {
-    player.pos = pos;
-    player.alive = true;
-    player.color = constants.COLOR_PLAYER_ALIVE;
-}
 
 // Kill unit
 pub fn killUnit(unit: *Unit) void {
@@ -160,6 +131,7 @@ pub fn attuneLifestone(lifestone: *entities.Lifestone) void {
 pub fn updateUnitWithAggroModECS(
     unit_comp: *ecs.components.Unit,
     transform: *ecs.components.Transform,
+    visual: *ecs.components.Visual,
     player_pos: Vec2,
     player_alive: bool,
     dt: f32,
@@ -180,16 +152,16 @@ pub fn updateUnitWithAggroModECS(
             const distance_to_player = @sqrt(dist_sq_to_player);
             velocity.x = (dx_player / distance_to_player) * constants.UNIT_SPEED;
             velocity.y = (dy_player / distance_to_player) * constants.UNIT_SPEED;
-            unit_comp.color = constants.COLOR_UNIT_AGGRO;
+            visual.color = constants.COLOR_UNIT_AGGRO;
         } else {
             // Return home (non-aggro state)
             velocity = calculateReturnHomeVelocityECS(unit_comp, transform);
-            unit_comp.color = constants.COLOR_UNIT_NON_AGGRO;
+            visual.color = constants.COLOR_UNIT_NON_AGGRO;
         }
     } else {
         // Player dead - return home (non-aggro state)
         velocity = calculateReturnHomeVelocityECS(unit_comp, transform);
-        unit_comp.color = constants.COLOR_UNIT_NON_AGGRO;
+        visual.color = constants.COLOR_UNIT_NON_AGGRO;
     }
 
     // Apply velocity

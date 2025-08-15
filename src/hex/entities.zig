@@ -13,25 +13,6 @@ pub const MAX_BULLETS = 20;
 pub const MAX_PORTALS = 6;
 pub const MAX_LIFESTONES = 13;
 
-// Player entity - special, only one
-pub const Player = struct {
-    pos: Vec2,
-    vel: Vec2,
-    radius: f32,
-    color: Color,
-    alive: bool,
-
-    pub fn init() Player {
-        return .{
-            .pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y },
-            .vel = Vec2{ .x = 0, .y = 0 },
-            .radius = constants.PLAYER_RADIUS,
-            .color = constants.COLOR_PLAYER_ALIVE,
-            .alive = true,
-        };
-    }
-};
-
 // Unit entity (enemies, neutrals, allies)
 pub const Unit = struct {
     pos: Vec2,
@@ -244,68 +225,3 @@ pub const Zone = struct {
     }
 };
 
-// World state - contains all game zones and entities
-pub const World = struct {
-    // Player is special
-    player: Player,
-    player_start_pos: Vec2, // Original spawn position for full reset
-
-    // Global bullet pool (persists across zone travel)
-    bullets: [MAX_BULLETS]Bullet,
-
-    // Zones the player can travel between
-    zones: [7]Zone, // Overworld + 6 dungeons
-    current_zone: usize,
-
-    pub fn init() World {
-        var world = World{
-            .player = Player.init(),
-            .player_start_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y },
-            .bullets = undefined,
-            .zones = undefined,
-            .current_zone = 0,
-        };
-
-        // Initialize bullets
-        for (0..MAX_BULLETS) |i| {
-            world.bullets[i] = Bullet.init();
-        }
-
-        // Zones will be loaded from ZON data
-        return world;
-    }
-
-    pub fn getCurrentZone(self: *const World) *const Zone {
-        return &self.zones[self.current_zone];
-    }
-
-    pub fn getCurrentZoneMut(self: *World) *Zone {
-        return &self.zones[self.current_zone];
-    }
-
-    pub fn findInactiveBullet(self: *World) ?*Bullet {
-        for (0..MAX_BULLETS) |i| {
-            if (!self.bullets[i].active) {
-                return &self.bullets[i];
-            }
-        }
-        return null;
-    }
-
-    pub fn resetCurrentZone(self: *World) void {
-        // Reset units in current zone to their original spawn state
-        self.zones[self.current_zone].resetUnitsToOriginal();
-    }
-
-    pub fn resetAllZones(self: *World) void {
-        // Reset all zones to their original state
-        for (0..self.zones.len) |i| {
-            self.zones[i].resetUnitsToOriginal();
-            self.zones[i].resetLifestones();
-        }
-        // Clear all bullets
-        for (0..MAX_BULLETS) |i| {
-            self.bullets[i].active = false;
-        }
-    }
-};

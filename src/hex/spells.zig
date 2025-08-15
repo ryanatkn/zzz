@@ -5,8 +5,8 @@ const effects = @import("effects.zig");
 const constants = @import("constants.zig");
 
 const Vec2 = types.Vec2;
-const Player = entities.Player;
 const Zone = entities.Zone;
+const HexWorld = @import("hex_world.zig").HexWorld;
 
 // Spell constants
 const LULL_RADIUS = 150.0; // Base AoE radius - can be upgraded
@@ -114,21 +114,21 @@ pub const SpellSystem = struct {
         }
     }
 
-    pub fn castActiveSpell(self: *SpellSystem, player: *Player, zone: *const Zone, target_pos: Vec2, effect_system: *effects.EffectSystem, self_cast: bool) bool {
+    pub fn castActiveSpell(self: *SpellSystem, world: *HexWorld, zone: *const Zone, target_pos: Vec2, effect_system: *effects.EffectSystem, self_cast: bool) bool {
         const slot = &self.spell_slots[self.active_slot];
         if (!slot.canCast()) return false;
 
         // If self-cast, target player position
-        const actual_target = if (self_cast) player.pos else target_pos;
+        const actual_target = if (self_cast) world.getPlayerPos() else target_pos;
 
-        const success = self.castSpell(slot.spell_type, player, zone, actual_target, effect_system);
+        const success = self.castSpell(slot.spell_type, world, zone, actual_target, effect_system);
         if (success) {
             slot.startCooldown();
         }
         return success;
     }
 
-    pub fn castSpell(self: *SpellSystem, spell: SpellType, player: *Player, zone: *const Zone, target_pos: Vec2, effect_system: *effects.EffectSystem) bool {
+    pub fn castSpell(self: *SpellSystem, spell: SpellType, world: *HexWorld, zone: *const Zone, target_pos: Vec2, effect_system: *effects.EffectSystem) bool {
         switch (spell) {
             .None => return false,
 
@@ -162,21 +162,25 @@ pub const SpellSystem = struct {
                 }
 
                 // Teleport player to target position
-                const dx = target_pos.x - player.pos.x;
-                const dy = target_pos.y - player.pos.y;
+                const player_pos = world.getPlayerPos();
+                const dx = target_pos.x - player_pos.x;
+                const dy = target_pos.y - player_pos.y;
                 const distance = @sqrt(dx * dx + dy * dy);
 
                 if (distance > BLINK_MAX_DISTANCE) {
                     // Limit blink distance
                     const scale = BLINK_MAX_DISTANCE / distance;
-                    player.pos.x += dx * scale;
-                    player.pos.y += dy * scale;
+                    const new_pos = Vec2{
+                        .x = player_pos.x + dx * scale,
+                        .y = player_pos.y + dy * scale,
+                    };
+                    world.setPlayerPos(new_pos);
                 } else {
-                    player.pos = target_pos;
+                    world.setPlayerPos(target_pos);
                 }
 
                 // Visual effects
-                effect_system.addPortalTravelEffect(player.pos, player.radius);
+                effect_system.addPortalTravelEffect(world.getPlayerPos(), world.getPlayerRadius());
                 std.debug.print("Blink teleport\n", .{});
                 return true;
             },
