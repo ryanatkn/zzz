@@ -383,6 +383,7 @@ pub const Interactable = struct {
     interaction_type: InteractionType,
     state: InteractionState,
     interaction_timer: f32,
+    destination_zone: ?u8, // For portals - zone to travel to
     interaction_data: union(enum) {
         deflect: struct {
             new_direction: Vec2,
@@ -404,6 +405,17 @@ pub const Interactable = struct {
             .interaction_type = interaction_type,
             .state = .normal,
             .interaction_timer = 0,
+            .destination_zone = null,
+            .interaction_data = .none,
+        };
+    }
+    
+    pub fn initPortal(destination: u8) Interactable {
+        return .{
+            .interaction_type = .telekinetic,
+            .state = .normal,
+            .interaction_timer = 0,
+            .destination_zone = destination,
             .interaction_data = .none,
         };
     }

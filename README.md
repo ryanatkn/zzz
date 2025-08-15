@@ -149,6 +149,7 @@ const ui = @import("../lib/ui.zig");
 ### Dependencies (automatically managed)
 - **SDL3**: cross-platform window management and GPU API
 - **SDL_shadercross**: HLSL shader compilation
+- **webref**: machine-readable references of terms defined in web browser specifications
 
 ## Contributing
 

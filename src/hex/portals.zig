@@ -8,6 +8,7 @@ const physics = @import("physics.zig");
 const player_controller = @import("player.zig");
 const input = @import("../lib/platform/input.zig");
 const constants = @import("constants.zig");
+const ecs = @import("../lib/game/ecs.zig");
 const effects = @import("effects.zig");
 
 const Vec2 = types.Vec2;
@@ -84,15 +85,40 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
     
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
-    const zone = world.getCurrentZoneConst();
 
-    // Check collision with all portals in current zone
-    for (0..zone.portal_count) |i| {
-        if (physics.checkPlayerPortalCollision(player_pos, player_radius, &zone.portals.items[i])) {
-            handlePortalTravel(game_state, &zone.portals.items[i]);
-            return true;
+    // Check collision with all portals using ECS queries
+    const ecs_world = world.getECSWorld();
+    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+    
+    while (terrain_iter.next()) |entry| {
+        const entity_id = entry.key_ptr.*;
+        const terrain = entry.value_ptr.*;
+        
+        // Only check portals (door terrain with interactable component)
+        if (terrain.terrain_type != .door) continue;
+        if (!ecs_world.interactables.has(entity_id)) continue;
+        
+        // Get components
+        if (ecs_world.transforms.getConst(entity_id)) |transform| {
+            if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+                if (physics.checkPlayerPortalCollisionECS(player_pos, player_radius, transform)) {
+                    handlePortalTravelECS(game_state, entity_id, interactable);
+                    return true;
+                }
+            }
         }
     }
     
     return false;
+}
+
+// Handle portal travel using ECS components
+fn handlePortalTravelECS(game_state: anytype, portal_id: ecs.EntityId, interactable: *const ecs.components.Interactable) void {
+    _ = portal_id; // Unused for now
+    if (interactable.destination_zone) |destination| {
+        std.debug.print("Portal travel! Entering zone {} from zone {}\n", .{ destination, game_state.world.current_zone });
+        game_state.travelToZone(destination);
+    } else {
+        std.debug.print("Portal has no destination zone!\n", .{});
+    }
 }

@@ -10,20 +10,24 @@ set -e  # Exit on error
 
 declare -A DEPS=(
     ["SDL"]="https://github.com/libsdl-org/SDL.git"
+    ["webref"]="https://github.com/w3c/webref.git"
 )
 
 declare -A VERSIONS=(
     ["SDL"]="main"
+    ["webref"]="main"
 )
 
 # Files to keep from existing installations (to preserve local modifications)
 declare -A PRESERVE_FILES=(
     ["SDL"]="build.zig build.zig.zon"
+    ["webref"]=""
 )
 
 # Files to remove from fresh clones (incompatible with our build)
 declare -A REMOVE_FILES=(
     ["SDL"]=""
+    ["webref"]=""
 )
 
 # Patches to apply (if any)
@@ -399,7 +403,43 @@ EOF
     fi
     
     # Clean the dependency in temp location
-    if ! (cd "$(dirname "$temp_dir")" && clean_dependency "$(basename "$temp_dir")"); then
+    # We need to clean using the actual dependency name, not the temp dir name
+    # First, temporarily update the target_dir in clean_dependency to use temp_dir
+    local original_target="deps/$name"
+    
+    # Create a modified clean function that works on temp dir
+    clean_temp_dependency() {
+        local dep_name=$1
+        local temp_target=$2
+        local temp_preserve_dir="/tmp/preserved_files_$$"
+        
+        # Remove .git directory if it exists
+        if [[ -d "$temp_target/.git" ]]; then
+            log_step "Removing .git directory"
+            rm -rf "$temp_target/.git"
+        fi
+        
+        # Remove incompatible files
+        if [[ -n "${REMOVE_FILES[$dep_name]}" ]]; then
+            for file in ${REMOVE_FILES[$dep_name]}; do
+                if [[ -f "$temp_target/$file" ]]; then
+                    log_step "Removing $file"
+                    rm -f "$temp_target/$file"
+                fi
+            done
+        fi
+        
+        # Apply patches if any
+        if [[ -n "${PATCHES[$dep_name]}" ]] && [[ -f "${PATCHES[$dep_name]}" ]]; then
+            log_step "Applying patch ${PATCHES[$dep_name]}"
+            if ! patch -p1 -d "$temp_target" < "${PATCHES[$dep_name]}"; then
+                log_error "Failed to apply patch ${PATCHES[$dep_name]}"
+                return 1
+            fi
+        fi
+    }
+    
+    if ! clean_temp_dependency "$name" "$temp_dir"; then
         log_error "Failed to clean $name"
         rm -rf "$temp_dir"
         if [[ "$backup_created" == "true" ]]; then

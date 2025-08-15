@@ -22,9 +22,12 @@ The SDL library itself is:
   - Repository: https://github.com/libsdl-org/SDL
   - License: zlib license
 
-**Text Rendering**: Pure Zig implementation using distance field techniques (no external font dependencies)
-
 ## Current Versions
+
+- **webref**: main
+  - Repository: https://github.com/w3c/webref.git
+  - Commit: 17f080039cfa6e14044c292d1643af0a3ddd86ce
+  - Last Updated: 2025-08-15 02:54:51 UTC
 
 - **SDL**: main
   - Repository: https://github.com/libsdl-org/SDL.git
@@ -32,9 +35,6 @@ The SDL library itself is:
   - Last Updated: 2025-08-13 17:55:50 UTC
 
 
-
 ## Note
 
 The source code in deps/SDL has been kept unmodified from the original repository to maintain compatibility and ease of updates. Only the build configuration files have been modified.
-
-Text rendering is implemented using pure Zig distance field techniques, eliminating the need for external font libraries.

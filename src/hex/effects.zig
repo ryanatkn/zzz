@@ -495,22 +495,37 @@ pub const EffectSystem = struct {
         }
         self.count = write_index;
 
-        // Create ambient effects for current zone entities
-        const zone = world.getCurrentZone();
-
-        // Add auras around active portals
-        for (0..zone.portal_count) |i| {
-            const portal = &zone.portals.items[i];
-            if (portal.active) {
-                self.addPortalAmbientEffect(portal.pos, portal.radius);
-            }
-        }
-
-        // Add glows around active lifestones
-        for (0..zone.lifestone_count) |i| {
-            const lifestone = &zone.lifestones.items[i];
-            if (lifestone.active) {
-                self.addLifestoneGlowEffect(lifestone.pos, lifestone.radius, lifestone.attuned);
+        // Create ambient effects for current zone entities using ECS queries
+        const ecs_world = world.getECSWorld();
+        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+            
+            // Get entity transform for position and radius
+            if (ecs_world.transforms.getConst(entity_id)) |transform| {
+                switch (terrain.terrain_type) {
+                    .door => {
+                        // Portal entities (door terrain with interactable component)
+                        if (ecs_world.interactables.has(entity_id)) {
+                            self.addPortalAmbientEffect(transform.pos, transform.radius);
+                        }
+                    },
+                    .altar => {
+                        // Lifestone entities (altar terrain with interactable component)
+                        if (ecs_world.interactables.has(entity_id)) {
+                            if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+                                // Check if lifestone is attuned (using transformable state as attuned indicator)
+                                const attuned = (interactable.interaction_type == .transformable);
+                                self.addLifestoneGlowEffect(transform.pos, transform.radius, attuned);
+                            }
+                        }
+                    },
+                    else => {
+                        // Skip other terrain types
+                    },
+                }
             }
         }
     }

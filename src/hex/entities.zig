@@ -130,7 +130,8 @@ pub const CameraMode = enum {
     follow,
 };
 
-// Zone - a distinct area of the game world with its own entities and environment
+// Zone - a distinct area of the game world with environmental properties only
+// All entities are now stored in the ECS system instead of here
 pub const Zone = struct {
     // Environmental properties
     name: []const u8,
@@ -138,90 +139,16 @@ pub const Zone = struct {
     camera_mode: CameraMode,
     camera_scale: f32, // Zoom level for this zone (1.0 = default, <1.0 = zoomed out, >1.0 = zoomed in)
 
-    // Entity pools with counts
-    units: [MAX_UNITS]Unit,
-    unit_count: usize,
-
-    obstacles: [MAX_OBSTACLES]Obstacle,
-    obstacle_count: usize,
-
-    portals: [MAX_PORTALS]Portal,
-    portal_count: usize,
-
-    lifestones: [MAX_LIFESTONES]Lifestone,
-    lifestone_count: usize,
-
-    // Original state for reset functionality
-    original_units: [MAX_UNITS]Unit,
-    original_unit_count: usize,
-
     pub fn init(name: []const u8, bg_color: Color, cam_mode: CameraMode, scale: f32) Zone {
         return .{
             .name = name,
             .background_color = bg_color,
             .camera_mode = cam_mode,
             .camera_scale = scale,
-            .units = std.mem.zeroes([MAX_UNITS]Unit),
-            .unit_count = 0,
-            .obstacles = std.mem.zeroes([MAX_OBSTACLES]Obstacle),
-            .obstacle_count = 0,
-            .portals = std.mem.zeroes([MAX_PORTALS]Portal),
-            .portal_count = 0,
-            .lifestones = std.mem.zeroes([MAX_LIFESTONES]Lifestone),
-            .lifestone_count = 0,
-            .original_units = std.mem.zeroes([MAX_UNITS]Unit),
-            .original_unit_count = 0,
         };
     }
 
-    pub fn addUnit(self: *Zone, unit: Unit) void {
-        if (self.unit_count < MAX_UNITS) {
-            self.units[self.unit_count] = unit;
-            self.unit_count += 1;
-        }
-    }
-
-    pub fn addObstacle(self: *Zone, obstacle: Obstacle) void {
-        if (self.obstacle_count < MAX_OBSTACLES) {
-            self.obstacles[self.obstacle_count] = obstacle;
-            self.obstacle_count += 1;
-        }
-    }
-
-    pub fn addPortal(self: *Zone, portal: Portal) void {
-        if (self.portal_count < MAX_PORTALS) {
-            self.portals[self.portal_count] = portal;
-            self.portal_count += 1;
-        }
-    }
-
-    pub fn addLifestone(self: *Zone, lifestone: Lifestone) void {
-        if (self.lifestone_count < MAX_LIFESTONES) {
-            self.lifestones[self.lifestone_count] = lifestone;
-            self.lifestone_count += 1;
-        }
-    }
-
-    pub fn resetUnits(self: *Zone) void {
-        for (0..self.unit_count) |i| {
-            // Reset velocity to stop aggro movement - units will walk home naturally
-            self.units[i].vel = Vec2{ .x = 0, .y = 0 };
-            // Don't reset position or alive status - preserve death state and let them walk home
-        }
-    }
-
-    pub fn resetUnitsToOriginal(self: *Zone) void {
-        // Restore units from original state (bulk copy)
-        self.units = self.original_units;
-        self.unit_count = self.original_unit_count;
-    }
-
-    pub fn resetLifestones(self: *Zone) void {
-        // Reset all lifestones to unattuned state
-        for (0..self.lifestone_count) |i| {
-            self.lifestones[i].attuned = false;
-            self.lifestones[i].color = constants.COLOR_LIFESTONE_UNATTUNED;
-        }
-    }
+    // All entity management methods have been removed
+    // Entities are now managed through the ECS system
 };
 

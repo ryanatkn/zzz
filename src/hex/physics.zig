@@ -5,6 +5,8 @@ const types = @import("../lib/core/types.zig");
 const maths = @import("../lib/core/maths.zig");
 const collision = @import("../lib/physics/collision.zig");
 const hex_world = @import("hex_world.zig");
+const ecs = @import("../lib/game/ecs.zig");
+const constants = @import("constants.zig");
 
 const Vec2 = types.Vec2;
 
@@ -178,14 +180,28 @@ pub fn wouldCollideWithObstacle(pos: Vec2, radius: f32, zone: *const entities.Zo
     return false;
 }
 
-// Check if position collides with deadly obstacle
-pub fn collidesWithDeadlyObstacle(pos: Vec2, radius: f32, zone: *const hex_world.HexWorld.Zone) bool {
-    for (0..zone.obstacle_count) |i| {
-        const obstacle = &zone.obstacles.items[i];
-        if (!obstacle.active or !obstacle.is_deadly) continue; // Only check deadly obstacles
-
-        if (checkCircleRectCollision(pos, radius, obstacle.pos, obstacle.size)) {
-            return true;
+// Check if position collides with deadly obstacle using ECS queries
+pub fn collidesWithDeadlyObstacle(pos: Vec2, radius: f32, world: *const hex_world.HexWorld) bool {
+    // Query all terrain entities for deadly obstacles (pit terrain type)
+    const ecs_world = world.getECSWorld();
+    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+    
+    while (terrain_iter.next()) |entry| {
+        const entity_id = entry.key_ptr.*;
+        const terrain = entry.value_ptr.*;
+        
+        // Only check deadly obstacles (pit terrain)
+        if (terrain.terrain_type != .pit) continue;
+        
+        // Get transform component for position and collision
+        if (ecs_world.transforms.getConst(entity_id)) |transform| {
+            // Convert from circular collision to rectangular
+            const half_size = transform.radius;
+            const obstacle_size = Vec2{ .x = half_size * 2, .y = half_size * 2 };
+            
+            if (checkCircleRectCollision(pos, radius, transform.pos, obstacle_size)) {
+                return true;
+            }
         }
     }
     return false;
@@ -202,52 +218,88 @@ pub fn findNearestAttunedLifestone(world: *const hex_world.HexWorld) ?LifestoneR
     var nearest_distance: f32 = std.math.floatMax(f32);
     var nearest_lifestone: ?LifestoneResult = null;
 
-    // First check current zone
-    const current_zone = world.getCurrentZoneConst();
-    for (0..current_zone.lifestone_count) |i| {
-        const lifestone = &current_zone.lifestones.items[i];
-        if (!lifestone.active or !lifestone.attuned) continue;
-
-        const dx = current_pos.x - lifestone.pos.x;
-        const dy = current_pos.y - lifestone.pos.y;
-        const distance = dx * dx + dy * dy;
-
-        if (distance < nearest_distance) {
-            nearest_distance = distance;
-            nearest_lifestone = LifestoneResult{
-                .zone_index = world.current_zone,
-                .pos = lifestone.pos,
-            };
-        }
-    }
-
-    // If found in current zone, return it
-    if (nearest_lifestone != null) {
-        return nearest_lifestone;
-    }
-
-    // Otherwise, search other zones with distance penalty
-    for (world.zones, 0..) |zone, zone_idx| {
-        if (zone_idx == world.current_zone) continue;
-
-        for (0..zone.lifestone_count) |i| {
-            const lifestone = &zone.lifestones.items[i];
-            if (!lifestone.active or !lifestone.attuned) continue;
-
-            // Add penalty for being in different zone
-            const dx = current_pos.x - lifestone.pos.x;
-            const dy = current_pos.y - lifestone.pos.y;
-            const distance = (dx * dx + dy * dy) + 1000000.0; // Large penalty
-
-            if (distance < nearest_distance) {
-                nearest_distance = distance;
-                nearest_lifestone = LifestoneResult{
-                    .zone_index = zone_idx,
-                    .pos = lifestone.pos,
-                };
+    // Query all lifestone entities using ECS
+    const ecs_world = world.getECSWorld();
+    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+    
+    while (terrain_iter.next()) |entry| {
+        const entity_id = entry.key_ptr.*;
+        const terrain = entry.value_ptr.*;
+        
+        // Only check lifestones (altar terrain with interactable component)
+        if (terrain.terrain_type != .altar) continue;
+        if (!ecs_world.interactables.has(entity_id)) continue;
+        
+        // Get components
+        if (ecs_world.transforms.getConst(entity_id)) |transform| {
+            if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+                // Check if lifestone is attuned (using transformable state as attuned indicator)
+                if (interactable.interaction_type != .transformable) continue;
+                // TODO: Add proper attuned state to Interactable component
+                // For now, assume all transformable lifestones are attuned
+                
+                const dx = current_pos.x - transform.pos.x;
+                const dy = current_pos.y - transform.pos.y;
+                const distance = dx * dx + dy * dy;
+                
+                if (distance < nearest_distance) {
+                    nearest_distance = distance;
+                    nearest_lifestone = LifestoneResult{
+                        .zone_index = world.current_zone, // TODO: Get actual zone from entity
+                        .pos = transform.pos,
+                    };
+                }
             }
         }
     }
 
     return nearest_lifestone;
+}
+
+// Check unit collision with obstacles using ECS queries
+pub fn checkUnitObstacleCollisionECS(
+    world: *hex_world.HexWorld,
+    unit_id: ecs.EntityId,
+    transform: *ecs.components.Transform,
+    health: *ecs.components.Health,
+    old_pos: Vec2
+) bool {
+    const ecs_world = world.getECSWorldMut();
+    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+    
+    while (terrain_iter.next()) |entry| {
+        const obstacle_id = entry.key_ptr.*;
+        const terrain = entry.value_ptr.*;
+        
+        // Only check obstacles (wall/pit terrain)
+        if (terrain.terrain_type != .wall and terrain.terrain_type != .pit) continue;
+        
+        // Get obstacle transform
+        if (ecs_world.transforms.getConst(obstacle_id)) |obstacle_transform| {
+            // Convert from circular collision to rectangular
+            const half_size = obstacle_transform.radius;
+            const obstacle_size = Vec2{ .x = half_size * 2, .y = half_size * 2 };
+            
+            if (checkCircleRectCollision(transform.pos, transform.radius, obstacle_transform.pos, obstacle_size)) {
+                if (terrain.terrain_type == .pit) {
+                    // Unit dies on deadly obstacle
+                    health.alive = false;
+                    // Update visual color to indicate death
+                    if (ecs_world.visuals.get(unit_id)) |visual| {
+                        visual.color = constants.COLOR_DEAD;
+                    }
+                } else {
+                    // Revert position for blocking obstacles
+                    transform.pos = old_pos;
+                }
+                return true; // Collision occurred
+            }
+        }
+    }
+    return false; // No collision
+}
+
+// Check player collision with portal using ECS transform component
+pub fn checkPlayerPortalCollisionECS(player_pos: Vec2, player_radius: f32, portal_transform: *const ecs.components.Transform) bool {
+    return checkCircleCollision(player_pos, player_radius, portal_transform.pos, portal_transform.radius);
 }

@@ -400,6 +400,10 @@ pub const HexWorld = struct {
     pub fn getECSWorld(self: *const HexWorld) *const World {
         return &self.world;
     }
+    
+    pub fn getECSWorldMut(self: *HexWorld) *World {
+        return &self.world;
+    }
 
     /// Get current zone (mutable) - alias for getCurrentZone
     pub fn getCurrentZoneMut(self: *HexWorld) *Zone {

@@ -13,7 +13,7 @@ $ zig version
 0.14.1
 ```
 
-Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation)
+Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation), webref (vendored)
 
 ## Design Philosophy
 
@@ -130,6 +130,7 @@ Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation)
 
 **Vendored Libraries:**
 - **SDL3**: Complete SDL3 library built from vendored source
+- **webref**: Machine-readable references of terms defined in web browser specifications
 - **Zero External Packages**: No `apt install` or `sudo` requirements
 
 **Key Features:**

@@ -235,7 +235,7 @@ pub const GameState = struct {
         std.debug.print("Full game reset\n", .{});
     }
     
-    /// Check if all lifestones across all zones are attuned
+    /// Check if all lifestones across all zones are attuned using ECS queries
     pub fn hasAttunedAllLifestones(self: *const Self) bool {
         // Use cached value if state manager is available
         if (self.state_manager) |manager| {
@@ -243,14 +243,26 @@ pub const GameState = struct {
             _ = manager;
         }
         
-        // Direct computation (efficient enough for 91 lifestones)
+        // Direct computation using ECS queries
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
         
-        for (self.world.zones) |*zone| {
-            total_lifestones += zone.lifestone_count;
-            for (0..zone.lifestone_count) |i| {
-                if (zone.lifestones[i].attuned) {
+        const ecs_world = self.world.getECSWorld();
+        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+            
+            // Only count lifestones (altar terrain with interactable component)
+            if (terrain.terrain_type != .altar) continue;
+            if (!ecs_world.interactables.has(entity_id)) continue;
+            
+            total_lifestones += 1;
+            
+            // Check if lifestone is attuned (using transformable state as attuned indicator)
+            if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+                if (interactable.interaction_type == .transformable) {
                     total_attuned += 1;
                 }
             }
@@ -259,15 +271,27 @@ pub const GameState = struct {
         return total_lifestones > 0 and total_attuned == total_lifestones;
     }
     
-    /// Properly compute all lifestones attuned for the cache
+    /// Properly compute all lifestones attuned for the cache using ECS queries
     pub fn computeAllLifestonesAttunedForWorld(self: *const Self) bool {
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
         
-        for (self.world.zones) |*zone| {
-            total_lifestones += zone.lifestone_count;
-            for (0..zone.lifestone_count) |i| {
-                if (zone.lifestones[i].attuned) {
+        const ecs_world = self.world.getECSWorld();
+        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+            
+            // Only count lifestones (altar terrain with interactable component)
+            if (terrain.terrain_type != .altar) continue;
+            if (!ecs_world.interactables.has(entity_id)) continue;
+            
+            total_lifestones += 1;
+            
+            // Check if lifestone is attuned (using transformable state as attuned indicator)
+            if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+                if (interactable.interaction_type == .transformable) {
                     total_attuned += 1;
                 }
             }
@@ -281,8 +305,7 @@ pub const GameState = struct {
 fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
     const world = &game_state.world;
     
-    // Get zone for obstacle collision checks (still using legacy obstacles)
-    const zone = world.getCurrentZoneMut();
+    // Note: Obstacle collision now uses ECS queries
     
     // Query all units from ECS system
     var unit_iter = world.world.units.iterator();
@@ -315,25 +338,10 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
                         );
                     }
                     
-                    // Check collision with obstacles (still using legacy obstacle system)
-                    for (0..zone.obstacle_count) |j| {
-                        const obstacle = &zone.obstacles.items[j];
-                        if (!obstacle.active) continue;
-
-                        if (physics.checkCircleRectCollision(transform.pos, transform.radius, obstacle.pos, obstacle.size)) {
-                            if (obstacle.is_deadly) {
-                                // Unit dies on deadly obstacle
-                                health.alive = false;
-                                // Update visual color to indicate death
-                                if (world.world.visuals.get(unit_id)) |visual| {
-                                    visual.color = constants.COLOR_DEAD;
-                                }
-                            } else {
-                                // Revert position for blocking obstacles
-                                transform.pos = old_pos;
-                            }
-                            break;
-                        }
+                    // Check collision with obstacles using ECS queries
+                    if (physics.checkUnitObstacleCollisionECS(@constCast(world), unit_id, transform, health, old_pos)) {
+                        // Collision was handled by the function
+                        break;
                     }
                 }
             }
@@ -390,7 +398,6 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
 pub fn checkCollisions(game_state: *GameState) void {
     const world = &game_state.world;
-    const zone = world.getCurrentZoneMut();
     
     // Player entity is accessed via helper methods instead of direct field access
 
@@ -415,28 +422,11 @@ pub fn checkCollisions(game_state: *GameState) void {
         return;
     }
 
-    for (0..zone.lifestone_count) |i| {
-        if (!zone.lifestones.items[i].attuned and physics.checkPlayerLifestoneCollision(player_pos, player_radius, &zone.lifestones.items[i])) {
-            behaviors.attuneLifestone(&zone.lifestones.items[i]);
-            std.debug.print("Lifestone attuned!\n", .{});
-            
-            // Emit lifestone attuned event
-            if (game_state.state_manager) |manager| {
-                manager.emit(hex_events.lifestoneAttuned(
-                    game_state.world.current_zone,
-                    i,
-                    zone.lifestones.items[i].pos,
-                ));
-            }
-            
-            // Add inner effect for newly attuned lifestone
-            // TODO more declaratively?
-            game_state.effect_system.addLifestoneInnerEffectOnly(zone.lifestones.items[i].pos, zone.lifestones.items[i].radius);
-        }
-    }
+    // Check lifestone collisions using ECS queries
+    checkLifestoneCollisionsECS(game_state, player_pos, player_radius);
 
     // Check collision with deadly obstacles
-    if (physics.collidesWithDeadlyObstacle(player_pos, player_radius, zone)) {
+    if (physics.collidesWithDeadlyObstacle(player_pos, player_radius, world)) {
         // Player dies on hazard contact
         world.setPlayerAlive(false);
         world.setPlayerColor(constants.COLOR_DEAD);
@@ -448,6 +438,58 @@ pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void 
         const screen_mouse_pos = game_state.input_state.getMousePos();
         const world_mouse_pos = cam.screenToWorldSafe(screen_mouse_pos);
         _ = combat.fireBulletAtMouse(&game_state.world, world_mouse_pos, &game_state.world.bullet_pool);
+    }
+}
+
+// Check lifestone collisions using ECS queries
+fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: types.Vec2, player_radius: f32) void {
+    const world = &game_state.world;
+    const ecs_world = world.getECSWorldMut();
+    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+    
+    while (terrain_iter.next()) |entry| {
+        const entity_id = entry.key_ptr.*;
+        const terrain = entry.value_ptr.*;
+        
+        // Only check lifestones (altar terrain with interactable component)
+        if (terrain.terrain_type != .altar) continue;
+        if (!ecs_world.interactables.has(entity_id)) continue;
+        
+        // Get components
+        if (ecs_world.transforms.getConst(entity_id)) |transform| {
+            if (ecs_world.interactables.get(entity_id)) |interactable| {
+                // Check if lifestone is not yet attuned (using transformable state as attuned indicator)
+                const is_attuned = (interactable.interaction_type == .transformable);
+                if (is_attuned) continue; // Skip already attuned lifestones
+                
+                // Check collision
+                if (physics.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
+                    // Attune the lifestone by changing interaction type to transformable
+                    interactable.interaction_type = .transformable;
+                    
+                    // Update visual color for attunement
+                    if (ecs_world.visuals.get(entity_id)) |visual| {
+                        visual.color = constants.COLOR_LIFESTONE_ATTUNED;
+                    }
+                    
+                    std.debug.print("Lifestone attuned!\n", .{});
+                    
+                    // Emit lifestone attuned event
+                    if (game_state.state_manager) |manager| {
+                        manager.emit(hex_events.lifestoneAttuned(
+                            game_state.world.current_zone,
+                            0, // TODO: Get actual index from entity system
+                            transform.pos,
+                        ));
+                    }
+                    
+                    // Add inner effect for newly attuned lifestone
+                    game_state.effect_system.addLifestoneInnerEffectOnly(transform.pos, transform.radius);
+                    
+                    return; // Only attune one lifestone per frame
+                }
+            }
+        }
     }
 }
 

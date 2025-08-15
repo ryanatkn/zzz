@@ -252,11 +252,8 @@ pub const World = struct {
         // Create terrain component as door type (portals are like doors)
         try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.door));
         
-        // Add interactable component for travel 
-        try self.interactables.add(id, components.Interactable.init(components.Interactable.InteractionType.telekinetic));
-
-        // TODO: Store destination_zone in a separate component for portals
-        _ = destination_zone;
+        // Add interactable component for travel with destination
+        try self.interactables.add(id, components.Interactable.initPortal(destination_zone));
 
         return id;
     }
