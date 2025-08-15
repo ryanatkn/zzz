@@ -97,6 +97,15 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     // Initialize loggers FIRST (before other components that might use them)
     logger = loggers.GameLogger.init(global_allocator);
     try loggers.initGlobalLoggers(global_allocator);
+    
+    // Load optional runtime config overrides from .zz/log-config.zon
+    const log_config = @import("../lib/debug/config.zig");
+    if (log_config.loadOverrides(global_allocator)) |overrides| {
+        defer if (@hasDecl(@TypeOf(overrides), "deinit")) overrides.deinit(global_allocator);
+        overrides.apply();
+    } else |_| {
+        // Config loading failed - continue with defaults
+    }
 
     // Initialize renderer (heap allocated to avoid memory corruption)
     game_renderer = try global_allocator.create(GameRenderer);

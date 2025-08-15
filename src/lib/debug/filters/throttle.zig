@@ -17,15 +17,19 @@ pub const Throttle = struct {
     allocator: std.mem.Allocator,
     start_time: i64,
     
-    // Configuration
+    // Mutable configuration (can be updated at runtime)
     summary_interval_ms: i64 = 30000, // Summary every 30 seconds
     first_time_delay_ms: i64 = 1000,  // Allow first occurrences for 1 second
     
     pub fn init(allocator: std.mem.Allocator) Self {
+        const config = @import("../config.zig");
         return Self{
             .entries = std.AutoHashMap(u64, LogEntry).init(allocator),
             .allocator = allocator,
             .start_time = std.time.milliTimestamp(),
+            // Initialize with config values (compile-time defaults)
+            .summary_interval_ms = config.game_log.throttle_interval_ms,
+            .first_time_delay_ms = config.game_log.first_time_delay_ms,
         };
     }
     

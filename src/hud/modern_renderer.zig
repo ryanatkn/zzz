@@ -177,8 +177,8 @@ pub const ModernHUDRenderer = struct {
             
             fn onClick(context: @This()) void {
                 // TODO: Integrate with router system to navigate to context.path
-                const log_throttle = @import("../lib/debug/log_throttle.zig");
-                log_throttle.logInfo("navigate", "Navigate to: {s}", .{context.path});
+                const loggers = @import("../lib/debug/loggers.zig");
+                loggers.getUILog().info("navigate", "Navigate to: {s}", .{context.path});
             }
         };
         

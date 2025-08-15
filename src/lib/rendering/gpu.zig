@@ -1,5 +1,5 @@
 const std = @import("std");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const c = @import("../platform/sdl.zig");
 
@@ -85,7 +85,7 @@ pub const SimpleGPURenderer = struct {
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) !Self {
-        log_throttle.logInfo("gpu_create", "Creating simple GPU device", .{});
+        loggers.getRenderLog().info("gpu_create", "Creating simple GPU device", .{});
 
         // Try different backends to work around NVIDIA Vulkan driver issues
         // Priority: 1) OpenGL first 2) Software 3) Auto-select as last resort
@@ -100,7 +100,7 @@ pub const SimpleGPURenderer = struct {
 
         for (backends) |backend_name| {
             const name_str = if (backend_name) |name| std.mem.span(name) else "auto-select";
-            log_throttle.logInfo("gpu_backend_try", "Trying GPU backend: {s}", .{name_str});
+            loggers.getRenderLog().info("gpu_backend_try", "Trying GPU backend: {s}", .{name_str});
 
             device = c.sdl.SDL_CreateGPUDevice(c.sdl.SDL_GPU_SHADERFORMAT_SPIRV | c.sdl.SDL_GPU_SHADERFORMAT_DXIL, true, // Enable debug mode for better error reporting
                 backend_name);
@@ -110,22 +110,22 @@ pub const SimpleGPURenderer = struct {
                 break;
             } else {
                 const err = c.sdl.SDL_GetError();
-                log_throttle.logInfo("gpu_backend_fail", "Failed to create GPU device with {s}: {s}", .{ name_str, err });
+                loggers.getRenderLog().warn("gpu_backend_fail", "Failed to create GPU device with {s}: {s}", .{ name_str, err });
             }
         }
 
         const final_device = device orelse {
-            log_throttle.logInfo("gpu_create_fail", "Failed to create GPU device", .{});
+            loggers.getRenderLog().err("gpu_create_fail", "Failed to create GPU device", .{});
             return error.GPUDeviceCreationFailed;
         };
 
         if (!c.sdl.SDL_ClaimWindowForGPUDevice(final_device, window)) {
-            log_throttle.logInfo("gpu_claim_fail", "Failed to claim window for GPU device", .{});
+            loggers.getRenderLog().err("gpu_claim_fail", "Failed to claim window for GPU device", .{});
             c.sdl.SDL_DestroyGPUDevice(final_device);
             return error.WindowClaimFailed;
         }
 
-        log_throttle.logInfo("gpu_create_success", "GPU device created successfully using backend: {s}", .{backend_used});
+        loggers.getRenderLog().info("gpu_create_success", "GPU device created successfully using backend: {s}", .{backend_used});
 
         var self = Self{
             .allocator = allocator,
@@ -177,7 +177,7 @@ pub const SimpleGPURenderer = struct {
     }
 
     fn createShaders(self: *Self) !void {
-        log_throttle.logInfo("shader_load_start", "Loading simple GPU shaders", .{});
+        loggers.getRenderLog().info("shader_load_start", "Loading simple GPU shaders", .{});
 
         // Load simple circle shaders
         const circle_vs_spv = @embedFile("../../shaders/compiled/vulkan/simple_circle_vs.spv");
@@ -196,7 +196,7 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.circle_vs = c.sdl.SDL_CreateGPUShader(self.device, &circle_vs_info) orelse {
-            log_throttle.logInfo("circle_vs_fail", "Failed to create circle vertex shader: {s}", .{c.sdl.SDL_GetError()});
+            loggers.getRenderLog().err("circle_vs_fail", "Failed to create circle vertex shader: {s}", .{c.sdl.SDL_GetError()});
             return error.VertexShaderFailed;
         };
 
@@ -213,7 +213,7 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.circle_ps = c.sdl.SDL_CreateGPUShader(self.device, &circle_ps_info) orelse {
-            log_throttle.logInfo("circle_fs_fail", "Failed to create circle fragment shader", .{});
+            loggers.getRenderLog().err("circle_fs_fail", "Failed to create circle fragment shader", .{});
             return error.FragmentShaderFailed;
         };
 
@@ -234,7 +234,7 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.rect_vs = c.sdl.SDL_CreateGPUShader(self.device, &rect_vs_info) orelse {
-            log_throttle.logInfo("rect_vs_fail", "Failed to create rectangle vertex shader", .{});
+            loggers.getRenderLog().err("rect_vs_fail", "Failed to create rectangle vertex shader", .{});
             return error.VertexShaderFailed;
         };
 
@@ -251,7 +251,7 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.rect_ps = c.sdl.SDL_CreateGPUShader(self.device, &rect_ps_info) orelse {
-            log_throttle.logInfo("rect_fs_fail", "Failed to create rectangle fragment shader", .{});
+            loggers.getRenderLog().err("rect_fs_fail", "Failed to create rectangle fragment shader", .{});
             return error.FragmentShaderFailed;
         };
 
@@ -272,7 +272,7 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.effect_vs = c.sdl.SDL_CreateGPUShader(self.device, &effect_vs_info) orelse {
-            log_throttle.logInfo("effect_vs_fail", "Failed to create effect vertex shader", .{});
+            loggers.getRenderLog().err("effect_vs_fail", "Failed to create effect vertex shader", .{});
             return error.VertexShaderFailed;
         };
 
@@ -289,15 +289,15 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.effect_ps = c.sdl.SDL_CreateGPUShader(self.device, &effect_ps_info) orelse {
-            log_throttle.logInfo("effect_fs_fail", "Failed to create effect fragment shader", .{});
+            loggers.getRenderLog().err("effect_fs_fail", "Failed to create effect fragment shader", .{});
             return error.FragmentShaderFailed;
         };
 
-        log_throttle.logInfo("shader_load_success", "Simple GPU shaders loaded successfully", .{});
+        loggers.getRenderLog().info("shader_load_success", "Simple GPU shaders loaded successfully", .{});
     }
 
     fn createPipelines(self: *Self) !void {
-        log_throttle.logInfo("pipeline_create_start", "Creating simple graphics pipelines", .{});
+        loggers.getRenderLog().info("pipeline_create_start", "Creating simple graphics pipelines", .{});
 
         // Get the actual swapchain texture format (usually B8G8R8A8 on most systems)
         const swapchain_format = c.sdl.SDL_GetGPUSwapchainTextureFormat(self.device, self.window);
@@ -384,8 +384,8 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.circle_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &circle_create_info) orelse {
-            log_throttle.logInfo("circle_pipeline_fail", "Failed to create circle graphics pipeline", .{});
-            log_throttle.logInfo("circle_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
+            loggers.getRenderLog().err("circle_pipeline_fail", "Failed to create circle graphics pipeline", .{});
+            loggers.getRenderLog().err("circle_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
             return error.PipelineCreationFailed;
         };
 
@@ -401,8 +401,8 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.rect_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &rect_create_info) orelse {
-            log_throttle.logInfo("rect_pipeline_fail", "Failed to create rectangle graphics pipeline", .{});
-            log_throttle.logInfo("circle_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
+            loggers.getRenderLog().err("rect_pipeline_fail", "Failed to create rectangle graphics pipeline", .{});
+            loggers.getRenderLog().err("rect_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
             return error.PipelineCreationFailed;
         };
 
@@ -425,12 +425,12 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.effect_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &effect_create_info) orelse {
-            log_throttle.logInfo("effect_pipeline_fail", "Failed to create effect graphics pipeline", .{});
-            log_throttle.logInfo("circle_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
+            loggers.getRenderLog().err("effect_pipeline_fail", "Failed to create effect graphics pipeline", .{});
+            loggers.getRenderLog().err("effect_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
             return error.PipelineCreationFailed;
         };
 
-        log_throttle.logInfo("pipeline_create_success", "Simple graphics pipelines created successfully", .{});
+        loggers.getRenderLog().info("pipeline_create_success", "Simple graphics pipelines created successfully", .{});
     }
 
     // Begin frame and get command buffer ready for rendering

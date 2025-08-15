@@ -1,5 +1,5 @@
 const std = @import("std");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 const c = @import("../platform/sdl.zig");
 
 const ShaderType = enum { vertex, fragment };
@@ -87,7 +87,7 @@ pub const ShaderManager = struct {
             };
 
             return self.loadShaderFromPath(dxil_path, entry_point, shader_type, num_uniform_buffers, num_samplers, num_storage_buffers, num_storage_textures, c.sdl.SDL_GPU_SHADERFORMAT_DXIL) catch {
-                log_throttle.logInfo("shader_load_fail", "Failed to load shader: {s} (tried both SPIRV and DXIL)", .{name});
+                loggers.getRenderLog().err("shader_load_fail", "Failed to load shader: {s} (tried both SPIRV and DXIL)", .{name});
                 return error.ShaderLoadFailed;
             };
         }
@@ -96,7 +96,7 @@ pub const ShaderManager = struct {
     fn loadShaderFromPath(self: *ShaderManager, path: []const u8, entry_point: []const u8, shader_type: ShaderType, num_uniform_buffers: u32, num_samplers: u32, num_storage_buffers: u32, num_storage_textures: u32, format: c.sdl.SDL_GPUShaderFormat) !*c.sdl.SDL_GPUShader {
         // Read shader file
         const file = std.fs.cwd().openFile(path, .{}) catch |err| {
-            log_throttle.logInfo("shader_file_fail", "Failed to open shader file: {s} (error: {})", .{ path, err });
+            loggers.getRenderLog().err("shader_file_fail", "Failed to open shader file: {s} (error: {})", .{ path, err });
             return err;
         };
         defer file.close();
@@ -126,11 +126,11 @@ pub const ShaderManager = struct {
         };
 
         const shader = c.sdl.SDL_CreateGPUShader(self.device, &shader_info) orelse {
-            log_throttle.logInfo("shader_create_fail", "Failed to create shader from {s}: {s}", .{ path, c.sdl.SDL_GetError() });
+            loggers.getRenderLog().err("shader_create_fail", "Failed to create shader from {s}: {s}", .{ path, c.sdl.SDL_GetError() });
             return error.ShaderCreationFailed;
         };
 
-        log_throttle.logInfo("shader_load_success", "Loaded shader: {s} from {s}", .{ entry_point, path });
+        loggers.getRenderLog().info("shader_load_success", "Loaded shader: {s} from {s}", .{ entry_point, path });
         return shader;
     }
 

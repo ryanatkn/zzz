@@ -3,6 +3,7 @@ const Logger = @import("logger.zig").Logger;
 const outputs = @import("outputs.zig");
 const filters = @import("filters.zig");
 const formatters = @import("formatters.zig");
+const config = @import("config.zig");
 
 // Pre-configured logger types for different use cases
 
@@ -11,7 +12,7 @@ const formatters = @import("formatters.zig");
 pub const GameLogger = Logger(.{
     .output = outputs.Multi(.{ 
         outputs.Console, 
-        outputs.File(.{ .path = "game.log" })
+        outputs.File(.{ .path = config.game_log.file_path })
     }),
     .filter = filters.Throttle,
     .formatter = formatters.Timestamped,
@@ -29,7 +30,7 @@ pub const UILogger = Logger(.{
 /// Only logs warnings and errors to avoid frame drops
 pub const RenderLogger = Logger(.{
     .output = outputs.Console,
-    .filter = filters.Level(.{ .min_level = .warn }),
+    .filter = filters.Level(.{ .min_level = config.render_log.min_level }),
     .formatter = formatters.Passthrough,
 });
 
@@ -38,7 +39,7 @@ pub const RenderLogger = Logger(.{
 pub const DebugLogger = Logger(.{
     .output = outputs.Multi(.{
         outputs.Console,
-        outputs.File(.{ .path = "debug.log" })
+        outputs.File(.{ .path = config.debug_log.file_path })
     }),
     .filter = filters.Passthrough,
     .formatter = formatters.Timestamped,
@@ -111,3 +112,4 @@ pub fn getRenderLog() *RenderLogger {
 pub fn getFontLog() *FontLogger {
     return &(font_log orelse @panic("Global font logger not initialized. Call initGlobalLoggers() first."));
 }
+

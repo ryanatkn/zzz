@@ -1,6 +1,6 @@
 const std = @import("std");
 const ttf_parser = @import("ttf_parser.zig");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const log = std.log.scoped(.glyph_extractor);
 
@@ -70,7 +70,7 @@ pub const GlyphExtractor = struct {
     /// Extract outline for a specific codepoint
     pub fn extractGlyph(self: *GlyphExtractor, codepoint: u32) !GlyphOutline {
         const glyph_id = try self.parser.getGlyphIndex(codepoint);
-        log_throttle.logDebug("glyph_extract", "Extracting codepoint {} ('{c}'): glyph_id={}", .{ codepoint, if (codepoint < 127) @as(u8, @intCast(codepoint)) else '?', glyph_id });
+        loggers.getFontLog().debug("glyph_extract", "Extracting codepoint {} ('{c}'): glyph_id={}", .{ codepoint, if (codepoint < 127) @as(u8, @intCast(codepoint)) else '?', glyph_id });
         if (glyph_id == 0 and codepoint != 0) {
             log.info("Using missing glyph outline for codepoint {}", .{codepoint});
             return self.createMissingGlyphOutline();
@@ -83,7 +83,7 @@ pub const GlyphExtractor = struct {
     pub fn extractGlyphById(self: *GlyphExtractor, glyph_id: u16) !GlyphOutline {
         const glyph_offset = self.parser.getGlyphOffset(glyph_id) catch |err| switch (err) {
             error.EmptyGlyph => {
-                log_throttle.logInfo("empty_glyph", "Empty glyph for glyph_id={}, creating empty outline", .{glyph_id});
+                loggers.getFontLog().info("empty_glyph", "Empty glyph for glyph_id={}, creating empty outline", .{glyph_id});
                 return self.createEmptyGlyphOutline(glyph_id);
             },
             else => {
@@ -92,7 +92,7 @@ pub const GlyphExtractor = struct {
             },
         };
 
-        log_throttle.logDebug("glyph_offset", "Got glyph_offset={} for glyph_id={}", .{ glyph_offset, glyph_id });
+        loggers.getFontLog().debug("glyph_offset", "Got glyph_offset={} for glyph_id={}", .{ glyph_offset, glyph_id });
 
         const glyf_offset = self.parser.glyf_offset orelse return error.NoGlyfTable;
         const glyph_data_offset = glyf_offset + glyph_offset;
@@ -112,7 +112,7 @@ pub const GlyphExtractor = struct {
 
     /// Extract a simple (non-composite) glyph
     fn extractSimpleGlyph(self: *GlyphExtractor, glyph_offset: usize, num_contours: i16, glyph_id: u16) !GlyphOutline {
-        log_throttle.logDebug("simple_glyph", "Extracting simple glyph_id={}, num_contours={}", .{ glyph_id, num_contours });
+        loggers.getFontLog().debug("simple_glyph", "Extracting simple glyph_id={}, num_contours={}", .{ glyph_id, num_contours });
 
         // Handle empty glyphs (like space)
         if (num_contours == 0) {

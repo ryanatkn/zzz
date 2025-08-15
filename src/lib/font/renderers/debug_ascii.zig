@@ -1,7 +1,7 @@
 const std = @import("std");
 const font_types = @import("../font_types.zig");
 const renderer_interface = @import("renderer_interface.zig");
-const log_throttle = @import("../../debug/log_throttle.zig");
+const loggers = @import("../../debug/loggers.zig");
 const bitmap_utils = @import("../../image/bitmap.zig");
 
 const Point = font_types.Point;
@@ -56,15 +56,15 @@ pub const DebugAsciiRenderer = struct {
         const self: *DebugAsciiRenderer = @ptrCast(@alignCast(ctx));
         const start_time = std.time.microTimestamp();
 
-        log_throttle.logDebug("debug_ascii_start", "DebugAsciiRenderer: rendering glyph at {}pt", .{font_size});
+        loggers.getFontLog().debug("debug_ascii_start", "DebugAsciiRenderer: rendering glyph at {}pt", .{font_size});
 
         // Add extensive safety checks
         if (outline.contours.len == 0) {
-            log_throttle.logDebug("debug_ascii_empty", "No contours in outline", .{});
+            loggers.getFontLog().debug("debug_ascii_empty", "No contours in outline", .{});
         } else {
-            log_throttle.logDebug("debug_ascii_contours", "Processing {} contours", .{outline.contours.len});
+            loggers.getFontLog().debug("debug_ascii_contours", "Processing {} contours", .{outline.contours.len});
             for (outline.contours, 0..) |contour, contour_idx| {
-                log_throttle.logDebug("debug_ascii_contour_info", "Contour {}: {} points, on_curve len: {}", .{ contour_idx, contour.points.len, contour.on_curve.len });
+                loggers.getFontLog().debug("debug_ascii_contour_info", "Contour {}: {} points, on_curve len: {}", .{ contour_idx, contour.points.len, contour.on_curve.len });
             }
         }
 
@@ -110,11 +110,11 @@ pub const DebugAsciiRenderer = struct {
         for (outline.contours, 0..) |contour, contour_idx| {
             // Safety check: ensure we have both points and on_curve data
             if (contour.points.len == 0 or contour.on_curve.len == 0) {
-                log_throttle.logDebug("debug_ascii_skip", "Skipping contour {} with no points or on_curve data", .{contour_idx});
+                loggers.getFontLog().debug("debug_ascii_skip", "Skipping contour {} with no points or on_curve data", .{contour_idx});
                 continue;
             }
 
-            log_throttle.logDebug("debug_ascii_process", "Processing contour {} with {} points", .{ contour_idx, contour.points.len });
+            loggers.getFontLog().debug("debug_ascii_process", "Processing contour {} with {} points", .{ contour_idx, contour.points.len });
 
             // Draw outline points
             for (contour.points, 0..) |point, i| {
@@ -139,13 +139,13 @@ pub const DebugAsciiRenderer = struct {
                     } else {
                         // Fallback: assume on-curve if index out of bounds
                         bitmap[bitmap_idx] = Coverage.FULL; // 255 for on-curve points
-                        log_throttle.logError("debug_ascii_bounds", "on_curve index {} out of bounds (len: {})", .{ i, contour.on_curve.len });
+                        loggers.getFontLog().err("debug_ascii_bounds", "on_curve index {} out of bounds (len: {})", .{ i, contour.on_curve.len });
                     }
                 }
             }
 
             // Draw lines between consecutive points
-            log_throttle.logDebug("debug_ascii_lines", "Drawing {} lines for contour {}", .{ contour.points.len, contour_idx });
+            loggers.getFontLog().debug("debug_ascii_lines", "Drawing {} lines for contour {}", .{ contour.points.len, contour_idx });
             for (contour.points, 0..) |_, i| {
                 const next_i = (i + 1) % contour.points.len;
                 const p1 = contour.points[i];
@@ -157,7 +157,7 @@ pub const DebugAsciiRenderer = struct {
 
         // Fill interior using simple point-in-polygon test
         if (self.config.debug_mode) {
-            log_throttle.logDebug("debug_ascii_fill", "Filling interior for debug visualization", .{});
+            loggers.getFontLog().debug("debug_ascii_fill", "Filling interior for debug visualization", .{});
             self.fillInterior(bitmap, ascii_width, ascii_height, outline.contours, bounds_center_x, bounds_center_y, center_x, center_y, scale);
         }
 

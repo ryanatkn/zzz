@@ -2,7 +2,7 @@ const std = @import("std");
 const c = @import("../platform/sdl.zig");
 const colors = @import("../core/colors.zig");
 const reactive_text_cache = @import("../reactive/text_cache.zig");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 
 /// Persistent text texture system that maintains texture handles across frames
 /// Unlike the immediate mode text renderer, this system keeps textures alive
@@ -72,7 +72,7 @@ pub const PersistentTextSystem = struct {
     pub fn getOrCreateTexture(self: *Self, text: []const u8, font_manager: anytype, font_category: anytype, font_size: f32, color: colors.Color) !?PersistentTextureHandle {
         // Validate UTF-8 before processing
         if (!std.unicode.utf8ValidateSlice(text)) {
-            log_throttle.logError("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});
+            loggers.getFontLog().err("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});
             return null;
         }
 
@@ -84,7 +84,7 @@ pub const PersistentTextSystem = struct {
             self.last_failure_check = now;
         } else if (self.recent_failures > max_failures_per_second) {
             // Too many failures, stop trying
-            log_throttle.logError("circuit_breaker", "Circuit breaker triggered: too many texture creation failures", .{});
+            loggers.getFontLog().err("circuit_breaker", "Circuit breaker triggered: too many texture creation failures", .{});
             return null;
         }
 
@@ -96,7 +96,7 @@ pub const PersistentTextSystem = struct {
             if (existing.is_valid) {
                 existing.last_used = current_time;
 
-                log_throttle.logDebug("cache_hit", "Using persistent texture for '{s}' ({}x{})", .{ text, existing.width, existing.height });
+                loggers.getFontLog().debug("cache_hit", "Using persistent texture for '{s}' ({}x{})", .{ text, existing.width, existing.height });
 
                 return PersistentTextureHandle{
                     .texture = existing.texture,
@@ -110,16 +110,16 @@ pub const PersistentTextSystem = struct {
 
         // Validate UTF-8 before attempting texture creation
         if (!std.unicode.utf8ValidateSlice(text)) {
-            log_throttle.logError("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});
+            loggers.getFontLog().err("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});
             self.recent_failures += 1;
             return null;
         }
 
         // Create new texture (only log first few times to avoid spam)
-        log_throttle.logDebug("create_texture", "Creating new persistent texture for '{s}'", .{text});
+        loggers.getFontLog().debug("create_texture", "Creating new persistent texture for '{s}'", .{text});
 
         const text_result = font_manager.renderTextToTexture(text, font_category, font_size, color) catch |err| {
-            log_throttle.logError("texture_error", "Failed to create persistent texture for text: {}", .{err});
+            loggers.getFontLog().err("texture_error", "Failed to create persistent texture for text: {}", .{err});
             self.recent_failures += 1;
             return null;
         };
@@ -136,7 +136,7 @@ pub const PersistentTextSystem = struct {
 
         try self.textures.put(content_hash, persistent);
 
-        log_throttle.logDebug("texture_created", "Created persistent texture: {}x{}", .{ text_result.width, text_result.height });
+        loggers.getFontLog().debug("texture_created", "Created persistent texture: {}x{}", .{ text_result.width, text_result.height });
 
         return PersistentTextureHandle{
             .texture = text_result.texture,
@@ -163,7 +163,7 @@ pub const PersistentTextSystem = struct {
             existing.deinit(self.device);
             _ = self.textures.remove(content_hash);
 
-            log_throttle.logInfo("invalidate", "Invalidated persistent texture for '{s}'", .{text});
+            loggers.getFontLog().info("invalidate", "Invalidated persistent texture for '{s}'", .{text});
         }
     }
 
@@ -187,7 +187,7 @@ pub const PersistentTextSystem = struct {
         }
 
         if (to_remove.items.len > 0) {
-            log_throttle.logInfo("cleanup", "Cleaned up {} old persistent textures", .{to_remove.items.len});
+            loggers.getFontLog().info("cleanup", "Cleaned up {} old persistent textures", .{to_remove.items.len});
         }
     }
 
@@ -267,7 +267,7 @@ pub fn initGlobalPersistentTextSystem(allocator: std.mem.Allocator, device: *c.s
     system.* = try PersistentTextSystem.init(allocator, device);
     global_persistent_text_system = system;
 
-    log_throttle.logInfo("init_system", "Initialized global persistent text system", .{});
+    loggers.getFontLog().info("init_system", "Initialized global persistent text system", .{});
 }
 
 pub fn deinitGlobalPersistentTextSystem(allocator: std.mem.Allocator) void {
@@ -276,7 +276,7 @@ pub fn deinitGlobalPersistentTextSystem(allocator: std.mem.Allocator) void {
         allocator.destroy(system);
         global_persistent_text_system = null;
 
-        log_throttle.logInfo("deinit_system", "Deinitialized global persistent text system", .{});
+        loggers.getFontLog().info("deinit_system", "Deinitialized global persistent text system", .{});
     }
 }
 

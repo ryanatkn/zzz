@@ -8,7 +8,6 @@ const font_types = @import("../../lib/font/font_types.zig");
 const math = @import("../../lib/math/mod.zig");
 const colors = @import("../../lib/core/colors.zig");
 const bitmap_utils = @import("../../lib/image/bitmap.zig");
-const log_throttle = @import("../../lib/debug/log_throttle.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;

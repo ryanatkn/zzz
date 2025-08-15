@@ -3,7 +3,7 @@ const c = @import("../platform/sdl.zig");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const persistent_text = @import("cache.zig");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -193,10 +193,10 @@ pub const TextRenderer = struct {
             };
 
             self.text_draw_queue.append(cmd) catch |err| {
-                log_throttle.logError("queue_text_texture", "Failed to queue text texture: {}", .{err});
+                loggers.getFontLog().err("queue_text_texture", "Failed to queue text texture: {}", .{err});
             };
         } else {
-            log_throttle.logInfo("text_sampler_not_init", "Text sampler not initialized, cannot queue text texture", .{});
+            loggers.getFontLog().warn("text_sampler_not_init", "Text sampler not initialized, cannot queue text texture", .{});
         }
     }
 
@@ -224,14 +224,14 @@ pub const TextRenderer = struct {
                 try self.persistent_text_queue.append(cmd);
 
                 if (handle.is_cached) {
-                    log_throttle.logDebug("queue_cached_text", "Queued cached persistent text: '{s}'", .{text});
+                    loggers.getFontLog().debug("queue_cached_text", "Queued cached persistent text: '{s}'", .{text});
                 } else {
-                    log_throttle.logDebug("queue_new_text", "Queued new persistent text: '{s}' ({}x{})", .{ text, handle.width, handle.height });
+                    loggers.getFontLog().debug("queue_new_text", "Queued new persistent text: '{s}' ({}x{})", .{ text, handle.width, handle.height });
                 }
             }
         } else {
             // Fallback to immediate mode if persistent system not available
-            log_throttle.logInfo("persistent_fallback", "Persistent text system not available, falling back to immediate mode", .{});
+            loggers.getFontLog().info("persistent_fallback", "Persistent text system not available, falling back to immediate mode", .{});
             // Note: This would require the font_manager to create a texture immediately
             // For now, we'll just log the warning
         }
@@ -247,11 +247,11 @@ pub const TextRenderer = struct {
             return;
         }
 
-        log_throttle.logDebug("draw_text_start", "Drawing {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
+        loggers.getFontLog().debug("draw_text_start", "Drawing {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
 
         // Draw immediate mode text first (these textures will be released)
         for (self.text_draw_queue.items, 0..) |cmd, cmd_index| {
-            log_throttle.logDebug("draw_immediate", "Drawing immediate text {} as textured quad: {}x{} at ({d:.1}, {d:.1})", .{ cmd_index, cmd.texture.width, cmd.texture.height, cmd.position.x, cmd.position.y });
+            loggers.getFontLog().debug("draw_immediate", "Drawing immediate text {} as textured quad: {}x{} at ({d:.1}, {d:.1})", .{ cmd_index, cmd.texture.width, cmd.texture.height, cmd.position.x, cmd.position.y });
 
             const size = Vec2{
                 .x = @as(f32, @floatFromInt(cmd.texture.width)),
@@ -268,7 +268,7 @@ pub const TextRenderer = struct {
         // Draw persistent mode text (these textures are kept alive)
         for (self.persistent_text_queue.items, 0..) |cmd, cmd_index| {
             const cache_status = if (cmd.is_cached) "cached" else "new";
-            log_throttle.logDebug("draw_persistent", "Drawing persistent text {} ({s}) as textured quad: {}x{} at ({d:.1}, {d:.1})", .{ cmd_index, cache_status, cmd.texture.width, cmd.texture.height, cmd.position.x, cmd.position.y });
+            loggers.getFontLog().debug("draw_persistent", "Drawing persistent text {} ({s}) as textured quad: {}x{} at ({d:.1}, {d:.1})", .{ cmd_index, cache_status, cmd.texture.width, cmd.texture.height, cmd.position.x, cmd.position.y });
 
             const size = Vec2{
                 .x = @as(f32, @floatFromInt(cmd.texture.width)),
@@ -282,7 +282,7 @@ pub const TextRenderer = struct {
             }
         }
 
-        log_throttle.logDebug("draw_text_complete", "Drew {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
+        loggers.getFontLog().debug("draw_text_complete", "Drew {} text textures ({} immediate, {} persistent)", .{ total_count, immediate_count, persistent_count });
 
         // Release immediate mode textures and clear both queues
         for (self.text_draw_queue.items) |cmd| {

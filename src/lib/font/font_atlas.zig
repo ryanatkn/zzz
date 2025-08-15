@@ -3,7 +3,7 @@ const c = @import("../platform/sdl.zig");
 const rasterizer_core = @import("rasterizer_core.zig");
 const sdf_renderer = @import("../text/sdf_renderer.zig");
 const vector_path = @import("../vector/path.zig");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const log = std.log.scoped(.font_atlas);
 
@@ -135,7 +135,7 @@ pub const FontAtlas = struct {
         const rasterized = try rasterizer.rasterizeGlyph(codepoint, 0, 0);
         // Don't free the bitmap yet - we'll store it in the cache
 
-        log_throttle.logDebug("rasterize", "Rasterized glyph '{}' (U+{X:0>4}): {}x{} pixels, {} bytes", .{ codepoint, codepoint, rasterized.width, rasterized.height, rasterized.bitmap.len });
+        loggers.getFontLog().debug("rasterize", "Rasterized glyph '{}' (U+{X:0>4}): {}x{} pixels, {} bytes", .{ codepoint, codepoint, rasterized.width, rasterized.height, rasterized.bitmap.len });
 
         if (rasterized.width == 0 or rasterized.height == 0) {
             // For empty glyphs, we can free immediately since we don't need to store
@@ -300,7 +300,7 @@ pub const FontAtlas = struct {
         // Add to end (most recently used)
         self.lru_order.append(cache_key) catch {
             // If append fails, just log and continue - LRU tracking is best effort
-            log_throttle.logDebug("lru_append", "Failed to update LRU order for glyph key {}", .{cache_key});
+            loggers.getFontLog().debug("lru_append", "Failed to update LRU order for glyph key {}", .{cache_key});
         };
     }
 
@@ -315,7 +315,7 @@ pub const FontAtlas = struct {
                     self.allocator.free(bitmap);
                 }
                 _ = self.glyph_cache.remove(oldest_key);
-                log_throttle.logDebug("evict_glyph", "Evicted glyph key {} to free memory", .{oldest_key});
+                loggers.getFontLog().debug("evict_glyph", "Evicted glyph key {} to free memory", .{oldest_key});
             }
         }
     }
@@ -325,12 +325,12 @@ pub const FontAtlas = struct {
         // ASCII printable characters (space through tilde)
         const common_chars = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
-        log_throttle.logOnce("pregenerate", "Pre-generating {} common glyphs for font {} size {}", .{ common_chars.len, font_id, size });
+        loggers.getFontLog().info("pregenerate", "Pre-generating {} common glyphs for font {} size {}", .{ common_chars.len, font_id, size });
 
         for (common_chars) |char| {
             const codepoint = @as(u32, @intCast(char));
             _ = self.getOrRasterizeGlyph(rasterizer, codepoint, font_id, size) catch |err| {
-                log_throttle.logDebug("pregenerate_fail", "Failed to pregenerate glyph '{}': {}", .{ char, err });
+                loggers.getFontLog().debug("pregenerate_fail", "Failed to pregenerate glyph '{}': {}", .{ char, err });
                 continue;
             };
         }
