@@ -204,11 +204,11 @@ pub const SpellSystem = struct {
     fn applyLullEffectToUnit(ecs_world: *ecs.World, unit_id: EntityId, duration: f32, unit_pos: Vec2, unit_radius: f32, effect_system: *GameEffectSystem) void {
 
         // Get or create Effects component for this unit
-        const effects_component = ecs_world.units.getComponent(unit_id, .effects) orelse blk: {
+        const effects_component = ecs_world.units.getComponentMut(unit_id, .effects) orelse blk: {
             // Create new Effects component
             const new_effects = @import("../lib/game/components.zig").Effects.init();
             ecs_world.units.addOptionalComponent(unit_id, .effects, new_effects) catch return;
-            break :blk ecs_world.units.getComponent(unit_id, .effects).?;
+            break :blk ecs_world.units.getComponentMut(unit_id, .effects).?;
         };
 
         // Add lull modifier

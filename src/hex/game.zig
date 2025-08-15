@@ -386,11 +386,11 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
         if (!ecs_world.isAlive(unit_id)) continue;
 
         // Get components
-        if (ecs_world.units.getComponent(unit_id, .transform)) |transform| {
+        if (ecs_world.units.getComponentMut(unit_id, .transform)) |transform| {
             if (ecs_world.units.getComponent(unit_id, .health)) |health| {
                 if (!health.alive) continue;
 
-                if (ecs_world.units.getComponent(unit_id, .unit)) |unit_comp| {
+                if (ecs_world.units.getComponentMut(unit_id, .unit)) |unit_comp| {
                     const old_pos = transform.pos;
 
                     if (ecs_world.units.getComponent(unit_id, .visual)) |visual| {
@@ -517,20 +517,22 @@ fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_
             // Only check lifestones (altar terrain type)
             if (terrain.terrain_type != .altar) continue;
 
-            if (ecs_world.lifestones.getComponent(entity_id, .interactable)) |interactable| {
+            if (ecs_world.lifestones.getComponent(entity_id, .interactable)) |interactable_const| {
                 // Get transform component
                 if (ecs_world.lifestones.getComponent(entity_id, .transform)) |transform| {
                     // Check if lifestone is not yet attuned
-                    const is_attuned = interactable.attuned;
+                    const is_attuned = interactable_const.attuned;
                     if (is_attuned) continue; // Skip already attuned lifestones
 
                     // Check collision
                     if (physics.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
-                        // Attune the lifestone
-                        interactable.attuned = true;
+                        // Attune the lifestone - need mutable access
+                        if (ecs_world.lifestones.getComponentMut(entity_id, .interactable)) |interactable| {
+                            interactable.attuned = true;
+                        }
 
                         // Update visual color for attunement
-                        if (ecs_world.lifestones.getComponent(entity_id, .visual)) |visual| {
+                        if (ecs_world.lifestones.getComponentMut(entity_id, .visual)) |visual| {
                             visual.color = constants.COLOR_LIFESTONE_ATTUNED;
                         }
 

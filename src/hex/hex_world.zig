@@ -153,7 +153,7 @@ pub const HexWorld = struct {
     pub fn setPlayerPos(self: *HexWorld, pos: Vec2) void {
         if (self.player_entity) |player| {
             const zone = self.world.getCurrentZone();
-            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
+            if (zone.world.players.getComponentMut(player, .transform)) |transform| {
                 transform.pos = pos;
             }
         }
@@ -185,7 +185,7 @@ pub const HexWorld = struct {
     pub fn setPlayerVel(self: *HexWorld, vel: Vec2) void {
         if (self.player_entity) |player| {
             const zone = self.world.getCurrentZone();
-            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
+            if (zone.world.players.getComponentMut(player, .transform)) |transform| {
                 transform.vel = vel;
             }
         }
@@ -217,7 +217,7 @@ pub const HexWorld = struct {
     pub fn setPlayerAlive(self: *HexWorld, alive: bool) void {
         if (self.player_entity) |player| {
             const zone = self.world.getCurrentZone();
-            if (@constCast(&zone.world.players).getComponent(player, .health)) |health| {
+            if (zone.world.players.getComponentMut(player, .health)) |health| {
                 health.alive = alive;
                 if (alive) {
                     health.current = health.max; // Full heal on resurrection
@@ -274,7 +274,7 @@ pub const HexWorld = struct {
     pub fn setPlayerColor(self: *HexWorld, color: Color) void {
         if (self.player_entity) |player| {
             const zone = self.world.getCurrentZone();
-            if (@constCast(&zone.world.players).getComponent(player, .visual)) |visual| {
+            if (zone.world.players.getComponentMut(player, .visual)) |visual| {
                 visual.color = color;
             }
         }
@@ -431,7 +431,7 @@ pub const HexWorld = struct {
 
             // Update player position in new zone
             if (self.world.getZone(@intCast(zone_index))) |new_zone| {
-                if (new_zone.world.players.getComponent(player, .transform)) |transform| {
+                if (new_zone.world.players.getComponentMut(player, .transform)) |transform| {
                     transform.pos = spawn_pos;
                     transform.vel = Vec2.ZERO;
                 }
@@ -496,9 +496,9 @@ pub const HexWorld = struct {
         const zone = self.world.getCurrentZone();
         var projectile_iter = zone.world.projectiles.entityIterator();
         while (projectile_iter.next()) |entity_id| {
-            if (zone.world.projectiles.getComponent(entity_id, .transform)) |transform| {
+            if (zone.world.projectiles.getComponentMut(entity_id, .transform)) |transform| {
                 // Update projectile lifetime
-                if (zone.world.projectiles.getComponent(entity_id, .projectile)) |projectile| {
+                if (zone.world.projectiles.getComponentMut(entity_id, .projectile)) |projectile| {
                     if (!projectile.update(dt)) {
                         try to_destroy.append(entity_id);
                         continue;
@@ -533,8 +533,8 @@ pub const HexWorld = struct {
 
             // Get unit transform and health from zone storage
             if (zone.world.units.getComponent(unit_id, .transform)) |unit_transform| {
-                if (zone.world.units.getComponent(unit_id, .health)) |health| {
-                    if (!health.alive) continue;
+                if (zone.world.units.getComponent(unit_id, .health)) |health_const| {
+                    if (!health_const.alive) continue;
 
                     // Check circle-circle collision
                     const to_unit = math.vec2_subtract(unit_transform.pos, projectile_transform.pos);
@@ -542,16 +542,18 @@ pub const HexWorld = struct {
                     const radius_sum = projectile_transform.radius + unit_transform.radius;
 
                     if (distance_sq < radius_sum * radius_sum) {
-                        // Collision detected - damage the unit
+                        // Collision detected - damage the unit (need mutable access)
                         if (zone.world.projectiles.getComponent(projectile_id, .combat)) |projectile_combat| {
-                            // Deal damage to unit
-                            health.current -= projectile_combat.damage;
+                            if (zone.world.units.getComponentMut(unit_id, .health)) |health| {
+                                // Deal damage to unit
+                                health.current -= projectile_combat.damage;
 
-                            if (health.current <= 0) {
-                                // Unit is killed
-                                health.alive = false;
-                                if (zone.world.units.getComponent(unit_id, .visual)) |visual| {
-                                    visual.color = constants.COLOR_DEAD;
+                                if (health.current <= 0) {
+                                    // Unit is killed
+                                    health.alive = false;
+                                    if (zone.world.units.getComponentMut(unit_id, .visual)) |visual| {
+                                        visual.color = constants.COLOR_DEAD;
+                                    }
                                 }
                             }
 
