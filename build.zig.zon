@@ -1,7 +1,7 @@
 .{
     .name = .zzz,
     .version = "0.0.0",
-    .fingerprint = 0x715d11386ff0d100,
+    .fingerprint = 0xc3273dcaaed238dc,
     .minimum_zig_version = "0.14.1",
     .dependencies = .{
         // No external dependencies - all libraries built from vendored source
