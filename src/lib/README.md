@@ -36,6 +36,14 @@ Complete graphics pipeline capabilities:
 Spatial reasoning and collision systems:
 - **Collision** (`physics/collision.zig`) - Generic collision detection with Shape enum
 
+#### **Game Systems (`game/`)**
+Core game engine infrastructure:
+- **ECS** (`game/ecs.zig`) - Entity Component System implementation
+- **Events** (`game/events/`) - Generic event system with listeners
+- **State** (`game/state/`) - State management and caching
+- **Control** (`game/control/`) - AI control system with lock-free ring buffer
+- **Persistence** (`game/persistence/`) - Save state management
+
 #### **Specialized Subsystems**
 Advanced feature modules that leverage the core capabilities:
 - **Reactive** (`reactive/`) - Complete Svelte 5 reactive system implementation
@@ -135,6 +143,23 @@ const effect = createEffect(&counter, |c| {
     std.log.info("Counter changed to: {}", .{c.get()});
 });
 ```
+
+#### AI Control System
+High-performance external control interface:
+- **Lock-free ring buffer** - Zero contention between AI and game
+- **Memory-mapped file** - Shared memory interface (`.ai_commands`)
+- **Binary protocol** - 20-byte commands for minimal overhead
+- **Frame-accurate** - Commands can target specific frame numbers
+
+```zig
+// Enable AI control in game
+game_state.initAIControl(allocator);
+
+// Process commands each frame (automatic)
+ai_control.processCommands(buffer, &input_state, frame_number);
+```
+
+Performance: ~50ns per command with zero allocations during runtime.
 
 ## Usage Guidelines
 

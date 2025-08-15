@@ -72,6 +72,9 @@ pub fn handleSDLEvent(
                     }
                 },
                 c.sdl.SDL_SCANCODE_F => game_state.spell_system.setActiveSlot(7),
+                c.sdl.SDL_SCANCODE_G => { // G key - toggle AI control
+                    game_state.toggleAIControl();
+                },
                 else => {},
             }
         },

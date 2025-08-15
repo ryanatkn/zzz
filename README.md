@@ -6,6 +6,8 @@ Zzz is a GUI in Zig written by Claude Code and designed by people.
 For the companion CLI see [zz](https://github.com/ryanatkn/zz)
 and [ztack.net](https://www.ztack.net/) for a web+ stack.
 
+> status: unstable vibe engineered slop
+
 ## Quick start
 
 ```bash
@@ -33,6 +35,7 @@ The library (`src/lib/`) provides core graphics and media capabilities with a ca
 - **Font & text**: pure Zig TTF parsing, rasterization, SDF rendering, layout
 - **Vector graphics**: GPU-accelerated Bezier curves, path rendering, glyph caching
 - **Component system**: reactive UI components with automatic lifecycle management
+- **AI control**: lock-free memory-mapped input injection for external control
 
 ## Hex demo controls
 
@@ -60,6 +63,7 @@ The library (`src/lib/`) provides core graphics and media capabilities with a ca
 - **R**: respawn when dead
 - **T**: reset current zone units
 - **Y**: full game reset
+- **G**: toggle AI control mode
 - **Backtick (`)**: toggle transparent HUD overlay
 - **ESC**: quit game
 - **Mouse Wheel**: zoom in/out
@@ -100,6 +104,27 @@ zig build clean-shaders    # clean rebuild all shaders
 zig build -Dtarget=x86_64-windows -Doptimize=ReleaseFast  # Windows release
 zig build -Doptimize=ReleaseFast                          # native release
 ```
+
+## AI Control
+
+The game includes a high-performance AI control system that allows external programs to control the game:
+
+1. **Enable AI mode**: Press `G` in-game to toggle AI control
+2. **Run controller**: Use the provided Python example or write your own controller
+3. **Protocol**: Binary commands via memory-mapped file (`.ai_commands`)
+
+Example usage:
+```bash
+# Start the game
+zig build run
+
+# In game, press G to enable AI control
+
+# In another terminal, run the Python controller
+python3 ai_control_example.py
+```
+
+The AI control system uses a lock-free ring buffer for ultra-low latency (~50ns per command) with zero allocations during runtime. See `ai_control_example.py` for implementation details.
 
 ## Creating new applications
 

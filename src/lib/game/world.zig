@@ -598,37 +598,196 @@ pub const Game = struct {
 
     /// Move an entity from one zone to another
     pub fn moveEntityToZone(self: *Game, entity: EntityId, new_zone_id: u32) !void {
+        std.log.info("moveEntityToZone: Moving entity {any} to zone {}", .{ entity, new_zone_id });
+        
         // Find the source zone containing the entity
         var source_zone_index: ?usize = null;
         for (self.zones.items, 0..) |*zone, i| {
             if (zone.world.isAlive(entity)) {
                 source_zone_index = i;
+                std.log.info("moveEntityToZone: Found entity in source zone {}", .{i});
                 break;
             }
         }
 
         // If entity not found in any zone, do nothing
-        const source_index = source_zone_index orelse return;
+        const source_index = source_zone_index orelse {
+            std.log.warn("moveEntityToZone: Entity {any} not found in any zone", .{entity});
+            return;
+        };
         
         // Find the destination zone
         var dest_zone_index: ?usize = null;
         for (self.zones.items, 0..) |zone, i| {
             if (zone.id == new_zone_id) {
                 dest_zone_index = i;
+                std.log.info("moveEntityToZone: Found destination zone {} at index {}", .{ new_zone_id, i });
                 break;
             }
         }
 
         // If destination zone not found, do nothing
-        const dest_index = dest_zone_index orelse return;
+        const dest_index = dest_zone_index orelse {
+            std.log.warn("moveEntityToZone: Destination zone {} not found", .{new_zone_id});
+            return;
+        };
         
         // Don't move if already in the target zone
-        if (source_index == dest_index) return;
+        if (source_index == dest_index) {
+            std.log.info("moveEntityToZone: Entity already in target zone, no move needed", .{});
+            return;
+        }
 
-        // For now, this is a placeholder that just destroys the entity
-        // A full implementation would preserve the entity's components
-        // and recreate it in the new zone, but that's complex for the current architecture
-        try self.zones.items[source_index].destroyEntity(entity);
+        const source_zone = &self.zones.items[source_index];
+        const dest_zone = &self.zones.items[dest_index];
+        
+        // Determine which archetype the entity belongs to and transfer accordingly
+        const archetype = source_zone.world.findEntityArchetype(entity);
+        std.log.info("moveEntityToZone: Entity has archetype {?}", .{archetype});
+        
+        if (archetype) |arch| {
+            switch (arch) {
+                .player => try self.transferPlayerEntity(entity, source_zone, dest_zone),
+                .unit => try self.transferUnitEntity(entity, source_zone, dest_zone),
+                .projectile => try self.transferProjectileEntity(entity, source_zone, dest_zone),
+                .obstacle => try self.transferObstacleEntity(entity, source_zone, dest_zone),
+                .lifestone => try self.transferLifestoneEntity(entity, source_zone, dest_zone),
+                .portal => try self.transferPortalEntity(entity, source_zone, dest_zone),
+            }
+            std.log.info("moveEntityToZone: Successfully transferred entity to new zone", .{});
+        } else {
+            std.log.warn("moveEntityToZone: Could not determine entity archetype, destroying entity", .{});
+            try source_zone.destroyEntity(entity);
+        }
+    }
+    
+    /// Transfer a player entity between zones
+    fn transferPlayerEntity(self: *Game, entity: EntityId, source_zone: *Zone, dest_zone: *Zone) !void {
+        _ = self;
+        std.log.info("transferPlayerEntity: Transferring player entity {any}", .{entity});
+        
+        // Extract all player components
+        std.log.info("transferPlayerEntity: Extracting transform component", .{});
+        const transform = source_zone.world.players.getComponent(entity, .transform) orelse {
+            std.log.err("transferPlayerEntity: Missing transform component", .{});
+            return error.MissingComponent;
+        };
+        std.log.info("transferPlayerEntity: Extracting health component", .{});
+        const health = source_zone.world.players.getComponent(entity, .health) orelse {
+            std.log.err("transferPlayerEntity: Missing health component", .{});
+            return error.MissingComponent;
+        };
+        std.log.info("transferPlayerEntity: Extracting movement component", .{});
+        const movement = source_zone.world.players.getComponent(entity, .movement) orelse {
+            std.log.err("transferPlayerEntity: Missing movement component", .{});
+            return error.MissingComponent;
+        };
+        std.log.info("transferPlayerEntity: Extracting visual component", .{});
+        const visual = source_zone.world.players.getComponent(entity, .visual) orelse {
+            std.log.err("transferPlayerEntity: Missing visual component", .{});
+            return error.MissingComponent;
+        };
+        std.log.info("transferPlayerEntity: Extracting player_input component", .{});
+        const player_input = source_zone.world.players.getComponent(entity, .player_input) orelse {
+            std.log.err("transferPlayerEntity: Missing player_input component", .{});
+            return error.MissingComponent;
+        };
+        std.log.info("transferPlayerEntity: Extracting combat component", .{});
+        const combat = source_zone.world.players.getComponent(entity, .combat) orelse {
+            std.log.err("transferPlayerEntity: Missing combat component", .{});
+            return error.MissingComponent;
+        };
+        
+        // Check for optional effects component
+        std.log.info("transferPlayerEntity: Extracting optional effects component", .{});
+        const effects = source_zone.world.players.getComponent(entity, .effects);
+        
+        std.log.info("transferPlayerEntity: All components extracted, creating new player in destination zone", .{});
+        // Create new player in destination zone with same components
+        const new_entity = dest_zone.world.createPlayer(
+            transform.pos,
+            transform.radius,
+            health.max,
+            player_input.controller_id
+        ) catch |err| {
+            std.log.err("transferPlayerEntity: Failed to create player in destination zone: {}", .{err});
+            return err;
+        };
+        std.log.info("transferPlayerEntity: Created new player entity {any}", .{new_entity});
+        
+        // Copy remaining component data
+        std.log.info("transferPlayerEntity: Copying component data", .{});
+        if (dest_zone.world.players.getComponentMut(new_entity, .transform)) |new_transform| {
+            new_transform.vel = transform.vel;
+        }
+        if (dest_zone.world.players.getComponentMut(new_entity, .health)) |new_health| {
+            new_health.current = health.current;
+            new_health.alive = health.alive;
+        }
+        if (dest_zone.world.players.getComponentMut(new_entity, .movement)) |new_movement| {
+            new_movement.speed = movement.speed;
+        }
+        if (dest_zone.world.players.getComponentMut(new_entity, .visual)) |new_visual| {
+            new_visual.color = visual.color;
+        }
+        if (dest_zone.world.players.getComponentMut(new_entity, .combat)) |new_combat| {
+            new_combat.damage = combat.damage;
+            new_combat.attack_rate = combat.attack_rate;
+        }
+        
+        // Copy effects if present
+        if (effects) |eff| {
+            std.log.info("transferPlayerEntity: Copying effects component", .{});
+            dest_zone.world.players.addOptionalComponent(new_entity, .effects, eff.*) catch |err| {
+                std.log.err("transferPlayerEntity: Failed to add effects component: {}", .{err});
+                return err;
+            };
+        }
+        
+        std.log.info("transferPlayerEntity: Component copying complete, destroying original entity", .{});
+        // Destroy original entity
+        source_zone.destroyEntity(entity) catch |err| {
+            std.log.err("transferPlayerEntity: Failed to destroy original entity: {}", .{err});
+            return err;
+        };
+        
+        std.log.info("transferPlayerEntity: Player transferred from entity {any} to entity {any}", .{ entity, new_entity });
+    }
+    
+    /// Stub implementations for other entity types (can be expanded later)
+    fn transferUnitEntity(self: *Game, entity: EntityId, source_zone: *Zone, dest_zone: *Zone) !void {
+        _ = self;
+        _ = dest_zone;
+        std.log.warn("transferUnitEntity: Unit transfer not implemented, destroying entity {any}", .{entity});
+        try source_zone.destroyEntity(entity);
+    }
+    
+    fn transferProjectileEntity(self: *Game, entity: EntityId, source_zone: *Zone, dest_zone: *Zone) !void {
+        _ = self;
+        _ = dest_zone;
+        std.log.warn("transferProjectileEntity: Projectile transfer not implemented, destroying entity {any}", .{entity});
+        try source_zone.destroyEntity(entity);
+    }
+    
+    fn transferObstacleEntity(self: *Game, entity: EntityId, source_zone: *Zone, dest_zone: *Zone) !void {
+        _ = self;
+        _ = dest_zone;
+        std.log.warn("transferObstacleEntity: Obstacle transfer not implemented, destroying entity {any}", .{entity});
+        try source_zone.destroyEntity(entity);
+    }
+    
+    fn transferLifestoneEntity(self: *Game, entity: EntityId, source_zone: *Zone, dest_zone: *Zone) !void {
+        _ = self;
+        _ = dest_zone;
+        std.log.warn("transferLifestoneEntity: Lifestone transfer not implemented, destroying entity {any}", .{entity});
+        try source_zone.destroyEntity(entity);
+    }
+    
+    fn transferPortalEntity(self: *Game, entity: EntityId, source_zone: *Zone, dest_zone: *Zone) !void {
+        _ = self;
+        _ = dest_zone;
+        std.log.warn("transferPortalEntity: Portal transfer not implemented, destroying entity {any}", .{entity});
+        try source_zone.destroyEntity(entity);
     }
 
     /// Get total entity count across all zones

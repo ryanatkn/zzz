@@ -52,18 +52,33 @@ pub fn respawnPlayer(game_state: anytype) void {
 
     if (nearest) |result| {
         if (result.zone_index != world.getCurrentZoneIndex()) {
+            loggers.getGameLog().info("respawn_travel", "Respawning: traveling to zone {} for nearest lifestone", .{result.zone_index});
+            
+            // Check if player exists before travel
+            const player_before = world.getPlayer();
+            loggers.getGameLog().info("respawn_player_check", "Player entity before travel: {?any}", .{player_before});
+            
             game_state.travelToZone(result.zone_index) catch |err| {
                 std.log.err("Failed to travel to zone {}: {}", .{ result.zone_index, err });
+                loggers.getGameLog().err("respawn_travel_failed", "Failed to travel for respawn: {}", .{err});
             };
-            loggers.getGameLog().info("travel_to_lifestone", "Traveling to zone {} for nearest lifestone", .{result.zone_index});
+            
+            // Check if player exists after travel
+            const player_after = world.getPlayer();
+            loggers.getGameLog().info("respawn_player_after_travel", "Player entity after travel: {?any}", .{player_after});
+            
+            if (player_after == null) {
+                loggers.getGameLog().err("respawn_player_lost", "Player entity lost during respawn travel! This is a critical bug.", .{});
+            }
         }
         respawn_pos = result.pos;
     } else {
         if (world.getCurrentZoneIndex() != 0) {
+            loggers.getGameLog().info("respawn_overworld", "No lifestones found, returning to overworld spawn", .{});
             game_state.travelToZone(0) catch |err| {
                 std.log.err("Failed to travel to overworld: {}", .{err});
+                loggers.getGameLog().err("respawn_overworld_failed", "Failed to travel to overworld for respawn: {}", .{err});
             };
-            loggers.getGameLog().info("no_lifestones", "No lifestones found, returning to overworld spawn", .{});
         }
         respawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
     }

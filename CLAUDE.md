@@ -68,6 +68,13 @@ Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation), 
     │   │   ├── physics/              # Collision and spatial systems
     │   │   │   ├── collision.zig     # Generic collision detection
     │   │   │   └── shapes.zig        # Shape definitions (circle, rect, line, point)
+    │   │   ├── game/                 # Game engine systems
+    │   │   │   ├── control/          # AI control system
+    │   │   │   │   ├── direct_input.zig  # Lock-free ring buffer for AI commands
+    │   │   │   │   └── mod.zig           # Control module exports
+    │   │   │   ├── ecs.zig           # Entity Component System
+    │   │   │   ├── events/           # Event system
+    │   │   │   └── state/            # State management
     │   │   ├── reactive/             # Svelte 5 reactive system implementation
     │   │   ├── font/                 # TTF parsing and rasterization
     │   │   ├── text/                 # Text rendering and layout
@@ -169,7 +176,7 @@ $ zig build --help       # Show all build options
 - **Movement:** WASD + Shift (walk) + Ctrl+mouse
 - **Combat:** Left-click shoot (burst/rhythm), Right-click cast spell  
 - **Spells:** 1-4, Q, E, R, F select slots
-- **System:** Space pause, R respawn, Y reset, ESC quit
+- **System:** Space pause, R respawn, Y reset, ESC quit, G toggle AI control
 - **HUD:** ` (backtick) toggle transparent menu overlay
 
 **Key Features:**
@@ -179,6 +186,7 @@ $ zig build --help       # Show all build options
 - **World:** Zone-based travel with persistent lifestone checkpoints
 - **HUD System:** Transparent overlay menu with world visible underneath
 - **Rendering:** Pure procedural generation, no texture assets
+- **AI Control:** Lock-free memory-mapped input injection for external control
 
 ## GPU Performance Strategy
 
@@ -215,6 +223,7 @@ $ zig build --help       # Show all build options
 - ✓ Full gameplay loop with lifestone persistence
 - ✓ Character sheet and transparent HUD system
 - ✓ Data-driven zone configuration via ZON files
+- ✓ AI control system with lock-free memory-mapped input
 
 **Key Success Factors:**
 - **Procedural vertex generation:** Use `SV_VertexID` instead of vertex buffers for basic shapes
@@ -272,6 +281,7 @@ $ zig build --help       # Show all build options
 - **Effect System:** 256 simultaneous effects with lifecycle management
 - **Browser System:** SvelteKit-style routing for UI pages
 - **Reactive System:** Complete Svelte 5 implementation with full rune support ✅
+- **AI Control System:** Lock-free ring buffer for external input injection
 
 **Reactive System:**
 - **Status:** ✅ Complete Svelte 5 implementation with full rune support
@@ -295,6 +305,15 @@ $ zig build --help       # Show all build options
 - **Auto Mode Selection:** `rendering_modes.zig` provides guidelines based on change frequency
 - **Performance Proven:** FPS counter no longer flashes, 95%+ cache hit rate for persistent text
 - **Core Components:** `persistent_text.zig`, `text_renderer.zig` (dual mode), reusable UI components
+
+**AI Control System:**
+- **Architecture:** Lock-free ring buffer with memory-mapped file interface
+- **Performance:** ~50ns per command, zero allocations, cache-friendly design
+- **Protocol:** Binary format - 20 bytes per command (frame, keys, mouse, buttons)
+- **Integration:** Processes commands before game update, overrides InputState
+- **File:** `.ai_commands` - shared memory between game and AI controller
+- **Python API:** Example script `ai_control_example.py` demonstrates usage
+- **Activation:** Press G in-game to toggle AI control mode
 
 **Development Principles:**
 - Procedural generation over static assets

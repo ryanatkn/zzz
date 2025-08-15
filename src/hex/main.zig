@@ -139,6 +139,13 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 
     // Initialize HUD system
     try game_state.?.initHud(global_allocator, game_renderer.?);
+    
+    // Initialize AI control system (optional - fails silently if file doesn't exist)
+    game_state.?.initAIControl(global_allocator) catch |err| {
+        if (logger) |*log| {
+            log.info("ai_init_skip", "AI control not initialized: {}", .{err});
+        }
+    };
 
     // Show window after initialization
     _ = c.sdl.SDL_ShowWindow(window);
@@ -150,6 +157,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
         log.info("game_init_success", "Hex GPU game initialized successfully", .{});
         log.info("controls_info", "Controls: Hold mouse to move, WASD for direct movement, Space to pause, ESC to quit", .{});
         log.info("portal_info", "Portal interaction: Walk into portals to travel between zones", .{});
+        log.info("ai_control_info", "Press G to toggle AI control mode", .{});
     }
     return c.sdl.SDL_APP_CONTINUE;
 }
