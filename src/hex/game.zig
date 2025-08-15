@@ -4,6 +4,7 @@ const c = @import("../lib/platform/sdl.zig");
 
 const types = @import("../lib/core/types.zig");
 const entities = @import("entities.zig");
+const hex_world = @import("hex_world.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
@@ -18,13 +19,17 @@ const reactive_hud = @import("../hud/reactive_hud.zig");
 const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
+const game_systems = @import("../lib/game/game.zig");
+const hex_events = @import("events.zig");
+const save_data = @import("save_data.zig");
+const ecs = @import("../lib/game/ecs.zig");
 
 const Vec2 = types.Vec2;
-const World = entities.World;
+const HexWorld = hex_world.HexWorld;
 const InputState = input.InputState;
 
 pub const GameState = struct {
-    world: World,
+    world: HexWorld,
     input_state: InputState,
     game_paused: bool,
     quit_requested: bool,
@@ -35,8 +40,8 @@ pub const GameState = struct {
     // Spell system
     spell_system: spells.SpellSystem,
 
-    // Bullet pool for burst/rhythm shooting
-    bullet_pool: combat.BulletPool,
+    // Allocator for ECS world cleanup
+    allocator: std.mem.Allocator,
 
     // HUD system for system menu (reactive)
     hud_system: ?reactive_hud.ReactiveHud,
@@ -44,22 +49,116 @@ pub const GameState = struct {
     // Iris wipe effect for resurrection
     iris_wipe_active: bool,
     iris_wipe_start_time: u64,
+    
+    // State management system
+    state_manager: ?*game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents),
+    game_stats: save_data.GameStatistics,
 
     const Self = @This();
 
-    pub fn init() Self {
+    pub fn init(allocator: std.mem.Allocator) !Self {
         return .{
-            .world = World.init(),
+            .world = try HexWorld.init(allocator),
             .input_state = InputState.init(),
             .game_paused = false,
             .quit_requested = false,
             .effect_system = effects.EffectSystem.init(),
             .spell_system = spells.SpellSystem.init(),
-            .bullet_pool = combat.BulletPool.init(),
+            .allocator = allocator,
             .hud_system = null,
             .iris_wipe_active = false,
             .iris_wipe_start_time = 0,
+            .state_manager = null,
+            .game_stats = .{},
         };
+    }
+    
+    pub fn deinit(self: *Self) void {
+        self.world.deinit();
+    }
+
+    pub fn initStateManager(self: *Self, allocator: std.mem.Allocator) !void {
+        const manager = try allocator.create(game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents));
+        manager.* = try game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents).init(
+            allocator,
+            "dealt",
+            "hex",
+        );
+        self.state_manager = manager;
+        
+        // Register compute callbacks for expensive operations
+        try self.registerComputeCallbacks();
+        
+        // Set up event listeners
+        try self.setupEventListeners();
+    }
+    
+    pub fn deinitStateManager(self: *Self, allocator: std.mem.Allocator) void {
+        if (self.state_manager) |manager| {
+            manager.deinit();
+            allocator.destroy(manager);
+            self.state_manager = null;
+        }
+    }
+    
+    fn registerComputeCallbacks(self: *Self) !void {
+        if (self.state_manager) |manager| {
+            // Register callback to compute all_lifestones_attuned
+            try manager.registerCompute("all_lifestones_attuned", computeAllLifestonesAttuned);
+            try manager.registerCompute("total_lifestones", computeTotalLifestones);
+            try manager.registerCompute("total_lifestones_attuned", computeTotalLifestonesAttuned);
+        }
+    }
+    
+    fn setupEventListeners(self: *Self) !void {
+        if (self.state_manager) |manager| {
+            // Listen for lifestone attunement to invalidate cache
+            try manager.on(.custom, onCustomEvent, self);
+        }
+    }
+    
+    fn onCustomEvent(event: hex_events.HexEvents, ctx: ?*anyopaque) void {
+        if (ctx) |context| {
+            const self = @as(*Self, @ptrCast(@alignCast(context)));
+            if (self.state_manager) |manager| {
+                switch (event) {
+                    .custom => |custom| {
+                        switch (custom) {
+                            .lifestone_attuned => {
+                                // Invalidate cached values
+                                manager.invalidate("all_lifestones_attuned");
+                                manager.invalidate("total_lifestones_attuned");
+                                
+                                // Check if this was the last one
+                                if (manager.queryBool("all_lifestones_attuned") catch false) {
+                                    // Emit all lifestones attuned event
+                                    const total = manager.queryInt("total_lifestones") catch 0;
+                                    manager.emit(hex_events.allLifestonesAttuned(@intCast(total)));
+                                }
+                            },
+                            else => {},
+                        }
+                    },
+                    else => {},
+                }
+            }
+        }
+    }
+    
+    fn computeAllLifestonesAttuned(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
+        // TEMPORARY: Just return false for now since we need access to world state
+        // In a complete implementation, we'd store a reference to the GameState in the manager
+        try manager.cache.setBool("all_lifestones_attuned", false);
+    }
+    
+    fn computeTotalLifestones(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
+        // TEMPORARY: Just return a reasonable number for now
+        try manager.cache.setInt("total_lifestones", 91); // Total from game_data.zon
+    }
+    
+    fn computeTotalLifestonesAttuned(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
+        // TEMPORARY: Just return 0 for now
+        try manager.cache.setInt("total_lifestones_attuned", 0);
     }
 
     pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
@@ -77,10 +176,8 @@ pub const GameState = struct {
         if (destination_zone < self.world.zones.len) {
             self.world.current_zone = destination_zone;
             self.world.zones[destination_zone].resetUnits();
-            // Clear bullets on zone travel
-            for (0..entities.MAX_BULLETS) |i| {
-                self.world.bullets[i].active = false;
-            }
+            // Clear bullets on zone travel - bullets are now ECS entities
+            // TODO: Destroy bullet entities when traveling to new zone
             // Clear ALL effects on zone travel to prevent persistence
             self.effect_system.clear();
             // Rebuild ambient effects for new zone
@@ -111,16 +208,15 @@ pub const GameState = struct {
 
     pub fn resetZone(self: *Self) void {
         // Reset units in current zone to their original spawn state
-        self.world.resetCurrentZone();
+        self.world.resetCurrentZone() catch |err| {
+            std.log.err("Failed to reset zone: {}", .{err});
+        };
         std.debug.print("Zone units reset to original state\n", .{});
     }
 
     pub fn resetGame(self: *Self) void {
         // Reset player to starting position and state
-        self.world.player.pos = self.world.player_start_pos;
-        self.world.player.vel = types.Vec2{ .x = 0, .y = 0 };
-        self.world.player.alive = true;
-        self.world.player.color = constants.COLOR_PLAYER_ALIVE;
+        self.world.resetPlayerToStart();
 
         // Reset to starting zone
         if (self.world.current_zone != 0) {
@@ -128,13 +224,56 @@ pub const GameState = struct {
         }
 
         // Reset all zones
-        self.world.resetAllZones();
+        self.world.resetAllZones() catch |err| {
+            std.log.err("Failed to reset all zones: {}", .{err});
+        };
 
         // Clear effects for clean slate
         self.effect_system.clear();
         self.effect_system.refreshAmbientEffects(&self.world);
 
         std.debug.print("Full game reset\n", .{});
+    }
+    
+    /// Check if all lifestones across all zones are attuned
+    pub fn hasAttunedAllLifestones(self: *const Self) bool {
+        // Use cached value if state manager is available
+        if (self.state_manager) |manager| {
+            // For now, fall back to direct computation since cache doesn't have world access
+            _ = manager;
+        }
+        
+        // Direct computation (efficient enough for 91 lifestones)
+        var total_lifestones: usize = 0;
+        var total_attuned: usize = 0;
+        
+        for (self.world.zones) |*zone| {
+            total_lifestones += zone.lifestone_count;
+            for (0..zone.lifestone_count) |i| {
+                if (zone.lifestones[i].attuned) {
+                    total_attuned += 1;
+                }
+            }
+        }
+        
+        return total_lifestones > 0 and total_attuned == total_lifestones;
+    }
+    
+    /// Properly compute all lifestones attuned for the cache
+    pub fn computeAllLifestonesAttunedForWorld(self: *const Self) bool {
+        var total_lifestones: usize = 0;
+        var total_attuned: usize = 0;
+        
+        for (self.world.zones) |*zone| {
+            total_lifestones += zone.lifestone_count;
+            for (0..zone.lifestone_count) |i| {
+                if (zone.lifestones[i].attuned) {
+                    total_attuned += 1;
+                }
+            }
+        }
+        
+        return total_lifestones > 0 and total_attuned == total_lifestones;
     }
 };
 
@@ -151,33 +290,39 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     const world = &game_state.world;
     const input_state = &game_state.input_state;
 
-    if (world.player.alive) {
-        player_controller.updatePlayer(&world.player, input_state, world.getCurrentZone(), cam, deltaTime);
+    if (world.getPlayerAlive()) {
+        // Update player using ECS-compatible controller
+        player_controller.updatePlayerECS(world, input_state, cam, deltaTime);
 
         // Handle continuous shooting on left-click hold (rhythm mode)
         // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
-        if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and game_state.bullet_pool.canFire()) {
-            const world_mouse_pos = input_state.getWorldMousePos(viewport.createViewport(cam));
-            _ = combat.fireBulletAtMouse(world, world_mouse_pos, &game_state.bullet_pool);
+        if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and world.canFireBullet()) {
+            // Direct camera coordinate conversion - no viewport indirection
+            const screen_mouse_pos = input_state.getMousePos();
+            const world_mouse_pos = cam.screenToWorldSafe(screen_mouse_pos);
+            _ = combat.fireBulletAtMouse(world, world_mouse_pos, &world.bullet_pool);
         }
     }
 
-    for (0..entities.MAX_BULLETS) |i| {
-        behaviors.updateBullet(&world.bullets[i], deltaTime);
-    }
+    // Update bullet entities using ECS
+    world.updateProjectiles(deltaTime) catch |err| {
+        std.log.err("Failed to update projectiles: {}", .{err});
+    };
 
+    // Update units using ECS queries instead of zone arrays
+    // For now, fall back to old ArrayList approach until we can properly convert obstacles
     const zone = world.getCurrentZoneMut();
     for (0..zone.unit_count) |i| {
-        const unit = &zone.units[i];
+        const unit = &zone.units.items[i];
 
         if (!unit.active or !unit.alive) continue;
 
         const old_pos = unit.pos;
         const aggro_mod = game_state.spell_system.getAggroMultiplierForUnit(unit.pos);
-        behaviors.updateUnitWithAggroMod(unit, world.player.pos, world.player.alive, deltaTime, aggro_mod);
+        behaviors.updateUnitWithAggroMod(unit, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
 
         for (0..zone.obstacle_count) |j| {
-            const obstacle = &zone.obstacles[j];
+            const obstacle = &zone.obstacles.items[j];
             if (!obstacle.active) continue;
 
             if (physics.checkCircleRectCollision(unit.pos, unit.radius, obstacle.pos, obstacle.size)) {
@@ -199,49 +344,72 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     // Update spell system
     game_state.spell_system.update(deltaTime);
 
-    // Update bullet pool
-    game_state.bullet_pool.update(deltaTime);
+    // Update bullet pool (manages firing rate limiting)
+    world.updateBulletPool(deltaTime);
 }
 
 pub fn checkCollisions(game_state: *GameState) void {
     const world = &game_state.world;
     const zone = world.getCurrentZoneMut();
-    const player = &world.player;
+    
+    // Player entity is accessed via helper methods instead of direct field access
 
-    physics.processBulletCollisions(world);
+    // TODO: Update physics.processBulletCollisions to work with ECS
+    // physics.processBulletCollisions(world);
 
-    if (!player.alive) return;
+    if (!world.getPlayerAlive()) return;
 
     if (portals.checkPortalCollisions(game_state)) {
         return;
     }
 
+    // Get player position and radius for collision checks
+    const player_pos = world.getPlayerPos();
+    const player_radius = world.getPlayerRadius();
+
+    // Check player-unit collisions (player dies on contact)
     for (0..zone.unit_count) |i| {
-        if (physics.checkPlayerUnitCollision(player, &zone.units[i])) {
-            combat.handlePlayerDeath(player);
+        if (physics.checkPlayerUnitCollision(player_pos, player_radius, &zone.units.items[i])) {
+            // Player dies on unit contact
+            world.setPlayerAlive(false);
+            world.setPlayerColor(constants.COLOR_DEAD);
             return;
         }
     }
 
     for (0..zone.lifestone_count) |i| {
-        if (!zone.lifestones[i].attuned and physics.checkPlayerLifestoneCollision(player, &zone.lifestones[i])) {
-            behaviors.attuneLifestone(&zone.lifestones[i]);
+        if (!zone.lifestones.items[i].attuned and physics.checkPlayerLifestoneCollision(player_pos, player_radius, &zone.lifestones.items[i])) {
+            behaviors.attuneLifestone(&zone.lifestones.items[i]);
             std.debug.print("Lifestone attuned!\n", .{});
+            
+            // Emit lifestone attuned event
+            if (game_state.state_manager) |manager| {
+                manager.emit(hex_events.lifestoneAttuned(
+                    game_state.world.current_zone,
+                    i,
+                    zone.lifestones.items[i].pos,
+                ));
+            }
+            
             // Add inner effect for newly attuned lifestone
             // TODO more declaratively?
-            game_state.effect_system.addLifestoneInnerEffectOnly(zone.lifestones[i].pos, zone.lifestones[i].radius);
+            game_state.effect_system.addLifestoneInnerEffectOnly(zone.lifestones.items[i].pos, zone.lifestones.items[i].radius);
         }
     }
 
-    if (physics.collidesWithDeadlyObstacle(player.pos, player.radius, zone)) {
-        combat.handlePlayerDeathOnHazard(player);
+    // Check collision with deadly obstacles
+    if (physics.collidesWithDeadlyObstacle(player_pos, player_radius, zone)) {
+        // Player dies on hazard contact
+        world.setPlayerAlive(false);
+        world.setPlayerColor(constants.COLOR_DEAD);
     }
 }
 
 pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void {
-    if (game_state.world.player.alive and !game_state.game_paused) {
-        const world_mouse_pos = game_state.input_state.getWorldMousePos(viewport.createViewport(cam));
-        _ = combat.fireBulletAtMouse(&game_state.world, world_mouse_pos, &game_state.bullet_pool);
+    if (game_state.world.getPlayerAlive() and !game_state.game_paused and game_state.world.canFireBullet()) {
+        const screen_mouse_pos = game_state.input_state.getMousePos();
+        const world_mouse_pos = cam.screenToWorldSafe(screen_mouse_pos);
+        _ = combat.fireBulletAtMouse(&game_state.world, world_mouse_pos, &game_state.world.bullet_pool);
     }
 }
 

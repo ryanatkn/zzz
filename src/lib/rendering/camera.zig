@@ -6,6 +6,12 @@ const types = @import("../core/types.zig");
 
 const Vec2 = types.Vec2;
 
+// Camera-specific errors
+pub const CameraError = error{
+    InvalidDimensions,
+    NotInitialized,
+};
+
 pub const Camera = struct {
     // Screen dimensions (pixels)
     screen_width: f32,
@@ -19,6 +25,9 @@ pub const Camera = struct {
 
     // Visual scale (zoom level)
     scale: f32,
+    
+    // Initialization state tracking
+    initialized: bool,
 
     const Self = @This();
 
@@ -31,7 +40,23 @@ pub const Camera = struct {
             .view_width = screen_w,
             .view_height = screen_h,
             .scale = 1.0,
+            .initialized = true,
         };
+    }
+    
+    // Validate camera state
+    pub fn validate(self: *const Self) CameraError!void {
+        // Check dimensions first as a basic sanity check
+        if (self.screen_width <= 0.0 or self.screen_height <= 0.0 or 
+            self.screen_width > 10000.0 or self.screen_height > 10000.0) {
+            return CameraError.InvalidDimensions;
+        }
+        
+        // For backwards compatibility, don't require initialized field for now
+        // In the future when all cameras are properly initialized, we can uncomment this:
+        // if (!self.initialized) {
+        //     return CameraError.NotInitialized;
+        // }
     }
 
     // Fixed camera - shows entire world with adjustable zoom
@@ -73,14 +98,38 @@ pub const Camera = struct {
     }
 
     // Convert screen position to world position (for mouse input)
-    pub fn screenToWorld(self: *const Self, screen_pos: Vec2) Vec2 {
-        // Normalize from screen space [0,1]
+    pub fn screenToWorld(self: *const Self, screen_pos: Vec2) CameraError!Vec2 {
+        // Validate camera state first
+        try self.validate();
+        
+        // Perform coordinate conversion
         const norm_x = screen_pos.x / self.screen_width;
         const norm_y = screen_pos.y / self.screen_height;
-        // Map to world coordinates
+        
         return Vec2{
             .x = norm_x * self.view_width + self.view_x,
             .y = norm_y * self.view_height + self.view_y,
         };
+    }
+    
+    // Fallback version that returns a safe default on error
+    pub fn screenToWorldSafe(self: *const Self, screen_pos: Vec2) Vec2 {
+        // Extra safety: try to detect completely corrupted pointers
+        // by checking if we can even access the struct safely
+        
+        // Try to access the fields directly in a way that might catch corruption
+        const screen_w = self.screen_width;
+        const screen_h = self.screen_height;
+        
+        // Basic sanity checks for totally corrupted values
+        if (screen_w != screen_w or screen_h != screen_h or  // NaN check
+            screen_w <= 0.0 or screen_h <= 0.0 or
+            screen_w > 50000.0 or screen_h > 50000.0) {
+            // Return screen coordinates as world coordinates as fallback
+            return screen_pos;
+        }
+        
+        // If basic access works, try the proper validation
+        return self.screenToWorld(screen_pos) catch screen_pos;
     }
 };

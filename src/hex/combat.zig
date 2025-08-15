@@ -6,9 +6,10 @@ const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const effects = @import("effects.zig");
 const constants = @import("constants.zig");
+const ecs = @import("../lib/game/ecs.zig");
 
 const Vec2 = types.Vec2;
-const World = entities.World;
+const HexWorld = @import("hex_world.zig").HexWorld;
 const Player = entities.Player;
 
 // Bullet pool constants
@@ -81,29 +82,40 @@ pub const BulletPool = struct {
     }
 };
 
-pub fn fireBullet(world: *World, target_pos: Vec2, pool: *BulletPool) bool {
-    if (!world.player.alive) return false;
+pub fn fireBullet(world: *HexWorld, target_pos: Vec2, pool: *BulletPool) bool {
+    if (!world.getPlayerAlive()) return false;
     if (!pool.canFire()) return false;
 
-    if (world.findInactiveBullet()) |bullet| {
-        behaviors.fireBullet(bullet, world.player.pos, target_pos);
+    // Fire bullet as ECS entity
+    const player_pos = world.getPlayerPos();
+    if (world.getPlayer()) |player_entity| {
+        const bullet_id = world.fireBullet(
+            player_pos,
+            target_pos,
+            player_entity,
+            25.0, // damage
+            constants.BULLET_SPEED,
+            4.0, // lifetime
+        ) catch |err| {
+            std.log.err("Failed to create bullet: {}", .{err});
+            return false;
+        };
+        
+        std.log.info("Created bullet entity: {}", .{bullet_id});
         pool.fire();
-
-        // Future: Bullet travel distance upgrade
-        // bullet.max_distance = getUpgradedBulletDistance();
         return true;
     }
     return false;
 }
 
-pub fn fireBulletAtMouse(world: *World, mouse_pos: Vec2, pool: *BulletPool) bool {
+pub fn fireBulletAtMouse(world: *HexWorld, mouse_pos: Vec2, pool: *BulletPool) bool {
     return fireBullet(world, mouse_pos, pool);
 }
 
 pub fn respawnPlayer(game_state: anytype) void {
     const world = &game_state.world;
     const effect_system = &game_state.effect_system;
-    const nearest = physics.findNearestAttunedLifestone(world, world.player.pos);
+    const nearest: ?physics.LifestoneResult = physics.findNearestAttunedLifestone(world);
 
     var respawn_pos: Vec2 = undefined;
 
@@ -122,8 +134,11 @@ pub fn respawnPlayer(game_state: anytype) void {
     }
 
     // Common respawn logic
-    behaviors.respawnPlayer(&world.player, respawn_pos);
-    effect_system.addPlayerSpawnEffect(respawn_pos, world.player.radius);
+    // Set player position and alive status using ECS
+    world.setPlayerPos(respawn_pos);
+    world.setPlayerAlive(true);
+    world.setPlayerColor(constants.COLOR_PLAYER_ALIVE);
+    effect_system.addPlayerSpawnEffect(respawn_pos, world.getPlayerRadius());
     std.debug.print("Player respawned!\n", .{});
 }
 
@@ -144,5 +159,16 @@ pub fn handleUnitDeath(unit: *entities.Unit) void {
 
 pub fn handleUnitDeathOnHazard(unit: *entities.Unit) void {
     behaviors.killUnit(unit);
+    std.debug.print("Unit died on hazard!\n", .{});
+}
+
+// ECS-compatible unit death on hazard
+pub fn handleUnitDeathOnHazardECS(unit_entity: ecs.EntityId, world: *HexWorld) void {
+    if (world.world.healths.get(unit_entity)) |health| {
+        health.alive = false;
+    }
+    if (world.world.visuals.get(unit_entity)) |visual| {
+        visual.color = constants.COLOR_DEAD;
+    }
     std.debug.print("Unit died on hazard!\n", .{});
 }

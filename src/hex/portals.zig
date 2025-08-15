@@ -11,7 +11,7 @@ const constants = @import("constants.zig");
 const effects = @import("effects.zig");
 
 const Vec2 = types.Vec2;
-const World = entities.World;
+const HexWorld = @import("hex_world.zig").HexWorld;
 const Portal = entities.Portal;
 const Player = entities.Player;
 
@@ -20,37 +20,47 @@ pub fn handlePortalTravel(game_state: anytype, portal: *const Portal) void {
     const effect_system = &game_state.effect_system;
     game_state.input_state.clearMouseHold();
 
-    const movement_direction = player_controller.getPlayerMovementDirection(&world.player);
+    const movement_direction = player_controller.getPlayerMovementDirectionECS(world);
+    const player_radius = world.getPlayerRadius();
 
     const origin_zone = world.current_zone;
     const destination_zone = portal.destination_zone;
-    game_state.travelToZone(destination_zone);
-
+    
     std.debug.print("Portal travel! Entering zone {} from zone {}\n", .{ destination_zone, origin_zone });
 
     const new_zone = &world.zones[destination_zone];
+    var spawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y }; // Default fallback
+    
+    // Find return portal and calculate spawn position
     for (0..new_zone.portal_count) |i| {
-        const return_portal = &new_zone.portals[i];
+        const return_portal = &new_zone.portals.items[i];
         if (return_portal.active and return_portal.destination_zone == origin_zone) {
-            const offset_distance = return_portal.radius + world.player.radius + constants.PORTAL_SPAWN_OFFSET;
+            const offset_distance = return_portal.radius + player_radius + constants.PORTAL_SPAWN_OFFSET;
 
             if (movement_direction.x != 0 or movement_direction.y != 0) {
-                world.player.pos = Vec2{
+                spawn_pos = Vec2{
                     .x = return_portal.pos.x + movement_direction.x * offset_distance,
                     .y = return_portal.pos.y + movement_direction.y * offset_distance,
                 };
             } else {
-                world.player.pos = Vec2{
+                spawn_pos = Vec2{
                     .x = return_portal.pos.x,
                     .y = return_portal.pos.y + offset_distance,
                 };
             }
 
-            world.player.pos.x = std.math.clamp(world.player.pos.x, world.player.radius, constants.SCREEN_WIDTH - world.player.radius);
-            world.player.pos.y = std.math.clamp(world.player.pos.y, world.player.radius, constants.SCREEN_HEIGHT - world.player.radius);
+            // Clamp spawn position to screen bounds
+            spawn_pos.x = std.math.clamp(spawn_pos.x, player_radius, constants.SCREEN_WIDTH - player_radius);
+            spawn_pos.y = std.math.clamp(spawn_pos.y, player_radius, constants.SCREEN_HEIGHT - player_radius);
 
-            // Add portal travel effect on the player
-            effect_system.addPortalTravelEffect(world.player.pos, world.player.radius);
+            // Add portal travel effect on the player's current position
+            effect_system.addPortalTravelEffect(world.getPlayerPos(), player_radius);
+
+            // Travel to destination zone with calculated spawn position
+            world.travelToZone(destination_zone, spawn_pos) catch {
+                std.debug.print("Error: Failed to travel to zone {}\n", .{destination_zone});
+                return;
+            };
 
             // Add portal ripple effect on the portal itself in the new zone
             effect_system.addPortalRippleEffect(return_portal.pos, return_portal.radius);
@@ -58,25 +68,32 @@ pub fn handlePortalTravel(game_state: anytype, portal: *const Portal) void {
         }
     }
 
-    world.player.pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
+    // Fallback: no return portal found, spawn at center
+    world.travelToZone(destination_zone, spawn_pos) catch {
+        std.debug.print("Error: Failed to travel to zone {} (fallback)\n", .{destination_zone});
+        return;
+    };
 
     // Add portal travel effect for fallback spawn
-    effect_system.addPortalTravelEffect(world.player.pos, world.player.radius);
+    effect_system.addPortalTravelEffect(spawn_pos, player_radius);
 }
 
 pub fn checkPortalCollisions(game_state: anytype) bool {
     const world = &game_state.world;
-    const zone = world.getCurrentZone();
-    const player = &world.player;
 
-    if (!player.alive) return false;
+    if (!world.getPlayerAlive()) return false;
+    
+    const player_pos = world.getPlayerPos();
+    const player_radius = world.getPlayerRadius();
+    const zone = world.getCurrentZoneConst();
 
+    // Check collision with all portals in current zone
     for (0..zone.portal_count) |i| {
-        if (physics.checkPlayerPortalCollision(player, &zone.portals[i])) {
-            handlePortalTravel(game_state, &zone.portals[i]);
+        if (physics.checkPlayerPortalCollision(player_pos, player_radius, &zone.portals.items[i])) {
+            handlePortalTravel(game_state, &zone.portals.items[i]);
             return true;
         }
     }
-
+    
     return false;
 }

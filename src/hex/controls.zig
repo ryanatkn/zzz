@@ -22,11 +22,14 @@ pub fn handleSDLEvent(
     game_hud: *Hud,
     event: *c.sdl.SDL_Event,
 ) !c.sdl.SDL_AppResult {
+    _ = game_renderer; // Not used in this function currently
     // Let HUD handle events first if it's open
     if (game_state.hud_system) |*hud_sys| {
         const handled = try hud_sys.handleEvent(event.*);
         if (handled) return c.sdl.SDL_APP_CONTINUE;
     }
+    
+    // Legacy HUD doesn't block events - it's just a display overlay
 
     switch (event.type) {
         c.sdl.SDL_EVENT_QUIT => {
@@ -65,7 +68,7 @@ pub fn handleSDLEvent(
                 c.sdl.SDL_SCANCODE_Q => game_state.spell_system.setActiveSlot(4),
                 c.sdl.SDL_SCANCODE_E => game_state.spell_system.setActiveSlot(5),
                 c.sdl.SDL_SCANCODE_R => { // R key - respawn or spell slot 6
-                    if (!game_state.world.player.alive) {
+                    if (!game_state.world.getPlayerAlive()) {
                         game_controller.handleRespawn(game_state);
                     } else {
                         game_state.spell_system.setActiveSlot(6);
@@ -83,24 +86,34 @@ pub fn handleSDLEvent(
         },
         c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
             game_state.input_state.handleMouseButtonDown(event.button.button);
+            
+            // Don't handle game actions if HUD is open
+            if (game_state.hud_system) |*hud_sys| {
+                if (hud_sys.is_open()) {
+                    std.debug.print("Mouse click blocked - HUD is open\n", .{});
+                    return c.sdl.SDL_APP_CONTINUE;
+                }
+                std.debug.print("HUD system exists but is closed - allowing game input\n", .{});
+            } else {
+                std.debug.print("No HUD system - allowing game input\n", .{});
+            }
+            
             switch (event.button.button) {
                 c.sdl.SDL_BUTTON_LEFT => {
-                    if (!game_state.world.player.alive) {
+                    if (!game_state.world.getPlayerAlive()) {
                         game_controller.handleRespawn(game_state);
                     } else {
-                        // Left-click shoots unless Ctrl is held
-                        if (!game_state.input_state.isCtrlHeld()) {
-                            game_controller.handleFireBullet(game_state, &game_renderer.camera);
-                        }
+                        // Left-click shooting is handled in continuous shooting (mouse hold)
+                        // Single-click shooting is disabled to prevent double-shooting
                     }
                 },
                 c.sdl.SDL_BUTTON_RIGHT => {
                     // Right-click casts spell (self-cast if Ctrl held)
-                    if (game_state.world.player.alive) {
-                        const ctrl_held = game_state.input_state.isCtrlHeld();
-                        const world_mouse_pos = game_state.input_state.getWorldMousePos(viewport.createViewport(&game_renderer.camera));
-                        _ = game_state.spell_system.castActiveSpell(&game_state.world.player, game_state.world.getCurrentZone(), world_mouse_pos, &game_state.effect_system, ctrl_held // self_cast parameter
-                        );
+                    if (game_state.world.getPlayerAlive()) {
+                        // TODO: Update spell system to work with ECS player entity
+                        // const ctrl_held = game_state.input_state.isCtrlHeld();
+                        // const world_mouse_pos = game_state.input_state.getWorldMousePos(viewport.createViewport(&game_renderer.camera));
+                        // _ = game_state.spell_system.castActiveSpell(&game_state.world.player, game_state.world.getCurrentZone(), world_mouse_pos, &game_state.effect_system, ctrl_held);
                     }
                 },
                 else => {},

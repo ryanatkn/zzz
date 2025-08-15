@@ -35,7 +35,7 @@ const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
 const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));
 const Vec2 = types.Vec2;
 const Color = types.Color;
-const World = entities.World;
+const HexWorld = @import("hex_world.zig").HexWorld;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const GameState = game_controller.GameState;
 const Hud = hud.Hud;
@@ -69,9 +69,9 @@ pub fn run(allocator: std.mem.Allocator) !void {
 
 var fully_initialized = false;
 var window: *c.sdl.SDL_Window = undefined;
-var game_renderer: GameRenderer = undefined;
-var game_state: GameState = undefined;
-var game_hud: Hud = undefined;
+var game_renderer: ?*GameRenderer = null;
+var game_state: ?*GameState = null;
+var game_hud: ?*Hud = null;
 var global_allocator: std.mem.Allocator = undefined;
 
 // Timing
@@ -101,33 +101,39 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     try reactive_time.initGlobalTime(global_allocator, .Second);
     try reactive_text_cache.initGlobalTextCache(global_allocator);
 
-    // Initialize renderer
-    game_renderer = try GameRenderer.init(global_allocator, window);
+    // Initialize renderer (heap allocated to avoid memory corruption)
+    game_renderer = try global_allocator.create(GameRenderer);
+    errdefer global_allocator.destroy(game_renderer.?);
+    game_renderer.?.* = try GameRenderer.init(global_allocator, window);
 
     // Initialize debug logging throttle system
     try log_throttle.initGlobal(global_allocator);
 
     // Initialize persistent text system (needs GPU device from renderer)
-    try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.gpu.device);
+    try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.?.gpu.device);
 
-    // Initialize game state
-    game_state = GameState.init();
+    // Initialize game state (heap allocated)
+    game_state = try global_allocator.create(GameState);
+    errdefer global_allocator.destroy(game_state.?);
+    game_state.?.* = try GameState.init(global_allocator);
 
-    // Initialize HUD
-    game_hud = Hud.init();
+    // Initialize HUD (heap allocated)
+    game_hud = try global_allocator.create(Hud);
+    errdefer global_allocator.destroy(game_hud.?);
+    game_hud.?.* = Hud.init();
 
     // Load game data
-    loader.loadGameData(global_allocator, &game_state.world) catch |err| {
+    loader.loadGameData(global_allocator, &game_state.?.world) catch |err| {
         std.debug.print("Failed to load game data from ZON file: {}\n", .{err});
         std.debug.print("Please check that game_data.zon exists and is valid\n", .{});
         return err;
     };
 
     // Initialize ambient effects for starting zone
-    game_state.effect_system.refreshAmbientEffects(&game_state.world);
+    game_state.?.effect_system.refreshAmbientEffects(&game_state.?.world);
 
     // Initialize HUD system
-    try game_state.initHud(global_allocator, &game_renderer);
+    try game_state.?.initHud(global_allocator, game_renderer.?);
 
     // Show window after initialization
     _ = c.sdl.SDL_ShowWindow(window);
@@ -144,7 +150,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 fn sdlAppIterate(appstate: ?*anyopaque) !c.sdl.SDL_AppResult {
     _ = appstate;
 
-    if (game_state.shouldQuit()) {
+    if (game_state.?.shouldQuit()) {
         return c.sdl.SDL_APP_SUCCESS;
     }
 
@@ -161,7 +167,17 @@ fn sdlAppIterate(appstate: ?*anyopaque) !c.sdl.SDL_AppResult {
 
 fn sdlAppEvent(appstate: ?*anyopaque, event: *c.sdl.SDL_Event) !c.sdl.SDL_AppResult {
     _ = appstate;
-    return controls.handleSDLEvent(&game_state, &game_renderer, &game_hud, event);
+    
+    // Prevent accessing uninitialized game objects
+    if (!fully_initialized) {
+        // During initialization, only handle critical events
+        switch (event.type) {
+            c.sdl.SDL_EVENT_QUIT => return c.sdl.SDL_APP_SUCCESS,
+            else => return c.sdl.SDL_APP_CONTINUE,
+        }
+    }
+    
+    return controls.handleSDLEvent(game_state.?, game_renderer.?, game_hud.?, event);
 }
 
 fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void {
@@ -170,15 +186,21 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
 
     if (fully_initialized) {
         if (!DEBUG_MODE) {
-            game_state.deinitHud();
+            game_state.?.deinitHud();
 
             // CRITICAL: Clean up persistent text system BEFORE game_renderer.deinit()
             // This ensures GPU textures are released before the GPU device is destroyed
             persistent_text.deinitGlobalPersistentTextSystem(global_allocator);
 
             // Now safe to deinitialize the renderer and GPU device
-            game_renderer.deinit();
+            game_renderer.?.deinit();
             loader.deinit(); // Clean up ZON data memory
+            
+            // Free heap-allocated structures
+            global_allocator.destroy(game_renderer.?);
+            game_state.?.deinit();
+            global_allocator.destroy(game_state.?);
+            global_allocator.destroy(game_hud.?);
 
             // Clean up reactive system
             reactive_text_cache.deinitGlobalTextCache(global_allocator);
@@ -215,48 +237,49 @@ fn runGameLoop() !void {
     last_time = current_time;
 
     // Update camera before game logic (for correct mouse coordinate transformation)
-    game_renderer.updateCamera(&game_state.world);
+    game_renderer.?.updateCamera(&game_state.?.world);
 
     // Update game state
-    game_controller.updateGame(&game_state, &game_renderer.camera, deltaTime);
+    // Pass camera pointer directly from the heap-allocated GameRenderer
+    game_controller.updateGame(game_state.?, &game_renderer.?.camera, deltaTime);
 
     // Render
     try renderGame();
 }
 
 fn renderGame() !void {
-    const zone = game_state.world.getCurrentZone();
+    const zone = game_state.?.world.getCurrentZone();
 
     // Begin GPU frame
-    const cmd_buffer = try game_renderer.beginFrame(window);
-    const render_pass = try game_renderer.beginRenderPass(cmd_buffer, window, zone.background_color);
+    const cmd_buffer = try game_renderer.?.beginFrame(window);
+    const render_pass = try game_renderer.?.beginRenderPass(cmd_buffer, window, zone.background_color);
 
     // Render all entities
-    game_renderer.renderZone(cmd_buffer, render_pass, &game_state.world);
+    game_renderer.?.renderZone(cmd_buffer, render_pass, &game_state.?.world);
 
     // Render visual effects
-    game_renderer.renderEffects(cmd_buffer, render_pass, &game_state.effect_system);
+    game_renderer.?.renderEffects(cmd_buffer, render_pass, &game_state.?.effect_system);
 
     // Draw HUD
-    if (game_hud.visible) {
+    if (game_hud.?.visible) {
         const fps = reactive_time.getFPS();
-        game_renderer.drawFPS(cmd_buffer, render_pass, fps);
+        game_renderer.?.drawFPS(cmd_buffer, render_pass, fps);
     }
 
     // Render HUD overlay if open
-    if (game_state.hud_system) |*hud_sys| {
+    if (game_state.?.hud_system) |*hud_sys| {
         try hud_sys.render(cmd_buffer, render_pass);
     }
 
     // Draw all queued text (TTF text that was queued during frame)
     // IMPORTANT: This must come AFTER HUD rendering so text queued by HUD is drawn
-    game_renderer.gpu.drawQueuedText(cmd_buffer, render_pass);
+    game_renderer.?.gpu.drawQueuedText(cmd_buffer, render_pass);
 
     // Draw state borders with stacking support and iris wipe effect - LAST for proper visual effect
-    game_renderer.drawBorders(cmd_buffer, render_pass, &game_state);
+    game_renderer.?.drawBorders(cmd_buffer, render_pass, game_state.?);
 
-    game_renderer.endRenderPass(render_pass);
-    game_renderer.endFrame(cmd_buffer);
+    game_renderer.?.endRenderPass(render_pass);
+    game_renderer.?.endFrame(cmd_buffer);
 }
 
 // SDL boilerplate

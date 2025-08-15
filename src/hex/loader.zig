@@ -1,6 +1,7 @@
 const std = @import("std");
 
 const entities = @import("entities.zig");
+const hex_world = @import("hex_world.zig");
 const types = @import("../lib/core/types.zig");
 
 const Vec2 = types.Vec2;
@@ -17,8 +18,8 @@ pub fn deinit() void {
     }
 }
 
-// Load game data from ZON file
-pub fn loadGameData(allocator: std.mem.Allocator, world: *entities.World) !void {
+// Load game data from ZON file  
+pub fn loadGameData(allocator: std.mem.Allocator, world: *hex_world.HexWorld) !void {
     // Load game data from ZON file
     const gameDataFile = @embedFile("game_data.zon");
 
@@ -38,44 +39,36 @@ pub fn loadGameData(allocator: std.mem.Allocator, world: *entities.World) !void 
     };
 
     // Set player start position
-    world.player.pos = Vec2{
-        .x = game_data.player_start.position.x,
-        .y = game_data.player_start.position.y,
-    };
-    world.player.radius = game_data.player_start.radius;
+    // Create the player entity if it doesn't exist
+    if (world.getPlayer() == null) {
+        _ = try world.createPlayer(Vec2{
+            .x = game_data.player_start.position.x,
+            .y = game_data.player_start.position.y,
+        });
+    } else {
+        // Update existing player position
+        world.setPlayerPos(Vec2{
+            .x = game_data.player_start.position.x,
+            .y = game_data.player_start.position.y,
+        });
+    }
+    // TODO: Set player radius from game_data.player_start.radius
     // Store original spawn position for full reset
-    world.player_start_pos = world.player.pos;
+    world.player_start_pos = world.getPlayerPos();
 
     // Load each zone
     for (game_data.zones, 0..) |zone_data, i| {
         // Initialize zone with basic data (scale will be set in loadZone)
-        world.zones[i] = entities.Zone.init("", types.Color{ .r = 0, .g = 0, .b = 0, .a = 255 }, entities.CameraMode.follow, 1.0);
+        // Zone is already initialized in HexWorld.init(), just need to load data
         // Then load detailed data
-        loadZone(&world.zones[i], zone_data);
+        try loadZone(&world.zones[i], zone_data, world, i);
     }
 }
 
 // Load a single zone from ZON data
-fn loadZone(zone: *entities.Zone, data: ZoneData) void {
-    // Set zone properties - use static strings to avoid allocation
-    if (std.mem.eql(u8, data.name, "Overworld")) {
-        zone.name = "Overworld";
-    } else if (std.mem.indexOf(u8, data.name, "Southeast") != null) {
-        zone.name = "Southeast Dungeon";
-    } else if (std.mem.indexOf(u8, data.name, "Southwest") != null) {
-        zone.name = "Southwest Dungeon";
-    } else if (std.mem.indexOf(u8, data.name, "West") != null) {
-        zone.name = "West Dungeon";
-    } else if (std.mem.indexOf(u8, data.name, "Northwest") != null) {
-        zone.name = "Northwest Dungeon";
-    } else if (std.mem.indexOf(u8, data.name, "Northeast") != null) {
-        zone.name = "Northeast Dungeon";
-    } else if (std.mem.indexOf(u8, data.name, "East") != null) {
-        zone.name = "East Dungeon";
-    } else {
-        zone.name = "Unknown";
-    }
-
+fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.HexWorld, zone_index: usize) !void {
+    // Zone type is already set in HexWorld.init(), skip name setting
+    
     zone.background_color = Color{
         .r = data.background_color.r,
         .g = data.background_color.g,
@@ -85,18 +78,34 @@ fn loadZone(zone: *entities.Zone, data: ZoneData) void {
 
     // Set camera mode for this zone
     if (std.mem.eql(u8, data.camera_mode, "fixed")) {
-        zone.camera_mode = entities.CameraMode.fixed;
+        zone.camera_mode = .fixed;
     } else {
-        zone.camera_mode = entities.CameraMode.follow;
+        zone.camera_mode = .follow;
     }
 
     // Set camera scale (default to 1.0 if not specified)
     zone.camera_scale = data.camera_scale orelse 1.0;
 
-    // Load obstacles
+    // Load obstacles as ECS entities
     if (data.obstacles) |obstacles| {
+        // Set current zone for entity creation
+        const old_zone = world.current_zone;
+        world.current_zone = zone_index;
+        
         for (obstacles) |obstacle_data| {
             const is_deadly = std.mem.eql(u8, obstacle_data.type, "deadly");
+            
+            // Create ECS obstacle entity
+            const obstacle_id = world.createObstacle(
+                Vec2{ .x = obstacle_data.position.x, .y = obstacle_data.position.y },
+                Vec2{ .x = obstacle_data.size.x, .y = obstacle_data.size.y },
+                is_deadly,
+            ) catch |err| {
+                std.log.err("Failed to create obstacle entity: {}", .{err});
+                continue;
+            };
+            
+            // Also add to legacy ArrayList for now (dual storage during transition)
             const obstacle = entities.Obstacle.init(
                 obstacle_data.position.x,
                 obstacle_data.position.y,
@@ -104,8 +113,17 @@ fn loadZone(zone: *entities.Zone, data: ZoneData) void {
                 obstacle_data.size.y,
                 is_deadly,
             );
-            zone.addObstacle(obstacle);
+            zone.obstacles.append(obstacle) catch |err| {
+                std.log.err("Failed to add obstacle to ArrayList: {}", .{err});
+                continue;
+            };
+            zone.obstacle_count += 1;
+            
+            _ = obstacle_id; // TODO: Track obstacle entities for zone reset
         }
+        
+        // Restore current zone
+        world.current_zone = old_zone;
     }
 
     // Load units
@@ -116,41 +134,90 @@ fn loadZone(zone: *entities.Zone, data: ZoneData) void {
                 unit_data.position.y,
                 unit_data.radius,
             );
-            zone.addUnit(unit);
-            // Also store in original units for reset functionality
-            if (zone.original_unit_count < entities.MAX_UNITS) {
-                zone.original_units[zone.original_unit_count] = unit;
-                zone.original_unit_count += 1;
-            }
+            zone.units.append(unit) catch |err| {
+                std.log.err("Failed to add unit: {}", .{err});
+                return;
+            };
+            zone.unit_count += 1;
+            // TODO: Store original unit data for reset functionality using ECS patterns
         }
     }
 
-    // Load portals
+    // Load portals as ECS entities
     if (data.portals) |portals| {
+        // Set current zone for entity creation
+        const old_zone = world.current_zone;
+        world.current_zone = zone_index;
+        
         for (portals) |portal_data| {
+            // Create ECS portal entity
+            const portal_id = world.createPortal(
+                Vec2{ .x = portal_data.position.x, .y = portal_data.position.y },
+                portal_data.radius,
+                portal_data.destination,
+            ) catch |err| {
+                std.log.err("Failed to create portal entity: {}", .{err});
+                continue;
+            };
+            
+            // Also add to legacy ArrayList for now (dual storage during transition)
             const portal = entities.Portal.init(
                 portal_data.position.x,
                 portal_data.position.y,
                 portal_data.radius,
                 portal_data.destination,
             );
-            zone.addPortal(portal);
+            zone.portals.append(portal) catch |err| {
+                std.log.err("Failed to add portal to ArrayList: {}", .{err});
+                continue;
+            };
+            zone.portal_count += 1;
+            
+            _ = portal_id; // TODO: Track portal entities for zone reset
         }
+        
+        // Restore current zone
+        world.current_zone = old_zone;
     }
 
-    // Load lifestones
+    // Load lifestones as ECS entities
     if (data.lifestones) |lifestones| {
+        // Set current zone for entity creation
+        const old_zone = world.current_zone;
+        world.current_zone = zone_index;
+        
         for (lifestones) |lifestone_data| {
             // First lifestone in overworld (zone 0) is pre-attuned
             const pre_attuned = (zone.lifestone_count == 0 and std.mem.eql(u8, data.name, "Overworld"));
+            
+            // Create ECS lifestone entity
+            const lifestone_id = world.createLifestone(
+                Vec2{ .x = lifestone_data.position.x, .y = lifestone_data.position.y },
+                lifestone_data.radius,
+                pre_attuned,
+            ) catch |err| {
+                std.log.err("Failed to create lifestone entity: {}", .{err});
+                continue;
+            };
+            
+            // Also add to legacy ArrayList for now (dual storage during transition)
             const lifestone = entities.Lifestone.init(
                 lifestone_data.position.x,
                 lifestone_data.position.y,
                 lifestone_data.radius,
                 pre_attuned,
             );
-            zone.addLifestone(lifestone);
+            zone.lifestones.append(lifestone) catch |err| {
+                std.log.err("Failed to add lifestone to ArrayList: {}", .{err});
+                continue;
+            };
+            zone.lifestone_count += 1;
+            
+            _ = lifestone_id; // TODO: Track lifestone entities for zone reset
         }
+        
+        // Restore current zone
+        world.current_zone = old_zone;
     }
 }
 

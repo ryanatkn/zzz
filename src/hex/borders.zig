@@ -30,6 +30,12 @@ const YELLOW_BRIGHT = Color{ .r = 255, .g = 220, .b = 80, .a = 255 };
 const ORANGE_BRIGHT = Color{ .r = 255, .g = 180, .b = 80, .a = 255 };
 const CYAN = Color{ .r = 0, .g = 200, .b = 200, .a = 255 };
 
+// Lifestone master colors - matches the attuned lifestone color
+const LIFESTONE_COLORS = BorderColorPair{
+    .dark = .{ .r = 0.0, .g = 100.0, .b = 100.0 },
+    .bright = .{ .r = 0.0, .g = 200.0, .b = 200.0 },
+};
+
 // Border color definitions for cycling
 pub const BorderColorPair = struct {
     dark: struct { r: f32, g: f32, b: f32 },
@@ -246,6 +252,14 @@ pub fn drawScreenBorder(game_state: anytype) void {
     if (!game_state.world.player.alive) {
         // Animated dead border: base 9px + 5px pulse amplitude
         border_stack.pushAnimated(9.0, RED_COLORS, BORDER_PULSE_DEAD, 5.0);
+    }
+    
+    // Lifestone master border - TEMPORARY improvement
+    // Shows when all lifestones across all zones are attuned
+    if (game_state.hasAttunedAllLifestones()) {
+        // Animated lifestone border: base 5px + 2px pulse amplitude
+        // Uses cyan color matching the attuned lifestone color
+        border_stack.pushAnimated(5.0, LIFESTONE_COLORS, 3.0, 2.0);
     }
 
     // Render all borders with automatic offset calculation based on current animated widths

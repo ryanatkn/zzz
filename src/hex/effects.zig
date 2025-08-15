@@ -473,7 +473,7 @@ pub const EffectSystem = struct {
 
         // Add auras around active portals
         for (0..zone.portal_count) |i| {
-            const portal = &zone.portals[i];
+            const portal = &zone.portals.items[i];
             if (portal.active) {
                 self.addPortalAmbientEffect(portal.pos, portal.radius);
             }
@@ -481,7 +481,7 @@ pub const EffectSystem = struct {
 
         // Add glows around active lifestones
         for (0..zone.lifestone_count) |i| {
-            const lifestone = &zone.lifestones[i];
+            const lifestone = &zone.lifestones.items[i];
             if (lifestone.active) {
                 self.addLifestoneGlowEffect(lifestone.pos, lifestone.radius, lifestone.attuned);
             }

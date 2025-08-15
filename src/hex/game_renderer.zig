@@ -3,6 +3,7 @@ const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
 
 const entities = @import("entities.zig");
+const hex_world = @import("hex_world.zig");
 const types = @import("../lib/core/types.zig");
 const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
 const camera = @import("../lib/rendering/camera.zig");
@@ -70,7 +71,7 @@ pub const GameRenderer = struct {
     }
 
     // Update camera based on current zone (call before game logic update)
-    pub fn updateCamera(self: *GameRenderer, world: *const entities.World) void {
+    pub fn updateCamera(self: *GameRenderer, world: *const hex_world.HexWorld) void {
         // Ensure camera has current screen dimensions (in case window resized)
         if (self.camera.screen_width != self.gpu.screen_width or
             self.camera.screen_height != self.gpu.screen_height)
@@ -79,16 +80,16 @@ pub const GameRenderer = struct {
             self.camera.screen_height = self.gpu.screen_height;
         }
 
-        const zone = world.getCurrentZone();
+        const zone = world.getCurrentZoneConst();
         switch (zone.camera_mode) {
             .fixed => self.camera.setupFixed(zone.camera_scale),
-            .follow => self.camera.setupFollow(world.player.pos, zone.camera_scale),
+            .follow => self.camera.setupFollow(world.getPlayerPosConst(), zone.camera_scale),
         }
     }
 
     // Render all entities in a zone
-    pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const entities.World) void {
-        const zone = world.getCurrentZone();
+    pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+        const zone = world.getCurrentZoneConst();
 
         // Draw all rectangles first (obstacles)
         self.renderObstacles(cmd_buffer, render_pass, zone);
@@ -98,9 +99,9 @@ pub const GameRenderer = struct {
     }
 
     // Render all obstacles (rectangles)
-    fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, zone: *const entities.Zone) void {
+    fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, zone: *const hex_world.HexWorld.Zone) void {
         for (0..zone.obstacle_count) |i| {
-            const obstacle = &zone.obstacles[i];
+            const obstacle = &zone.obstacles.items[i];
             if (obstacle.active) {
                 const screen_pos = self.camera.worldToScreen(obstacle.pos);
                 const screen_size = Vec2{
@@ -119,25 +120,37 @@ pub const GameRenderer = struct {
         self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, color);
     }
 
-    // Render all circular entities
-    fn renderCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const entities.World) void {
-        const zone = world.getCurrentZone();
-
-        // Draw player
-        const player = &world.player;
-        self.renderCircleEntity(cmd_buffer, render_pass, player.pos, player.radius, player.color);
-
-        // Draw bullets
-        for (0..entities.MAX_BULLETS) |i| {
-            const bullet = &world.bullets[i];
-            if (bullet.active) {
-                self.renderCircleEntity(cmd_buffer, render_pass, bullet.pos, bullet.radius, bullet.color);
+    // Render all projectiles (bullets) using ECS queries
+    fn renderProjectiles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+        // Get the ECS world
+        const ecs_world = world.getECSWorld();
+        
+        // Iterate over all projectile entities
+        // Note: Cast away const to access iterator (safe for read-only iteration)
+        var projectiles_storage = @constCast(&ecs_world.projectiles);
+        var projectile_iter = projectiles_storage.iterator();
+        
+        while (projectile_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            
+            // Get transform and visual components for this projectile
+            if (ecs_world.transforms.getConst(entity_id)) |transform| {
+                if (ecs_world.visuals.getConst(entity_id)) |visual| {
+                    if (visual.visible) {
+                        self.renderCircleEntity(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+                    }
+                }
             }
         }
+    }
 
-        // Draw lifestones
+    // Render all circular entities
+    fn renderCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+        const zone = world.getCurrentZoneConst();
+
+        // Draw lifestones (bottom layer)
         for (0..zone.lifestone_count) |i| {
-            const lifestone = &zone.lifestones[i];
+            const lifestone = &zone.lifestones.items[i];
             if (lifestone.active) {
                 self.renderCircleEntity(cmd_buffer, render_pass, lifestone.pos, lifestone.radius, lifestone.color);
             }
@@ -145,7 +158,7 @@ pub const GameRenderer = struct {
 
         // Draw portals
         for (0..zone.portal_count) |i| {
-            const portal = &zone.portals[i];
+            const portal = &zone.portals.items[i];
             if (portal.active) {
                 self.renderCircleEntity(cmd_buffer, render_pass, portal.pos, portal.radius, portal.color);
             }
@@ -153,11 +166,20 @@ pub const GameRenderer = struct {
 
         // Draw units
         for (0..zone.unit_count) |i| {
-            const unit = &zone.units[i];
+            const unit = &zone.units.items[i];
             if (unit.active) {
                 self.renderCircleEntity(cmd_buffer, render_pass, unit.pos, unit.radius, unit.color);
             }
         }
+
+        // Draw player (above units)
+        const player_pos = world.getPlayerPosConst();
+        const player_radius = world.getPlayerRadiusConst();
+        const player_color = world.getPlayerColorConst();
+        self.renderCircleEntity(cmd_buffer, render_pass, player_pos, player_radius, player_color);
+
+        // Draw bullets LAST (top layer - always visible)
+        self.renderProjectiles(cmd_buffer, render_pass, world);
     }
 
     // Render visual effects
@@ -227,7 +249,7 @@ pub const GameRenderer = struct {
             border_stack.pushAnimated(6.0, borders.GOLD_YELLOW_COLORS, 1.5, 4.0);
         }
 
-        if (!game_state.world.player.alive) {
+        if (!game_state.world.getPlayerAlive()) {
             // Animated dead border: base 9px + 5px pulse amplitude
             border_stack.pushAnimated(9.0, borders.RED_COLORS, 1.2, 5.0);
         }

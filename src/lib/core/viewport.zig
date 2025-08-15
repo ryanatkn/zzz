@@ -22,7 +22,8 @@ pub fn createViewport(viewport_impl: anytype) Viewport {
     const impl = struct {
         fn screenToWorld(ptr: *const anyopaque, screen_pos: Vec2) Vec2 {
             const self: *const T = @ptrCast(@alignCast(ptr));
-            return self.*.screenToWorld(screen_pos);
+            // Use the safe version that handles errors gracefully
+            return self.*.screenToWorldSafe(screen_pos);
         }
     };
 

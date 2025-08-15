@@ -4,6 +4,7 @@ const entities = @import("entities.zig");
 const types = @import("../lib/core/types.zig");
 const maths = @import("../lib/core/maths.zig");
 const collision = @import("../lib/physics/collision.zig");
+const hex_world = @import("hex_world.zig");
 
 const Vec2 = types.Vec2;
 
@@ -22,9 +23,9 @@ pub fn checkCircleRectCollision(circle_pos: Vec2, circle_radius: f32, rect_pos: 
 }
 
 // Check player-unit collision
-pub fn checkPlayerUnitCollision(player: *const entities.Player, unit: *const entities.Unit) bool {
-    if (!player.alive or !unit.active or !unit.alive) return false;
-    return checkCircleCollision(player.pos, player.radius, unit.pos, unit.radius);
+pub fn checkPlayerUnitCollision(player_pos: Vec2, player_radius: f32, unit: *const entities.Unit) bool {
+    if (!unit.active or !unit.alive) return false;
+    return checkCircleCollision(player_pos, player_radius, unit.pos, unit.radius);
 }
 
 // Check bullet-unit collision
@@ -33,11 +34,6 @@ pub fn checkBulletUnitCollision(bullet: *const entities.Bullet, unit: *const ent
     return checkCircleCollision(bullet.pos, bullet.radius, unit.pos, unit.radius);
 }
 
-// Check player-obstacle collision
-pub fn checkPlayerObstacleCollision(player: *const entities.Player, obstacle: *const entities.Obstacle) bool {
-    if (!player.alive or !obstacle.active) return false;
-    return checkCircleRectCollision(player.pos, player.radius, obstacle.pos, obstacle.size);
-}
 
 // Check unit-obstacle collision
 pub fn checkUnitObstacleCollision(unit: *const entities.Unit, obstacle: *const entities.Obstacle) bool {
@@ -46,15 +42,21 @@ pub fn checkUnitObstacleCollision(unit: *const entities.Unit, obstacle: *const e
 }
 
 // Check player-portal collision
-pub fn checkPlayerPortalCollision(player: *const entities.Player, portal: *const entities.Portal) bool {
-    if (!player.alive or !portal.active) return false;
-    return checkCircleCollision(player.pos, player.radius, portal.pos, portal.radius);
+pub fn checkPlayerPortalCollision(player_pos: Vec2, player_radius: f32, portal: *const entities.Portal) bool {
+    if (!portal.active) return false;
+    return checkCircleCollision(player_pos, player_radius, portal.pos, portal.radius);
 }
 
 // Check player-lifestone collision
-pub fn checkPlayerLifestoneCollision(player: *const entities.Player, lifestone: *const entities.Lifestone) bool {
-    if (!player.alive or !lifestone.active) return false;
-    return checkCircleCollision(player.pos, player.radius, lifestone.pos, lifestone.radius);
+pub fn checkPlayerLifestoneCollision(player_pos: Vec2, player_radius: f32, lifestone: *const entities.Lifestone) bool {
+    if (!lifestone.active) return false;
+    return checkCircleCollision(player_pos, player_radius, lifestone.pos, lifestone.radius);
+}
+
+// Check player-obstacle collision
+pub fn checkPlayerObstacleCollision(player_pos: Vec2, player_radius: f32, obstacle: *const entities.Obstacle) bool {
+    if (!obstacle.active) return false;
+    return checkCircleRectCollision(player_pos, player_radius, obstacle.pos, obstacle.size);
 }
 
 // Process all collisions for a zone
@@ -147,9 +149,9 @@ pub fn wouldCollideWithObstacle(pos: Vec2, radius: f32, zone: *const entities.Zo
 }
 
 // Check if position collides with deadly obstacle
-pub fn collidesWithDeadlyObstacle(pos: Vec2, radius: f32, zone: *const entities.Zone) bool {
+pub fn collidesWithDeadlyObstacle(pos: Vec2, radius: f32, zone: *const hex_world.HexWorld.Zone) bool {
     for (0..zone.obstacle_count) |i| {
-        const obstacle = &zone.obstacles[i];
+        const obstacle = &zone.obstacles.items[i];
         if (!obstacle.active or !obstacle.is_deadly) continue; // Only check deadly obstacles
 
         if (checkCircleRectCollision(pos, radius, obstacle.pos, obstacle.size)) {
@@ -165,14 +167,15 @@ pub const LifestoneResult = struct {
     pos: Vec2,
 };
 
-pub fn findNearestAttunedLifestone(world: *const entities.World, current_pos: Vec2) ?LifestoneResult {
-    // First check current zone
-    const current_zone = world.getCurrentZone();
+pub fn findNearestAttunedLifestone(world: *const hex_world.HexWorld) ?LifestoneResult {
+    const current_pos = world.getPlayerPosConst();
     var nearest_distance: f32 = std.math.floatMax(f32);
     var nearest_lifestone: ?LifestoneResult = null;
 
+    // First check current zone
+    const current_zone = world.getCurrentZoneConst();
     for (0..current_zone.lifestone_count) |i| {
-        const lifestone = &current_zone.lifestones[i];
+        const lifestone = &current_zone.lifestones.items[i];
         if (!lifestone.active or !lifestone.attuned) continue;
 
         const dx = current_pos.x - lifestone.pos.x;
@@ -194,12 +197,11 @@ pub fn findNearestAttunedLifestone(world: *const entities.World, current_pos: Ve
     }
 
     // Otherwise, search other zones with distance penalty
-    for (0..world.zones.len) |zone_idx| {
+    for (world.zones, 0..) |zone, zone_idx| {
         if (zone_idx == world.current_zone) continue;
 
-        const zone = &world.zones[zone_idx];
         for (0..zone.lifestone_count) |i| {
-            const lifestone = &zone.lifestones[i];
+            const lifestone = &zone.lifestones.items[i];
             if (!lifestone.active or !lifestone.attuned) continue;
 
             // Add penalty for being in different zone
