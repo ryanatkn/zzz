@@ -8,7 +8,6 @@ const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
 const spells = @import("spells.zig");
-const viewport = @import("../lib/core/viewport.zig");
 
 const Vec2 = math.Vec2;
 const GameState = game_controller.GameState;
@@ -88,12 +87,8 @@ pub fn handleSDLEvent(
             // Don't handle game actions if HUD is open
             if (game_state.hud_system) |*hud_sys| {
                 if (hud_sys.is_open()) {
-                    std.debug.print("Mouse click blocked - HUD is open\n", .{});
                     return c.sdl.SDL_APP_CONTINUE;
                 }
-                std.debug.print("HUD system exists but is closed - allowing game input\n", .{});
-            } else {
-                std.debug.print("No HUD system - allowing game input\n", .{});
             }
 
             switch (event.button.button) {

@@ -1,6 +1,6 @@
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
-const effects = @import("effects.zig");
+const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
 const constants = @import("constants.zig");
 const components = @import("../lib/game/components.zig");
 const entity = @import("../lib/game/entity.zig");
@@ -13,16 +13,7 @@ const HexWorld = @import("hex_world.zig").HexWorld;
 const EntityId = entity.EntityId;
 const World = world_mod.World;
 
-// Spell constants
-const LULL_RADIUS = 150.0; // Base AoE radius - can be upgraded
-const LULL_DURATION = 12.0; // Effect duration in seconds
-const LULL_AGGRO_MULT = 0.3; // Reduce aggro to 30%
-const LULL_COOLDOWN = 10.0;
-
-const BLINK_MAX_DISTANCE = 200.0;
-const BLINK_COOLDOWN = 3.0;
-
-const MAX_LULL_EFFECTS = 10;
+// Import spell constants from centralized location
 
 pub const SpellType = enum {
     None,
@@ -77,13 +68,13 @@ pub const SpellSystem = struct {
     active_slot: usize,
 
     // Active Lull effects (support multiple)
-    lull_effects: [MAX_LULL_EFFECTS]LullEffect,
+    lull_effects: [constants.MAX_LULL_EFFECTS]LullEffect,
 
     pub fn init() SpellSystem {
         var system = SpellSystem{
             .spell_slots = undefined,
             .active_slot = 0,
-            .lull_effects = std.mem.zeroes([MAX_LULL_EFFECTS]LullEffect),
+            .lull_effects = std.mem.zeroes([constants.MAX_LULL_EFFECTS]LullEffect),
         };
 
         // Initialize spell slots
@@ -119,7 +110,7 @@ pub const SpellSystem = struct {
         }
     }
 
-    pub fn castActiveSpell(self: *SpellSystem, world: *HexWorld, zone: *const Zone, target_pos: Vec2, effect_system: *effects.EffectSystem, self_cast: bool) bool {
+    pub fn castActiveSpell(self: *SpellSystem, world: *HexWorld, zone: *const Zone, target_pos: Vec2, effect_system: *GameEffectSystem, self_cast: bool) bool {
         const slot = &self.spell_slots[self.active_slot];
         if (!slot.canCast()) return false;
 
@@ -133,19 +124,19 @@ pub const SpellSystem = struct {
         return success;
     }
 
-    pub fn castSpell(self: *SpellSystem, spell: SpellType, world: *HexWorld, zone: *const Zone, target_pos: Vec2, effect_system: *effects.EffectSystem) bool {
+    pub fn castSpell(self: *SpellSystem, spell: SpellType, world: *HexWorld, zone: *const Zone, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
         _ = self;
         switch (spell) {
             .None => return false,
 
             .Lull => {
                 // Apply lull effect to all units in area using ECS Effects
-                applyLullEffectToUnitsInArea(world, target_pos, LULL_RADIUS, LULL_DURATION, effect_system);
+                applyLullEffectToUnitsInArea(world, target_pos, constants.LULL_RADIUS, constants.LULL_DURATION, effect_system);
 
                 // Add area of effect visual indicator
-                effect_system.addLullAreaEffect(target_pos, LULL_RADIUS, LULL_DURATION);
+                effect_system.addLullAreaEffect(target_pos, constants.LULL_RADIUS, constants.LULL_DURATION);
 
-                log_throttle.logInfo("lull_cast", "Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s", .{ target_pos.x, target_pos.y, LULL_DURATION });
+                log_throttle.logInfo("lull_cast", "Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s", .{ target_pos.x, target_pos.y, constants.LULL_DURATION });
                 return true;
             },
 
@@ -161,10 +152,10 @@ pub const SpellSystem = struct {
                 const to_target = target_pos.sub(player_pos);
                 const distance = to_target.length();
 
-                if (distance > BLINK_MAX_DISTANCE) {
+                if (distance > constants.BLINK_MAX_DISTANCE) {
                     // Limit blink distance
                     const direction = to_target.normalize();
-                    const new_pos = player_pos.add(direction.scale(BLINK_MAX_DISTANCE));
+                    const new_pos = player_pos.add(direction.scale(constants.BLINK_MAX_DISTANCE));
                     world.setPlayerPos(new_pos);
                 } else {
                     world.setPlayerPos(target_pos);
@@ -184,16 +175,16 @@ pub const SpellSystem = struct {
     }
 
     /// Apply lull effect to all units in the specified area using ECS Effects
-    fn applyLullEffectToUnitsInArea(world: *HexWorld, center_pos: Vec2, radius: f32, duration: f32, effect_system: *effects.EffectSystem) void {
-        const ecs_world = world.getECSWorld();
+    fn applyLullEffectToUnitsInArea(world: *HexWorld, center_pos: Vec2, radius: f32, duration: f32, effect_system: *GameEffectSystem) void {
+        const ecs_world = world.getECSWorldMut();
 
         // Query all units and check if they're in the area
-        var unit_iter = @constCast(&ecs_world.units).iterator();
+        var unit_iter = ecs_world.units.iterator();
         while (unit_iter.next()) |entry| {
             const unit_id = entry.key_ptr.*;
 
             // Skip if unit is not alive
-            var ecs_world_mut = @constCast(ecs_world);
+            var ecs_world_mut = ecs_world;
             if (!ecs_world_mut.isAlive(unit_id)) continue;
 
             // Get unit position
@@ -212,7 +203,7 @@ pub const SpellSystem = struct {
     }
 
     /// Apply lull effect to a specific unit using ECS Effects component
-    fn applyLullEffectToUnit(ecs_world: *World, unit_id: EntityId, duration: f32, unit_pos: Vec2, unit_radius: f32, effect_system: *effects.EffectSystem) void {
+    fn applyLullEffectToUnit(ecs_world: *World, unit_id: EntityId, duration: f32, unit_pos: Vec2, unit_radius: f32, effect_system: *GameEffectSystem) void {
 
         // Get or create Effects component for this unit
         const effects_component = ecs_world.effects.get(unit_id) orelse blk: {
@@ -225,7 +216,7 @@ pub const SpellSystem = struct {
         // Add lull modifier
         const lull_modifier = @import("../lib/game/components.zig").Effects.Modifier{
             .type = .aggro_mult,
-            .value = LULL_AGGRO_MULT,
+            .value = constants.LULL_AGGRO_MULT,
             .duration = duration,
             .stack_type = .replace, // New lull replaces old
             .source = unit_id, // Self-applied for now
@@ -257,8 +248,8 @@ pub const SpellSystem = struct {
 fn getSpellCooldown(spell: SpellType) f32 {
     return switch (spell) {
         .None => 0,
-        .Lull => LULL_COOLDOWN,
-        .Blink => BLINK_COOLDOWN,
+        .Lull => constants.LULL_COOLDOWN,
+        .Blink => constants.BLINK_COOLDOWN,
         .Shield => 15.0, // Future
         .Haste => 20.0, // Future
         .Multishot => 8.0, // Future

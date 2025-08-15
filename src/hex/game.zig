@@ -10,8 +10,7 @@ const player_controller = @import("player.zig");
 const combat = @import("combat.zig");
 const portals = @import("portals.zig");
 const camera = @import("../lib/rendering/camera.zig");
-const viewport = @import("../lib/core/viewport.zig");
-const effects = @import("effects.zig");
+const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
 const hud = @import("../hud/hud.zig");
 const reactive_hud = @import("../hud/reactive_hud.zig");
 const game_renderer = @import("game_renderer.zig");
@@ -36,7 +35,7 @@ pub const GameState = struct {
     quit_requested: bool,
 
     // Visual effects system
-    effect_system: effects.EffectSystem,
+    effect_system: GameEffectSystem,
 
     // Spell system
     spell_system: spells.SpellSystem,
@@ -63,7 +62,7 @@ pub const GameState = struct {
             .input_state = InputState.init(),
             .game_paused = false,
             .quit_requested = false,
-            .effect_system = effects.EffectSystem.init(),
+            .effect_system = GameEffectSystem.init(),
             .spell_system = spells.SpellSystem.init(),
             .allocator = allocator,
             .hud_system = null,
@@ -272,8 +271,8 @@ pub const GameState = struct {
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
 
-        const ecs_world = self.world.getECSWorld();
-        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        const ecs_world = self.world.getECSWorldMut();
+        var terrain_iter = ecs_world.terrains.iterator();
 
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
@@ -301,8 +300,8 @@ pub const GameState = struct {
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
 
-        const ecs_world = self.world.getECSWorld();
-        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        const ecs_world = self.world.getECSWorldMut();
+        var terrain_iter = ecs_world.terrains.iterator();
 
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
@@ -329,8 +328,8 @@ pub const GameState = struct {
     pub fn computeTotalLifestonesForWorld(self: *const Self) usize {
         var total_lifestones: usize = 0;
 
-        const ecs_world = self.world.getECSWorld();
-        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        const ecs_world = self.world.getECSWorldMut();
+        var terrain_iter = ecs_world.terrains.iterator();
 
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
@@ -350,8 +349,8 @@ pub const GameState = struct {
     pub fn computeTotalAttunedLifestonesForWorld(self: *const Self) usize {
         var total_attuned: usize = 0;
 
-        const ecs_world = self.world.getECSWorld();
-        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        const ecs_world = self.world.getECSWorldMut();
+        var terrain_iter = ecs_world.terrains.iterator();
 
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
@@ -512,7 +511,7 @@ pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void 
 fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_radius: f32) void {
     const world = &game_state.world;
     const ecs_world = world.getECSWorldMut();
-    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+    var terrain_iter = ecs_world.terrains.iterator();
 
     while (terrain_iter.next()) |entry| {
         const entity_id = entry.key_ptr.*;

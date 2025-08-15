@@ -8,7 +8,7 @@ const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
 const camera = @import("../lib/rendering/camera.zig");
 const borders = @import("borders.zig");
 const constants = @import("constants.zig");
-const effects = @import("effects.zig");
+const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
 const font_manager = @import("../lib/font/manager.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 const log_throttle = @import("../lib/debug/log_throttle.zig");
@@ -199,7 +199,7 @@ pub const GameRenderer = struct {
     }
 
     // Render visual effects
-    pub fn renderEffects(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, effect_system: *const effects.EffectSystem) void {
+    pub fn renderEffects(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, effect_system: *const GameEffectSystem) void {
         const active_effects = effect_system.getActiveEffects();
 
         // Get current time for shader animations

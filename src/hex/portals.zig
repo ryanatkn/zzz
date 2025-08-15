@@ -3,7 +3,6 @@ const math = @import("../lib/math/mod.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
-const effects = @import("effects.zig");
 const log_throttle = @import("../lib/debug/log_throttle.zig");
 
 // Portal cooldown to prevent re-triggering after travel

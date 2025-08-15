@@ -77,6 +77,20 @@ pub const DEAD_BORDER_PULSE_AMPLITUDE = 5.0; // Pulse amplitude for dead border
 pub const WALK_SPEED_MULTIPLIER = 0.25; // Walking speed is 1/4 of normal
 pub const PLAYER_BOUNDARY_MARGIN = 10.0; // Extra margin for boundary checks
 
+// Spell system constants
+pub const LULL_RADIUS = 150.0; // Base AoE radius - can be upgraded
+pub const LULL_DURATION = 12.0; // Effect duration in seconds
+pub const LULL_AGGRO_MULT = 0.3; // Reduce aggro to 30%
+pub const LULL_COOLDOWN = 10.0;
+pub const BLINK_MAX_DISTANCE = 200.0;
+pub const BLINK_COOLDOWN = 3.0;
+pub const MAX_LULL_EFFECTS = 10;
+
+// Border system constants
+pub const ASPECT_RATIO = 16.0 / 9.0;
+pub const MAX_BORDER_LAYERS = 8;
+pub const COLOR_CYCLE_FREQ = 4.0;
+
 // Color constants (imported from shared colors module)
 pub const COLOR_PLAYER_ALIVE = colors.PLAYER_ALIVE;
 pub const COLOR_UNIT_DEFAULT = colors.UNIT_DEFAULT;

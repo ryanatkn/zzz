@@ -1,20 +1,19 @@
 const std = @import("std");
 const log_throttle = @import("../lib/debug/log_throttle.zig");
 const math = @import("../lib/math/mod.zig");
-const projectiles = @import("../lib/game/projectiles/mod.zig");
+const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
-const effects = @import("effects.zig");
 const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
 
 const Vec2 = math.Vec2;
 const HexWorld = @import("hex_world.zig").HexWorld;
 
-// Re-export BulletPool from lib/game/projectiles
-pub const BulletPool = projectiles.BulletPool;
+// Re-export BulletPool from lib/game/projectiles for compatibility
+pub const BulletPool = BulletPoolImpl;
 
-pub fn fireBullet(world: *HexWorld, target_pos: Vec2, pool: *BulletPool) bool {
+pub fn fireBullet(world: *HexWorld, target_pos: Vec2, pool: *BulletPoolImpl) bool {
     if (!world.getPlayerAlive()) return false;
     if (!pool.canFire()) return false;
 
@@ -40,7 +39,7 @@ pub fn fireBullet(world: *HexWorld, target_pos: Vec2, pool: *BulletPool) bool {
     return false;
 }
 
-pub fn fireBulletAtMouse(world: *HexWorld, mouse_pos: Vec2, pool: *BulletPool) bool {
+pub fn fireBulletAtMouse(world: *HexWorld, mouse_pos: Vec2, pool: *BulletPoolImpl) bool {
     return fireBullet(world, mouse_pos, pool);
 }
 

@@ -8,7 +8,7 @@ const Color = colors.Color;
 const constants = @import("constants.zig");
 
 // Border animation constants
-const ASPECT_RATIO = 16.0 / 9.0;
+// Use constants.ASPECT_RATIO instead
 
 // Screen constants for border calculations
 const SCREEN_WIDTH = constants.SCREEN_WIDTH;
@@ -42,7 +42,7 @@ pub const GREEN_COLORS = BorderColorPair{
 };
 
 // Border system for declarative stacked borders
-const MAX_BORDER_LAYERS = 8;
+// Use constants.MAX_BORDER_LAYERS instead
 
 pub const BorderSpec = struct {
     base_width: f32,
@@ -78,7 +78,7 @@ pub const BorderSpec = struct {
 };
 
 pub const BorderStack = struct {
-    specs: [MAX_BORDER_LAYERS]BorderSpec,
+    specs: [constants.MAX_BORDER_LAYERS]BorderSpec,
     count: usize,
 
     const Self = @This();
@@ -95,7 +95,7 @@ pub const BorderStack = struct {
     }
 
     pub fn push(self: *Self, base_width: f32, base_color: Color, color_pair: ?BorderColorPair, pulse_freq: ?f32, pulse_amplitude: f32) void {
-        if (self.count < MAX_BORDER_LAYERS) {
+        if (self.count < constants.MAX_BORDER_LAYERS) {
             self.specs[self.count] = BorderSpec{
                 .base_width = base_width,
                 .base_color = base_color,
@@ -145,7 +145,7 @@ fn calculateAnimationPulse(frequency: f32) f32 {
 }
 
 fn calculateColorCycle() f32 {
-    const COLOR_CYCLE_FREQ = 4.0;
+    const COLOR_CYCLE_FREQ = constants.COLOR_CYCLE_FREQ;
     const current_time_ms = @as(f32, @floatFromInt(c.sdl.SDL_GetTicks()));
     const current_time_sec = current_time_ms / 1000.0;
     return (math.sin(current_time_sec * COLOR_CYCLE_FREQ) + 1.0) * 0.5;

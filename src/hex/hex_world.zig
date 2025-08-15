@@ -589,17 +589,17 @@ pub const HexWorld = struct {
     // ===== ECS Query Helpers for Obstacles, Lifestones, Portals =====
 
     /// Query obstacles in current zone using ECS components
-    pub fn queryObstaclesInCurrentZone(self: *const HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
+    pub fn queryObstaclesInCurrentZone(self: *HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
         const zone = self.getCurrentZoneConst();
         self.queryObstaclesInZone(zone, CallbackFn, callback);
     }
 
     /// Query obstacles in specific zone using ECS components
-    pub fn queryObstaclesInZone(self: *const HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
-        _ = zone; // TODO: Zone-specific filtering when we add zone tracking to entities
+    pub fn queryObstaclesInZone(self: *HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
+        _ = zone; // Note: Zone-specific filtering not implemented yet
 
         // Query all terrain entities with transform and visual
-        var terrain_iter = @constCast(&self.world.terrains).iterator();
+        var terrain_iter = self.world.terrains.iterator();
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
             const terrain = entry.value_ptr.*;
@@ -618,17 +618,17 @@ pub const HexWorld = struct {
     }
 
     /// Query lifestones in current zone using ECS components
-    pub fn queryLifestonesInCurrentZone(self: *const HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
+    pub fn queryLifestonesInCurrentZone(self: *HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
         const zone = self.getCurrentZoneConst();
         self.queryLifestonesInZone(zone, CallbackFn, callback);
     }
 
     /// Query lifestones in specific zone using ECS components
-    pub fn queryLifestonesInZone(self: *const HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
-        _ = zone; // TODO: Zone-specific filtering when we add zone tracking to entities
+    pub fn queryLifestonesInZone(self: *HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
+        _ = zone; // Note: Zone-specific filtering not implemented yet
 
         // Query terrain entities that are interact type (lifestones)
-        var terrain_iter = @constCast(&self.world.terrains).iterator();
+        var terrain_iter = self.world.terrains.iterator();
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
             const terrain = entry.value_ptr.*;
@@ -650,17 +650,17 @@ pub const HexWorld = struct {
     }
 
     /// Query portals in current zone using ECS components
-    pub fn queryPortalsInCurrentZone(self: *const HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
+    pub fn queryPortalsInCurrentZone(self: *HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
         const zone = self.getCurrentZoneConst();
         self.queryPortalsInZone(zone, CallbackFn, callback);
     }
 
     /// Query portals in specific zone using ECS components
-    pub fn queryPortalsInZone(self: *const HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
-        _ = zone; // TODO: Zone-specific filtering when we add zone tracking to entities
+    pub fn queryPortalsInZone(self: *HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
+        _ = zone; // Note: Zone-specific filtering not implemented yet
 
         // Query terrain entities that are door type (portals)
-        var terrain_iter = @constCast(&self.world.terrains).iterator();
+        var terrain_iter = self.world.terrains.iterator();
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
             const terrain = entry.value_ptr.*;

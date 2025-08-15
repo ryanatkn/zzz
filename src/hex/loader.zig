@@ -2,6 +2,7 @@ const std = @import("std");
 const hex_world = @import("hex_world.zig");
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
+const log_throttle = @import("../lib/debug/log_throttle.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -32,8 +33,7 @@ pub fn loadGameData(allocator: std.mem.Allocator, world: *hex_world.HexWorld) !v
     const gameDataNullTerm = try arena_allocator.dupeZ(u8, gameDataFile);
 
     const game_data = std.zon.parse.fromSlice(GameData, arena_allocator, gameDataNullTerm, null, .{}) catch |err| {
-        std.debug.print("Failed to parse ZON file: {}\n", .{err});
-        std.debug.print("This is likely due to a mismatch between the ZON file structure and the expected GameData struct\n", .{});
+        log_throttle.logError("zon_parse_error", "Failed to parse ZON file: {}. Check structure match with GameData struct", .{err});
         return err;
     };
 
