@@ -1,6 +1,6 @@
 const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
-const log_throttle = @import("../lib/debug/log_throttle.zig");
+const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
 const hex_world = @import("hex_world.zig");
 const behaviors = @import("behaviors.zig");
@@ -210,9 +210,9 @@ pub const GameState = struct {
     pub fn togglePause(self: *Self) void {
         self.game_paused = !self.game_paused;
         if (self.game_paused) {
-            log_throttle.logInfo("game_paused", "Game paused", .{});
+            loggers.getGameLog().info("game_paused", "Game paused", .{});
         } else {
-            log_throttle.logInfo("game_resumed", "Game resumed", .{});
+            loggers.getGameLog().info("game_resumed", "Game resumed", .{});
         }
     }
 
@@ -233,7 +233,7 @@ pub const GameState = struct {
         self.world.resetCurrentZone() catch |err| {
             std.log.err("Failed to reset zone: {}", .{err});
         };
-        log_throttle.logInfo("zone_reset", "Zone units reset to original state", .{});
+        loggers.getGameLog().info("zone_reset", "Zone units reset to original state", .{});
     }
 
     pub fn resetGame(self: *Self) void {
@@ -256,7 +256,7 @@ pub const GameState = struct {
         self.effect_system.clear();
         self.effect_system.refreshAmbientEffects(&self.world);
 
-        log_throttle.logInfo("full_reset", "Full game reset", .{});
+        loggers.getGameLog().info("full_reset", "Full game reset", .{});
     }
 
     /// Check if all lifestones across all zones are attuned using ECS queries
@@ -539,7 +539,7 @@ fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_
                         visual.color = constants.COLOR_LIFESTONE_ATTUNED;
                     }
 
-                    log_throttle.logInfo("lifestone_attuned", "Lifestone attuned!", .{});
+                    loggers.getGameLog().info("lifestone_attuned", "Lifestone attuned!", .{});
 
                     // Emit lifestone attuned event
                     if (game_state.state_manager) |manager| {

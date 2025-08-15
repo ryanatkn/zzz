@@ -81,7 +81,7 @@ pub fn Logger(comptime config: LoggerConfig) type {
             // Apply formatter if present
             const formatted_message = if (@hasDecl(@TypeOf(self.formatter), "format")) blk: {
                 var format_buffer: [1024]u8 = undefined;
-                break :blk self.formatter.format(&format_buffer, level, final_message) catch final_message;
+                break :blk self.formatter.format(format_buffer[0..], level, final_message) catch final_message;
             } else final_message;
             
             // Send to output

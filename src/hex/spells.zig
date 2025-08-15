@@ -6,7 +6,7 @@ const components = @import("../lib/game/components.zig");
 const entity = @import("../lib/game/entity.zig");
 const world_mod = @import("../lib/game/world.zig");
 const ecs = @import("../lib/game/ecs.zig");
-const log_throttle = @import("../lib/debug/log_throttle.zig");
+const loggers = @import("../lib/debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 const Zone = @import("hex_world.zig").HexWorld.Zone;
@@ -137,14 +137,14 @@ pub const SpellSystem = struct {
                 // Add area of effect visual indicator
                 effect_system.addLullAreaEffect(target_pos, constants.LULL_RADIUS, constants.LULL_DURATION);
 
-                log_throttle.logInfo("lull_cast", "Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s", .{ target_pos.x, target_pos.y, constants.LULL_DURATION });
+                loggers.getGameLog().info("lull_cast", "Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s", .{ target_pos.x, target_pos.y, constants.LULL_DURATION });
                 return true;
             },
 
             .Blink => {
                 // Only works in dungeons (follow camera mode)
                 if (zone.camera_mode != constants.CameraMode.follow) {
-                    log_throttle.logInfo("blink_dungeon_only", "Blink only works in dungeons", .{});
+                    loggers.getGameLog().info("blink_dungeon_only", "Blink only works in dungeons", .{});
                     return false;
                 }
 
@@ -164,12 +164,12 @@ pub const SpellSystem = struct {
 
                 // Visual effects
                 effect_system.addPortalTravelEffect(world.getPlayerPos(), world.getPlayerRadius());
-                log_throttle.logInfo("blink_teleport", "Blink teleport", .{});
+                loggers.getGameLog().info("blink_teleport", "Blink teleport", .{});
                 return true;
             },
 
             else => {
-                log_throttle.logInfo("unimplemented_spell", "Spell {} not implemented yet", .{spell});
+                loggers.getGameLog().info("unimplemented_spell", "Spell {} not implemented yet", .{spell});
                 return false;
             },
         }

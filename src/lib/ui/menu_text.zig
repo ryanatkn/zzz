@@ -5,7 +5,7 @@ const text_renderer = @import("../text/renderer.zig");
 const font_manager = @import("../font/manager.zig");
 const drawing = @import("../rendering/drawing.zig");
 const font_config = @import("../font/config.zig");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -63,7 +63,7 @@ pub const MenuTextRenderer = struct {
     pub fn queueButtonText(self: *Self, text: []const u8, rect: Rectangle, is_hovered: bool) void {
         // Skip empty text to prevent crashes
         if (text.len == 0) {
-            log_throttle.logDebug("empty_button", "Skipping empty button text", .{});
+            loggers.getUILog().debug("empty_button", "Skipping empty button text", .{});
             return;
         }
 
@@ -72,10 +72,10 @@ pub const MenuTextRenderer = struct {
 
         const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
 
-        log_throttle.logDebug("queue_button", "Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{ text, text_pos.x, text_pos.y, rect.size.x, rect.size.y });
+        loggers.getUILog().debug("queue_button", "Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{ text, text_pos.x, text_pos.y, rect.size.x, rect.size.y });
 
         self.text_renderer.queuePersistentText(text, text_pos, self.font_manager, .sans, style.font_size(), text_color) catch |err| {
-            log_throttle.logError("button_error", "Failed to queue button text '{s}': {}", .{ text, err });
+            loggers.getUILog().err("button_error", "Failed to queue button text '{s}': {}", .{ text, err });
         };
     }
 
@@ -83,7 +83,7 @@ pub const MenuTextRenderer = struct {
     pub fn queueNavigationText(self: *Self, text: []const u8, position: Vec2) void {
         // Skip empty text to prevent crashes
         if (text.len == 0) {
-            log_throttle.logDebug("empty_nav", "Skipping empty navigation text", .{});
+            loggers.getUILog().debug("empty_nav", "Skipping empty navigation text", .{});
             return;
         }
 
@@ -92,7 +92,7 @@ pub const MenuTextRenderer = struct {
         // Debug logging disabled to reduce spam
 
         self.text_renderer.queuePersistentText(text, position, self.font_manager, .sans, style.font_size(), style.color) catch |err| {
-            log_throttle.logError("nav_error", "Failed to queue navigation text '{s}': {}", .{ text, err });
+            loggers.getUILog().err("nav_error", "Failed to queue navigation text '{s}': {}", .{ text, err });
         };
     }
 
@@ -103,14 +103,14 @@ pub const MenuTextRenderer = struct {
         const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
 
         self.text_renderer.queuePersistentText(text, text_pos, self.font_manager, .sans, style.font_size(), style.color) catch |err| {
-            log_throttle.logError("header_error", "Failed to queue header text '{s}': {}", .{ text, err });
+            loggers.getUILog().err("header_error", "Failed to queue header text '{s}': {}", .{ text, err });
         };
     }
 
     /// Queue text at a specific position with custom style
     pub fn queueCustomText(self: *Self, text: []const u8, position: Vec2, font_size: f32, color: Color) void {
         self.text_renderer.queuePersistentText(text, position, self.font_manager, .sans, font_size, color) catch |err| {
-            log_throttle.logError("custom_error", "Failed to queue custom text '{s}': {}", .{ text, err });
+            loggers.getUILog().err("custom_error", "Failed to queue custom text '{s}': {}", .{ text, err });
         };
     }
 };

@@ -1,5 +1,5 @@
 const std = @import("std");
-const log_throttle = @import("../lib/debug/log_throttle.zig");
+const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
 const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
 const behaviors = @import("behaviors.zig");
@@ -55,7 +55,7 @@ pub fn respawnPlayer(game_state: anytype) void {
             game_state.travelToZone(result.zone_index) catch |err| {
                 std.log.err("Failed to travel to zone {}: {}", .{ result.zone_index, err });
             };
-            log_throttle.logInfo("travel_to_lifestone", "Traveling to zone {} for nearest lifestone", .{result.zone_index});
+            loggers.getGameLog().info("travel_to_lifestone", "Traveling to zone {} for nearest lifestone", .{result.zone_index});
         }
         respawn_pos = result.pos;
     } else {
@@ -63,7 +63,7 @@ pub fn respawnPlayer(game_state: anytype) void {
             game_state.travelToZone(0) catch |err| {
                 std.log.err("Failed to travel to overworld: {}", .{err});
             };
-            log_throttle.logInfo("no_lifestones", "No lifestones found, returning to overworld spawn", .{});
+            loggers.getGameLog().info("no_lifestones", "No lifestones found, returning to overworld spawn", .{});
         }
         respawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
     }
@@ -74,17 +74,17 @@ pub fn respawnPlayer(game_state: anytype) void {
     world.setPlayerAlive(true);
     world.setPlayerColor(constants.COLOR_PLAYER_ALIVE);
     effect_system.addPlayerSpawnEffect(respawn_pos, world.getPlayerRadius());
-    log_throttle.logInfo("player_respawn", "Player respawned!", .{});
+    loggers.getGameLog().info("player_respawn", "Player respawned!", .{});
 }
 
 pub fn handlePlayerDeath(world: *HexWorld) void {
     world.setPlayerAlive(false);
-    log_throttle.logInfo("player_death", "Player died! Press R or click to respawn", .{});
+    loggers.getGameLog().info("player_death", "Player died! Press R or click to respawn", .{});
 }
 
 pub fn handlePlayerDeathOnHazard(world: *HexWorld) void {
     world.setPlayerAlive(false);
-    log_throttle.logInfo("player_hazard_death", "Player died on hazard! Press R or click to respawn", .{});
+    loggers.getGameLog().info("player_hazard_death", "Player died on hazard! Press R or click to respawn", .{});
 }
 
 // ECS-compatible unit death on hazard
@@ -96,5 +96,5 @@ pub fn handleUnitDeathOnHazardECS(unit_entity: ecs.EntityId, world: *HexWorld) v
     if (ecs_world.visuals.get(unit_entity)) |visual| {
         visual.color = constants.COLOR_DEAD;
     }
-    log_throttle.logInfo("unit_hazard_death", "Unit died on hazard!", .{});
+    loggers.getGameLog().info("unit_hazard_death", "Unit died on hazard!", .{});
 }

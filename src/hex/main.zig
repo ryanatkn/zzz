@@ -1,7 +1,5 @@
 const std = @import("std");
-const Logger = @import("../lib/debug/logger.zig").Logger;
-const outputs = @import("../lib/debug/outputs.zig");
-const filters = @import("../lib/debug/filters.zig");
+const loggers = @import("../lib/debug/loggers.zig");
 const c = @import("../lib/platform/sdl.zig");
 
 // Engine imports
@@ -71,15 +69,8 @@ var game_state: ?*GameState = null;
 var game_hud: ?*Hud = null;
 var global_allocator: std.mem.Allocator = undefined;
 
-// Configure logger for console + file output with throttling
-const AppLogger = Logger(.{
-    .output = outputs.Multi(.{ 
-        outputs.Console, 
-        outputs.File(.{ .path = "game.log" })
-    }),
-    .filter = filters.Throttle,
-});
-var logger: ?AppLogger = null;
+// Use pre-configured game logger from loggers module
+var logger: ?loggers.GameLogger = null;
 
 // Timing
 var last_time: u64 = 0;
@@ -103,13 +94,14 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     try reactive_time.initGlobalTime(global_allocator, .Second);
     try reactive_text_cache.initGlobalTextCache(global_allocator);
 
+    // Initialize loggers FIRST (before other components that might use them)
+    logger = loggers.GameLogger.init(global_allocator);
+    try loggers.initGlobalLoggers(global_allocator);
+
     // Initialize renderer (heap allocated to avoid memory corruption)
     game_renderer = try global_allocator.create(GameRenderer);
     errdefer global_allocator.destroy(game_renderer.?);
     game_renderer.?.* = try GameRenderer.init(global_allocator, window);
-
-    // Initialize logger (console + file output with throttling)
-    logger = AppLogger.init(global_allocator);
 
     // Initialize persistent text system (needs GPU device from renderer)
     try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.?.gpu.device);
@@ -213,6 +205,7 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
             if (logger) |*log| {
                 log.deinit();
             }
+            loggers.deinitGlobalLoggers();
         }
         c.sdl.SDL_DestroyWindow(window);
         fully_initialized = false;

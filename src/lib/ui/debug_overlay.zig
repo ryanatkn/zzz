@@ -8,7 +8,7 @@ const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent
 const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -115,7 +115,7 @@ pub const DebugOverlayData = struct {
         try self.values.append(debug_value);
         self.values_changed.set(true);
 
-        log_throttle.logInfo("add_debug_value", "Added debug value '{s}' with {s} mode (changes: {d:.2}/sec)", .{ key, @tagName(recommended_mode.recommended_mode), change_frequency });
+        loggers.getUILog().info("add_debug_value", "Added debug value '{s}' with {s} mode (changes: {d:.2}/sec)", .{ key, @tagName(recommended_mode.recommended_mode), change_frequency });
     }
 
     pub fn updateValue(self: *Self, key: []const u8, new_value: DebugValue.ValueType) !void {
@@ -152,7 +152,7 @@ pub const DebugOverlayData = struct {
     pub fn render(self: *Self, renderer: *text_renderer.TextRenderer, font_manager: anytype, font_category: anytype) !void {
         if (!self.is_visible.peek() or self.values.items.len == 0) return;
 
-        log_throttle.logDebug("render_overlay", "Rendering debug overlay with {} values", .{self.values.items.len});
+        loggers.getUILog().debug("render_overlay", "Rendering debug overlay with {} values", .{self.values.items.len});
 
         // Render background if specified
         if (self.background_color) |bg_color| {
@@ -176,19 +176,19 @@ pub const DebugOverlayData = struct {
                 .immediate => {
                     // Use immediate mode for frequently changing values
                     const text_result = font_manager.renderTextToTexture(formatted_text, font_category, self.font_size, self.color, renderer.device) catch |err| {
-                        log_throttle.logError("render_error", "Failed to render debug text '{}': {}", .{ formatted_text, err });
+                        loggers.getUILog().err("render_error", "Failed to render debug text '{}': {}", .{ formatted_text, err });
                         continue;
                     };
 
                     renderer.queueTextTexture(text_result.texture, line_position, text_result.width, text_result.height, self.color);
 
-                    log_throttle.logDebug("render_immediate", "Rendered immediate debug text: '{s}'", .{formatted_text});
+                    loggers.getUILog().debug("render_immediate", "Rendered immediate debug text: '{s}'", .{formatted_text});
                 },
                 .persistent => {
                     // Use persistent mode for slowly changing values
                     try renderer.queuePersistentText(formatted_text, line_position, font_manager, font_category, self.font_size, self.color);
 
-                    log_throttle.logDebug("queue_persistent", "Queued persistent debug text: '{s}'", .{formatted_text});
+                    loggers.getUILog().debug("queue_persistent", "Queued persistent debug text: '{s}'", .{formatted_text});
                 },
             }
         }
@@ -239,18 +239,18 @@ pub const DebugOverlayData = struct {
     // Component vtable implementation
     fn onMount(state: *anyopaque) !void {
         _ = state;
-        log_throttle.logInfo("mount", "Debug overlay component mounted", .{});
+        loggers.getUILog().info("mount", "Debug overlay component mounted", .{});
     }
 
     fn onUnmount(state: *anyopaque) void {
         _ = state;
-        log_throttle.logInfo("unmount", "Debug overlay component unmounted", .{});
+        loggers.getUILog().info("unmount", "Debug overlay component unmounted", .{});
     }
 
     fn onRender(state: *anyopaque) !void {
         const self = @as(*DebugOverlayData, @ptrCast(@alignCast(state)));
 
-        log_throttle.logDebug("reactive_render", "Debug overlay render triggered - {} values, visible: {}", .{ self.values.items.len, self.is_visible.peek() });
+        loggers.getUILog().debug("reactive_render", "Debug overlay render triggered - {} values, visible: {}", .{ self.values.items.len, self.is_visible.peek() });
     }
 
     fn shouldRender(state: *anyopaque) bool {

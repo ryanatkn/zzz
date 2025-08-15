@@ -9,7 +9,7 @@ const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent
 const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
-const log_throttle = @import("../debug/log_throttle.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -121,7 +121,7 @@ pub const FPSCounterData = struct {
             self.current_fps.set(new_fps);
             self.last_update_time.set(@as(u64, @intCast(std.time.milliTimestamp())));
 
-            log_throttle.logInfo("fps_change", "FPS counter updated: {} -> {}", .{ old_fps, new_fps });
+            loggers.getUILog().info("fps_change", "FPS counter updated: {} -> {}", .{ old_fps, new_fps });
         }
     }
 
@@ -140,7 +140,7 @@ pub const FPSCounterData = struct {
         // This follows the rendering mode guidelines - FPS changes ~1-3 times per second
         try renderer.queuePersistentText(fps_text, self.position, font_manager, font_category, self.font_size, self.color);
 
-        log_throttle.logDebug("render", "FPS counter rendered: '{s}' at ({d:.1}, {d:.1})", .{ fps_text, self.position.x, self.position.y });
+        loggers.getUILog().debug("render", "FPS counter rendered: '{s}' at ({d:.1}, {d:.1})", .{ fps_text, self.position.x, self.position.y });
     }
 
     pub fn deinit(self: *Self) void {
@@ -162,19 +162,19 @@ pub const FPSCounterData = struct {
     // Component vtable implementation
     fn onMount(state: *anyopaque) !void {
         _ = state;
-        log_throttle.logInfo("mount", "FPS counter component mounted", .{});
+        loggers.getUILog().info("mount", "FPS counter component mounted", .{});
     }
 
     fn onUnmount(state: *anyopaque) void {
         _ = state;
-        log_throttle.logInfo("unmount", "FPS counter component unmounted", .{});
+        loggers.getUILog().info("unmount", "FPS counter component unmounted", .{});
     }
 
     fn onRender(state: *anyopaque) !void {
         const self = @as(*FPSCounterData, @ptrCast(@alignCast(state)));
 
         // This is called when reactive dependencies change
-        log_throttle.logDebug("reactive_render", "FPS counter render triggered - FPS: {}, visible: {}", .{ self.current_fps.peek(), self.is_visible.peek() });
+        loggers.getUILog().debug("reactive_render", "FPS counter render triggered - FPS: {}, visible: {}", .{ self.current_fps.peek(), self.is_visible.peek() });
     }
 
     fn shouldRender(state: *anyopaque) bool {
