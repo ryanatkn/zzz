@@ -4,17 +4,17 @@ const std = @import("std");
 pub fn EventListener(comptime EventType: type) type {
     return struct {
         const Self = @This();
-        
+
         event_system: *anyopaque,
         callbacks: std.ArrayList(CallbackEntry),
         allocator: std.mem.Allocator,
-        
+
         const CallbackEntry = struct {
             event_tag: @typeInfo(EventType).@"union".tag_type.?,
             callback: *const fn (event: EventType, ctx: ?*anyopaque) void,
             context: ?*anyopaque,
         };
-        
+
         pub fn init(allocator: std.mem.Allocator, event_system: *anyopaque) Self {
             return .{
                 .event_system = event_system,
@@ -22,11 +22,11 @@ pub fn EventListener(comptime EventType: type) type {
                 .allocator = allocator,
             };
         }
-        
+
         pub fn deinit(self: *Self) void {
             self.callbacks.deinit();
         }
-        
+
         /// Register a callback and track it for later cleanup
         pub fn on(self: *Self, event_tag: @typeInfo(EventType).@"union".tag_type.?, callback: *const fn (EventType, ?*anyopaque) void, context: ?*anyopaque) !void {
             try self.callbacks.append(.{
@@ -34,22 +34,22 @@ pub fn EventListener(comptime EventType: type) type {
                 .callback = callback,
                 .context = context,
             });
-            
+
             // Register with the actual event system
             const system = @as(*@import("system.zig").EventSystem(EventType), @ptrCast(@alignCast(self.event_system)));
             try system.on(event_tag, callback, context);
         }
-        
+
         /// Unregister all callbacks registered through this listener
         pub fn removeAll(self: *Self) void {
             const system = @as(*@import("system.zig").EventSystem(EventType), @ptrCast(@alignCast(self.event_system)));
-            
+
             for (self.callbacks.items) |entry| {
                 // Note: This removes ALL listeners for the event type
                 // A more sophisticated implementation would track individual callbacks
                 system.off(entry.event_tag);
             }
-            
+
             self.callbacks.clearRetainingCapacity();
         }
     };

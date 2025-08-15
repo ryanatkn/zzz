@@ -183,27 +183,26 @@ pub const SpellSystem = struct {
         }
     }
 
-/// Apply lull effect to all units in the specified area using ECS Effects
-fn applyLullEffectToUnitsInArea(world: *HexWorld, center_pos: Vec2, radius: f32, duration: f32, effect_system: *effects.EffectSystem) void {
-        
+    /// Apply lull effect to all units in the specified area using ECS Effects
+    fn applyLullEffectToUnitsInArea(world: *HexWorld, center_pos: Vec2, radius: f32, duration: f32, effect_system: *effects.EffectSystem) void {
         const ecs_world = world.getECSWorld();
-        
+
         // Query all units and check if they're in the area
         var unit_iter = @constCast(&ecs_world.units).iterator();
         while (unit_iter.next()) |entry| {
             const unit_id = entry.key_ptr.*;
-            
+
             // Skip if unit is not alive
             var ecs_world_mut = @constCast(ecs_world);
             if (!ecs_world_mut.isAlive(unit_id)) continue;
-            
+
             // Get unit position
             if (ecs_world.transforms.getConst(unit_id)) |transform| {
                 // Check if unit is within the lull area
                 const to_center = transform.pos.sub(center_pos);
                 const dist_sq = to_center.lengthSquared();
                 const radius_sq = radius * radius;
-                
+
                 if (dist_sq <= radius_sq) {
                     // Unit is in area - apply lull effect
                     applyLullEffectToUnit(ecs_world_mut, unit_id, duration, transform.pos, transform.radius, effect_system);
@@ -211,10 +210,10 @@ fn applyLullEffectToUnitsInArea(world: *HexWorld, center_pos: Vec2, radius: f32,
             }
         }
     }
-    
-/// Apply lull effect to a specific unit using ECS Effects component  
-fn applyLullEffectToUnit(ecs_world: *World, unit_id: EntityId, duration: f32, unit_pos: Vec2, unit_radius: f32, effect_system: *effects.EffectSystem) void {
-        
+
+    /// Apply lull effect to a specific unit using ECS Effects component
+    fn applyLullEffectToUnit(ecs_world: *World, unit_id: EntityId, duration: f32, unit_pos: Vec2, unit_radius: f32, effect_system: *effects.EffectSystem) void {
+
         // Get or create Effects component for this unit
         const effects_component = ecs_world.effects.get(unit_id) orelse blk: {
             // Create new Effects component
@@ -222,7 +221,7 @@ fn applyLullEffectToUnit(ecs_world: *World, unit_id: EntityId, duration: f32, un
             ecs_world.effects.add(unit_id, new_effects) catch return;
             break :blk ecs_world.effects.get(unit_id).?;
         };
-        
+
         // Add lull modifier
         const lull_modifier = @import("../lib/game/components.zig").Effects.Modifier{
             .type = .aggro_mult,
@@ -231,9 +230,9 @@ fn applyLullEffectToUnit(ecs_world: *World, unit_id: EntityId, duration: f32, un
             .stack_type = .replace, // New lull replaces old
             .source = unit_id, // Self-applied for now
         };
-        
+
         effects_component.addModifier(lull_modifier) catch return;
-        
+
         // Add visual effect aura around the affected unit
         effect_system.addUnitEffectAura(unit_pos, unit_radius, duration);
     }
@@ -243,7 +242,7 @@ fn applyLullEffectToUnit(ecs_world: *World, unit_id: EntityId, duration: f32, un
         _ = unit_pos; // Position-based lookup is deprecated
         return 1.0; // Fallback - ECS method should be used instead
     }
-    
+
     /// Get aggro multiplier for a unit using ECS Effects component
     pub fn getAggroMultiplierForUnitECS(unit_id: EntityId, ecs_world: *const World) f32 {
         // Get Effects component for this unit

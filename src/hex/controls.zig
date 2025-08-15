@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const c = @import("../lib/platform/sdl.zig");
 
 const math = @import("../lib/math/mod.zig");
@@ -27,7 +26,7 @@ pub fn handleSDLEvent(
         const handled = try hud_sys.handleEvent(event.*);
         if (handled) return c.sdl.SDL_APP_CONTINUE;
     }
-    
+
     // Legacy HUD doesn't block events - it's just a display overlay
 
     switch (event.type) {
@@ -85,7 +84,7 @@ pub fn handleSDLEvent(
         },
         c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
             game_state.input_state.handleMouseButtonDown(event.button.button);
-            
+
             // Don't handle game actions if HUD is open
             if (game_state.hud_system) |*hud_sys| {
                 if (hud_sys.is_open()) {
@@ -96,7 +95,7 @@ pub fn handleSDLEvent(
             } else {
                 std.debug.print("No HUD system - allowing game input\n", .{});
             }
-            
+
             switch (event.button.button) {
                 c.sdl.SDL_BUTTON_LEFT => {
                     if (!game_state.world.getPlayerAlive()) {
@@ -113,14 +112,8 @@ pub fn handleSDLEvent(
                         const screen_mouse_pos = game_state.input_state.getMousePos();
                         const world_mouse_pos = game_renderer.camera.screenToWorldSafe(screen_mouse_pos);
                         const zone = game_state.world.getCurrentZoneConst();
-                        
-                        _ = game_state.spell_system.castActiveSpell(
-                            &game_state.world,
-                            zone,
-                            world_mouse_pos,
-                            &game_state.effect_system,
-                            ctrl_held
-                        );
+
+                        _ = game_state.spell_system.castActiveSpell(&game_state.world, zone, world_mouse_pos, &game_state.effect_system, ctrl_held);
                     }
                 },
                 else => {},

@@ -1,6 +1,5 @@
 /// ECS (Entity Component System) barrel export
 /// Provides core abstractions for game entity management
-
 pub const entity = @import("entity.zig");
 pub const storage = @import("storage.zig");
 pub const components = @import("components.zig");

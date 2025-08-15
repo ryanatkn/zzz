@@ -6,22 +6,22 @@ pub fn EventSystem(comptime EventType: type) type {
     return struct {
         const Self = @This();
         const Callback = *const fn (event: EventType, ctx: ?*anyopaque) void;
-        
+
         const Listener = struct {
             callback: Callback,
             context: ?*anyopaque,
         };
-        
+
         allocator: std.mem.Allocator,
         listeners: std.AutoHashMap(@typeInfo(EventType).@"union".tag_type.?, ArrayList(Listener)),
-        
+
         pub fn init(allocator: std.mem.Allocator) Self {
             return .{
                 .allocator = allocator,
                 .listeners = std.AutoHashMap(@typeInfo(EventType).@"union".tag_type.?, ArrayList(Listener)).init(allocator),
             };
         }
-        
+
         pub fn deinit(self: *Self) void {
             var iter = self.listeners.iterator();
             while (iter.next()) |entry| {
@@ -29,7 +29,7 @@ pub fn EventSystem(comptime EventType: type) type {
             }
             self.listeners.deinit();
         }
-        
+
         /// Register a listener for a specific event type
         pub fn on(self: *Self, event_tag: @typeInfo(EventType).@"union".tag_type.?, callback: Callback, context: ?*anyopaque) !void {
             const result = try self.listeners.getOrPut(event_tag);
@@ -41,7 +41,7 @@ pub fn EventSystem(comptime EventType: type) type {
                 .context = context,
             });
         }
-        
+
         /// Emit an event to all registered listeners
         pub fn emit(self: *Self, event: EventType) void {
             const event_tag = std.meta.activeTag(event);
@@ -51,7 +51,7 @@ pub fn EventSystem(comptime EventType: type) type {
                 }
             }
         }
-        
+
         /// Remove all listeners for a specific event type
         pub fn off(self: *Self, event_tag: @typeInfo(EventType).@"union".tag_type.?) void {
             if (self.listeners.fetchRemove(event_tag)) |entry| {
@@ -59,7 +59,7 @@ pub fn EventSystem(comptime EventType: type) type {
                 list.deinit();
             }
         }
-        
+
         /// Clear all event listeners
         pub fn clear(self: *Self) void {
             var iter = self.listeners.iterator();

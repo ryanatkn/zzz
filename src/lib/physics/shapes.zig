@@ -108,26 +108,26 @@ pub const PhysicsExt = struct {
 test "shape union operations" {
     const circle = Shape{ .circle = Circle.init(Vec2.init(0.0, 0.0), 5.0) };
     const rect = Shape{ .rectangle = Rectangle.fromXYWH(10.0, 10.0, 20.0, 30.0) };
-    
+
     try std.testing.expect(circle.contains(Vec2.init(3.0, 4.0)));
     try std.testing.expect(rect.contains(Vec2.init(15.0, 15.0)));
-    
+
     const circle_bounds = circle.getBounds();
     const rect_bounds = rect.getBounds();
-    
+
     try std.testing.expect(circle_bounds.width() == 10.0);
     try std.testing.expect(rect_bounds.width() == 20.0);
 }
 
 test "physics extensions" {
     var circle = Shape{ .circle = Circle.init(Vec2.init(0.0, 0.0), 5.0) };
-    
+
     const area = PhysicsExt.area(circle);
     try std.testing.expect(@abs(area - 78.54) < 0.1);
-    
+
     PhysicsExt.translate(&circle, Vec2.init(10.0, 0.0));
     try std.testing.expect(circle.center().x == 10.0);
-    
+
     PhysicsExt.scale(&circle, 2.0);
     try std.testing.expect(circle.circle.radius == 10.0);
 }

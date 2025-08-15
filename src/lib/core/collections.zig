@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const MAX_HISTORY = 50;
 const MAX_PATH_LEN = 256;
 

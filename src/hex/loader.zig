@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const hex_world = @import("hex_world.zig");
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
@@ -18,7 +17,7 @@ pub fn deinit() void {
     }
 }
 
-// Load game data from ZON file  
+// Load game data from ZON file
 pub fn loadGameData(allocator: std.mem.Allocator, world: *hex_world.HexWorld) !void {
     // Load game data from ZON file
     const gameDataFile = @embedFile("game_data.zon");
@@ -68,7 +67,7 @@ pub fn loadGameData(allocator: std.mem.Allocator, world: *hex_world.HexWorld) !v
 // Load a single zone from ZON data
 fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.HexWorld, zone_index: usize) !void {
     // Zone type is already set in HexWorld.init(), skip name setting
-    
+
     zone.background_color = Color{
         .r = data.background_color.r,
         .g = data.background_color.g,
@@ -91,10 +90,10 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         // Set current zone for entity creation
         const old_zone = world.current_zone;
         world.current_zone = zone_index;
-        
+
         for (obstacles) |obstacle_data| {
             const is_deadly = std.mem.eql(u8, obstacle_data.type, "deadly");
-            
+
             // Create ECS obstacle entity
             const obstacle_id = world.createObstacle(
                 Vec2{ .x = obstacle_data.position.x, .y = obstacle_data.position.y },
@@ -104,10 +103,10 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 std.log.err("Failed to create obstacle entity: {}", .{err});
                 continue;
             };
-            
+
             _ = obstacle_id; // Entity automatically tracked in zone.obstacle_entities
         }
-        
+
         // Restore current zone
         world.current_zone = old_zone;
     }
@@ -117,7 +116,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         // Set current zone for entity creation
         const old_zone = world.current_zone;
         world.current_zone = zone_index;
-        
+
         for (units) |unit_data| {
             // Create ECS unit entity (default to enemy type)
             const unit_id = world.createUnit(
@@ -129,10 +128,10 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 std.log.err("Failed to create unit entity: {}", .{err});
                 continue;
             };
-            
+
             _ = unit_id; // Unit created successfully as ECS entity
         }
-        
+
         // Restore current zone
         world.current_zone = old_zone;
     }
@@ -142,7 +141,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         // Set current zone for entity creation
         const old_zone = world.current_zone;
         world.current_zone = zone_index;
-        
+
         for (portals) |portal_data| {
             // Create ECS portal entity
             const portal_id = world.createPortal(
@@ -153,10 +152,10 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 std.log.err("Failed to create portal entity: {}", .{err});
                 continue;
             };
-            
+
             _ = portal_id; // Entity automatically tracked in zone.portal_entities
         }
-        
+
         // Restore current zone
         world.current_zone = old_zone;
     }
@@ -166,11 +165,11 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         // Set current zone for entity creation
         const old_zone = world.current_zone;
         world.current_zone = zone_index;
-        
+
         for (lifestones) |lifestone_data| {
             // First lifestone in overworld (zone 0) is pre-attuned
             const pre_attuned = (zone.lifestone_entities.items.len == 0 and std.mem.eql(u8, data.name, "Overworld"));
-            
+
             // Create ECS lifestone entity
             const lifestone_id = world.createLifestone(
                 Vec2{ .x = lifestone_data.position.x, .y = lifestone_data.position.y },
@@ -180,10 +179,10 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 std.log.err("Failed to create lifestone entity: {}", .{err});
                 continue;
             };
-            
+
             _ = lifestone_id; // Entity automatically tracked in zone.lifestone_entities
         }
-        
+
         // Restore current zone
         world.current_zone = old_zone;
     }

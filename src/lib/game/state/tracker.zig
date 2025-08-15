@@ -5,9 +5,9 @@ pub const ProgressTracker = struct {
     allocator: std.mem.Allocator,
     achievements: std.StringHashMap(Achievement),
     statistics: std.StringHashMap(Statistic),
-    
+
     const Self = @This();
-    
+
     pub const Achievement = struct {
         id: []const u8,
         name: []const u8,
@@ -17,7 +17,7 @@ pub const ProgressTracker = struct {
         progress: f32, // 0.0 to 1.0
         target: f32,
     };
-    
+
     pub const Statistic = struct {
         id: []const u8,
         name: []const u8,
@@ -25,7 +25,7 @@ pub const ProgressTracker = struct {
         max_value: f64,
         total_accumulated: f64,
     };
-    
+
     pub fn init(allocator: std.mem.Allocator) Self {
         return .{
             .allocator = allocator,
@@ -33,12 +33,12 @@ pub const ProgressTracker = struct {
             .statistics = std.StringHashMap(Statistic).init(allocator),
         };
     }
-    
+
     pub fn deinit(self: *Self) void {
         self.achievements.deinit();
         self.statistics.deinit();
     }
-    
+
     /// Register a new achievement
     pub fn addAchievement(self: *Self, id: []const u8, name: []const u8, description: []const u8, target: f32) !void {
         try self.achievements.put(id, .{
@@ -51,14 +51,14 @@ pub const ProgressTracker = struct {
             .target = target,
         });
     }
-    
+
     /// Update achievement progress
     pub fn updateAchievementProgress(self: *Self, id: []const u8, progress: f32) !bool {
         if (self.achievements.getPtr(id)) |achievement| {
             if (achievement.unlocked) return false;
-            
+
             achievement.progress = @min(progress, achievement.target);
-            
+
             if (achievement.progress >= achievement.target) {
                 achievement.unlocked = true;
                 achievement.unlock_time = std.time.milliTimestamp();
@@ -67,7 +67,7 @@ pub const ProgressTracker = struct {
         }
         return false;
     }
-    
+
     /// Increment achievement progress
     pub fn incrementAchievement(self: *Self, id: []const u8, amount: f32) !bool {
         if (self.achievements.get(id)) |achievement| {
@@ -75,7 +75,7 @@ pub const ProgressTracker = struct {
         }
         return false;
     }
-    
+
     /// Check if an achievement is unlocked
     pub fn isAchievementUnlocked(self: *const Self, id: []const u8) bool {
         if (self.achievements.get(id)) |achievement| {
@@ -83,7 +83,7 @@ pub const ProgressTracker = struct {
         }
         return false;
     }
-    
+
     /// Get achievement progress (0.0 to 1.0)
     pub fn getAchievementProgress(self: *const Self, id: []const u8) f32 {
         if (self.achievements.get(id)) |achievement| {
@@ -93,7 +93,7 @@ pub const ProgressTracker = struct {
         }
         return 0.0;
     }
-    
+
     /// Register a new statistic
     pub fn addStatistic(self: *Self, id: []const u8, name: []const u8) !void {
         try self.statistics.put(id, .{
@@ -104,7 +104,7 @@ pub const ProgressTracker = struct {
             .total_accumulated = 0.0,
         });
     }
-    
+
     /// Update a statistic value
     pub fn updateStatistic(self: *Self, id: []const u8, value: f64) void {
         if (self.statistics.getPtr(id)) |stat| {
@@ -113,7 +113,7 @@ pub const ProgressTracker = struct {
             stat.total_accumulated += @abs(value - stat.value);
         }
     }
-    
+
     /// Increment a statistic
     pub fn incrementStatistic(self: *Self, id: []const u8, amount: f64) void {
         if (self.statistics.getPtr(id)) |stat| {
@@ -122,7 +122,7 @@ pub const ProgressTracker = struct {
             stat.total_accumulated += @abs(amount);
         }
     }
-    
+
     /// Get a statistic value
     pub fn getStatistic(self: *const Self, id: []const u8) ?f64 {
         if (self.statistics.get(id)) |stat| {
@@ -130,25 +130,25 @@ pub const ProgressTracker = struct {
         }
         return null;
     }
-    
+
     /// Get all unlocked achievements
     pub fn getUnlockedAchievements(self: *const Self, allocator: std.mem.Allocator) ![]Achievement {
         var unlocked = std.ArrayList(Achievement).init(allocator);
-        
+
         var iter = self.achievements.iterator();
         while (iter.next()) |entry| {
             if (entry.value_ptr.unlocked) {
                 try unlocked.append(entry.value_ptr.*);
             }
         }
-        
+
         return unlocked.toOwnedSlice();
     }
-    
+
     /// Get overall completion percentage
     pub fn getCompletionPercentage(self: *const Self) f32 {
         if (self.achievements.count() == 0) return 100.0;
-        
+
         var unlocked: f32 = 0.0;
         var iter = self.achievements.iterator();
         while (iter.next()) |entry| {
@@ -156,7 +156,7 @@ pub const ProgressTracker = struct {
                 unlocked += 1.0;
             }
         }
-        
+
         return (unlocked / @as(f32, @floatFromInt(self.achievements.count()))) * 100.0;
     }
 };

@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const log = std.log.scoped(.ttf_parser);
 
 pub const GlyphID = u16;

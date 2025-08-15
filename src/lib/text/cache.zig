@@ -14,7 +14,7 @@ pub const PersistentTextSystem = struct {
 
     // Rendering resources
     sampler: ?*c.sdl.SDL_GPUSampler,
-    
+
     // Circuit breaker to prevent infinite loops
     recent_failures: u32,
     last_failure_check: i64,
@@ -75,7 +75,7 @@ pub const PersistentTextSystem = struct {
             log_throttle.logError("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});
             return null;
         }
-        
+
         // Circuit breaker: Check if we're hitting too many failures
         const now = std.time.milliTimestamp();
         if (now - self.last_failure_check > 1000) {
@@ -87,7 +87,7 @@ pub const PersistentTextSystem = struct {
             log_throttle.logError("circuit_breaker", "Circuit breaker triggered: too many texture creation failures", .{});
             return null;
         }
-        
+
         const content_hash = self.hashText(text);
         const current_time = @as(u64, @intCast(std.time.milliTimestamp()));
 

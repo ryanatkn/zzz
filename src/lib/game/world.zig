@@ -190,14 +190,14 @@ pub const World = struct {
         // Create rectangular obstacle using width/height as radius for collision detection
         const radius = @max(size.x, size.y) / 2.0; // Use larger dimension for collision
         try self.transforms.add(id, components.Transform.init(pos, radius));
-        
+
         // Create visual component
-        const color = if (is_deadly) 
+        const color = if (is_deadly)
             colors.Color{ .r = 200, .g = 0, .b = 0, .a = 255 } // Red for deadly
-        else 
+        else
             colors.Color{ .r = 100, .g = 100, .b = 100, .a = 255 }; // Gray for blocking
         try self.visuals.add(id, components.Visual.init(color));
-        
+
         // Create terrain component with size information
         const terrain_type = if (is_deadly) components.Terrain.TerrainType.pit else components.Terrain.TerrainType.wall;
         try self.terrains.add(id, components.Terrain.init(terrain_type, size));
@@ -216,19 +216,19 @@ pub const World = struct {
         errdefer self.destroyEntity(id) catch {};
 
         try self.transforms.add(id, components.Transform.init(pos, radius));
-        
+
         // Create visual component with proper lifestone color
-        const color = if (attuned) 
+        const color = if (attuned)
             colors.Color{ .r = 0, .g = 255, .b = 255, .a = 255 } // Cyan for attuned
-        else 
+        else
             colors.Color{ .r = 128, .g = 128, .b = 255, .a = 255 }; // Light blue for unattuned
         try self.visuals.add(id, components.Visual.init(color));
-        
+
         // Create terrain component as altar type
         // Lifestones are circular, so create square size from radius
         const lifestone_size = components.Vec2{ .x = radius * 2.0, .y = radius * 2.0 };
         try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.altar, lifestone_size));
-        
+
         // Add interactable component for attunement
         var interactable = components.Interactable.init(components.Interactable.InteractionType.transformable);
         interactable.attuned = attuned;
@@ -248,16 +248,16 @@ pub const World = struct {
         errdefer self.destroyEntity(id) catch {};
 
         try self.transforms.add(id, components.Transform.init(pos, radius));
-        
+
         // Create visual component with portal color (purple/magenta)
         const color = colors.Color{ .r = 255, .g = 0, .b = 255, .a = 255 }; // Magenta
         try self.visuals.add(id, components.Visual.init(color));
-        
+
         // Create terrain component as door type (portals are like doors)
         // Portals are circular, so create square size from radius
         const portal_size = components.Vec2{ .x = radius * 2.0, .y = radius * 2.0 };
         try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.door, portal_size));
-        
+
         // Add interactable component for travel with destination
         try self.interactables.add(id, components.Interactable.initPortal(destination_zone));
 
@@ -279,7 +279,7 @@ pub const World = struct {
             *DenseStorage(C1)
         else
             *SparseStorage(C1);
-            
+
         const Storage2Type = if (C2 == components.Transform or C2 == components.Health or C2 == components.Movement or C2 == components.Visual)
             *DenseStorage(C2)
         else

@@ -402,7 +402,7 @@ pub const ReactiveHud = struct {
 
         // Render current page with layouts
         try hud_data.router.renderWithLayouts(&hud_data.links);
-        
+
         // Render custom GPU content for pages that need it
         if (hud_data.router.getCurrentPage()) |current_page| {
             try hud_data.renderer.renderPageContent(cmd_buffer, render_pass, current_page);

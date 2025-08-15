@@ -54,12 +54,12 @@ pub fn lerpAngle(from: f32, to: f32, t: f32) f32 {
 test "scalar math operations" {
     // Test lerp
     try std.testing.expect(equals(lerp(0.0, 10.0, 0.5), 5.0, 0.001));
-    
+
     // Test clamp
     try std.testing.expect(clamp(-5.0, 0.0, 10.0) == 0.0);
     try std.testing.expect(clamp(15.0, 0.0, 10.0) == 10.0);
     try std.testing.expect(clamp(5.0, 0.0, 10.0) == 5.0);
-    
+
     // Test equals
     try std.testing.expect(equals(1.0, 1.001, 0.01));
     try std.testing.expect(!equals(1.0, 1.1, 0.01));

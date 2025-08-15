@@ -43,7 +43,7 @@ pub const FontAtlas = struct {
     padding: u32,
     default_render_mode: RenderMode,
     sdf_generator: ?sdf_renderer.SDFGenerator,
-    
+
     // Performance optimization fields
     max_memory_bytes: usize,
     current_memory_bytes: usize,
@@ -214,7 +214,7 @@ pub const FontAtlas = struct {
         // Check memory limit before adding new glyph
         const bitmap_size = if (final_bitmap.len > 0) final_bitmap.len else 0;
         try self.ensureMemoryLimit(bitmap_size);
-        
+
         self.current_memory_bytes += bitmap_size;
         try self.glyph_cache.put(cache_key, info);
         try self.lru_order.append(cache_key);
@@ -287,7 +287,7 @@ pub const FontAtlas = struct {
         self.lru_order.clearRetainingCapacity();
         self.current_memory_bytes = 0;
     }
-    
+
     /// Update LRU order when glyph is accessed
     fn updateLRUOrder(self: *FontAtlas, cache_key: u64) void {
         // Find and remove the key from its current position
@@ -303,12 +303,12 @@ pub const FontAtlas = struct {
             log_throttle.logDebug("lru_append", "Failed to update LRU order for glyph key {}", .{cache_key});
         };
     }
-    
+
     /// Ensure memory usage stays within limits by evicting LRU glyphs
     fn ensureMemoryLimit(self: *FontAtlas, needed_bytes: usize) !void {
         while (self.current_memory_bytes + needed_bytes > self.max_memory_bytes and self.lru_order.items.len > 0) {
             const oldest_key = self.lru_order.orderedRemove(0);
-            
+
             if (self.glyph_cache.get(oldest_key)) |info| {
                 if (info.bitmap) |bitmap| {
                     self.current_memory_bytes -= bitmap.len;
@@ -319,14 +319,14 @@ pub const FontAtlas = struct {
             }
         }
     }
-    
+
     /// Pre-generate commonly used glyphs for better performance
     pub fn pregenerateCommonGlyphs(self: *FontAtlas, rasterizer: *rasterizer_core.RasterizerCore, font_id: u32, size: u32) !void {
         // ASCII printable characters (space through tilde)
         const common_chars = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-        
+
         log_throttle.logOnce("pregenerate", "Pre-generating {} common glyphs for font {} size {}", .{ common_chars.len, font_id, size });
-        
+
         for (common_chars) |char| {
             const codepoint = @as(u32, @intCast(char));
             _ = self.getOrRasterizeGlyph(rasterizer, codepoint, font_id, size) catch |err| {
@@ -335,7 +335,7 @@ pub const FontAtlas = struct {
             };
         }
     }
-    
+
     /// Get memory usage statistics
     pub fn getMemoryStats(self: *FontAtlas) struct { used: usize, max: usize, glyphs: usize } {
         return .{

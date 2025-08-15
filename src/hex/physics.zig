@@ -20,10 +20,10 @@ pub fn canPlayerMoveTo(world: *hex_world.HexWorld, new_pos: math.Vec2, player_ra
         const obstacle_id = entry.key_ptr.*;
         const terrain = entry.value_ptr;
         if (!world.world.isAlive(obstacle_id)) continue;
-        
+
         // Only check solid terrain for movement blocking
         if (!terrain.solid) continue;
-        
+
         if (world.world.transforms.get(obstacle_id)) |transform| {
             const circle = collision.Shape{ .circle = .{ .center = new_pos, .radius = player_radius } };
             const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
@@ -39,12 +39,12 @@ pub fn canPlayerMoveTo(world: *hex_world.HexWorld, new_pos: math.Vec2, player_ra
 pub fn checkPlayerUnitCollisionECS(world: *hex_world.HexWorld) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
-    
+
     var unit_iter = world.world.units.iterator();
     while (unit_iter.next()) |entry| {
         const unit_id = entry.key_ptr.*;
         if (!world.world.isAlive(unit_id)) continue;
-        
+
         if (world.world.transforms.get(unit_id)) |transform| {
             if (world.world.healths.get(unit_id)) |health| {
                 if (!health.alive) continue;
@@ -68,12 +68,12 @@ pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.En
     while (obstacle_iter.next()) |entry| {
         const obstacle_id = entry.key_ptr.*;
         if (!world.world.isAlive(obstacle_id)) continue;
-        
+
         if (world.world.transforms.get(obstacle_id)) |obstacle_transform| {
             if (world.world.terrains.get(obstacle_id)) |terrain| {
                 const circle = collision.Shape{ .circle = .{ .center = unit_transform.pos, .radius = unit_transform.radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = obstacle_transform.pos, .size = terrain.size } };
-                
+
                 if (collision.checkCollision(circle, rect)) {
                     // Check if it's a deadly obstacle
                     if (terrain.terrain_type == .pit) {
@@ -100,10 +100,10 @@ pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_world
     while (obstacle_iter.next()) |entry| {
         const obstacle_id = entry.key_ptr.*;
         if (!world.world.isAlive(obstacle_id)) continue;
-        
+
         if (world.world.terrains.get(obstacle_id)) |terrain| {
             if (terrain.terrain_type != .pit) continue;
-            
+
             if (world.world.transforms.get(obstacle_id)) |transform| {
                 const circle = collision.Shape{ .circle = .{ .center = pos, .radius = radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
@@ -127,13 +127,13 @@ pub fn findNearestAttunedLifestone(world: *hex_world.HexWorld) ?LifestoneResult 
     const player_pos = world.getPlayerPos();
     var nearest_distance_sq: f32 = std.math.inf(f32);
     var nearest_lifestone: ?LifestoneResult = null;
-    
+
     var lifestone_iter = world.world.interactables.iterator();
     while (lifestone_iter.next()) |entry| {
         const lifestone_id = entry.key_ptr.*;
         const interactable = entry.value_ptr;
         if (!world.world.isAlive(lifestone_id)) continue;
-        
+
         // Check if it's a lifestone by looking for altar terrain type
         if (world.world.terrains.get(lifestone_id)) |terrain| {
             if (terrain.terrain_type == .altar and interactable.attuned) {
@@ -150,6 +150,6 @@ pub fn findNearestAttunedLifestone(world: *hex_world.HexWorld) ?LifestoneResult 
             }
         }
     }
-    
+
     return nearest_lifestone;
 }

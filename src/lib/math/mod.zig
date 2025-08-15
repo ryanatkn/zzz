@@ -1,12 +1,11 @@
 /// Math module - Unified mathematical operations and geometric primitives
-/// 
+///
 /// This module provides all mathematical functionality used across the engine:
 /// - Vec2 operations and 2D vector math
 /// - Scalar math utilities (lerp, clamp, etc.)
 /// - Geometric shapes (Rectangle, Circle, Line, Bounds)
 /// - Distance calculations and transformations
 /// - Coordinate system conversions
-
 pub const Vec2 = @import("vec2.zig").Vec2;
 pub const scalar = @import("scalar.zig");
 pub const shapes = @import("shapes.zig");
@@ -63,24 +62,24 @@ pub const distanceSquared = vec2.distanceSquared;
 
 test "math module integration" {
     const std = @import("std");
-    
+
     // Test Vec2 operations
     const v1 = Vec2.init(3.0, 4.0);
     const v2 = Vec2.init(1.0, 2.0);
-    
+
     const sum = v1.add(v2);
     try std.testing.expect(sum.x == 4.0 and sum.y == 6.0);
-    
+
     // Test shapes
     const rect = Rectangle.fromXYWH(10.0, 20.0, 30.0, 40.0);
     const circle = Circle.init(Vec2.init(0.0, 0.0), 5.0);
-    
+
     try std.testing.expect(rect.area() == 1200.0);
     try std.testing.expect(circle.contains(Vec2.init(3.0, 4.0)));
-    
+
     // Test scalar functions
     try std.testing.expect(lerp(0.0, 10.0, 0.5) == 5.0);
-    
+
     // Test compatibility functions
     try std.testing.expect(vec2_length(v1) == v1.length());
     try std.testing.expect(distance(v1, v2) == v1.distance(v2));

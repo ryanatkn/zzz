@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const c = @import("../lib/platform/sdl.zig");
 
 const colors = @import("../lib/core/colors.zig");

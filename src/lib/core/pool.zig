@@ -60,7 +60,7 @@ pub fn ResourcePool(comptime config: PoolConfig) type {
             // Update recharge (only if not at max)
             if (self.current_resources < self.max_resources) {
                 self.recharge_accumulator += self.recharge_rate * deltaTime;
-                
+
                 // Recharge whole resources
                 while (self.recharge_accumulator >= 1.0 and self.current_resources < self.max_resources) {
                     self.current_resources += 1;
@@ -188,7 +188,7 @@ pub fn ObjectPool(comptime T: type, comptime max_objects: u32) type {
             return count;
         }
 
-        /// Get count of used objects  
+        /// Get count of used objects
         pub fn getUsedCount(self: *const Self) u32 {
             return max_objects - self.getAvailableCount();
         }
@@ -246,16 +246,16 @@ test "ResourcePool basic functionality" {
     });
 
     var pool = TestPool.init();
-    
+
     // Should start full
     try testing.expect(pool.isFull());
     try testing.expectEqual(@as(u32, 3), pool.getCurrentCount());
-    
+
     // Should be able to use
     try testing.expect(pool.canUse());
     try testing.expect(pool.use());
     try testing.expectEqual(@as(u32, 2), pool.getCurrentCount());
-    
+
     // Should be on cooldown after use
     try testing.expect(pool.isOnCooldown());
     try testing.expect(!pool.canUse());
@@ -266,22 +266,22 @@ test "ObjectPool basic functionality" {
         value: i32,
         active: bool,
     };
-    
+
     const TestPool = ObjectPool(TestObject, 3);
     var pool = TestPool.init();
-    
+
     // Should start empty (all available)
     try testing.expect(pool.isEmpty());
     try testing.expectEqual(@as(u32, 3), pool.getAvailableCount());
-    
+
     // Acquire objects
     const obj1 = pool.acquire();
     const obj2 = pool.acquire();
-    
+
     try testing.expect(obj1 != null);
     try testing.expect(obj2 != null);
     try testing.expectEqual(@as(u32, 2), pool.getUsedCount());
-    
+
     // Release an object
     pool.release(obj1.?);
     try testing.expectEqual(@as(u32, 1), pool.getUsedCount());

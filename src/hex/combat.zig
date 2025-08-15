@@ -1,5 +1,5 @@
 const std = @import("std");
-
+const log_throttle = @import("../lib/debug/log_throttle.zig");
 const math = @import("../lib/math/mod.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
@@ -98,7 +98,7 @@ pub fn fireBullet(world: *HexWorld, target_pos: Vec2, pool: *BulletPool) bool {
             std.log.err("Failed to create bullet: {}", .{err});
             return false;
         };
-        
+
         std.log.info("Created bullet entity: {}", .{bullet_id});
         pool.fire();
         return true;
@@ -120,13 +120,13 @@ pub fn respawnPlayer(game_state: anytype) void {
     if (nearest) |result| {
         if (result.zone_index != world.current_zone) {
             game_state.travelToZone(result.zone_index);
-            std.debug.print("Traveling to zone {} for nearest lifestone\n", .{result.zone_index});
+            log_throttle.logInfo("travel_to_lifestone", "Traveling to zone {} for nearest lifestone", .{result.zone_index});
         }
         respawn_pos = result.pos;
     } else {
         if (world.current_zone != 0) {
             game_state.travelToZone(0);
-            std.debug.print("No lifestones found, returning to overworld spawn\n", .{});
+            log_throttle.logInfo("no_lifestones", "No lifestones found, returning to overworld spawn", .{});
         }
         respawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
     }
@@ -137,19 +137,18 @@ pub fn respawnPlayer(game_state: anytype) void {
     world.setPlayerAlive(true);
     world.setPlayerColor(constants.COLOR_PLAYER_ALIVE);
     effect_system.addPlayerSpawnEffect(respawn_pos, world.getPlayerRadius());
-    std.debug.print("Player respawned!\n", .{});
+    log_throttle.logInfo("player_respawn", "Player respawned!", .{});
 }
 
 pub fn handlePlayerDeath(world: *HexWorld) void {
     world.setPlayerAlive(false);
-    std.debug.print("Player died! Press R or click to respawn\n", .{});
+    log_throttle.logInfo("player_death", "Player died! Press R or click to respawn", .{});
 }
 
 pub fn handlePlayerDeathOnHazard(world: *HexWorld) void {
     world.setPlayerAlive(false);
-    std.debug.print("Player died on hazard! Press R or click to respawn\n", .{});
+    log_throttle.logInfo("player_hazard_death", "Player died on hazard! Press R or click to respawn", .{});
 }
-
 
 // ECS-compatible unit death on hazard
 pub fn handleUnitDeathOnHazardECS(unit_entity: ecs.EntityId, world: *HexWorld) void {
@@ -159,5 +158,5 @@ pub fn handleUnitDeathOnHazardECS(unit_entity: ecs.EntityId, world: *HexWorld) v
     if (world.world.visuals.get(unit_entity)) |visual| {
         visual.color = constants.COLOR_DEAD;
     }
-    std.debug.print("Unit died on hazard!\n", .{});
+    log_throttle.logInfo("unit_hazard_death", "Unit died on hazard!", .{});
 }

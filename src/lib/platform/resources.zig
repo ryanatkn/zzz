@@ -6,7 +6,7 @@ const font_manager = @import("../font/manager.zig");
 const WindowGPU = window_mod.WindowGPU;
 const FontManager = font_manager.FontManager;
 
-/// Common error types for resource initialization  
+/// Common error types for resource initialization
 pub const ResourceError = error{
     RendererInitFailed,
     FontManagerInitFailed,

@@ -236,7 +236,7 @@ pub const Effects = struct {
 
         return result * multiplicative;
     }
-    
+
     /// Get aggro multiplier for this entity (1.0 = normal aggro)
     pub fn getAggroMultiplier(self: Effects) f32 {
         return self.getModifiedValue(1.0, .aggro_mult);
@@ -263,7 +263,7 @@ pub const Projectile = struct {
     max_lifetime: f32,
     pierce_count: u8,
     max_pierce: u8,
-    
+
     pub fn init(owner: EntityId, max_lifetime: f32) Projectile {
         return .{
             .owner = owner,
@@ -273,16 +273,16 @@ pub const Projectile = struct {
             .max_pierce = 1,
         };
     }
-    
+
     pub fn update(self: *Projectile, dt: f32) bool {
         self.lifetime += dt;
         return self.lifetime < self.max_lifetime and self.pierce_count < self.max_pierce;
     }
-    
+
     pub fn canPierce(self: Projectile) bool {
         return self.pierce_count < self.max_pierce;
     }
-    
+
     pub fn pierce(self: *Projectile) void {
         self.pierce_count += 1;
     }
@@ -299,12 +299,12 @@ pub const Terrain = struct {
         pit,
         altar,
     };
-    
+
     solid: bool,
     blocks_sight: bool,
     terrain_type: TerrainType,
     size: Vec2, // Original rectangular size for proper rendering
-    
+
     pub fn init(terrain_type: TerrainType, size: Vec2) Terrain {
         return .{
             .solid = switch (terrain_type) {
@@ -331,19 +331,19 @@ pub const Awakeable = struct {
         time_elapsed,
         player_touch,
     };
-    
+
     pub const EntityType = enum {
         basic_creature,
         animated_wall,
         living_floor,
         guardian_statue,
     };
-    
+
     trigger_condition: TriggerType,
     awakened_entity_type: EntityType,
     trigger_value: f32, // Threshold/timer/distance etc.
     current_value: f32,
-    
+
     pub fn init(trigger: TriggerType, entity_type: EntityType, trigger_value: f32) Awakeable {
         return .{
             .trigger_condition = trigger,
@@ -352,7 +352,7 @@ pub const Awakeable = struct {
             .current_value = 0,
         };
     }
-    
+
     pub fn checkTrigger(self: *Awakeable, value: f32) bool {
         self.current_value = value;
         return switch (self.trigger_condition) {
@@ -367,13 +367,13 @@ pub const Awakeable = struct {
 /// Sparse storage - only interactive entities have this
 pub const Interactable = struct {
     pub const InteractionType = enum {
-        deflectable,      // Can be deflected by spells/abilities
-        telekinetic,      // Can be moved by telekinesis
-        transformable,    // Can be polymorphed
-        combinable,       // Can merge with other entities
-        splittable,       // Can split into multiple entities
+        deflectable, // Can be deflected by spells/abilities
+        telekinetic, // Can be moved by telekinesis
+        transformable, // Can be polymorphed
+        combinable, // Can merge with other entities
+        splittable, // Can split into multiple entities
     };
-    
+
     pub const InteractionState = enum {
         normal,
         being_deflected,
@@ -382,7 +382,7 @@ pub const Interactable = struct {
         combining,
         splitting,
     };
-    
+
     interaction_type: InteractionType,
     state: InteractionState,
     interaction_timer: f32,
@@ -403,7 +403,7 @@ pub const Interactable = struct {
         },
         none: void,
     },
-    
+
     pub fn init(interaction_type: InteractionType) Interactable {
         return .{
             .interaction_type = interaction_type,
@@ -414,7 +414,7 @@ pub const Interactable = struct {
             .interaction_data = .none,
         };
     }
-    
+
     pub fn initPortal(destination: u8) Interactable {
         return .{
             .interaction_type = .telekinetic,
@@ -425,7 +425,7 @@ pub const Interactable = struct {
             .interaction_data = .none,
         };
     }
-    
+
     pub fn startDeflection(self: *Interactable, direction: Vec2, force: f32) void {
         if (self.interaction_type == .deflectable) {
             self.state = .being_deflected;
@@ -433,7 +433,7 @@ pub const Interactable = struct {
             self.interaction_data = .{ .deflect = .{ .new_direction = direction, .force = force } };
         }
     }
-    
+
     pub fn update(self: *Interactable, dt: f32) void {
         if (self.state != .normal) {
             self.interaction_timer -= dt;

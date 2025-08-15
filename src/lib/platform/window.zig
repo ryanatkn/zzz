@@ -3,7 +3,6 @@ const c = @import("sdl.zig");
 
 /// Window creation and management utilities
 /// This is platform-level functionality that doesn't depend on rendering
-
 /// Common error types for window operations
 pub const WindowError = error{
     WindowCreationFailed,
@@ -30,10 +29,8 @@ pub fn createWindow(config: WindowConfig) WindowError!*c.sdl.SDL_Window {
 
 /// Create a GPU device
 pub fn createGPUDevice() WindowError!*c.sdl.SDL_GPUDevice {
-    return c.sdl.SDL_CreateGPUDevice(
-        c.sdl.SDL_GPU_SHADERFORMAT_SPIRV,
-        true, // debug mode
-        null  // preferred backend (let SDL choose)
+    return c.sdl.SDL_CreateGPUDevice(c.sdl.SDL_GPU_SHADERFORMAT_SPIRV, true, // debug mode
+        null // preferred backend (let SDL choose)
     ) orelse {
         const log = std.log.scoped(.window);
         log.err("Failed to create GPU device", .{});

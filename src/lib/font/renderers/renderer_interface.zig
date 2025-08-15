@@ -78,7 +78,7 @@ pub const RenderStrategy = enum {
     pub fn getName(self: RenderStrategy) []const u8 {
         return switch (self) {
             .simple_bitmap => "Simple Bitmap",
-            .scanline_antialiased => "Scanline AA", 
+            .scanline_antialiased => "Scanline AA",
             .oversampling_2x => "Oversample 2x",
             .oversampling_4x => "Oversample 4x",
             .sdf_generator => "SDF Generator",
@@ -122,28 +122,28 @@ pub const TextRenderer = struct {
     /// Virtual function table for renderer implementation
     pub const VTable = struct {
         /// Render a single glyph outline to a bitmap
-        renderGlyph: *const fn(ctx: *anyopaque, allocator: std.mem.Allocator, outline: font_types.GlyphOutline, font_size: f32) anyerror!RenderResult,
-        
+        renderGlyph: *const fn (ctx: *anyopaque, allocator: std.mem.Allocator, outline: font_types.GlyphOutline, font_size: f32) anyerror!RenderResult,
+
         /// Get the name of this rendering strategy
-        getName: *const fn(ctx: *const anyopaque) []const u8,
-        
+        getName: *const fn (ctx: *const anyopaque) []const u8,
+
         /// Get current performance metrics
-        getMetrics: *const fn(ctx: *const anyopaque) RendererMetrics,
-        
-        /// Update renderer configuration  
-        configure: *const fn(ctx: *anyopaque, config: RendererConfig) void,
-        
+        getMetrics: *const fn (ctx: *const anyopaque) RendererMetrics,
+
+        /// Update renderer configuration
+        configure: *const fn (ctx: *anyopaque, config: RendererConfig) void,
+
         /// Reset metrics and clear caches
-        reset: *const fn(ctx: *anyopaque) void,
-        
+        reset: *const fn (ctx: *anyopaque) void,
+
         /// Check if renderer is currently functional
-        isHealthy: *const fn(ctx: *const anyopaque) bool,
-        
+        isHealthy: *const fn (ctx: *const anyopaque) bool,
+
         /// Get last error message if any
-        getLastError: *const fn(ctx: *const anyopaque) ?[]const u8,
-        
+        getLastError: *const fn (ctx: *const anyopaque) ?[]const u8,
+
         /// Clean up resources
-        deinit: *const fn(ctx: *anyopaque, allocator: std.mem.Allocator) void,
+        deinit: *const fn (ctx: *anyopaque, allocator: std.mem.Allocator) void,
     };
 
     /// Pointer to implementation context
@@ -193,7 +193,7 @@ pub const TextRenderer = struct {
 };
 
 /// Utility to compare two render results for testing
-pub fn compareRenderResults(a: RenderResult, b: RenderResult) struct { 
+pub fn compareRenderResults(a: RenderResult, b: RenderResult) struct {
     pixel_diff: f32, // 0.0 = identical, 1.0 = completely different
     size_match: bool,
     bearing_diff: Vec2,
@@ -202,16 +202,13 @@ pub fn compareRenderResults(a: RenderResult, b: RenderResult) struct {
         return .{
             .pixel_diff = 1.0,
             .size_match = false,
-            .bearing_diff = Vec2{ 
-                .x = @as(f32, @floatFromInt(a.bearing_x - b.bearing_x)), 
-                .y = @as(f32, @floatFromInt(a.bearing_y - b.bearing_y)) 
-            },
+            .bearing_diff = Vec2{ .x = @as(f32, @floatFromInt(a.bearing_x - b.bearing_x)), .y = @as(f32, @floatFromInt(a.bearing_y - b.bearing_y)) },
         };
     }
 
     var total_diff: u64 = 0;
     var total_possible: u64 = 0;
-    
+
     for (a.bitmap, b.bitmap) |pixel_a, pixel_b| {
         const diff = if (pixel_a > pixel_b) pixel_a - pixel_b else pixel_b - pixel_a;
         total_diff += diff;
@@ -221,9 +218,6 @@ pub fn compareRenderResults(a: RenderResult, b: RenderResult) struct {
     return .{
         .pixel_diff = if (total_possible > 0) @as(f32, @floatFromInt(total_diff)) / @as(f32, @floatFromInt(total_possible)) else 0.0,
         .size_match = true,
-        .bearing_diff = Vec2{ 
-            .x = @as(f32, @floatFromInt(a.bearing_x - b.bearing_x)), 
-            .y = @as(f32, @floatFromInt(a.bearing_y - b.bearing_y)) 
-        },
+        .bearing_diff = Vec2{ .x = @as(f32, @floatFromInt(a.bearing_x - b.bearing_x)), .y = @as(f32, @floatFromInt(a.bearing_y - b.bearing_y)) },
     };
 }

@@ -57,7 +57,7 @@ pub const OversamplingRenderer = struct {
         const scale = font_size / 1000.0; // TTF units to pixels
         const bounds_width = @as(f32, @floatFromInt(outline.bounds.width())) * scale;
         const bounds_height = @as(f32, @floatFromInt(outline.bounds.height())) * scale;
-        
+
         // Add padding
         const padding = 2.0;
         const target_width = @as(u32, @intFromFloat(@ceil(bounds_width + padding * 2.0)));
@@ -72,7 +72,7 @@ pub const OversamplingRenderer = struct {
             // Empty glyph
             const empty_bitmap = try allocator.alloc(u8, 1);
             empty_bitmap[0] = 0;
-            
+
             const end_time = std.time.microTimestamp();
             return RenderResult{
                 .bitmap = empty_bitmap,
@@ -89,13 +89,13 @@ pub const OversamplingRenderer = struct {
         // Calculate oversampled dimensions with overflow checking
         const oversample_width = @as(u64, final_width) * @as(u64, self.oversample_factor);
         const oversample_height = @as(u64, final_height) * @as(u64, self.oversample_factor);
-        
+
         // Check for reasonable limits to prevent excessive memory usage
         if (oversample_width > std.math.maxInt(u32) or oversample_height > std.math.maxInt(u32)) {
             // Fall back to simple rendering if oversampling would be too large
             return try self.renderSimple(allocator, outline, font_size, final_width, final_height, scale, padding);
         }
-        
+
         const oversample_width_u32 = @as(u32, @intCast(oversample_width));
         const oversample_height_u32 = @as(u32, @intCast(oversample_height));
 
@@ -127,13 +127,13 @@ pub const OversamplingRenderer = struct {
             while (x < oversample_width_u32) : (x += 1) {
                 const pixel_x = @as(f32, @floatFromInt(x)) - transform_offset_x;
                 const pixel_y = @as(f32, @floatFromInt(y)) - transform_offset_y;
-                
+
                 // Convert to TTF coordinate space
                 const ttf_x = pixel_x / oversample_scale;
                 const ttf_y = pixel_y / oversample_scale;
 
                 const inside = isPointInside(Point{ .x = ttf_x, .y = ttf_y }, outline.contours);
-                
+
                 const bitmap_idx = y * oversample_width_u32 + x;
                 oversample_bitmap[bitmap_idx] = if (inside) 255 else 0;
             }
@@ -141,7 +141,7 @@ pub const OversamplingRenderer = struct {
 
         // Downsample to target resolution
         const final_bitmap = try allocator.alloc(u8, final_width * final_height);
-        
+
         y = 0;
         while (y < final_height) : (y += 1) {
             var x: u32 = 0;
@@ -149,21 +149,21 @@ pub const OversamplingRenderer = struct {
                 // Sample box from oversampled bitmap
                 var sum: u32 = 0;
                 const box_size = self.oversample_factor;
-                
+
                 var by: u32 = 0;
                 while (by < box_size) : (by += 1) {
                     var bx: u32 = 0;
                     while (bx < box_size) : (bx += 1) {
                         const sample_x = x * box_size + bx;
                         const sample_y = y * box_size + by;
-                        
+
                         if (sample_x < oversample_width_u32 and sample_y < oversample_height_u32) {
                             const sample_idx = sample_y * oversample_width_u32 + sample_x;
                             sum += oversample_bitmap[sample_idx];
                         }
                     }
                 }
-                
+
                 // Average the samples
                 const pixel_value = sum / (box_size * box_size);
                 const final_idx = y * final_width + x;
@@ -174,11 +174,11 @@ pub const OversamplingRenderer = struct {
         // Calculate metrics
         const end_time = std.time.microTimestamp();
         const render_time = @as(u64, @intCast(end_time - start_time));
-        
+
         self.metrics.glyphs_rendered += 1;
         self.metrics.total_render_time_us += render_time;
         self.metrics.avg_render_time_us = self.metrics.total_render_time_us / self.metrics.glyphs_rendered;
-        
+
         // Quality score based on oversampling level
         const quality_score: f32 = switch (self.oversample_factor) {
             2 => 75.0,
@@ -201,7 +201,7 @@ pub const OversamplingRenderer = struct {
     /// Fallback simple rendering when oversampling would use too much memory
     fn renderSimple(self: *OversamplingRenderer, allocator: std.mem.Allocator, outline: GlyphOutline, _: f32, width: u32, height: u32, scale: f32, padding: f32) !RenderResult {
         const start_time = std.time.microTimestamp();
-        
+
         const bitmap = try allocator.alloc(u8, width * height);
         @memset(bitmap, 0);
 
@@ -214,12 +214,12 @@ pub const OversamplingRenderer = struct {
             while (x < width) : (x += 1) {
                 const pixel_x = @as(f32, @floatFromInt(x)) - transform_offset_x;
                 const pixel_y = @as(f32, @floatFromInt(y)) - transform_offset_y;
-                
+
                 const ttf_x = pixel_x / scale;
                 const ttf_y = pixel_y / scale;
 
                 const inside = isPointInside(Point{ .x = ttf_x, .y = ttf_y }, outline.contours);
-                
+
                 const bitmap_idx = y * width + x;
                 bitmap[bitmap_idx] = if (inside) 255 else 0;
             }
@@ -260,7 +260,7 @@ pub const OversamplingRenderer = struct {
                 if ((p1.y <= point.y and point.y < p2.y) or (p2.y <= point.y and point.y < p1.y)) {
                     const t = (point.y - p1.y) / (p2.y - p1.y);
                     const intersection_x = p1.x + t * (p2.x - p1.x);
-                    
+
                     if (intersection_x > point.x) {
                         if (p1.y < p2.y) {
                             winding_number += 1;
@@ -321,7 +321,7 @@ pub fn create2x() OversamplingRenderer {
     return OversamplingRenderer.init(2);
 }
 
-/// Create a new 4x oversampling renderer  
+/// Create a new 4x oversampling renderer
 pub fn create4x() OversamplingRenderer {
     return OversamplingRenderer.init(4);
 }

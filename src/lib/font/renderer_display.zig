@@ -13,7 +13,7 @@ const RenderStrategy = renderer_interface.RenderStrategy;
 pub const RendererDisplay = struct {
     allocator: std.mem.Allocator,
     device: *c.sdl.SDL_GPUDevice,
-    
+
     /// Cached GPU textures for display
     display_textures: std.AutoHashMap(RenderStrategy, *c.sdl.SDL_GPUTexture),
 
@@ -48,10 +48,10 @@ pub const RendererDisplay = struct {
 
         // Create GPU texture from bitmap
         const texture = try self.createTextureFromBitmap(result.bitmap, result.width, result.height);
-        
+
         // Cache the texture
         try self.display_textures.put(strategy, texture);
-        
+
         return texture;
     }
 
@@ -70,7 +70,7 @@ pub const RendererDisplay = struct {
             const rgba_idx = i * 4;
             // White text on transparent background
             rgba_data[rgba_idx + 0] = 255; // R
-            rgba_data[rgba_idx + 1] = 255; // G  
+            rgba_data[rgba_idx + 1] = 255; // G
             rgba_data[rgba_idx + 2] = 255; // B
             rgba_data[rgba_idx + 3] = gray_value; // A (coverage)
         }
@@ -119,7 +119,7 @@ pub const RendererDisplay = struct {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CommandBufferCreationFailed;
         };
-        
+
         const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer) orelse {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CopyPassCreationFailed;
@@ -146,7 +146,7 @@ pub const RendererDisplay = struct {
 
         c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
         c.sdl.SDL_EndGPUCopyPass(copy_pass);
-        
+
         // Submit command buffer to execute the upload
         _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
 
@@ -157,7 +157,7 @@ pub const RendererDisplay = struct {
     fn createAsciiDisplayTexture(self: *RendererDisplay, result: RenderResult) !*c.sdl.SDL_GPUTexture {
         // Debug ASCII renderer now stores grayscale values (0-255) instead of ASCII characters
         // Treat it like a regular grayscale bitmap but with enhanced contrast for debugging
-        
+
         if (result.width == 0 or result.height == 0) {
             return try self.createEmptyTexture();
         }
@@ -168,33 +168,32 @@ pub const RendererDisplay = struct {
 
         for (result.bitmap, 0..) |gray_value, i| {
             const rgba_idx = i * 4;
-            
+
             // Enhanced contrast for debug visualization
-            const enhanced_value: u8 = if (gray_value == 0) 0
-                else if (gray_value < 64) 64    // Light coverage -> dark gray
-                else if (gray_value < 128) 128  // Medium coverage -> medium gray
-                else if (gray_value < 192) 192  // Heavy coverage -> light gray
-                else 255;                       // Full coverage -> white
-            
+            const enhanced_value: u8 = if (gray_value == 0) 0 else if (gray_value < 64) 64 // Light coverage -> dark gray
+                else if (gray_value < 128) 128 // Medium coverage -> medium gray
+                else if (gray_value < 192) 192 // Heavy coverage -> light gray
+                else 255; // Full coverage -> white
+
             // Use different colors for different coverage levels for easier debugging
             if (gray_value == 0) {
                 // Empty -> black/transparent
-                rgba_data[rgba_idx + 0] = 0;   // R
-                rgba_data[rgba_idx + 1] = 0;   // G
-                rgba_data[rgba_idx + 2] = 0;   // B
-                rgba_data[rgba_idx + 3] = 32;  // A (slight transparency)
+                rgba_data[rgba_idx + 0] = 0; // R
+                rgba_data[rgba_idx + 1] = 0; // G
+                rgba_data[rgba_idx + 2] = 0; // B
+                rgba_data[rgba_idx + 3] = 32; // A (slight transparency)
             } else if (gray_value < 128) {
                 // Light coverage -> blue tint
-                rgba_data[rgba_idx + 0] = 0;             // R
+                rgba_data[rgba_idx + 0] = 0; // R
                 rgba_data[rgba_idx + 1] = enhanced_value / 2; // G
-                rgba_data[rgba_idx + 2] = enhanced_value;     // B
-                rgba_data[rgba_idx + 3] = 255;               // A
+                rgba_data[rgba_idx + 2] = enhanced_value; // B
+                rgba_data[rgba_idx + 3] = 255; // A
             } else {
                 // Heavy coverage -> white
                 rgba_data[rgba_idx + 0] = enhanced_value; // R
-                rgba_data[rgba_idx + 1] = enhanced_value; // G  
+                rgba_data[rgba_idx + 1] = enhanced_value; // G
                 rgba_data[rgba_idx + 2] = enhanced_value; // B
-                rgba_data[rgba_idx + 3] = 255;           // A
+                rgba_data[rgba_idx + 3] = 255; // A
             }
         }
 
@@ -245,7 +244,7 @@ pub const RendererDisplay = struct {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CommandBufferCreationFailed;
         };
-        
+
         const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer) orelse {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CopyPassCreationFailed;
@@ -272,7 +271,7 @@ pub const RendererDisplay = struct {
 
         c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
         c.sdl.SDL_EndGPUCopyPass(copy_pass);
-        
+
         // Submit command buffer to execute the upload
         _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
 
@@ -325,7 +324,7 @@ pub const RendererDisplay = struct {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CommandBufferCreationFailed;
         };
-        
+
         const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer) orelse {
             c.sdl.SDL_ReleaseGPUTexture(self.device, texture);
             return error.CopyPassCreationFailed;
@@ -352,7 +351,7 @@ pub const RendererDisplay = struct {
 
         c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
         c.sdl.SDL_EndGPUCopyPass(copy_pass);
-        
+
         // Submit command buffer to execute the upload
         _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
 

@@ -104,12 +104,12 @@ pub const BrowserRenderer = struct {
         }
         // Add other special pages here as needed
     }
-    
+
     /// Render font grid test custom content (separated from link rendering)
     fn renderFontGridTestContent(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page) !void {
         // Cast to FontGridTestPage to access font test functionality
         const grid_page: *font_grid_test_page.FontGridTestPage = @constCast(@fieldParentPtr("base", current_page));
-        
+
         // Check font grid test auto-initialization status
         if (!grid_page.initialized) {
             // Auto-initialize font grid test
@@ -128,7 +128,7 @@ pub const BrowserRenderer = struct {
 
         // Cast to FontGridTestPage to access new functionality
         const grid_page: *font_grid_test_page.FontGridTestPage = @fieldParentPtr("base", current_page);
-        
+
         // Check auto-initialization status
         if (!grid_page.initialized) {
             // Auto-initialize if needed
@@ -239,7 +239,7 @@ pub const BrowserRenderer = struct {
             },
         }
     }
-    
+
     /// Font grid rendering stub - simplified for core functionality
     fn renderStrategyComparison(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, grid_page: *const font_grid_test_page.FontGridTestPage) !void {
         _ = self;

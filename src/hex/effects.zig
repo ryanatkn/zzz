@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const c = @import("../lib/platform/sdl.zig");
 
 const math = @import("../lib/math/mod.zig");
@@ -499,11 +498,11 @@ pub const EffectSystem = struct {
         // Create ambient effects for current zone entities using ECS queries
         const ecs_world = world.getECSWorld();
         var terrain_iter = @constCast(&ecs_world.terrains).iterator();
-        
+
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
             const terrain = entry.value_ptr.*;
-            
+
             // Get entity transform for position and radius
             if (ecs_world.transforms.getConst(entity_id)) |transform| {
                 switch (terrain.terrain_type) {

@@ -7,19 +7,19 @@ pub const HexCustomEvents = union(enum) {
     // Lifestone events
     lifestone_attuned: struct { zone: usize, index: usize, pos: Vec2 },
     all_lifestones_attuned: struct { total_count: usize },
-    
-    // Portal events  
+
+    // Portal events
     portal_entered: struct { from_zone: usize, to_zone: usize, portal_index: usize },
-    
+
     // Spell events
     spell_cast: struct { spell_id: usize, target_pos: Vec2, caster_pos: Vec2 },
     spell_cooldown_expired: struct { spell_id: usize },
-    
+
     // Combat events
     bullet_fired: struct { pos: Vec2, direction: Vec2 },
     bullet_hit_unit: struct { unit_id: usize, damage: f32 },
     player_respawned: struct { pos: Vec2, zone: usize },
-    
+
     // Zone events
     zone_units_cleared: struct { zone: usize },
     zone_fully_explored: struct { zone: usize },

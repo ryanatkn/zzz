@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");

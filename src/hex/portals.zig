@@ -21,9 +21,9 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
 
     // Skip portal checks during cooldown
     if (portal_cooldown > 0) return false;
-    
+
     if (!world.getPlayerAlive()) return false;
-    
+
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
 
@@ -33,29 +33,29 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
         const portal_id = entry.key_ptr.*;
         const interactable = entry.value_ptr;
         if (!world.world.isAlive(portal_id)) continue;
-        
+
         // Check if it's a portal (has destination_zone set)
         if (interactable.destination_zone) |destination_zone| {
             if (world.world.transforms.get(portal_id)) |transform| {
                 if (physics.checkPlayerPortalCollisionECS(player_pos, player_radius, transform)) {
                     // Set cooldown and travel
                     portal_cooldown = 1.0; // 1 second cooldown
-                    
+
                     // Add portal travel effect
                     game_state.effect_system.addPortalTravelEffect(player_pos, player_radius);
-                    
+
                     // Travel to destination zone
                     const zone = &world.zones[destination_zone];
                     world.travelToZone(destination_zone, zone.spawn_pos) catch {
                         log_throttle.logError("portal_travel_error", "Error: Failed to travel to zone {}", .{destination_zone});
                         return false;
                     };
-                    
+
                     return true;
                 }
             }
         }
     }
-    
+
     return false;
 }

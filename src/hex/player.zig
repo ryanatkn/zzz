@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const hex_world = @import("hex_world.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
@@ -59,19 +58,18 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
         velocity = keyboard_velocity;
     }
 
-
     // Get current zone
     const zone = world.getCurrentZoneConst();
-    
+
     // Use screen bounds only in fixed camera mode (overworld)
     const use_screen_bounds = (zone.camera_mode == .fixed);
-    
+
     // Calculate new position
     var new_pos = Vec2{
         .x = player_pos.x + velocity.x * deltaTime,
         .y = player_pos.y + velocity.y * deltaTime,
     };
-    
+
     // Apply screen bounds if needed
     if (use_screen_bounds) {
         // Keep player within screen bounds for fixed camera mode
@@ -93,9 +91,7 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
     world.setPlayerVel(velocity);
 }
 
-
 /// ECS-compatible movement direction getter
 pub fn getPlayerMovementDirectionECS(world: *const HexWorld) Vec2 {
     return math.vec2_normalize(world.getPlayerVelConst());
 }
-

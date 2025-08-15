@@ -150,21 +150,21 @@ pub const TextRenderer = struct {
     /// Debug function to test text pipeline with checkerboard pattern
     pub fn debugTestTexturePipeline(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
         const texture_utils = @import("../image/texture.zig");
-        
+
         // Create simple white texture for testing
         const debug_texture = try texture_utils.createWhiteTexture(self.device);
         defer debug_texture.deinit(self.device);
-        
+
         // Use our text sampler
         const sampler = self.text_sampler orelse return error.SamplerNotInitialized;
-        
+
         // Draw at fixed position for testing
         const position = Vec2{ .x = 50.0, .y = 50.0 };
         const size = Vec2{ .x = 100.0, .y = 100.0 };
         const color = colors.Color{ .r = 255, .g = 0, .b = 0, .a = 255 }; // Red tint
-        
+
         std.debug.print("DEBUG: Testing texture pipeline with checkerboard at ({}, {}) size {}x{}\n", .{ position.x, position.y, size.x, size.y });
-        
+
         self.drawTexturedQuad(cmd_buffer, render_pass, debug_texture.texture, sampler, position, size, color);
     }
 

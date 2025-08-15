@@ -139,16 +139,16 @@ pub const RasterizerCore = struct {
                 const pixel_x = @as(f32, @floatFromInt(x)) + offset_x;
                 // Flip Y coordinate: TTF uses bottom-up, screen uses top-down
                 const pixel_y = bounds.y_max - (@as(f32, @floatFromInt(y)) + offset_y);
-                
+
                 // Test if point is inside glyph using simple winding number
                 const inside = isPointInsideGlyph(pixel_x, pixel_y, outline.contours);
-                
+
                 const bitmap_idx = y * width + x;
                 bitmap[bitmap_idx] = if (inside) 255 else 0; // Pure black/white
             }
         }
 
-        // Debug mode 
+        // Debug mode
         if (self.debug_mode) {
             log.debug("Rasterized glyph using point-in-polygon: {}x{}", .{ width, height });
         }

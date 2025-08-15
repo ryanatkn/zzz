@@ -1,7 +1,6 @@
 const std = @import("std");
-
 const c = @import("../lib/platform/sdl.zig");
-
+const log_throttle = @import("../lib/debug/log_throttle.zig");
 const math = @import("../lib/math/mod.zig");
 const hex_world = @import("hex_world.zig");
 const behaviors = @import("behaviors.zig");
@@ -22,7 +21,6 @@ const game_systems = @import("../lib/game/game.zig");
 const hex_events = @import("events.zig");
 const save_data = @import("save_data.zig");
 const ecs = @import("../lib/game/ecs.zig");
-const log_throttle = @import("../lib/debug/log_throttle.zig");
 
 const Vec2 = math.Vec2;
 const HexWorld = hex_world.HexWorld;
@@ -188,9 +186,9 @@ pub const GameState = struct {
     pub fn togglePause(self: *Self) void {
         self.game_paused = !self.game_paused;
         if (self.game_paused) {
-            std.debug.print("Game paused\n", .{});
+            log_throttle.logInfo("game_paused", "Game paused", .{});
         } else {
-            std.debug.print("Game resumed\n", .{});
+            log_throttle.logInfo("game_resumed", "Game resumed", .{});
         }
     }
 
@@ -211,7 +209,7 @@ pub const GameState = struct {
         self.world.resetCurrentZone() catch |err| {
             std.log.err("Failed to reset zone: {}", .{err});
         };
-        std.debug.print("Zone units reset to original state\n", .{});
+        log_throttle.logInfo("zone_reset", "Zone units reset to original state", .{});
     }
 
     pub fn resetGame(self: *Self) void {
@@ -232,7 +230,7 @@ pub const GameState = struct {
         self.effect_system.clear();
         self.effect_system.refreshAmbientEffects(&self.world);
 
-        std.debug.print("Full game reset\n", .{});
+        log_throttle.logInfo("full_reset", "Full game reset", .{});
     }
 
     /// Check if all lifestones across all zones are attuned using ECS queries

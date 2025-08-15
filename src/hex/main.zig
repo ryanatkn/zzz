@@ -1,5 +1,5 @@
 const std = @import("std");
-
+const log_throttle = @import("../lib/debug/log_throttle.zig");
 const c = @import("../lib/platform/sdl.zig");
 
 // Engine imports
@@ -27,8 +27,7 @@ const reactive_time = @import("../lib/reactive/time.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 const persistent_text = @import("../lib/text/cache.zig");
 
-// Debug system imports
-const log_throttle = @import("../lib/debug/log_throttle.zig");
+// Debug system imports (already imported above)
 
 const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
 const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));
@@ -41,7 +40,6 @@ const Hud = hud.Hud;
 
 // Test mode for debugging - change to enable debug tests
 const DEBUG_MODE = false; // Set to true to run debug tests instead of game
-
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -123,8 +121,8 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 
     // Load game data
     loader.loadGameData(global_allocator, &game_state.?.world) catch |err| {
-        std.debug.print("Failed to load game data from ZON file: {}\n", .{err});
-        std.debug.print("Please check that game_data.zon exists and is valid\n", .{});
+        log_throttle.logInfo("zon_load_fail", "Failed to load game data from ZON file: {}", .{err});
+        log_throttle.logInfo("zon_check_msg", "Please check that game_data.zon exists and is valid", .{});
         return err;
     };
 
@@ -140,9 +138,9 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     last_time = c.sdl.SDL_GetPerformanceCounter();
 
     fully_initialized = true;
-    std.debug.print("Hex GPU game initialized successfully\n", .{});
-    std.debug.print("Controls: Hold mouse to move, WASD for direct movement, Space to pause, ESC to quit\n", .{});
-    std.debug.print("Portal interaction: Walk into portals to travel between zones\n", .{});
+    log_throttle.logInfo("game_init_success", "Hex GPU game initialized successfully", .{});
+    log_throttle.logInfo("controls_info", "Controls: Hold mouse to move, WASD for direct movement, Space to pause, ESC to quit", .{});
+    log_throttle.logInfo("portal_info", "Portal interaction: Walk into portals to travel between zones", .{});
     return c.sdl.SDL_APP_CONTINUE;
 }
 
@@ -166,7 +164,7 @@ fn sdlAppIterate(appstate: ?*anyopaque) !c.sdl.SDL_AppResult {
 
 fn sdlAppEvent(appstate: ?*anyopaque, event: *c.sdl.SDL_Event) !c.sdl.SDL_AppResult {
     _ = appstate;
-    
+
     // Prevent accessing uninitialized game objects
     if (!fully_initialized) {
         // During initialization, only handle critical events
@@ -175,7 +173,7 @@ fn sdlAppEvent(appstate: ?*anyopaque, event: *c.sdl.SDL_Event) !c.sdl.SDL_AppRes
             else => return c.sdl.SDL_APP_CONTINUE,
         }
     }
-    
+
     return controls.handleSDLEvent(game_state.?, game_renderer.?, game_hud.?, event);
 }
 
@@ -194,7 +192,7 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
             // Now safe to deinitialize the renderer and GPU device
             game_renderer.?.deinit();
             loader.deinit(); // Clean up ZON data memory
-            
+
             // Free heap-allocated structures
             global_allocator.destroy(game_renderer.?);
             game_state.?.deinit();

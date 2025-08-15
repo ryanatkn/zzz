@@ -253,7 +253,7 @@ pub fn drawScreenBorder(game_state: anytype) void {
         // Animated dead border: base 9px + 5px pulse amplitude
         border_stack.pushAnimated(9.0, RED_COLORS, BORDER_PULSE_DEAD, 5.0);
     }
-    
+
     // Lifestone master border - TEMPORARY improvement
     // Shows when all lifestones across all zones are attuned
     if (game_state.hasAttunedAllLifestones()) {

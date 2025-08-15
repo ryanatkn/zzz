@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const c = @import("../lib/platform/sdl.zig");
 
 const hex_world = @import("hex_world.zig");
@@ -101,14 +100,14 @@ pub const GameRenderer = struct {
         // Query all terrain entities (obstacles, lifestones, portals)
         const ecs_world = world.getECSWorld();
         var terrain_iter = @constCast(&ecs_world.terrains).iterator();
-        
+
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
             const terrain = entry.value_ptr.*;
-            
+
             // Only render obstacles (wall/pit terrain)
             if (terrain.terrain_type != .wall and terrain.terrain_type != .pit) continue;
-            
+
             // Get transform and visual components
             if (ecs_world.transforms.getConst(entity_id)) |transform| {
                 if (ecs_world.visuals.getConst(entity_id)) |visual| {
@@ -131,14 +130,14 @@ pub const GameRenderer = struct {
         // Query all terrain entities
         const ecs_world = world.getECSWorld();
         var terrain_iter = @constCast(&ecs_world.terrains).iterator();
-        
+
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
             const terrain = entry.value_ptr.*;
-            
+
             // Only render circular terrain (lifestones and portals)
             if (terrain.terrain_type != .altar and terrain.terrain_type != .door) continue;
-            
+
             // Get transform and visual components
             if (ecs_world.transforms.getConst(entity_id)) |transform| {
                 if (ecs_world.visuals.getConst(entity_id)) |visual| {
@@ -161,15 +160,15 @@ pub const GameRenderer = struct {
     fn renderProjectiles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
         // Get the ECS world
         const ecs_world = world.getECSWorld();
-        
+
         // Iterate over all projectile entities
         // Note: Cast away const to access iterator (safe for read-only iteration)
         var projectiles_storage = @constCast(&ecs_world.projectiles);
         var projectile_iter = projectiles_storage.iterator();
-        
+
         while (projectile_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
-            
+
             // Get transform and visual components for this projectile
             if (ecs_world.transforms.getConst(entity_id)) |transform| {
                 if (ecs_world.visuals.getConst(entity_id)) |visual| {
@@ -323,18 +322,18 @@ pub const GameRenderer = struct {
     fn renderUnitsECS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
         // Get the ECS world
         const ecs_world = world.getECSWorld();
-        
+
         // Iterate over all unit entities (cast away const for iterator access)
         var units_storage = @constCast(&ecs_world.units);
         var unit_iter = units_storage.iterator();
-        
+
         while (unit_iter.next()) |entry| {
             const unit_id = entry.key_ptr.*;
-            
-            // Skip if entity is not alive  
+
+            // Skip if entity is not alive
             var ecs_world_mut = @constCast(ecs_world);
             if (!ecs_world_mut.isAlive(unit_id)) continue;
-            
+
             // Get unit transform for rendering (render both alive and dead units)
             if (ecs_world.transforms.getConst(unit_id)) |transform| {
                 // Get visual component for color

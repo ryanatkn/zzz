@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const c = @import("sdl.zig");
 
 const math = @import("../math/mod.zig");
@@ -94,8 +93,7 @@ pub const InputState = struct {
             velocity.x += 1.0;
         }
 
-
-        const length = @sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+        const length = velocity.length();
         if (length > 0) {
             velocity.x /= length;
             velocity.y /= length;

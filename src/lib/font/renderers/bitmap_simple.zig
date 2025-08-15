@@ -56,12 +56,12 @@ pub const SimpleBitmapRenderer = struct {
 
         // Calculate render bounds based on outline bounds and font size
         const scale = font_size / 1000.0; // TTF units to pixels (assuming 1000 units per EM)
-        
+
         const bounds_width = @as(f32, @floatFromInt(outline.bounds.width())) * scale;
         const bounds_height = @as(f32, @floatFromInt(outline.bounds.height())) * scale;
-        
-        log_throttle.logInfo("simple_bitmap_bounds", "Glyph bounds: {}x{} TTF units, {}x{} pixels (scale={d:.3})", .{outline.bounds.width(), outline.bounds.height(), bounds_width, bounds_height, scale});
-        
+
+        log_throttle.logInfo("simple_bitmap_bounds", "Glyph bounds: {}x{} TTF units, {}x{} pixels (scale={d:.3})", .{ outline.bounds.width(), outline.bounds.height(), bounds_width, bounds_height, scale });
+
         // Add padding for safety
         const padding = 2.0;
         const render_width = @as(u32, @intFromFloat(@ceil(bounds_width + padding * 2.0)));
@@ -71,14 +71,14 @@ pub const SimpleBitmapRenderer = struct {
         const max_size = self.config.max_glyph_size;
         const width = @min(render_width, max_size);
         const height = @min(render_height, max_size);
-        
-        log_throttle.logDebug("simple_bitmap_render_size", "Calculated render size: {}x{} -> clamped to {}x{} (max_size={})", .{render_width, render_height, width, height, max_size});
+
+        log_throttle.logDebug("simple_bitmap_render_size", "Calculated render size: {}x{} -> clamped to {}x{} (max_size={})", .{ render_width, render_height, width, height, max_size });
 
         if (width == 0 or height == 0) {
             // Empty glyph
             const empty_bitmap = try allocator.alloc(u8, 1);
             empty_bitmap[0] = 0;
-            
+
             const end_time = std.time.microTimestamp();
             return RenderResult{
                 .bitmap = empty_bitmap,
@@ -107,7 +107,7 @@ pub const SimpleBitmapRenderer = struct {
             while (x < width) : (x += 1) {
                 const pixel_x = @as(f32, @floatFromInt(x)) - transform_offset_x;
                 const pixel_y = @as(f32, @floatFromInt(y)) - transform_offset_y;
-                
+
                 // Convert to TTF coordinate space
                 const ttf_x = pixel_x / scale;
                 // Flip Y coordinate: TTF uses bottom-up, screen uses top-down
@@ -115,7 +115,7 @@ pub const SimpleBitmapRenderer = struct {
 
                 // Test if point is inside glyph using winding number
                 const inside = isPointInside(Point{ .x = ttf_x, .y = ttf_y }, outline.contours);
-                
+
                 const bitmap_idx = y * width + x;
                 bitmap[bitmap_idx] = if (inside) 255 else 0;
             }
@@ -124,16 +124,16 @@ pub const SimpleBitmapRenderer = struct {
         // Calculate metrics
         const end_time = std.time.microTimestamp();
         const render_time = @as(u64, @intCast(end_time - start_time));
-        
+
         self.metrics.glyphs_rendered += 1;
         self.metrics.total_render_time_us += render_time;
         self.metrics.avg_render_time_us = self.metrics.total_render_time_us / self.metrics.glyphs_rendered;
-        
+
         // Calculate quality score (simple bitmap gets medium score)
         const quality_score = 60.0; // Fixed score for simple bitmap
-        
-        log_throttle.logDebug("simple_bitmap_result", "SimpleBitmapRenderer: rendered {}x{} bitmap", .{width, height});
-        
+
+        log_throttle.logDebug("simple_bitmap_result", "SimpleBitmapRenderer: rendered {}x{} bitmap", .{ width, height });
+
         return RenderResult{
             .bitmap = bitmap,
             .width = width,
@@ -165,7 +165,7 @@ pub const SimpleBitmapRenderer = struct {
                     // Compute intersection point
                     const t = (point.y - p1.y) / (p2.y - p1.y);
                     const intersection_x = p1.x + t * (p2.x - p1.x);
-                    
+
                     if (intersection_x > point.x) {
                         // Edge crosses the ray to the right
                         if (p1.y < p2.y) {

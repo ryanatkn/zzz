@@ -204,7 +204,7 @@ pub const GPUVectorRenderer = struct {
                 .x = end.x - start.x,
                 .y = end.y - start.y,
             };
-            const length = @sqrt(line_vec.x * line_vec.x + line_vec.y * line_vec.y);
+            const length = line_vec.length();
 
             if (length > 0.001) { // Avoid zero-length lines
                 simple_gpu_renderer.drawRect(cmd_buffer, render_pass, start, Vec2{ .x = length, .y = 1.0 }, color);
@@ -224,7 +224,7 @@ pub const GPUVectorRenderer = struct {
                 .x = end.x - start.x,
                 .y = end.y - start.y,
             };
-            const length = @sqrt(line_vec.x * line_vec.x + line_vec.y * line_vec.y);
+            const length = line_vec.length();
 
             if (length > 0.001) {
                 // Draw thick line as rectangle

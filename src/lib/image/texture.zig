@@ -3,7 +3,6 @@ const c = @import("../platform/sdl.zig");
 
 /// GPU texture creation and management utilities
 /// Centralizes texture creation patterns used throughout the font and text systems
-
 /// GPU texture wrapper for easier management
 pub const Texture = struct {
     texture: *c.sdl.SDL_GPUTexture,
@@ -86,7 +85,7 @@ pub fn uploadRGBAData(device: *c.sdl.SDL_GPUDevice, texture: *c.sdl.SDL_GPUTextu
     const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(device) orelse {
         return error.CommandBufferCreationFailed;
     };
-    
+
     const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer) orelse {
         return error.CopyPassCreationFailed;
     };
@@ -126,4 +125,3 @@ pub fn createWhite(device: *c.sdl.SDL_GPUDevice) !Texture {
     const white_rgba = [_]u8{ 255, 255, 255, 255 }; // Opaque white
     return try createFromRGBA(device, &white_rgba, 1, 1);
 }
-

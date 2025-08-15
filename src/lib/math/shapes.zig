@@ -71,13 +71,13 @@ pub const Bounds = struct {
     /// Check if point is inside bounds
     pub fn contains(self: Bounds, point: Vec2) bool {
         return point.x >= self.x_min and point.x <= self.x_max and
-               point.y >= self.y_min and point.y <= self.y_max;
+            point.y >= self.y_min and point.y <= self.y_max;
     }
 
     /// Check if bounds intersect
     pub fn intersects(self: Bounds, other: Bounds) bool {
         return self.x_min <= other.x_max and self.x_max >= other.x_min and
-               self.y_min <= other.y_max and self.y_max >= other.y_min;
+            self.y_min <= other.y_max and self.y_max >= other.y_min;
     }
 
     /// Expand bounds to include a point
@@ -183,13 +183,13 @@ pub const Rectangle = struct {
     /// Check if point is inside rectangle
     pub fn contains(self: Rectangle, point: Vec2) bool {
         return point.x >= self.position.x and point.x <= self.position.x + self.size.x and
-               point.y >= self.position.y and point.y <= self.position.y + self.size.y;
+            point.y >= self.position.y and point.y <= self.position.y + self.size.y;
     }
 
     /// Check if rectangles intersect
     pub fn intersects(self: Rectangle, other: Rectangle) bool {
         return self.position.x <= other.position.x + other.size.x and self.position.x + self.size.x >= other.position.x and
-               self.position.y <= other.position.y + other.size.y and self.position.y + self.size.y >= other.position.y;
+            self.position.y <= other.position.y + other.size.y and self.position.y + self.size.y >= other.position.y;
     }
 
     /// Get area
@@ -291,9 +291,9 @@ pub const Line = struct {
         const line_vec = self.vector();
         const point_vec = point.sub(self.start);
         const line_len_sq = line_vec.lengthSquared();
-        
+
         if (line_len_sq == 0) return self.start;
-        
+
         const t = std.math.clamp(point_vec.dot(line_vec) / line_len_sq, 0.0, 1.0);
         return self.pointAt(t);
     }
@@ -312,34 +312,34 @@ pub const Line = struct {
 
 test "Rectangle operations" {
     const rect = Rectangle.fromXYWH(10.0, 20.0, 30.0, 40.0);
-    
+
     try std.testing.expect(rect.area() == 1200.0);
     try std.testing.expect(rect.contains(Vec2.init(25.0, 35.0)));
     try std.testing.expect(!rect.contains(Vec2.init(5.0, 35.0)));
-    
+
     const center_pt = rect.center();
     try std.testing.expect(center_pt.x == 25.0 and center_pt.y == 40.0);
 }
 
 test "Circle operations" {
     const circle = Circle.init(Vec2.init(0.0, 0.0), 5.0);
-    
+
     try std.testing.expect(circle.contains(Vec2.init(3.0, 4.0))); // 3-4-5 triangle
     try std.testing.expect(!circle.contains(Vec2.init(5.0, 5.0))); // Outside
-    
+
     const area = circle.area();
     try std.testing.expect(@abs(area - 78.54) < 0.1); // π * 5²
 }
 
 test "Bounds operations" {
     const bounds = Bounds.init(10.0, 20.0, 50.0, 80.0);
-    
+
     try std.testing.expect(bounds.width() == 40.0);
     try std.testing.expect(bounds.height() == 60.0);
-    
+
     const center_pt = bounds.center();
     try std.testing.expect(center_pt.x == 30.0 and center_pt.y == 50.0);
-    
+
     try std.testing.expect(bounds.contains(Vec2.init(30.0, 40.0)));
     try std.testing.expect(!bounds.contains(Vec2.init(5.0, 40.0)));
 }
