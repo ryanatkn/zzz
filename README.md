@@ -4,7 +4,7 @@
 
 Zzz is a GUI in Zig.
 For the companion CLI see [zz](https://github.com/ryanatkn/zz)
-and ztack.net for a web+ stack.
+and [ztack.net](https://www.ztack.net/) for a web+ stack.
 
 ## Quick start
 
