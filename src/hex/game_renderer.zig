@@ -2,7 +2,6 @@ const std = @import("std");
 
 const c = @import("../lib/platform/sdl.zig");
 
-const entities = @import("entities.zig");
 const hex_world = @import("hex_world.zig");
 const types = @import("../lib/core/types.zig");
 const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");

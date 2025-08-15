@@ -230,7 +230,9 @@ pub const World = struct {
         try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.altar, lifestone_size));
         
         // Add interactable component for attunement
-        try self.interactables.add(id, components.Interactable.init(components.Interactable.InteractionType.transformable));
+        var interactable = components.Interactable.init(components.Interactable.InteractionType.transformable);
+        interactable.attuned = attuned;
+        try self.interactables.add(id, interactable);
 
         return id;
     }

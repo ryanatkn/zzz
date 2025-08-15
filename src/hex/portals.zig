@@ -1,86 +1,12 @@
 const std = @import("std");
-
-const types = @import("../lib/core/types.zig");
-const entities = @import("entities.zig");
-const behaviors = @import("behaviors.zig");
 const math = @import("../lib/math/mod.zig");
-const physics = @import("physics.zig");
-const player_controller = @import("player.zig");
-const input = @import("../lib/platform/input.zig");
-const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
+const physics = @import("physics.zig");
+const constants = @import("constants.zig");
 const effects = @import("effects.zig");
-
-const Vec2 = types.Vec2;
-const HexWorld = @import("hex_world.zig").HexWorld;
-const Portal = entities.Portal;
 
 // Portal cooldown to prevent re-triggering after travel
 var portal_cooldown: f32 = 0;
-
-pub fn handlePortalTravel(game_state: anytype, portal: *const Portal) void {
-    const world = &game_state.world;
-    const effect_system = &game_state.effect_system;
-    game_state.input_state.clearMouseHold();
-
-    const movement_direction = player_controller.getPlayerMovementDirectionECS(world);
-    const player_radius = world.getPlayerRadius();
-
-    const origin_zone = world.current_zone;
-    const destination_zone = portal.destination_zone;
-    
-    // Set cooldown to prevent immediate re-triggering
-    portal_cooldown = 1.0; // 1 second cooldown
-
-    const new_zone = &world.zones[destination_zone];
-    var spawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y }; // Default fallback
-    
-    // Find return portal and calculate spawn position
-    for (0..new_zone.portal_count) |i| {
-        const return_portal = &new_zone.portals.items[i];
-        if (return_portal.active and return_portal.destination_zone == origin_zone) {
-            const offset_distance = return_portal.radius + player_radius + constants.PORTAL_SPAWN_OFFSET;
-
-            if (movement_direction.x != 0 or movement_direction.y != 0) {
-                spawn_pos = Vec2{
-                    .x = return_portal.pos.x + movement_direction.x * offset_distance,
-                    .y = return_portal.pos.y + movement_direction.y * offset_distance,
-                };
-            } else {
-                spawn_pos = Vec2{
-                    .x = return_portal.pos.x,
-                    .y = return_portal.pos.y + offset_distance,
-                };
-            }
-
-            // Clamp spawn position to screen bounds
-            spawn_pos.x = std.math.clamp(spawn_pos.x, player_radius, constants.SCREEN_WIDTH - player_radius);
-            spawn_pos.y = std.math.clamp(spawn_pos.y, player_radius, constants.SCREEN_HEIGHT - player_radius);
-
-            // Add portal travel effect on the player's current position
-            effect_system.addPortalTravelEffect(world.getPlayerPos(), player_radius);
-
-            // Travel to destination zone with calculated spawn position
-            world.travelToZone(destination_zone, spawn_pos) catch {
-                std.debug.print("Error: Failed to travel to zone {}\n", .{destination_zone});
-                return;
-            };
-
-            // Add portal ripple effect on the portal itself in the new zone
-            effect_system.addPortalRippleEffect(return_portal.pos, return_portal.radius);
-            return;
-        }
-    }
-
-    // Fallback: no return portal found, spawn at center
-    world.travelToZone(destination_zone, spawn_pos) catch {
-        std.debug.print("Error: Failed to travel to zone {} (fallback)\n", .{destination_zone});
-        return;
-    };
-
-    // Add portal travel effect for fallback spawn
-    effect_system.addPortalTravelEffect(spawn_pos, player_radius);
-}
 
 // Update portal cooldown timer
 pub fn updatePortalCooldown(deltaTime: f32) void {
@@ -100,23 +26,30 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
 
-    // Check collision with all portals using ECS queries
-    const ecs_world = world.getECSWorld();
-    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
-    
-    while (terrain_iter.next()) |entry| {
-        const entity_id = entry.key_ptr.*;
-        const terrain = entry.value_ptr.*;
+    // Check collisions with all portal entities using ECS
+    var portal_iter = world.world.interactables.iterator();
+    while (portal_iter.next()) |entry| {
+        const portal_id = entry.key_ptr.*;
+        const interactable = entry.value_ptr;
+        if (!world.world.isAlive(portal_id)) continue;
         
-        // Only check portals (door terrain with interactable component)
-        if (terrain.terrain_type != .door) continue;
-        if (!ecs_world.interactables.has(entity_id)) continue;
-        
-        // Get components
-        if (ecs_world.transforms.getConst(entity_id)) |transform| {
-            if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+        // Check if it's a portal (has destination_zone set)
+        if (interactable.destination_zone) |destination_zone| {
+            if (world.world.transforms.get(portal_id)) |transform| {
                 if (physics.checkPlayerPortalCollisionECS(player_pos, player_radius, transform)) {
-                    handlePortalTravelECS(game_state, entity_id, interactable);
+                    // Set cooldown and travel
+                    portal_cooldown = 1.0; // 1 second cooldown
+                    
+                    // Add portal travel effect
+                    game_state.effect_system.addPortalTravelEffect(player_pos, player_radius);
+                    
+                    // Travel to destination zone
+                    const zone = &world.zones[destination_zone];
+                    world.travelToZone(destination_zone, zone.spawn_pos) catch {
+                        std.debug.print("Error: Failed to travel to zone {}\n", .{destination_zone});
+                        return false;
+                    };
+                    
                     return true;
                 }
             }
@@ -124,14 +57,4 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
     }
     
     return false;
-}
-
-// Handle portal travel using ECS components
-fn handlePortalTravelECS(game_state: anytype, portal_id: ecs.EntityId, interactable: *const ecs.components.Interactable) void {
-    _ = portal_id; // Unused for now
-    if (interactable.destination_zone) |destination| {
-        // Set cooldown to prevent immediate re-triggering
-        portal_cooldown = 1.0; // 1 second cooldown
-        game_state.travelToZone(destination);
-    }
 }

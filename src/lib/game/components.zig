@@ -386,6 +386,7 @@ pub const Interactable = struct {
     state: InteractionState,
     interaction_timer: f32,
     destination_zone: ?u8, // For portals - zone to travel to
+    attuned: bool, // For lifestones - whether player is attuned to this lifestone
     interaction_data: union(enum) {
         deflect: struct {
             new_direction: Vec2,
@@ -408,6 +409,7 @@ pub const Interactable = struct {
             .state = .normal,
             .interaction_timer = 0,
             .destination_zone = null,
+            .attuned = false,
             .interaction_data = .none,
         };
     }
@@ -418,6 +420,7 @@ pub const Interactable = struct {
             .state = .normal,
             .interaction_timer = 0,
             .destination_zone = destination,
+            .attuned = false,
             .interaction_data = .none,
         };
     }

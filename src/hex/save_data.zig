@@ -1,7 +1,7 @@
 const std = @import("std");
 const types = @import("../lib/core/types.zig");
-const entities = @import("entities.zig");
 const constants = @import("constants.zig");
+const hex_world = @import("hex_world.zig");
 const game_systems = @import("../lib/game/game.zig");
 
 const Vec2 = types.Vec2;
@@ -30,12 +30,12 @@ pub const HexSaveData = struct {
     cached: CachedData,
     
     pub const ZoneLifestones = struct {
-        attuned: [entities.MAX_LIFESTONES]bool = [_]bool{false} ** entities.MAX_LIFESTONES,
+        attuned: [constants.MAX_LIFESTONES]bool = [_]bool{false} ** constants.MAX_LIFESTONES,
         count: usize = 0,
     };
     
     pub const ZoneUnits = struct {
-        killed: [entities.MAX_UNITS]bool = [_]bool{false} ** entities.MAX_UNITS,
+        killed: [constants.MAX_UNITS]bool = [_]bool{false} ** constants.MAX_UNITS,
         count: usize = 0,
     };
     
@@ -49,7 +49,7 @@ pub const HexSaveData = struct {
     };
     
     /// Create save data from current game state
-    pub fn fromGameState(world: *const entities.World, stats: GameStatistics) HexSaveData {
+    pub fn fromGameState(world: *const hex_world.HexWorld, stats: GameStatistics) HexSaveData {
         var save = HexSaveData{
             .player_zone = world.current_zone,
             .player_pos = world.player.pos,
@@ -108,7 +108,7 @@ pub const HexSaveData = struct {
     }
     
     /// Apply save data to game state
-    pub fn applyToGameState(self: *const HexSaveData, world: *entities.World, stats: *GameStatistics) void {
+    pub fn applyToGameState(self: *const HexSaveData, world: *hex_world.HexWorld, stats: *GameStatistics) void {
         // Restore player state
         world.current_zone = self.player_zone;
         world.player.pos = self.player_pos;

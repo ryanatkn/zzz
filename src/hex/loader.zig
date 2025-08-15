@@ -1,6 +1,5 @@
 const std = @import("std");
 
-const entities = @import("entities.zig");
 const hex_world = @import("hex_world.zig");
 const types = @import("../lib/core/types.zig");
 
@@ -105,20 +104,6 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 continue;
             };
             
-            // Also add to legacy ArrayList for now (dual storage during transition)
-            const obstacle = entities.Obstacle.init(
-                obstacle_data.position.x,
-                obstacle_data.position.y,
-                obstacle_data.size.x,
-                obstacle_data.size.y,
-                is_deadly,
-            );
-            zone.obstacles.append(obstacle) catch |err| {
-                std.log.err("Failed to add obstacle to ArrayList: {}", .{err});
-                continue;
-            };
-            zone.obstacle_count += 1;
-            
             _ = obstacle_id; // TODO: Track obstacle entities for zone reset
         }
         
@@ -168,19 +153,6 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 continue;
             };
             
-            // Also add to legacy ArrayList for now (dual storage during transition)
-            const portal = entities.Portal.init(
-                portal_data.position.x,
-                portal_data.position.y,
-                portal_data.radius,
-                portal_data.destination,
-            );
-            zone.portals.append(portal) catch |err| {
-                std.log.err("Failed to add portal to ArrayList: {}", .{err});
-                continue;
-            };
-            zone.portal_count += 1;
-            
             _ = portal_id; // TODO: Track portal entities for zone reset
         }
         
@@ -196,7 +168,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         
         for (lifestones) |lifestone_data| {
             // First lifestone in overworld (zone 0) is pre-attuned
-            const pre_attuned = (zone.lifestone_count == 0 and std.mem.eql(u8, data.name, "Overworld"));
+            const pre_attuned = (zone.lifestone_entities.items.len == 0 and std.mem.eql(u8, data.name, "Overworld"));
             
             // Create ECS lifestone entity
             const lifestone_id = world.createLifestone(
@@ -207,19 +179,6 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 std.log.err("Failed to create lifestone entity: {}", .{err});
                 continue;
             };
-            
-            // Also add to legacy ArrayList for now (dual storage during transition)
-            const lifestone = entities.Lifestone.init(
-                lifestone_data.position.x,
-                lifestone_data.position.y,
-                lifestone_data.radius,
-                pre_attuned,
-            );
-            zone.lifestones.append(lifestone) catch |err| {
-                std.log.err("Failed to add lifestone to ArrayList: {}", .{err});
-                continue;
-            };
-            zone.lifestone_count += 1;
             
             _ = lifestone_id; // TODO: Track lifestone entities for zone reset
         }

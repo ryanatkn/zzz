@@ -1,7 +1,6 @@
 const std = @import("std");
 
 const types = @import("../lib/core/types.zig");
-const entities = @import("entities.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const effects = @import("effects.zig");
@@ -151,15 +150,6 @@ pub fn handlePlayerDeathOnHazard(world: *HexWorld) void {
     std.debug.print("Player died on hazard! Press R or click to respawn\n", .{});
 }
 
-pub fn handleUnitDeath(unit: *entities.Unit) void {
-    behaviors.killUnit(unit);
-    std.debug.print("Unit defeated!\n", .{});
-}
-
-pub fn handleUnitDeathOnHazard(unit: *entities.Unit) void {
-    behaviors.killUnit(unit);
-    std.debug.print("Unit died on hazard!\n", .{});
-}
 
 // ECS-compatible unit death on hazard
 pub fn handleUnitDeathOnHazardECS(unit_entity: ecs.EntityId, world: *HexWorld) void {

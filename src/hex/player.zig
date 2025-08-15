@@ -1,7 +1,6 @@
 const std = @import("std");
 
 const types = @import("../lib/core/types.zig");
-const entities = @import("entities.zig");
 const hex_world = @import("hex_world.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");

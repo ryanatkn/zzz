@@ -3,7 +3,6 @@ const types = @import("../lib/core/types.zig");
 const math = @import("../lib/math/mod.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const constants = @import("constants.zig");
-const entities = @import("entities.zig");
 const combat = @import("combat.zig");
 
 const Vec2 = types.Vec2;
@@ -43,18 +42,10 @@ pub const HexWorld = struct {
         };
 
         zone_type: ZoneType,
-        camera_mode: entities.CameraMode,
+        camera_mode: constants.CameraMode,
         camera_scale: f32,
         spawn_pos: Vec2,
         background_color: Color,
-        portal_count: usize,
-        portals: std.ArrayList(entities.Portal), // TODO: Convert to ECS entities
-        unit_count: usize, // TODO: Remove when fully converted to ECS
-        lifestone_count: usize, // TODO: Remove when fully converted to ECS
-        units: std.ArrayList(entities.Unit), // TODO: Remove when fully converted to ECS
-        obstacle_count: usize, // TODO: Remove when fully converted to ECS
-        obstacles: std.ArrayList(entities.Obstacle), // TODO: Remove when fully converted to ECS
-        lifestones: std.ArrayList(entities.Lifestone), // TODO: Remove when fully converted to ECS
         
         // Entity lists for this zone (for zone reset functionality)
         unit_entities: std.ArrayList(EntityId),
@@ -75,14 +66,6 @@ pub const HexWorld = struct {
                 },
                 .spawn_pos = Vec2{ .x = 400, .y = 300 }, // Default, overridden by loader
                 .background_color = Color{ .r = 0, .g = 0, .b = 0, .a = 1 }, // Default black
-                .portal_count = 0, // Will be set by loader
-                .portals = std.ArrayList(entities.Portal).init(allocator),
-                .unit_count = 0, // Will be set by loader
-                .lifestone_count = 0, // Will be set by loader
-                .units = std.ArrayList(entities.Unit).init(allocator),
-                .obstacle_count = 0, // Will be set by loader
-                .obstacles = std.ArrayList(entities.Obstacle).init(allocator),
-                .lifestones = std.ArrayList(entities.Lifestone).init(allocator),
                 .unit_entities = std.ArrayList(EntityId).init(allocator),
                 .portal_entities = std.ArrayList(EntityId).init(allocator),
                 .lifestone_entities = std.ArrayList(EntityId).init(allocator),
@@ -91,10 +74,6 @@ pub const HexWorld = struct {
         }
         
         pub fn deinit(self: *Zone) void {
-            self.portals.deinit();
-            self.units.deinit();
-            self.obstacles.deinit();
-            self.lifestones.deinit();
             self.unit_entities.deinit();
             self.portal_entities.deinit();
             self.lifestone_entities.deinit();

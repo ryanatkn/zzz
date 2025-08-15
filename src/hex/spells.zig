@@ -1,6 +1,5 @@
 const std = @import("std");
 const types = @import("../lib/core/types.zig");
-const entities = @import("entities.zig");
 const effects = @import("effects.zig");
 const constants = @import("constants.zig");
 const components = @import("../lib/game/components.zig");
@@ -151,7 +150,7 @@ pub const SpellSystem = struct {
 
             .Blink => {
                 // Only works in dungeons (follow camera mode)
-                if (zone.camera_mode != entities.CameraMode.follow) {
+                if (zone.camera_mode != constants.CameraMode.follow) {
                     std.debug.print("Blink only works in dungeons\n", .{});
                     return false;
                 }

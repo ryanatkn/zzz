@@ -6,6 +6,13 @@ pub const SCREEN_HEIGHT = 1080.0;
 pub const SCREEN_CENTER_X = SCREEN_WIDTH / 2.0;
 pub const SCREEN_CENTER_Y = SCREEN_HEIGHT / 2.0;
 
+// Entity limits (moved from entities.zig)
+pub const MAX_UNITS = 12;
+pub const MAX_OBSTACLES = 50;
+pub const MAX_BULLETS = 20;
+pub const MAX_PORTALS = 6;
+pub const MAX_LIFESTONES = 13;
+
 // Movement and gameplay constants
 pub const PLAYER_SPEED = 600.0;
 pub const PLAYER_RADIUS = 20.0;
@@ -16,6 +23,12 @@ pub const UNIT_HOME_TOLERANCE = 2.0; // Distance tolerance for "at home" check
 pub const BULLET_SPEED = 400.0;
 pub const BULLET_RADIUS = 5.0;
 pub const PORTAL_SPAWN_OFFSET = 10.0; // Extra distance when spawning near portals
+
+// Camera modes (moved from entities.zig)
+pub const CameraMode = enum {
+    fixed,
+    follow,
+};
 
 // Color constants (imported from shared colors module)
 pub const COLOR_PLAYER_ALIVE = colors.PLAYER_ALIVE;
