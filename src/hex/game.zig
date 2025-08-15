@@ -387,13 +387,13 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
 
         // Get components
         if (ecs_world.units.getComponentMut(unit_id, .transform)) |transform| {
-            if (ecs_world.units.getComponent(unit_id, .health)) |health| {
+            if (ecs_world.units.getComponentMut(unit_id, .health)) |health| {
                 if (!health.alive) continue;
 
                 if (ecs_world.units.getComponentMut(unit_id, .unit)) |unit_comp| {
                     const old_pos = transform.pos;
 
-                    if (ecs_world.units.getComponent(unit_id, .visual)) |visual| {
+                    if (ecs_world.units.getComponentMut(unit_id, .visual)) |visual| {
                         const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnitECS(unit_id, ecs_world);
 
                         // Update unit AI behavior using ECS components

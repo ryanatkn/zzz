@@ -81,7 +81,7 @@ pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.En
                     // Check if it's a deadly obstacle
                     if (terrain.terrain_type == .pit) {
                         unit_health.alive = false;
-                        if (ecs_world.units.getComponent(unit_id, .visual)) |unit_visual| {
+                        if (ecs_world.units.getComponentMut(unit_id, .visual)) |unit_visual| {
                             unit_visual.color = constants.COLOR_DEAD;
                         }
                     } else {

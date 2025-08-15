@@ -1,6 +1,6 @@
 # Zzz - SDL3 Game Engine with Hex Game Implementation
 
-NOTE TO LLMs: see ./WORKFLOW.md for dev sessions
+NOTE TO THE MACHINE: see ./WORKFLOW.md for dev sessions
 
 A GPU-accelerated game engine built with Zig, SDL3 GPU API, and HLSL shaders, featuring the Hex 2D action RPG as a reference implementation.
 
@@ -437,4 +437,4 @@ $ zig build --help       # Show all build options
 - memorize this perspective: a scalable lib directory can look like, for a system that exposes all modules 
   to all other modules without arbitrary restrictions.
 
-NOTE TO LLMs: see ./WORKFLOW.md for dev sessions
+NOTE TO THE MACHINE: see ./WORKFLOW.md for dev sessions
