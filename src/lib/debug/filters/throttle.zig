@@ -45,7 +45,7 @@ pub const Throttle = struct {
     }
     
     /// Check if a log message should be emitted or throttled
-    pub fn shouldLog(self: *Self, key: []const u8, value: []const u8) bool {
+    pub fn shouldLog(self: *Self, _: std.log.Level, key: []const u8, value: []const u8) bool {
         const now = std.time.milliTimestamp();
         const key_hash = self.hashKey(key);
         

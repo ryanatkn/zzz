@@ -68,7 +68,7 @@ pub fn Logger(comptime config: LoggerConfig) type {
             
             // Check if filter allows this message
             const should_log = if (@hasDecl(@TypeOf(self.filter), "shouldLog"))
-                self.filter.shouldLog(key, message)
+                self.filter.shouldLog(level, key, message)
             else
                 true;
                 
