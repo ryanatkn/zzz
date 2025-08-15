@@ -209,3 +209,22 @@ world.updateProjectiles(dt);
 ### 🎊 Migration Status: **COMPLETE**
 
 The ECS migration is **fully complete** with a production-ready architecture that maintains the game's procedural, performance-focused philosophy while providing excellent extensibility for future development. All major systems have been converted to use ECS queries, dual storage has been eliminated, and the architecture is clean and maintainable.
+
+---
+
+## 📋 Post-Migration Cleanup (December 2024)
+
+### Interface Standardization ✅ COMPLETED
+- **Fixed Old Interface Usage**: Eliminated references to pre-ECS `world.player.alive` pattern
+- **Standardized World Access**: Consistent use of `getECSWorld()` throughout codebase
+- **Simplified Entity Creation**: Removed hardcoded defaults from loader and world creation methods
+
+### Access Pattern Guidelines ✅ ESTABLISHED
+- **HexWorld Layer**: Use helper methods (`getPlayerAlive()`, `getPlayerPos()`) for game logic
+- **ECS Layer**: Access via `const ecs_world = world.getECSWorldMut()` for component iteration
+- **Clear Separation**: No more confusing `world.world.X` double-access patterns
+
+### Data Loading Simplification ✅ COMPLETED
+- **Clean Game Data**: `game_data.zon` remains purely declarative
+- **Simple Defaults**: Units created with just position and radius (health=1.0 by default)
+- **Logic Separation**: Gameplay values defined in ECS components, not in data loader

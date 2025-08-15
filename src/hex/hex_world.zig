@@ -318,10 +318,8 @@ pub const HexWorld = struct {
         self: *HexWorld,
         pos: Vec2,
         radius: f32,
-        health: f32,
-        unit_type: components.Unit.UnitType,
     ) !EntityId {
-        const unit = try self.world.createUnit(pos, radius, health, unit_type);
+        const unit = try self.world.createUnit(pos, radius);
 
         // Add to current zone's unit list for reset functionality
         try self.zones[self.current_zone].unit_entities.append(unit);

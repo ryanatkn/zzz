@@ -102,17 +102,14 @@ pub const World = struct {
         self: *World,
         pos: components.Vec2,
         radius: f32,
-        health: f32,
-        unit_type: components.Unit.UnitType,
     ) !EntityId {
         const id = try self.createEntity();
         errdefer self.destroyEntity(id) catch {};
 
         try self.transforms.add(id, components.Transform.init(pos, radius));
-        try self.healths.add(id, components.Health.init(health));
-        try self.movements.add(id, components.Movement.init(100));
+        try self.healths.add(id, components.Health.init(1.0)); // Simple 1-hit units like original
         try self.visuals.add(id, components.Visual.init(.{ .r = 1, .g = 1, .b = 1, .a = 1 }));
-        try self.units.add(id, components.Unit.init(unit_type, pos));
+        try self.units.add(id, components.Unit.init(.enemy, pos)); // All units are enemies by default
 
         return id;
     }

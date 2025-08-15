@@ -380,23 +380,24 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
     // Note: Obstacle collision now uses ECS queries
 
     // Query all units from ECS system
-    var unit_iter = world.world.units.iterator();
+    const ecs_world = world.getECSWorldMut();
+    var unit_iter = ecs_world.units.iterator();
     while (unit_iter.next()) |entry| {
         const unit_id = entry.key_ptr.*;
 
         // Skip if entity is not alive
-        if (!world.world.isAlive(unit_id)) continue;
+        if (!ecs_world.isAlive(unit_id)) continue;
 
         // Get components
-        if (world.world.transforms.get(unit_id)) |transform| {
-            if (world.world.healths.get(unit_id)) |health| {
+        if (ecs_world.transforms.get(unit_id)) |transform| {
+            if (ecs_world.healths.get(unit_id)) |health| {
                 if (!health.alive) continue;
 
-                if (world.world.units.get(unit_id)) |unit_comp| {
+                if (ecs_world.units.get(unit_id)) |unit_comp| {
                     const old_pos = transform.pos;
 
-                    if (world.world.visuals.get(unit_id)) |visual| {
-                        const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnitECS(unit_id, &world.world);
+                    if (ecs_world.visuals.get(unit_id)) |visual| {
+                        const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnitECS(unit_id, ecs_world);
 
                         // Update unit AI behavior using ECS components
                         behaviors.updateUnitWithAggroModECS(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);

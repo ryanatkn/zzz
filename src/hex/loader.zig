@@ -118,12 +118,10 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         world.current_zone = zone_index;
 
         for (units) |unit_data| {
-            // Create ECS unit entity (default to enemy type)
+            // Create ECS unit entity with simple defaults
             const unit_id = world.createUnit(
                 Vec2{ .x = unit_data.position.x, .y = unit_data.position.y },
                 unit_data.radius,
-                100.0, // Default health
-                .enemy, // Default unit type
             ) catch |err| {
                 std.log.err("Failed to create unit entity: {}", .{err});
                 continue;

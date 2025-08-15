@@ -28,15 +28,16 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
     const player_radius = world.getPlayerRadius();
 
     // Check collisions with all portal entities using ECS
-    var portal_iter = world.world.interactables.iterator();
+    const ecs_world = world.getECSWorldMut();
+    var portal_iter = ecs_world.interactables.iterator();
     while (portal_iter.next()) |entry| {
         const portal_id = entry.key_ptr.*;
         const interactable = entry.value_ptr;
-        if (!world.world.isAlive(portal_id)) continue;
+        if (!ecs_world.isAlive(portal_id)) continue;
 
         // Check if it's a portal (has destination_zone set)
         if (interactable.destination_zone) |destination_zone| {
-            if (world.world.transforms.get(portal_id)) |transform| {
+            if (ecs_world.transforms.get(portal_id)) |transform| {
                 if (physics.checkPlayerPortalCollisionECS(player_pos, player_radius, transform)) {
                     // Set cooldown and travel
                     portal_cooldown = 1.0; // 1 second cooldown

@@ -14,11 +14,9 @@ pub const EffectType = enum {
     player_spawn, // Dramatic ping when player respawns
     portal_travel, // Multiple pings when player travels through portal
     portal_ripple, // Subtle ripples emanating from portal
-    portal_ambient, // Continuous pulsing field around portals
-    portal_middle, // Medium layer with different timing between outer and inner
-    portal_inner, // Faster, smaller inner aura around portals
-    lifestone_glow, // Gentle glow around lifestones
-    lifestone_inner, // Faster inner aura inside lifestone glow
+    portal_ambient, // Single portal effect (reduced from 3 layers)
+    lifestone_glow, // Gentle glow around unattuned lifestones
+    lifestone_inner, // Brighter effect for attuned lifestones
     lull_area, // Area of effect indicator for Lull spell
     unit_effect_aura, // Glowing aura around units under effects
 };
@@ -117,16 +115,6 @@ pub const Effect = struct {
                 const pulse = getPulse(elapsed, 0.5, 0.0);
                 return self.radius * (0.9 + pulse * 0.2); // 90% to 110% size
             },
-            .portal_middle => {
-                // Medium size pulse with phase offset for staggered timing
-                const pulse = getPulse(elapsed, 0.65, 2.1);
-                return self.radius * (0.85 + pulse * 0.4); // 85% to 125% size
-            },
-            .portal_inner => {
-                // Faster size pulse with different phase offset
-                const pulse = getPulse(elapsed, 0.8, 4.2);
-                return self.radius * (0.9 + pulse * 0.8); // 90% to 170% size (much larger growth)
-            },
             .lifestone_glow => {
                 // Very gentle size pulse for lifestone glow
                 const pulse = getPulse(elapsed, 0.7, 0.0);
@@ -184,16 +172,6 @@ pub const Effect = struct {
                 // Gentle but visible pulse for ambient effects
                 const pulse = getPulse(elapsed, 0.6, 0.0);
                 return (0.22 + pulse * 0.03) * self.intensity; // 0.22 to 0.25 range
-            },
-            .portal_middle => {
-                // Medium pulse for middle portal layer with phase offset
-                const pulse = getPulse(elapsed, 0.78, 1.8);
-                return (0.20 + pulse * 0.04) * self.intensity; // 0.20 to 0.24 range
-            },
-            .portal_inner => {
-                // Faster pulse for inner portal aura with phase offset
-                const pulse = getPulse(elapsed, 0.96, 3.5);
-                return (0.18 + pulse * 0.05) * self.intensity; // 0.18 to 0.23 range
             },
             .lifestone_glow => {
                 // Gentle pulse for lifestone auras
@@ -269,24 +247,6 @@ pub const Effect = struct {
                 return Color{
                     .r = 255,
                     .g = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
-                    .b = 255,
-                    .a = @as(u8, @intFromFloat(@min(255.0, 255.0 * intensity))),
-                };
-            },
-            .portal_middle => {
-                // Medium purple between outer and inner layers
-                return Color{
-                    .r = 255,
-                    .g = @as(u8, @intFromFloat(@min(255.0, 150.0 * intensity))),
-                    .b = 255,
-                    .a = @as(u8, @intFromFloat(@min(255.0, 255.0 * intensity))),
-                };
-            },
-            .portal_inner => {
-                // Slightly different purple for inner aura (more magenta)
-                return Color{
-                    .r = 255,
-                    .g = @as(u8, @intFromFloat(@min(255.0, 120.0 * intensity))),
                     .b = 255,
                     .a = @as(u8, @intFromFloat(@min(255.0, 255.0 * intensity))),
                 };
@@ -443,10 +403,8 @@ pub const EffectSystem = struct {
     }
 
     pub fn addPortalAmbientEffect(self: *Self, pos: Vec2, portal_radius: f32) void {
-        // Triple-layer persistent aura around portals with different timings
-        self.addEffect(pos, portal_radius * 1.44, .portal_ambient, 0.0); // Outer gentle pulse
-        self.addEffect(pos, portal_radius * 1.32, .portal_middle, 0.0); // Middle layer with different timing
-        self.addEffect(pos, portal_radius * 1.2, .portal_inner, 0.0); // Inner dynamic pulse
+        // Single subtle portal effect to reduce visual clutter
+        self.addEffect(pos, portal_radius * 1.3, .portal_ambient, 0.0); // Single portal aura
     }
 
     pub fn addLifestoneGlowEffect(self: *Self, pos: Vec2, lifestone_radius: f32, attuned: bool) void {
@@ -469,14 +427,10 @@ pub const EffectSystem = struct {
     }
 
     fn addLifestoneGlowEffectParts(self: *Self, pos: Vec2, lifestone_radius: f32, add_outer: bool, attuned: bool) void {
-        // Outer lifestone glow (always present when add_outer is true)
+        // Single lifestone effect to reduce visual clutter
         if (add_outer) {
-            self.addEffect(pos, lifestone_radius * 1.8, .lifestone_glow, 0.0);
-        }
-
-        // Inner lifestone aura - only for attuned lifestones
-        if (attuned) {
-            self.addEffect(pos, lifestone_radius * 1.4, .lifestone_inner, 0.0);
+            const effect_type: EffectType = if (attuned) .lifestone_inner else .lifestone_glow;
+            self.addEffect(pos, lifestone_radius * 1.5, effect_type, 0.0);
         }
     }
 
@@ -486,7 +440,7 @@ pub const EffectSystem = struct {
         var write_index: usize = 0;
         for (0..self.count) |read_index| {
             const effect = &self.effects[read_index];
-            if (effect.effect_type != .portal_ambient and effect.effect_type != .portal_middle and effect.effect_type != .portal_inner and effect.effect_type != .lifestone_glow and effect.effect_type != .lifestone_inner) {
+            if (effect.effect_type != .portal_ambient and effect.effect_type != .lifestone_glow and effect.effect_type != .lifestone_inner) {
                 if (write_index != read_index) {
                     self.effects[write_index] = self.effects[read_index];
                 }

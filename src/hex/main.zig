@@ -38,8 +38,6 @@ const GameRenderer = game_renderer_mod.GameRenderer;
 const GameState = game_controller.GameState;
 const Hud = hud.Hud;
 
-// Test mode for debugging - change to enable debug tests
-const DEBUG_MODE = false; // Set to true to run debug tests instead of game
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -86,11 +84,6 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     };
     errdefer c.sdl.SDL_DestroyWindow(window);
 
-    if (DEBUG_MODE) {
-        // Debug mode - no GPU renderer needed
-        fully_initialized = true;
-        return c.sdl.SDL_APP_CONTINUE;
-    }
 
     // Initialize reactive system
     try reactive_context.initContext(global_allocator);
@@ -151,13 +144,8 @@ fn sdlAppIterate(appstate: ?*anyopaque) !c.sdl.SDL_AppResult {
         return c.sdl.SDL_APP_SUCCESS;
     }
 
-    if (DEBUG_MODE) {
-        // Debug mode - no tests available
-        return c.sdl.SDL_APP_SUCCESS;
-    } else {
-        // Game mode - run actual game
-        try runGameLoop();
-    }
+    // Run the game
+    try runGameLoop();
 
     return c.sdl.SDL_APP_CONTINUE;
 }
@@ -182,7 +170,7 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
     _ = result catch {};
 
     if (fully_initialized) {
-        if (!DEBUG_MODE) {
+        {
             game_state.?.deinitHud();
 
             // CRITICAL: Clean up persistent text system BEFORE game_renderer.deinit()

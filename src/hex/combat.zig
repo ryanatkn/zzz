@@ -156,10 +156,11 @@ pub fn handlePlayerDeathOnHazard(world: *HexWorld) void {
 
 // ECS-compatible unit death on hazard
 pub fn handleUnitDeathOnHazardECS(unit_entity: ecs.EntityId, world: *HexWorld) void {
-    if (world.world.healths.get(unit_entity)) |health| {
+    const ecs_world = world.getECSWorldMut();
+    if (ecs_world.healths.get(unit_entity)) |health| {
         health.alive = false;
     }
-    if (world.world.visuals.get(unit_entity)) |visual| {
+    if (ecs_world.visuals.get(unit_entity)) |visual| {
         visual.color = constants.COLOR_DEAD;
     }
     log_throttle.logInfo("unit_hazard_death", "Unit died on hazard!", .{});

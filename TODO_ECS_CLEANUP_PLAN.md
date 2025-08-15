@@ -536,3 +536,36 @@ After types.zig elimination and aggressive cleanup, remaining opportunities:
 - ✅ Robust error handling and fallback systems
 
 **🎊 Achievement Unlocked: PRODUCTION-READY GAME ENGINE WITH PEAK CODE QUALITY!** ✨
+
+---
+
+## ✅ COMPLETED: ECS Interface Cleanup & Data Simplification (December 2024)
+
+### Phase 11: Architecture Interface Cleanup ✅ COMPLETED
+
+#### Phase 11.1: Fixed Interface Confusion ✅ COMPLETED
+- [x] **Critical Bug Fix**: Fixed `borders.zig` using old `world.player.alive` interface
+  - **Problem**: Accessing non-existent field from pre-ECS interface
+  - **Solution**: Updated to use `world.getPlayerAlive()` helper method
+  - **Result**: Proper ECS-aware player state access
+
+#### Phase 11.2: Standardized ECS World Access ✅ COMPLETED  
+- [x] **Consistent Access Pattern**: Eliminated confusing `world.world.X` pattern
+  - **physics.zig**: All 5 functions now use `const ecs_world = world.getECSWorldMut()`
+  - **portals.zig**: Portal iteration uses proper ECS world access
+  - **game.zig**: Unit iteration system uses consistent pattern
+  - **combat.zig**: Unit death handling uses proper ECS world access
+  - **Result**: Clear separation between HexWorld wrapper and ECS core
+
+#### Phase 11.3: Simplified Game Data Loading ✅ COMPLETED
+- [x] **Removed Hardcoded Defaults**: Simplified entity creation
+  - **loader.zig**: Removed hardcoded `health: 100.0` and `unit_type: .enemy`
+  - **world.zig**: Simplified `createUnit()` to just position and radius
+  - **Result**: Game data remains declarative without gameplay logic in loader
+
+### **Phase 11 Technical Accomplishments**
+- ✅ **Zero Interface Confusion**: No more mixing old and new interfaces
+- ✅ **Consistent Access Patterns**: `getECSWorld()` used throughout
+- ✅ **Simplified Data Loading**: Clean separation of data and logic
+- ✅ **Better Encapsulation**: HexWorld provides proper helper methods
+- ✅ **Clean Architecture**: Clear layers with no re-export confusion
