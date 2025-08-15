@@ -107,13 +107,13 @@ pub const GameRenderer = struct {
 
         while (obstacle_iter.next()) |entity_id| {
             // Get terrain component to check if it's an obstacle (wall/pit)
-            if (ecs_world.obstacles.getComponent(entity_id, .terrain)) |terrain| {
+            if (@constCast(&ecs_world.obstacles).getComponent(entity_id, .terrain)) |terrain| {
                 // Only render obstacles (wall/pit terrain)
                 if (terrain.terrain_type != .wall and terrain.terrain_type != .pit) continue;
 
                 // Get transform and visual components
-                if (ecs_world.obstacles.getComponent(entity_id, .transform)) |transform| {
-                    if (ecs_world.obstacles.getComponent(entity_id, .visual)) |visual| {
+                    if (@constCast(&ecs_world.obstacles).getComponent(entity_id, .transform)) |transform| {
+                        if (@constCast(&ecs_world.obstacles).getComponent(entity_id, .visual)) |visual| {
                         if (visual.visible) {
                             // Render obstacles using their actual rectangular size from terrain component
                             const screen_pos = self.camera.worldToScreen(transform.pos);
@@ -134,13 +134,13 @@ pub const GameRenderer = struct {
         const ecs_world = world.getECSWorld();
 
         // Render lifestones as circles
-        var lifestone_iter = ecs_world.lifestones.entityIterator();
+        var lifestone_iter = @constCast(&ecs_world.lifestones).entityIterator();
         while (lifestone_iter.next()) |entity_id| {
             self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .lifestone);
         }
 
         // Render portals as circles
-        var portal_iter = ecs_world.portals.entityIterator();
+        var portal_iter = @constCast(&ecs_world.portals).entityIterator();
         while (portal_iter.next()) |entity_id| {
             self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .portal);
         }
@@ -156,19 +156,19 @@ pub const GameRenderer = struct {
     // Helper to handle the common pattern: get transform+visual, check visibility, render circle
     fn renderEntityAsCircle(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ecs_world: *const ecs.World, entity_id: EntityId, archetype: enum { player, unit, projectile, lifestone, portal }) void {
         const transform = switch (archetype) {
-            .player => ecs_world.players.getComponent(entity_id, .transform),
-            .unit => ecs_world.units.getComponent(entity_id, .transform),
-            .projectile => ecs_world.projectiles.getComponent(entity_id, .transform),
-            .lifestone => ecs_world.lifestones.getComponent(entity_id, .transform),
-            .portal => ecs_world.portals.getComponent(entity_id, .transform),
+            .player => @constCast(&ecs_world.players).getComponent(entity_id, .transform),
+            .unit => @constCast(&ecs_world.units).getComponent(entity_id, .transform),
+            .projectile => @constCast(&ecs_world.projectiles).getComponent(entity_id, .transform),
+            .lifestone => @constCast(&ecs_world.lifestones).getComponent(entity_id, .transform),
+            .portal => @constCast(&ecs_world.portals).getComponent(entity_id, .transform),
         };
         
         const visual = switch (archetype) {
-            .player => ecs_world.players.getComponent(entity_id, .visual),
-            .unit => ecs_world.units.getComponent(entity_id, .visual),
-            .projectile => ecs_world.projectiles.getComponent(entity_id, .visual),
-            .lifestone => ecs_world.lifestones.getComponent(entity_id, .visual),
-            .portal => ecs_world.portals.getComponent(entity_id, .visual),
+            .player => @constCast(&ecs_world.players).getComponent(entity_id, .visual),
+            .unit => @constCast(&ecs_world.units).getComponent(entity_id, .visual),
+            .projectile => @constCast(&ecs_world.projectiles).getComponent(entity_id, .visual),
+            .lifestone => @constCast(&ecs_world.lifestones).getComponent(entity_id, .visual),
+            .portal => @constCast(&ecs_world.portals).getComponent(entity_id, .visual),
         };
         
         if (transform) |t| {
@@ -186,7 +186,7 @@ pub const GameRenderer = struct {
         const ecs_world = world.getECSWorld();
 
         // Iterate over all projectile entities
-        var projectile_iter = ecs_world.projectiles.entityIterator();
+        var projectile_iter = @constCast(&ecs_world.projectiles).entityIterator();
         while (projectile_iter.next()) |entity_id| {
             self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .projectile);
         }
@@ -202,7 +202,7 @@ pub const GameRenderer = struct {
 
         // Draw player (above units)
         const ecs_world = world.getECSWorld();
-        var player_iter = ecs_world.players.entityIterator();
+        var player_iter = @constCast(&ecs_world.players).entityIterator();
         while (player_iter.next()) |entity_id| {
             self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .player);
         }
@@ -336,7 +336,7 @@ pub const GameRenderer = struct {
         // Iterate units in current zone
         const ecs_world = world.getECSWorld();
         
-        var unit_iter = ecs_world.units.entityIterator();
+        var unit_iter = @constCast(&ecs_world.units).entityIterator();
         while (unit_iter.next()) |entity_id| {
             self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .unit);
         }

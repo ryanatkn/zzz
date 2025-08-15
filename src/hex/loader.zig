@@ -89,7 +89,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
     if (data.obstacles) |obstacles| {
         // Set current zone for entity creation
         const old_zone = world.getCurrentZoneIndex();
-        world.getZonedWorld().setCurrentZone(zone_index);
+        world.getZonedWorld().setCurrentZone(@intCast(zone_index));
 
         for (obstacles) |obstacle_data| {
             const is_deadly = std.mem.eql(u8, obstacle_data.type, "deadly");
@@ -115,7 +115,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
     if (data.units) |units| {
         // Set current zone for entity creation
         const old_zone = world.getCurrentZoneIndex();
-        world.getZonedWorld().setCurrentZone(zone_index);
+        world.getZonedWorld().setCurrentZone(@intCast(zone_index));
 
         for (units) |unit_data| {
             // Create ECS unit entity with simple defaults
@@ -138,7 +138,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
     if (data.portals) |portals| {
         // Set current zone for entity creation
         const old_zone = world.getCurrentZoneIndex();
-        world.getZonedWorld().setCurrentZone(zone_index);
+        world.getZonedWorld().setCurrentZone(@intCast(zone_index));
 
         for (portals) |portal_data| {
             // Create ECS portal entity
@@ -162,17 +162,19 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
     if (data.lifestones) |lifestones| {
         // Set current zone for entity creation
         const old_zone = world.getCurrentZoneIndex();
-        world.getZonedWorld().setCurrentZone(zone_index);
+        world.getZonedWorld().setCurrentZone(@intCast(zone_index));
 
         for (lifestones) |lifestone_data| {
             // First lifestone in overworld (zone 0) is pre-attuned
             // Count existing lifestones in the zone through ECS
-            const zone_storage = world.getZoneStorageByIndex(zone_index);
+            const zone_storage = world.getZoneStorageByIndex(@intCast(zone_index));
             var lifestone_count: usize = 0;
-            var terrain_iter = zone_storage.terrains.iterator();
-            while (terrain_iter.next()) |entry| {
-                if (entry.value_ptr.terrain_type == .altar) {
-                    lifestone_count += 1;
+            var lifestone_iter = zone_storage.lifestones.entityIterator();
+            while (lifestone_iter.next()) |entity_id| {
+                if (zone_storage.lifestones.getComponent(entity_id, .terrain)) |terrain| {
+                    if (terrain.terrain_type == .altar) {
+                        lifestone_count += 1;
+                    }
                 }
             }
             const pre_attuned = (lifestone_count == 0 and std.mem.eql(u8, data.name, "Overworld"));

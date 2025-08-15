@@ -92,19 +92,17 @@ pub const GameEffectSystem = struct {
 
         // Portal ambient effects from current zone
         var portal_iter = world.iteratePortalsInCurrentZone();
-        while (portal_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            if (ecs_world.transforms.getConst(entity_id)) |transform| {
+        while (portal_iter.next()) |entity_id| {
+            if (@constCast(&ecs_world.portals).getComponent(entity_id, .transform)) |transform| {
                 self.addPortalAmbientEffect(transform.pos, transform.radius);
             }
         }
 
         // Lifestone ambient effects from current zone
         var lifestone_iter = world.iterateLifestonesInCurrentZone();
-        while (lifestone_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            if (ecs_world.transforms.getConst(entity_id)) |transform| {
-                if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+        while (lifestone_iter.next()) |entity_id| {
+            if (@constCast(&ecs_world.lifestones).getComponent(entity_id, .transform)) |transform| {
+                if (@constCast(&ecs_world.lifestones).getComponent(entity_id, .interactable)) |interactable| {
                     // Check if lifestone is attuned
                     const attuned = interactable.attuned;
                     self.addLifestoneGlowEffect(transform.pos, transform.radius, attuned);

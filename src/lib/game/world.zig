@@ -389,11 +389,115 @@ pub const Game = struct {
     allocator: std.mem.Allocator,
 
     pub fn init(allocator: std.mem.Allocator) Game {
-        return .{
+        var game = Game{
             .zones = std.ArrayList(Zone).init(allocator),
             .current_zone_id = 0,
             .allocator = allocator,
         };
+        
+        // Pre-create all 7 zones to ensure they exist before loader access
+        game.initializeAllZones() catch |err| {
+            std.log.err("Failed to initialize zones: {}", .{err});
+            // Return incomplete game - let caller handle the error
+            return game;
+        };
+        
+        return game;
+    }
+    
+    /// Initialize all 7 zones with default metadata
+    fn initializeAllZones(self: *Game) !void {
+        const zone_configs = [_]Zone.Config{
+            // Zone 0: Overworld
+            .{
+                .id = 0,
+                .metadata = .{
+                    .zone_type = .overworld,
+                    .camera_mode = .fixed,
+                    .camera_scale = 1.0,
+                    .spawn_pos = .{ .x = 400, .y = 300 },
+                    .background_color = .{ .r = 0, .g = 0, .b = 0, .a = 255 },
+                },
+                .max_entities = 1000,
+            },
+            // Zone 1: Fire Dungeon
+            .{
+                .id = 1,
+                .metadata = .{
+                    .zone_type = .dungeon_fire,
+                    .camera_mode = .follow,
+                    .camera_scale = 2.0,
+                    .spawn_pos = .{ .x = 400, .y = 300 },
+                    .background_color = .{ .r = 64, .g = 16, .b = 16, .a = 255 },
+                },
+                .max_entities = 500,
+            },
+            // Zone 2: Ice Dungeon
+            .{
+                .id = 2,
+                .metadata = .{
+                    .zone_type = .dungeon_ice,
+                    .camera_mode = .follow,
+                    .camera_scale = 2.0,
+                    .spawn_pos = .{ .x = 400, .y = 300 },
+                    .background_color = .{ .r = 16, .g = 32, .b = 64, .a = 255 },
+                },
+                .max_entities = 500,
+            },
+            // Zone 3: Storm Dungeon
+            .{
+                .id = 3,
+                .metadata = .{
+                    .zone_type = .dungeon_storm,
+                    .camera_mode = .follow,
+                    .camera_scale = 2.0,
+                    .spawn_pos = .{ .x = 400, .y = 300 },
+                    .background_color = .{ .r = 32, .g = 32, .b = 32, .a = 255 },
+                },
+                .max_entities = 500,
+            },
+            // Zone 4: Nature Dungeon
+            .{
+                .id = 4,
+                .metadata = .{
+                    .zone_type = .dungeon_nature,
+                    .camera_mode = .follow,
+                    .camera_scale = 2.0,
+                    .spawn_pos = .{ .x = 400, .y = 300 },
+                    .background_color = .{ .r = 16, .g = 64, .b = 16, .a = 255 },
+                },
+                .max_entities = 500,
+            },
+            // Zone 5: Shadow Dungeon
+            .{
+                .id = 5,
+                .metadata = .{
+                    .zone_type = .dungeon_shadow,
+                    .camera_mode = .follow,
+                    .camera_scale = 2.0,
+                    .spawn_pos = .{ .x = 400, .y = 300 },
+                    .background_color = .{ .r = 16, .g = 8, .b = 32, .a = 255 },
+                },
+                .max_entities = 500,
+            },
+            // Zone 6: Arcane Dungeon
+            .{
+                .id = 6,
+                .metadata = .{
+                    .zone_type = .dungeon_arcane,
+                    .camera_mode = .follow,
+                    .camera_scale = 2.0,
+                    .spawn_pos = .{ .x = 400, .y = 300 },
+                    .background_color = .{ .r = 64, .g = 32, .b = 64, .a = 255 },
+                },
+                .max_entities = 500,
+            },
+        };
+        
+        // Create all zones
+        for (zone_configs) |config| {
+            try self.addZone(config);
+        }
     }
 
     pub fn deinit(self: *Game) void {
@@ -411,11 +515,21 @@ pub const Game = struct {
 
     /// Get current zone
     pub fn getCurrentZone(self: *Game) *Zone {
+        if (self.current_zone_id >= self.zones.items.len) {
+            std.log.err("getCurrentZone: current_zone_id {} >= zones.len {}", .{ self.current_zone_id, self.zones.items.len });
+            // Return zone 0 as fallback
+            self.current_zone_id = 0;
+        }
         return &self.zones.items[self.current_zone_id];
     }
 
     /// Get current zone (const)
     pub fn getCurrentZoneConst(self: *const Game) *const Zone {
+        if (self.current_zone_id >= self.zones.items.len) {
+            std.log.err("getCurrentZoneConst: current_zone_id {} >= zones.len {}", .{ self.current_zone_id, self.zones.items.len });
+            // Return zone 0 as fallback
+            return &self.zones.items[0];
+        }
         return &self.zones.items[self.current_zone_id];
     }
 
@@ -480,6 +594,41 @@ pub const Game = struct {
                 try zone.destroyEntity(entity);
             }
         }
+    }
+
+    /// Move an entity from one zone to another
+    pub fn moveEntityToZone(self: *Game, entity: EntityId, new_zone_id: u32) !void {
+        // Find the source zone containing the entity
+        var source_zone_index: ?usize = null;
+        for (self.zones.items, 0..) |*zone, i| {
+            if (zone.world.isAlive(entity)) {
+                source_zone_index = i;
+                break;
+            }
+        }
+
+        // If entity not found in any zone, do nothing
+        const source_index = source_zone_index orelse return;
+        
+        // Find the destination zone
+        var dest_zone_index: ?usize = null;
+        for (self.zones.items, 0..) |zone, i| {
+            if (zone.id == new_zone_id) {
+                dest_zone_index = i;
+                break;
+            }
+        }
+
+        // If destination zone not found, do nothing
+        const dest_index = dest_zone_index orelse return;
+        
+        // Don't move if already in the target zone
+        if (source_index == dest_index) return;
+
+        // For now, this is a placeholder that just destroys the entity
+        // A full implementation would preserve the entity's components
+        // and recreate it in the new zone, but that's complex for the current architecture
+        try self.zones.items[source_index].destroyEntity(entity);
     }
 
     /// Get total entity count across all zones

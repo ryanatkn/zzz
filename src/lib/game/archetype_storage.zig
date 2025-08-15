@@ -218,15 +218,48 @@ pub fn ArchetypeStorage(comptime archetype_type: ArchetypeRegistry.ArchetypeType
         pub fn getComponent(self: *Self, entity: EntityId, comptime component_type: ComponentRegistry.ComponentType) ?*ComponentRegistry.getType(component_type) {
             const info = ComponentRegistry.getInfo(component_type);
             
-            if (ArchetypeRegistry.isRequired(archetype_type, component_type)) {
+            // Use comptime branching to ensure correct field access
+            comptime {
+                if (ArchetypeRegistry.isRequired(archetype_type, component_type)) {
+                    // This component is required for this archetype
+                } else if (ArchetypeRegistry.isOptional(archetype_type, component_type)) {
+                    // This component is optional for this archetype
+                } else {
+                    @compileError("Component " ++ info.name ++ " is not part of archetype " ++ @tagName(archetype_type));
+                }
+            }
+            
+            if (comptime ArchetypeRegistry.isRequired(archetype_type, component_type)) {
                 const storage_ptr = &@field(self.required_storages, info.name);
                 return storage_ptr.get(entity);
-            } else if (ArchetypeRegistry.isOptional(archetype_type, component_type)) {
+            } else {
                 const storage_ptr = &@field(self.optional_storages, info.name);
                 return storage_ptr.get(entity);
             }
+        }
+
+        /// Get component (const version for read-only access)
+        pub fn getComponentConst(self: *const Self, entity: EntityId, comptime component_type: ComponentRegistry.ComponentType) ?*const ComponentRegistry.getType(component_type) {
+            const info = ComponentRegistry.getInfo(component_type);
             
-            @compileError("Component " ++ info.name ++ " is not part of archetype " ++ @tagName(archetype_type));
+            // Use comptime branching to ensure correct field access
+            comptime {
+                if (ArchetypeRegistry.isRequired(archetype_type, component_type)) {
+                    // This component is required for this archetype
+                } else if (ArchetypeRegistry.isOptional(archetype_type, component_type)) {
+                    // This component is optional for this archetype
+                } else {
+                    @compileError("Component " ++ info.name ++ " is not part of archetype " ++ @tagName(archetype_type));
+                }
+            }
+            
+            if (comptime ArchetypeRegistry.isRequired(archetype_type, component_type)) {
+                const storage_ptr = &@field(self.required_storages, info.name);
+                return storage_ptr.getConst(entity);
+            } else {
+                const storage_ptr = &@field(self.optional_storages, info.name);
+                return storage_ptr.getConst(entity);
+            }
         }
 
         /// Add optional component to entity
@@ -234,8 +267,12 @@ pub fn ArchetypeStorage(comptime archetype_type: ArchetypeRegistry.ArchetypeType
             if (!self.entity_to_index.contains(entity)) return error.EntityNotFound;
             
             const info = ComponentRegistry.getInfo(component_type);
-            if (!ArchetypeRegistry.isOptional(archetype_type, component_type)) {
-                @compileError("Component " ++ info.name ++ " is not optional for archetype " ++ @tagName(archetype_type));
+            
+            // Use comptime check to validate this component is optional for this archetype
+            comptime {
+                if (!ArchetypeRegistry.isOptional(archetype_type, component_type)) {
+                    @compileError("Component " ++ info.name ++ " is not optional for archetype " ++ @tagName(archetype_type));
+                }
             }
             
             const storage_ptr = &@field(self.optional_storages, info.name);

@@ -44,10 +44,9 @@ pub fn checkPlayerUnitCollisionECS(world: *hex_world.HexWorld) bool {
 
     // Use idiomatic Zig iterator pattern
     var unit_iter = world.iterateUnitsInCurrentZone();
-    while (unit_iter.next()) |entry| {
-        const entity_id = entry.key_ptr.*;
-        if (ecs_world.transforms.get(entity_id)) |transform| {
-            if (ecs_world.healths.get(entity_id)) |health| {
+    while (unit_iter.next()) |entity_id| {
+        if (ecs_world.units.getComponent(entity_id, .transform)) |transform| {
+            if (ecs_world.units.getComponent(entity_id, .health)) |health| {
                 // Only check alive units
                 if (!health.alive) continue;
                 
@@ -72,10 +71,9 @@ pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.En
     
     // Use idiomatic Zig iterator pattern
     var obstacle_iter = world.iterateObstaclesInCurrentZone();
-    while (obstacle_iter.next()) |entry| {
-        const entity_id = entry.key_ptr.*;
-        if (ecs_world.terrains.get(entity_id)) |terrain| {
-            if (ecs_world.transforms.get(entity_id)) |transform| {
+    while (obstacle_iter.next()) |entity_id| {
+        if (ecs_world.obstacles.getComponent(entity_id, .terrain)) |terrain| {
+            if (ecs_world.obstacles.getComponent(entity_id, .transform)) |transform| {
                 const circle = collision.Shape{ .circle = .{ .center = unit_transform.pos, .radius = unit_transform.radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
 
@@ -83,7 +81,7 @@ pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.En
                     // Check if it's a deadly obstacle
                     if (terrain.terrain_type == .pit) {
                         unit_health.alive = false;
-                        if (ecs_world.visuals.get(unit_id)) |unit_visual| {
+                        if (ecs_world.units.getComponent(unit_id, .visual)) |unit_visual| {
                             unit_visual.color = constants.COLOR_DEAD;
                         }
                     } else {
@@ -105,13 +103,12 @@ pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_world
     
     // Use idiomatic Zig iterator pattern
     var obstacle_iter = world.iterateObstaclesInCurrentZone();
-    while (obstacle_iter.next()) |entry| {
-        const entity_id = entry.key_ptr.*;
-        if (ecs_world.terrains.get(entity_id)) |terrain| {
+    while (obstacle_iter.next()) |entity_id| {
+        if (ecs_world.obstacles.getComponent(entity_id, .terrain)) |terrain| {
             // Only check deadly terrain
             if (terrain.terrain_type != .pit) continue;
 
-            if (ecs_world.transforms.get(entity_id)) |transform| {
+            if (ecs_world.obstacles.getComponent(entity_id, .transform)) |transform| {
                 const circle = collision.Shape{ .circle = .{ .center = pos, .radius = radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
                 if (collision.checkCollision(circle, rect)) {

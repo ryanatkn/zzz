@@ -114,7 +114,7 @@ pub const HexWorld = struct {
 
     /// Create player entity with custom radius
     pub fn createPlayerWithRadius(self: *HexWorld, pos: Vec2, radius: f32) !EntityId {
-        const player = try self.world.createPlayer(pos, radius, 100, 0);
+        const player = try self.world.getCurrentZone().createPlayer(pos, radius, 100, 0);
         self.player_entity = player;
         self.player_start_pos = pos; // Remember initial position
         return player;
@@ -130,8 +130,8 @@ pub const HexWorld = struct {
     /// Get player position (returns Vec2{0,0} if no player)
     pub fn getPlayerPos(self: *HexWorld) Vec2 {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.transforms.get(player)) |transform| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
                 return transform.pos;
             }
         }
@@ -141,8 +141,8 @@ pub const HexWorld = struct {
     /// Get player position (const version)
     pub fn getPlayerPosConst(self: *const HexWorld) Vec2 {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZoneConst();
-            if (zone_storage.transforms.getConst(player)) |transform| {
+            const zone = self.world.getCurrentZoneConst();
+            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
                 return transform.pos;
             }
         }
@@ -152,8 +152,8 @@ pub const HexWorld = struct {
     /// Set player position
     pub fn setPlayerPos(self: *HexWorld, pos: Vec2) void {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.transforms.get(player)) |transform| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
                 transform.pos = pos;
             }
         }
@@ -162,8 +162,8 @@ pub const HexWorld = struct {
     /// Get player velocity
     pub fn getPlayerVel(self: *HexWorld) Vec2 {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.transforms.get(player)) |transform| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
                 return transform.vel;
             }
         }
@@ -173,8 +173,8 @@ pub const HexWorld = struct {
     /// Get player velocity (const version)
     pub fn getPlayerVelConst(self: *const HexWorld) Vec2 {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZoneConst();
-            if (zone_storage.transforms.getConst(player)) |transform| {
+            const zone = self.world.getCurrentZoneConst();
+            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
                 return transform.vel;
             }
         }
@@ -184,8 +184,8 @@ pub const HexWorld = struct {
     /// Set player velocity
     pub fn setPlayerVel(self: *HexWorld, vel: Vec2) void {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.transforms.get(player)) |transform| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
                 transform.vel = vel;
             }
         }
@@ -194,8 +194,8 @@ pub const HexWorld = struct {
     /// Check if player is alive
     pub fn getPlayerAlive(self: *HexWorld) bool {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.healths.get(player)) |health| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .health)) |health| {
                 return health.alive;
             }
         }
@@ -205,8 +205,8 @@ pub const HexWorld = struct {
     /// Check if player is alive (const version)
     pub fn getPlayerAliveConst(self: *const HexWorld) bool {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZoneConst();
-            if (zone_storage.healths.getConst(player)) |health| {
+            const zone = self.world.getCurrentZoneConst();
+            if (@constCast(&zone.world.players).getComponent(player, .health)) |health| {
                 return health.alive;
             }
         }
@@ -216,8 +216,8 @@ pub const HexWorld = struct {
     /// Set player alive status
     pub fn setPlayerAlive(self: *HexWorld, alive: bool) void {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.healths.get(player)) |health| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .health)) |health| {
                 health.alive = alive;
                 if (alive) {
                     health.current = health.max; // Full heal on resurrection
@@ -229,8 +229,8 @@ pub const HexWorld = struct {
     /// Get player radius
     pub fn getPlayerRadius(self: *HexWorld) f32 {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.transforms.get(player)) |transform| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
                 return transform.radius;
             }
         }
@@ -240,8 +240,8 @@ pub const HexWorld = struct {
     /// Get player radius (const version)
     pub fn getPlayerRadiusConst(self: *const HexWorld) f32 {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZoneConst();
-            if (zone_storage.transforms.getConst(player)) |transform| {
+            const zone = self.world.getCurrentZoneConst();
+            if (@constCast(&zone.world.players).getComponent(player, .transform)) |transform| {
                 return transform.radius;
             }
         }
@@ -251,8 +251,8 @@ pub const HexWorld = struct {
     /// Get player color (from Visual component)
     pub fn getPlayerColor(self: *HexWorld) Color {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.visuals.get(player)) |visual| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .visual)) |visual| {
                 return visual.color;
             }
         }
@@ -262,8 +262,8 @@ pub const HexWorld = struct {
     /// Get player color (const version)
     pub fn getPlayerColorConst(self: *const HexWorld) Color {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZoneConst();
-            if (zone_storage.visuals.getConst(player)) |visual| {
+            const zone = self.world.getCurrentZoneConst();
+            if (@constCast(&zone.world.players).getComponent(player, .visual)) |visual| {
                 return visual.color;
             }
         }
@@ -273,8 +273,8 @@ pub const HexWorld = struct {
     /// Set player color
     pub fn setPlayerColor(self: *HexWorld, color: Color) void {
         if (self.player_entity) |player| {
-            const zone_storage = self.world.getCurrentZone();
-            if (zone_storage.visuals.get(player)) |visual| {
+            const zone = self.world.getCurrentZone();
+            if (@constCast(&zone.world.players).getComponent(player, .visual)) |visual| {
                 visual.color = color;
             }
         }
@@ -411,34 +411,35 @@ pub const HexWorld = struct {
 
         // Clear all projectiles when traveling between zones
         // Iterate through all zones to find and destroy all projectiles
-        for (&self.world.zones) |*zone_storage| {
+        for (self.world.zones.items) |*zone_storage| {
             var projectiles_to_destroy = std.ArrayList(EntityId).init(self.allocator);
             defer projectiles_to_destroy.deinit();
 
-            var projectile_iter = zone_storage.projectiles.iterator();
-            while (projectile_iter.next()) |entry| {
-                try projectiles_to_destroy.append(entry.key_ptr.*);
+            var projectile_iter = zone_storage.world.projectiles.entityIterator();
+            while (projectile_iter.next()) |entity_id| {
+                try projectiles_to_destroy.append(entity_id);
             }
 
             for (projectiles_to_destroy.items) |entity_id| {
-                try self.world.destroyEntity(entity_id);
+                try zone_storage.destroyEntity(entity_id);
             }
         }
 
         // Move player to the new zone if they exist
         if (self.player_entity) |player| {
-            try self.world.moveEntityToZone(player, zone_index);
+            try self.world.moveEntityToZone(player, @intCast(zone_index));
 
             // Update player position in new zone
-            const new_zone = self.world.getZone(zone_index);
-            if (new_zone.transforms.get(player)) |transform| {
-                transform.pos = spawn_pos;
-                transform.vel = Vec2.ZERO;
+            if (self.world.getZone(@intCast(zone_index))) |new_zone| {
+                if (new_zone.world.players.getComponent(player, .transform)) |transform| {
+                    transform.pos = spawn_pos;
+                    transform.vel = Vec2.ZERO;
+                }
             }
         }
 
         // Switch to the new zone
-        self.world.setCurrentZone(zone_index);
+        self.world.setCurrentZone(@intCast(zone_index));
     }
 
     /// Reset current zone (respawn units, reset state)
