@@ -1,6 +1,7 @@
 const std = @import("std");
-const log_throttle = @import("../lib/debug/log_throttle.zig");
-const unified_logger = @import("../lib/debug/unified_logger.zig");
+const Logger = @import("../lib/debug/logger.zig").Logger;
+const outputs = @import("../lib/debug/outputs.zig");
+const filters = @import("../lib/debug/filters.zig");
 const c = @import("../lib/platform/sdl.zig");
 
 // Engine imports
@@ -70,6 +71,16 @@ var game_state: ?*GameState = null;
 var game_hud: ?*Hud = null;
 var global_allocator: std.mem.Allocator = undefined;
 
+// Configure logger for console + file output with throttling
+const AppLogger = Logger(.{
+    .output = outputs.Multi(.{ 
+        outputs.Console, 
+        outputs.File(.{ .path = "game.log" })
+    }),
+    .filter = filters.Throttle,
+});
+var logger: ?AppLogger = null;
+
 // Timing
 var last_time: u64 = 0;
 
@@ -97,11 +108,8 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     errdefer global_allocator.destroy(game_renderer.?);
     game_renderer.?.* = try GameRenderer.init(global_allocator, window);
 
-    // Initialize debug logging throttle system
-    try log_throttle.initGlobal(global_allocator);
-
-    // Initialize unified logger (console + file output)
-    try unified_logger.initGlobal(global_allocator, "game.log");
+    // Initialize logger (console + file output with throttling)
+    logger = AppLogger.init(global_allocator);
 
     // Initialize persistent text system (needs GPU device from renderer)
     try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.?.gpu.device);
@@ -118,8 +126,10 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 
     // Load game data
     loader.loadGameData(global_allocator, &game_state.?.world) catch |err| {
-        unified_logger.err("zon_load_fail", "Failed to load game data from ZON file: {}", .{err});
-        unified_logger.err("zon_check_msg", "Please check that game_data.zon exists and is valid", .{});
+        if (logger) |*log| {
+            log.err("zon_load_fail", "Failed to load game data from ZON file: {}", .{err});
+            log.err("zon_check_msg", "Please check that game_data.zon exists and is valid", .{});
+        }
         return err;
     };
 
@@ -135,9 +145,11 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     last_time = c.sdl.SDL_GetPerformanceCounter();
 
     fully_initialized = true;
-    unified_logger.info("game_init_success", "Hex GPU game initialized successfully", .{});
-    unified_logger.info("controls_info", "Controls: Hold mouse to move, WASD for direct movement, Space to pause, ESC to quit", .{});
-    unified_logger.info("portal_info", "Portal interaction: Walk into portals to travel between zones", .{});
+    if (logger) |*log| {
+        log.info("game_init_success", "Hex GPU game initialized successfully", .{});
+        log.info("controls_info", "Controls: Hold mouse to move, WASD for direct movement, Space to pause, ESC to quit", .{});
+        log.info("portal_info", "Portal interaction: Walk into portals to travel between zones", .{});
+    }
     return c.sdl.SDL_APP_CONTINUE;
 }
 
@@ -197,11 +209,10 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
             reactive_batch.deinitGlobalBatcher(global_allocator);
             reactive_context.deinitContext(global_allocator);
 
-            // Clean up debug logging system
-            log_throttle.deinitGlobal(global_allocator);
-
-            // Clean up unified logger system
-            unified_logger.deinitGlobal(global_allocator);
+            // Clean up logger system
+            if (logger) |*log| {
+                log.deinit();
+            }
         }
         c.sdl.SDL_DestroyWindow(window);
         fully_initialized = false;
@@ -218,7 +229,12 @@ fn runGameLoop() !void {
     // Print logging summary every 10 seconds (at 60 FPS = 600 frames)
     frame_counter += 1;
     if (frame_counter % 600 == 0) {
-        log_throttle.printGlobalSummary();
+        // Print throttle summary if available
+        if (logger) |*log| {
+            if (@hasDecl(@TypeOf(log.filter), "getSummary")) {
+                // TODO: Add summary printing method to throttle filter
+            }
+        }
     }
 
     // Calculate delta time

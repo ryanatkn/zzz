@@ -309,8 +309,14 @@ $ zig build --help       # Show all build options
   - Update title: `# TODO: Task Name` → `# ✅ COMPLETED: Task Name`
   - Add completion date and final status summary
   - Keep file in root to show what major work has been accomplished
+- **Validation before archival** (for complex architecture migrations):
+  - Run validation session to verify implementation matches design intent
+  - Machine develops complete understanding of relevant codebase parts
+  - Validate local file state against TODO documentation claims
+  - User verifies results, conclusions, and presented data
+  - Only then proceed to archive validated TODO files
 - **Permanent docs** (README.md, CLAUDE.md) remain unprefixed in root
-- **Only archive to `docs/archive/`** when TODO docs become stale or superseded
+- **Only archive to `docs/archive/`** when TODO docs become stale, superseded, or fully validated as complete
 - **Always commit todo docs** to git both during work and after completion
 - This workflow ensures completed work remains visible while tracking major accomplishments
 
@@ -325,22 +331,41 @@ $ zig build --help       # Show all build options
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
 
-**Debug Logging Guidelines:**
-- **CRITICAL**: Use log throttling to prevent spam - see `src/lib/debug/log_throttle.zig`
-- **Available Throttle Methods**:
-  - `logOnce()` - Log message only once ever
-  - `logPeriodic()` - Log at most once per time period (e.g., every 5 seconds)
-  - `logOnChange()` - Log only when value changes
-  - `logThrottled()` - General throttling with customizable rate
-- **Usage Pattern**:
+**Logging System Guidelines:**
+- **New Architecture**: Composable logging with compile-time configuration (see `src/lib/debug/logger.zig`)
+- **Core Components**:
+  - **Outputs**: console, file, multi-destination
+  - **Filters**: throttle, level, passthrough
+  - **Formatters**: timestamped, passthrough
+- **Main Logger Configuration**:
   ```zig
-  const log_throttle = @import("../debug/log_throttle.zig");
-  // Instead of: std.log.info("Processing glyph {}", .{glyph_id});
-  // Use: log_throttle.logPeriodic("glyph_process", 5000, "Processing glyph {}", .{glyph_id});
+  const Logger = @import("../lib/debug/logger.zig").Logger;
+  const outputs = @import("../lib/debug/outputs.zig");
+  const filters = @import("../lib/debug/filters.zig");
+
+  // Console + file with throttling (main.zig pattern)
+  const AppLogger = Logger(.{
+      .output = outputs.Multi(.{ 
+          outputs.Console, 
+          outputs.File(.{ .path = "game.log" })
+      }),
+      .filter = filters.Throttle,
+  });
+  
+  var logger = AppLogger.init(allocator);
+  logger.info("startup", "Game initialized", .{});
   ```
-- **Why This Matters**: Font system can generate 500,000+ log lines in 2 minutes without throttling
-- **Already Converted**: text/renderer.zig, text/cache.zig, fps_counter.zig, menu_text.zig, game_renderer.zig
-- **Needs Conversion**: Font grid test system, HUD modules, any new diagnostic code
+- **Module-Specific Loggers**:
+  ```zig
+  // Console-only with throttling for modules
+  const ModuleLogger = Logger(.{
+      .output = outputs.Console,
+      .filter = filters.Throttle,
+  });
+  ```
+- **Legacy System**: `log_throttle.zig` still exists for gradual migration
+- **File Output**: Automatic session tracking with timestamps in `game.log`
+- **Performance**: Compile-time composition ensures zero runtime overhead
 
 **Library Import Guidelines:**
 - **Capability-based imports**: Import from specific capability directories
