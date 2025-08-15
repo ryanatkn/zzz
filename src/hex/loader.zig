@@ -88,8 +88,8 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
     // Load obstacles as ECS entities
     if (data.obstacles) |obstacles| {
         // Set current zone for entity creation
-        const old_zone = world.current_zone;
-        world.current_zone = zone_index;
+        const old_zone = world.getCurrentZoneIndex();
+        world.getZonedWorld().setCurrentZone(zone_index);
 
         for (obstacles) |obstacle_data| {
             const is_deadly = std.mem.eql(u8, obstacle_data.type, "deadly");
@@ -108,14 +108,14 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.current_zone = old_zone;
+        world.getZonedWorld().setCurrentZone(old_zone);
     }
 
     // Load units as ECS entities
     if (data.units) |units| {
         // Set current zone for entity creation
-        const old_zone = world.current_zone;
-        world.current_zone = zone_index;
+        const old_zone = world.getCurrentZoneIndex();
+        world.getZonedWorld().setCurrentZone(zone_index);
 
         for (units) |unit_data| {
             // Create ECS unit entity with simple defaults
@@ -131,14 +131,14 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.current_zone = old_zone;
+        world.getZonedWorld().setCurrentZone(old_zone);
     }
 
     // Load portals as ECS entities
     if (data.portals) |portals| {
         // Set current zone for entity creation
-        const old_zone = world.current_zone;
-        world.current_zone = zone_index;
+        const old_zone = world.getCurrentZoneIndex();
+        world.getZonedWorld().setCurrentZone(zone_index);
 
         for (portals) |portal_data| {
             // Create ECS portal entity
@@ -155,18 +155,27 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.current_zone = old_zone;
+        world.getZonedWorld().setCurrentZone(old_zone);
     }
 
     // Load lifestones as ECS entities
     if (data.lifestones) |lifestones| {
         // Set current zone for entity creation
-        const old_zone = world.current_zone;
-        world.current_zone = zone_index;
+        const old_zone = world.getCurrentZoneIndex();
+        world.getZonedWorld().setCurrentZone(zone_index);
 
         for (lifestones) |lifestone_data| {
             // First lifestone in overworld (zone 0) is pre-attuned
-            const pre_attuned = (zone.lifestone_entities.items.len == 0 and std.mem.eql(u8, data.name, "Overworld"));
+            // Count existing lifestones in the zone through ECS
+            const zone_storage = world.getZoneStorageByIndex(zone_index);
+            var lifestone_count: usize = 0;
+            var terrain_iter = zone_storage.terrains.iterator();
+            while (terrain_iter.next()) |entry| {
+                if (entry.value_ptr.terrain_type == .altar) {
+                    lifestone_count += 1;
+                }
+            }
+            const pre_attuned = (lifestone_count == 0 and std.mem.eql(u8, data.name, "Overworld"));
 
             // Create ECS lifestone entity
             const lifestone_id = world.createLifestone(
@@ -182,7 +191,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.current_zone = old_zone;
+        world.getZonedWorld().setCurrentZone(old_zone);
     }
 }
 

@@ -10,4 +10,7 @@ zig-out/
 *.tmp
 .tmp*
 
+# Log files
+*.log
+
 .zz

@@ -28,11 +28,12 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
 
     // Check collisions with all portal entities using ECS
     const ecs_world = world.getECSWorldMut();
+    const zoned_world = world.getZonedWorld();
     var portal_iter = ecs_world.interactables.iterator();
     while (portal_iter.next()) |entry| {
         const portal_id = entry.key_ptr.*;
         const interactable = entry.value_ptr;
-        if (!ecs_world.isAlive(portal_id)) continue;
+        if (!zoned_world.isAlive(portal_id)) continue;
 
         // Check if it's a portal (has destination_zone set)
         if (interactable.destination_zone) |destination_zone| {

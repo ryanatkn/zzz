@@ -87,36 +87,27 @@ pub const GameEffectSystem = struct {
         }
         self.core.count = write_index;
 
-        // Create ambient effects for current zone entities using ECS queries
+        // Create ambient effects for current zone entities using idiomatic iterators
         const ecs_world = world.getECSWorld();
-        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
 
-        while (terrain_iter.next()) |entry| {
+        // Portal ambient effects from current zone
+        var portal_iter = world.iteratePortalsInCurrentZone();
+        while (portal_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
-
-            // Get entity transform for position and radius
             if (ecs_world.transforms.getConst(entity_id)) |transform| {
-                switch (terrain.terrain_type) {
-                    .door => {
-                        // Portal entities (door terrain with interactable component)
-                        if (ecs_world.interactables.has(entity_id)) {
-                            self.addPortalAmbientEffect(transform.pos, transform.radius);
-                        }
-                    },
-                    .altar => {
-                        // Lifestone entities (altar terrain with interactable component)
-                        if (ecs_world.interactables.has(entity_id)) {
-                            if (ecs_world.interactables.getConst(entity_id)) |interactable| {
-                                // Check if lifestone is attuned (using transformable state as attuned indicator)
-                                const attuned = (interactable.interaction_type == .transformable);
-                                self.addLifestoneGlowEffect(transform.pos, transform.radius, attuned);
-                            }
-                        }
-                    },
-                    else => {
-                        // Skip other terrain types
-                    },
+                self.addPortalAmbientEffect(transform.pos, transform.radius);
+            }
+        }
+
+        // Lifestone ambient effects from current zone
+        var lifestone_iter = world.iterateLifestonesInCurrentZone();
+        while (lifestone_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            if (ecs_world.transforms.getConst(entity_id)) |transform| {
+                if (ecs_world.interactables.getConst(entity_id)) |interactable| {
+                    // Check if lifestone is attuned
+                    const attuned = interactable.attuned;
+                    self.addLifestoneGlowEffect(transform.pos, transform.radius, attuned);
                 }
             }
         }

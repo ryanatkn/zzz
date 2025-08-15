@@ -51,7 +51,7 @@ pub fn respawnPlayer(game_state: anytype) void {
     var respawn_pos: Vec2 = undefined;
 
     if (nearest) |result| {
-        if (result.zone_index != world.current_zone) {
+        if (result.zone_index != world.getCurrentZoneIndex()) {
             game_state.travelToZone(result.zone_index) catch |err| {
                 std.log.err("Failed to travel to zone {}: {}", .{ result.zone_index, err });
             };
@@ -59,7 +59,7 @@ pub fn respawnPlayer(game_state: anytype) void {
         }
         respawn_pos = result.pos;
     } else {
-        if (world.current_zone != 0) {
+        if (world.getCurrentZoneIndex() != 0) {
             game_state.travelToZone(0) catch |err| {
                 std.log.err("Failed to travel to overworld: {}", .{err});
             };

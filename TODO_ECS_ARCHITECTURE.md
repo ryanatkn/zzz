@@ -252,3 +252,110 @@ The ECS migration is **fully complete** with a production-ready architecture tha
   - Removed unused `.portal_middle` and `.portal_inner` types
   - Simplified animation and color code
   - Better maintainability
+
+---
+
+## 🏗️ Zone Memory Layout Strategy (December 2024)
+
+### Problem Statement
+- **Goal**: Full world simulation with all entities in memory for complete game state
+- **Hot Path**: Iterating entities within current zone (95%+ of operations)
+- **Challenge**: Cache locality for zone iteration vs global entity management
+- **Discovery**: Global terrain/projectile/effects iteration causing performance issues
+
+### Analysis: Memory Layout Trade-offs
+
+#### Current Issue: Global Filtering
+```zig
+// Current approach - poor cache locality
+var terrain_iter = ecs_world.terrains.iterator(); // ALL zones
+while (terrain_iter.next()) |entry| {
+    // Skip entities not in current zone - cache misses!
+    if (!isInCurrentZone(entry.key_ptr.*)) continue;
+}
+```
+
+#### Rejected Approaches:
+1. **Prebaked Views**: Still fragmented memory when dereferencing EntityIDs
+2. **Duplicate Storage**: Two sources of truth, synchronization nightmare
+3. **Global SOA with Filtering**: Poor cache performance on hot path
+
+### Solution: Per-Zone SOA Storage
+
+**Core Insight**: Separate SOA storage per zone for perfect cache locality on hot path.
+
+```zig
+pub const ZonedWorld = struct {
+    // Per-zone component storage (SOA layout within each zone)
+    zones: [7]ZoneStorage,
+    current_zone: usize,
+    
+    // Global entity allocator (shared)
+    entities: EntityAllocator,
+    
+    pub const ZoneStorage = struct {
+        // Dense storage per zone - perfect cache locality
+        transforms: DenseStorage(Transform),
+        healths: DenseStorage(Health),
+        visuals: DenseStorage(Visual),
+        
+        // Sparse storage per zone
+        units: SparseStorage(Unit),
+        terrains: SparseStorage(Terrain),
+        projectiles: SparseStorage(Projectile),
+    };
+};
+```
+
+### Benefits:
+1. **Perfect Cache Locality**: Zone iteration walks contiguous arrays
+2. **No Filtering Overhead**: Direct iteration over zone's storage
+3. **Single Source of Truth**: Each entity exists in exactly one zone
+4. **Fast Zone Switch**: Just change current_zone index
+5. **Global Iteration**: Walk zones sequentially (rare case, acceptable cost)
+
+### Implementation Strategy:
+
+#### Hot Path Optimization:
+```zig
+// Zone iteration - contiguous memory, perfect cache locality
+for (world.zones[world.current_zone].transforms.data[0..count]) |*transform| {
+    // CPU loves this! All data in cache lines
+}
+```
+
+#### Cold Path (Global):
+```zig
+// Global iteration - acceptable performance for rare operations
+for (world.zones) |zone| {
+    for (zone.transforms.data[0..zone.transforms.count]) |*transform| {
+        // Still good sequential access pattern
+    }
+}
+```
+
+#### Entity Management:
+- **Creation**: Add to current zone's storage
+- **Zone Travel**: Migrate entity between zone storages
+- **Destruction**: Remove from zone's storage
+
+### Trade-offs:
+- **Pro**: Optimal cache performance for hot path (zone iteration)
+- **Pro**: No synchronization/duplication issues  
+- **Pro**: Clean architectural separation
+- **Pro**: Scales to larger worlds (more zones = more isolated storage)
+- **Con**: Entity movement between zones requires storage migration
+- **Con**: Global queries need zone-by-zone iteration (acceptable for rare use)
+
+### Special Cases:
+- **Projectiles**: May need global pool if they travel between zones frequently
+- **Effects**: Can be zone-local since they're typically position-bound
+- **Player**: Lives in current zone, moves on zone travel
+
+### Expected Performance Impact:
+- **Zone iteration**: Massive improvement (no filtering, perfect cache locality)
+- **Zone switching**: Slight cost for entity migration (rare operation)
+- **Memory usage**: Similar to current (just reorganized)
+- **Global iteration**: Acceptable performance for rare operations
+
+This architecture prioritizes our hot path (current zone processing) while maintaining clean abstractions and avoiding the pitfalls of duplicate storage.

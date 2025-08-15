@@ -1,5 +1,6 @@
 const std = @import("std");
 const log_throttle = @import("../lib/debug/log_throttle.zig");
+const unified_logger = @import("../lib/debug/unified_logger.zig");
 const c = @import("../lib/platform/sdl.zig");
 
 // Engine imports
@@ -99,6 +100,9 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     // Initialize debug logging throttle system
     try log_throttle.initGlobal(global_allocator);
 
+    // Initialize unified logger (console + file output)
+    try unified_logger.initGlobal(global_allocator, "game.log");
+
     // Initialize persistent text system (needs GPU device from renderer)
     try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.?.gpu.device);
 
@@ -114,8 +118,8 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 
     // Load game data
     loader.loadGameData(global_allocator, &game_state.?.world) catch |err| {
-        log_throttle.logInfo("zon_load_fail", "Failed to load game data from ZON file: {}", .{err});
-        log_throttle.logInfo("zon_check_msg", "Please check that game_data.zon exists and is valid", .{});
+        unified_logger.err("zon_load_fail", "Failed to load game data from ZON file: {}", .{err});
+        unified_logger.err("zon_check_msg", "Please check that game_data.zon exists and is valid", .{});
         return err;
     };
 
@@ -131,9 +135,9 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     last_time = c.sdl.SDL_GetPerformanceCounter();
 
     fully_initialized = true;
-    log_throttle.logInfo("game_init_success", "Hex GPU game initialized successfully", .{});
-    log_throttle.logInfo("controls_info", "Controls: Hold mouse to move, WASD for direct movement, Space to pause, ESC to quit", .{});
-    log_throttle.logInfo("portal_info", "Portal interaction: Walk into portals to travel between zones", .{});
+    unified_logger.info("game_init_success", "Hex GPU game initialized successfully", .{});
+    unified_logger.info("controls_info", "Controls: Hold mouse to move, WASD for direct movement, Space to pause, ESC to quit", .{});
+    unified_logger.info("portal_info", "Portal interaction: Walk into portals to travel between zones", .{});
     return c.sdl.SDL_APP_CONTINUE;
 }
 
@@ -195,6 +199,9 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
 
             // Clean up debug logging system
             log_throttle.deinitGlobal(global_allocator);
+
+            // Clean up unified logger system
+            unified_logger.deinitGlobal(global_allocator);
         }
         c.sdl.SDL_DestroyWindow(window);
         fully_initialized = false;

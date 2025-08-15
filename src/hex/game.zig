@@ -196,8 +196,8 @@ pub const GameState = struct {
 
     pub fn travelToZone(self: *Self, destination_zone: usize) !void {
         if (destination_zone < self.world.zones.len) {
-            self.world.current_zone = destination_zone;
-            self.world.zones[destination_zone].resetUnits();
+            self.world.getZonedWorld().setCurrentZone(destination_zone);
+            // Zone reset is handled by the loader when switching zones
             // Clear bullets on zone travel - bullets are now ECS entities
             try self.world.clearAllProjectiles();
             // Clear ALL effects on zone travel to prevent persistence
@@ -241,7 +241,7 @@ pub const GameState = struct {
         self.world.resetPlayerToStart();
 
         // Reset to starting zone
-        if (self.world.current_zone != 0) {
+        if (self.world.getCurrentZoneIndex() != 0) {
             self.travelToZone(0) catch |err| {
                 std.log.err("Failed to travel to overworld during reset: {}", .{err});
             };
@@ -380,12 +380,13 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
 
     // Query all units from ECS system
     const ecs_world = world.getECSWorldMut();
+    const zoned_world = world.getZonedWorld();
     var unit_iter = ecs_world.units.iterator();
     while (unit_iter.next()) |entry| {
         const unit_id = entry.key_ptr.*;
 
         // Skip if entity is not alive
-        if (!ecs_world.isAlive(unit_id)) continue;
+        if (!zoned_world.isAlive(unit_id)) continue;
 
         // Get components
         if (ecs_world.transforms.get(unit_id)) |transform| {
@@ -543,7 +544,7 @@ fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_
                     // Emit lifestone attuned event
                     if (game_state.state_manager) |manager| {
                         manager.emit(hex_events.lifestoneAttuned(
-                            game_state.world.current_zone,
+                            game_state.world.getCurrentZoneIndex(),
                             entity_id.index, // Use EntityId index as unique identifier
                             transform.pos,
                         ));

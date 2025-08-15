@@ -93,7 +93,7 @@ pub const World = struct {
     }
 
     /// Check if an entity is alive
-    pub fn isAlive(self: *World, id: EntityId) bool {
+    pub fn isAlive(self: *const World, id: EntityId) bool {
         return self.entities.isAlive(id);
     }
 

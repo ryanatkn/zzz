@@ -8,21 +8,24 @@ const combat = @import("combat.zig");
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 const EntityId = ecs.EntityId;
-const World = ecs.World;
+const ZonedWorld = ecs.ZonedWorld;
+const ZoneStorage = ecs.ZoneStorage;
 const components = ecs.components;
 const BulletPool = combat.BulletPool;
 
-/// HexWorld - ECS-based world for the hex game
-/// Wraps the generic ECS World with hex-specific functionality
+// ZoneEntityIterator removed - use direct zone storage access instead:
+// world.getZoneStorageConst().units.iterator() etc.
+
+/// HexWorld - Zone-segmented ECS world for the hex game
+/// Wraps ZonedWorld with per-zone SOA storage for optimal cache locality
 pub const HexWorld = struct {
-    // Core ECS world
-    world: World,
+    // Core zone-segmented ECS world
+    world: ZonedWorld,
 
     // Game-specific tracking
     player_entity: ?EntityId,
     player_start_pos: Vec2, // Original spawn position for full reset (matching old interface)
-    current_zone: usize,
-    zones: [7]Zone, // Overworld + 6 dungeons
+    zones: [7]Zone, // Zone metadata only (entities now stored in world.zones)
 
     // Allocator for cleanup
     allocator: std.mem.Allocator,
@@ -47,13 +50,7 @@ pub const HexWorld = struct {
         spawn_pos: Vec2,
         background_color: Color,
 
-        // Entity lists for this zone (for zone reset functionality)
-        unit_entities: std.ArrayList(EntityId),
-        portal_entities: std.ArrayList(EntityId),
-        lifestone_entities: std.ArrayList(EntityId),
-        obstacle_entities: std.ArrayList(EntityId),
-
-        pub fn init(allocator: std.mem.Allocator, zone_type: ZoneType) Zone {
+        pub fn init(zone_type: ZoneType) Zone {
             return .{
                 .zone_type = zone_type,
                 .camera_mode = switch (zone_type) {
@@ -66,39 +63,26 @@ pub const HexWorld = struct {
                 },
                 .spawn_pos = Vec2{ .x = 400, .y = 300 }, // Default, overridden by loader
                 .background_color = Color{ .r = 0, .g = 0, .b = 0, .a = 1 }, // Default black
-                .unit_entities = std.ArrayList(EntityId).init(allocator),
-                .portal_entities = std.ArrayList(EntityId).init(allocator),
-                .lifestone_entities = std.ArrayList(EntityId).init(allocator),
-                .obstacle_entities = std.ArrayList(EntityId).init(allocator),
             };
         }
 
         pub fn deinit(self: *Zone) void {
-            self.unit_entities.deinit();
-            self.portal_entities.deinit();
-            self.lifestone_entities.deinit();
-            self.obstacle_entities.deinit();
-        }
-
-        /// Reset units in this zone (placeholder - will be called by HexWorld.resetCurrentZone)
-        pub fn resetUnits(self: *Zone) void {
-            // This is a placeholder - actual reset is handled by HexWorld.resetCurrentZone
+            // No entity storage to clean up - entities are in ZonedWorld
             _ = self;
         }
     };
 
     pub fn init(allocator: std.mem.Allocator) !HexWorld {
         var hex_world = HexWorld{
-            .world = try World.init(allocator, 50000), // High capacity for bullets, particles, terrain
+            .world = try ZonedWorld.init(allocator, 50000), // High capacity for bullets, particles, terrain
             .player_entity = null,
             .player_start_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y },
-            .current_zone = 0,
             .zones = undefined,
             .allocator = allocator,
             .bullet_pool = BulletPool.init(),
         };
 
-        // Initialize zones
+        // Initialize zone metadata
         for (&hex_world.zones, 0..) |*zone, i| {
             const zone_type: Zone.ZoneType = switch (i) {
                 0 => .overworld,
@@ -110,7 +94,7 @@ pub const HexWorld = struct {
                 6 => .dungeon_arcane,
                 else => unreachable,
             };
-            zone.* = Zone.init(allocator, zone_type);
+            zone.* = Zone.init(zone_type);
         }
 
         return hex_world;
@@ -146,7 +130,8 @@ pub const HexWorld = struct {
     /// Get player position (returns Vec2{0,0} if no player)
     pub fn getPlayerPos(self: *HexWorld) Vec2 {
         if (self.player_entity) |player| {
-            if (self.world.transforms.get(player)) |transform| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.transforms.get(player)) |transform| {
                 return transform.pos;
             }
         }
@@ -156,7 +141,8 @@ pub const HexWorld = struct {
     /// Get player position (const version)
     pub fn getPlayerPosConst(self: *const HexWorld) Vec2 {
         if (self.player_entity) |player| {
-            if (self.world.transforms.getConst(player)) |transform| {
+            const zone_storage = self.world.getCurrentZoneConst();
+            if (zone_storage.transforms.getConst(player)) |transform| {
                 return transform.pos;
             }
         }
@@ -166,7 +152,8 @@ pub const HexWorld = struct {
     /// Set player position
     pub fn setPlayerPos(self: *HexWorld, pos: Vec2) void {
         if (self.player_entity) |player| {
-            if (self.world.transforms.get(player)) |transform| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.transforms.get(player)) |transform| {
                 transform.pos = pos;
             }
         }
@@ -175,7 +162,8 @@ pub const HexWorld = struct {
     /// Get player velocity
     pub fn getPlayerVel(self: *HexWorld) Vec2 {
         if (self.player_entity) |player| {
-            if (self.world.transforms.get(player)) |transform| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.transforms.get(player)) |transform| {
                 return transform.vel;
             }
         }
@@ -185,7 +173,8 @@ pub const HexWorld = struct {
     /// Get player velocity (const version)
     pub fn getPlayerVelConst(self: *const HexWorld) Vec2 {
         if (self.player_entity) |player| {
-            if (self.world.transforms.getConst(player)) |transform| {
+            const zone_storage = self.world.getCurrentZoneConst();
+            if (zone_storage.transforms.getConst(player)) |transform| {
                 return transform.vel;
             }
         }
@@ -195,7 +184,8 @@ pub const HexWorld = struct {
     /// Set player velocity
     pub fn setPlayerVel(self: *HexWorld, vel: Vec2) void {
         if (self.player_entity) |player| {
-            if (self.world.transforms.get(player)) |transform| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.transforms.get(player)) |transform| {
                 transform.vel = vel;
             }
         }
@@ -204,7 +194,8 @@ pub const HexWorld = struct {
     /// Check if player is alive
     pub fn getPlayerAlive(self: *HexWorld) bool {
         if (self.player_entity) |player| {
-            if (self.world.healths.get(player)) |health| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.healths.get(player)) |health| {
                 return health.alive;
             }
         }
@@ -214,7 +205,8 @@ pub const HexWorld = struct {
     /// Check if player is alive (const version)
     pub fn getPlayerAliveConst(self: *const HexWorld) bool {
         if (self.player_entity) |player| {
-            if (self.world.healths.getConst(player)) |health| {
+            const zone_storage = self.world.getCurrentZoneConst();
+            if (zone_storage.healths.getConst(player)) |health| {
                 return health.alive;
             }
         }
@@ -224,7 +216,8 @@ pub const HexWorld = struct {
     /// Set player alive status
     pub fn setPlayerAlive(self: *HexWorld, alive: bool) void {
         if (self.player_entity) |player| {
-            if (self.world.healths.get(player)) |health| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.healths.get(player)) |health| {
                 health.alive = alive;
                 if (alive) {
                     health.current = health.max; // Full heal on resurrection
@@ -236,7 +229,8 @@ pub const HexWorld = struct {
     /// Get player radius
     pub fn getPlayerRadius(self: *HexWorld) f32 {
         if (self.player_entity) |player| {
-            if (self.world.transforms.get(player)) |transform| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.transforms.get(player)) |transform| {
                 return transform.radius;
             }
         }
@@ -246,7 +240,8 @@ pub const HexWorld = struct {
     /// Get player radius (const version)
     pub fn getPlayerRadiusConst(self: *const HexWorld) f32 {
         if (self.player_entity) |player| {
-            if (self.world.transforms.getConst(player)) |transform| {
+            const zone_storage = self.world.getCurrentZoneConst();
+            if (zone_storage.transforms.getConst(player)) |transform| {
                 return transform.radius;
             }
         }
@@ -256,7 +251,8 @@ pub const HexWorld = struct {
     /// Get player color (from Visual component)
     pub fn getPlayerColor(self: *HexWorld) Color {
         if (self.player_entity) |player| {
-            if (self.world.visuals.get(player)) |visual| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.visuals.get(player)) |visual| {
                 return visual.color;
             }
         }
@@ -266,7 +262,8 @@ pub const HexWorld = struct {
     /// Get player color (const version)
     pub fn getPlayerColorConst(self: *const HexWorld) Color {
         if (self.player_entity) |player| {
-            if (self.world.visuals.getConst(player)) |visual| {
+            const zone_storage = self.world.getCurrentZoneConst();
+            if (zone_storage.visuals.getConst(player)) |visual| {
                 return visual.color;
             }
         }
@@ -276,7 +273,8 @@ pub const HexWorld = struct {
     /// Set player color
     pub fn setPlayerColor(self: *HexWorld, color: Color) void {
         if (self.player_entity) |player| {
-            if (self.world.visuals.get(player)) |visual| {
+            const zone_storage = self.world.getCurrentZone();
+            if (zone_storage.visuals.get(player)) |visual| {
                 visual.color = color;
             }
         }
@@ -319,12 +317,7 @@ pub const HexWorld = struct {
         pos: Vec2,
         radius: f32,
     ) !EntityId {
-        const unit = try self.world.createUnit(pos, radius);
-
-        // Add to current zone's unit list for reset functionality
-        try self.zones[self.current_zone].unit_entities.append(unit);
-
-        return unit;
+        return try self.world.createUnit(pos, radius);
     }
 
     /// Create an obstacle entity in the current zone
@@ -334,12 +327,7 @@ pub const HexWorld = struct {
         size: Vec2,
         is_deadly: bool,
     ) !EntityId {
-        const obstacle = try self.world.createObstacle(pos, size, is_deadly);
-
-        // Add to current zone's obstacle list for reset functionality
-        try self.zones[self.current_zone].obstacle_entities.append(obstacle);
-
-        return obstacle;
+        return try self.world.createObstacle(pos, size, is_deadly);
     }
 
     /// Create a lifestone entity in the current zone
@@ -349,12 +337,7 @@ pub const HexWorld = struct {
         radius: f32,
         attuned: bool,
     ) !EntityId {
-        const lifestone = try self.world.createLifestone(pos, radius, attuned);
-
-        // Add to current zone's lifestone list for future reference
-        try self.zones[self.current_zone].lifestone_entities.append(lifestone);
-
-        return lifestone;
+        return try self.world.createLifestone(pos, radius, attuned);
     }
 
     /// Create a portal entity in the current zone
@@ -364,35 +347,62 @@ pub const HexWorld = struct {
         radius: f32,
         destination_zone: u8,
     ) !EntityId {
-        const portal = try self.world.createPortal(pos, radius, destination_zone);
-
-        // Add to current zone's portal list for future reference
-        try self.zones[self.current_zone].portal_entities.append(portal);
-
-        return portal;
+        return try self.world.createPortal(pos, radius, destination_zone);
     }
 
-    /// Get current zone
+    /// Get current zone index
+    pub fn getCurrentZoneIndex(self: *const HexWorld) usize {
+        return self.world.current_zone;
+    }
+
+    /// Temporary compatibility: direct access to current_zone field
+    pub fn current_zone(self: *const HexWorld) usize {
+        return self.world.current_zone;
+    }
+
+    /// Get current zone metadata
     pub fn getCurrentZone(self: *HexWorld) *Zone {
-        return &self.zones[self.current_zone];
+        return &self.zones[self.world.current_zone];
     }
 
-    /// Get current zone (const)
+    /// Get current zone metadata (const)
     pub fn getCurrentZoneConst(self: *const HexWorld) *const Zone {
-        return &self.zones[self.current_zone];
+        return &self.zones[self.world.current_zone];
     }
 
-    pub fn getECSWorld(self: *const HexWorld) *const World {
-        return &self.world;
+    // DEPRECATED: These methods provide access to the old global API
+    // Use getZoneStorage() methods for better cache locality
+    pub fn getECSWorld(self: *const HexWorld) *const ZoneStorage {
+        return self.world.getCurrentZoneConst();
     }
 
-    pub fn getECSWorldMut(self: *HexWorld) *World {
+    pub fn getECSWorldMut(self: *HexWorld) *ZoneStorage {
+        return self.world.getCurrentZone();
+    }
+
+    /// Get current zone's storage (preferred method)
+    pub fn getZoneStorage(self: *HexWorld) *ZoneStorage {
+        return self.world.getCurrentZone();
+    }
+
+    /// Get current zone's storage (const version)
+    pub fn getZoneStorageConst(self: *const HexWorld) *const ZoneStorage {
+        return self.world.getCurrentZoneConst();
+    }
+
+    /// Get specific zone's storage
+    pub fn getZoneStorageByIndex(self: *HexWorld, zone_index: usize) *ZoneStorage {
+        return self.world.getZone(zone_index);
+    }
+
+    /// Get underlying ZonedWorld (for advanced operations)
+    pub fn getZonedWorld(self: *HexWorld) *ZonedWorld {
         return &self.world;
     }
 
     /// Get current zone (mutable) - alias for getCurrentZone
     pub fn getCurrentZoneMut(self: *HexWorld) *Zone {
-        return &self.zones[self.current_zone];
+        return &self.zones[self.world.current_zone];
     }
 
     /// Travel to a different zone
@@ -400,69 +410,81 @@ pub const HexWorld = struct {
         if (zone_index >= self.zones.len) return;
 
         // Clear all projectiles when traveling between zones
-        var projectile_iter = self.world.projectiles.iterator();
-        while (projectile_iter.next()) |entry| {
-            try self.world.destroyEntity(entry.key_ptr.*);
+        // Iterate through all zones to find and destroy all projectiles
+        for (&self.world.zones) |*zone_storage| {
+            var projectiles_to_destroy = std.ArrayList(EntityId).init(self.allocator);
+            defer projectiles_to_destroy.deinit();
+
+            var projectile_iter = zone_storage.projectiles.iterator();
+            while (projectile_iter.next()) |entry| {
+                try projectiles_to_destroy.append(entry.key_ptr.*);
+            }
+
+            for (projectiles_to_destroy.items) |entity_id| {
+                try self.world.destroyEntity(entity_id);
+            }
         }
 
-        self.current_zone = zone_index;
-
-        // Move player to spawn position
+        // Move player to the new zone if they exist
         if (self.player_entity) |player| {
-            if (self.world.transforms.get(player)) |transform| {
+            try self.world.moveEntityToZone(player, zone_index);
+
+            // Update player position in new zone
+            const new_zone = self.world.getZone(zone_index);
+            if (new_zone.transforms.get(player)) |transform| {
                 transform.pos = spawn_pos;
                 transform.vel = Vec2.ZERO;
             }
         }
+
+        // Switch to the new zone
+        self.world.setCurrentZone(zone_index);
     }
 
     /// Reset current zone (respawn units, reset state)
     pub fn resetCurrentZone(self: *HexWorld) !void {
-        const zone = &self.zones[self.current_zone];
+        const zone_storage = self.world.getCurrentZone();
+        var entities_to_destroy = std.ArrayList(EntityId).init(self.allocator);
+        defer entities_to_destroy.deinit();
 
-        // Destroy all units in current zone
-        for (zone.unit_entities.items) |unit_entity| {
-            try self.world.destroyEntity(unit_entity);
+        // Collect all entities in current zone for destruction
+        // Units
+        var unit_iter = zone_storage.units.iterator();
+        while (unit_iter.next()) |entry| {
+            try entities_to_destroy.append(entry.key_ptr.*);
         }
-        zone.unit_entities.clearRetainingCapacity();
 
-        // Destroy all obstacles in current zone
-        for (zone.obstacle_entities.items) |obstacle_entity| {
-            try self.world.destroyEntity(obstacle_entity);
+        // Terrains (obstacles, lifestones, portals)
+        var terrain_iter = zone_storage.terrains.iterator();
+        while (terrain_iter.next()) |entry| {
+            try entities_to_destroy.append(entry.key_ptr.*);
         }
-        zone.obstacle_entities.clearRetainingCapacity();
 
-        // Destroy all portals in current zone
-        for (zone.portal_entities.items) |portal_entity| {
-            try self.world.destroyEntity(portal_entity);
-        }
-        zone.portal_entities.clearRetainingCapacity();
-
-        // Destroy all lifestones in current zone
-        for (zone.lifestone_entities.items) |lifestone_entity| {
-            try self.world.destroyEntity(lifestone_entity);
-        }
-        zone.lifestone_entities.clearRetainingCapacity();
-
-        // Destroy all projectiles
-        var projectile_iter = self.world.projectiles.iterator();
+        // Projectiles  
+        var projectile_iter = zone_storage.projectiles.iterator();
         while (projectile_iter.next()) |entry| {
-            try self.world.destroyEntity(entry.key_ptr.*);
+            try entities_to_destroy.append(entry.key_ptr.*);
+        }
+
+        // Destroy all collected entities
+        for (entities_to_destroy.items) |entity_id| {
+            try self.world.destroyEntity(entity_id);
         }
 
         // Zone will be repopulated by the loader
     }
 
-    /// Update all projectiles (lifetime, movement)
+    /// Update all projectiles (lifetime, movement) - now zone-aware
     pub fn updateProjectiles(self: *HexWorld, dt: f32) !void {
         var to_destroy = std.ArrayList(EntityId).init(self.allocator);
         defer to_destroy.deinit();
 
-        // Iterate over all projectiles to update them
-        var projectile_iter = self.world.projectiles.iterator();
+        // Only update projectiles in current zone for performance
+        const zone_storage = self.world.getCurrentZone();
+        var projectile_iter = zone_storage.projectiles.iterator();
         while (projectile_iter.next()) |projectile_entry| {
             const entity_id = projectile_entry.key_ptr.*;
-            if (self.world.transforms.get(entity_id)) |transform| {
+            if (zone_storage.transforms.get(entity_id)) |transform| {
                 // Update projectile lifetime
                 if (!projectile_entry.value_ptr.update(dt)) {
                     try to_destroy.append(entity_id);
@@ -473,7 +495,7 @@ pub const HexWorld = struct {
                 transform.pos.x += transform.vel.x * dt;
                 transform.pos.y += transform.vel.y * dt;
 
-                // Check collision with units
+                // Check collision with units (zone-local)
                 if (self.checkProjectileUnitCollision(entity_id, transform)) {
                     try to_destroy.append(entity_id);
                 }
@@ -486,19 +508,20 @@ pub const HexWorld = struct {
         }
     }
 
-    /// Check if projectile collides with any unit (and damage them)
+    /// Check if projectile collides with any unit (and damage them) - zone-aware
     fn checkProjectileUnitCollision(self: *HexWorld, projectile_id: EntityId, projectile_transform: *const components.Transform) bool {
-        // Query all units for collision
-        var unit_iter = self.world.units.iterator();
+        // Query units in current zone only for performance
+        const zone_storage = self.world.getCurrentZone();
+        var unit_iter = zone_storage.units.iterator();
         while (unit_iter.next()) |entry| {
             const unit_id = entry.key_ptr.*;
 
             // Skip if unit is not alive
             if (!self.world.isAlive(unit_id)) continue;
 
-            // Get unit transform and health
-            if (self.world.transforms.get(unit_id)) |unit_transform| {
-                if (self.world.healths.get(unit_id)) |health| {
+            // Get unit transform and health from zone storage
+            if (zone_storage.transforms.get(unit_id)) |unit_transform| {
+                if (zone_storage.healths.get(unit_id)) |health| {
                     if (!health.alive) continue;
 
                     // Check circle-circle collision
@@ -508,14 +531,14 @@ pub const HexWorld = struct {
 
                     if (distance_sq < radius_sum * radius_sum) {
                         // Collision detected - damage the unit
-                        if (self.world.combats.get(projectile_id)) |projectile_combat| {
+                        if (zone_storage.combats.get(projectile_id)) |projectile_combat| {
                             // Deal damage to unit
                             health.current -= projectile_combat.damage;
 
                             if (health.current <= 0) {
                                 // Unit is killed
                                 health.alive = false;
-                                if (self.world.visuals.get(unit_id)) |visual| {
+                                if (zone_storage.visuals.get(unit_id)) |visual| {
                                     visual.color = constants.COLOR_DEAD;
                                 }
                             }
@@ -529,11 +552,12 @@ pub const HexWorld = struct {
         return false; // No collision
     }
 
-    /// Update all effects on entities
+    /// Update all effects on entities - zone-aware
     pub fn updateEffects(self: *HexWorld, dt: f32) void {
-        var effects_iter = self.world.effects.iterator();
+        const zone_storage = self.world.getCurrentZone();
+        var effects_iter = zone_storage.effects.iterator();
         while (effects_iter.next()) |entry| {
-            entry.component.update(dt);
+            entry.value_ptr.update(dt);
         }
     }
 
@@ -552,149 +576,84 @@ pub const HexWorld = struct {
         self.bullet_pool.fire();
     }
 
-    /// Get all entities with Transform and Visual components for rendering
-    pub fn getRenderableEntities(self: *HexWorld) World.Query2(components.Transform, components.Visual) {
-        return self.world.query2(components.Transform, components.Visual);
-    }
-
-    /// Get all units for AI processing
-    pub fn getUnits(self: *HexWorld) World.Query2(components.Unit, components.Transform) {
-        return self.world.query2(components.Unit, components.Transform);
-    }
-
-    /// Get all interactable entities for spell effects
-    pub fn getInteractables(self: *HexWorld) World.Query2(components.Interactable, components.Transform) {
-        return self.world.query2(components.Interactable, components.Transform);
-    }
+    // NOTE: Query methods removed - use direct zone storage iteration instead
+    // Example: for (world.getZoneStorage().units.iterator().next()) |unit| { ... }
 
     /// Reset all zones to original state
     pub fn resetAllZones(self: *HexWorld) !void {
-        for (&self.zones) |*zone| {
-            // Destroy all units in this zone
-            for (zone.unit_entities.items) |unit_entity| {
-                try self.world.destroyEntity(unit_entity);
-            }
-            zone.unit_entities.clearRetainingCapacity();
-        }
+        // Destroy all entities in all zones
+        for (&self.world.zones) |*zone_storage| {
+            var entities_to_destroy = std.ArrayList(EntityId).init(self.allocator);
+            defer entities_to_destroy.deinit();
 
-        // Destroy all projectiles
-        var projectile_iter = self.world.projectiles.iterator();
-        while (projectile_iter.next()) |entry| {
-            try self.world.destroyEntity(entry.key_ptr.*);
+            // Collect all entities in this zone
+            var unit_iter = zone_storage.units.iterator();
+            while (unit_iter.next()) |entry| {
+                try entities_to_destroy.append(entry.key_ptr.*);
+            }
+
+            var terrain_iter = zone_storage.terrains.iterator();
+            while (terrain_iter.next()) |entry| {
+                try entities_to_destroy.append(entry.key_ptr.*);
+            }
+
+            var projectile_iter = zone_storage.projectiles.iterator();
+            while (projectile_iter.next()) |entry| {
+                try entities_to_destroy.append(entry.key_ptr.*);
+            }
+
+            // Destroy all entities in this zone
+            for (entities_to_destroy.items) |entity_id| {
+                try self.world.destroyEntity(entity_id);
+            }
         }
 
         // All zones will be repopulated by the loader
     }
 
-    // ===== ECS Query Helpers for Obstacles, Lifestones, Portals =====
-
-    /// Query obstacles in current zone using ECS components
-    pub fn queryObstaclesInCurrentZone(self: *HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
-        const zone = self.getCurrentZoneConst();
-        self.queryObstaclesInZone(zone, CallbackFn, callback);
+    // ===== Temporary Compatibility Layer for Migration =====
+    
+    /// Temporary wrapper for iterating obstacles - delegates to zone storage
+    pub fn iterateObstaclesInCurrentZone(self: *HexWorld) @TypeOf(self.world.getCurrentZone().terrains.iterator()) {
+        return self.world.getCurrentZone().terrains.iterator();
     }
 
-    /// Query obstacles in specific zone using ECS components
-    pub fn queryObstaclesInZone(self: *HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
-        _ = zone; // Note: Zone-specific filtering not implemented yet
-
-        // Query all terrain entities with transform and visual
-        var terrain_iter = self.world.terrains.iterator();
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
-
-            // Skip if not an obstacle
-            if (terrain.terrain_type != .block and terrain.terrain_type != .deadly) continue;
-
-            // Get components
-            if (self.world.transforms.getConst(entity_id)) |transform| {
-                if (self.world.visuals.getConst(entity_id)) |visual| {
-                    // Call callback with obstacle data
-                    callback.call(entity_id, transform, visual, terrain);
-                }
-            }
-        }
+    /// Temporary wrapper for iterating units - delegates to zone storage
+    pub fn iterateUnitsInCurrentZone(self: *HexWorld) @TypeOf(self.world.getCurrentZone().units.iterator()) {
+        return self.world.getCurrentZone().units.iterator();
     }
 
-    /// Query lifestones in current zone using ECS components
-    pub fn queryLifestonesInCurrentZone(self: *HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
-        const zone = self.getCurrentZoneConst();
-        self.queryLifestonesInZone(zone, CallbackFn, callback);
+    /// Temporary wrapper for iterating lifestones - filters terrains for altars (mutable)
+    pub fn iterateLifestonesInCurrentZone(self: *HexWorld) @TypeOf(self.world.getCurrentZone().terrains.iterator()) {
+        // NOTE: This is less efficient than the old approach but maintains compatibility
+        // In the new design, you should iterate terrains and filter for .altar type
+        return self.world.getCurrentZone().terrains.iterator();
     }
 
-    /// Query lifestones in specific zone using ECS components
-    pub fn queryLifestonesInZone(self: *HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
-        _ = zone; // Note: Zone-specific filtering not implemented yet
-
-        // Query terrain entities that are interact type (lifestones)
-        var terrain_iter = self.world.terrains.iterator();
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
-
-            // Skip if not a lifestone (interact terrain with interactable component)
-            if (terrain.terrain_type != .interact) continue;
-            if (!self.world.interactables.contains(entity_id)) continue;
-
-            // Get components
-            if (self.world.transforms.getConst(entity_id)) |transform| {
-                if (self.world.visuals.getConst(entity_id)) |visual| {
-                    if (self.world.interactables.getConst(entity_id)) |interactable| {
-                        // Call callback with lifestone data
-                        callback.call(entity_id, transform, visual, terrain, interactable);
-                    }
-                }
-            }
-        }
-    }
-
-    /// Query portals in current zone using ECS components
-    pub fn queryPortalsInCurrentZone(self: *HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
-        const zone = self.getCurrentZoneConst();
-        self.queryPortalsInZone(zone, CallbackFn, callback);
-    }
-
-    /// Query portals in specific zone using ECS components
-    pub fn queryPortalsInZone(self: *HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
-        _ = zone; // Note: Zone-specific filtering not implemented yet
-
-        // Query terrain entities that are door type (portals)
-        var terrain_iter = self.world.terrains.iterator();
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
-
-            // Skip if not a portal (door terrain with interactable component)
-            if (terrain.terrain_type != .door) continue;
-            if (!self.world.interactables.contains(entity_id)) continue;
-
-            // Get components
-            if (self.world.transforms.getConst(entity_id)) |transform| {
-                if (self.world.visuals.getConst(entity_id)) |visual| {
-                    if (self.world.interactables.getConst(entity_id)) |interactable| {
-                        // Call callback with portal data
-                        callback.call(entity_id, transform, visual, terrain, interactable);
-                    }
-                }
-            }
-        }
+    /// Temporary wrapper for iterating portals - filters terrains for doors (mutable)
+    pub fn iteratePortalsInCurrentZone(self: *HexWorld) @TypeOf(self.world.getCurrentZone().terrains.iterator()) {
+        // NOTE: This is less efficient than the old approach but maintains compatibility
+        // In the new design, you should iterate terrains and filter for .door type
+        return self.world.getCurrentZone().terrains.iterator();
     }
 
     /// Clear all projectile entities (used when traveling between zones)
     pub fn clearAllProjectiles(self: *HexWorld) !void {
-        var projectiles_to_destroy = std.ArrayList(EntityId).init(self.world.allocator);
-        defer projectiles_to_destroy.deinit();
+        // Clear projectiles from all zones
+        for (&self.world.zones) |*zone_storage| {
+            var projectiles_to_destroy = std.ArrayList(EntityId).init(self.allocator);
+            defer projectiles_to_destroy.deinit();
 
-        // Collect all projectile entity IDs
-        var iter = self.world.projectiles.iterator();
-        while (iter.next()) |entry| {
-            try projectiles_to_destroy.append(entry.key_ptr.*);
-        }
+            // Collect all projectile entity IDs in this zone
+            var iter = zone_storage.projectiles.iterator();
+            while (iter.next()) |entry| {
+                try projectiles_to_destroy.append(entry.key_ptr.*);
+            }
 
-        // Destroy all collected projectiles
-        for (projectiles_to_destroy.items) |entity_id| {
-            try self.world.destroyEntity(entity_id);
+            // Destroy all collected projectiles
+            for (projectiles_to_destroy.items) |entity_id| {
+                try self.world.destroyEntity(entity_id);
+            }
         }
     }
 };

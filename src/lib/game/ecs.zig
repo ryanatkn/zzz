@@ -4,11 +4,14 @@ pub const entity = @import("entity.zig");
 pub const storage = @import("storage.zig");
 pub const components = @import("components.zig");
 pub const world = @import("world.zig");
+pub const zoned_world = @import("zoned_world.zig");
 
 // Core types
 pub const EntityId = entity.EntityId;
 pub const EntityAllocator = entity.EntityAllocator;
 pub const World = world.World;
+pub const ZonedWorld = zoned_world.ZonedWorld;
+pub const ZoneStorage = zoned_world.ZoneStorage;
 
 // Storage types
 pub const DenseStorage = storage.DenseStorage;

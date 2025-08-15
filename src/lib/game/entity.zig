@@ -75,7 +75,7 @@ pub const EntityAllocator = struct {
         try self.free_list.append(id.index);
     }
 
-    pub fn isAlive(self: *EntityAllocator, id: EntityId) bool {
+    pub fn isAlive(self: *const EntityAllocator, id: EntityId) bool {
         if (id.index >= self.generations.len) return false;
         return self.generations[id.index] == id.generation;
     }
