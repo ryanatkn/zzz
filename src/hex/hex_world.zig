@@ -125,7 +125,12 @@ pub const HexWorld = struct {
 
     /// Create player entity
     pub fn createPlayer(self: *HexWorld, pos: Vec2) !EntityId {
-        const player = try self.world.createPlayer(pos, constants.PLAYER_RADIUS, 100, 0);
+        return self.createPlayerWithRadius(pos, constants.PLAYER_RADIUS);
+    }
+
+    /// Create player entity with custom radius
+    pub fn createPlayerWithRadius(self: *HexWorld, pos: Vec2, radius: f32) !EntityId {
+        const player = try self.world.createPlayer(pos, radius, 100, 0);
         self.player_entity = player;
         self.player_start_pos = pos; // Remember initial position
         return player;
@@ -145,7 +150,7 @@ pub const HexWorld = struct {
                 return transform.pos;
             }
         }
-        return Vec2{ .x = 0, .y = 0 };
+        return Vec2.ZERO;
     }
     
     /// Get player position (const version)
@@ -155,7 +160,7 @@ pub const HexWorld = struct {
                 return transform.pos;
             }
         }
-        return Vec2{ .x = 0, .y = 0 };
+        return Vec2.ZERO;
     }
     
     /// Set player position
@@ -174,7 +179,7 @@ pub const HexWorld = struct {
                 return transform.vel;
             }
         }
-        return Vec2{ .x = 0, .y = 0 };
+        return Vec2.ZERO;
     }
     
     /// Get player velocity (const version)
@@ -184,7 +189,7 @@ pub const HexWorld = struct {
                 return transform.vel;
             }
         }
-        return Vec2{ .x = 0, .y = 0 };
+        return Vec2.ZERO;
     }
     
     /// Set player velocity
@@ -280,7 +285,7 @@ pub const HexWorld = struct {
     /// Reset player to start position (full reset functionality)
     pub fn resetPlayerToStart(self: *HexWorld) void {
         self.setPlayerPos(self.player_start_pos);
-        self.setPlayerVel(Vec2{ .x = 0, .y = 0 });
+        self.setPlayerVel(Vec2.ZERO);
         self.setPlayerAlive(true);
         self.setPlayerColor(constants.COLOR_PLAYER_ALIVE);
     }
@@ -408,7 +413,7 @@ pub const HexWorld = struct {
         if (self.player_entity) |player| {
             if (self.world.transforms.get(player)) |transform| {
                 transform.pos = spawn_pos;
-                transform.vel = Vec2{ .x = 0, .y = 0 };
+                transform.vel = Vec2.ZERO;
             }
         }
     }
@@ -499,9 +504,8 @@ pub const HexWorld = struct {
                     if (!health.alive) continue;
                     
                     // Check circle-circle collision
-                    const dx = projectile_transform.pos.x - unit_transform.pos.x;
-                    const dy = projectile_transform.pos.y - unit_transform.pos.y;
-                    const distance_sq = dx * dx + dy * dy;
+                    const to_unit = unit_transform.pos.sub(projectile_transform.pos);
+                    const distance_sq = to_unit.lengthSquared();
                     const radius_sum = projectile_transform.radius + unit_transform.radius;
                     
                     if (distance_sq < radius_sum * radius_sum) {

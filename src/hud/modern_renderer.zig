@@ -49,7 +49,7 @@ pub const ModernHUDRenderer = struct {
         // Create root container that fills the screen
         var root_props = try ui.ComponentProps.init(
             allocator, 
-            Vec2{ .x = 0, .y = 0 }, 
+            Vec2.ZERO, 
             Vec2{ .x = current_width, .y = current_height }
         );
         
@@ -142,7 +142,7 @@ pub const ModernHUDRenderer = struct {
         };
         var page_props = try ui.ComponentProps.init(
             self.allocator, 
-            Vec2{ .x = 0, .y = 0 }, 
+            Vec2.ZERO, 
             page_size
         );
         

@@ -107,7 +107,7 @@ pub fn drawNavigationBar(gpu: *SimpleGPURenderer, cmd_buffer: *c.sdl.SDL_GPUComm
 /// Draw an overlay background (semi-transparent screen overlay)
 pub fn drawOverlay(gpu: *SimpleGPURenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, screen_width: f32, screen_height: f32, overlay_color: ?Color) void {
     const color = overlay_color orelse colors.OVERLAY;
-    gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = 0, .y = 0 }, Vec2{ .x = screen_width, .y = screen_height }, color);
+    gpu.drawRect(cmd_buffer, render_pass, Vec2.ZERO, Vec2{ .x = screen_width, .y = screen_height }, color);
 }
 
 /// Draw a centered rectangle (useful for modal dialogs, popups)

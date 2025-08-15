@@ -363,7 +363,7 @@ test "layout creation and basic properties" {
     try reactive.init(allocator);
     defer reactive.deinit(allocator);
     
-    var props = try ComponentProps.init(allocator, Vec2{ .x = 0, .y = 0 }, Vec2{ .x = 400, .y = 300 });
+    var props = try ComponentProps.init(allocator, Vec2.ZERO, Vec2{ .x = 400, .y = 300 });
     defer props.deinit();
     
     var layout = try createLayout(allocator, props);
@@ -395,7 +395,7 @@ test "column layout positioning" {
     defer reactive.deinit(allocator);
     
     // Create parent layout
-    var parent_props = try ComponentProps.init(allocator, Vec2{ .x = 0, .y = 0 }, Vec2{ .x = 200, .y = 300 });
+    var parent_props = try ComponentProps.init(allocator, Vec2.ZERO, Vec2{ .x = 200, .y = 300 });
     defer parent_props.deinit();
     
     var parent_layout = try createLayout(allocator, parent_props);
@@ -406,8 +406,8 @@ test "column layout positioning" {
     parent_layout_impl.setGap(5.0);
     
     // Create child components
-    var child1_props = try ComponentProps.init(allocator, Vec2{ .x = 0, .y = 0 }, Vec2{ .x = 100, .y = 50 });
-    var child2_props = try ComponentProps.init(allocator, Vec2{ .x = 0, .y = 0 }, Vec2{ .x = 100, .y = 60 });
+    var child1_props = try ComponentProps.init(allocator, Vec2.ZERO, Vec2{ .x = 100, .y = 50 });
+    var child2_props = try ComponentProps.init(allocator, Vec2.ZERO, Vec2{ .x = 100, .y = 60 });
     defer child1_props.deinit();
     defer child2_props.deinit();
     

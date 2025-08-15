@@ -26,7 +26,7 @@ pub fn canPlayerMoveTo(world: *hex_world.HexWorld, new_pos: math.Vec2, player_ra
         
         if (world.world.transforms.get(obstacle_id)) |transform| {
             const circle = collision.Shape{ .circle = .{ .center = new_pos, .radius = player_radius } };
-            const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = .{ .x = transform.radius * 2, .y = transform.radius * 2 } } };
+            const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
             if (collision.checkCollision(circle, rect)) {
                 return false;
             }
@@ -70,12 +70,12 @@ pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.En
         if (!world.world.isAlive(obstacle_id)) continue;
         
         if (world.world.transforms.get(obstacle_id)) |obstacle_transform| {
-            const circle = collision.Shape{ .circle = .{ .center = unit_transform.pos, .radius = unit_transform.radius } };
-            const rect = collision.Shape{ .rectangle = .{ .position = obstacle_transform.pos, .size = .{ .x = obstacle_transform.radius * 2, .y = obstacle_transform.radius * 2 } } };
-            
-            if (collision.checkCollision(circle, rect)) {
-                // Check if it's a deadly obstacle
-                if (world.world.terrains.get(obstacle_id)) |terrain| {
+            if (world.world.terrains.get(obstacle_id)) |terrain| {
+                const circle = collision.Shape{ .circle = .{ .center = unit_transform.pos, .radius = unit_transform.radius } };
+                const rect = collision.Shape{ .rectangle = .{ .position = obstacle_transform.pos, .size = terrain.size } };
+                
+                if (collision.checkCollision(circle, rect)) {
+                    // Check if it's a deadly obstacle
                     if (terrain.terrain_type == .pit) {
                         unit_health.alive = false;
                         if (world.world.visuals.get(unit_id)) |visual| {
@@ -106,7 +106,7 @@ pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_world
             
             if (world.world.transforms.get(obstacle_id)) |transform| {
                 const circle = collision.Shape{ .circle = .{ .center = pos, .radius = radius } };
-                const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = .{ .x = transform.radius * 2, .y = transform.radius * 2 } } };
+                const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
                 if (collision.checkCollision(circle, rect)) {
                     return true;
                 }

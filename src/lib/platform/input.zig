@@ -18,7 +18,7 @@ pub const InputState = struct {
     pub fn init() Self {
         return .{
             .keys_down = std.StaticBitSet(512).initEmpty(),
-            .mouse_pos = Vec2{ .x = 0, .y = 0 },
+            .mouse_pos = Vec2.ZERO,
             .left_mouse_held = false,
             .right_mouse_held = false,
         };
@@ -74,7 +74,7 @@ pub const InputState = struct {
     }
 
     pub fn getMovementVector(self: *const Self) Vec2 {
-        var velocity = Vec2{ .x = 0, .y = 0 };
+        var velocity = Vec2.ZERO;
 
         const w_pressed = self.isKeyDown(c.sdl.SDL_SCANCODE_W);
         const s_pressed = self.isKeyDown(c.sdl.SDL_SCANCODE_S);

@@ -40,18 +40,18 @@ pub fn loadGameData(allocator: std.mem.Allocator, world: *hex_world.HexWorld) !v
     // Set player start position
     // Create the player entity if it doesn't exist
     if (world.getPlayer() == null) {
-        _ = try world.createPlayer(Vec2{
+        _ = try world.createPlayerWithRadius(Vec2{
             .x = game_data.player_start.position.x,
             .y = game_data.player_start.position.y,
-        });
+        }, game_data.player_start.radius);
     } else {
         // Update existing player position
         world.setPlayerPos(Vec2{
             .x = game_data.player_start.position.x,
             .y = game_data.player_start.position.y,
         });
+        // Note: Player radius update requires recreating entity, which isn't supported yet
     }
-    // TODO: Set player radius from game_data.player_start.radius
     // Store original spawn position for full reset
     world.player_start_pos = world.getPlayerPos();
 
@@ -104,7 +104,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 continue;
             };
             
-            _ = obstacle_id; // TODO: Track obstacle entities for zone reset
+            _ = obstacle_id; // Entity automatically tracked in zone.obstacle_entities
         }
         
         // Restore current zone
@@ -153,7 +153,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 continue;
             };
             
-            _ = portal_id; // TODO: Track portal entities for zone reset
+            _ = portal_id; // Entity automatically tracked in zone.portal_entities
         }
         
         // Restore current zone
@@ -180,7 +180,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 continue;
             };
             
-            _ = lifestone_id; // TODO: Track lifestone entities for zone reset
+            _ = lifestone_id; // Entity automatically tracked in zone.lifestone_entities
         }
         
         // Restore current zone

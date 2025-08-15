@@ -5,6 +5,7 @@ const constants = @import("constants.zig");
 const components = @import("../lib/game/components.zig");
 const entity = @import("../lib/game/entity.zig");
 const world_mod = @import("../lib/game/world.zig");
+const log_throttle = @import("../lib/debug/log_throttle.zig");
 
 const Vec2 = types.Vec2;
 const Zone = @import("hex_world.zig").HexWorld.Zone;
@@ -144,30 +145,26 @@ pub const SpellSystem = struct {
                 // Add area of effect visual indicator
                 effect_system.addLullAreaEffect(target_pos, LULL_RADIUS, LULL_DURATION);
 
-                std.debug.print("Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s\n", .{ target_pos.x, target_pos.y, LULL_DURATION });
+                log_throttle.logInfo("lull_cast", "Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s", .{ target_pos.x, target_pos.y, LULL_DURATION });
                 return true;
             },
 
             .Blink => {
                 // Only works in dungeons (follow camera mode)
                 if (zone.camera_mode != constants.CameraMode.follow) {
-                    std.debug.print("Blink only works in dungeons\n", .{});
+                    log_throttle.logInfo("blink_dungeon_only", "Blink only works in dungeons", .{});
                     return false;
                 }
 
                 // Teleport player to target position
                 const player_pos = world.getPlayerPos();
-                const dx = target_pos.x - player_pos.x;
-                const dy = target_pos.y - player_pos.y;
-                const distance = @sqrt(dx * dx + dy * dy);
+                const to_target = target_pos.sub(player_pos);
+                const distance = to_target.length();
 
                 if (distance > BLINK_MAX_DISTANCE) {
                     // Limit blink distance
-                    const scale = BLINK_MAX_DISTANCE / distance;
-                    const new_pos = Vec2{
-                        .x = player_pos.x + dx * scale,
-                        .y = player_pos.y + dy * scale,
-                    };
+                    const direction = to_target.normalize();
+                    const new_pos = player_pos.add(direction.scale(BLINK_MAX_DISTANCE));
                     world.setPlayerPos(new_pos);
                 } else {
                     world.setPlayerPos(target_pos);
@@ -175,12 +172,12 @@ pub const SpellSystem = struct {
 
                 // Visual effects
                 effect_system.addPortalTravelEffect(world.getPlayerPos(), world.getPlayerRadius());
-                std.debug.print("Blink teleport\n", .{});
+                log_throttle.logInfo("blink_teleport", "Blink teleport", .{});
                 return true;
             },
 
             else => {
-                std.debug.print("Spell {} not implemented yet\n", .{spell});
+                log_throttle.logInfo("unimplemented_spell", "Spell {} not implemented yet", .{spell});
                 return false;
             },
         }
@@ -203,9 +200,8 @@ fn applyLullEffectToUnitsInArea(world: *HexWorld, center_pos: Vec2, radius: f32,
             // Get unit position
             if (ecs_world.transforms.getConst(unit_id)) |transform| {
                 // Check if unit is within the lull area
-                const dx = transform.pos.x - center_pos.x;
-                const dy = transform.pos.y - center_pos.y;
-                const dist_sq = dx * dx + dy * dy;
+                const to_center = transform.pos.sub(center_pos);
+                const dist_sq = to_center.lengthSquared();
                 const radius_sq = radius * radius;
                 
                 if (dist_sq <= radius_sq) {

@@ -121,18 +121,6 @@ pub const BrowserRenderer = struct {
         try self.renderStrategyComparison(cmd_buffer, render_pass, grid_page);
     }
 
-    /// DEPRECATED: Legacy method for backward compatibility - will be removed
-    pub fn renderPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
-        const log_throttle = @import("../lib/debug/log_throttle.zig");
-        log_throttle.logInfo("deprecated_renderPage", "DEPRECATED: renderPage called - use renderPageContent instead", .{});
-        
-        // First render the page content normally
-        try current_page.render(links);
-        
-        // Then render any custom GPU content
-        try self.renderPageContent(cmd_buffer, render_pass, current_page);
-    }
-
     fn renderFontGridTestPage(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page, links: *std.ArrayList(page.Link)) !void {
         // First, let the page render its basic UI elements (headers, navigation)
         try current_page.render(links);
@@ -251,44 +239,12 @@ pub const BrowserRenderer = struct {
         }
     }
     
-    /// Render the strategy comparison grid showing actual rendered output
+    /// Font grid rendering stub - simplified for core functionality
     fn renderStrategyComparison(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, grid_page: *const font_grid_test_page.FontGridTestPage) !void {
-        // Simplified font grid test - removed complex multi-strategy rendering
-        // This is now a placeholder function
+        _ = self;
+        _ = cmd_buffer;
+        _ = render_pass;
         _ = grid_page;
-        
-        // Grid layout parameters
-        const start_x = 150.0;
-        const start_y = 200.0;
-        const cell_width = 140.0;
-        const cell_height = 100.0;
-        
-        // Just show a placeholder message
-        const gray_color = Color{ .r = 77, .g = 77, .b = 77, .a = 204 }; // 0.3 and 0.8 as u8 values
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = start_x, .y = start_y }, .{ .x = cell_width * 3, .y = cell_height }, gray_color);
-    }
-    
-    /// Render a GPU texture at specified position and size (TEMPORARY: simplified to avoid texture issues)
-    fn renderTexture(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, texture: *c.sdl.SDL_GPUTexture, x: f32, y: f32, width: f32, height: f32) !void {
-        // TEMPORARY: Instead of rendering complex textures, show colored placeholders
-        // This avoids the texture compatibility issues while we debug
-        _ = texture; // Ignore texture for now
-        
-        // Draw a colored rectangle to show that the renderer is working
-        const placeholder_color = Color{ .r = 100, .g = 150, .b = 200, .a = 255 };
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x, .y = y }, .{ .x = width, .y = height }, placeholder_color);
-        
-        // Add a border to make it more visible
-        const border_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
-        const border_thickness = 2.0;
-        
-        // Top border
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x, .y = y }, .{ .x = width, .y = border_thickness }, border_color);
-        // Bottom border  
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x, .y = y + height - border_thickness }, .{ .x = width, .y = border_thickness }, border_color);
-        // Left border
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x, .y = y }, .{ .x = border_thickness, .y = height }, border_color);
-        // Right border
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = x + width - border_thickness, .y = y }, .{ .x = border_thickness, .y = height }, border_color);
+        // No-op: Font grid functionality not implemented
     }
 };

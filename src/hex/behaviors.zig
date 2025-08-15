@@ -16,21 +16,19 @@ pub fn updateUnitWithAggroModECS(
     dt: f32,
     aggro_multiplier: f32,
 ) void {
-    var velocity = Vec2{ .x = 0, .y = 0 };
+    var velocity = Vec2.ZERO;
 
     if (player_alive) {
-        const dx_player = player_pos.x - transform.pos.x;
-        const dy_player = player_pos.y - transform.pos.y;
-        const dist_sq_to_player = dx_player * dx_player + dy_player * dy_player;
+        const to_player = player_pos.sub(transform.pos);
+        const dist_sq_to_player = to_player.lengthSquared();
         const effective_aggro_range = unit_comp.aggro_range * aggro_multiplier;
         const aggro_range_sq = effective_aggro_range * effective_aggro_range;
         const min_dist_sq = (transform.radius + constants.PLAYER_RADIUS) * (transform.radius + constants.PLAYER_RADIUS);
 
         if (dist_sq_to_player < aggro_range_sq and dist_sq_to_player > min_dist_sq) {
             // Chase player (aggro state)
-            const distance_to_player = @sqrt(dist_sq_to_player);
-            velocity.x = (dx_player / distance_to_player) * constants.UNIT_SPEED;
-            velocity.y = (dy_player / distance_to_player) * constants.UNIT_SPEED;
+            const direction = to_player.normalize();
+            velocity = direction.scale(constants.UNIT_SPEED);
             visual.color = constants.COLOR_UNIT_AGGRO;
         } else {
             // Return home (non-aggro state)
@@ -51,22 +49,18 @@ pub fn updateUnitWithAggroModECS(
 
 // Calculate velocity for ECS unit returning home
 fn calculateReturnHomeVelocityECS(unit_comp: *const ecs.components.Unit, transform: *const ecs.components.Transform) Vec2 {
-    const dx = unit_comp.home_pos.x - transform.pos.x;
-    const dy = unit_comp.home_pos.y - transform.pos.y;
-    const dist_sq = dx * dx + dy * dy;
+    const to_home = unit_comp.home_pos.sub(transform.pos);
+    const dist_sq = to_home.lengthSquared();
 
     // Use squared distance to avoid sqrt when possible
     if (dist_sq <= constants.UNIT_HOME_TOLERANCE * constants.UNIT_HOME_TOLERANCE) {
         // At home - stop moving
-        return Vec2{ .x = 0, .y = 0 };
+        return Vec2.ZERO;
     }
 
     // Move towards home
-    const distance = @sqrt(dist_sq);
-    const velocity = Vec2{
-        .x = (dx / distance) * constants.UNIT_WALK_SPEED,
-        .y = (dy / distance) * constants.UNIT_WALK_SPEED,
-    };
+    const direction = to_home.normalize();
+    const velocity = direction.scale(constants.UNIT_WALK_SPEED);
 
     return velocity;
 }

@@ -137,7 +137,7 @@ pub fn createNavMenu(
     
     // Create buttons for the menu
     for (buttons) |button_def| {
-        const nav_button = try createSimpleButton(allocator, button_def.label, types.Vec2{ .x = 0, .y = 0 }, button_def.handler);
+        const nav_button = try createSimpleButton(allocator, button_def.label, types.Vec2.ZERO, button_def.handler);
         try menu.addChild(nav_button);
     }
     
@@ -237,14 +237,14 @@ test "UI system integration" {
     defer container.destroy(allocator);
     
     // Add a title
-    var title = try createTitle(allocator, "Test Title", types.Vec2{ .x = 0, .y = 0 }, 24.0);
+    var title = try createTitle(allocator, "Test Title", types.Vec2.ZERO, 24.0);
     try container.addChild(title);
     
     // Add a button
     const TestHandler = struct {
         fn onClick() void {}
     };
-    var button = try createSimpleButton(allocator, "Test Button", types.Vec2{ .x = 0, .y = 0 }, TestHandler.onClick);
+    var button = try createSimpleButton(allocator, "Test Button", types.Vec2.ZERO, TestHandler.onClick);
     try container.addChild(button);
     
     // Verify structure

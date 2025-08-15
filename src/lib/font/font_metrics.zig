@@ -413,7 +413,7 @@ pub const MetricsUtils = struct {
         metrics: *const TextMetrics,
         glyph_advances: []const f32,
     ) Vec2 {
-        var position = Vec2{ .x = 0, .y = 0 };
+        var position = Vec2.ZERO;
 
         // Calculate Y position
         for (0..line) |line_index| {

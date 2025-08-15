@@ -216,7 +216,7 @@ pub const Contour = struct {
         const start = if (self.segments.items.len > 0)
             self.segments.items[self.segments.items.len - 1].endPoint()
         else
-            Vec2{ .x = 0, .y = 0 };
+            Vec2.ZERO;
 
         try self.segments.append(.{ .line = LineSegment{ .start = start, .end = end } });
     }
@@ -225,7 +225,7 @@ pub const Contour = struct {
         const start = if (self.segments.items.len > 0)
             self.segments.items[self.segments.items.len - 1].endPoint()
         else
-            Vec2{ .x = 0, .y = 0 };
+            Vec2.ZERO;
 
         try self.segments.append(.{ .quadratic = QuadraticCurve{ .start = start, .control = control, .end = end } });
     }
@@ -234,7 +234,7 @@ pub const Contour = struct {
         const start = if (self.segments.items.len > 0)
             self.segments.items[self.segments.items.len - 1].endPoint()
         else
-            Vec2{ .x = 0, .y = 0 };
+            Vec2.ZERO;
 
         try self.segments.append(.{ .cubic = CubicCurve{ .start = start, .control1 = control1, .control2 = control2, .end = end } });
     }
@@ -373,7 +373,7 @@ pub const PathBuilder = struct {
         return PathBuilder{
             .path = VectorPath.init(allocator),
             .current_contour = null,
-            .current_position = Vec2{ .x = 0, .y = 0 },
+            .current_position = Vec2.ZERO,
         };
     }
 

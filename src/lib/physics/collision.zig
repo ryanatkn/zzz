@@ -83,8 +83,8 @@ pub fn pointPoint(p1: Point, p2: Point) bool {
 pub const CollisionResult = struct {
     collided: bool,
     penetration_depth: f32 = 0.0,
-    normal: Vec2 = Vec2{ .x = 0, .y = 0 }, // Direction to separate shapes
-    contact_point: Vec2 = Vec2{ .x = 0, .y = 0 },
+    normal: Vec2 = Vec2.ZERO, // Direction to separate shapes
+    contact_point: Vec2 = Vec2.ZERO,
 };
 
 /// Advanced collision detection with detailed result information

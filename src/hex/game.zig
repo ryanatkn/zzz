@@ -22,6 +22,7 @@ const game_systems = @import("../lib/game/game.zig");
 const hex_events = @import("events.zig");
 const save_data = @import("save_data.zig");
 const ecs = @import("../lib/game/ecs.zig");
+const log_throttle = @import("../lib/debug/log_throttle.zig");
 
 const Vec2 = types.Vec2;
 const HexWorld = hex_world.HexWorld;
@@ -465,7 +466,7 @@ fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: types.Vec2, p
                         visual.color = constants.COLOR_LIFESTONE_ATTUNED;
                     }
 
-                    std.debug.print("Lifestone attuned!\n", .{});
+                    log_throttle.logInfo("lifestone_attuned", "Lifestone attuned!", .{});
 
                     // Emit lifestone attuned event
                     if (game_state.state_manager) |manager| {

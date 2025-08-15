@@ -20,8 +20,8 @@ const WALK_SPEED_MULT = 0.25; // Walking speed is 1/4 of normal
 pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *const camera.Camera, deltaTime: f32) void {
     if (!world.getPlayerAlive()) return;
 
-    var keyboard_velocity = Vec2{ .x = 0, .y = 0 };
-    var mouse_velocity = Vec2{ .x = 0, .y = 0 };
+    var keyboard_velocity = Vec2.ZERO;
+    var mouse_velocity = Vec2.ZERO;
 
     // Check modifiers
     const is_walking = input_state.isShiftHeld();
@@ -43,17 +43,13 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
     if (ctrl_held and input_state.isLeftMouseHeld()) {
         const screen_mouse_pos = input_state.getMousePos();
         const world_mouse_pos = cam.screenToWorldSafe(screen_mouse_pos);
-        const dx = world_mouse_pos.x - player_pos.x;
-        const dy = world_mouse_pos.y - player_pos.y;
-        const distance_sq = dx * dx + dy * dy;
+        const to_mouse = world_mouse_pos.sub(player_pos);
+        const distance_sq = to_mouse.lengthSquared();
         const radius_sq = player_radius * player_radius;
 
         if (distance_sq > radius_sq) {
-            const distance = @sqrt(distance_sq);
-            const dir_x = dx / distance;
-            const dir_y = dy / distance;
-            mouse_velocity.x = dir_x * move_speed;
-            mouse_velocity.y = dir_y * move_speed;
+            const direction = to_mouse.normalize();
+            mouse_velocity = direction.scale(move_speed);
         }
     }
 

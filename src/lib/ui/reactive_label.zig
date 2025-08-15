@@ -31,7 +31,7 @@ pub const LabelStyle = struct {
         .font_size = 24.0,
         .color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
         .background_color = null,
-        .padding = Vec2{ .x = 0, .y = 0 },
+        .padding = Vec2.ZERO,
         .alignment = .left,
     };
 
@@ -55,7 +55,7 @@ pub const LabelStyle = struct {
         .font_size = 14.0,
         .color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 },
         .background_color = null,
-        .padding = Vec2{ .x = 0, .y = 0 },
+        .padding = Vec2.ZERO,
         .alignment = .left,
     };
 };

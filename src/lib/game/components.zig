@@ -17,7 +17,7 @@ pub const Transform = extern struct {
     pub fn init(pos: Vec2, radius: f32) Transform {
         return .{
             .pos = pos,
-            .vel = Vec2{ .x = 0, .y = 0 },
+            .vel = Vec2.ZERO,
             .radius = radius,
         };
     }

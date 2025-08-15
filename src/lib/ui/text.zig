@@ -51,7 +51,7 @@ pub const Text = struct {
     cache_valid: bool = false,
     
     // Text measurement cache
-    measured_size: Vec2 = Vec2{ .x = 0, .y = 0 },
+    measured_size: Vec2 = Vec2.ZERO,
     
     const Self = @This();
     
@@ -407,7 +407,7 @@ test "text size estimation" {
     defer reactive.deinit(allocator);
     
     const style = TextStyle{ .font_size = 20.0 };
-    var text = try createText(allocator, "Test", Vec2{ .x = 0, .y = 0 }, style);
+    var text = try createText(allocator, "Test", Vec2.ZERO, style);
     defer text.destroy(allocator);
     
     const text_impl: *Text = @fieldParentPtr("base", text);

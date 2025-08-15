@@ -4,6 +4,7 @@ const ecs = @import("../lib/game/ecs.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const effects = @import("effects.zig");
+const log_throttle = @import("../lib/debug/log_throttle.zig");
 
 // Portal cooldown to prevent re-triggering after travel
 var portal_cooldown: f32 = 0;
@@ -46,7 +47,7 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
                     // Travel to destination zone
                     const zone = &world.zones[destination_zone];
                     world.travelToZone(destination_zone, zone.spawn_pos) catch {
-                        std.debug.print("Error: Failed to travel to zone {}\n", .{destination_zone});
+                        log_throttle.logError("portal_travel_error", "Error: Failed to travel to zone {}", .{destination_zone});
                         return false;
                     };
                     
