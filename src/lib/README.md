@@ -13,7 +13,7 @@ The library is organized by **capability** rather than implementation details, p
 #### **Core (`core/`)**
 Fundamental data structures and utilities that everything else depends on:
 - **Types** (`core/types.zig`) - Vec2, Color, Rectangle and other basic types
-- **Math** (`core/maths.zig`) - Vector operations, distance calculations, transformations  
+- **Math** (`math/mod.zig`) - Vector operations, distance calculations, transformations, geometric shapes  
 - **Colors** (`core/colors.zig`) - Color manipulation, HSV conversion, theming
 - **Collections** (`core/collections.zig`) - Navigation history and state management
 
@@ -170,7 +170,7 @@ SDL3 GPU API (src/lib/platform/sdl.zig)
 ```zig
 // Core utilities
 const types = @import("../lib/core/types.zig");
-const maths = @import("../lib/core/maths.zig");
+const math = @import("../lib/math/mod.zig");
 
 // Platform integration  
 const input = @import("../lib/platform/input.zig");

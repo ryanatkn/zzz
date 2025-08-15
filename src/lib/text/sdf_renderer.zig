@@ -1,6 +1,6 @@
 const std = @import("std");
 const types = @import("../core/types.zig");
-const maths = @import("../core/maths.zig");
+const math = @import("../math/mod.zig");
 const vector_path = @import("../vector/path.zig");
 const font_metrics = @import("../font/font_metrics.zig");
 
@@ -94,10 +94,10 @@ pub const SDFTexture = struct {
         const v01 = @as(f32, @floatFromInt(self.getPixel(x0, y1)[0])) / 255.0;
         const v11 = @as(f32, @floatFromInt(self.getPixel(x1, y1)[0])) / 255.0;
 
-        const v0 = maths.lerp(v00, v10, fx);
-        const v1 = maths.lerp(v01, v11, fx);
+        const v0 = math.lerp(v00, v10, fx);
+        const v1 = math.lerp(v01, v11, fx);
 
-        return maths.lerp(v0, v1, fy);
+        return math.lerp(v0, v1, fy);
     }
 };
 
@@ -245,18 +245,18 @@ pub const SDFGenerator = struct {
     /// Calculate distance from point to line segment
     fn distanceToLine(self: *Self, point: Vec2, start: Vec2, end: Vec2) f32 {
         _ = self;
-        const line_vec = maths.vec2_subtract(end, start);
-        const point_vec = maths.vec2_subtract(point, start);
+        const line_vec = math.vec2_subtract(end, start);
+        const point_vec = math.vec2_subtract(point, start);
 
-        const line_len_sq = maths.vec2_lengthSquared(line_vec);
+        const line_len_sq = math.vec2_lengthSquared(line_vec);
         if (line_len_sq == 0) {
-            return maths.vec2_length(point_vec);
+            return math.vec2_length(point_vec);
         }
 
-        const t = std.math.clamp(maths.vec2_dot(point_vec, line_vec) / line_len_sq, 0, 1);
-        const projection = maths.vec2_add(start, maths.vec2_multiply(line_vec, t));
+        const t = std.math.clamp(math.vec2_dot(point_vec, line_vec) / line_len_sq, 0, 1);
+        const projection = math.vec2_add(start, math.vec2_multiply(line_vec, t));
 
-        return maths.vec2_length(maths.vec2_subtract(point, projection));
+        return math.vec2_length(math.vec2_subtract(point, projection));
     }
 
     /// Calculate distance from point to quadratic bezier curve (approximated)

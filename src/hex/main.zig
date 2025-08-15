@@ -6,7 +6,7 @@ const c = @import("../lib/platform/sdl.zig");
 const types = @import("../lib/core/types.zig");
 const input = @import("../lib/platform/input.zig");
 const game_renderer_mod = @import("game_renderer.zig");
-const maths = @import("../lib/core/maths.zig");
+const math = @import("../lib/math/mod.zig");
 
 // Game-specific imports
 const constants = @import("constants.zig");

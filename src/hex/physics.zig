@@ -2,7 +2,7 @@ const std = @import("std");
 
 const entities = @import("entities.zig");
 const types = @import("../lib/core/types.zig");
-const maths = @import("../lib/core/maths.zig");
+const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision.zig");
 const hex_world = @import("hex_world.zig");
 const ecs = @import("../lib/game/ecs.zig");
@@ -12,7 +12,7 @@ const Vec2 = types.Vec2;
 
 // Check circle-circle collision (now using shared math functions)
 pub fn checkCircleCollision(pos1: Vec2, radius1: f32, pos2: Vec2, radius2: f32) bool {
-    const distance_sq = maths.distanceSquared(pos1, pos2);
+    const distance_sq = math.distanceSquared(pos1, pos2);
     const radius_sum = radius1 + radius2;
     return distance_sq < radius_sum * radius_sum;
 }
@@ -302,26 +302,31 @@ pub fn checkUnitObstacleCollisionECS(
 // Check if player can move to a position without colliding with obstacles
 pub fn canPlayerMoveTo(world: *const hex_world.HexWorld, new_pos: Vec2, player_radius: f32) bool {
     const ecs_world = world.getECSWorld();
-    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+    const current_zone = &world.zones[world.current_zone];
     
-    while (terrain_iter.next()) |entry| {
-        const terrain = entry.value_ptr.*;
+    // Only check obstacles in the current zone
+    for (current_zone.obstacle_entities.items) |obstacle_id| {
+        // Check if entity is still alive
+        if (!@constCast(ecs_world).isAlive(obstacle_id)) continue;
         
-        // Only check wall obstacles (walls block movement, pits don't prevent movement but kill on contact)
-        if (terrain.terrain_type != .wall) continue;
-        
-        // Get obstacle transform
-        const obstacle_id = entry.key_ptr.*;
-        if (ecs_world.transforms.getConst(obstacle_id)) |obstacle_transform| {
-            // Convert from circular collision to rectangular
-            const half_size = obstacle_transform.radius;
-            const obstacle_size = Vec2{ .x = half_size * 2, .y = half_size * 2 };
+        // Get terrain component
+        if (ecs_world.terrains.getConst(obstacle_id)) |terrain| {
+            // Only check wall obstacles (walls block movement, pits don't prevent movement but kill on contact)
+            if (terrain.terrain_type != .wall) continue;
             
-            if (checkCircleRectCollision(new_pos, player_radius, obstacle_transform.pos, obstacle_size)) {
-                return false; // Collision detected, cannot move
+            // Get obstacle transform
+            if (ecs_world.transforms.getConst(obstacle_id)) |obstacle_transform| {
+                // Convert from circular collision to rectangular
+                const half_size = obstacle_transform.radius;
+                const obstacle_size = Vec2{ .x = half_size * 2, .y = half_size * 2 };
+                
+                if (checkCircleRectCollision(new_pos, player_radius, obstacle_transform.pos, obstacle_size)) {
+                    return false; // Collision detected, cannot move
+                }
             }
         }
     }
+    
     return true; // No collision, can move
 }
 

@@ -1,6 +1,6 @@
 const std = @import("std");
 const types = @import("../core/types.zig");
-const maths = @import("../core/maths.zig");
+const math = @import("../math/mod.zig");
 const shapes = @import("shapes.zig");
 
 const Vec2 = types.Vec2;
@@ -19,27 +19,27 @@ pub fn checkCollision(shape1: Shape, shape2: Shape) bool {
             .circle => |c2| circleCircle(c1, c2),
             .rectangle => |r2| circleRectangle(c1, r2),
             .point => |p2| circlePoint(c1, p2),
-            .line_segment => false, // Circle-line collision not implemented yet
+            .line => false, // Circle-line collision not implemented yet
         },
         .rectangle => |r1| switch (shape2) {
             .circle => |c2| circleRectangle(c2, r1), // Symmetric
             .rectangle => |r2| rectangleRectangle(r1, r2),
             .point => |p2| rectanglePoint(r1, p2),
-            .line_segment => false, // Rectangle-line collision not implemented yet
+            .line => false, // Rectangle-line collision not implemented yet
         },
         .point => |p1| switch (shape2) {
             .circle => |c2| circlePoint(c2, p1), // Symmetric
             .rectangle => |r2| rectanglePoint(r2, p1), // Symmetric
             .point => |p2| pointPoint(p1, p2),
-            .line_segment => false, // Point-line collision not implemented yet
+            .line => false, // Point-line collision not implemented yet
         },
-        .line_segment => false, // Line segment collisions not implemented yet
+        .line => false, // Line segment collisions not implemented yet
     };
 }
 
 /// Circle-circle collision detection (optimized with squared distance)
 pub fn circleCircle(c1: Circle, c2: Circle) bool {
-    const distance_sq = maths.distanceSquared(c1.center, c2.center);
+    const distance_sq = math.distanceSquared(c1.center, c2.center);
     const radius_sum = c1.radius + c2.radius;
     return distance_sq <= radius_sum * radius_sum;
 }
@@ -51,14 +51,14 @@ pub fn circleRectangle(circle: Circle, rect: Rectangle) bool {
     const closest_y = std.math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
 
     const closest_point = Vec2{ .x = closest_x, .y = closest_y };
-    const distance_sq = maths.distanceSquared(circle.center, closest_point);
+    const distance_sq = math.distanceSquared(circle.center, closest_point);
 
     return distance_sq <= circle.radius * circle.radius;
 }
 
 /// Circle-point collision detection
 pub fn circlePoint(circle: Circle, point: Point) bool {
-    return maths.distanceSquared(circle.center, point.position) <= circle.radius * circle.radius;
+    return math.distanceSquared(circle.center, point) <= circle.radius * circle.radius;
 }
 
 /// Rectangle-rectangle collision detection (AABB)
@@ -71,12 +71,12 @@ pub fn rectangleRectangle(r1: Rectangle, r2: Rectangle) bool {
 
 /// Rectangle-point collision detection
 pub fn rectanglePoint(rect: Rectangle, point: Point) bool {
-    return rect.contains(point.position);
+    return rect.contains(point);
 }
 
 /// Point-point collision detection (exact match)
 pub fn pointPoint(p1: Point, p2: Point) bool {
-    return maths.vec2_isEqual(p1.position, p2.position, 0.001); // Small tolerance for floating point
+    return math.vec2_isEqual(p1, p2, 0.001); // Small tolerance for floating point
 }
 
 /// Collision result with additional information
@@ -99,7 +99,7 @@ pub fn checkCollisionDetailed(shape1: Shape, shape2: Shape) CollisionResult {
             .circle => |c2| {
                 var result = circleRectangleDetailed(c2, r1);
                 // Flip normal for symmetric case
-                result.normal = maths.vec2_multiply(result.normal, -1.0);
+                result.normal = math.vec2_multiply(result.normal, -1.0);
                 return result;
             },
             .rectangle => |r2| rectangleRectangleDetailed(r1, r2),
@@ -108,12 +108,12 @@ pub fn checkCollisionDetailed(shape1: Shape, shape2: Shape) CollisionResult {
         .point => |p1| switch (shape2) {
             .circle => |c2| {
                 var result = circlePointDetailed(c2, p1);
-                result.normal = maths.multiply(result.normal, -1.0);
+                result.normal = math.multiply(result.normal, -1.0);
                 return result;
             },
             .rectangle => |r2| {
                 var result = rectanglePointDetailed(r2, p1);
-                result.normal = maths.multiply(result.normal, -1.0);
+                result.normal = math.multiply(result.normal, -1.0);
                 return result;
             },
             .point => |p2| pointPointDetailed(p1, p2),
@@ -122,7 +122,7 @@ pub fn checkCollisionDetailed(shape1: Shape, shape2: Shape) CollisionResult {
 }
 
 fn circleCircleDetailed(c1: Shape.Circle, c2: Shape.Circle) CollisionResult {
-    const distance = maths.distance(c1.center, c2.center);
+    const distance = math.distance(c1.center, c2.center);
     const radius_sum = c1.radius + c2.radius;
 
     if (distance > radius_sum) {
@@ -131,11 +131,11 @@ fn circleCircleDetailed(c1: Shape.Circle, c2: Shape.Circle) CollisionResult {
 
     const penetration = radius_sum - distance;
     const normal = if (distance > 0.001)
-        maths.direction(c1.center, c2.center)
+        math.direction(c1.center, c2.center)
     else
         Vec2{ .x = 1, .y = 0 }; // Default normal if centers overlap
 
-    const contact_point = maths.add(c1.center, maths.multiply(normal, c1.radius - penetration / 2.0));
+    const contact_point = math.add(c1.center, math.multiply(normal, c1.radius - penetration / 2.0));
 
     return CollisionResult{
         .collided = true,
@@ -150,7 +150,7 @@ fn circleRectangleDetailed(circle: Shape.Circle, rect: Shape.Rectangle) Collisio
     const closest_y = std.math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
     const closest_point = Vec2{ .x = closest_x, .y = closest_y };
 
-    const distance = maths.distance(circle.center, closest_point);
+    const distance = math.distance(circle.center, closest_point);
 
     if (distance > circle.radius) {
         return CollisionResult{ .collided = false };
@@ -158,7 +158,7 @@ fn circleRectangleDetailed(circle: Shape.Circle, rect: Shape.Rectangle) Collisio
 
     const penetration = circle.radius - distance;
     const normal = if (distance > 0.001)
-        maths.direction(closest_point, circle.center)
+        math.direction(closest_point, circle.center)
     else
         Vec2{ .x = 0, .y = -1 }; // Default normal from top of rectangle
 
@@ -171,7 +171,7 @@ fn circleRectangleDetailed(circle: Shape.Circle, rect: Shape.Rectangle) Collisio
 }
 
 fn circlePointDetailed(circle: Shape.Circle, point: Shape.Point) CollisionResult {
-    const distance = maths.distance(circle.center, point.position);
+    const distance = math.distance(circle.center, point.position);
 
     if (distance > circle.radius) {
         return CollisionResult{ .collided = false };
@@ -179,7 +179,7 @@ fn circlePointDetailed(circle: Shape.Circle, point: Shape.Point) CollisionResult
 
     const penetration = circle.radius - distance;
     const normal = if (distance > 0.001)
-        maths.direction(point.position, circle.center)
+        math.direction(point.position, circle.center)
     else
         Vec2{ .x = 1, .y = 0 };
 
@@ -246,7 +246,7 @@ fn rectanglePointDetailed(rect: Shape.Rectangle, point: Shape.Point) CollisionRe
 }
 
 fn pointPointDetailed(p1: Shape.Point, p2: Shape.Point) CollisionResult {
-    const distance = maths.distance(p1.position, p2.position);
+    const distance = math.distance(p1.position, p2.position);
     const tolerance = 0.001;
 
     if (distance > tolerance) {

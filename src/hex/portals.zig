@@ -3,7 +3,7 @@ const std = @import("std");
 const types = @import("../lib/core/types.zig");
 const entities = @import("entities.zig");
 const behaviors = @import("behaviors.zig");
-const maths = @import("../lib/core/maths.zig");
+const math = @import("../lib/math/mod.zig");
 const physics = @import("physics.zig");
 const player_controller = @import("player.zig");
 const input = @import("../lib/platform/input.zig");
@@ -14,6 +14,9 @@ const effects = @import("effects.zig");
 const Vec2 = types.Vec2;
 const HexWorld = @import("hex_world.zig").HexWorld;
 const Portal = entities.Portal;
+
+// Portal cooldown to prevent re-triggering after travel
+var portal_cooldown: f32 = 0;
 
 pub fn handlePortalTravel(game_state: anytype, portal: *const Portal) void {
     const world = &game_state.world;
@@ -26,7 +29,8 @@ pub fn handlePortalTravel(game_state: anytype, portal: *const Portal) void {
     const origin_zone = world.current_zone;
     const destination_zone = portal.destination_zone;
     
-    std.debug.print("Portal travel! Entering zone {} from zone {}\n", .{ destination_zone, origin_zone });
+    // Set cooldown to prevent immediate re-triggering
+    portal_cooldown = 1.0; // 1 second cooldown
 
     const new_zone = &world.zones[destination_zone];
     var spawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y }; // Default fallback
@@ -78,9 +82,19 @@ pub fn handlePortalTravel(game_state: anytype, portal: *const Portal) void {
     effect_system.addPortalTravelEffect(spawn_pos, player_radius);
 }
 
+// Update portal cooldown timer
+pub fn updatePortalCooldown(deltaTime: f32) void {
+    if (portal_cooldown > 0) {
+        portal_cooldown = @max(0, portal_cooldown - deltaTime);
+    }
+}
+
 pub fn checkPortalCollisions(game_state: anytype) bool {
     const world = &game_state.world;
 
+    // Skip portal checks during cooldown
+    if (portal_cooldown > 0) return false;
+    
     if (!world.getPlayerAlive()) return false;
     
     const player_pos = world.getPlayerPos();
@@ -116,9 +130,8 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
 fn handlePortalTravelECS(game_state: anytype, portal_id: ecs.EntityId, interactable: *const ecs.components.Interactable) void {
     _ = portal_id; // Unused for now
     if (interactable.destination_zone) |destination| {
-        std.debug.print("Portal travel! Entering zone {} from zone {}\n", .{ destination, game_state.world.current_zone });
+        // Set cooldown to prevent immediate re-triggering
+        portal_cooldown = 1.0; // 1 second cooldown
         game_state.travelToZone(destination);
-    } else {
-        std.debug.print("Portal has no destination zone!\n", .{});
     }
 }

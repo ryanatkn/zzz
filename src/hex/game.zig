@@ -354,6 +354,9 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     const world = &game_state.world;
     const input_state = &game_state.input_state;
 
+    // Update portal cooldown
+    portals.updatePortalCooldown(deltaTime);
+
     if (world.getPlayerAlive()) {
         // Update player using ECS-compatible controller
         player_controller.updatePlayerECS(world, input_state, cam, deltaTime);

@@ -6,7 +6,7 @@ const hex_world = @import("hex_world.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
-const maths = @import("../lib/core/maths.zig");
+const math = @import("../lib/math/mod.zig");
 const camera = @import("../lib/rendering/camera.zig");
 const viewport = @import("../lib/core/viewport.zig");
 const constants = @import("constants.zig");
@@ -102,6 +102,6 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
 
 /// ECS-compatible movement direction getter
 pub fn getPlayerMovementDirectionECS(world: *const HexWorld) Vec2 {
-    return maths.vec2_normalize(world.getPlayerVelConst());
+    return math.vec2_normalize(world.getPlayerVelConst());
 }
 

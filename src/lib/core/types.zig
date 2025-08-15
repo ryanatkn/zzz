@@ -1,6 +1,6 @@
-pub const Vec2 = extern struct { x: f32, y: f32 };
-pub const Color = extern struct { r: u8, g: u8, b: u8, a: u8 };
-pub const Rectangle = struct {
-    position: Vec2,
-    size: Vec2,
-};
+// Import math types
+pub const Vec2 = @import("../math/mod.zig").Vec2;
+pub const Rectangle = @import("../math/mod.zig").Rectangle;
+
+// Import color type
+pub const Color = @import("colors.zig").Color;

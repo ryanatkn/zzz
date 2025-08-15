@@ -1,12 +1,12 @@
 const fs = require('fs').promises;
 const path = require('path');
 
-async function listAll({folder = __dirname} = {}) {
+async function listAll({folder = process.cwd()} = {}) {
   const json = await fs.readFile(path.join(folder, 'css.json'), 'utf8');
   return JSON.parse(json);
 }
 
-async function index({folder = __dirname} = {}) {
+async function index({folder = process.cwd()} = {}) {
   const nonIndexed = await listAll(folder);
   const indexed = {};
   for (const [category, features] of Object.entries(nonIndexed)) {
@@ -37,5 +37,7 @@ async function index({folder = __dirname} = {}) {
   }
   return indexed;
 }
+
+listAll()
 
 module.exports = {listAll, index};

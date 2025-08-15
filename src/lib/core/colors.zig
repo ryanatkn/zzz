@@ -1,7 +1,12 @@
-const types = @import("types.zig");
 const std = @import("std");
 
-const Color = types.Color;
+/// RGBA color struct compatible with GPU buffers
+pub const Color = extern struct {
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
+};
 
 // Core game entity colors
 pub const PLAYER_ALIVE = Color{ .r = 0, .g = 70, .b = 200, .a = 255 }; // BLUE

@@ -76,18 +76,24 @@ pub const InputState = struct {
     pub fn getMovementVector(self: *const Self) Vec2 {
         var velocity = Vec2{ .x = 0, .y = 0 };
 
-        if (self.isKeyDown(c.sdl.SDL_SCANCODE_W)) {
+        const w_pressed = self.isKeyDown(c.sdl.SDL_SCANCODE_W);
+        const s_pressed = self.isKeyDown(c.sdl.SDL_SCANCODE_S);
+        const a_pressed = self.isKeyDown(c.sdl.SDL_SCANCODE_A);
+        const d_pressed = self.isKeyDown(c.sdl.SDL_SCANCODE_D);
+
+        if (w_pressed) {
             velocity.y -= 1.0;
         }
-        if (self.isKeyDown(c.sdl.SDL_SCANCODE_S)) {
+        if (s_pressed) {
             velocity.y += 1.0;
         }
-        if (self.isKeyDown(c.sdl.SDL_SCANCODE_A)) {
+        if (a_pressed) {
             velocity.x -= 1.0;
         }
-        if (self.isKeyDown(c.sdl.SDL_SCANCODE_D)) {
+        if (d_pressed) {
             velocity.x += 1.0;
         }
+
 
         const length = @sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
         if (length > 0) {

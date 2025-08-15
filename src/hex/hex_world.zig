@@ -1,6 +1,6 @@
 const std = @import("std");
 const types = @import("../lib/core/types.zig");
-const maths = @import("../lib/core/maths.zig");
+const math = @import("../lib/math/mod.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const constants = @import("constants.zig");
 const entities = @import("entities.zig");
@@ -316,8 +316,8 @@ pub const HexWorld = struct {
         speed: f32,
         lifetime: f32,
     ) !EntityId {
-        const direction = maths.vec2_normalize(maths.vec2_subtract(target_pos, pos));
-        const velocity = maths.vec2_multiply(direction, speed);
+        const direction = math.vec2_normalize(math.vec2_subtract(target_pos, pos));
+        const velocity = math.vec2_multiply(direction, speed);
         
         return try self.world.createProjectile(
             pos,
