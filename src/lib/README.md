@@ -1,4 +1,4 @@
-# Dealt Library
+# Zzz Library
 
 Core engine components providing SDL3-based rendering and framework functionality with capability-based organization.
 

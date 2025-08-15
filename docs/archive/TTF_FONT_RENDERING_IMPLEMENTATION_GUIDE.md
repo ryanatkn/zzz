@@ -151,4 +151,4 @@ Once surface rendering works, upgrade to full GPU rendering for better performan
 
 ---
 
-*This migration eliminates SDL_ttf dependency and implements pure Zig distance field text rendering for the Dealt/Hex game engine.*
+*This migration eliminates SDL_ttf dependency and implements pure Zig distance field text rendering for the Zzz/Hex game engine.*

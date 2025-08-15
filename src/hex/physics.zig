@@ -299,6 +299,32 @@ pub fn checkUnitObstacleCollisionECS(
     return false; // No collision
 }
 
+// Check if player can move to a position without colliding with obstacles
+pub fn canPlayerMoveTo(world: *const hex_world.HexWorld, new_pos: Vec2, player_radius: f32) bool {
+    const ecs_world = world.getECSWorld();
+    var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+    
+    while (terrain_iter.next()) |entry| {
+        const terrain = entry.value_ptr.*;
+        
+        // Only check wall obstacles (walls block movement, pits don't prevent movement but kill on contact)
+        if (terrain.terrain_type != .wall) continue;
+        
+        // Get obstacle transform
+        const obstacle_id = entry.key_ptr.*;
+        if (ecs_world.transforms.getConst(obstacle_id)) |obstacle_transform| {
+            // Convert from circular collision to rectangular
+            const half_size = obstacle_transform.radius;
+            const obstacle_size = Vec2{ .x = half_size * 2, .y = half_size * 2 };
+            
+            if (checkCircleRectCollision(new_pos, player_radius, obstacle_transform.pos, obstacle_size)) {
+                return false; // Collision detected, cannot move
+            }
+        }
+    }
+    return true; // No collision, can move
+}
+
 // Check player collision with portal using ECS transform component
 pub fn checkPlayerPortalCollisionECS(player_pos: Vec2, player_radius: f32, portal_transform: *const ecs.components.Transform) bool {
     return checkCircleCollision(player_pos, player_radius, portal_transform.pos, portal_transform.radius);

@@ -2,7 +2,7 @@ const std = @import("std");
 const persistent_text = @import("../text/cache.zig");
 const text_renderer = @import("../text/renderer.zig");
 
-/// Rendering Mode Guidelines for the Dealt Game Engine
+/// Rendering Mode Guidelines for the Zzz Game Engine
 ///
 /// This module provides clear guidance on when to use immediate mode vs persistent mode
 /// rendering, with helper functions to make the right choice easy for developers.

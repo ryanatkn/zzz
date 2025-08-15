@@ -1,4 +1,4 @@
-//! Reactive system for Dealt Game Engine with performance-first shallow reactivity
+//! Reactive system for Zzz Game Engine with performance-first shallow reactivity
 //!
 //! Complete implementation inspired by Svelte 5's rune system with automatic dependency tracking:
 //! - $state/$state.raw: Reactive signals with shallow equality and automatic tracking (Signal)

@@ -1,8 +1,10 @@
-# Dealt
+# Zzz
 
 > ⚠️ AI slop code and docs
 
-A GPU-accelerated graphics and media programming environment built with Zig, SDL3, and HLSL shaders.
+Zzz is a GUI in Zig.
+For the companion CLI see [zz](https://github.com/ryanatkn/zz)
+and ztack.net for a web+ stack.
 
 ## Quick start
 
@@ -16,7 +18,7 @@ zig build run
 
 ## What it does
 
-Dealt is a graphics and media programming environment that generates all visuals through code and mathematics - no texture or sprite assets. It provides a framework for building creative tools, games, and interactive applications with procedural content generation.
+Zzz is a graphics and media programming environment that generates all visuals through code and mathematics - no texture or sprite assets. It provides a framework for building creative tools, games, and interactive applications with procedural content generation.
 
 The library (`src/lib/`) provides core graphics and media capabilities with a capability-based architecture. The included Hex action RPG (`src/hex/`) demonstrates these capabilities as a complete game with zone-based worlds, reactive UI, and GPU-accelerated effects running at 60+ FPS.
 
@@ -101,7 +103,7 @@ zig build -Doptimize=ReleaseFast                          # native release
 
 ## Creating new applications
 
-Dealt is designed for creating games, creative tools, and interactive applications:
+Zzz is designed for creating games, creative tools, and interactive applications:
 
 1. Create project directory: `src/myapp/`
 2. Import library components from `src/lib/`

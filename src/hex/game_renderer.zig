@@ -113,14 +113,11 @@ pub const GameRenderer = struct {
             if (ecs_world.transforms.getConst(entity_id)) |transform| {
                 if (ecs_world.visuals.getConst(entity_id)) |visual| {
                     if (visual.visible) {
-                        // For obstacles, we need to render as rectangles
-                        // TODO: Store original size in terrain component
-                        // For now, render as squares using radius
+                        // Render obstacles using their actual rectangular size from terrain component
                         const screen_pos = self.camera.worldToScreen(transform.pos);
-                        const size = transform.radius * 2.0; // Convert radius to size
                         const screen_size = Vec2{
-                            .x = self.camera.worldSizeToScreen(size),
-                            .y = self.camera.worldSizeToScreen(size),
+                            .x = self.camera.worldSizeToScreen(terrain.size.x),
+                            .y = self.camera.worldSizeToScreen(terrain.size.y),
                         };
                         self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, visual.color);
                     }

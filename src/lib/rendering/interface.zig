@@ -1,4 +1,4 @@
-// Dealt - Renderer Interface
+// Zzz - Renderer Interface
 // Common interface for drawing operations that can be implemented by different renderers
 
 const std = @import("std");

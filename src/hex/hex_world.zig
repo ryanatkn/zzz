@@ -60,6 +60,7 @@ pub const HexWorld = struct {
         unit_entities: std.ArrayList(EntityId),
         portal_entities: std.ArrayList(EntityId),
         lifestone_entities: std.ArrayList(EntityId),
+        obstacle_entities: std.ArrayList(EntityId),
         
         pub fn init(allocator: std.mem.Allocator, zone_type: ZoneType) Zone {
             return .{
@@ -85,6 +86,7 @@ pub const HexWorld = struct {
                 .unit_entities = std.ArrayList(EntityId).init(allocator),
                 .portal_entities = std.ArrayList(EntityId).init(allocator),
                 .lifestone_entities = std.ArrayList(EntityId).init(allocator),
+                .obstacle_entities = std.ArrayList(EntityId).init(allocator),
             };
         }
         
@@ -96,6 +98,7 @@ pub const HexWorld = struct {
             self.unit_entities.deinit();
             self.portal_entities.deinit();
             self.lifestone_entities.deinit();
+            self.obstacle_entities.deinit();
         }
         
         /// Reset units in this zone (placeholder - will be called by HexWorld.resetCurrentZone)
@@ -351,8 +354,8 @@ pub const HexWorld = struct {
     ) !EntityId {
         const obstacle = try self.world.createObstacle(pos, size, is_deadly);
         
-        // Add to current zone's obstacle list for future reference
-        // For now, track by zone (could be enhanced later)
+        // Add to current zone's obstacle list for reset functionality
+        try self.zones[self.current_zone].obstacle_entities.append(obstacle);
         
         return obstacle;
     }
@@ -414,6 +417,12 @@ pub const HexWorld = struct {
     pub fn travelToZone(self: *HexWorld, zone_index: usize, spawn_pos: Vec2) !void {
         if (zone_index >= self.zones.len) return;
         
+        // Clear all projectiles when traveling between zones
+        var projectile_iter = self.world.projectiles.iterator();
+        while (projectile_iter.next()) |entry| {
+            try self.world.destroyEntity(entry.key_ptr.*);
+        }
+        
         self.current_zone = zone_index;
         
         // Move player to spawn position
@@ -434,6 +443,24 @@ pub const HexWorld = struct {
             try self.world.destroyEntity(unit_entity);
         }
         zone.unit_entities.clearRetainingCapacity();
+        
+        // Destroy all obstacles in current zone
+        for (zone.obstacle_entities.items) |obstacle_entity| {
+            try self.world.destroyEntity(obstacle_entity);
+        }
+        zone.obstacle_entities.clearRetainingCapacity();
+        
+        // Destroy all portals in current zone
+        for (zone.portal_entities.items) |portal_entity| {
+            try self.world.destroyEntity(portal_entity);
+        }
+        zone.portal_entities.clearRetainingCapacity();
+        
+        // Destroy all lifestones in current zone
+        for (zone.lifestone_entities.items) |lifestone_entity| {
+            try self.world.destroyEntity(lifestone_entity);
+        }
+        zone.lifestone_entities.clearRetainingCapacity();
         
         // Destroy all projectiles
         var projectile_iter = self.world.projectiles.iterator();

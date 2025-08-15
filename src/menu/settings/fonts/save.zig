@@ -79,7 +79,7 @@ pub fn exportConfig(allocator: std.mem.Allocator, settings: font_config.FontSett
     var config_buf = std.ArrayList(u8).init(allocator);
 
     try std.fmt.format(config_buf.writer(),
-        \\// Font Configuration for Dealt/Hex
+        \\// Font Configuration for Zzz/Hex
         \\// Generated on {d}
         \\
         \\pub const font_settings = font_config.FontSettings{{

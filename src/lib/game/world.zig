@@ -198,9 +198,9 @@ pub const World = struct {
             types.Color{ .r = 100, .g = 100, .b = 100, .a = 255 }; // Gray for blocking
         try self.visuals.add(id, components.Visual.init(color));
         
-        // Create terrain component
+        // Create terrain component with size information
         const terrain_type = if (is_deadly) components.Terrain.TerrainType.pit else components.Terrain.TerrainType.wall;
-        try self.terrains.add(id, components.Terrain.init(terrain_type));
+        try self.terrains.add(id, components.Terrain.init(terrain_type, size));
 
         return id;
     }
@@ -225,7 +225,9 @@ pub const World = struct {
         try self.visuals.add(id, components.Visual.init(color));
         
         // Create terrain component as altar type
-        try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.altar));
+        // Lifestones are circular, so create square size from radius
+        const lifestone_size = components.Vec2{ .x = radius * 2.0, .y = radius * 2.0 };
+        try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.altar, lifestone_size));
         
         // Add interactable component for attunement
         try self.interactables.add(id, components.Interactable.init(components.Interactable.InteractionType.transformable));
@@ -250,7 +252,9 @@ pub const World = struct {
         try self.visuals.add(id, components.Visual.init(color));
         
         // Create terrain component as door type (portals are like doors)
-        try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.door));
+        // Portals are circular, so create square size from radius
+        const portal_size = components.Vec2{ .x = radius * 2.0, .y = radius * 2.0 };
+        try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.door, portal_size));
         
         // Add interactable component for travel with destination
         try self.interactables.add(id, components.Interactable.initPortal(destination_zone));

@@ -1,4 +1,4 @@
-# Dealt Reactive System - Comprehensive Guide
+# Zzz Reactive System - Comprehensive Guide
 
 **Version:** Shallow Reactivity Complete | **Date:** January 13, 2025  
 **Status:** Production-Ready | Performance-First | Idiomatic Zig
@@ -7,7 +7,7 @@
 
 ## 🎯 **Overview**
 
-The Dealt Reactive System is a high-performance, shallow-reactive framework built in Zig with inspiration from Svelte 5. It provides automatic dependency tracking, lazy evaluation, and efficient batched updates optimized for game engine performance.
+The Zzz Reactive System is a high-performance, shallow-reactive framework built in Zig with inspiration from Svelte 5. It provides automatic dependency tracking, lazy evaluation, and efficient batched updates optimized for game engine performance.
 
 ### **Key Features**
 - **Shallow Reactivity**: Only top-level changes trigger updates for maximum performance

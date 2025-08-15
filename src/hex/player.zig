@@ -88,9 +88,14 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
         if (new_pos.y > constants.SCREEN_HEIGHT - margin) new_pos.y = constants.SCREEN_HEIGHT - margin;
     }
 
-    // TODO: Check collision with obstacles
-    // For now, just update position
-    world.setPlayerPos(new_pos);
+    // Check collision with obstacles before moving
+    if (physics.canPlayerMoveTo(world, new_pos, player_radius)) {
+        // No collision, safe to move
+        world.setPlayerPos(new_pos);
+    } else {
+        // Collision detected, don't move (or try sliding along walls)
+        // For now, just stop movement completely
+    }
     world.setPlayerVel(velocity);
 }
 

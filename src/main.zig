@@ -1,4 +1,4 @@
-// Dealt - SDL3 Engine with Game Support
+// Zzz - SDL3 Engine with Game Support
 // Entry point that can run different game implementations
 
 const std = @import("std");

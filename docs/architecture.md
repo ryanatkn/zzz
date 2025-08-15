@@ -1,8 +1,8 @@
-# Dealt Architecture
+# Zzz Architecture
 
 ## Overview
 
-Dealt uses a **capability-based architecture** that organizes modules by what they enable rather than what they are. This creates natural dependency flows while maintaining unrestricted module access.
+Zzz uses a **capability-based architecture** that organizes modules by what they enable rather than what they are. This creates natural dependency flows while maintaining unrestricted module access.
 
 ## Architectural Principles
 

@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
     const use_llvm = b.option(bool, "use-llvm", "Use the LLVM backend");
 
     const exe = b.addExecutable(.{
-        .name = "dealt",
+        .name = "zzz",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
@@ -17,10 +17,10 @@ pub fn build(b: *std.Build) void {
     // Build SDL3 library inline
     const sdl3 = buildSDL3(b, target, optimize);
     exe.addIncludePath(b.path("deps/SDL/include"));
-    
+
     // Link SDL3
     exe.linkLibrary(sdl3);
-    
+
     exe.linkLibC();
 
     // System libraries (platform-specific)
@@ -94,11 +94,11 @@ pub fn build(b: *std.Build) void {
     const run_step = b.step("run", "Run the game");
     const run = b.addRunArtifact(exe);
     run.step.dependOn(b.getInstallStep());
-    
+
     if (b.args) |args| {
         run.addArgs(args);
     }
-    
+
     run_step.dependOn(&run.step);
 
     // Test step
@@ -124,7 +124,7 @@ fn hasSystemLibrary(lib_name: []const u8) bool {
             "/usr/lib/libfreetype.so",
             "/usr/local/lib/libfreetype.so",
         };
-        
+
         for (lib_paths) |path| {
             if (std.fs.cwd().access(path, .{})) {
                 return true;
@@ -132,28 +132,28 @@ fn hasSystemLibrary(lib_name: []const u8) bool {
         }
         return false;
     }
-    
+
     // For other libraries, use the generic approach
     const lib_paths = [_][]const u8{
         "/usr/lib/x86_64-linux-gnu",
         "/usr/lib",
-        "/lib/x86_64-linux-gnu", 
+        "/lib/x86_64-linux-gnu",
         "/lib",
         "/usr/local/lib",
     };
-    
+
     const lib_prefixed = std.fmt.allocPrint(std.heap.page_allocator, "lib{s}.so", .{lib_name}) catch return false;
     defer std.heap.page_allocator.free(lib_prefixed);
-    
+
     for (lib_paths) |path| {
-        const shared_path = std.fmt.allocPrint(std.heap.page_allocator, "{s}/{s}", .{path, lib_prefixed}) catch continue;
+        const shared_path = std.fmt.allocPrint(std.heap.page_allocator, "{s}/{s}", .{ path, lib_prefixed }) catch continue;
         defer std.heap.page_allocator.free(shared_path);
-        
+
         if (std.fs.cwd().access(shared_path, .{})) {
             return true;
         } else |_| {}
     }
-    
+
     return false;
 }
 
@@ -168,7 +168,7 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     // Common C flags following castholm's approach
     const sdl_c_flags = &[_][]const u8{
         "-Wall",
-        "-Wundef", 
+        "-Wundef",
         "-Wfloat-conversion",
         "-fno-strict-aliasing",
         "-Wshadow",
@@ -459,7 +459,7 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
             "deps/SDL/src/dialog/unix/SDL_portaldialog.c",
             "deps/SDL/src/dialog/unix/SDL_zenitydialog.c",
             // Video drivers (X11 core, some extensions disabled)
-            "deps/SDL/src/video/x11/SDL_x11stubs.c",    // Stubs for disabled extensions
+            "deps/SDL/src/video/x11/SDL_x11stubs.c", // Stubs for disabled extensions
             "deps/SDL/src/video/x11/SDL_x11clipboard.c",
             "deps/SDL/src/video/x11/SDL_x11dyn.c",
             "deps/SDL/src/video/x11/SDL_x11events.c",
@@ -493,7 +493,7 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
             // GPU backends
             "deps/SDL/src/gpu/vulkan/SDL_gpu_vulkan.c",
         };
-        
+
         sdl3.addCSourceFiles(.{
             .files = &linux_files,
             .flags = sdl_c_flags,
@@ -508,7 +508,7 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     // Add system include for Khronos headers
     sdl3.addSystemIncludePath(b.path("deps/SDL/src/video/khronos"));
 
-    // Link system libraries 
+    // Link system libraries
     if (target.result.os.tag == .linux) {
         // Required libraries (no optional detection - just link what we need)
         sdl3.linkSystemLibrary("m");
@@ -531,4 +531,3 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     sdl3.linkLibC();
     return sdl3;
 }
-

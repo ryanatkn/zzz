@@ -302,8 +302,9 @@ pub const Terrain = struct {
     solid: bool,
     blocks_sight: bool,
     terrain_type: TerrainType,
+    size: Vec2, // Original rectangular size for proper rendering
     
-    pub fn init(terrain_type: TerrainType) Terrain {
+    pub fn init(terrain_type: TerrainType, size: Vec2) Terrain {
         return .{
             .solid = switch (terrain_type) {
                 .wall, .door => true,
@@ -314,6 +315,7 @@ pub const Terrain = struct {
                 else => false,
             },
             .terrain_type = terrain_type,
+            .size = size,
         };
     }
 };

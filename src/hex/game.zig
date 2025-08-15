@@ -49,7 +49,7 @@ pub const GameState = struct {
     // Iris wipe effect for resurrection
     iris_wipe_active: bool,
     iris_wipe_start_time: u64,
-    
+
     // State management system
     state_manager: ?*game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents),
     game_stats: save_data.GameStatistics,
@@ -72,7 +72,7 @@ pub const GameState = struct {
             .game_stats = .{},
         };
     }
-    
+
     pub fn deinit(self: *Self) void {
         self.world.deinit();
     }
@@ -81,18 +81,18 @@ pub const GameState = struct {
         const manager = try allocator.create(game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents));
         manager.* = try game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents).init(
             allocator,
-            "dealt",
+            "zzz",
             "hex",
         );
         self.state_manager = manager;
-        
+
         // Register compute callbacks for expensive operations
         try self.registerComputeCallbacks();
-        
+
         // Set up event listeners
         try self.setupEventListeners();
     }
-    
+
     pub fn deinitStateManager(self: *Self, allocator: std.mem.Allocator) void {
         if (self.state_manager) |manager| {
             manager.deinit();
@@ -100,7 +100,7 @@ pub const GameState = struct {
             self.state_manager = null;
         }
     }
-    
+
     fn registerComputeCallbacks(self: *Self) !void {
         if (self.state_manager) |manager| {
             // Register callback to compute all_lifestones_attuned
@@ -109,14 +109,14 @@ pub const GameState = struct {
             try manager.registerCompute("total_lifestones_attuned", computeTotalLifestonesAttuned);
         }
     }
-    
+
     fn setupEventListeners(self: *Self) !void {
         if (self.state_manager) |manager| {
             // Listen for lifestone attunement to invalidate cache
             try manager.on(.custom, onCustomEvent, self);
         }
     }
-    
+
     fn onCustomEvent(event: hex_events.HexEvents, ctx: ?*anyopaque) void {
         if (ctx) |context| {
             const self = @as(*Self, @ptrCast(@alignCast(context)));
@@ -128,7 +128,7 @@ pub const GameState = struct {
                                 // Invalidate cached values
                                 manager.invalidate("all_lifestones_attuned");
                                 manager.invalidate("total_lifestones_attuned");
-                                
+
                                 // Check if this was the last one
                                 if (manager.queryBool("all_lifestones_attuned") catch false) {
                                     // Emit all lifestones attuned event
@@ -144,18 +144,18 @@ pub const GameState = struct {
             }
         }
     }
-    
+
     fn computeAllLifestonesAttuned(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
         // TEMPORARY: Just return false for now since we need access to world state
         // In a complete implementation, we'd store a reference to the GameState in the manager
         try manager.cache.setBool("all_lifestones_attuned", false);
     }
-    
+
     fn computeTotalLifestones(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
         // TEMPORARY: Just return a reasonable number for now
         try manager.cache.setInt("total_lifestones", 91); // Total from game_data.zon
     }
-    
+
     fn computeTotalLifestonesAttuned(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
         // TEMPORARY: Just return 0 for now
         try manager.cache.setInt("total_lifestones_attuned", 0);
@@ -234,7 +234,7 @@ pub const GameState = struct {
 
         std.debug.print("Full game reset\n", .{});
     }
-    
+
     /// Check if all lifestones across all zones are attuned using ECS queries
     pub fn hasAttunedAllLifestones(self: *const Self) bool {
         // Use cached value if state manager is available
@@ -242,24 +242,24 @@ pub const GameState = struct {
             // For now, fall back to direct computation since cache doesn't have world access
             _ = manager;
         }
-        
+
         // Direct computation using ECS queries
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
-        
+
         const ecs_world = self.world.getECSWorld();
         var terrain_iter = @constCast(&ecs_world.terrains).iterator();
-        
+
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
             const terrain = entry.value_ptr.*;
-            
+
             // Only count lifestones (altar terrain with interactable component)
             if (terrain.terrain_type != .altar) continue;
             if (!ecs_world.interactables.has(entity_id)) continue;
-            
+
             total_lifestones += 1;
-            
+
             // Check if lifestone is attuned (using transformable state as attuned indicator)
             if (ecs_world.interactables.getConst(entity_id)) |interactable| {
                 if (interactable.interaction_type == .transformable) {
@@ -267,28 +267,28 @@ pub const GameState = struct {
                 }
             }
         }
-        
+
         return total_lifestones > 0 and total_attuned == total_lifestones;
     }
-    
+
     /// Properly compute all lifestones attuned for the cache using ECS queries
     pub fn computeAllLifestonesAttunedForWorld(self: *const Self) bool {
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
-        
+
         const ecs_world = self.world.getECSWorld();
         var terrain_iter = @constCast(&ecs_world.terrains).iterator();
-        
+
         while (terrain_iter.next()) |entry| {
             const entity_id = entry.key_ptr.*;
             const terrain = entry.value_ptr.*;
-            
+
             // Only count lifestones (altar terrain with interactable component)
             if (terrain.terrain_type != .altar) continue;
             if (!ecs_world.interactables.has(entity_id)) continue;
-            
+
             total_lifestones += 1;
-            
+
             // Check if lifestone is attuned (using transformable state as attuned indicator)
             if (ecs_world.interactables.getConst(entity_id)) |interactable| {
                 if (interactable.interaction_type == .transformable) {
@@ -296,7 +296,7 @@ pub const GameState = struct {
                 }
             }
         }
-        
+
         return total_lifestones > 0 and total_attuned == total_lifestones;
     }
 };
@@ -304,40 +304,32 @@ pub const GameState = struct {
 /// Update all units using ECS
 fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
     const world = &game_state.world;
-    
+
     // Note: Obstacle collision now uses ECS queries
-    
+
     // Query all units from ECS system
     var unit_iter = world.world.units.iterator();
     while (unit_iter.next()) |entry| {
         const unit_id = entry.key_ptr.*;
-        
+
         // Skip if entity is not alive
         if (!world.world.isAlive(unit_id)) continue;
-        
+
         // Get components
         if (world.world.transforms.get(unit_id)) |transform| {
             if (world.world.healths.get(unit_id)) |health| {
                 if (!health.alive) continue;
-                
+
                 if (world.world.units.get(unit_id)) |unit_comp| {
                     const old_pos = transform.pos;
-                    
+
                     if (world.world.visuals.get(unit_id)) |visual| {
                         const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnitECS(unit_id, &world.world);
-                        
+
                         // Update unit AI behavior using ECS components
-                        behaviors.updateUnitWithAggroModECS(
-                            unit_comp,
-                            transform,
-                            visual,
-                            world.getPlayerPos(),
-                            world.getPlayerAlive(),
-                            deltaTime,
-                            aggro_mod
-                        );
+                        behaviors.updateUnitWithAggroModECS(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
                     }
-                    
+
                     // Check collision with obstacles using ECS queries
                     if (physics.checkUnitObstacleCollisionECS(@constCast(world), unit_id, transform, health, old_pos)) {
                         // Collision was handled by the function
@@ -398,11 +390,10 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
 pub fn checkCollisions(game_state: *GameState) void {
     const world = &game_state.world;
-    
+
     // Player entity is accessed via helper methods instead of direct field access
 
-    // TODO: Update physics.processBulletCollisions to work with ECS
-    // physics.processBulletCollisions(world);
+    // Bullet-unit collision is handled in world.updateProjectiles() above
 
     if (!world.getPlayerAlive()) return;
 
@@ -446,34 +437,34 @@ fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: types.Vec2, p
     const world = &game_state.world;
     const ecs_world = world.getECSWorldMut();
     var terrain_iter = @constCast(&ecs_world.terrains).iterator();
-    
+
     while (terrain_iter.next()) |entry| {
         const entity_id = entry.key_ptr.*;
         const terrain = entry.value_ptr.*;
-        
+
         // Only check lifestones (altar terrain with interactable component)
         if (terrain.terrain_type != .altar) continue;
         if (!ecs_world.interactables.has(entity_id)) continue;
-        
+
         // Get components
         if (ecs_world.transforms.getConst(entity_id)) |transform| {
             if (ecs_world.interactables.get(entity_id)) |interactable| {
                 // Check if lifestone is not yet attuned (using transformable state as attuned indicator)
                 const is_attuned = (interactable.interaction_type == .transformable);
                 if (is_attuned) continue; // Skip already attuned lifestones
-                
+
                 // Check collision
                 if (physics.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
                     // Attune the lifestone by changing interaction type to transformable
                     interactable.interaction_type = .transformable;
-                    
+
                     // Update visual color for attunement
                     if (ecs_world.visuals.get(entity_id)) |visual| {
                         visual.color = constants.COLOR_LIFESTONE_ATTUNED;
                     }
-                    
+
                     std.debug.print("Lifestone attuned!\n", .{});
-                    
+
                     // Emit lifestone attuned event
                     if (game_state.state_manager) |manager| {
                         manager.emit(hex_events.lifestoneAttuned(
@@ -482,10 +473,10 @@ fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: types.Vec2, p
                             transform.pos,
                         ));
                     }
-                    
+
                     // Add inner effect for newly attuned lifestone
                     game_state.effect_system.addLifestoneInnerEffectOnly(transform.pos, transform.radius);
-                    
+
                     return; // Only attune one lifestone per frame
                 }
             }

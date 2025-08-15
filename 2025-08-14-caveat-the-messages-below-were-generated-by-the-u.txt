@@ -3,7 +3,7 @@
 │                                                   │
 │   /help for help, /status for your current setup  │
 │                                                   │
-│   cwd: /home/desk/dev/dealt                       │
+│   cwd: /home/desk/dev/zzz                       │
 ╰───────────────────────────────────────────────────╯
 
 > /model 

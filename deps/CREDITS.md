@@ -9,7 +9,7 @@ The Zig build configuration for SDL in `deps/SDL/build.zig` and `deps/SDL/build.
   - License: MIT
   - © 2024 Carl Åstholm
 
-This build configuration has been adapted for the Dealt project with the following modifications:
+This build configuration has been adapted for the Zzz project with the following modifications:
 - Disabled Wayland and KMS/DRM video drivers for simplified vendoring
 - Disabled joystick and haptic subsystems per project requirements
 - Added dummy implementations for unsupported subsystems

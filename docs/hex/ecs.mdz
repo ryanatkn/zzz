@@ -1,4 +1,4 @@
-# Dealt Module Architecture
+# Zzz Module Architecture
 
 ## Overview
 Simple entity pool architecture with explicit types and direct function calls. No abstractions, just arrays and functions.

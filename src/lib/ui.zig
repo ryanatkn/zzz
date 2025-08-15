@@ -1,4 +1,4 @@
-//! Modern UI system for Dealt Game Engine
+//! Modern UI system for Zzz Game Engine
 //! Reactive, component-based UI inspired by modern web frameworks
 //! 
 //! Features:
