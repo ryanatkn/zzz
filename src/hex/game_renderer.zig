@@ -101,28 +101,28 @@ pub const GameRenderer = struct {
 
     // Render all obstacles (rectangles) using ECS queries
     fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
-        // Query all terrain entities (obstacles, lifestones, portals)
+        // Query obstacle entities in the current zone
         const ecs_world = world.getECSWorld();
-        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        var obstacle_iter = @constCast(&ecs_world.obstacles).entityIterator();
 
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
+        while (obstacle_iter.next()) |entity_id| {
+            // Get terrain component to check if it's an obstacle (wall/pit)
+            if (ecs_world.obstacles.getComponent(entity_id, .terrain)) |terrain| {
+                // Only render obstacles (wall/pit terrain)
+                if (terrain.terrain_type != .wall and terrain.terrain_type != .pit) continue;
 
-            // Only render obstacles (wall/pit terrain)
-            if (terrain.terrain_type != .wall and terrain.terrain_type != .pit) continue;
-
-            // Get transform and visual components
-            if (ecs_world.transforms.getConst(entity_id)) |transform| {
-                if (ecs_world.visuals.getConst(entity_id)) |visual| {
-                    if (visual.visible) {
-                        // Render obstacles using their actual rectangular size from terrain component
-                        const screen_pos = self.camera.worldToScreen(transform.pos);
-                        const screen_size = Vec2{
-                            .x = self.camera.worldSizeToScreen(terrain.size.x),
-                            .y = self.camera.worldSizeToScreen(terrain.size.y),
-                        };
-                        self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, visual.color);
+                // Get transform and visual components
+                if (ecs_world.obstacles.getComponent(entity_id, .transform)) |transform| {
+                    if (ecs_world.obstacles.getComponent(entity_id, .visual)) |visual| {
+                        if (visual.visible) {
+                            // Render obstacles using their actual rectangular size from terrain component
+                            const screen_pos = self.camera.worldToScreen(transform.pos);
+                            const screen_size = Vec2{
+                                .x = self.camera.worldSizeToScreen(terrain.size.x),
+                                .y = self.camera.worldSizeToScreen(terrain.size.y),
+                            };
+                            self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, visual.color);
+                        }
                     }
                 }
             }
@@ -133,13 +133,16 @@ pub const GameRenderer = struct {
     fn renderTerrainCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
         const ecs_world = world.getECSWorld();
 
-        // Manually iterate terrains since const methods can't use wrapper iterators
-        // Cast away const to access iterator (safe for read-only iteration)
-        var terrains_storage = @constCast(&ecs_world.terrains);
-        var terrain_iter = terrains_storage.iterator();
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id);
+        // Render lifestones as circles
+        var lifestone_iter = ecs_world.lifestones.entityIterator();
+        while (lifestone_iter.next()) |entity_id| {
+            self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .lifestone);
+        }
+
+        // Render portals as circles
+        var portal_iter = ecs_world.portals.entityIterator();
+        while (portal_iter.next()) |entity_id| {
+            self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .portal);
         }
     }
 
@@ -151,11 +154,27 @@ pub const GameRenderer = struct {
     }
 
     // Helper to handle the common pattern: get transform+visual, check visibility, render circle
-    fn renderEntityAsCircle(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ecs_world: *const ecs.ZoneStorage, entity_id: EntityId) void {
-        if (ecs_world.transforms.getConst(entity_id)) |transform| {
-            if (ecs_world.visuals.getConst(entity_id)) |visual| {
-                if (visual.visible) {
-                    self.renderCircleEntity(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+    fn renderEntityAsCircle(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ecs_world: *const ecs.World, entity_id: EntityId, archetype: enum { player, unit, projectile, lifestone, portal }) void {
+        const transform = switch (archetype) {
+            .player => ecs_world.players.getComponent(entity_id, .transform),
+            .unit => ecs_world.units.getComponent(entity_id, .transform),
+            .projectile => ecs_world.projectiles.getComponent(entity_id, .transform),
+            .lifestone => ecs_world.lifestones.getComponent(entity_id, .transform),
+            .portal => ecs_world.portals.getComponent(entity_id, .transform),
+        };
+        
+        const visual = switch (archetype) {
+            .player => ecs_world.players.getComponent(entity_id, .visual),
+            .unit => ecs_world.units.getComponent(entity_id, .visual),
+            .projectile => ecs_world.projectiles.getComponent(entity_id, .visual),
+            .lifestone => ecs_world.lifestones.getComponent(entity_id, .visual),
+            .portal => ecs_world.portals.getComponent(entity_id, .visual),
+        };
+        
+        if (transform) |t| {
+            if (visual) |v| {
+                if (v.visible) {
+                    self.renderCircleEntity(cmd_buffer, render_pass, t.pos, t.radius, v.color);
                 }
             }
         }
@@ -167,13 +186,9 @@ pub const GameRenderer = struct {
         const ecs_world = world.getECSWorld();
 
         // Iterate over all projectile entities
-        // Note: Cast away const to access iterator (safe for read-only iteration)
-        var projectiles_storage = @constCast(&ecs_world.projectiles);
-        var projectile_iter = projectiles_storage.iterator();
-
-        while (projectile_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id);
+        var projectile_iter = ecs_world.projectiles.entityIterator();
+        while (projectile_iter.next()) |entity_id| {
+            self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .projectile);
         }
     }
 
@@ -186,10 +201,11 @@ pub const GameRenderer = struct {
         self.renderUnitsECS(cmd_buffer, render_pass, world);
 
         // Draw player (above units)
-        const player_pos = world.getPlayerPosConst();
-        const player_radius = world.getPlayerRadiusConst();
-        const player_color = world.getPlayerColorConst();
-        self.renderCircleEntity(cmd_buffer, render_pass, player_pos, player_radius, player_color);
+        const ecs_world = world.getECSWorld();
+        var player_iter = ecs_world.players.entityIterator();
+        while (player_iter.next()) |entity_id| {
+            self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .player);
+        }
 
         // Draw bullets LAST (top layer - always visible)
         self.renderProjectiles(cmd_buffer, render_pass, world);
@@ -317,15 +333,12 @@ pub const GameRenderer = struct {
     }
 
     fn renderUnitsECS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
-        // Manually iterate units since const methods can't use wrapper iterators
+        // Iterate units in current zone
         const ecs_world = world.getECSWorld();
         
-        // Cast away const to access iterator (safe for read-only iteration)
-        var units_storage = @constCast(&ecs_world.units);
-        var unit_iter = units_storage.iterator();
-        while (unit_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id);
+        var unit_iter = ecs_world.units.entityIterator();
+        while (unit_iter.next()) |entity_id| {
+            self.renderEntityAsCircle(cmd_buffer, render_pass, ecs_world, entity_id, .unit);
         }
     }
 

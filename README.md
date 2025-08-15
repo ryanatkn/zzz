@@ -1,6 +1,6 @@
 # Zzz
 
-> ⚠️ AI slop code and docs
+> ⚠️ AI slop code and docs, may be unstable and bad
 
 Zzz is a GUI in Zig.
 For the companion CLI see [zz](https://github.com/ryanatkn/zz)

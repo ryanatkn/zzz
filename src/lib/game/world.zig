@@ -1,70 +1,58 @@
 const std = @import("std");
 const entity_mod = @import("entity.zig");
-const storage_mod = @import("storage.zig");
+const archetype_storage = @import("archetype_storage.zig");
+const component_registry = @import("component_registry.zig");
 const components = @import("components.zig");
 const colors = @import("../core/colors.zig");
 
 const EntityId = entity_mod.EntityId;
 const EntityAllocator = entity_mod.EntityAllocator;
-const DenseStorage = storage_mod.DenseStorage;
-const SparseStorage = storage_mod.SparseStorage;
+const PlayerArchetype = archetype_storage.PlayerArchetype;
+const UnitArchetype = archetype_storage.UnitArchetype;
+const ProjectileArchetype = archetype_storage.ProjectileArchetype;
+const ObstacleArchetype = archetype_storage.ObstacleArchetype;
+const LifestoneArchetype = archetype_storage.LifestoneArchetype;
+const PortalArchetype = archetype_storage.PortalArchetype;
 
-/// World container for ECS - manages entities and components
+/// Pure ECS world with archetype-based storage
+/// Contains entities and components with no zone-specific logic
 pub const World = struct {
-    // Entity management
+    // Entity allocation
     entities: EntityAllocator,
 
-    // Dense component storage (most entities have these)
-    transforms: DenseStorage(components.Transform),
-    healths: DenseStorage(components.Health),
-    movements: DenseStorage(components.Movement),
-    visuals: DenseStorage(components.Visual),
-
-    // Sparse component storage (few entities have these)
-    units: SparseStorage(components.Unit),
-    combats: SparseStorage(components.Combat),
-    effects: SparseStorage(components.Effects),
-    player_inputs: SparseStorage(components.PlayerInput),
-    projectiles: SparseStorage(components.Projectile),
-    terrains: SparseStorage(components.Terrain),
-    awakeables: SparseStorage(components.Awakeable),
-    interactables: SparseStorage(components.Interactable),
+    // Archetype-based storage for better cache locality
+    players: PlayerArchetype,
+    units: UnitArchetype,
+    projectiles: ProjectileArchetype,
+    obstacles: ObstacleArchetype,
+    lifestones: LifestoneArchetype,
+    portals: PortalArchetype,
 
     allocator: std.mem.Allocator,
 
     pub fn init(allocator: std.mem.Allocator, max_entities: usize) !World {
-        return .{
+        const entities_per_archetype = max_entities / 6; // Distribute capacity across archetypes
+
+        return World{
             .entities = try EntityAllocator.init(allocator, max_entities),
-            .transforms = try DenseStorage(components.Transform).init(allocator, max_entities),
-            .healths = try DenseStorage(components.Health).init(allocator, max_entities),
-            .movements = try DenseStorage(components.Movement).init(allocator, max_entities),
-            .visuals = try DenseStorage(components.Visual).init(allocator, max_entities),
-            .units = SparseStorage(components.Unit).init(allocator),
-            .combats = SparseStorage(components.Combat).init(allocator),
-            .effects = SparseStorage(components.Effects).init(allocator),
-            .player_inputs = SparseStorage(components.PlayerInput).init(allocator),
-            .projectiles = SparseStorage(components.Projectile).init(allocator),
-            .terrains = SparseStorage(components.Terrain).init(allocator),
-            .awakeables = SparseStorage(components.Awakeable).init(allocator),
-            .interactables = SparseStorage(components.Interactable).init(allocator),
+            .players = try PlayerArchetype.init(allocator, 10), // Few players expected
+            .units = try UnitArchetype.init(allocator, entities_per_archetype),
+            .projectiles = try ProjectileArchetype.init(allocator, entities_per_archetype),
+            .obstacles = try ObstacleArchetype.init(allocator, entities_per_archetype),
+            .lifestones = try LifestoneArchetype.init(allocator, entities_per_archetype),
+            .portals = try PortalArchetype.init(allocator, entities_per_archetype),
             .allocator = allocator,
         };
     }
 
     pub fn deinit(self: *World) void {
         self.entities.deinit();
-        self.transforms.deinit();
-        self.healths.deinit();
-        self.movements.deinit();
-        self.visuals.deinit();
+        self.players.deinit();
         self.units.deinit();
-        self.combats.deinit();
-        self.effects.deinit();
-        self.player_inputs.deinit();
         self.projectiles.deinit();
-        self.terrains.deinit();
-        self.awakeables.deinit();
-        self.interactables.deinit();
+        self.obstacles.deinit();
+        self.lifestones.deinit();
+        self.portals.deinit();
     }
 
     /// Create a new entity
@@ -72,49 +60,46 @@ pub const World = struct {
         return try self.entities.create();
     }
 
-    /// Destroy an entity and all its components
-    pub fn destroyEntity(self: *World, id: EntityId) !void {
-        // Remove from all component storages
-        _ = self.transforms.remove(id);
-        _ = self.healths.remove(id);
-        _ = self.movements.remove(id);
-        _ = self.visuals.remove(id);
-        _ = self.units.remove(id);
-        _ = self.combats.remove(id);
-        _ = self.effects.remove(id);
-        _ = self.player_inputs.remove(id);
-        _ = self.projectiles.remove(id);
-        _ = self.terrains.remove(id);
-        _ = self.awakeables.remove(id);
-        _ = self.interactables.remove(id);
+    /// Destroy an entity and remove it from all archetypes
+    pub fn destroyEntity(self: *World, entity: EntityId) !void {
+        // Remove from all archetypes (only one should contain it)
+        _ = self.players.removeEntity(entity);
+        _ = self.units.removeEntity(entity);
+        _ = self.projectiles.removeEntity(entity);
+        _ = self.obstacles.removeEntity(entity);
+        _ = self.lifestones.removeEntity(entity);
+        _ = self.portals.removeEntity(entity);
 
-        // Mark entity as destroyed
-        try self.entities.destroy(id);
+        // Destroy in entity allocator
+        try self.entities.destroy(entity);
     }
 
-    /// Check if an entity is alive
-    pub fn isAlive(self: *const World, id: EntityId) bool {
-        return self.entities.isAlive(id);
+    /// Check if entity is alive
+    pub fn isAlive(self: *const World, entity: EntityId) bool {
+        return self.entities.isAlive(entity);
     }
 
-    /// Helper to create a basic unit entity
-    pub fn createUnit(
-        self: *World,
-        pos: components.Vec2,
-        radius: f32,
-    ) !EntityId {
-        const id = try self.createEntity();
-        errdefer self.destroyEntity(id) catch {};
-
-        try self.transforms.add(id, components.Transform.init(pos, radius));
-        try self.healths.add(id, components.Health.init(1.0)); // Simple 1-hit units like original
-        try self.visuals.add(id, components.Visual.init(.{ .r = 1, .g = 1, .b = 1, .a = 1 }));
-        try self.units.add(id, components.Unit.init(.enemy, pos)); // All units are enemies by default
-
-        return id;
+    /// Find which archetype contains an entity
+    pub fn findEntityArchetype(self: *const World, entity: EntityId) ?ArchetypeType {
+        if (self.players.hasEntity(entity)) return .player;
+        if (self.units.hasEntity(entity)) return .unit;
+        if (self.projectiles.hasEntity(entity)) return .projectile;
+        if (self.obstacles.hasEntity(entity)) return .obstacle;
+        if (self.lifestones.hasEntity(entity)) return .lifestone;
+        if (self.portals.hasEntity(entity)) return .portal;
+        return null;
     }
 
-    /// Helper to create a player entity
+    pub const ArchetypeType = enum {
+        player,
+        unit,
+        projectile,
+        obstacle,
+        lifestone,
+        portal,
+    };
+
+    /// Create a player entity
     pub fn createPlayer(
         self: *World,
         pos: components.Vec2,
@@ -122,20 +107,43 @@ pub const World = struct {
         health: f32,
         controller_id: u8,
     ) !EntityId {
-        const id = try self.createEntity();
-        errdefer self.destroyEntity(id) catch {};
+        const entity = try self.createEntity();
+        errdefer self.destroyEntity(entity) catch {};
 
-        try self.transforms.add(id, components.Transform.init(pos, radius));
-        try self.healths.add(id, components.Health.init(health));
-        try self.movements.add(id, components.Movement.init(200)); // Default player speed
-        try self.visuals.add(id, components.Visual.init(.{ .r = 51, .g = 178, .b = 255, .a = 255 })); // Blue player
-        try self.player_inputs.add(id, components.PlayerInput.init(controller_id));
-        try self.combats.add(id, components.Combat.init(25, 2.0)); // 25 damage, 2 attacks/sec
+        const required_data = PlayerArchetype.RequiredComponentData{
+            .transform = components.Transform.init(pos, radius),
+            .health = components.Health.init(health),
+            .movement = components.Movement.init(200), // Default player speed
+            .visual = components.Visual.init(.{ .r = 51, .g = 178, .b = 255, .a = 255 }), // Blue player
+            .player_input = components.PlayerInput.init(controller_id),
+            .combat = components.Combat.init(25, 2.0), // 25 damage, 2 attacks/sec
+        };
 
-        return id;
+        try self.players.addEntity(entity, required_data);
+        return entity;
     }
 
-    /// Helper to create a projectile entity
+    /// Create a unit entity
+    pub fn createUnit(
+        self: *World,
+        pos: components.Vec2,
+        radius: f32,
+    ) !EntityId {
+        const entity = try self.createEntity();
+        errdefer self.destroyEntity(entity) catch {};
+
+        const required_data = UnitArchetype.RequiredComponentData{
+            .transform = components.Transform.init(pos, radius),
+            .health = components.Health.init(1.0), // Simple 1-hit units
+            .visual = components.Visual.init(.{ .r = 1, .g = 1, .b = 1, .a = 1 }),
+            .unit = components.Unit.init(.enemy, pos),
+        };
+
+        try self.units.addEntity(entity, required_data);
+        return entity;
+    }
+
+    /// Create a projectile entity
     pub fn createProjectile(
         self: *World,
         pos: components.Vec2,
@@ -145,242 +153,574 @@ pub const World = struct {
         damage: f32,
         lifetime: f32,
     ) !EntityId {
-        const id = try self.createEntity();
-        errdefer self.destroyEntity(id) catch {};
+        const entity = try self.createEntity();
+        errdefer self.destroyEntity(entity) catch {};
 
-        try self.transforms.add(id, components.Transform{
-            .pos = pos,
-            .vel = vel,
-            .radius = radius,
-        });
-        try self.visuals.add(id, components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 })); // Yellow projectile
-        try self.projectiles.add(id, components.Projectile.init(owner, lifetime));
-        try self.combats.add(id, components.Combat.init(damage, 0)); // Projectiles don't attack repeatedly
+        const required_data = ProjectileArchetype.RequiredComponentData{
+            .transform = components.Transform{
+                .pos = pos,
+                .vel = vel,
+                .radius = radius,
+            },
+            .visual = components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 }), // Yellow projectile
+            .projectile = components.Projectile.init(owner, lifetime),
+            .combat = components.Combat.init(damage, 0), // Projectiles don't attack repeatedly
+        };
+
+        try self.projectiles.addEntity(entity, required_data);
 
         // Make projectiles deflectable by default
-        try self.interactables.add(id, components.Interactable.init(.deflectable));
+        try self.projectiles.addOptionalComponent(entity, .interactable, components.Interactable.init(.deflectable));
 
-        return id;
+        return entity;
     }
 
-    /// Helper to find the player entity
-    pub fn getPlayer(self: *World) ?EntityId {
-        var iter = self.player_inputs.iterator();
-        while (iter.next()) |entry| {
-            if (self.isAlive(entry.key_ptr.*)) {
-                return entry.key_ptr.*;
-            }
-        }
-        return null;
-    }
-
-    /// Helper to create an obstacle/terrain entity
+    /// Create an obstacle entity
     pub fn createObstacle(
         self: *World,
         pos: components.Vec2,
         size: components.Vec2,
         is_deadly: bool,
     ) !EntityId {
-        const id = try self.createEntity();
-        errdefer self.destroyEntity(id) catch {};
+        const entity = try self.createEntity();
+        errdefer self.destroyEntity(entity) catch {};
 
         // Create rectangular obstacle using width/height as radius for collision detection
         const radius = @max(size.x, size.y) / 2.0; // Use larger dimension for collision
-        try self.transforms.add(id, components.Transform.init(pos, radius));
 
         // Create visual component
         const color = if (is_deadly)
             colors.Color{ .r = 200, .g = 0, .b = 0, .a = 255 } // Red for deadly
         else
             colors.Color{ .r = 100, .g = 100, .b = 100, .a = 255 }; // Gray for blocking
-        try self.visuals.add(id, components.Visual.init(color));
 
         // Create terrain component with size information
         const terrain_type = if (is_deadly) components.Terrain.TerrainType.pit else components.Terrain.TerrainType.wall;
-        try self.terrains.add(id, components.Terrain.init(terrain_type, size));
 
-        return id;
+        const required_data = ObstacleArchetype.RequiredComponentData{
+            .transform = components.Transform.init(pos, radius),
+            .visual = components.Visual.init(color),
+            .terrain = components.Terrain.init(terrain_type, size),
+        };
+
+        try self.obstacles.addEntity(entity, required_data);
+        return entity;
     }
 
-    /// Helper to create a lifestone entity
+    /// Create a lifestone entity
     pub fn createLifestone(
         self: *World,
         pos: components.Vec2,
         radius: f32,
         attuned: bool,
     ) !EntityId {
-        const id = try self.createEntity();
-        errdefer self.destroyEntity(id) catch {};
-
-        try self.transforms.add(id, components.Transform.init(pos, radius));
+        const entity = try self.createEntity();
+        errdefer self.destroyEntity(entity) catch {};
 
         // Create visual component with proper lifestone color
         const color = if (attuned)
             colors.Color{ .r = 0, .g = 255, .b = 255, .a = 255 } // Cyan for attuned
         else
             colors.Color{ .r = 128, .g = 128, .b = 255, .a = 255 }; // Light blue for unattuned
-        try self.visuals.add(id, components.Visual.init(color));
 
-        // Create terrain component as altar type
         // Lifestones are circular, so create square size from radius
         const lifestone_size = components.Vec2{ .x = radius * 2.0, .y = radius * 2.0 };
-        try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.altar, lifestone_size));
 
         // Add interactable component for attunement
         var interactable = components.Interactable.init(components.Interactable.InteractionType.transformable);
         interactable.attuned = attuned;
-        try self.interactables.add(id, interactable);
 
-        return id;
+        const required_data = LifestoneArchetype.RequiredComponentData{
+            .transform = components.Transform.init(pos, radius),
+            .visual = components.Visual.init(color),
+            .terrain = components.Terrain.init(components.Terrain.TerrainType.altar, lifestone_size),
+            .interactable = interactable,
+        };
+
+        try self.lifestones.addEntity(entity, required_data);
+        return entity;
     }
 
-    /// Helper to create a portal entity
+    /// Create a portal entity
     pub fn createPortal(
         self: *World,
         pos: components.Vec2,
         radius: f32,
         destination_zone: u8,
     ) !EntityId {
-        const id = try self.createEntity();
-        errdefer self.destroyEntity(id) catch {};
-
-        try self.transforms.add(id, components.Transform.init(pos, radius));
+        const entity = try self.createEntity();
+        errdefer self.destroyEntity(entity) catch {};
 
         // Create visual component with portal color (purple/magenta)
         const color = colors.Color{ .r = 255, .g = 0, .b = 255, .a = 255 }; // Magenta
-        try self.visuals.add(id, components.Visual.init(color));
 
-        // Create terrain component as door type (portals are like doors)
         // Portals are circular, so create square size from radius
         const portal_size = components.Vec2{ .x = radius * 2.0, .y = radius * 2.0 };
-        try self.terrains.add(id, components.Terrain.init(components.Terrain.TerrainType.door, portal_size));
 
-        // Add interactable component for travel with destination
-        try self.interactables.add(id, components.Interactable.initPortal(destination_zone));
+        const required_data = PortalArchetype.RequiredComponentData{
+            .transform = components.Transform.init(pos, radius),
+            .visual = components.Visual.init(color),
+            .terrain = components.Terrain.init(components.Terrain.TerrainType.door, portal_size),
+            .interactable = components.Interactable.initPortal(destination_zone),
+        };
 
-        return id;
+        try self.portals.addEntity(entity, required_data);
+        return entity;
     }
 
-    /// Query entities with specific components
-    pub fn query2(
-        self: *World,
-        comptime C1: type,
-        comptime C2: type,
-    ) Query2(C1, C2) {
-        return Query2(C1, C2).init(self);
+    /// Get player entity (there should be only one per zone typically)
+    pub fn getPlayer(self: *World) ?EntityId {
+        var iter = self.players.entityIterator();
+        return iter.next();
     }
 
-    /// Query helper for two components
-    pub fn Query2(comptime C1: type, comptime C2: type) type {
-        const Storage1Type = if (C1 == components.Transform or C1 == components.Health or C1 == components.Movement or C1 == components.Visual)
-            *DenseStorage(C1)
-        else
-            *SparseStorage(C1);
+    /// Get total entity count
+    pub fn getTotalEntityCount(self: *const World) usize {
+        return self.players.count() +
+            self.units.count() +
+            self.projectiles.count() +
+            self.obstacles.count() +
+            self.lifestones.count() +
+            self.portals.count();
+    }
+};
 
-        const Storage2Type = if (C2 == components.Transform or C2 == components.Health or C2 == components.Movement or C2 == components.Visual)
-            *DenseStorage(C2)
-        else
-            *SparseStorage(C2);
+/// Zone metadata and configuration
+pub const ZoneMetadata = struct {
+    pub const ZoneType = enum {
+        overworld,
+        dungeon_fire,
+        dungeon_ice,
+        dungeon_storm,
+        dungeon_nature,
+        dungeon_shadow,
+        dungeon_arcane,
+    };
 
-        return struct {
-            world: *World,
-            storage1: Storage1Type,
-            storage2: Storage2Type,
+    pub const CameraMode = enum {
+        fixed,
+        follow,
+    };
 
-            const Self = @This();
+    zone_type: ZoneType,
+    camera_mode: CameraMode,
+    camera_scale: f32,
+    spawn_pos: components.Vec2,
+    background_color: colors.Color,
+};
 
-            pub fn init(world: *World) Self {
-                const storage1 = comptime blk: {
-                    if (C1 == components.Transform) break :blk &world.transforms;
-                    if (C1 == components.Health) break :blk &world.healths;
-                    if (C1 == components.Movement) break :blk &world.movements;
-                    if (C1 == components.Visual) break :blk &world.visuals;
-                    if (C1 == components.Unit) break :blk &world.units;
-                    if (C1 == components.Combat) break :blk &world.combats;
-                    if (C1 == components.Effects) break :blk &world.effects;
-                    if (C1 == components.PlayerInput) break :blk &world.player_inputs;
-                    if (C1 == components.Projectile) break :blk &world.projectiles;
-                    if (C1 == components.Terrain) break :blk &world.terrains;
-                    if (C1 == components.Awakeable) break :blk &world.awakeables;
-                    if (C1 == components.Interactable) break :blk &world.interactables;
-                    @compileError("Unknown component type");
-                };
+/// Lightweight zone that composes a World with metadata
+pub const Zone = struct {
+    id: u32,
+    world: World,
+    metadata: ZoneMetadata,
 
-                const storage2 = comptime blk: {
-                    if (C2 == components.Transform) break :blk &world.transforms;
-                    if (C2 == components.Health) break :blk &world.healths;
-                    if (C2 == components.Movement) break :blk &world.movements;
-                    if (C2 == components.Visual) break :blk &world.visuals;
-                    if (C2 == components.Unit) break :blk &world.units;
-                    if (C2 == components.Combat) break :blk &world.combats;
-                    if (C2 == components.Effects) break :blk &world.effects;
-                    if (C2 == components.PlayerInput) break :blk &world.player_inputs;
-                    if (C2 == components.Projectile) break :blk &world.projectiles;
-                    if (C2 == components.Terrain) break :blk &world.terrains;
-                    if (C2 == components.Awakeable) break :blk &world.awakeables;
-                    if (C2 == components.Interactable) break :blk &world.interactables;
-                    @compileError("Unknown component type");
-                };
+    pub const Config = struct {
+        id: u32,
+        metadata: ZoneMetadata,
+        max_entities: usize,
+    };
 
-                return .{
-                    .world = world,
-                    .storage1 = storage1,
-                    .storage2 = storage2,
-                };
+    pub fn init(allocator: std.mem.Allocator, config: Config) !Zone {
+        return .{
+            .id = config.id,
+            .world = try World.init(allocator, config.max_entities),
+            .metadata = config.metadata,
+        };
+    }
+
+    pub fn deinit(self: *Zone) void {
+        self.world.deinit();
+    }
+
+    // Delegate entity creation methods to world
+    pub fn createPlayer(self: *Zone, pos: components.Vec2, radius: f32, health: f32, controller_id: u8) !EntityId {
+        return self.world.createPlayer(pos, radius, health, controller_id);
+    }
+
+    pub fn createUnit(self: *Zone, pos: components.Vec2, radius: f32) !EntityId {
+        return self.world.createUnit(pos, radius);
+    }
+
+    pub fn createProjectile(self: *Zone, pos: components.Vec2, vel: components.Vec2, radius: f32, owner: EntityId, damage: f32, lifetime: f32) !EntityId {
+        return self.world.createProjectile(pos, vel, radius, owner, damage, lifetime);
+    }
+
+    pub fn createObstacle(self: *Zone, pos: components.Vec2, size: components.Vec2, is_deadly: bool) !EntityId {
+        return self.world.createObstacle(pos, size, is_deadly);
+    }
+
+    pub fn createLifestone(self: *Zone, pos: components.Vec2, radius: f32, attuned: bool) !EntityId {
+        return self.world.createLifestone(pos, radius, attuned);
+    }
+
+    pub fn createPortal(self: *Zone, pos: components.Vec2, radius: f32, destination_zone: u8) !EntityId {
+        return self.world.createPortal(pos, radius, destination_zone);
+    }
+
+    // Delegate other methods to world
+    pub fn destroyEntity(self: *Zone, entity: EntityId) !void {
+        return self.world.destroyEntity(entity);
+    }
+
+    pub fn isAlive(self: *const Zone, entity: EntityId) bool {
+        return self.world.isAlive(entity);
+    }
+
+    pub fn getPlayer(self: *Zone) ?EntityId {
+        return self.world.getPlayer();
+    }
+
+    pub fn getTotalEntityCount(self: *const Zone) usize {
+        return self.world.getTotalEntityCount();
+    }
+};
+
+/// Entity with zone context for global iteration
+pub const EntityWithZone = struct {
+    entity: EntityId,
+    zone_id: u32,
+};
+
+/// Global game container with zone management and global iterators
+pub const Game = struct {
+    zones: std.ArrayList(Zone),
+    current_zone_id: u32,
+    allocator: std.mem.Allocator,
+
+    pub fn init(allocator: std.mem.Allocator) Game {
+        return .{
+            .zones = std.ArrayList(Zone).init(allocator),
+            .current_zone_id = 0,
+            .allocator = allocator,
+        };
+    }
+
+    pub fn deinit(self: *Game) void {
+        for (self.zones.items) |*zone| {
+            zone.deinit();
+        }
+        self.zones.deinit();
+    }
+
+    /// Add a new zone
+    pub fn addZone(self: *Game, config: Zone.Config) !void {
+        const zone = try Zone.init(self.allocator, config);
+        try self.zones.append(zone);
+    }
+
+    /// Get current zone
+    pub fn getCurrentZone(self: *Game) *Zone {
+        return &self.zones.items[self.current_zone_id];
+    }
+
+    /// Get current zone (const)
+    pub fn getCurrentZoneConst(self: *const Game) *const Zone {
+        return &self.zones.items[self.current_zone_id];
+    }
+
+    /// Get zone by ID
+    pub fn getZone(self: *Game, zone_id: u32) ?*Zone {
+        for (self.zones.items) |*zone| {
+            if (zone.id == zone_id) return zone;
+        }
+        return null;
+    }
+
+    /// Get zone by ID (const)
+    pub fn getZoneConst(self: *const Game, zone_id: u32) ?*const Zone {
+        for (self.zones.items) |*zone| {
+            if (zone.id == zone_id) return zone;
+        }
+        return null;
+    }
+
+    /// Switch to a different zone
+    pub fn setCurrentZone(self: *Game, zone_id: u32) void {
+        for (self.zones.items) |zone| {
+            if (zone.id == zone_id) {
+                self.current_zone_id = zone_id;
+                break;
+            }
+        }
+    }
+
+    /// Get current zone ID
+    pub fn getCurrentZoneId(self: *const Game) u32 {
+        return self.current_zone_id;
+    }
+
+    /// Global iterator for all units across all zones
+    pub fn iterateAllUnits(self: *Game) UnitIterator {
+        return UnitIterator.init(self.zones.items);
+    }
+
+    /// Global iterator for all projectiles across all zones
+    pub fn iterateAllProjectiles(self: *Game) ProjectileIterator {
+        return ProjectileIterator.init(self.zones.items);
+    }
+
+    /// Global iterator for all entities of a specific archetype
+    pub fn iterateArchetype(self: *Game, comptime archetype: World.ArchetypeType) ArchetypeIterator(archetype) {
+        return ArchetypeIterator(archetype).init(self.zones.items);
+    }
+
+    /// Clear all projectiles from all zones
+    pub fn clearAllProjectiles(self: *Game) !void {
+        for (self.zones.items) |*zone| {
+            var projectiles_to_destroy = std.ArrayList(EntityId).init(self.allocator);
+            defer projectiles_to_destroy.deinit();
+
+            var iter = zone.world.projectiles.entityIterator();
+            while (iter.next()) |entity| {
+                try projectiles_to_destroy.append(entity);
             }
 
-            pub const Result = struct {
-                entity: EntityId,
-                c1: *C1,
-                c2: *C2,
+            for (projectiles_to_destroy.items) |entity| {
+                try zone.destroyEntity(entity);
+            }
+        }
+    }
+
+    /// Get total entity count across all zones
+    pub fn getTotalEntityCount(self: *const Game) usize {
+        var total: usize = 0;
+        for (self.zones.items) |zone| {
+            total += zone.getTotalEntityCount();
+        }
+        return total;
+    }
+
+    // Global iterators for different entity types
+    pub const UnitIterator = struct {
+        zones: []Zone,
+        zone_index: usize,
+        current_iter: ?UnitArchetype.EntityIterator,
+
+        pub fn init(zones: []Zone) UnitIterator {
+            var iter = UnitIterator{
+                .zones = zones,
+                .zone_index = 0,
+                .current_iter = null,
+            };
+            iter.findNextIterator();
+            return iter;
+        }
+
+        pub fn next(self: *UnitIterator) ?EntityWithZone {
+            while (self.current_iter) |*iter| {
+                if (iter.next()) |entity| {
+                    return EntityWithZone{
+                        .entity = entity,
+                        .zone_id = self.zones[self.zone_index].id,
+                    };
+                }
+                
+                // Current iterator exhausted, move to next zone
+                self.zone_index += 1;
+                self.findNextIterator();
+            }
+            return null;
+        }
+
+        fn findNextIterator(self: *UnitIterator) void {
+            self.current_iter = null;
+            while (self.zone_index < self.zones.len) {
+                if (self.zones[self.zone_index].world.units.count() > 0) {
+                    self.current_iter = self.zones[self.zone_index].world.units.entityIterator();
+                    break;
+                }
+                self.zone_index += 1;
+            }
+        }
+    };
+
+    pub const ProjectileIterator = struct {
+        zones: []Zone,
+        zone_index: usize,
+        current_iter: ?ProjectileArchetype.EntityIterator,
+
+        pub fn init(zones: []Zone) ProjectileIterator {
+            var iter = ProjectileIterator{
+                .zones = zones,
+                .zone_index = 0,
+                .current_iter = null,
+            };
+            iter.findNextIterator();
+            return iter;
+        }
+
+        pub fn next(self: *ProjectileIterator) ?EntityWithZone {
+            while (self.current_iter) |*iter| {
+                if (iter.next()) |entity| {
+                    return EntityWithZone{
+                        .entity = entity,
+                        .zone_id = self.zones[self.zone_index].id,
+                    };
+                }
+                
+                self.zone_index += 1;
+                self.findNextIterator();
+            }
+            return null;
+        }
+
+        fn findNextIterator(self: *ProjectileIterator) void {
+            self.current_iter = null;
+            while (self.zone_index < self.zones.len) {
+                if (self.zones[self.zone_index].world.projectiles.count() > 0) {
+                    self.current_iter = self.zones[self.zone_index].world.projectiles.entityIterator();
+                    break;
+                }
+                self.zone_index += 1;
+            }
+        }
+    };
+
+    // Generic archetype iterator
+    pub fn ArchetypeIterator(comptime archetype: World.ArchetypeType) type {
+        return struct {
+            const Self = @This();
+            const ArchetypeType = switch (archetype) {
+                .player => PlayerArchetype,
+                .unit => UnitArchetype,
+                .projectile => ProjectileArchetype,
+                .obstacle => ObstacleArchetype,
+                .lifestone => LifestoneArchetype,
+                .portal => PortalArchetype,
             };
 
-            // TODO: Implement proper iterator
-            // For now, simple callback-based iteration
-            pub fn forEach(self: Self, callback: fn (Result) void) void {
-                // Iterate over the smaller storage for efficiency
-                // This is a simplified implementation
-                var iter = self.storage1.iterator();
-                while (iter.next()) |entry| {
-                    if (self.storage2.get(entry.entity)) |c2| {
-                        callback(.{
-                            .entity = entry.entity,
-                            .c1 = entry.component,
-                            .c2 = c2,
-                        });
+            zones: []Zone,
+            zone_index: usize,
+            current_iter: ?ArchetypeType.EntityIterator,
+
+            pub fn init(zones: []Zone) Self {
+                var iter = Self{
+                    .zones = zones,
+                    .zone_index = 0,
+                    .current_iter = null,
+                };
+                iter.findNextIterator();
+                return iter;
+            }
+
+            pub fn next(self: *Self) ?EntityWithZone {
+                while (self.current_iter) |*iter| {
+                    if (iter.next()) |entity| {
+                        return EntityWithZone{
+                            .entity = entity,
+                            .zone_id = self.zones[self.zone_index].id,
+                        };
                     }
+                    
+                    self.zone_index += 1;
+                    self.findNextIterator();
+                }
+                return null;
+            }
+
+            fn findNextIterator(self: *Self) void {
+                self.current_iter = null;
+                while (self.zone_index < self.zones.len) {
+                    const storage = switch (archetype) {
+                        .player => &self.zones[self.zone_index].world.players,
+                        .unit => &self.zones[self.zone_index].world.units,
+                        .projectile => &self.zones[self.zone_index].world.projectiles,
+                        .obstacle => &self.zones[self.zone_index].world.obstacles,
+                        .lifestone => &self.zones[self.zone_index].world.lifestones,
+                        .portal => &self.zones[self.zone_index].world.portals,
+                    };
+                    
+                    if (storage.count() > 0) {
+                        self.current_iter = storage.entityIterator();
+                        break;
+                    }
+                    self.zone_index += 1;
                 }
             }
         };
     }
 };
 
-test "World basic operations" {
-    var world = try World.init(std.testing.allocator, 100);
+test "world basic operations" {
+    const testing = std.testing;
+
+    var world = try World.init(testing.allocator, 100);
     defer world.deinit();
 
-    const e1 = try world.createEntity();
-    try std.testing.expect(world.isAlive(e1));
+    // Create player
+    const player = try world.createPlayer(.{ .x = 100, .y = 100 }, 16, 100, 0);
+    try testing.expect(world.isAlive(player));
+    try testing.expect(world.findEntityArchetype(player) == .player);
 
-    try world.transforms.add(e1, components.Transform.init(.{ .x = 0, .y = 0 }, 10));
-    try world.healths.add(e1, components.Health.init(100));
+    // Create unit
+    const unit = try world.createUnit(.{ .x = 200, .y = 200 }, 15);
+    try testing.expect(world.isAlive(unit));
+    try testing.expect(world.findEntityArchetype(unit) == .unit);
 
-    try world.destroyEntity(e1);
-    try std.testing.expect(!world.isAlive(e1));
+    // Test counts
+    try testing.expect(world.players.count() == 1);
+    try testing.expect(world.units.count() == 1);
+    try testing.expect(world.getTotalEntityCount() == 2);
+
+    // Destroy entities
+    try world.destroyEntity(player);
+    try world.destroyEntity(unit);
+    try testing.expect(!world.isAlive(player));
+    try testing.expect(!world.isAlive(unit));
+    try testing.expect(world.getTotalEntityCount() == 0);
 }
 
-test "World createUnit helper" {
-    var world = try World.init(std.testing.allocator, 100);
-    defer world.deinit();
+test "game with zones operations" {
+    const testing = std.testing;
 
-    const unit = try world.createUnit(
-        .{ .x = 100, .y = 200 },
-        16,
-        100,
-        .enemy,
-    );
+    var game = Game.init(testing.allocator);
+    defer game.deinit();
 
-    try std.testing.expect(world.transforms.has(unit));
-    try std.testing.expect(world.healths.has(unit));
-    try std.testing.expect(world.units.has(unit));
+    // Add zones
+    try game.addZone(.{
+        .id = 0,
+        .metadata = .{
+            .zone_type = .overworld,
+            .camera_mode = .fixed,
+            .camera_scale = 1.0,
+            .spawn_pos = .{ .x = 400, .y = 300 },
+            .background_color = .{ .r = 0, .g = 0, .b = 0, .a = 255 },
+        },
+        .max_entities = 100,
+    });
+
+    try game.addZone(.{
+        .id = 1,
+        .metadata = .{
+            .zone_type = .dungeon_fire,
+            .camera_mode = .follow,
+            .camera_scale = 2.0,
+            .spawn_pos = .{ .x = 200, .y = 200 },
+            .background_color = .{ .r = 64, .g = 16, .b = 16, .a = 255 },
+        },
+        .max_entities = 100,
+    });
+
+    // Create entity in zone 0
+    const zone0 = game.getZone(0).?;
+    _ = try zone0.createPlayer(.{ .x = 100, .y = 100 }, 16, 100, 0);
+
+    // Create unit in zone 1
+    game.setCurrentZone(1);
+    const zone1 = game.getCurrentZone();
+    const unit = try zone1.createUnit(.{ .x = 200, .y = 200 }, 15);
+
+    // Test global iteration
+    var unit_iter = game.iterateAllUnits();
+    var unit_count: usize = 0;
+    while (unit_iter.next()) |entity_with_zone| {
+        unit_count += 1;
+        try testing.expect(entity_with_zone.zone_id == 1);
+        try testing.expect(entity_with_zone.entity.eql(unit));
+    }
+    try testing.expect(unit_count == 1);
+
+    // Check total entity count
+    try testing.expect(game.getTotalEntityCount() == 2);
 }

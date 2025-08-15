@@ -196,7 +196,7 @@ pub const GameState = struct {
 
     pub fn travelToZone(self: *Self, destination_zone: usize) !void {
         if (destination_zone < self.world.zones.len) {
-            self.world.getZonedWorld().setCurrentZone(destination_zone);
+            self.world.getZonedWorld().setCurrentZone(@intCast(destination_zone));
             // Zone reset is handled by the loader when switching zones
             // Clear bullets on zone travel - bullets are now ECS entities
             try self.world.clearAllProjectiles();
@@ -380,23 +380,20 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
 
     // Query all units from ECS system
     const ecs_world = world.getECSWorldMut();
-    const zoned_world = world.getZonedWorld();
-    var unit_iter = ecs_world.units.iterator();
-    while (unit_iter.next()) |entry| {
-        const unit_id = entry.key_ptr.*;
-
+    var unit_iter = ecs_world.units.entityIterator();
+    while (unit_iter.next()) |unit_id| {
         // Skip if entity is not alive
-        if (!zoned_world.isAlive(unit_id)) continue;
+        if (!ecs_world.isAlive(unit_id)) continue;
 
         // Get components
-        if (ecs_world.transforms.get(unit_id)) |transform| {
-            if (ecs_world.healths.get(unit_id)) |health| {
+        if (ecs_world.units.getComponent(unit_id, .transform)) |transform| {
+            if (ecs_world.units.getComponent(unit_id, .health)) |health| {
                 if (!health.alive) continue;
 
-                if (ecs_world.units.get(unit_id)) |unit_comp| {
+                if (ecs_world.units.getComponent(unit_id, .unit)) |unit_comp| {
                     const old_pos = transform.pos;
 
-                    if (ecs_world.visuals.get(unit_id)) |visual| {
+                    if (ecs_world.units.getComponent(unit_id, .visual)) |visual| {
                         const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnitECS(unit_id, ecs_world);
 
                         // Update unit AI behavior using ECS components
@@ -512,48 +509,47 @@ pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void 
 fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_radius: f32) void {
     const world = &game_state.world;
     const ecs_world = world.getECSWorldMut();
-    var terrain_iter = ecs_world.terrains.iterator();
+    var lifestone_iter = ecs_world.lifestones.entityIterator();
 
-    while (terrain_iter.next()) |entry| {
-        const entity_id = entry.key_ptr.*;
-        const terrain = entry.value_ptr.*;
+    while (lifestone_iter.next()) |entity_id| {
+        // Get components - lifestones have terrain, transform, visual, and interactable components
+        if (ecs_world.lifestones.getComponent(entity_id, .terrain)) |terrain| {
+            // Only check lifestones (altar terrain type)
+            if (terrain.terrain_type != .altar) continue;
 
-        // Only check lifestones (altar terrain with interactable component)
-        if (terrain.terrain_type != .altar) continue;
-        if (!ecs_world.interactables.has(entity_id)) continue;
+            if (ecs_world.lifestones.getComponent(entity_id, .interactable)) |interactable| {
+                // Get transform component
+                if (ecs_world.lifestones.getComponent(entity_id, .transform)) |transform| {
+                    // Check if lifestone is not yet attuned
+                    const is_attuned = interactable.attuned;
+                    if (is_attuned) continue; // Skip already attuned lifestones
 
-        // Get components
-        if (ecs_world.transforms.getConst(entity_id)) |transform| {
-            if (ecs_world.interactables.get(entity_id)) |interactable| {
-                // Check if lifestone is not yet attuned (using transformable state as attuned indicator)
-                const is_attuned = (interactable.interaction_type == .transformable);
-                if (is_attuned) continue; // Skip already attuned lifestones
+                    // Check collision
+                    if (physics.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
+                        // Attune the lifestone
+                        interactable.attuned = true;
 
-                // Check collision
-                if (physics.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
-                    // Attune the lifestone by changing interaction type to transformable
-                    interactable.interaction_type = .transformable;
+                        // Update visual color for attunement
+                        if (ecs_world.lifestones.getComponent(entity_id, .visual)) |visual| {
+                            visual.color = constants.COLOR_LIFESTONE_ATTUNED;
+                        }
 
-                    // Update visual color for attunement
-                    if (ecs_world.visuals.get(entity_id)) |visual| {
-                        visual.color = constants.COLOR_LIFESTONE_ATTUNED;
+                        loggers.getGameLog().info("lifestone_attuned", "Lifestone attuned!", .{});
+
+                        // Emit lifestone attuned event
+                        if (game_state.state_manager) |manager| {
+                            manager.emit(hex_events.lifestoneAttuned(
+                                game_state.world.getCurrentZoneIndex(),
+                                entity_id.index, // Use EntityId index as unique identifier
+                                transform.pos,
+                            ));
+                        }
+
+                        // Add inner effect for newly attuned lifestone
+                        game_state.effect_system.addLifestoneInnerEffectOnly(transform.pos, transform.radius);
+
+                        return; // Only attune one lifestone per frame
                     }
-
-                    loggers.getGameLog().info("lifestone_attuned", "Lifestone attuned!", .{});
-
-                    // Emit lifestone attuned event
-                    if (game_state.state_manager) |manager| {
-                        manager.emit(hex_events.lifestoneAttuned(
-                            game_state.world.getCurrentZoneIndex(),
-                            entity_id.index, // Use EntityId index as unique identifier
-                            transform.pos,
-                        ));
-                    }
-
-                    // Add inner effect for newly attuned lifestone
-                    game_state.effect_system.addLifestoneInnerEffectOnly(transform.pos, transform.radius);
-
-                    return; // Only attune one lifestone per frame
                 }
             }
         }

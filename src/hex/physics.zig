@@ -18,13 +18,12 @@ pub fn canPlayerMoveTo(world: *hex_world.HexWorld, new_pos: math.Vec2, player_ra
     
     // Use idiomatic Zig iterator pattern
     var obstacle_iter = world.iterateObstaclesInCurrentZone();
-    while (obstacle_iter.next()) |entry| {
-        const entity_id = entry.key_ptr.*;
-        if (ecs_world.terrains.get(entity_id)) |terrain| {
+    while (obstacle_iter.next()) |entity_id| {
+        if (ecs_world.obstacles.getComponent(entity_id, .terrain)) |terrain| {
             // Only check solid terrain for movement blocking
             if (!terrain.solid) continue;
 
-            if (ecs_world.transforms.get(entity_id)) |transform| {
+            if (ecs_world.obstacles.getComponent(entity_id, .transform)) |transform| {
                 // Check collision with this obstacle
                 const circle = collision.Shape{ .circle = .{ .center = new_pos, .radius = player_radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
@@ -137,24 +136,23 @@ pub fn findNearestAttunedLifestone(world: *hex_world.HexWorld) ?LifestoneResult 
     var nearest_lifestone: ?LifestoneResult = null;
 
     const ecs_world = world.getECSWorldMut();
-    const zoned_world = world.getZonedWorld();
-    var lifestone_iter = ecs_world.interactables.iterator();
-    while (lifestone_iter.next()) |entry| {
-        const lifestone_id = entry.key_ptr.*;
-        const interactable = entry.value_ptr;
-        if (!zoned_world.isAlive(lifestone_id)) continue;
+    var lifestone_iter = ecs_world.lifestones.entityIterator();
+    while (lifestone_iter.next()) |lifestone_id| {
+        if (!ecs_world.isAlive(lifestone_id)) continue;
 
-        // Check if it's a lifestone by looking for altar terrain type
-        if (ecs_world.terrains.get(lifestone_id)) |terrain| {
-            if (terrain.terrain_type == .altar and interactable.attuned) {
-                if (ecs_world.transforms.get(lifestone_id)) |transform| {
-                    const distance_sq = math.distanceSquared(player_pos, transform.pos);
-                    if (distance_sq < nearest_distance_sq) {
-                        nearest_distance_sq = distance_sq;
-                        nearest_lifestone = LifestoneResult{
-                            .pos = transform.pos,
-                            .zone_index = @intCast(world.getCurrentZoneIndex()),
-                        };
+        // Get the interactable component to check if it's attuned
+        if (ecs_world.lifestones.getComponent(lifestone_id, .interactable)) |interactable| {
+            if (ecs_world.lifestones.getComponent(lifestone_id, .terrain)) |terrain| {
+                if (terrain.terrain_type == .altar and interactable.attuned) {
+                    if (ecs_world.lifestones.getComponent(lifestone_id, .transform)) |transform| {
+                        const distance_sq = math.distanceSquared(player_pos, transform.pos);
+                        if (distance_sq < nearest_distance_sq) {
+                            nearest_distance_sq = distance_sq;
+                            nearest_lifestone = LifestoneResult{
+                                .pos = transform.pos,
+                                .zone_index = @intCast(world.getCurrentZoneIndex()),
+                            };
+                        }
                     }
                 }
             }
