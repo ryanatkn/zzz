@@ -235,6 +235,11 @@ pub const Effects = struct {
 
         return result * multiplicative;
     }
+    
+    /// Get aggro multiplier for this entity (1.0 = normal aggro)
+    pub fn getAggroMultiplier(self: Effects) f32 {
+        return self.getModifiedValue(1.0, .aggro_mult);
+    }
 };
 
 /// PlayerInput - distinguishes player-controlled entities

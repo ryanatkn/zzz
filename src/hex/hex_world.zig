@@ -459,6 +459,11 @@ pub const HexWorld = struct {
                 // Move projectile
                 transform.pos.x += transform.vel.x * dt;
                 transform.pos.y += transform.vel.y * dt;
+                
+                // Check collision with units
+                if (self.checkProjectileUnitCollision(entity_id, transform)) {
+                    try to_destroy.append(entity_id);
+                }
             }
         }
         
@@ -466,6 +471,50 @@ pub const HexWorld = struct {
         for (to_destroy.items) |entity| {
             try self.world.destroyEntity(entity);
         }
+    }
+
+    /// Check if projectile collides with any unit (and damage them)
+    fn checkProjectileUnitCollision(self: *HexWorld, projectile_id: EntityId, projectile_transform: *const components.Transform) bool {
+        // Query all units for collision
+        var unit_iter = self.world.units.iterator();
+        while (unit_iter.next()) |entry| {
+            const unit_id = entry.key_ptr.*;
+            
+            // Skip if unit is not alive
+            if (!self.world.isAlive(unit_id)) continue;
+            
+            // Get unit transform and health
+            if (self.world.transforms.get(unit_id)) |unit_transform| {
+                if (self.world.healths.get(unit_id)) |health| {
+                    if (!health.alive) continue;
+                    
+                    // Check circle-circle collision
+                    const dx = projectile_transform.pos.x - unit_transform.pos.x;
+                    const dy = projectile_transform.pos.y - unit_transform.pos.y;
+                    const distance_sq = dx * dx + dy * dy;
+                    const radius_sum = projectile_transform.radius + unit_transform.radius;
+                    
+                    if (distance_sq < radius_sum * radius_sum) {
+                        // Collision detected - damage the unit
+                        if (self.world.combats.get(projectile_id)) |projectile_combat| {
+                            // Deal damage to unit
+                            health.current -= projectile_combat.damage;
+                            
+                            if (health.current <= 0) {
+                                // Unit is killed
+                                health.alive = false;
+                                if (self.world.visuals.get(unit_id)) |visual| {
+                                    visual.color = constants.COLOR_DEAD;
+                                }
+                            }
+                            
+                            return true; // Projectile should be destroyed
+                        }
+                    }
+                }
+            }
+        }
+        return false; // No collision
     }
 
     /// Update all effects on entities
@@ -523,5 +572,100 @@ pub const HexWorld = struct {
         }
         
         // All zones will be repopulated by the loader
+    }
+    
+    // ===== ECS Query Helpers for Obstacles, Lifestones, Portals =====
+    
+    /// Query obstacles in current zone using ECS components
+    pub fn queryObstaclesInCurrentZone(self: *const HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
+        const zone = self.getCurrentZoneConst();
+        self.queryObstaclesInZone(zone, CallbackFn, callback);
+    }
+    
+    /// Query obstacles in specific zone using ECS components
+    pub fn queryObstaclesInZone(self: *const HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
+        _ = zone; // TODO: Zone-specific filtering when we add zone tracking to entities
+        
+        // Query all terrain entities with transform and visual
+        var terrain_iter = @constCast(&self.world.terrains).iterator();
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+            
+            // Skip if not an obstacle
+            if (terrain.terrain_type != .block and terrain.terrain_type != .deadly) continue;
+            
+            // Get components
+            if (self.world.transforms.getConst(entity_id)) |transform| {
+                if (self.world.visuals.getConst(entity_id)) |visual| {
+                    // Call callback with obstacle data
+                    callback.call(entity_id, transform, visual, terrain);
+                }
+            }
+        }
+    }
+    
+    /// Query lifestones in current zone using ECS components  
+    pub fn queryLifestonesInCurrentZone(self: *const HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
+        const zone = self.getCurrentZoneConst();
+        self.queryLifestonesInZone(zone, CallbackFn, callback);
+    }
+    
+    /// Query lifestones in specific zone using ECS components
+    pub fn queryLifestonesInZone(self: *const HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
+        _ = zone; // TODO: Zone-specific filtering when we add zone tracking to entities
+        
+        // Query terrain entities that are interact type (lifestones)
+        var terrain_iter = @constCast(&self.world.terrains).iterator();
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+            
+            // Skip if not a lifestone (interact terrain with interactable component)
+            if (terrain.terrain_type != .interact) continue;
+            if (!self.world.interactables.contains(entity_id)) continue;
+            
+            // Get components
+            if (self.world.transforms.getConst(entity_id)) |transform| {
+                if (self.world.visuals.getConst(entity_id)) |visual| {
+                    if (self.world.interactables.getConst(entity_id)) |interactable| {
+                        // Call callback with lifestone data
+                        callback.call(entity_id, transform, visual, terrain, interactable);
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Query portals in current zone using ECS components
+    pub fn queryPortalsInCurrentZone(self: *const HexWorld, comptime CallbackFn: type, callback: CallbackFn) void {
+        const zone = self.getCurrentZoneConst();
+        self.queryPortalsInZone(zone, CallbackFn, callback);
+    }
+    
+    /// Query portals in specific zone using ECS components
+    pub fn queryPortalsInZone(self: *const HexWorld, zone: *const Zone, comptime CallbackFn: type, callback: CallbackFn) void {
+        _ = zone; // TODO: Zone-specific filtering when we add zone tracking to entities
+        
+        // Query terrain entities that are door type (portals)
+        var terrain_iter = @constCast(&self.world.terrains).iterator();
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+            
+            // Skip if not a portal (door terrain with interactable component)
+            if (terrain.terrain_type != .door) continue;
+            if (!self.world.interactables.contains(entity_id)) continue;
+            
+            // Get components
+            if (self.world.transforms.getConst(entity_id)) |transform| {
+                if (self.world.visuals.getConst(entity_id)) |visual| {
+                    if (self.world.interactables.getConst(entity_id)) |interactable| {
+                        // Call callback with portal data
+                        callback.call(entity_id, transform, visual, terrain, interactable);
+                    }
+                }
+            }
+        }
     }
 };

@@ -20,6 +20,7 @@ pub const EffectType = enum {
     lifestone_glow, // Gentle glow around lifestones
     lifestone_inner, // Faster inner aura inside lifestone glow
     lull_area, // Area of effect indicator for Lull spell
+    unit_effect_aura, // Glowing aura around units under effects
 };
 
 pub const Effect = struct {
@@ -141,6 +142,11 @@ pub const Effect = struct {
                 const pulse = getPulse(elapsed, 1.0, 0.0);
                 return self.radius * (0.98 + pulse * 0.04); // 98% to 102% size - very subtle
             },
+            .unit_effect_aura => {
+                // Pulsing aura around affected units
+                const pulse = getPulse(elapsed, 2.0, 0.0); // 2 second cycle
+                return self.radius * (1.1 + pulse * 0.3); // 110% to 140% size - noticeable effect
+            },
         }
     }
 
@@ -205,6 +211,13 @@ pub const Effect = struct {
                 // Fade in over first 0.5 seconds
                 const fade_in = @min(1.0, elapsed / 0.5);
                 return (0.35 + pulse * 0.10) * self.intensity * fade_in; // 0.35 to 0.45 range - much more visible
+            },
+            .unit_effect_aura => {
+                // Glowing aura intensity for units under effects
+                const pulse = getPulse(elapsed, 2.0, 0.0);
+                // Fade in quickly over first 0.3 seconds
+                const fade_in = @min(1.0, elapsed / 0.3);
+                return (0.4 + pulse * 0.15) * self.intensity * fade_in; // 0.4 to 0.55 range - visible but not overwhelming
             },
         }
     }
@@ -302,6 +315,15 @@ pub const Effect = struct {
                     .r = @as(u8, @intFromFloat(@min(255.0, 140.0 * intensity))),
                     .g = @as(u8, @intFromFloat(@min(255.0, 100.0 * intensity))),
                     .b = @as(u8, @intFromFloat(@min(255.0, 240.0 * intensity))),
+                    .a = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
+                };
+            },
+            .unit_effect_aura => {
+                // Soft green/yellow aura for units under beneficial effects
+                return Color{
+                    .r = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
+                    .g = @as(u8, @intFromFloat(@min(255.0, 220.0 * intensity))),
+                    .b = @as(u8, @intFromFloat(@min(255.0, 120.0 * intensity))),
                     .a = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
                 };
             },
@@ -439,6 +461,11 @@ pub const EffectSystem = struct {
     pub fn addLullAreaEffect(self: *Self, pos: Vec2, radius: f32, duration: f32) void {
         // Add visible area indicator for Lull spell
         self.addEffect(pos, radius, .lull_area, duration);
+    }
+
+    pub fn addUnitEffectAura(self: *Self, pos: Vec2, unit_radius: f32, duration: f32) void {
+        // Add glowing aura around units under effects
+        self.addEffect(pos, unit_radius * 1.5, .unit_effect_aura, duration);
     }
 
     fn addLifestoneGlowEffectParts(self: *Self, pos: Vec2, lifestone_radius: f32, add_outer: bool, attuned: bool) void {

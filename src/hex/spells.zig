@@ -3,15 +3,20 @@ const types = @import("../lib/core/types.zig");
 const entities = @import("entities.zig");
 const effects = @import("effects.zig");
 const constants = @import("constants.zig");
+const components = @import("../lib/game/components.zig");
+const entity = @import("../lib/game/entity.zig");
+const world_mod = @import("../lib/game/world.zig");
 
 const Vec2 = types.Vec2;
-const Zone = entities.Zone;
+const Zone = @import("hex_world.zig").HexWorld.Zone;
 const HexWorld = @import("hex_world.zig").HexWorld;
+const EntityId = entity.EntityId;
+const World = world_mod.World;
 
 // Spell constants
 const LULL_RADIUS = 150.0; // Base AoE radius - can be upgraded
 const LULL_DURATION = 12.0; // Effect duration in seconds
-const LULL_AGGRO_MULT = 0.2; // Reduce aggro to 20%
+const LULL_AGGRO_MULT = 0.3; // Reduce aggro to 30%
 const LULL_COOLDOWN = 10.0;
 
 const BLINK_MAX_DISTANCE = 200.0;
@@ -129,29 +134,19 @@ pub const SpellSystem = struct {
     }
 
     pub fn castSpell(self: *SpellSystem, spell: SpellType, world: *HexWorld, zone: *const Zone, target_pos: Vec2, effect_system: *effects.EffectSystem) bool {
+        _ = self;
         switch (spell) {
             .None => return false,
 
             .Lull => {
-                // Find an inactive lull effect slot
-                for (0..self.lull_effects.len) |i| {
-                    if (!self.lull_effects[i].active) {
-                        self.lull_effects[i] = .{
-                            .pos = target_pos,
-                            .radius = LULL_RADIUS,
-                            .duration = LULL_DURATION,
-                            .active = true,
-                        };
+                // Apply lull effect to all units in area using ECS Effects
+                applyLullEffectToUnitsInArea(world, target_pos, LULL_RADIUS, LULL_DURATION, effect_system);
 
-                        // Add area of effect visual indicator that matches the actual effect
-                        effect_system.addLullAreaEffect(target_pos, LULL_RADIUS, LULL_DURATION);
+                // Add area of effect visual indicator
+                effect_system.addLullAreaEffect(target_pos, LULL_RADIUS, LULL_DURATION);
 
-                        std.debug.print("Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s\n", .{ target_pos.x, target_pos.y, LULL_DURATION });
-                        return true;
-                    }
-                }
-                std.debug.print("Max lull effects active\n", .{});
-                return false;
+                std.debug.print("Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s\n", .{ target_pos.x, target_pos.y, LULL_DURATION });
+                return true;
             },
 
             .Blink => {
@@ -192,21 +187,76 @@ pub const SpellSystem = struct {
         }
     }
 
-    pub fn getAggroMultiplierForUnit(self: *const SpellSystem, unit_pos: Vec2) f32 {
-        // Check if unit is within any active lull effect
-        for (0..self.lull_effects.len) |i| {
-            if (self.lull_effects[i].active) {
-                const dx = unit_pos.x - self.lull_effects[i].pos.x;
-                const dy = unit_pos.y - self.lull_effects[i].pos.y;
+/// Apply lull effect to all units in the specified area using ECS Effects
+fn applyLullEffectToUnitsInArea(world: *HexWorld, center_pos: Vec2, radius: f32, duration: f32, effect_system: *effects.EffectSystem) void {
+        
+        const ecs_world = world.getECSWorld();
+        
+        // Query all units and check if they're in the area
+        var unit_iter = @constCast(&ecs_world.units).iterator();
+        while (unit_iter.next()) |entry| {
+            const unit_id = entry.key_ptr.*;
+            
+            // Skip if unit is not alive
+            var ecs_world_mut = @constCast(ecs_world);
+            if (!ecs_world_mut.isAlive(unit_id)) continue;
+            
+            // Get unit position
+            if (ecs_world.transforms.getConst(unit_id)) |transform| {
+                // Check if unit is within the lull area
+                const dx = transform.pos.x - center_pos.x;
+                const dy = transform.pos.y - center_pos.y;
                 const dist_sq = dx * dx + dy * dy;
-                const radius_sq = self.lull_effects[i].radius * self.lull_effects[i].radius;
-
+                const radius_sq = radius * radius;
+                
                 if (dist_sq <= radius_sq) {
-                    return LULL_AGGRO_MULT;
+                    // Unit is in area - apply lull effect
+                    applyLullEffectToUnit(ecs_world_mut, unit_id, duration, transform.pos, transform.radius, effect_system);
                 }
             }
         }
-        return 1.0;
+    }
+    
+/// Apply lull effect to a specific unit using ECS Effects component  
+fn applyLullEffectToUnit(ecs_world: *World, unit_id: EntityId, duration: f32, unit_pos: Vec2, unit_radius: f32, effect_system: *effects.EffectSystem) void {
+        
+        // Get or create Effects component for this unit
+        const effects_component = ecs_world.effects.get(unit_id) orelse blk: {
+            // Create new Effects component
+            const new_effects = @import("../lib/game/components.zig").Effects.init();
+            ecs_world.effects.add(unit_id, new_effects) catch return;
+            break :blk ecs_world.effects.get(unit_id).?;
+        };
+        
+        // Add lull modifier
+        const lull_modifier = @import("../lib/game/components.zig").Effects.Modifier{
+            .type = .aggro_mult,
+            .value = LULL_AGGRO_MULT,
+            .duration = duration,
+            .stack_type = .replace, // New lull replaces old
+            .source = unit_id, // Self-applied for now
+        };
+        
+        effects_component.addModifier(lull_modifier) catch return;
+        
+        // Add visual effect aura around the affected unit
+        effect_system.addUnitEffectAura(unit_pos, unit_radius, duration);
+    }
+
+    pub fn getAggroMultiplierForUnit(self: *const SpellSystem, unit_pos: Vec2) f32 {
+        _ = self; // Legacy method - no longer uses SpellSystem state
+        _ = unit_pos; // Position-based lookup is deprecated
+        return 1.0; // Fallback - ECS method should be used instead
+    }
+    
+    /// Get aggro multiplier for a unit using ECS Effects component
+    pub fn getAggroMultiplierForUnitECS(unit_id: EntityId, ecs_world: *const World) f32 {
+        // Get Effects component for this unit
+        if (ecs_world.effects.getConst(unit_id)) |effects_component| {
+            // Check for aggro multiplier effects
+            return effects_component.getAggroMultiplier();
+        }
+        return 1.0; // No effects, normal aggro
     }
 };
 

@@ -92,7 +92,7 @@ pub fn fireBullet(world: *HexWorld, target_pos: Vec2, pool: *BulletPool) bool {
             player_pos,
             target_pos,
             player_entity,
-            25.0, // damage
+            150.0, // damage - one-shot kill
             constants.BULLET_SPEED,
             4.0, // lifetime
         ) catch |err| {

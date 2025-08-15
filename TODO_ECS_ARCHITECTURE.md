@@ -1,6 +1,6 @@
 # ECS Architecture Implementation
 
-## Status: ✅ Core Implementation Complete
+## Status: ✅ ECS Migration Complete with Effect Stacking
 
 ### Completed Tasks
 1. ✅ **Core ECS entity system with generational IDs** - Safe ID recycling with generation tracking
@@ -10,6 +10,11 @@
 5. ✅ **Camera memory corruption fix** - Heap-allocated game_renderer/game_state
 6. ✅ **Specialized bullet pool** - High-performance projectile management
 7. ✅ **Integration example** - HexWorld showing migration path
+8. ✅ **Player ECS migration** - Player entity using pure ECS components
+9. ✅ **Unit ECS migration** - All units spawned as ECS entities
+10. ✅ **Combat system integration** - Bullet-unit collision with ECS components
+11. ✅ **Effect stacking system** - Spell effects using ECS Effects component
+12. ✅ **Aggro modifier system** - ECS-based aggro calculation with proper stacking
 
 ## Architecture Overview
 
@@ -66,7 +71,7 @@ Components group related data at meaningful granularity:
 - `Movement`: speed, walk_speed, movement flags
 - `Unit`: AI state, behavior, aggro
 - `Combat`: damage, attack rate, projectile properties
-- `Effects`: Stacked modifiers with duration
+- `Effects`: Stacked modifiers with duration and different stack behaviors (replace/add/multiply)
 
 #### 4. Specialized Pools
 High-frequency objects bypass ECS for performance:
@@ -107,24 +112,28 @@ This eliminates the camera corruption crash by:
 
 1. **Phase 1**: Core ECS in lib/game (✅ Complete)
 2. **Phase 2**: Fix memory corruption (✅ Complete)
-3. **Phase 3**: Migrate entities incrementally
-   - Start with Player using components
-   - Convert Units to component form
-   - Keep bullets in specialized pool
-4. **Phase 4**: Add new gameplay features
-   - Effect stacking system
-   - Item modifiers
-   - Spell interactions
+3. **Phase 3**: Migrate entities incrementally (✅ Complete)
+   - ✅ Player using pure ECS components
+   - ✅ Units converted to ECS form
+   - ✅ Bullets as ECS entities with pool optimization
+   - ✅ Spell effects using ECS Effects component
+4. **Phase 4**: Complete ECS migration
+   - ✅ Effect stacking system implemented
+   - ✅ Aggro modifiers via ECS Effects
+   - [ ] Migrate obstacles and lifestones to full ECS
+   - [ ] Update save/load system for ECS world state
 
-### TODO: Next Steps
+### TODO: Remaining Steps
 
-- [ ] Migrate Player entity to full ECS
-- [ ] Convert Unit spawning to use ECS
-- [ ] Implement effect stacking for spells
-- [ ] Add component query system
+- [x] ~~Migrate Player entity to full ECS~~ ✅ Complete
+- [x] ~~Convert Unit spawning to use ECS~~ ✅ Complete  
+- [x] ~~Implement effect stacking for spells~~ ✅ Complete
+- [ ] Add visual indicators for active effects on entities
+- [ ] Migrate obstacles and lifestones to full ECS
+- [ ] Update save/load system to work with ECS world state
+- [ ] Create query builder API for efficient multi-component queries
 - [ ] Profile and optimize hot paths
 - [ ] Add debug visualization for entities
-- [ ] Implement save/load for ECS world
 
 ### Usage Example
 
@@ -133,25 +142,44 @@ This eliminates the camera corruption crash by:
 var world = try HexWorld.init(allocator);
 defer world.deinit();
 
-// Create entities
+// Create entities with ECS components
 const player = try world.createPlayer(Vec2.new(100, 100));
-const enemy = try world.createEnemy(Vec2.new(200, 200), .medium);
+const enemy = try world.createUnit(Vec2.new(200, 200), 15.0, 100.0, .enemy);
 
-// Fire bullet (uses specialized pool)
-const bullet = world.fireBullet(player_pos, target_pos, player);
+// Fire bullet as ECS entity
+const bullet = world.fireBullet(player_pos, target_pos, player, 150.0, 300.0, 4.0);
 
-// Update systems
-updateUnitAI(&world, dt);
-updateCombat(&world, time);
-updatePhysics(&world, dt);
+// Apply spell effects using ECS Effects component
+const lull_modifier = Effects.Modifier{
+    .type = .aggro_mult,
+    .value = 0.3,  // 30% aggro
+    .duration = 12.0,
+    .stack_type = .replace,
+    .source = player,
+};
+try world.world.effects.get(enemy).?.addModifier(lull_modifier);
+
+// Update systems with ECS queries
+updateUnitsECS(&game_state, dt);
+world.updateProjectiles(dt);
 ```
 
 ## Benefits Achieved
 
 1. **Memory Safety**: No more undefined globals, proper lifecycle management
-2. **Performance**: Cache-friendly SOA layout, specialized pools
-3. **Flexibility**: Easy to add new components and behaviors
-4. **Maintainability**: Clean separation of data and logic
-5. **Scalability**: Supports thousands of entities efficiently
+2. **Performance**: Cache-friendly SOA layout, specialized pools for high-frequency objects
+3. **Effect Stacking**: Proper spell modifier system with different stack behaviors
+4. **Combat System**: One-hit kills with ECS bullet-unit collision detection
+5. **Flexibility**: Easy to add new components and behaviors
+6. **Maintainability**: Clean separation of data and logic
+7. **Scalability**: Supports thousands of entities efficiently
 
-The architecture is ready for incremental migration while maintaining the game's procedural, performance-focused philosophy.
+### Current Game Features Using ECS
+
+- **Player Entity**: Pure ECS components (Transform, Health, Visual, PlayerInput)
+- **Unit Entities**: AI, health, combat using ECS components
+- **Projectile Entities**: Bullets as ECS entities with collision detection
+- **Effect System**: Lull spell applies aggro modifiers via ECS Effects component
+- **Combat Balance**: 150 damage bullets for one-hit kills, gray corpses remain visible
+
+The ECS migration is largely complete with a working effect stacking system, maintaining the game's procedural, performance-focused philosophy.

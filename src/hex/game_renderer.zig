@@ -89,26 +89,66 @@ pub const GameRenderer = struct {
 
     // Render all entities in a zone
     pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
-        const zone = world.getCurrentZoneConst();
-
         // Draw all rectangles first (obstacles)
-        self.renderObstacles(cmd_buffer, render_pass, zone);
+        self.renderObstacles(cmd_buffer, render_pass, world);
 
         // Then draw all circles (player, enemies, bullets, etc)
         self.renderCircles(cmd_buffer, render_pass, world);
     }
 
-    // Render all obstacles (rectangles)
-    fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, zone: *const hex_world.HexWorld.Zone) void {
-        for (0..zone.obstacle_count) |i| {
-            const obstacle = &zone.obstacles.items[i];
-            if (obstacle.active) {
-                const screen_pos = self.camera.worldToScreen(obstacle.pos);
-                const screen_size = Vec2{
-                    .x = self.camera.worldSizeToScreen(obstacle.size.x),
-                    .y = self.camera.worldSizeToScreen(obstacle.size.y),
-                };
-                self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, obstacle.color);
+    // Render all obstacles (rectangles) using ECS queries
+    fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+        // Query all terrain entities (obstacles, lifestones, portals)
+        const ecs_world = world.getECSWorld();
+        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+            
+            // Only render obstacles (wall/pit terrain)
+            if (terrain.terrain_type != .wall and terrain.terrain_type != .pit) continue;
+            
+            // Get transform and visual components
+            if (ecs_world.transforms.getConst(entity_id)) |transform| {
+                if (ecs_world.visuals.getConst(entity_id)) |visual| {
+                    if (visual.visible) {
+                        // For obstacles, we need to render as rectangles
+                        // TODO: Store original size in terrain component
+                        // For now, render as squares using radius
+                        const screen_pos = self.camera.worldToScreen(transform.pos);
+                        const size = transform.radius * 2.0; // Convert radius to size
+                        const screen_size = Vec2{
+                            .x = self.camera.worldSizeToScreen(size),
+                            .y = self.camera.worldSizeToScreen(size),
+                        };
+                        self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, visual.color);
+                    }
+                }
+            }
+        }
+    }
+
+    // Render terrain entities as circles (lifestones, portals) using ECS queries
+    fn renderTerrainCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+        // Query all terrain entities
+        const ecs_world = world.getECSWorld();
+        var terrain_iter = @constCast(&ecs_world.terrains).iterator();
+        
+        while (terrain_iter.next()) |entry| {
+            const entity_id = entry.key_ptr.*;
+            const terrain = entry.value_ptr.*;
+            
+            // Only render circular terrain (lifestones and portals)
+            if (terrain.terrain_type != .altar and terrain.terrain_type != .door) continue;
+            
+            // Get transform and visual components
+            if (ecs_world.transforms.getConst(entity_id)) |transform| {
+                if (ecs_world.visuals.getConst(entity_id)) |visual| {
+                    if (visual.visible) {
+                        self.renderCircleEntity(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+                    }
+                }
             }
         }
     }
@@ -144,25 +184,10 @@ pub const GameRenderer = struct {
         }
     }
 
-    // Render all circular entities
+    // Render all circular entities using ECS queries
     fn renderCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
-        const zone = world.getCurrentZoneConst();
-
-        // Draw lifestones (bottom layer)
-        for (0..zone.lifestone_count) |i| {
-            const lifestone = &zone.lifestones.items[i];
-            if (lifestone.active) {
-                self.renderCircleEntity(cmd_buffer, render_pass, lifestone.pos, lifestone.radius, lifestone.color);
-            }
-        }
-
-        // Draw portals
-        for (0..zone.portal_count) |i| {
-            const portal = &zone.portals.items[i];
-            if (portal.active) {
-                self.renderCircleEntity(cmd_buffer, render_pass, portal.pos, portal.radius, portal.color);
-            }
-        }
+        // Draw lifestones and portals using ECS queries
+        self.renderTerrainCircles(cmd_buffer, render_pass, world);
 
         // Draw units (ECS version)
         self.renderUnitsECS(cmd_buffer, render_pass, world);
@@ -313,16 +338,12 @@ pub const GameRenderer = struct {
             var ecs_world_mut = @constCast(ecs_world);
             if (!ecs_world_mut.isAlive(unit_id)) continue;
             
-            // Get unit transform and health
+            // Get unit transform for rendering (render both alive and dead units)
             if (ecs_world.transforms.getConst(unit_id)) |transform| {
-                if (ecs_world.healths.getConst(unit_id)) |health| {
-                    if (!health.alive) continue;
-                    
-                    // Get visual component for color
-                    if (ecs_world.visuals.getConst(unit_id)) |visual| {
-                        if (visual.visible) {
-                            self.renderCircleEntity(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
-                        }
+                // Get visual component for color
+                if (ecs_world.visuals.getConst(unit_id)) |visual| {
+                    if (visual.visible) {
+                        self.renderCircleEntity(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
                     }
                 }
             }

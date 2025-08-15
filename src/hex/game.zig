@@ -301,7 +301,7 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
                     const old_pos = transform.pos;
                     
                     if (world.world.visuals.get(unit_id)) |visual| {
-                        const aggro_mod = game_state.spell_system.getAggroMultiplierForUnit(transform.pos);
+                        const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnitECS(unit_id, &world.world);
                         
                         // Update unit AI behavior using ECS components
                         behaviors.updateUnitWithAggroModECS(

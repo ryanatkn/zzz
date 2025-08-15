@@ -1,7 +1,7 @@
 # ✅ COMPLETED: ECS Migration Cleanup Plan
 
-**Status**: ALL PHASES COMPLETE ✅  
-**Final Status**: Complete ECS dual-storage architecture with all systems functional  
+**Status**: ALL PHASES COMPLETE + EFFECT STACKING SYSTEM ✅  
+**Final Status**: Complete ECS architecture with effect stacking and spell modifiers  
 **Completion Date**: 2025-08-15
 
 ## Phase 1: Core Gameplay Restoration ✅
@@ -129,6 +129,8 @@
 4. **Phase 4**: Feature Restoration & Enhancement - COMPLETE ✅
    - Advanced Gameplay: All spell systems, effects, and save/load working
    - Performance & Polish: All bugs fixed, code quality improved
+   - Effect Stacking System: ECS Effects component with modifier stacking implemented
+   - Combat Balance: One-hit kills (150 damage) with gray corpses system
 
 ### **Final Game State - FULLY FUNCTIONAL** 🎮
 - ✅ **Player movement**: WASD + mouse control working perfectly
@@ -136,24 +138,29 @@
 - ✅ **Portal travel**: Zone transitions working between all zones
 - ✅ **Collision detection**: All collision types working (units, lifestones, obstacles, portals)
 - ✅ **Lifestone system**: Attunement and respawn to nearest lifestone working
-- ✅ **Spell system**: All spells functional (Lull, Blink, etc.)
+- ✅ **Spell system**: All spells functional (Lull with 30% aggro reduction, Blink, etc.)
 - ✅ **Effects system**: Visual effects and particles working
+- ✅ **Effect stacking**: ECS Effects component with proper modifier stacking (replace/add/multiply)
+- ✅ **Combat balance**: 150 damage bullets for one-hit kills, gray corpses remain visible
 - ✅ **HUD system**: Reactive HUD with backtick toggle working
 - ✅ **Save/Load**: Persistence working with ECS architecture
 
 ### **Architecture Achievement**
-The ECS migration cleanup is **100% COMPLETE** with a robust dual-storage architecture that provides:
-- **Full backward compatibility** through ArrayList maintenance
-- **Modern ECS architecture** with proper component organization
+The ECS migration cleanup is **100% COMPLETE** with a robust ECS architecture that provides:
+- **Modern ECS architecture** with proper component organization and effect stacking
 - **Clean, unified API** without ECS suffixes
-- **Stable, tested gameplay** with all features working
+- **Effect Stacking System** using ECS Effects component with multiple stack behaviors
+- **Pure ECS entities** for player, units, and projectiles
+- **Stable, tested gameplay** with enhanced combat and spell systems
 
 ### **Key Technical Accomplishments**
 - ✅ Successful ECS migration without breaking existing functionality
-- ✅ Dual storage system providing safety during transition
-- ✅ All critical bugs resolved (camera corruption, respawn algorithm)
+- ✅ Effect stacking system with ECS Effects component (replace/add/multiply stacking)
+- ✅ Combat system enhancement: 150 damage bullets, one-hit kills, gray corpses
+- ✅ Spell system integration: Lull spell uses ECS Effects for 30% aggro reduction
+- ✅ Pure ECS entities: Player, units, and projectiles all use ECS components
+- ✅ All critical bugs resolved (camera corruption, respawn algorithm, bullet collision)
 - ✅ Clean code organization with consistent patterns
-- ✅ Complete feature parity with original systems
-- ✅ Performance maintained with new architecture
+- ✅ Performance maintained with enhanced ECS architecture
 
 **The ECS migration is COMPLETE and the game is fully functional!** 🎉

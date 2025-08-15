@@ -107,8 +107,21 @@ pub fn handleSDLEvent(
                     }
                 },
                 c.sdl.SDL_BUTTON_RIGHT => {
-                    // Right-click casts spell (self-cast if Ctrl held) 
-                    // TODO: Re-enable spell casting with ECS system - need camera access for world mouse position
+                    // Right-click casts spell (self-cast if Ctrl held)
+                    if (game_state.world.getPlayerAlive()) {
+                        const ctrl_held = game_state.input_state.isCtrlHeld();
+                        const screen_mouse_pos = game_state.input_state.getMousePos();
+                        const world_mouse_pos = game_renderer.camera.screenToWorldSafe(screen_mouse_pos);
+                        const zone = game_state.world.getCurrentZoneConst();
+                        
+                        _ = game_state.spell_system.castActiveSpell(
+                            &game_state.world,
+                            zone,
+                            world_mouse_pos,
+                            &game_state.effect_system,
+                            ctrl_held
+                        );
+                    }
                 },
                 else => {},
             }
