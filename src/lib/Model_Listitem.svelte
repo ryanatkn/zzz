@@ -1,27 +1,34 @@
 <script lang="ts">
 	import type {Model} from '$lib/model.svelte.js';
 	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
-	interface Props {
+	const {
+		model,
+		show_tags,
+	}: {
 		model: Model;
 		show_tags?: boolean | undefined;
-	}
+	} = $props();
 
-	const {model, show_tags}: Props = $props();
-
-	const provider = $derived(model.app.providers.find_by_name(model.provider_name));
+	// const provider = $derived(model.app.providers.find_by_name(model.provider_name));
 
 	// TODO show something to show if it's local (probably not file size?)
 </script>
 
 <Model_Contextmenu attrs={{class: 'w_100 py_sm'}} {model}>
-	<div class="font_size_md">
-		{model.name}
-	</div>
-	<div class="row justify_content_space_between">
-		<span>{provider?.name}</span>{#if model.context_window_formatted}<span
-				>{model.context_window_formatted}</span
-			>{/if}
+	<div class="font_size_md row">
+		<Provider_Logo name={model.provider_name} size="var(--font_size_xl)" />
+		<div class="pl_sm">
+			<div>
+				{model.name}
+			</div>
+			<small class="row justify_content_space_between">
+				<span>{model.provider_name}</span>{#if model.context_window_formatted}<span
+						>{model.context_window_formatted}</span
+					>{/if}
+			</small>
+		</div>
 	</div>
 
 	{#if show_tags && model.tags.length}

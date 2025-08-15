@@ -1,4 +1,5 @@
 import {GoogleGenerativeAI} from '@google/generative-ai';
+import type * as google from '@google/generative-ai';
 import {SECRET_GOOGLE_API_KEY} from '$env/static/private';
 
 import {Backend_Provider, type Completion_Handler_Options} from '$lib/server/backend_provider.js';
@@ -6,41 +7,26 @@ import {to_completion_result} from '$lib/response_helpers.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 
-export class Gemini_Backend_Provider extends Backend_Provider {
+export class Gemini_Backend_Provider extends Backend_Provider<GoogleGenerativeAI> {
 	readonly name = 'gemini';
-	private google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
+	readonly client = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
-	format_messages(
-		completion_messages: Array<Completion_Message> | undefined,
-		prompt: string,
-	): string {
-		// TODO does this have to be a string?
-		if (completion_messages && completion_messages.length > 0) {
-			return (
-				completion_messages.map((m) => `${m.role}: ${m.content}`).join('\n\n') +
-				'\n\nuser: ' +
-				prompt
-			);
-		}
-
-		return prompt;
-	}
-
-	async handle_streaming(
+	async handle_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
-		const {model, completion_options, completion_messages, prompt, progress_token, backend} =
-			options;
+		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
 		// TODO cache this by model?
-		const google_model = this.google.getGenerativeModel(
-			this.#create_gemini_model_options(model, completion_options),
+		const google_model = this.client.getGenerativeModel(
+			create_gemini_model_options(model, completion_options),
 		);
 
-		const content = this.format_messages(completion_messages, prompt);
+		const contents = to_contents(completion_messages, prompt);
 
-		const stream_result = await google_model.generateContentStream(content);
+		// TODO is there a different way to use this API with the messages?
+		// google_model.generateContentStream
+		const stream_result = await google_model.generateContentStream({contents});
 
 		let accumulated_content = '';
 		let final_response: any = null;
@@ -56,11 +42,11 @@ export class Gemini_Backend_Provider extends Backend_Provider {
 				accumulated_content += chunk_text;
 
 				// Send streaming progress notification to frontend
-				void this.send_streaming_progress(backend, progress_token, {
+				void this.send_streaming_progress(progress_token, {
 					// TODO @many other chunk data
 					message: {
-						content: chunk_text,
 						role: 'assistant',
+						content: chunk_text,
 					},
 				});
 			} catch (error) {
@@ -90,19 +76,20 @@ export class Gemini_Backend_Provider extends Backend_Provider {
 		return to_completion_result('gemini', model, api_response, progress_token);
 	}
 
-	async handle_non_streaming(
+	async handle_non_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
 		const {model, completion_options, completion_messages, prompt} = options;
 
 		// TODO cache this by model?
-		const google_model = this.google.getGenerativeModel(
-			this.#create_gemini_model_options(model, completion_options),
+		const google_model = this.client.getGenerativeModel(
+			create_gemini_model_options(model, completion_options),
 		);
 
-		const content = this.format_messages(completion_messages, prompt);
+		const contents = to_contents(completion_messages, prompt);
 
-		const result = await google_model.generateContent(content);
+		// TODO systemInstruction and others could also be included here, fully extend the options
+		const result = await google_model.generateContent({contents});
 		const response = result.response;
 
 		this.log_non_streaming_response(response);
@@ -121,26 +108,41 @@ export class Gemini_Backend_Provider extends Backend_Provider {
 		this.log_api_response(api_response);
 		return to_completion_result('gemini', model, api_response);
 	}
-
-	#create_gemini_model_options(
-		model: string,
-		completion_options: Completion_Handler_Options['completion_options'],
-	) {
-		return {
-			model,
-			systemInstruction: completion_options.system_message,
-			// TODO
-			// tools,
-			// toolConfig
-			generationConfig: {
-				maxOutputTokens: completion_options.output_token_max,
-				temperature: completion_options.temperature,
-				topK: completion_options.top_k,
-				topP: completion_options.top_p,
-				frequencyPenalty: completion_options.frequency_penalty,
-				presencePenalty: completion_options.presence_penalty,
-				stopSequences: completion_options.stop_sequences,
-			},
-		};
-	}
 }
+
+const create_gemini_model_options = (
+	model: string,
+	completion_options: Completion_Handler_Options['completion_options'],
+) => ({
+	model,
+	systemInstruction: completion_options.system_message,
+	// TODO
+	// tools,
+	// toolConfig
+	generationConfig: {
+		maxOutputTokens: completion_options.output_token_max,
+		temperature: completion_options.temperature,
+		topK: completion_options.top_k,
+		topP: completion_options.top_p,
+		frequencyPenalty: completion_options.frequency_penalty,
+		presencePenalty: completion_options.presence_penalty,
+		stopSequences: completion_options.stop_sequences,
+	},
+});
+
+// TODO @many cleanup with better data structures/helpers
+const to_contents = (
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+): Array<google.Content> => {
+	const prompt_message = {role: 'user', parts: [{text: prompt}]};
+
+	return completion_messages
+		? completion_messages
+				.map(({role, content}) => ({
+					role: role === 'user' ? role : 'model', // TODO maybe clearer API for mapping roles, Google uses 'model' not 'assistant'
+					parts: [{text: content}],
+				}))
+				.concat(prompt_message)
+		: [prompt_message];
+};

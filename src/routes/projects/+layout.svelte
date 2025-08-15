@@ -8,11 +8,11 @@
 	import {projects_context, Projects} from '$routes/projects/projects.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		children,
+	}: {
 		children: Snippet;
-	}
-
-	const {children}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

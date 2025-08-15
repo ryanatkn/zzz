@@ -6,12 +6,13 @@
 	import {format_gigabytes} from '$lib/format_helpers.js';
 	import type {Model} from '$lib/model.svelte.js';
 
-	interface Props {
+	const {
+		model,
+		onclick = () => ollama.select(model),
+	}: {
 		model: Model;
 		onclick?: () => void;
-	}
-
-	const {model, onclick = () => ollama.select(model)}: Props = $props();
+	} = $props();
 
 	const {ollama} = $derived(model.app);
 

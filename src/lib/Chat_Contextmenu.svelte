@@ -7,29 +7,21 @@
 
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {
-		GLYPH_CHAT,
-		GLYPH_DELETE,
-		GLYPH_EDIT,
-		GLYPH_REMOVE,
-		GLYPH_VIEW,
-		GLYPH_ADD,
-	} from '$lib/glyphs.js';
+	import {GLYPH_CHAT, GLYPH_DELETE, GLYPH_REMOVE, GLYPH_VIEW, GLYPH_ADD} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		chat,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		chat: Chat;
-	}
-
-	const {chat, ...rest}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
 	let show_model_picker = $state(false);
-
-	// TODO BLOCK edit chat dialog instead of prompt for name (just focus the input for now?)
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -80,7 +72,9 @@
 				</Contextmenu_Entry>
 			{/if}
 
-			<Contextmenu_Entry
+			<!-- TODO I think the best UX here is to have a dialog for the chat editor,
+			 focusing the editable input doesn't work outside of the Chat_View  -->
+			<!-- <Contextmenu_Entry
 				run={() => {
 					// TODO make this focus the `Editable_Text` if available, somehow
 					const new_name = prompt('Enter new name for chat:', chat.name); // eslint-disable-line no-alert
@@ -90,8 +84,8 @@
 				}}
 			>
 				{#snippet icon()}<Glyph glyph={GLYPH_EDIT} />{/snippet}
-				<span>rename chat</span>
-			</Contextmenu_Entry>
+				<span>edit chat</span>
+			</Contextmenu_Entry> -->
 
 			<Contextmenu_Entry
 				run={async () => {

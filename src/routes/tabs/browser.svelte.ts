@@ -26,6 +26,9 @@ export class Browser extends Cell<typeof Browser_Json> {
 	edited_url: string = $state()!;
 	browserified: boolean = $state()!;
 
+	/** True when the edited URL differs from the selected tab's URL. */
+	readonly url_edited: boolean = $derived(this.edited_url !== this.tabs.selected_url);
+
 	constructor(options: Browser_Options) {
 		super(Browser_Json, options);
 

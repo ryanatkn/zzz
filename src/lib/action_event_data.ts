@@ -20,7 +20,7 @@ export const Action_Event_Data = z.object({
 	step: Action_Event_Step,
 	method: Action_Method,
 	executor: Action_Executor,
-	input: z.unknown(),
+	input: z.unknown().nullable(),
 	output: z.unknown().nullable(),
 	error: Jsonrpc_Error_Json.nullable(),
 	progress: z.unknown().nullable(),

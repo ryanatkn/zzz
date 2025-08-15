@@ -52,9 +52,11 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 
 	recently_closed_tabs: Array<Browser_Tab> = $state([]);
 
-	selected_tab: Browser_Tab | undefined = $derived(this.ordered_tabs.find((t) => t.selected));
+	readonly selected_tab: Browser_Tab | undefined = $derived(
+		this.ordered_tabs.find((t) => t.selected),
+	);
 
-	selected_url: string = $derived(this.selected_tab?.url || '');
+	readonly selected_url: string = $derived(this.selected_tab?.url || '');
 
 	constructor(options: Browser_Tabs_Options) {
 		super(Browser_Tabs_Json, options);
@@ -114,7 +116,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 			id: create_uuid(),
 			title: 'new tab',
 			selected: true,
-			url: '~newtab',
+			url: '/newtab',
 			type: 'embedded_html',
 			content: fake_sites.new_tab.content,
 			refresh_counter: 0,
@@ -172,6 +174,12 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 		const selected_tab = this.selected_tab;
 		if (selected_tab) {
 			selected_tab.url = url;
+
+			// If navigating to a real URL from a new tab, change type to external_url
+			if (selected_tab.type === 'embedded_html' && url !== '~newtab' && url !== '/newtab') {
+				selected_tab.type = 'external_url';
+				selected_tab.content = undefined; // Clear embedded content
+			}
 
 			// If it's an external URL tab, force a refresh
 			if (selected_tab.type === 'external_url') {

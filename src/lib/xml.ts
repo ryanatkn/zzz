@@ -24,7 +24,7 @@ export const Xml_Attribute = z
 		key: Xml_Attribute_Key,
 		value: Xml_Attribute_Value,
 	})
-	.strict();
+	.strict(); // TODO is strict desired?
 export type Xml_Attribute = z.infer<typeof Xml_Attribute>;
 
 // Default attribute applies defaults and includes id with default
@@ -34,7 +34,7 @@ export const Xml_Attribute_With_Defaults = z
 		key: Xml_Attribute_Key_With_Default,
 		value: Xml_Attribute_Value_With_Default,
 	})
-	.strict();
+	.strict(); // TODO is strict desired?
 export type Xml_Attribute_With_Defaults = z.infer<typeof Xml_Attribute_With_Defaults>;
 
-// TODO: Consider adding support for XML namespaces and special XML character handling if needed// TODO?: Add element, document, and CDATA section schemas to create a complete XML model
+// TODO Consider adding support for XML namespaces and special XML character handling if needed// TODO?: Add element, document, and CDATA section schemas to create a complete XML model

@@ -66,7 +66,7 @@ export type Bit_Json = z.infer<typeof Bit_Json>;
 export type Bit_Json_Input = z.input<typeof Bit_Json>;
 
 /** Type union of all concrete bit classes.  */
-export type Bit_Type = Text_Bit | Diskfile_Bit | Sequence_Bit;
+export type Bit_Union = Text_Bit | Diskfile_Bit | Sequence_Bit;
 /** Type union of all concrete bit json types.  */
 export type Bit_Json_Type = Text_Bit_Json | Diskfile_Bit_Json | Sequence_Bit_Json;
 
@@ -82,7 +82,7 @@ export type Diskfile_Bit_Options = Bit_Options<typeof Diskfile_Bit_Json>;
 
 export type Sequence_Bit_Options = Bit_Options<typeof Sequence_Bit_Json>;
 
-export type Bit_Type_Options = Text_Bit_Options | Diskfile_Bit_Options | Sequence_Bit_Options;
+export type Bit_Options_Union = Text_Bit_Options | Diskfile_Bit_Options | Sequence_Bit_Options;
 
 /**
  * Abstract base class for all bit types.
@@ -106,11 +106,12 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 			: this.content,
 	);
 
+	// TODO rethink these patterns, see A2A Parts
 	// Common properties for all bit types
 	name: string = $state()!;
 	has_xml_tag: boolean = $state()!;
 	xml_tag_name: string = $state()!;
-	attributes: Array<Xml_Attribute_With_Defaults> = $state()!;
+	attributes: Array<Xml_Attribute_With_Defaults> = $state()!; // TODO if kept, name `xml_attributes`?
 	enabled: boolean = $state()!;
 	title: string | null = $state()!;
 	summary: string | null = $state()!;
@@ -120,6 +121,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	);
 
 	add_attribute(partial: z.input<typeof Xml_Attribute_With_Defaults> = EMPTY_OBJECT): void {
+		// TODO add with a default name
 		this.attributes.push(Xml_Attribute_With_Defaults.parse(partial));
 	}
 
@@ -134,13 +136,11 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 		const index = this.attributes.findIndex((a) => a.id === id);
 		if (index === -1) return false;
 
-		// Create a new attributes array to ensure reactivity
+		// TODO refactor this code, maybe update directly? using svelte 5 idioms
 		const new_attributes = [...this.attributes];
 
-		// Get the attribute to update
 		const attr = new_attributes[index];
 
-		// Apply updates directly
 		if ('key' in updates && updates.key !== undefined) {
 			attr.key = updates.key;
 		}
@@ -149,7 +149,6 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 			attr.value = updates.value;
 		}
 
-		// Replace the entire array to ensure reactivity
 		this.attributes = new_attributes;
 
 		return true;
@@ -181,8 +180,8 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 		json: Sequence_Bit_Json_Input,
 		options?: Sequence_Bit_Options,
 	): Sequence_Bit;
-	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type;
-	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type {
+	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Options_Union): Bit_Union;
+	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Options_Union): Bit_Union {
 		if (!json.type) {
 			throw new Error('Missing required "type" field in bit JSON');
 		}
@@ -210,7 +209,6 @@ export const Bit_Schema = z.instanceof(Bit);
 export class Text_Bit extends Bit<typeof Text_Bit_Json> {
 	override readonly type = 'text';
 
-	// Direct content storage
 	override content: string = $state()!;
 
 	constructor(options: Text_Bit_Options) {
@@ -316,10 +314,10 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 
 	items: Array<Uuid> = $state()!;
 
-	readonly bits: Array<Bit_Type> = $derived(
+	readonly bits: Array<Bit_Union> = $derived(
 		this.items
 			.map((id) => this.app.bits.items.by_id.get(id))
-			.filter((bit): bit is Bit_Type => !!bit),
+			.filter((bit): bit is Bit_Union => !!bit),
 	);
 
 	override get content(): string {

@@ -482,7 +482,7 @@ describe('Cell date formatting', () => {
 		expect(test_cell.created_formatted_time).not.toBeNull();
 
 		expect(test_cell.updated_formatted_short_date).not.toBeNull();
-		expect(test_cell.updated_formatted_date).not.toBeNull();
+		expect(test_cell.updated_formatted_datetime).not.toBeNull();
 		expect(test_cell.updated_formatted_time).not.toBeNull();
 	});
 
@@ -498,7 +498,7 @@ describe('Cell date formatting', () => {
 
 		expect(test_cell.updated_date).not.toBeNull();
 		expect(test_cell.updated_formatted_short_date).not.toBeNull();
-		expect(test_cell.updated_formatted_date).not.toBeNull();
+		expect(test_cell.updated_formatted_datetime).not.toBeNull();
 		expect(test_cell.updated_formatted_time).not.toBeNull();
 	});
 });

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {scale, fade} from 'svelte/transition';
+	import {fade} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 
@@ -25,14 +25,17 @@
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
 	import Editable_Text from '$lib/Editable_Text.svelte';
+	import Tutorial_For_Database from '$lib/Tutorial_For_Database.svelte';
+	import Tutorial_For_Prompts from '$lib/Tutorial_For_Prompts.svelte';
+	import {DURATION_SM} from '$lib/helpers.js';
 
 	const app = frontend_context.get();
+
+	// TODO hovering/selecting bits should show them hovered/selected in both the grid and list
 
 	// TODO clicking the bits should select them, and then selected one should show its name input (or just on hover/tap? what signifier?)
 
 	// TODO history of prompt states (opt in snapshots? also autosave?) using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
-
-	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes
 
 	let show_diskfile_picker = $state(false);
 
@@ -67,22 +70,20 @@
 
 		app.prompts.selected.add_bit(bit);
 	};
+
+	// TODO refactor, maybe move the nav and init logic to `Prompts`?
+	const create_prompt = async () => {
+		const prompt = app.prompts.add();
+		await app.prompts.navigate_to(prompt.id);
+	};
 </script>
 
 <div class="display_flex w_100 h_100">
 	<div class="column_fixed">
 		<div class="p_sm pl_0">
 			<div class="row gap_xs2 mb_xs pl_xs2">
-				<button
-					type="button"
-					class="plain w_100 justify_content_start"
-					onclick={async () => {
-						const prompt = app.prompts.add();
-						prompt.add_bit(Bit.create(app, {type: 'text'}));
-						await app.prompts.navigate_to(prompt.id);
-					}}
-				>
-					<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt
+				<button type="button" class="plain w_100 justify_content_start" onclick={create_prompt}>
+					<Glyph glyph={GLYPH_ADD} />&nbsp; new prompt
 				</button>
 				{#if app.prompts.items.size > 1}
 					<button
@@ -98,6 +99,8 @@
 			</div>
 			<Prompt_List />
 		</div>
+		<Tutorial_For_Database />
+		<Tutorial_For_Prompts />
 	</div>
 
 	{#if app.prompts.selected}
@@ -116,19 +119,18 @@
 						</small>
 					</div>
 					<div class="row gap_xs py_xs">
+						<Copy_To_Clipboard text={app.prompts.selected.content} attrs={{class: 'plain'}} />
+						<div class="flex_1">
+							<Prompt_Stats prompt={app.prompts.selected} />
+						</div>
 						<Confirm_Button
 							onconfirm={() => app.prompts.selected && app.prompts.remove(app.prompts.selected)}
-							position="right"
-							attrs={{
-								title: `delete prompt "${app.prompts.selected.name}"`,
-								class: 'plain icon_button',
-							}}
+							title="delete prompt {'"' + app.prompts.selected.name + '"'}"
+							class="plain icon_button"
 						>
 							<Glyph glyph={GLYPH_DELETE} />
 							{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 						</Confirm_Button>
-						<Copy_To_Clipboard text={app.prompts.selected.content} attrs={{class: 'plain'}} />
-						<Prompt_Stats prompt={app.prompts.selected} />
 					</div>
 					<Content_Preview content={app.prompts.selected.content} />
 				</section>
@@ -150,7 +152,7 @@
 						<div class="display_flex flex_wrap gap_xs">
 							<button type="button" class="plain font_size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
-									<Glyph glyph={GLYPH_BIT} attrs={{class: 'mr_xs2'}} /> add text
+									<Glyph glyph={GLYPH_BIT} />&nbsp; add text
 								</div>
 							</button>
 							<button
@@ -160,20 +162,21 @@
 								disabled={!app.diskfiles.items.size}
 							>
 								<div class="row white_space_nowrap">
-									<Glyph glyph={GLYPH_FILE} attrs={{class: 'mr_xs2'}} /> add file
+									<Glyph glyph={GLYPH_FILE} />&nbsp; add file
 								</div>
 							</button>
 							<button type="button" class="plain font_size_sm" onclick={add_sequence_bit}>
 								<div class="row white_space_nowrap">
-									<Glyph glyph={GLYPH_LIST} attrs={{class: 'mr_xs2'}} /> add sequence
+									<Glyph glyph={GLYPH_LIST} />&nbsp; add sequence
 								</div>
 							</button>
 							<Confirm_Button
 								onconfirm={() => app.prompts.selected?.remove_all_bits()}
-								attrs={{disabled: !app.prompts.selected.bits.length, class: 'plain font_size_sm'}}
+								disabled={!app.prompts.selected.bits.length}
+								class="plain font_size_sm"
 							>
 								<div class="row white_space_nowrap">
-									<Glyph glyph={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all
+									<Glyph glyph={GLYPH_REMOVE} />&nbsp; remove all
 								</div>
 							</Confirm_Button>
 						</div>
@@ -183,7 +186,7 @@
 						style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 					>
 						{#each app.prompts.selected.bits as bit (bit.id)}
-							<li in:scale>
+							<li in:fade={{duration: DURATION_SM}}>
 								<!-- the extra wrapper makes the grid items not stretch vertically -->
 								<div class="bg border_radius_xs p_sm">
 									<Bit_View {bit} />
@@ -195,14 +198,12 @@
 			</div>
 		</Prompt_Contextmenu>
 	{:else if app.prompts.items.size}
-		<div class="display_flex align_items_center justify_content_center h_100 flex_1" in:fade>
+		<div class="box h_100 flex_1" in:fade={{duration: DURATION_SM}}>
 			<p>
 				select a prompt from the list or <button
 					type="button"
 					class="inline color_d"
-					onclick={() => {
-						app.prompts.add();
-					}}>create one</button
+					onclick={create_prompt}>create one</button
 				>
 				or
 				<button
@@ -216,14 +217,10 @@
 			</p>
 		</div>
 	{:else}
-		<div class="display_flex align_items_center justify_content_center h_100 flex_1" in:fade>
+		<div class="box h_100 flex_1" in:fade={{duration: DURATION_SM}}>
 			<p>
-				no prompts yet, <button
-					type="button"
-					class="inline color_d"
-					onclick={() => {
-						app.prompts.add();
-					}}>create a new prompt</button
+				no prompts yet, <button type="button" class="inline color_d" onclick={create_prompt}
+					>create a new prompt</button
 				>?
 			</p>
 		</div>

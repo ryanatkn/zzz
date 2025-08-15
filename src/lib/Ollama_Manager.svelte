@@ -17,11 +17,11 @@
 	import Ollama_Model_Listitem from '$lib/Ollama_Model_Listitem.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+	}: {
 		ollama: Ollama;
-	}
-
-	const {ollama}: Props = $props();
+	} = $props();
 
 	// TODO consider "pinning" views so that when others open, they stay open and stable onscreen (but you probably want to rearrange the panels)
 
@@ -35,7 +35,7 @@
 	// like using SvelteKit's snapshots - https://svelte.dev/docs/kit/snapshots
 
 	onMount(() => {
-		void ollama.refresh();
+		void ollama.refresh(); // TODO maybe only if `this.ollama.status === 'initial'` like the capability?
 
 		// TODO @many probably want a different state to capture user intent of enabling polling, but the whole UX may change
 		// Start polling for `ps` status if not already started
@@ -61,14 +61,14 @@
 				<div class="display_flex gap_sm align_items_start">
 					<div
 						class="flex_1 chip plain display_flex justify_content_start font_weight_400"
-						class:color_b={ollama.list_status === 'success'}
-						class:color_c={ollama.list_status === 'failure'}
-						class:color_d={ollama.list_status === 'pending'}
-						class:color_e={ollama.list_status === 'initial'}
+						class:color_b={ollama.available}
+						class:color_c={!ollama.available && ollama.list_status === 'failure'}
+						class:color_d={!ollama.available && ollama.list_status === 'pending'}
+						class:color_e={!ollama.available && ollama.list_status === 'initial'}
 					>
 						<div class="column justify_content_center gap_xs p_md">
 							<span class="font_size_lg">
-								Ollama {ollama.list_status === 'success'
+								Ollama {ollama.available
 									? `connected`
 									: ollama.list_status === 'failure'
 										? 'unavailable'
@@ -138,53 +138,55 @@
 				</div>
 			</section>
 
-			{#if ollama.available}
-				{#if ollama.models_downloaded.length > 0}
-					<!-- downloaded mdels -->
+			{#if ollama.models_downloaded.length > 0}
+				<!-- downloaded models -->
+				<section>
+					<h3 class="mt_xl3 mb_md">
+						{ollama.models_downloaded.length} model{plural(ollama.models_downloaded.length)}
+					</h3>
+
+					<menu class="unstyled column">
+						{#each ollama.models_downloaded as model (model.id)}
+							<li transition:slide>
+								<Ollama_Model_Listitem {model} />
+							</li>
+						{/each}
+					</menu>
+				</section>
+				<!-- models not downloaded -->
+				{#if ollama.models_not_downloaded.length > 0}
 					<section>
 						<h3 class="mt_xl3 mb_md">
-							{ollama.models_downloaded.length} model{plural(ollama.models_downloaded.length)}
+							{ollama.models_not_downloaded.length} not downloaded
 						</h3>
 
-						<div class="column">
-							{#each ollama.models_downloaded as model (model.id)}
-								<Ollama_Model_Listitem {model} />
-							{/each}
-						</div>
-					</section>
-					<!-- models not downloaded -->
-					{#if ollama.models_not_downloaded.length > 0}
-						<section>
-							<h3 class="mt_xl3 mb_md">
-								{ollama.models_not_downloaded.length} not downloaded
-							</h3>
-
-							<div class="column">
-								{#each ollama.models_not_downloaded as model (model.id)}
+						<menu class="unstyled column">
+							{#each ollama.models_not_downloaded as model (model.id)}
+								<li transition:slide>
 									<Ollama_Model_Listitem
 										{model}
 										onclick={async () => {
 											await model.navigate_to_download();
 										}}
 									/>
-								{/each}
-							</div>
-						</section>
-					{/if}
-				{:else}
-					<section class="panel p_md" transition:slide>
-						<p>
-							no models found, <button
-								type="button"
-								class="inline compact"
-								disabled={ollama.manager_selected_view === 'pull'}
-								onclick={() => ollama.set_manager_view('pull', null)}>pull a model</button
-							>
-							or install them using the
-							<External_Link href="https://github.com/ollama/ollama">Ollama CLI</External_Link>
-						</p>
+								</li>
+							{/each}
+						</menu>
 					</section>
 				{/if}
+			{:else if ollama.available}
+				<section class="panel p_md" transition:slide>
+					<p>
+						no models found, <button
+							type="button"
+							class="inline compact"
+							disabled={ollama.manager_selected_view === 'pull'}
+							onclick={() => ollama.set_manager_view('pull', null)}>pull a model</button
+						>
+						or install them using the
+						<External_Link href="https://github.com/ollama/ollama">Ollama CLI</External_Link>
+					</p>
+				</section>
 			{/if}
 		</div>
 	</div>

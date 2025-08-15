@@ -12,21 +12,19 @@
 	const app = frontend_context.get();
 	const {models} = app;
 
-	interface Props {
-		show: boolean;
-		onpick: (model: Model | undefined) => boolean | void;
-		filter?: ((model: Model) => boolean) | undefined;
-		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
-		children?: Snippet | undefined;
-	}
-
 	let {
 		show = $bindable(false),
 		onpick,
 		filter,
 		dialog_props,
 		children: children_prop,
-	}: Props = $props();
+	}: {
+		show: boolean;
+		onpick: (model: Model | undefined) => boolean | void;
+		filter?: ((model: Model) => boolean) | undefined;
+		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
+		children?: Snippet | undefined;
+	} = $props();
 </script>
 
 <Picker_Dialog

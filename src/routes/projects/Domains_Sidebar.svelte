@@ -20,7 +20,7 @@
 				class="plain justify_content_start flex_1"
 				onclick={() => project_viewmodel.create_new_domain()}
 			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new domain
+				<Glyph glyph={GLYPH_ADD} />&nbsp; new domain
 			</button>
 		</div>
 
@@ -32,7 +32,7 @@
 							<Nav_Link
 								href="{base}/projects/{project_viewmodel.project_id}/domains/{domain.id}"
 								selected={domain.id === projects.current_domain_id}
-								attrs={{title: domain.name}}
+								title={domain.name}
 							>
 								<div class="ellipsis row flex_1 pr_xs">{domain.name || '[new domain]'}</div>
 								<span

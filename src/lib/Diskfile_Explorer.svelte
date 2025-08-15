@@ -17,11 +17,11 @@
 	import Sortable_List from '$lib/Sortable_List.svelte';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
-	interface Props {
+	const {
+		empty,
+	}: {
 		empty?: Snippet | undefined;
-	}
-
-	const {empty}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {diskfiles} = app;
@@ -33,27 +33,28 @@
 	const TODO_create_file_pending = false;
 	const TODO_create_folder_pending = false;
 
-	// TODO improve UX to not use alert/prompt
+	// TODO @many this is very hacky and duplicated, refactor into cell methods
+	// TODO @many improve UX to not use alert/prompt
 	const create_file = async () => {
 		if (!zzz_cache_dir) {
-			alert('Cannot create file: no directory is selected'); // eslint-disable-line no-alert
+			alert('cannot create file: filesystem is not available'); // eslint-disable-line no-alert
 			return;
 		}
 
-		const filename = prompt('New file name:'); // eslint-disable-line no-alert
+		const filename = prompt('new file name:'); // eslint-disable-line no-alert
 		if (!filename) return;
 
 		try {
 			await diskfiles.create_file(filename);
 		} catch (error) {
 			console.error('failed to create file:', error);
-			alert(`Failed to create file: ${error}`); // eslint-disable-line no-alert
+			alert(`failed to create file: ${error}`); // eslint-disable-line no-alert
 		}
 	};
 
 	const create_folder = async () => {
 		if (!zzz_cache_dir) {
-			alert('Cannot create folder: no directory is selected'); // eslint-disable-line no-alert
+			alert('cannot create folder: filesystem is not available'); // eslint-disable-line no-alert
 			return;
 		}
 
@@ -64,7 +65,7 @@
 			await diskfiles.create_directory(dirname);
 		} catch (error) {
 			console.error('failed to create folder:', error);
-			alert(`Failed to create folder: ${error}`); // eslint-disable-line no-alert
+			alert(`failed to create folder: ${error}`); // eslint-disable-line no-alert
 		}
 	};
 </script>
@@ -132,8 +133,9 @@
 					<Diskfile_Listitem
 						{diskfile}
 						{selected}
-						onselect={(diskfile, hard) => {
-							diskfiles.select(diskfile.id, hard);
+						onselect={(diskfile, open_not_preview) => {
+							// TODO this needs to navigate to the path of the file (so should be a link, not this onselect callback)
+							diskfiles.select(diskfile.id, open_not_preview);
 						}}
 					/>
 				</div>

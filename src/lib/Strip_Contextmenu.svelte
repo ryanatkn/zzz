@@ -12,11 +12,12 @@
 	import Strip_View from '$lib/Strip_View.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		strip,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		strip: Strip;
-	}
-
-	const {strip, ...rest}: Props = $props();
+	} = $props();
 
 	let show_editor = $state(false);
 </script>

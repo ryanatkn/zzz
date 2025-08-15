@@ -28,11 +28,11 @@
 
 	const pid = $props.id();
 
-	interface Props {
+	const {
+		socket: socket_prop,
+	}: {
 		socket?: Socket | undefined;
-	}
-
-	const {socket: socket_prop}: Props = $props();
+	} = $props();
 
 	// Get socket from props or context
 	const app = frontend_context.get();
@@ -128,7 +128,7 @@
 						}}
 					>
 						<div class:flip_x={has_undo_state}>
-							<Glyph glyph={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
+							<Glyph glyph={GLYPH_RESET} />
 						</div>
 					</button>
 				</div>
@@ -333,7 +333,7 @@
 			<div class="display_flex justify_content_end">
 				<Confirm_Button
 					onconfirm={reset_to_defaults}
-					attrs={{class: 'plain font_size_sm compact font_weight_600'}}
+					class="plain font_size_sm compact font_weight_600"
 				>
 					reset to defaults
 
@@ -347,7 +347,7 @@
 								popover.hide();
 							}}
 						>
-							<Glyph glyph={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
+							<Glyph glyph={GLYPH_RESET} />
 						</button>
 					{/snippet}
 				</Confirm_Button>

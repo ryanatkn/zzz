@@ -1,22 +1,22 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Xml_Attribute_Editor from '$lib/Xml_Attribute_Editor.svelte';
 	import {GLYPH_ADD, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
-		bit: Bit_Type;
-	}
-
-	const {bit}: Props = $props();
+	const {
+		bit,
+	}: {
+		bit: Bit_Union;
+	} = $props();
 
 	let input_el: HTMLInputElement | undefined;
 </script>
 
-<div class="column align_items_start gap_xs">
-	<div class="display_flex align_items_center gap_xs2 w_100">
+<div class="column gap_xs">
+	<div class="display_flex align_items_center gap_xs2">
 		<label
 			class="row mb_0 pr_md"
 			title="when enabled, the prompt's content will be wrapped with the xml tag '{bit.xml_tag_name ||
@@ -52,16 +52,16 @@
 		</button>
 	</div>
 
-	<div class="attributes column gap_xs2">
+	<ul class="unstyled">
 		{#each bit.attributes as attribute (attribute.id)}
-			<div transition:slide>
+			<li transition:slide class="py_xs4">
 				<Xml_Attribute_Editor
 					{attribute}
 					dormant={!bit.has_xml_tag}
 					onupdate={(updates) => bit.update_attribute(attribute.id, updates)}
 					onremove={() => bit.remove_attribute(attribute.id)}
 				/>
-			</div>
+			</li>
 		{/each}
-	</div>
+	</ul>
 </div>

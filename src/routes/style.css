@@ -15,7 +15,7 @@ textarea {
 	scrollbar-width: thin; /* TODO maybe upstream? */
 	border-radius: var(--border_radius_xs2); /* TODO upstream? */
 }
-input {
+input[type='text'] {
 	border-radius: var(--border_radius_xs2); /* TODO upstream? */
 }
 
@@ -366,4 +366,9 @@ button.menu_item[disabled] {
 /* TODO upstream? */
 pre code {
 	padding: var(--space_xs) var(--space_md);
+}
+
+/* TODO upstream */
+[role='button'] {
+	outline-color: var(--outline_color);
 }

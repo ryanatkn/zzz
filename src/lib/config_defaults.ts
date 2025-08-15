@@ -26,10 +26,30 @@ export const BOTS_DEFAULT = {
 // TODO needs work, hardcoding a bunch of stuff for now, and needs more support for different providers
 
 export const providers_default: Array<Provider_Json_Input> = [
-	{name: 'ollama', title: 'Ollama', url: 'https://github.com/ollama/ollama/tree/main/docs'},
-	{name: 'claude', title: 'Claude', url: 'https://docs.anthropic.com/en/home'},
-	{name: 'chatgpt', title: 'ChatGPT', url: 'https://platform.openai.com/docs/overview'},
-	{name: 'gemini', title: 'Gemini', url: 'https://ai.google.dev/gemini-api/docs/'},
+	{
+		name: 'ollama',
+		title: 'Ollama',
+		url: 'https://github.com/ollama/ollama/tree/main/docs',
+		homepage: 'https://ollama.com/',
+	},
+	{
+		name: 'claude',
+		title: 'Claude',
+		url: 'https://docs.anthropic.com/en/home',
+		homepage: 'https://claude.ai/',
+	},
+	{
+		name: 'chatgpt',
+		title: 'ChatGPT',
+		url: 'https://platform.openai.com/docs/overview',
+		homepage: 'https://chatgpt.com/',
+	},
+	{
+		name: 'gemini',
+		title: 'Gemini',
+		url: 'https://ai.google.dev/gemini-api/docs/',
+		homepage: 'https://gemini.google.com/',
+	},
 ];
 
 // TODO any data here beyond name/provider_name/tags (and probably some future ones) should be fetched from the provider API
@@ -56,6 +76,7 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 
 	// https://docs.anthropic.com/en/home
 	{name: 'claude-sonnet-4-20250514', provider_name: 'claude', tags: ['smart']}, // name: 'claude-sonnet-4-0'
+	{name: 'claude-opus-4-1-20250805', provider_name: 'claude', tags: ['smart', 'smartest']}, // name: 'claude-opus-4-0'
 	{name: 'claude-opus-4-20250514', provider_name: 'claude', tags: ['smart', 'smarter']}, // name: 'claude-opus-4-0'
 	{name: 'claude-3-7-sonnet-20250219', provider_name: 'claude', tags: ['smart']}, // name: 'claude-3-7-sonnet-latest'
 	{name: 'claude-3-5-haiku-20241022', provider_name: 'claude', tags: ['cheap']}, // name: 'claude-3-5-haiku-latest'
@@ -127,5 +148,15 @@ export const chat_template_defaults: Array<Chat_Template> = [
 		id: create_uuid(),
 		name: 'local gemmas',
 		model_names: ['gemma3:1b', 'gemma3n:e2b', 'gemma3n:e4b', 'gemma3:4b'],
+	},
+	{
+		id: create_uuid(),
+		name: 'quick test',
+		model_names: [
+			'gemma3:1b',
+			'claude-3-5-haiku-20241022',
+			'gpt-4.1-nano-2025-04-14',
+			'gemini-2.5-flash-lite-preview-06-17',
+		],
 	},
 ];

@@ -55,39 +55,73 @@ export interface Frontend_Action_Handlers {
 		) => void | Promise<void>;
 	};
 	ollama_copy?: {
-		execute?: (
-			action_event: Action_Event<'ollama_copy', Frontend, 'execute', 'handling'>,
-		) => Action_Outputs['ollama_copy'] | Promise<Action_Outputs['ollama_copy']>;
+		send_request?: (
+			action_event: Action_Event<'ollama_copy', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_copy', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
 	};
 	ollama_create?: {
-		execute?: (
-			action_event: Action_Event<'ollama_create', Frontend, 'execute', 'handling'>,
-		) => Action_Outputs['ollama_create'] | Promise<Action_Outputs['ollama_create']>;
+		send_request?: (
+			action_event: Action_Event<'ollama_create', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_create', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
 	};
 	ollama_delete?: {
-		execute?: (
-			action_event: Action_Event<'ollama_delete', Frontend, 'execute', 'handling'>,
-		) => Action_Outputs['ollama_delete'] | Promise<Action_Outputs['ollama_delete']>;
+		send_request?: (
+			action_event: Action_Event<'ollama_delete', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_delete', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
 	};
 	ollama_list?: {
-		execute?: (
-			action_event: Action_Event<'ollama_list', Frontend, 'execute', 'handling'>,
-		) => Action_Outputs['ollama_list'] | Promise<Action_Outputs['ollama_list']>;
+		send_request?: (
+			action_event: Action_Event<'ollama_list', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_list', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_progress?: {
+		receive?: (
+			action_event: Action_Event<'ollama_progress', Frontend, 'receive', 'handling'>,
+		) => void | Promise<void>;
 	};
 	ollama_ps?: {
-		execute?: (
-			action_event: Action_Event<'ollama_ps', Frontend, 'execute', 'handling'>,
-		) => Action_Outputs['ollama_ps'] | Promise<Action_Outputs['ollama_ps']>;
+		send_request?: (
+			action_event: Action_Event<'ollama_ps', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_ps', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
 	};
 	ollama_pull?: {
-		execute?: (
-			action_event: Action_Event<'ollama_pull', Frontend, 'execute', 'handling'>,
-		) => Action_Outputs['ollama_pull'] | Promise<Action_Outputs['ollama_pull']>;
+		send_request?: (
+			action_event: Action_Event<'ollama_pull', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_pull', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
 	};
 	ollama_show?: {
-		execute?: (
-			action_event: Action_Event<'ollama_show', Frontend, 'execute', 'handling'>,
-		) => Action_Outputs['ollama_show'] | Promise<Action_Outputs['ollama_show']>;
+		send_request?: (
+			action_event: Action_Event<'ollama_show', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_show', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_unload?: {
+		send_request?: (
+			action_event: Action_Event<'ollama_unload', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_unload', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
 	};
 	ping?: {
 		send_request?: (

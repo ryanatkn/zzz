@@ -5,17 +5,21 @@
 	import Model_Picker from '$lib/Model_Picker.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import type {Chat} from '$lib/chat.svelte.js';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
 	const app = frontend_context.get();
 
-	interface Props {
+	const {
+		chat: chat_prop,
+		oninit,
+		heading = 'create new chat',
+		items,
+	}: {
 		chat?: Chat;
 		oninit?: (chat_id: Uuid) => void;
 		heading?: string;
 		items?: Array<Model>;
-	}
-
-	const {chat: chat_prop, oninit, heading = 'create new chat', items}: Props = $props();
+	} = $props();
 
 	const get_or_create_chat = () => chat_prop ?? app.chats.add();
 
@@ -76,7 +80,13 @@
 						<div class="font_size_lg mb_sm">{chat_template.name}</div>
 						<div class="display_flex flex_wrap gap_xs2">
 							{#each chat_template.model_names as model_name (model_name)}
-								<small class="chip">{model_name}</small>
+								{@const provider_name = app.models.find_by_name(model_name)?.provider_name}
+								<small class="chip"
+									>{#if provider_name}<Provider_Logo
+											name={provider_name}
+											size="var(--font_size_xs)"
+										/>&nbsp;{/if}{model_name}</small
+								>
 							{/each}
 						</div>
 					</div>

@@ -11,19 +11,10 @@
 	import Tape_Contextmenu from '$lib/Tape_Contextmenu.svelte';
 	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Content_Editor from '$lib/Content_Editor.svelte';
-	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import {GLYPH_PLACEHOLDER, GLYPH_SEND} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	// TODO no longer uses `Chat`, maybe rename to `Tape_View` or similar?
-
-	interface Props {
-		tape: Tape;
-		onsend: (input: string) => Promise<void>;
-		// TODO @many think about how these two could be refactored, like a single class instance
-		focus_key?: string | number | null | undefined;
-		pending_element_to_focus_key?: string | number | null | undefined;
-		strips_attrs?: SvelteHTMLElements['div'] | undefined;
-		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
 
 	let {
 		tape,
@@ -32,7 +23,15 @@
 		pending_element_to_focus_key = $bindable(),
 		strips_attrs,
 		attrs,
-	}: Props = $props();
+	}: {
+		tape: Tape;
+		onsend: (input: string) => Promise<void>;
+		// TODO @many think about how these two could be refactored, like a single class instance
+		focus_key?: string | number | null | undefined;
+		pending_element_to_focus_key?: string | number | null | undefined;
+		strips_attrs?: SvelteHTMLElements['div'] | undefined;
+		attrs?: SvelteHTMLElements['div'] | undefined;
+	} = $props();
 
 	let input = $state('');
 	const input_token_count = $derived(estimate_token_count(input));
@@ -66,7 +65,7 @@
 				<header>
 					<button
 						type="button"
-						class="plain compact font_size_lg text_align_left"
+						class="plain compact font_size_lg text_align_left font_weight_400"
 						onclick={() => (show_model_picker = true)}
 					>
 						{tape.model.name}
@@ -74,7 +73,8 @@
 					<small
 						><Provider_Link
 							provider={tape.app.providers.find_by_name(tape.model.provider_name)}
-							icon="glyph"
+							icon="svg"
+							icon_props={{size: 'var(--font_size_sm)'}}
 							show_name
 						/></small
 					>
@@ -103,7 +103,7 @@
 						attrs={{class: 'plain'}}
 						title="send {input_token_count} tokens to {tape.model_name}"
 					>
-						send
+						<Glyph glyph={GLYPH_SEND} />
 					</Pending_Button>
 				</Content_Editor>
 			</div>

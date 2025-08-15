@@ -4,12 +4,17 @@
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import type {Project, Project_Section} from '$routes/projects/project.svelte.js';
 
-	interface Props {
+	const {
+		project,
+		section,
+	}: {
 		project: Project;
 		section: Project_Section;
-	}
+	} = $props();
 
-	const {project, section}: Props = $props();
+	// TODO what else should be here? deployments?
+	// is `pages` the wrong way to think about it?
+	// what about data?
 </script>
 
 <aside class="overflow_y_auto unstyled width_xs p_xs">

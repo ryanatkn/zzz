@@ -6,50 +6,18 @@ import {to_completion_result} from '$lib/response_helpers.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 
-export class Claude_Backend_Provider extends Backend_Provider {
+export class Claude_Backend_Provider extends Backend_Provider<Anthropic> {
 	readonly name = 'claude';
-	private anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
+	readonly client = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 
-	format_messages(
-		completion_messages: Array<Completion_Message> | undefined,
-		prompt: string,
-	): Array<{role: 'user' | 'assistant'; content: Array<{type: 'text'; text: string}>}> {
-		const claude_messages: Array<{
-			role: 'user' | 'assistant';
-			content: Array<{type: 'text'; text: string}>;
-		}> = [];
-
-		// Add tape history with proper typing for Claude API
-		if (completion_messages) {
-			for (const message of completion_messages) {
-				if (message.role !== 'system') {
-					// Claude expects 'user' or 'assistant' roles only
-					claude_messages.push({
-						role: message.role as 'user' | 'assistant', // TODO maybe parse?
-						content: [{type: 'text', text: message.content}],
-					});
-				}
-			}
-		}
-
-		// Add the current message
-		claude_messages.push({
-			role: 'user',
-			content: [{type: 'text', text: prompt}],
-		});
-
-		return claude_messages;
-	}
-
-	async handle_streaming(
+	async handle_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
-		const {model, completion_options, completion_messages, prompt, progress_token, backend} =
-			options;
+		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
-		const stream = await this.anthropic.messages.create(
-			this.#create_claude_completion_options(
+		const stream = await this.client.messages.create(
+			create_claude_completion_options(
 				model,
 				completion_options,
 				completion_messages,
@@ -73,11 +41,11 @@ export class Claude_Backend_Provider extends Backend_Provider {
 				accumulated_content += event.delta.text;
 
 				// Send streaming progress notification to frontend
-				void this.send_streaming_progress(backend, progress_token, {
+				void this.send_streaming_progress(progress_token, {
 					// TODO @many other chunk data
 					message: {
-						content: event.delta.text,
 						role: 'assistant',
+						content: event.delta.text,
 					},
 				});
 			} else if (event.type === 'message_delta') {
@@ -104,13 +72,13 @@ export class Claude_Backend_Provider extends Backend_Provider {
 		return to_completion_result('claude', model, api_response, progress_token);
 	}
 
-	async handle_non_streaming(
+	async handle_non_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
 		const {model, completion_options, completion_messages, prompt} = options;
 
-		const response = await this.anthropic.messages.create(
-			this.#create_claude_completion_options(
+		const response = await this.client.messages.create(
+			create_claude_completion_options(
 				model,
 				completion_options,
 				completion_messages,
@@ -135,24 +103,54 @@ export class Claude_Backend_Provider extends Backend_Provider {
 		this.log_api_response(api_response);
 		return to_completion_result('claude', model, api_response);
 	}
-
-	#create_claude_completion_options<T extends boolean>(
-		model: string,
-		completion_options: Completion_Handler_Options['completion_options'],
-		completion_messages: Array<Completion_Message> | undefined,
-		prompt: string,
-		stream: T,
-	) {
-		return {
-			model,
-			stream,
-			max_tokens: completion_options.output_token_max,
-			temperature: completion_options.temperature,
-			top_k: completion_options.top_k,
-			top_p: completion_options.top_p,
-			stop_sequences: completion_options.stop_sequences,
-			system: completion_options.system_message,
-			messages: this.format_messages(completion_messages, prompt),
-		};
-	}
 }
+
+const create_claude_completion_options = <T extends boolean>(
+	model: string,
+	completion_options: Completion_Handler_Options['completion_options'],
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+	stream: T,
+) => ({
+	model,
+	stream,
+	max_tokens: completion_options.output_token_max,
+	temperature: completion_options.temperature,
+	top_k: completion_options.top_k,
+	top_p: completion_options.top_p,
+	stop_sequences: completion_options.stop_sequences,
+	system: completion_options.system_message,
+	messages: to_messages(completion_messages, prompt),
+});
+
+// TODO @many cleanup with better data structures/helpers
+const to_messages = (
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+): Array<{role: 'user' | 'assistant'; content: Array<{type: 'text'; text: string}>}> => {
+	const claude_messages: Array<{
+		role: 'user' | 'assistant';
+		content: Array<{type: 'text'; text: string}>;
+	}> = [];
+
+	// Add tape history with proper typing for Claude API
+	if (completion_messages) {
+		for (const message of completion_messages) {
+			if (message.role !== 'system') {
+				// Claude expects 'user' or 'assistant' roles only
+				claude_messages.push({
+					role: message.role as 'user' | 'assistant', // TODO maybe parse?
+					content: [{type: 'text', text: message.content}],
+				});
+			}
+		}
+	}
+
+	// Add the current message
+	claude_messages.push({
+		role: 'user',
+		content: [{type: 'text', text: prompt}],
+	});
+
+	return claude_messages;
+};

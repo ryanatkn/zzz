@@ -4,9 +4,9 @@ import {z} from 'zod';
 
 import {
 	Diskfile_Change,
+	Diskfile_Directory_Path,
 	Diskfile_Path,
 	Serializable_Source_File,
-	Zzz_Dir,
 } from '$lib/diskfile_types.js';
 import {
 	Completion_Message,
@@ -26,11 +26,13 @@ import {
 	Ollama_Delete_Request,
 	Ollama_Copy_Request,
 	Ollama_Create_Request,
+	Ollama_Progress_Response,
 } from '$lib/ollama_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
 // TODO I tried using the helper `create_action_spec` but I don't see how to get proper typing,
-// we want the declared specs to have their literal types but not need to include optional properties
+// we want the declared specs to have their literal types but not need to include optional
+// properties;
 
 export const ping_action_spec = {
 	method: 'ping',
@@ -61,8 +63,7 @@ export const load_session_action_spec = {
 			data: z
 				// TODO extract this schema to diskfile_types or something
 				.object({
-					zzz_dir: Zzz_Dir,
-					zzz_cache_dir: Diskfile_Path,
+					zzz_cache_dir: Diskfile_Directory_Path,
 					files: z.array(Serializable_Source_File),
 				})
 				.strict(),
@@ -197,6 +198,19 @@ export const completion_progress_action_spec = {
 	async: true,
 } satisfies Action_Spec_Union;
 
+export const ollama_progress_action_spec = {
+	method: 'ollama_progress',
+	kind: 'remote_notification',
+	initiator: 'backend',
+	auth: null,
+	side_effects: true,
+	input: Ollama_Progress_Response.extend({
+		_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
+	}).strict(),
+	output: z.void(),
+	async: true,
+} satisfies Action_Spec_Union;
+
 // TODO this is just a placeholder for a local call
 export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
@@ -211,9 +225,9 @@ export const toggle_main_menu_action_spec = {
 
 export const ollama_list_action_spec = {
 	method: 'ollama_list',
-	kind: 'local_call',
+	kind: 'request_response',
 	initiator: 'frontend',
-	auth: null,
+	auth: 'public',
 	side_effects: null,
 	input: Ollama_List_Request,
 	output: z.union([Ollama_List_Response, z.null()]),
@@ -222,9 +236,9 @@ export const ollama_list_action_spec = {
 
 export const ollama_ps_action_spec = {
 	method: 'ollama_ps',
-	kind: 'local_call',
+	kind: 'request_response',
 	initiator: 'frontend',
-	auth: null,
+	auth: 'public',
 	side_effects: null,
 	input: Ollama_Ps_Request,
 	output: z.union([Ollama_Ps_Response, z.null()]),
@@ -233,9 +247,9 @@ export const ollama_ps_action_spec = {
 
 export const ollama_show_action_spec = {
 	method: 'ollama_show',
-	kind: 'local_call',
+	kind: 'request_response',
 	initiator: 'frontend',
-	auth: null,
+	auth: 'public',
 	side_effects: null,
 	input: Ollama_Show_Request,
 	output: z.union([Ollama_Show_Response, z.null()]),
@@ -244,20 +258,22 @@ export const ollama_show_action_spec = {
 
 export const ollama_pull_action_spec = {
 	method: 'ollama_pull',
-	kind: 'local_call',
+	kind: 'request_response',
 	initiator: 'frontend',
-	auth: null,
+	auth: 'public',
 	side_effects: true,
-	input: Ollama_Pull_Request,
+	input: Ollama_Pull_Request.extend({
+		_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
+	}).strict(), // TODO @many is strict right here?
 	output: z.void().optional(),
 	async: true,
 } satisfies Action_Spec_Union;
 
 export const ollama_delete_action_spec = {
 	method: 'ollama_delete',
-	kind: 'local_call',
+	kind: 'request_response',
 	initiator: 'frontend',
-	auth: null,
+	auth: 'public',
 	side_effects: true,
 	input: Ollama_Delete_Request,
 	output: z.void().optional(),
@@ -266,9 +282,9 @@ export const ollama_delete_action_spec = {
 
 export const ollama_copy_action_spec = {
 	method: 'ollama_copy',
-	kind: 'local_call',
+	kind: 'request_response',
 	initiator: 'frontend',
-	auth: null,
+	auth: 'public',
 	side_effects: true,
 	input: Ollama_Copy_Request,
 	output: z.void().optional(),
@@ -277,11 +293,28 @@ export const ollama_copy_action_spec = {
 
 export const ollama_create_action_spec = {
 	method: 'ollama_create',
-	kind: 'local_call',
+	kind: 'request_response',
 	initiator: 'frontend',
-	auth: null,
+	auth: 'public',
 	side_effects: true,
-	input: Ollama_Create_Request,
+	input: Ollama_Create_Request.extend({
+		_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
+	}).strict(), // TODO @many is strict right here?
+	output: z.void().optional(),
+	async: true,
+} satisfies Action_Spec_Union;
+
+export const ollama_unload_action_spec = {
+	method: 'ollama_unload',
+	kind: 'request_response',
+	initiator: 'frontend',
+	auth: 'public',
+	side_effects: true,
+	input: z
+		.object({
+			model: z.string(),
+		})
+		.strict(),
 	output: z.void().optional(),
 	async: true,
 } satisfies Action_Spec_Union;

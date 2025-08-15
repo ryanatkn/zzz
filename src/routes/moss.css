@@ -362,6 +362,9 @@ a.chip {
 	font-weight: 600;
 	--font_weight: 600;
 }
+.text_color_2 {
+	color: var(--text_color_2);
+}
 .text_color_3 {
 	color: var(--text_color_3);
 }
@@ -419,9 +422,6 @@ a.chip {
 .border_radius_0 {
 	border-radius: 0;
 }
-.border_radius_xs2 {
-	border-radius: var(--border_radius_xs2);
-}
 .border_radius_xs {
 	border-radius: var(--border_radius_xs);
 }
@@ -474,6 +474,9 @@ a.chip {
 .p_xs4 {
 	padding: var(--space_xs4);
 }
+.p_xs2 {
+	padding: var(--space_xs2);
+}
 .p_xs {
 	padding: var(--space_xs);
 }
@@ -494,6 +497,9 @@ a.chip {
 }
 .pt_md {
 	padding-top: var(--space_md);
+}
+.pt_lg {
+	padding-top: var(--space_lg);
 }
 .pr_xs3 {
 	padding-right: var(--space_xs3);
@@ -554,6 +560,10 @@ a.chip {
 .px_xl {
 	padding-left: var(--space_xl);
 	padding-right: var(--space_xl);
+}
+.py_xs4 {
+	padding-top: var(--space_xs4);
+	padding-bottom: var(--space_xs4);
 }
 .py_xs3 {
 	padding-top: var(--space_xs3);
@@ -624,9 +634,6 @@ a.chip {
 .mb_0 {
 	margin-bottom: 0;
 }
-.mb_xs3 {
-	margin-bottom: var(--space_xs3);
-}
 .mb_xs {
 	margin-bottom: var(--space_xs);
 }
@@ -691,10 +698,6 @@ a.chip {
 .my_lg {
 	margin-top: var(--space_lg);
 	margin-bottom: var(--space_lg);
-}
-.my_xl5 {
-	margin-top: var(--space_xl5);
-	margin-bottom: var(--space_xl5);
 }
 .gap_xs5 {
 	gap: var(--space_xs5);

@@ -9,7 +9,9 @@ import {Cell_Json} from '$lib/cell_types.js';
 export const Provider_Json = Cell_Json.extend({
 	name: Provider_Name,
 	title: z.string(),
+	// TODO maybe change this to `docs_url` and add `url` for the homepage? and/or some other homepage url property?
 	url: z.string(),
+	homepage: z.string(), // TODO name? see `url` too
 });
 export type Provider_Json = z.infer<typeof Provider_Json>;
 export type Provider_Json_Input = z.input<typeof Provider_Json>;
@@ -19,7 +21,8 @@ export interface Provider_Options extends Cell_Options<typeof Provider_Json> {} 
 export class Provider extends Cell<typeof Provider_Json> {
 	name: Provider_Name = $state()!;
 	title: string = $state()!;
-	url: string = $state()!;
+	url: string = $state()!; // TODO @many should these be optional? or just default to `''`? need init patterns
+	homepage: string = $state()!; // TODO @many should these be optional? or just default to `''`? need init patterns
 
 	readonly models: Array<Model> = $derived(this.app.models.items.where('provider_name', this.name));
 

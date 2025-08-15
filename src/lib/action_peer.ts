@@ -1,15 +1,13 @@
 // @slop Claude Opus 4
 
+import {create_action_event} from '$lib/action_event.js';
 import {
-	JSONRPC_INTERNAL_ERROR,
-	JSONRPC_INVALID_REQUEST,
-	JSONRPC_METHOD_NOT_FOUND,
-	JSONRPC_PARSE_ERROR,
 	Jsonrpc_Message_From_Client_To_Server,
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
 import {Transports, type Transport_Name} from '$lib/transports.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
@@ -20,7 +18,7 @@ import {
 	is_jsonrpc_request,
 	is_jsonrpc_notification,
 } from '$lib/jsonrpc_helpers.js';
-import {create_action_event} from '$lib/action_event.js';
+import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
@@ -45,6 +43,10 @@ export interface Action_Peer_Options {
 export class Action_Peer {
 	readonly environment: Action_Event_Environment;
 	readonly transports: Transports;
+	// TODO maybe expand the pattern of using `transports` in send, so what's used in receive?
+	// It seems abstracting that out would make this class much simpler and generic, but too much so?
+	// What deps should it actually know about, and what gains could we have by making it more decoupled?
+	// e.g. don't just decouple for the sake of imagined flexibility!
 
 	default_send_options: Action_Peer_Send_Options;
 
@@ -59,65 +61,74 @@ export class Action_Peer {
 		message: Jsonrpc_Request,
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification, options?: Action_Peer_Send_Options): Promise<null>;
+	async send(
+		message: Jsonrpc_Notification,
+		options?: Action_Peer_Send_Options,
+	): Promise<Jsonrpc_Error_Message | null>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
-		const transport = this.transports.get_or_throw(
-			options?.transport_name ?? this.default_send_options.transport_name,
-		);
-		return transport.send(message);
+		try {
+			const transport = this.transports.get_transport(
+				options?.transport_name ?? this.default_send_options.transport_name,
+			);
+
+			if (!transport) {
+				this.environment.log?.error('[action_peer.send] no transport available');
+				return create_jsonrpc_error_message(
+					to_jsonrpc_message_id(message),
+					jsonrpc_error_messages.service_unavailable('no transport available'),
+				);
+			}
+
+			const result = await transport.send(message);
+			return result;
+		} catch (error) {
+			// TODO add retry handling here?
+			this.environment.log?.error('[action_peer.send] unexpected error:', error);
+			return create_jsonrpc_error_message_from_thrown(to_jsonrpc_message_id(message), error);
+		} // TODO finally?
 	}
 
 	async receive(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		try {
-			// Validate the message is a valid JSON-RPC message
-			if (!message || typeof message !== 'object') {
-				return this.#create_parse_error_response();
-			}
-
-			// Handle a single message - MCP does not support JSON-RPC batches
-			// because of some tricky cases, so we don't either
-			return await this.#process_message(message);
+			const result = await this.#receive_message(message);
+			return result;
 		} catch (error) {
-			// Only programmer errors should reach here
-			this.environment.log?.error('unexpected error:', error);
-			return this.#create_fatal_error_response(message);
-		}
+			this.environment.log?.error('[action_peer.receive] unexpected error:', error);
+			// Return appropriate error response based on the message
+			return create_jsonrpc_error_message_from_thrown(to_jsonrpc_message_id(message), error);
+		} // TODO finally?
 	}
 
 	/**
-	 * Process a single JSON-RPC message.
+	 * Process a single JSON-RPC message, returning a response message if any.
 	 */
-	async #process_message(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
-		// Validate it's a request or notification
+	async #receive_message(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		if (is_jsonrpc_request(message)) {
-			return this.#process_request(message);
+			return this.#receive_request(message);
 		} else if (is_jsonrpc_notification(message)) {
-			await this.#process_notification(message);
-			return null; // Notifications don't have responses
+			await this.#receive_notification(message);
+			return null;
 		} else {
-			const id = to_jsonrpc_message_id(message);
-			return id === null
-				? null
-				: create_jsonrpc_error_message(id, {
-						code: JSONRPC_INVALID_REQUEST,
-						message: 'invalid request',
-					});
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.invalid_request(),
+			);
 		}
 	}
 
 	/**
-	 * Process a JSON-RPC request.
+	 * Process a JSON-RPC request. Returns the response message.
 	 */
-	async #process_request(request: Jsonrpc_Request): Promise<Jsonrpc_Message_From_Server_To_Client> {
+	async #receive_request(request: Jsonrpc_Request): Promise<Jsonrpc_Message_From_Server_To_Client> {
 		const spec = this.environment.lookup_action_spec(request.method as Action_Method); // TODO @many try not to cast, idk what the best design is here
 		if (!spec) {
-			return create_jsonrpc_error_message(request.id, {
-				code: JSONRPC_METHOD_NOT_FOUND,
-				message: `method not found: ${request.method}`,
-			});
+			return create_jsonrpc_error_message(
+				request.id,
+				jsonrpc_error_messages.method_not_found(request.method),
+			);
 		}
 
 		try {
@@ -147,19 +158,19 @@ export class Action_Peer {
 			}
 
 			// Fallback error
-			return create_jsonrpc_error_message(request.id, {
-				code: JSONRPC_INTERNAL_ERROR,
-				message: 'failed to process request',
-			});
+			return create_jsonrpc_error_message(
+				request.id,
+				jsonrpc_error_messages.internal_error('failed to receive request'),
+			);
 		} catch (error) {
 			return create_jsonrpc_error_message_from_thrown(request.id, error);
 		}
 	}
 
 	/**
-	 * Process a JSON-RPC notification.
+	 * Process a JSON-RPC notification. Returns nothing, no response exists.
 	 */
-	async #process_notification(notification: Jsonrpc_Notification): Promise<void> {
+	async #receive_notification(notification: Jsonrpc_Notification): Promise<void> {
 		const spec = this.environment.lookup_action_spec(notification.method as Action_Method); // TODO @many try not to cast, idk what the best design is here
 		if (!spec) {
 			this.environment.log?.warn(`unknown notification method: ${notification.method}`);
@@ -178,27 +189,7 @@ export class Action_Peer {
 				this.environment.log?.error(`notification handler failed:`, event.data.error);
 			}
 		} catch (error) {
-			this.environment.log?.error(`error processing notification:`, error);
+			this.environment.log?.error(`error receiving notification:`, error);
 		}
-	}
-
-	/**
-	 * Create error response for parse errors.
-	 */
-	#create_parse_error_response(): Jsonrpc_Message_From_Server_To_Client {
-		return create_jsonrpc_error_message(null, {
-			code: JSONRPC_PARSE_ERROR,
-			message: 'parse error',
-		});
-	}
-
-	/**
-	 * Create error response for fatal/unexpected errors.
-	 */
-	#create_fatal_error_response(raw_message: unknown): Jsonrpc_Message_From_Server_To_Client | null {
-		return create_jsonrpc_error_message(to_jsonrpc_message_id(raw_message), {
-			code: JSONRPC_INTERNAL_ERROR,
-			message: 'internal server error',
-		});
 	}
 }

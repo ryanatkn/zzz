@@ -16,11 +16,11 @@
 
 	// TODO dashboard should be mounted with Markdown
 
-	interface Props {
+	const {
+		children,
+	}: {
 		children: Snippet;
-	}
-
-	const {children}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
@@ -67,6 +67,8 @@
 	const sidebar_button_title = $derived(
 		(app.ui.show_sidebar ? 'hide sidebar' : 'show sidebar') + ' [backtick `]',
 	);
+
+	// TODO consider the
 </script>
 
 <svelte:window
@@ -96,23 +98,21 @@
 						<div class="display_flex p_sm mb_sm">
 							<Nav_Link
 								href="{base}/"
-								attrs={{
-									title: app.futuremode ? 'futuremode' : 'home',
-									class: 'click_effect_scale',
-									onclick: () => {
-										if (futureclicks_activated) {
-											// If already activated once, toggle immediately when on root
-											if (page.url.pathname === base + '/') {
-												app.futuremode = !app.futuremode;
-											}
-										} else {
-											futureclicks++;
-											if (futureclicks >= FUTURECLICKS) {
-												app.futuremode = !app.futuremode;
-												futureclicks_activated = true;
-											}
+								title={app.futuremode ? 'futuremode' : 'home'}
+								class="click_effect_scale"
+								onclick={() => {
+									if (futureclicks_activated) {
+										// If already activated once, toggle immediately when on root
+										if (page.url.pathname === base + '/') {
+											app.futuremode = !app.futuremode;
 										}
-									},
+									} else {
+										futureclicks++;
+										if (futureclicks >= FUTURECLICKS) {
+											app.futuremode = !app.futuremode;
+											futureclicks_activated = true;
+										}
+									}
 								}}
 							>
 								<Svg
@@ -134,10 +134,10 @@
 
 					{#each section.items as link (link.label)}
 						<div transition:slide>
-							<Nav_Link href={to_nav_link_href(app, link)}>
+							<Nav_Link href={to_nav_link_href(app, link.label, link.href)}>
 								{#snippet children(selected)}
 									{#if typeof link.icon === 'string'}
-										<Glyph glyph={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
+										<Glyph glyph={link.icon} class="icon_xs" /> {link.label}
 									{:else}
 										<span class="icon_xs">
 											<Svg
@@ -157,12 +157,10 @@
 		</div>
 	</div>
 
-	<!-- Sidebar toggle button -->
+	<!-- sidebar toggle button -->
 	<button
 		type="button"
-		class="position_fixed b_0 l_0 icon_button plain border_radius_xs2"
-		style:border-bottom-left-radius="0"
-		style:border-top-right-radius="var(--border_radius_lg)"
+		class="position_fixed b_0 l_0 icon_button plain border_radius_0"
 		aria-label={sidebar_button_title}
 		title={sidebar_button_title}
 		onclick={() => app.ui.toggle_sidebar()}

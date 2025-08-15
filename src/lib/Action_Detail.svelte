@@ -5,11 +5,11 @@
 	import {get_glyph_for_action_kind} from '$lib/glyphs.js';
 	import type {Action} from '$lib/action.svelte.js';
 
-	interface Props {
+	const {
+		action,
+	}: {
 		action: Action;
-	}
-
-	const {action}: Props = $props();
+	} = $props();
 
 	// TODO this is all hacky, just proof of concept stuff
 </script>
@@ -32,11 +32,11 @@
 					{action.created_formatted_time}
 				</td>
 			</tr>
-			{#if action.updated_formatted_date}
+			{#if action.updated_formatted_datetime !== action.created_formatted_datetime}
 				<tr>
 					<td>updated</td>
 					<td>
-						{action.updated_formatted_date}
+						{action.updated_formatted_datetime}
 						{action.updated_formatted_time}
 					</td>
 				</tr>
@@ -45,10 +45,10 @@
 				<td>kind</td>
 				<td>{action.kind}</td>
 			</tr>
-			{#if action.action_event?.error}
+			{#if action.action_event_data?.error}
 				<tr>
 					<td>error</td>
-					<td class="font_family_mono color_c">{JSON.stringify(action.action_event.error)}</td>
+					<td class="font_family_mono color_c">{JSON.stringify(action.action_event_data.error)}</td>
 				</tr>
 			{/if}
 		</tbody>

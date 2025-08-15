@@ -20,6 +20,7 @@ export const Chat_Json = Cell_Json.extend({
 	tape_ids: z.array(Uuid).default(() => []),
 	main_input: z.string().default(''),
 	view_mode: Chat_View_Mode,
+	selected_tape_id: Uuid.nullable().default(null),
 });
 export type Chat_Json = z.infer<typeof Chat_Json>;
 export type Chat_Json_Input = z.input<typeof Chat_Json>;
@@ -31,6 +32,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	tape_ids: Array<Uuid> = $state()!;
 	main_input: string = $state()!;
 	view_mode: Chat_View_Mode = $state()!;
+	selected_tape_id: Uuid | null = $state()!;
 
 	readonly main_input_length: number = $derived(this.main_input.length);
 	readonly main_input_token_count: number = $derived(estimate_token_count(this.main_input));
@@ -50,11 +52,15 @@ export class Chat extends Cell<typeof Chat_Json> {
 		return result;
 	});
 
-	// TODO maybe make this settable directly, currently relies on the order of `tapes`
-	readonly current_tape: Tape | undefined = $derived(this.tapes.find((t) => t.enabled));
-
 	readonly enabled_tapes = $derived(this.tapes.filter((t) => t.enabled)); // TODO indexed collection, also disabled variant?
 
+	readonly selected_tape: Tape | undefined = $derived(
+		this.selected_tape_id ? this.app.tapes.items.by_id.get(this.selected_tape_id) : undefined,
+	);
+
+	readonly current_tape: Tape | undefined = $derived(this.selected_tape || this.enabled_tapes[0]);
+
+	// TODO refactor
 	init_name_status: Async_Status = $state('initial');
 
 	constructor(options: Chat_Options) {
@@ -62,14 +68,18 @@ export class Chat extends Cell<typeof Chat_Json> {
 		this.init();
 	}
 
-	add_tape(model: Model): void {
+	add_tape(model: Model, select?: boolean): void {
 		const tape = new Tape({app: this.app, json: {model_name: model.name}});
 		this.app.tapes.add_tape(tape);
 		this.tape_ids.push(tape.id);
+		if (select || (!this.selected_tape_id && this.tape_ids.length === 1)) {
+			this.select_tape(tape.id);
+		}
 	}
 
 	add_tapes_by_model_tag(tag: string): void {
-		for (const model of this.app.models.filter_by_tag(tag)) {
+		const models = this.app.models.filter_by_tag(tag);
+		for (const model of models) {
 			this.add_tape(model);
 		}
 	}
@@ -103,7 +113,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	async send_to_tape(tape_id: Uuid, content: string): Promise<void> {
-		const tape = this.tapes.find((s) => s.id === tape_id);
+		const tape = this.app.tapes.items.by_id.get(tape_id);
 		if (!tape) return;
 
 		this.updated = get_datetime_now(); // TODO @many probably rely on the db to bump `updated`
@@ -167,6 +177,10 @@ export class Chat extends Cell<typeof Chat_Json> {
 	/**
 	 * Reorder tapes by moving from one index to another
 	 */
+	select_tape(tape_id: Uuid | null): void {
+		this.selected_tape_id = tape_id;
+	}
+
 	reorder_tapes(from_index: number, to_index: number): void {
 		reorder_list(this.tape_ids, from_index, to_index);
 	}

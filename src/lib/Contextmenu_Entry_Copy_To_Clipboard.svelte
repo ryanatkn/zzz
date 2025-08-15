@@ -8,16 +8,6 @@
 	import {to_preview} from '$lib/helpers.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props
-		extends Omit_Strict<ComponentProps<typeof Contextmenu_Entry>, 'run' | 'children'> {
-		content: string | Thunk<string> | undefined;
-		label?: string | undefined;
-		preview?: string | undefined;
-		preview_limit?: number | undefined;
-		show_preview?: boolean | undefined;
-		children?: Snippet | undefined;
-	}
-
 	const {
 		content,
 		label = 'copy',
@@ -26,7 +16,14 @@
 		show_preview = true,
 		children,
 		...rest
-	}: Props = $props();
+	}: Omit_Strict<ComponentProps<typeof Contextmenu_Entry>, 'run' | 'children'> & {
+		content: string | Thunk<string> | undefined;
+		label?: string | undefined;
+		preview?: string | undefined;
+		preview_limit?: number | undefined;
+		show_preview?: boolean | undefined; // TODO maybe rename to `nopreview`?
+		children?: Snippet | undefined;
+	} = $props();
 
 	const read_content = () => (typeof content === 'function' ? content() : content);
 

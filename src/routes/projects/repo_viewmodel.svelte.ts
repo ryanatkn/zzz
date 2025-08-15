@@ -27,7 +27,7 @@ export class Repo_Viewmodel {
 	checkouts: Array<Repo_Checkout> = $state([]);
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.repo === null ||
 			this.git_url !== this.repo.git_url ||

@@ -9,12 +9,13 @@
 	import Bit_Picker_Dialog from '$lib/Bit_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		sequence_bit,
+		prompt,
+	}: {
 		sequence_bit: Sequence_Bit;
 		prompt?: Prompt | undefined;
-	}
-
-	const {sequence_bit, prompt}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
@@ -32,6 +33,10 @@
 	};
 
 	let show_bit_picker = $state(false);
+
+	// TODO NEXT sequence bits are broken, add bit doesn't work
+
+	// TODO NEXT what if we had a sequence bit per strip? maybe use A2A Parts instead though.
 </script>
 
 <div class="row justify_content_space_between mb_xs">

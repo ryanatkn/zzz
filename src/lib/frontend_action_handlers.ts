@@ -1,6 +1,6 @@
 import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
 import {Strip} from '$lib/strip.svelte.js';
-import {to_completion_response_text} from './response_helpers.js';
+import {to_completion_response_text} from '$lib/response_helpers.js';
 
 // TODO stubbing out a lot of these
 
@@ -135,52 +135,113 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 	},
 
 	ollama_list: {
-		execute: async ({app}) => {
-			console.log('[frontend_action_handlers.ollama_list]');
-			return await app.ollama.handle_ollama_list();
+		send_request: ({app}) => {
+			console.log('[frontend_action_handlers] sending ollama_list request');
+			app.ollama.handle_ollama_list_start();
+		},
+		receive_response: ({app, data: {output}}) => {
+			console.log('[frontend_action_handlers] received ollama_list response:', output);
+			app.ollama.handle_ollama_list_complete(output);
 		},
 	},
 	ollama_ps: {
-		execute: async ({app}) => {
-			console.log('[frontend_action_handlers.ollama_ps]');
-			return await app.ollama.handle_ollama_ps();
+		send_request: ({app}) => {
+			console.log('[frontend_action_handlers] sending ollama_ps request');
+			app.ollama.handle_ollama_ps_start();
+		},
+		receive_response: ({app, data: {output}}) => {
+			console.log('[frontend_action_handlers] received ollama_ps response:', output);
+			app.ollama.handle_ollama_ps_complete(output);
 		},
 	},
 	ollama_show: {
-		execute: async ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers.ollama_show]', input);
-			return await app.ollama.handle_ollama_show(input);
+		send_request: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_show request:', input);
+		},
+		receive_response: ({app, data: {input, output}}) => {
+			console.log('[frontend_action_handlers] received ollama_show response:', input, output);
+			app.ollama.handle_ollama_show(input, output);
 		},
 	},
 	ollama_pull: {
-		execute: async (action_event) => {
-			const {
-				app,
-				data: {input},
-			} = action_event;
-			console.log('[frontend_action_handlers.ollama_pull]', input);
-			// TODO is this the pattern we want?
-			await app.ollama.handle_ollama_pull(input, (progress) => {
-				action_event.update_progress(progress);
-			});
+		send_request: ({app, data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_pull request:', input);
+			app.ollama.handle_ollama_pull_start(input);
+		},
+		receive_response: ({app, data: {input, output}}) => {
+			console.log('[frontend_action_handlers] received ollama_pull response:', input, output);
+			app.ollama.handle_ollama_pull_complete(input);
 		},
 	},
 	ollama_delete: {
-		execute: async ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers.ollama_delete]', input);
+		send_request: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_delete request:', input);
+		},
+		receive_response: async ({app, data: {input}}) => {
+			console.log('[frontend_action_handlers] received ollama_delete response:', input);
 			await app.ollama.handle_ollama_delete(input);
 		},
 	},
 	ollama_copy: {
-		execute: async ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers.ollama_copy]', input);
+		send_request: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_copy request:', input);
+		},
+		receive_response: async ({app, data: {input}}) => {
+			console.log('[frontend_action_handlers] received ollama_copy response:', input);
 			await app.ollama.handle_ollama_copy(input);
 		},
 	},
 	ollama_create: {
-		execute: async ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers.ollama_create]', input);
-			await app.ollama.handle_ollama_create(input);
+		send_request: ({app, data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_create request:', input);
+			app.ollama.handle_ollama_create_start(input);
+		},
+		receive_response: async ({app, data: {input}}) => {
+			console.log('[frontend_action_handlers] received ollama_create response:', input);
+			await app.ollama.handle_ollama_create_complete(input);
+		},
+	},
+
+	ollama_progress: {
+		receive: ({app, data: {input}}) => {
+			// console.log('[frontend_action_handlers] received ollama_progress notification:', input);
+
+			const {_meta, ...progress} = input;
+			if (!_meta) {
+				console.error('[frontend_action_handlers] ollama_progress missing _meta');
+				return;
+			}
+
+			// TODO this is hacky, rethink in combination with some other things including the backend,
+			// also notice we have a different progress pattern for other actions because the data received is different,
+			// but there's probably a cleaner/simpler design
+
+			const progress_token = _meta.progressToken;
+			if (!progress_token) {
+				console.error('[frontend_action_handlers] ollama_progress missing progress_token');
+				return;
+			}
+
+			// TODO refactor
+			const action = app.actions.items.values.find(
+				(a) => (a.action_event_data?.input as any)?._meta?.progressToken === progress_token,
+			);
+			if (!action) {
+				console.error(
+					'[frontend_action_handlers] ollama_progress cannot find action for progress_token:',
+					progress_token,
+				);
+				return;
+			}
+			if (!action.action_event) {
+				console.error(
+					'[frontend_action_handlers] action does not have action_event reference',
+					action,
+				);
+				return;
+			}
+
+			action.action_event.update_progress(progress);
 		},
 	},
 };

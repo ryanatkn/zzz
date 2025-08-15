@@ -10,13 +10,15 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Popover_Button from '$lib/Popover_Button.svelte';
 	import {format_timestamp} from '$lib/time_helpers.js';
+	import {DURATION_SM} from '$lib/helpers.js';
 
-	interface Props {
+	const {
+		socket,
+		type,
+	}: {
 		socket: Socket;
 		type: 'queued' | 'failed';
-	}
-
-	const {socket, type}: Props = $props();
+	} = $props();
 
 	// TODO show "ping the server" for both http and websocket transports
 
@@ -145,7 +147,8 @@
 					<Confirm_Button
 						onconfirm={remove_selected}
 						popover_button_attrs={{class: 'icon_button color_c bg_c_1 font_size_sm'}}
-						attrs={{class: 'icon_button plain', title: 'remove selected messages'}}
+						class="icon_button plain"
+						title="remove selected messages"
 					>
 						<Glyph glyph={GLYPH_REMOVE} />
 					</Confirm_Button>
@@ -204,7 +207,7 @@
 									{#if copied}
 										<div><small class="font_size_xs">{message.id}</small></div>
 									{:else}
-										<div in:slide={{duration: 200}}>
+										<div in:slide={{duration: DURATION_SM}}>
 											<small class="font_size_xs">{message.id}</small>
 										</div>
 									{/if}
@@ -224,7 +227,7 @@
 									{#if copied}
 										<div><small class="font_size_xs">{message.data.id}</small></div>
 									{:else}
-										<div in:slide={{duration: 200}}>
+										<div in:slide={{duration: DURATION_SM}}>
 											<small class="font_size_xs">{message.data.id}</small>
 										</div>
 									{/if}
@@ -238,7 +241,8 @@
 							<!-- Message details in popover -->
 							<Popover_Button
 								position="left"
-								attrs={{class: 'icon_button plain font_size_sm', title: 'view message details'}}
+								class="icon_button plain font_size_sm"
+								title="view message details"
 							>
 								<Glyph glyph={GLYPH_INFO} size="var(--font_size_lg)" />
 								{#snippet popover_content(popover)}
@@ -284,7 +288,8 @@
 								onconfirm={() => remove_message(message.id)}
 								position="center"
 								popover_button_attrs={{class: 'icon_button color_c bg_c_1 font_size_sm'}}
-								attrs={{class: 'icon_button plain font_size_sm', title: 'remove message'}}
+								class="icon_button plain font_size_sm"
+								title="remove message"
 							>
 								<Glyph glyph={GLYPH_REMOVE} />
 							</Confirm_Button>

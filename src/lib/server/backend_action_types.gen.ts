@@ -27,7 +27,8 @@ export const gen: Gen = ({origin_path}) => {
 	const banner = create_banner(origin_path);
 	const imports = new Import_Builder();
 
-	// Generate handlers for each spec, building imports on demand
+	// Generate handlers for each spec, building imports on demand.
+	// Note this must be done before generating the imports.
 	const backend_action_handlers = registry.specs
 		.map((spec) => generate_phase_handlers(spec, 'backend', imports))
 		.join(';\n\t');

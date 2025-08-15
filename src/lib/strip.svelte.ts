@@ -3,7 +3,7 @@ import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import type {Bit_Type} from '$lib/bit.svelte.js';
+import type {Bit_Union} from '$lib/bit.svelte.js';
 import type {Frontend} from '$lib/frontend.svelte.js';
 import {Strip_Json} from '$lib/strip_types.js';
 import type {
@@ -12,11 +12,16 @@ import type {
 	Completion_Role,
 } from '$lib/completion_types.js';
 
-// TODO rename? is more like a message, maybe `Tape_Message`, idk, maybe rethink "tape" too
+// TODO NEXT rename? is more like a message but Message (A2A) is *so* generic of a word,
+// and is already used in contexts with additional names like "error_message" "jsonrpc_message",
+// bits are maybe parts and strips have many bits,
+// maybe `Tape_Message` or `Chat_Message`, idk, maybe rethink "tape" too.
+// Is `Turn` a misnaming?
 
 export interface Strip_Options extends Cell_Options<typeof Strip_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Strip extends Cell<typeof Strip_Json> {
+	// TODO looking at A2A, I think the best mapping is Strip::Message and Bit::Part, but this is 1:1 with bits right now
 	bit_id: Uuid = $state()!;
 	tape_id: Uuid | null | undefined = $state();
 	role: Completion_Role = $state()!;
@@ -25,7 +30,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 	error_message: string | undefined = $state();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
-	readonly bit: Bit_Type | null = $derived(this.app.bits.items.by_id.get(this.bit_id) ?? null);
+	readonly bit: Bit_Union | null = $derived(this.app.bits.items.by_id.get(this.bit_id) ?? null);
 
 	get enabled(): boolean {
 		return this.bit?.enabled ?? false;
@@ -36,6 +41,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 		}
 	}
 
+	// TODO thinking about refactoring this, does this sort of thing make it more like a viewmodel? still want the cell machinery?
 	// Content always returns a string, normalizing null/undefined to empty string
 	get content(): string {
 		return this.bit?.content ?? '';
@@ -75,7 +81,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 	/**
 	 * Update the bit reference for this strip
 	 */
-	set_bit(bit: Bit_Type): void {
+	set_bit(bit: Bit_Union): void {
 		this.bit_id = bit.id;
 	}
 }
@@ -84,7 +90,7 @@ export class Strip extends Cell<typeof Strip_Json> {
  * Create a strip that references an existing bit for its content
  */
 export const create_strip_from_bit = (
-	bit: Bit_Type,
+	bit: Bit_Union,
 	role: Completion_Role,
 	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
 ): Strip => {

@@ -1,17 +1,19 @@
 <script lang="ts">
 	import type {Prompt} from '$lib/prompt.svelte.js';
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import Bit_Contextmenu from '$lib/Bit_Contextmenu.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 
-	interface Props {
-		bit: Bit_Type;
+	const {
+		bit,
+		prompt,
+	}: {
+		bit: Bit_Union;
 		prompt?: Prompt | undefined;
-	}
-	const {bit, prompt}: Props = $props();
+	} = $props();
 
 	const total_chars = $derived(bit.enabled ? bit.length : 0);
 	// TODO bug here where the xml tag is not taken into account, so they add up to less than 100% as calculated
@@ -27,7 +29,7 @@
 	>
 		<div class="progress_bar" style:width="{percent}%"></div>
 		<div class="flex_1 pl_sm py_xs3 ellipsis">
-			<Glyph glyph={get_bit_type_glyph(bit)} attrs={{class: 'mr_xs2'}} />
+			<Glyph glyph={get_bit_type_glyph(bit)} />&nbsp;
 			{bit.name}
 			{bit.content_preview}
 		</div>

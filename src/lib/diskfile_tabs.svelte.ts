@@ -251,16 +251,18 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 		console.log('Diskfile_Tabs.preview_diskfile', {diskfile_id});
 
 		const previously_selected_id = this.selected_tab_id;
+		const previous_preview_diskfile_id = this.preview_tab?.diskfile_id;
 		const {tab, is_new} = this.#get_or_create_tab(diskfile_id, 'preview');
 
 		// Select the tab
 		this.selected_tab_id = tab.id;
 		this.#update_tab_history(tab.id);
 
-		// If we're reusing a preview tab, reposition it after the previously selected tab
+		// Only reposition if we're reusing a preview tab for a DIFFERENT file
 		if (
 			!is_new &&
 			tab.id === this.preview_tab_id &&
+			previous_preview_diskfile_id !== diskfile_id &&
 			previously_selected_id &&
 			previously_selected_id !== tab.id
 		) {

@@ -12,6 +12,7 @@
 		GLYPH_ARROW_LEFT,
 		GLYPH_ADD,
 		GLYPH_DOWNLOAD,
+		GLYPH_DISCONNECT,
 	} from '$lib/glyphs.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -20,16 +21,20 @@
 	import {format_short_date} from '$lib/time_helpers.js';
 	import {format_gigabytes} from '$lib/format_helpers.js';
 
-	interface Props {
+	const {
+		model,
+		onshow,
+		onclose,
+		ondelete,
+		header,
+	}: {
 		model: Model;
 		// TODO maybe dont include these args?
 		onshow: (model: Model) => void;
 		onclose?: (model: Model) => void;
 		ondelete?: (model: Model) => void;
 		header?: Snippet;
-	}
-
-	const {model, onshow, onclose, ondelete, header}: Props = $props();
+	} = $props();
 
 	// TODO refactor with `Model_Detail`?
 </script>
@@ -64,7 +69,7 @@
 				class="plain"
 				onclick={() => model.app.chats.add(undefined, true).add_tape(model)}
 			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
+				<Glyph glyph={GLYPH_ADD} />&nbsp; create a new chat
 			</button>
 
 			<button
@@ -79,14 +84,23 @@
 				<Glyph glyph={GLYPH_REFRESH} />&nbsp; reload details
 			</button>
 
+			<!-- TODO should show pending status -->
+			<button
+				type="button"
+				class="plain"
+				title="unload model from memory"
+				onclick={() => model.app.ollama.unload(model.name)}
+				disabled={!model.loaded}
+			>
+				<Glyph glyph={GLYPH_DISCONNECT} />&nbsp; unload
+			</button>
+
 			{#if ondelete}
 				<Confirm_Button
 					onconfirm={() => ondelete(model)}
 					position="right"
-					attrs={{
-						class: 'plain color_c',
-						title: `delete ${model.name}`,
-					}}
+					class="plain color_c"
+					title="delete {model.name}"
 				>
 					<Glyph glyph={GLYPH_DELETE} />&nbsp; delete model
 
@@ -113,7 +127,7 @@
 				onclick={() => model.navigate_to_download()}
 				title="download this model"
 			>
-				<Glyph glyph={GLYPH_DOWNLOAD} attrs={{class: 'mr_xs2'}} /> download model
+				<Glyph glyph={GLYPH_DOWNLOAD} />&nbsp; download model
 			</button>
 		{/if}
 	</section>
@@ -143,7 +157,7 @@
 		</section>
 	{:else if model.ollama_show_response}
 		<section class="display_flex flex_column gap_md">
-			<!-- Basic Info -->
+			<!-- basic info -->
 			{#if model.ollama_show_response.details}
 				<div class="display_grid gap_sm" style:grid-template-columns="auto 1fr">
 					<h5 class="my_0">capabilities:</h5>
@@ -184,7 +198,16 @@
 				</div>
 			{/if}
 
-			<!-- Template -->
+			<!-- model info -->
+			{#if model.ollama_show_response.model_info && Object.keys(model.ollama_show_response.model_info).length > 0}
+				<div>
+					<h5>model info:</h5>
+					<pre><code>{JSON.stringify(model.ollama_show_response.model_info, null, '\t')}</code
+						></pre>
+				</div>
+			{/if}
+
+			<!-- template -->
 			{#if model.ollama_show_response.template}
 				<div>
 					<h5>template:</h5>
@@ -192,23 +215,31 @@
 				</div>
 			{/if}
 
-			<!-- Model Info -->
-			{#if model.ollama_show_response.model_info && Object.keys(model.ollama_show_response.model_info).length > 0}
+			<!-- parameters -->
+			{#if model.ollama_show_response.parameters}
 				<div>
-					<h5>model info:</h5>
-					<pre><code>{JSON.stringify(model.ollama_show_response, null, '\t')}</code></pre>
+					<h5>parameters:</h5>
+					<pre><code>{model.ollama_show_response.parameters}</code></pre>
 				</div>
 			{/if}
 
-			<!-- License -->
+			<!-- system -->
+			{#if model.ollama_show_response.system}
+				<div>
+					<h5>system:</h5>
+					<pre><code>{model.ollama_show_response.system}</code></pre>
+				</div>
+			{/if}
+
+			<!-- license -->
 			{#if model.ollama_show_response.license}
-				<div>
-					<h5>license:</h5>
+				<Details attrs={{class: 'mt_xl3'}}>
+					{#snippet summary()}<h5 class="display_inline">license:</h5>{/snippet}
 					<pre><code>{model.ollama_show_response.license}</code></pre>
-				</div>
+				</Details>
 			{/if}
 
-			<!-- Modelfile -->
+			<!-- modelfile -->
 			{#if model.ollama_show_response.modelfile}
 				<Details attrs={{class: 'mt_xl3'}}>
 					{#snippet summary()}<h5 class="display_inline">modelfile:</h5>{/snippet}

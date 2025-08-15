@@ -3,13 +3,15 @@
 	import type {Tape} from '$lib/tape.svelte.js';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
+	import Chat_Tape_Manage_By_Tag from '$lib/Chat_Tape_Manage_By_Tag.svelte';
 
-	interface Props {
+	const {
+		chat,
+		tape,
+	}: {
 		chat: Chat;
 		tape: Tape | undefined;
-	}
-
-	const {chat, tape}: Props = $props();
+	} = $props();
 
 	const strip_count = $derived(tape?.strips.size);
 
@@ -17,15 +19,15 @@
 </script>
 
 <!-- TODO the overflow change is hacky, allows the shadow to overlap the sidebar -->
-<div
-	class="column_fluid column flex_1"
-	class:pr_xl={empty}
-	style:overflow={empty ? 'visible' : undefined}
-	style:justify-content={empty ? 'center' : undefined}
->
-	<!-- the two `p_sm` are expected to stay in sync so the size is the same regardless of presentation style -->
-	<div class="column width_md min_width_sm" class:h_100={!empty} class:p_sm={!empty}>
-		{#if tape}
+{#if tape}
+	<div
+		class="column_fluid column flex_1"
+		class:pr_xl={empty}
+		style:overflow={empty ? 'visible' : undefined}
+		style:justify-content={empty ? 'center' : undefined}
+	>
+		<!-- the two `p_sm` are expected to stay in sync so the size is the same regardless of presentation style -->
+		<div class="column width_md min_width_sm" class:h_100={!empty} class:p_sm={!empty}>
 			<Chat_Tape
 				{tape}
 				onsend={(input) => chat.send_to_tape(tape.id, input)}
@@ -38,8 +40,13 @@
 					}
 				}
 			/>
-		{:else}
-			<Chat_Tape_Add_By_Model {chat} />
-		{/if}
+		</div>
 	</div>
-</div>
+{:else}
+	<section class="column_section">
+		<Chat_Tape_Add_By_Model {chat} />
+	</section>
+	<section class="column_section">
+		<Chat_Tape_Manage_By_Tag {chat} />
+	</section>
+{/if}

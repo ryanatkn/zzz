@@ -98,6 +98,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	readonly json: z.output<T_Schema> = $derived(this.to_json());
 	readonly json_serialized: string = $derived(JSON.stringify(this.json));
+	// TODO maybe add a variant `json_serialized_pretty` or `_formatted`
 	readonly json_parsed: z.SafeParseReturnType<z.output<T_Schema>, z.output<T_Schema>> = $derived.by(
 		() => this.schema.safeParse(this.json),
 	);
@@ -124,7 +125,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	readonly updated_date: Date = $derived(new Date(this.updated));
 	readonly updated_formatted_short_date: string = $derived(format_short_date(this.updated_date));
-	readonly updated_formatted_date: string = $derived(format_datetime(this.updated_date));
+	readonly updated_formatted_datetime: string = $derived(format_datetime(this.updated_date));
 	readonly updated_formatted_time: string = $derived(format_time(this.updated_date));
 
 	/** Stored only between construction and initialization */
@@ -158,17 +159,30 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		this.#initial_json = undefined;
 		this.set_json(initial_json); // `set_json` parses with the schema, so this may be `undefined` and it's fine
 
-		// Register the cell with the global registry
+		// Add to global registry
 		this.register();
 	}
 
-	// TODO handle disposing a subtree?
 	/**
 	 * Clean up resources when this cell is no longer needed.
-	 * Should be called before the cell is discarded.
 	 */
 	dispose(): void {
+		// Remove from global registry
 		this.unregister();
+
+		// TODO handle disposing a subtree?
+
+		// TODO any other cleanup needed? null out any references?
+		// maybe things can register themselves to be tied to this cell's lifecycle
+		// and we loop over those here?
+	}
+
+	/**
+	 * This is not supported in Safari, don't rely on this yet.
+	 * Uncomment temporarily to experiment in dev.
+	 */
+	[Symbol.dispose](): void {
+		this.dispose();
 	}
 
 	/** Flag to track registration status - prevents double registration */
@@ -361,7 +375,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 				const field_schema = this.field_schemas.get(key);
 				return (field_schema?.parse(value) ?? value) as this[K];
 			} catch (e) {
-				console.error(`Failed to parse branded type for ${key}:`, e);
+				console.error(`failed to parse branded type for ${key}:`, e);
 				return value as this[K];
 			}
 		}
@@ -447,8 +461,8 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 				json: structuredClone(json ? {...current_json, ...json} : current_json),
 			});
 		} catch (error) {
-			console.error(`Failed to clone instance of ${constructor.name}:`, error);
-			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+			console.error(`failed to clone instance of ${constructor.name}:`, error);
+			throw new Error(`failed to clone: ${error.message}`);
 		}
 	}
 
@@ -459,7 +473,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		}
 
 		const instance = this.app.cell_registry.maybe_instantiate(class_name as any, json, options);
-		if (!instance) console.error(`Failed to instantiate ${class_name}`);
+		if (!instance) console.error(`failed to instantiate ${class_name}`);
 		return instance;
 	}
 }

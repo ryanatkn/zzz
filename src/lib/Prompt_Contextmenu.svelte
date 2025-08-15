@@ -20,11 +20,12 @@
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		prompt,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		prompt: Prompt;
-	}
-
-	const {prompt, ...rest}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

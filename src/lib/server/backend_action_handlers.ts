@@ -1,3 +1,5 @@
+import ollama from 'ollama';
+
 import {Serializable_Source_File} from '$lib/diskfile_types.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
@@ -6,10 +8,16 @@ import {to_serializable_source_file} from '$lib/diskfile_helpers.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 import type {Completion_Options, Completion_Handler_Options} from '$lib/server/backend_provider.js';
 import {save_completion_response_to_disk} from '$lib/server/helpers.js';
+import type {
+	Ollama_List_Response,
+	Ollama_Ps_Response,
+	Ollama_Show_Response,
+} from '$lib/ollama_helpers.js';
 
 // TODO refactor to a plugin architecture
 
-// TODO API usage is roughed in, very hacky just to get things working -- needs a lot of work like not hardcoding `role` below
+// TODO API usage is roughed in, very hacky just to get things working -- needs a lot of work
+// like not hardcoding `role` below
 
 // TODO proper logging
 
@@ -21,6 +29,8 @@ import {save_completion_response_to_disk} from '$lib/server/helpers.js';
 export const backend_action_handlers: Backend_Action_Handlers = {
 	ping: {
 		receive_request: ({data: {request}}) => {
+			// TODO NEXT @many these errors need to render correctly
+			throw Error('ois');
 			console.log(
 				`[backend_action_handlers.ping.receive_request] ping receive_request message`,
 				request,
@@ -47,7 +57,6 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			return {
 				data: {
 					files: files_array,
-					zzz_dir: backend.zzz_dir,
 					zzz_cache_dir: backend.zzz_cache_dir,
 				},
 			};
@@ -55,16 +64,9 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	create_completion: {
-		receive_request: async (action_event) => {
-			const {
-				backend,
-				data: {input},
-			} = action_event;
-			const {
-				completion_request: {prompt, provider_name, model, completion_messages},
-				_meta,
-			} = input;
-			const progress_token = _meta?.progressToken;
+		receive_request: async ({backend, data: {input}}) => {
+			const {prompt, provider_name, model, completion_messages} = input.completion_request;
+			const progress_token = input._meta?.progressToken;
 
 			console.log(
 				'[backend_action_handlers.create_completion.receive_request] progress_token:',
@@ -107,7 +109,6 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				completion_options,
 				completion_messages,
 				prompt,
-				backend,
 				progress_token,
 			};
 
@@ -154,6 +155,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			console.log(`[backend_action_handlers.update_diskfile.receive_request] message`, request);
 			const {path, content} = input;
 
+			// TODO this clobbers existing files even if that wasn't the intent since there's no `create` action
 			try {
 				// Use the server's scoped_fs instance to write the file
 				await backend.scoped_fs.write_file(path, content);
@@ -161,7 +163,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			} catch (error) {
 				console.error(`error writing file ${path}:`, error);
 				throw jsonrpc_errors.internal_error(
-					`Failed to write file: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+					`failed to write file: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 				);
 			}
 		},
@@ -181,7 +183,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 					error,
 				);
 				throw jsonrpc_errors.internal_error(
-					`Failed to delete file: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+					`failed to delete file: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 				);
 			}
 		},
@@ -201,30 +203,243 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 					error,
 				);
 				throw jsonrpc_errors.internal_error(
-					`Failed to create directory: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+					`failed to create directory: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 				);
 			}
 		},
 	},
 
+	// these work but are too noisy right now, maybe at a debug level?
+
 	// TODO @api think about logging, validation, or other processing
-	filer_change: {
-		send: ({data: {input}}) => {
-			console.log(
-				'[backend_action_handlers.filer_change.send] sending filer_change notification',
-				input.source_file.id,
-				input.change,
-			);
+	// filer_change: {
+	// 	send: ({data: {input}}) => {
+	// 		console.log(
+	// 			'[backend_action_handlers.filer_change.send] sending filer_change notification',
+	// 			input,
+	// 		);
+	// 	},
+	// },
+
+	// completion_progress: {
+	// 	send: ({data: {input}}) => {
+	// 		console.log(
+	// 			'[backend_action_handlers.completion_progress.send] sending completion_progress notification',
+	// 			input,
+	// 		);
+	// 	},
+	// },
+
+	// ollama_progress: {
+	// 	send: ({data: {input}}) => {
+	// 		console.log(
+	// 			'[backend_action_handlers.ollama_progress.send] sending ollama_progress notification',
+	// 			input,
+	// 		);
+	// 	},
+	// },
+
+	// Ollama action handlers
+	ollama_list: {
+		receive_request: async () => {
+			console.log('[backend_action_handlers.ollama_list.receive_request] listing models');
+			// TODO NEXT @many these errors need to render correctly
+			throw Error('bleh2');
+
+			try {
+				const response = (await ollama.list()) as unknown as Ollama_List_Response;
+				console.log(
+					`[backend_action_handlers.ollama_list.receive_request] found ${response.models.length} models`,
+				);
+				return response;
+			} catch (error) {
+				console.error('[backend_action_handlers.ollama_list.receive_request] failed:', error);
+				return null;
+			}
 		},
 	},
 
-	completion_progress: {
-		send: ({data: {input}}) => {
+	ollama_ps: {
+		receive_request: async () => {
+			// TODO NEXT @many these errors need to render correctly
+			throw Error('bleh');
+			console.log('[backend_action_handlers.ollama_ps.receive_request] getting running models');
+
+			try {
+				const response = (await ollama.ps()) as unknown as Ollama_Ps_Response;
+				console.log(
+					`[backend_action_handlers.ollama_ps.receive_request] found ${response.models.length} running 
+  models`,
+				);
+				return response;
+			} catch (error) {
+				console.error('[backend_action_handlers.ollama_ps.receive_request] failed:', error);
+				return null;
+			}
+		},
+	},
+
+	ollama_show: {
+		receive_request: async ({data: {input}}) => {
+			console.log(`[backend_action_handlers.ollama_show.receive_request] showing: ${input.model}`);
+
+			try {
+				const response = (await ollama.show(input)) as unknown as Ollama_Show_Response;
+				console.log(
+					`[backend_action_handlers.ollama_show.receive_request] success for: ${input.model}`,
+				);
+				return response;
+			} catch (error) {
+				console.error(
+					`[backend_action_handlers.ollama_show.receive_request] failed for ${input.model}:`,
+					error,
+				);
+				return null;
+			}
+		},
+	},
+
+	ollama_pull: {
+		receive_request: async ({backend, data: {input}}) => {
+			console.log(`[backend_action_handlers.ollama_pull.receive_request] pulling: ${input.model}`);
+			const {_meta, ...params} = input;
+			try {
+				const response = await ollama.pull({...params, stream: true});
+
+				for await (const progress of response) {
+					// console.log(`[backend_action_handlers.ollama_pull.receive_request] progress`, progress);
+
+					await backend.api.ollama_progress({
+						status: progress.status,
+						digest: progress.digest,
+						total: progress.total,
+						completed: progress.completed,
+						_meta: {progressToken: _meta?.progressToken},
+					});
+				}
+
+				console.log(`[backend_action_handlers.ollama_pull.receive_request] completed`);
+				return undefined;
+			} catch (error) {
+				console.error(
+					`[backend_action_handlers.ollama_pull.receive_request] failed for ${input.model}:`,
+					error,
+				);
+				throw jsonrpc_errors.internal_error(
+					`failed to pull model: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+				);
+			}
+		},
+	},
+
+	ollama_delete: {
+		receive_request: async ({data: {input}}) => {
 			console.log(
-				'[backend_action_handlers.completion_progress.send] sending completion_progress notification',
-				input._meta?.progressToken,
-				input.chunk,
+				`[backend_action_handlers.ollama_delete.receive_request] deleting: ${input.model}`,
 			);
+
+			try {
+				await ollama.delete(input);
+				console.log(
+					`[backend_action_handlers.ollama_delete.receive_request] success for: ${input.model}`,
+				);
+				return undefined;
+			} catch (error) {
+				console.error(
+					`[backend_action_handlers.ollama_delete.receive_request] failed for ${input.model}:`,
+					error,
+				);
+				throw jsonrpc_errors.internal_error(
+					`failed to delete model: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+				);
+			}
+		},
+	},
+
+	ollama_copy: {
+		receive_request: async ({data: {input}}) => {
+			const {source, destination} = input;
+			console.log(
+				`[backend_action_handlers.ollama_copy.receive_request] copying: ${source} --> ${destination}`,
+			);
+
+			try {
+				await ollama.copy(input);
+				console.log(
+					`[backend_action_handlers.ollama_copy.receive_request] success: ${source} --> ${destination}`,
+				);
+				return undefined;
+			} catch (error) {
+				console.error(
+					`[backend_action_handlers.ollama_copy.receive_request] failed for ${source} --> ${destination}:`,
+					error,
+				);
+				throw jsonrpc_errors.internal_error(
+					`failed to copy model: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+				);
+			}
+		},
+	},
+
+	ollama_create: {
+		receive_request: async ({backend, data: {input}}) => {
+			console.log(
+				`[backend_action_handlers.ollama_create.receive_request] creating: ${input.model}`,
+			);
+			const {_meta, ...params} = input;
+
+			try {
+				const response = await ollama.create({...params, stream: true});
+
+				for await (const progress of response) {
+					// console.log(`[backend_action_handlers.ollama_create.receive_request] progress`, progress);
+
+					await backend.api.ollama_progress({
+						status: progress.status,
+						digest: progress.digest,
+						total: progress.total,
+						completed: progress.completed,
+						_meta: {progressToken: _meta?.progressToken},
+					});
+				}
+
+				console.log(
+					`[backend_action_handlers.ollama_create.receive_request] success for: ${input.model}`,
+				);
+				return undefined;
+			} catch (error) {
+				console.error(
+					`[backend_action_handlers.ollama_create.receive_request] failed for ${input.model}:`,
+					error,
+				);
+				throw jsonrpc_errors.internal_error(
+					`failed to create model: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+				);
+			}
+		},
+	},
+
+	ollama_unload: {
+		receive_request: async ({data: {input}}) => {
+			console.log(
+				`[backend_action_handlers.ollama_unload.receive_request] unloading: ${input.model}`,
+			);
+
+			try {
+				await ollama.generate({model: input.model, prompt: '', keep_alive: 0});
+				console.log(
+					`[backend_action_handlers.ollama_unload.receive_request] success for: ${input.model}`,
+				);
+				return undefined;
+			} catch (error) {
+				console.error(
+					`[backend_action_handlers.ollama_unload.receive_request] failed for ${input.model}:`,
+					error,
+				);
+				throw jsonrpc_errors.internal_error(
+					`failed to unload model: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+				);
+			}
 		},
 	},
 };

@@ -30,7 +30,7 @@ export class Project_Viewmodel {
 	editing_project: boolean = $state(false);
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.project &&
 			(this.edited_name !== this.project.name ||
@@ -121,7 +121,7 @@ export class Project_Viewmodel {
 		if (!this.project) return;
 
 		// Generate a unique page name within this project
-		const base_title = 'New Page';
+		const base_title = 'New page';
 		const existing_titles = this.project.pages.map((p) => p.title);
 		const unique_title = get_unique_name(base_title, new Set(existing_titles));
 

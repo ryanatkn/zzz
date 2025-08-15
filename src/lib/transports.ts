@@ -8,12 +8,11 @@ import type {
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
 
 // TODO figure out the symmetry of frontend and backend transports (none/partial/full?) --
 // we may also need orthogonal abstractions to clarify the transport role
-
-// TODO support configurable/extensible transports
 
 export const Transport_Name = z.string(); // not branded for convenience, will just error at runtime, the schema is just for docs atm
 export type Transport_Name = z.infer<typeof Transport_Name>;
@@ -22,7 +21,7 @@ export interface Transport {
 	transport_name: Transport_Name;
 	/* eslint-disable @typescript-eslint/method-signature-style */
 	send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	send(message: Jsonrpc_Notification): Promise<null>;
+	send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
 	send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null>;
@@ -53,10 +52,23 @@ export class Transports {
 
 	set_current_transport(transport_name: Transport_Name): void {
 		const transport = this.#transport_by_name.get(transport_name);
-		if (!transport) throw new Error(`Transport not registered: ${transport_name}`);
+		if (!transport) throw new Error(`transport not registered: ${transport_name}`);
 		this.#current_transport = transport;
 	}
 
+	/**
+	 * Gets either the current transport or the first ready transport
+	 * depending on `allow_fallback`, or throws an error.
+	 * @param transport_name Optional transport to use instead of the current
+	 * @throws when no transport available or ready
+	 */
+	get_transport(transport_name?: Transport_Name): Transport | null {
+		return this.allow_fallback
+			? this.#get_first_ready(transport_name)
+			: this.#get_exact(transport_name);
+	}
+
+	// TODO these 4 arent used yet but seem useful? `get_transport` is the main method
 	is_ready(): boolean | null {
 		const transport = this.#current_transport;
 		if (!transport) return null;
@@ -71,21 +83,8 @@ export class Transports {
 		return this.#current_transport?.transport_name ?? null;
 	}
 
-	get_transport(transport_name: Transport_Name): Transport | null {
+	get_transport_by_name(transport_name: Transport_Name): Transport | null {
 		return this.#transport_by_name.get(transport_name) ?? null;
-	}
-
-	/**
-	 * Gets either the current transport or the first ready transport
-	 * depending on `allow_fallback`, or throws an error.
-	 * @param transport_name Optional transport to use instead of the current
-	 * @throws when no transport available or ready
-	 */
-	get_or_throw(transport_name?: Transport_Name): Transport {
-		if (this.allow_fallback) {
-			return this.#get_first_ready_or_throw(transport_name);
-		}
-		return this.#get_exact_or_throw(transport_name);
 	}
 
 	/**
@@ -93,19 +92,16 @@ export class Transports {
 	 * @param transport_name Optional transport type to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_exact_or_throw(transport_name?: Transport_Name): Transport {
+	#get_exact(transport_name?: Transport_Name): Transport | null {
 		const transport = transport_name
 			? this.#transport_by_name.get(transport_name)
 			: this.#current_transport;
 
-		if (!transport) {
-			throw new Error('No transport available');
-		}
-		if (!transport.is_ready()) {
-			throw new Error('Transport not ready');
+		if (transport?.is_ready()) {
+			return transport;
 		}
 
-		return transport;
+		return null;
 	}
 
 	/**
@@ -113,7 +109,7 @@ export class Transports {
 	 * @param transport_name Optional transport type or array of types to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_first_ready_or_throw(transport_name?: Transport_Name | Array<Transport_Name>): Transport {
+	#get_first_ready(transport_name?: Transport_Name | Array<Transport_Name>): Transport | null {
 		// First try the specified transport(s) if provided
 		if (transport_name) {
 			const transport_names = Array.isArray(transport_name) ? transport_name : [transport_name];
@@ -138,10 +134,6 @@ export class Transports {
 			}
 		}
 
-		// No ready transport found, throw an error
-		if (!this.#current_transport) {
-			throw new Error('No transport available');
-		}
-		throw new Error('Transport not ready');
+		return null;
 	}
 }

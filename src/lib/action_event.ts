@@ -1,5 +1,7 @@
 // @slop Claude Opus 4
 
+import {DEV} from 'esm-env';
+
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {
@@ -12,9 +14,6 @@ import {
 	validate_step_transition,
 	validate_phase_transition,
 	should_validate_output,
-	create_parse_error,
-	create_validation_error,
-	create_handler_error,
 	is_action_complete,
 	create_initial_data,
 	get_initial_phase,
@@ -23,7 +22,7 @@ import {
 	is_notification_send_with_parsed_input,
 } from '$lib/action_event_helpers.js';
 import type {Action_Event_Datas} from '$lib/action_collections.js';
-import {parse_action_input, parse_action_output} from '$lib/action_collection_helpers.js';
+import {safe_parse_action_input, safe_parse_action_output} from '$lib/action_collection_helpers.js';
 import {
 	create_jsonrpc_request,
 	create_jsonrpc_response,
@@ -32,7 +31,8 @@ import {
 	to_jsonrpc_params,
 	to_jsonrpc_result,
 } from '$lib/jsonrpc_helpers.js';
-import {create_uuid} from '$lib/zod_helpers.js';
+import {create_uuid, format_zod_validation_error} from '$lib/zod_helpers.js';
+import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import type {
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
@@ -40,6 +40,7 @@ import type {
 	Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
 import type {Action_Kind} from '$lib/action_types.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO maybe just use runes in this module and remove `observe`
 export type Action_Event_Change_Observer<T_Method extends Action_Method> = (
@@ -97,10 +98,8 @@ export class Action_Event<
 		return structuredClone(this.#data);
 	}
 
-	/**
-	 * Add listener for state changes.
-	 */
-	// TODO Consider middleware pattern for more complex scenarios
+	// TODO rethink the reactivity of this class, maybe just use `$state` or `$state.raw`?
+	// does that have any negative implications when used on the backend?
 	observe(listener: Action_Event_Change_Observer<T_Method>): () => void {
 		this.#listeners.add(listener);
 		return () => this.#listeners.delete(listener);
@@ -124,11 +123,23 @@ export class Action_Event<
 			throw new Error(`cannot parse from step '${this.#data.step}' - must be 'initial'`);
 		}
 
-		try {
-			const parsed_input = parse_action_input(this.spec.method, this.#data.input);
-			this.#transition_step('parsed', {input: parsed_input});
-		} catch (error) {
-			this.#fail(create_parse_error(error));
+		// Propagate any existing error, short-circuiting parsing.
+		if (this.#data.response && 'error' in this.#data.response) {
+			this.#fail(this.#data.response.error);
+			return this;
+		}
+
+		const parsed = safe_parse_action_input(this.spec.method, this.#data.input);
+		if (parsed.success) {
+			this.#transition_step('parsed', {input: parsed.data});
+		} else {
+			this.#fail(
+				// no need to protect this info
+				jsonrpc_error_messages.invalid_params(
+					`failed to parse input: ${format_zod_validation_error(parsed.error)}`,
+					{validation_errors: parsed.error.errors},
+				),
+			);
 		}
 
 		return this;
@@ -140,10 +151,11 @@ export class Action_Event<
 	// TODO add timeout support
 	// TODO add cancellation support
 	async handle_async(): Promise<void> {
+		if (this.#data.step === 'failed') {
+			return; // already failed, no-op
+		}
 		if (this.#data.step !== 'parsed') {
-			throw new Error(
-				`cannot handle from step '${this.#data.step}' - must be 'parsed': ${this.#data.error?.message}`,
-			);
+			throw new Error(`cannot handle from step '${this.#data.step}' - must be 'parsed'`);
 		}
 
 		this.#transition_step('handling', this.#create_handling_updates());
@@ -158,7 +170,14 @@ export class Action_Event<
 			const result = await handler(this);
 			this.#complete_handling(result);
 		} catch (error) {
-			this.#fail(create_handler_error(error));
+			this.#fail(
+				// TODO @many what simpler/safer/more correct patterns are there for protecting errors/info in prod?
+				DEV
+					? jsonrpc_error_messages.internal_error(error.message || UNKNOWN_ERROR_MESSAGE, {
+							error: String(error),
+						})
+					: jsonrpc_error_messages.internal_error(),
+			);
 		}
 	}
 
@@ -170,10 +189,11 @@ export class Action_Event<
 			throw new Error('handle_sync can only be used with synchronous local_call actions');
 		}
 
+		if (this.#data.step === 'failed') {
+			return; // already failed, no-op
+		}
 		if (this.#data.step !== 'parsed') {
-			throw new Error(
-				`cannot handle from step '${this.#data.step}' - must be 'parsed': ${this.#data.error?.message}`,
-			);
+			throw new Error(`cannot handle from step '${this.#data.step}' - must be 'parsed'`);
 		}
 
 		this.#transition_step('handling', this.#create_handling_updates());
@@ -188,7 +208,14 @@ export class Action_Event<
 			const result = handler(this);
 			this.#complete_handling(result);
 		} catch (error) {
-			this.#fail(create_handler_error(error));
+			this.#fail(
+				// TODO @many what simpler/safer/more correct patterns are there for protecting errors/info in prod?
+				DEV
+					? jsonrpc_error_messages.internal_error(error.message || UNKNOWN_ERROR_MESSAGE, {
+							error: String(error),
+						})
+					: jsonrpc_error_messages.internal_error(),
+			);
 		}
 	}
 
@@ -196,6 +223,9 @@ export class Action_Event<
 	 * Transition to a new phase.
 	 */
 	transition(phase: Action_Event_Phase): void {
+		if (this.#data.step === 'failed') {
+			return; // already failed, no-op
+		}
 		if (this.#data.step !== 'handled') {
 			throw new Error(`cannot transition from step '${this.#data.step}' - must be 'handled'`);
 		}
@@ -207,28 +237,14 @@ export class Action_Event<
 		this.set_data(new_data);
 	}
 
-	/**
-	 * Check if the action event is complete.
-	 */
 	is_complete(): boolean {
 		return is_action_complete(this.#data);
 	}
 
-	// TODO does it make sense for notifications to be sent after the action is complete? they wouldn't be "progress" I suppose
-	/**
-	 * Update progress for long-running operations.
-	 */
 	update_progress(progress: unknown): void {
-		if (this.#data.step !== 'handling') {
-			throw new Error(`cannot update progress from step '${this.#data.step}' - must be 'handling'`);
-		}
-
 		this.#update_data({progress});
 	}
 
-	/**
-	 * Set protocol-specific data.
-	 */
 	set_request(request: Jsonrpc_Request): void {
 		this.#validate_protocol_setter('request', {
 			kind: 'request_response',
@@ -260,12 +276,13 @@ export class Action_Event<
 		this.#update_data({...updates, step});
 	}
 
-	/** Shallowly merges `updates` with the current data. */
+	/** Shallowly merge `updates` with the current data immutably. */
 	#update_data(updates: Partial<Action_Event_Data>): void {
 		const new_data = {...this.#data, ...updates} as Action_Event_Datas[T_Method];
 		this.set_data(new_data);
 	}
 
+	// TODO usage of this in this module is silently swallowing errors, maybe log on the environment?
 	#fail(error: Jsonrpc_Error_Json): void {
 		this.#transition_step('failed', {error});
 	}
@@ -307,13 +324,21 @@ export class Action_Event<
 		return undefined;
 	}
 
-	#complete_handling(result: unknown): void {
-		if (result !== undefined && should_validate_output(this.spec.kind, this.#data.phase)) {
-			try {
-				const parsed_output = parse_action_output(this.spec.method, result);
-				this.#transition_step('handled', {output: parsed_output});
-			} catch (error) {
-				this.#fail(create_validation_error('output', error));
+	#complete_handling(output: unknown): void {
+		if (output !== undefined && should_validate_output(this.spec.kind, this.#data.phase)) {
+			const parsed = safe_parse_action_output(this.spec.method, output);
+			if (parsed.success) {
+				this.#transition_step('handled', {output: parsed.data});
+			} else {
+				this.#fail(
+					// TODO @many what simpler/safer/more correct patterns are there for protecting errors/info in prod?
+					DEV
+						? jsonrpc_error_messages.validation_error(
+								`failed to parse output: ${format_zod_validation_error(parsed.error)}`,
+								{output, validation_errors: parsed.error.errors},
+							)
+						: jsonrpc_error_messages.validation_error('failed to parse output'),
+				);
 			}
 		} else {
 			this.#transition_step('handled');

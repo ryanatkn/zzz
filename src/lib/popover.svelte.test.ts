@@ -1,4 +1,4 @@
-// @slop Claude Sonnet 3.7
+// @slop Claude Sonnet 4
 
 // @vitest-environment jsdom
 
@@ -6,7 +6,6 @@ import {describe, test, expect, vi, beforeEach, afterEach} from 'vitest';
 
 import {Popover} from '$lib/popover.svelte.js';
 import type {Position} from '$lib/position_helpers.js';
-import type {ActionReturn} from 'svelte/action';
 
 // Helper functions for testing
 const create_elements = (): {
@@ -77,13 +76,11 @@ describe('Popover', () => {
 		}
 	});
 
-	// Helper to register actions for automatic cleanup
-	const register_action = <T extends ActionReturn<any, any>>(action: T | void): T => {
-		if (!action) throw new Error('Expected action to be defined');
-		if (action.destroy) {
-			cleanup_actions.push(action.destroy);
+	// Helper to register attachments for automatic cleanup
+	const register_attachment = (cleanup: (() => void) | void): void => {
+		if (cleanup) {
+			cleanup_actions.push(cleanup);
 		}
-		return action;
 	};
 
 	describe('constructor', () => {
@@ -231,12 +228,12 @@ describe('Popover', () => {
 	});
 
 	describe('actions', () => {
-		describe('trigger action', () => {
+		describe('trigger attachment', () => {
 			test('attaches click handler to show/hide popover', () => {
 				const {trigger} = elements;
 
-				// Set up trigger action
-				register_action(popover.trigger(trigger));
+				// Set up trigger attachment
+				register_attachment(popover.trigger()(trigger));
 
 				// Initial state
 				expect(popover.visible).toBe(false);
@@ -250,40 +247,28 @@ describe('Popover', () => {
 				expect(popover.visible).toBe(false);
 			});
 
-			test('accepts and updates parameters', () => {
+			test('accepts parameters', () => {
 				const {trigger} = elements;
 
-				// Set up trigger action with params
-				const action_result = register_action(
-					popover.trigger(trigger, {
+				// Set up trigger attachment with params
+				register_attachment(
+					popover.trigger({
 						position: 'right',
 						align: 'start',
-					}),
+					})(trigger),
 				);
 
 				// Check params were applied
 				expect(popover.position).toBe('right');
 				expect(popover.align).toBe('start');
-
-				// Update params
-				action_result.update?.({
-					position: 'top',
-					align: 'end',
-					offset: '20px',
-				});
-
-				// Check updated params
-				expect(popover.position).toBe('top');
-				expect(popover.align).toBe('end');
-				expect(popover.offset).toBe('20px');
 			});
 
 			test('sets proper aria attributes', () => {
 				const {trigger, content} = elements;
 
-				// Set up actions
-				register_action(popover.trigger(trigger));
-				register_action(popover.content(content));
+				// Set up attachments
+				register_attachment(popover.trigger()(trigger));
+				register_attachment(popover.content()(content));
 
 				// Check for aria-expanded on trigger
 				expect(trigger.getAttribute('aria-expanded')).toBe('false');
@@ -302,18 +287,18 @@ describe('Popover', () => {
 			});
 		});
 
-		describe('content action', () => {
+		describe('content attachment', () => {
 			test('applies position styles and classes', () => {
 				const {content} = elements;
 
-				// Set up content action
-				register_action(
-					popover.content(content, {
+				// Set up content attachment
+				register_attachment(
+					popover.content({
 						position: 'bottom',
 						align: 'start',
 						offset: '15px',
 						popover_class: 'test-popover',
-					}),
+					})(content),
 				);
 
 				// Check styles were applied
@@ -333,17 +318,17 @@ describe('Popover', () => {
 			test('updates styles when parameters change', () => {
 				const {content} = elements;
 
-				// Set up content action
-				const action_result = register_action(
-					popover.content(content, {
+				// Set up content attachment
+				register_attachment(
+					popover.content({
 						position: 'bottom',
 						align: 'start',
 						popover_class: 'test-popover',
-					}),
+					})(content),
 				);
 
-				// Update params
-				action_result.update?.({
+				// Since attachments are reactive, updating the popover instance should trigger re-evaluation
+				popover.update({
 					position: 'right',
 					align: 'center',
 					popover_class: 'updated-class',
@@ -355,14 +340,14 @@ describe('Popover', () => {
 			});
 		});
 
-		describe('container action', () => {
+		describe('container attachment', () => {
 			test('registers container element for positioning', () => {
 				const {container, trigger, content} = elements;
 
-				// Set up all actions
-				register_action(popover.container(container));
-				register_action(popover.trigger(trigger));
-				register_action(popover.content(content));
+				// Set up all attachments
+				register_attachment(popover.container(container));
+				register_attachment(popover.trigger()(trigger));
+				register_attachment(popover.content()(content));
 
 				// Show popover
 				popover.show();
@@ -391,7 +376,7 @@ describe('Popover', () => {
 			const {content} = elements;
 
 			// Apply position and alignment
-			register_action(popover.content(content, {position, align}));
+			register_attachment(popover.content({position, align})(content));
 
 			// Show popover
 			popover.show();
@@ -422,7 +407,7 @@ describe('Popover', () => {
 				const {content} = elements;
 
 				// Test left + start
-				register_action(popover.content(content, {position: 'left', align: 'start'}));
+				register_attachment(popover.content({position: 'left', align: 'start'})(content));
 				check_style(content, 'right', '100%');
 				check_style(content, 'left', 'auto');
 				check_style(content, 'top', '0');
@@ -432,7 +417,7 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test left + center
-				register_action(popover.content(content, {position: 'left', align: 'center'}));
+				register_attachment(popover.content({position: 'left', align: 'center'})(content));
 				check_style(content, 'right', '100%');
 				check_style(content, 'left', 'auto');
 				check_style(content, 'top', '50%');
@@ -442,7 +427,7 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test left + end
-				register_action(popover.content(content, {position: 'left', align: 'end'}));
+				register_attachment(popover.content({position: 'left', align: 'end'})(content));
 				check_style(content, 'right', '100%');
 				check_style(content, 'left', 'auto');
 				check_style(content, 'top', 'auto');
@@ -452,8 +437,8 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test left with offset
-				register_action(
-					popover.content(content, {position: 'left', align: 'start', offset: '10px'}),
+				register_attachment(
+					popover.content({position: 'left', align: 'start', offset: '10px'})(content),
 				);
 				check_style(content, 'right', 'calc(100% + 10px)');
 			});
@@ -462,7 +447,7 @@ describe('Popover', () => {
 				const {content} = elements;
 
 				// Test right + start
-				register_action(popover.content(content, {position: 'right', align: 'start'}));
+				register_attachment(popover.content({position: 'right', align: 'start'})(content));
 				check_style(content, 'left', '100%');
 				check_style(content, 'right', 'auto');
 				check_style(content, 'top', '0');
@@ -472,7 +457,7 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test right + center
-				register_action(popover.content(content, {position: 'right', align: 'center'}));
+				register_attachment(popover.content({position: 'right', align: 'center'})(content));
 				check_style(content, 'left', '100%');
 				check_style(content, 'right', 'auto');
 				check_style(content, 'top', '50%');
@@ -482,7 +467,7 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test right + end
-				register_action(popover.content(content, {position: 'right', align: 'end'}));
+				register_attachment(popover.content({position: 'right', align: 'end'})(content));
 				check_style(content, 'left', '100%');
 				check_style(content, 'right', 'auto');
 				check_style(content, 'top', 'auto');
@@ -492,8 +477,8 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test right with offset
-				register_action(
-					popover.content(content, {position: 'right', align: 'start', offset: '10px'}),
+				register_attachment(
+					popover.content({position: 'right', align: 'start', offset: '10px'})(content),
 				);
 				check_style(content, 'left', 'calc(100% + 10px)');
 			});
@@ -502,7 +487,7 @@ describe('Popover', () => {
 				const {content} = elements;
 
 				// Test top + start
-				register_action(popover.content(content, {position: 'top', align: 'start'}));
+				register_attachment(popover.content({position: 'top', align: 'start'})(content));
 				check_style(content, 'bottom', '100%');
 				check_style(content, 'top', 'auto');
 				check_style(content, 'left', '0');
@@ -512,7 +497,7 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test top + center
-				register_action(popover.content(content, {position: 'top', align: 'center'}));
+				register_attachment(popover.content({position: 'top', align: 'center'})(content));
 				check_style(content, 'bottom', '100%');
 				check_style(content, 'top', 'auto');
 				check_style(content, 'left', '50%');
@@ -522,7 +507,7 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test top + end
-				register_action(popover.content(content, {position: 'top', align: 'end'}));
+				register_attachment(popover.content({position: 'top', align: 'end'})(content));
 				check_style(content, 'bottom', '100%');
 				check_style(content, 'top', 'auto');
 				check_style(content, 'left', 'auto');
@@ -532,8 +517,8 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test top with offset
-				register_action(
-					popover.content(content, {position: 'top', align: 'start', offset: '10px'}),
+				register_attachment(
+					popover.content({position: 'top', align: 'start', offset: '10px'})(content),
 				);
 				check_style(content, 'bottom', 'calc(100% + 10px)');
 			});
@@ -542,7 +527,7 @@ describe('Popover', () => {
 				const {content} = elements;
 
 				// Test bottom + start
-				register_action(popover.content(content, {position: 'bottom', align: 'start'}));
+				register_attachment(popover.content({position: 'bottom', align: 'start'})(content));
 				check_style(content, 'top', '100%');
 				check_style(content, 'bottom', 'auto');
 				check_style(content, 'left', '0');
@@ -552,7 +537,7 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test bottom + center
-				register_action(popover.content(content, {position: 'bottom', align: 'center'}));
+				register_attachment(popover.content({position: 'bottom', align: 'center'})(content));
 				check_style(content, 'top', '100%');
 				check_style(content, 'bottom', 'auto');
 				check_style(content, 'left', '50%');
@@ -562,7 +547,7 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test bottom + end
-				register_action(popover.content(content, {position: 'bottom', align: 'end'}));
+				register_attachment(popover.content({position: 'bottom', align: 'end'})(content));
 				check_style(content, 'top', '100%');
 				check_style(content, 'bottom', 'auto');
 				check_style(content, 'left', 'auto');
@@ -572,8 +557,8 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Test bottom with offset
-				register_action(
-					popover.content(content, {position: 'bottom', align: 'start', offset: '10px'}),
+				register_attachment(
+					popover.content({position: 'bottom', align: 'start', offset: '10px'})(content),
 				);
 				check_style(content, 'top', 'calc(100% + 10px)');
 			});
@@ -581,7 +566,7 @@ describe('Popover', () => {
 			test('verifies center position styles', () => {
 				const {content} = elements;
 
-				register_action(popover.content(content, {position: 'center'}));
+				register_attachment(popover.content({position: 'center'})(content));
 				check_style(content, 'top', '50%');
 				check_style(content, 'left', '50%');
 				check_style(content, 'transform', 'translate(-50%, -50%)');
@@ -589,8 +574,8 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Center ignores alignment and offset
-				register_action(
-					popover.content(content, {position: 'center', align: 'start', offset: '10px'}),
+				register_attachment(
+					popover.content({position: 'center', align: 'start', offset: '10px'})(content),
 				);
 				check_style(content, 'top', '50%');
 				check_style(content, 'left', '50%');
@@ -600,7 +585,7 @@ describe('Popover', () => {
 			test('verifies overlay position styles', () => {
 				const {content} = elements;
 
-				register_action(popover.content(content, {position: 'overlay'}));
+				register_attachment(popover.content({position: 'overlay'})(content));
 				check_style(content, 'top', '0');
 				check_style(content, 'left', '0');
 				check_style(content, 'width', '100%');
@@ -609,8 +594,8 @@ describe('Popover', () => {
 				cleanup_actions.pop()?.();
 
 				// Overlay ignores alignment and offset
-				register_action(
-					popover.content(content, {position: 'overlay', align: 'end', offset: '10px'}),
+				register_attachment(
+					popover.content({position: 'overlay', align: 'end', offset: '10px'})(content),
 				);
 				check_style(content, 'top', '0');
 				check_style(content, 'left', '0');
@@ -627,35 +612,35 @@ describe('Popover', () => {
 				});
 
 				// Initial setup
-				register_action(popover.content(content));
+				register_attachment(popover.content()(content));
 				check_style(content, 'top', '100%');
 				check_style(content, 'left', '50%');
 
-				// Need to force refresh of styles by destroying and recreating the action
+				// With attachments being reactive, we need to recreate them to pick up new params
 				cleanup_actions.pop()?.();
 
 				// Update position
 				popover.update({position: 'right'});
-				register_action(popover.content(content));
+				register_attachment(popover.content()(content));
 				check_style(content, 'left', '100%');
 				check_style(content, 'top', '50%');
 				cleanup_actions.pop()?.();
 
 				// Update alignment
 				popover.update({align: 'start'});
-				register_action(popover.content(content));
+				register_attachment(popover.content()(content));
 				check_style(content, 'top', '0');
 				cleanup_actions.pop()?.();
 
 				// Update offset
 				popover.update({offset: '15px'});
-				register_action(popover.content(content));
+				register_attachment(popover.content()(content));
 				check_style(content, 'left', 'calc(100% + 15px)');
 				cleanup_actions.pop()?.();
 
 				// Multiple updates at once
 				popover.update({position: 'top', align: 'end', offset: '5px'});
-				register_action(popover.content(content));
+				register_attachment(popover.content()(content));
 				check_style(content, 'bottom', 'calc(100% + 5px)');
 				check_style(content, 'right', '0');
 				check_style(content, 'top', 'auto');
@@ -669,7 +654,7 @@ describe('Popover', () => {
 				const positions: Array<Position> = ['left', 'right', 'top', 'bottom', 'center', 'overlay'];
 
 				for (const position of positions) {
-					register_action(popover.content(content, {position}));
+					register_attachment(popover.content({position})(content));
 					expect(content.style.zIndex).toBe('10');
 					cleanup_actions.pop()?.();
 				}
@@ -688,7 +673,7 @@ describe('Popover', () => {
 				];
 
 				for (const {position, expected} of position_origins) {
-					register_action(popover.content(content, {position: position as Position}));
+					register_attachment(popover.content({position: position as Position})(content));
 					expect(content.style.getPropertyValue('transform-origin')).toBe(expected);
 					cleanup_actions.pop()?.();
 				}
@@ -702,9 +687,9 @@ describe('Popover', () => {
 			const onhide = vi.fn();
 			popover = new Popover({onhide});
 
-			// Set up actions
-			register_action(popover.trigger(trigger));
-			register_action(popover.content(content));
+			// Set up attachments
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
 
 			// Show the popover
 			popover.show();
@@ -727,9 +712,9 @@ describe('Popover', () => {
 				onhide,
 			});
 
-			// Set up actions
-			register_action(popover.trigger(trigger));
-			register_action(popover.content(content));
+			// Set up attachments
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
 
 			// Show the popover
 			popover.show();
@@ -749,9 +734,9 @@ describe('Popover', () => {
 			const onhide = vi.fn();
 			popover = new Popover({onhide});
 
-			// Set up actions
-			register_action(popover.trigger(trigger));
-			register_action(popover.content(content));
+			// Set up attachments
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
 
 			// Show the popover
 			popover.show();
@@ -786,9 +771,9 @@ describe('Popover', () => {
 			const inner_content = document.createElement('span');
 			content.appendChild(inner_content);
 
-			// Set up actions
-			register_action(popover.trigger(trigger));
-			register_action(popover.content(content));
+			// Set up attachments
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
 
 			// Show popover
 			popover.show();
@@ -818,9 +803,9 @@ describe('Popover', () => {
 		test('changing disable_outside_click dynamically', () => {
 			const {trigger, content, body} = elements;
 
-			// Set up actions
-			register_action(popover.trigger(trigger));
-			register_action(popover.content(content));
+			// Set up attachments
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
 
 			// Show popover
 
@@ -857,8 +842,8 @@ describe('Popover', () => {
 				popover_class: 'initial-class',
 			});
 
-			// Set up content action
-			register_action(popover.content(content));
+			// Set up content attachment
+			register_attachment(popover.content()(content));
 
 			// Initial class should be applied
 			expect(content.classList.contains('initial-class')).toBe(true);
@@ -874,17 +859,16 @@ describe('Popover', () => {
 		test('cleanup removes event listeners', () => {
 			const {trigger, content} = elements;
 
-			// Set up actions
-			const trigger_action = register_action(popover.trigger(trigger));
-			const content_action = register_action(popover.content(content));
+			// Set up attachments
+			const trigger_cleanup = popover.trigger()(trigger);
+			const content_cleanup = popover.content()(content);
 
 			// Show popover to set up document click listener
 			popover.show();
 
-			// Clean up actions
-			cleanup_actions = []; // Clear all registered cleanups
-			trigger_action.destroy?.();
-			content_action.destroy?.();
+			// Clean up attachments
+			trigger_cleanup?.();
+			content_cleanup?.();
 
 			// After cleanup, clicking trigger should do nothing
 			trigger.click();
@@ -900,12 +884,12 @@ describe('Popover', () => {
 			const popover1 = new Popover();
 			const popover2 = new Popover();
 
-			// Set up actions for both popovers
-			register_action(popover1.trigger(elements1.trigger));
-			register_action(popover1.content(elements1.content));
+			// Set up attachments for both popovers
+			register_attachment(popover1.trigger()(elements1.trigger));
+			register_attachment(popover1.content()(elements1.content));
 
-			register_action(popover2.trigger(elements2.trigger));
-			register_action(popover2.content(elements2.content));
+			register_attachment(popover2.trigger()(elements2.trigger));
+			register_attachment(popover2.content()(elements2.content));
 
 			// Show first popover
 			elements1.trigger.click();
@@ -924,6 +908,196 @@ describe('Popover', () => {
 
 			// Clean up
 			document.body.removeChild(elements2.container);
+		});
+	});
+
+	describe('real-world scenarios and robustness', () => {
+		test('popover survives DOM manipulation', () => {
+			const {trigger, content} = elements;
+			const onhide = vi.fn();
+			popover = new Popover({onhide});
+
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
+
+			// Show popover
+			trigger.click();
+			expect(popover.visible).toBe(true);
+
+			// Add/remove siblings (common in dynamic UIs)
+			const sibling = document.createElement('div');
+			elements.container.appendChild(sibling);
+			elements.container.removeChild(sibling);
+
+			// Popover should still be functional
+			expect(popover.visible).toBe(true);
+			trigger.click();
+			expect(popover.visible).toBe(false);
+			expect(onhide).toHaveBeenCalled();
+		});
+
+		test('handles rapid show/hide cycles', () => {
+			const {trigger} = elements;
+			const onshow = vi.fn();
+			const onhide = vi.fn();
+			popover = new Popover({onshow, onhide});
+
+			register_attachment(popover.trigger()(trigger));
+
+			// Rapid clicking should be handled gracefully
+			for (let i = 0; i < 10; i++) {
+				trigger.click();
+			}
+
+			// Should end up hidden (started hidden, 10 clicks = even number)
+			expect(popover.visible).toBe(false);
+			expect(onshow).toHaveBeenCalledTimes(5);
+			expect(onhide).toHaveBeenCalledTimes(5);
+		});
+
+		test('preserves state during attachment recreation', () => {
+			const {trigger} = elements;
+			popover = new Popover({position: 'top', align: 'start'});
+
+			// Set up initial attachment
+			let cleanup = popover.trigger()(trigger);
+			register_attachment(cleanup);
+
+			// Show popover
+			trigger.click();
+			expect(popover.visible).toBe(true);
+
+			// Recreate attachment (simulates reactive updates)
+			cleanup?.();
+			cleanup = popover.trigger()(trigger);
+			register_attachment(cleanup);
+
+			// State should be preserved
+			expect(popover.visible).toBe(true);
+			expect(popover.position).toBe('top');
+			expect(popover.align).toBe('start');
+		});
+
+		test('handles element removal gracefully', () => {
+			const {trigger} = elements;
+
+			// Should not throw when elements are missing
+			expect(() => {
+				popover.show();
+				popover.hide();
+				popover.toggle();
+			}).not.toThrow();
+
+			// Should handle element removal during operation
+			register_attachment(popover.trigger()(trigger));
+			popover.show();
+
+			// Should not crash when trigger is removed
+			trigger.remove();
+			expect(() => popover.hide()).not.toThrow();
+		});
+
+		test('ARIA attributes maintained correctly', () => {
+			const {trigger, content} = elements;
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
+
+			// Initial ARIA state
+			expect(trigger.getAttribute('aria-expanded')).toBe('false');
+			expect(content.getAttribute('role')).toBe('dialog');
+
+			// Show and verify ARIA
+			popover.show();
+			expect(trigger.getAttribute('aria-expanded')).toBe('true');
+			expect(trigger.getAttribute('aria-controls')).toBeTruthy();
+			expect(content.id).toBeTruthy();
+			expect(trigger.getAttribute('aria-controls')).toBe(content.id);
+
+			// Hide and verify ARIA persists
+			popover.hide();
+			expect(trigger.getAttribute('aria-expanded')).toBe('false');
+			expect(trigger.getAttribute('aria-controls')).toBe(content.id);
+		});
+
+		test('callbacks fire in correct order', () => {
+			const events: Array<string> = [];
+			const onshow = () => events.push('show');
+			const onhide = () => events.push('hide');
+			popover = new Popover({onshow, onhide});
+
+			// Test multiple show/hide cycles
+			popover.show();
+			popover.hide();
+			popover.show();
+			popover.hide();
+
+			expect(events).toEqual(['show', 'hide', 'show', 'hide']);
+		});
+
+		test('nested element click detection', () => {
+			const {trigger, content} = elements;
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
+
+			// Create deeply nested structure
+			const level1 = document.createElement('div');
+			const level2 = document.createElement('span');
+			const level3 = document.createElement('em');
+			level1.appendChild(level2);
+			level2.appendChild(level3);
+			content.appendChild(level1);
+
+			popover.show();
+			expect(popover.visible).toBe(true);
+
+			// Click on deeply nested element should not close popover
+			const nested_click = create_mock_event('click', level3);
+			document.dispatchEvent(nested_click);
+			expect(popover.visible).toBe(true);
+
+			// Click outside should close popover
+			const outside_click = create_mock_event('click', document.body);
+			document.dispatchEvent(outside_click);
+			expect(popover.visible).toBe(false);
+		});
+
+		test('multiple popovers independence', () => {
+			const popovers: Array<Popover> = [];
+			const triggers: Array<HTMLElement> = [];
+
+			// Create multiple popovers
+			for (let i = 0; i < 3; i++) {
+				const popover_instance = new Popover();
+				const trigger = document.createElement('button');
+				trigger.textContent = `Trigger ${i}`;
+				document.body.appendChild(trigger);
+
+				register_attachment(popover_instance.trigger()(trigger));
+				popovers.push(popover_instance);
+				triggers.push(trigger);
+			}
+
+			// Show all popovers
+			for (const popover_instance of popovers) {
+				popover_instance.show();
+				expect(popover_instance.visible).toBe(true);
+			}
+
+			// Hide them one by one and verify others remain visible
+			for (let i = 0; i < popovers.length; i++) {
+				popovers[i].hide();
+				expect(popovers[i].visible).toBe(false);
+
+				// Check remaining popovers are still visible
+				for (let j = i + 1; j < popovers.length; j++) {
+					expect(popovers[j].visible).toBe(true);
+				}
+			}
+
+			// Clean up
+			for (const trigger of triggers) {
+				trigger.remove();
+			}
 		});
 	});
 });

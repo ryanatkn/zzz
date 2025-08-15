@@ -8,22 +8,21 @@
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+		onclose,
+		oncancel,
+	}: {
 		ollama: Ollama;
 		onclose?: () => void;
 		oncancel?: () => void;
-	}
-
-	const {ollama, onclose, oncancel}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
 	const {models_not_downloaded} = $derived(app.ollama);
 
-	// Filter actions to show only pull operations
-	const pull_actions = $derived(
-		ollama.actions.filter((action) => action.method === 'ollama_pull').reverse(),
-	);
+	const pull_actions = $derived(ollama.actions.filter((a) => a.method === 'ollama_pull')); // TODO index?
 
 	const handle_pull = async () => {
 		onclose?.();

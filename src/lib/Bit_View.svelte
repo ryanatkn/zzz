@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -12,12 +12,13 @@
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
-		bit: Bit_Type;
+	const {
+		bit,
+		show_actions = true,
+	}: {
+		bit: Bit_Union;
 		show_actions?: boolean | undefined;
-	}
-
-	const {bit, show_actions = true}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {prompts} = app;
@@ -30,7 +31,7 @@
 		<div class="display_flex mb_0 justify_content_space_between">
 			<div class="font_size_lg m_0">
 				<!-- TODO I like the idea of making this glyph the drag handle (but we probably want dynamic tiles first) -->
-				<Glyph glyph={get_bit_type_glyph(bit)} attrs={{class: 'mr_xs2'}} />
+				<Glyph glyph={get_bit_type_glyph(bit)} />&nbsp;
 				{bit.name}
 			</div>
 			<div class="display_flex gap_xs">

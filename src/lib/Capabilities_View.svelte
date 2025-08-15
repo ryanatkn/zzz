@@ -30,8 +30,8 @@
 			<h2><Glyph glyph={GLYPH_CONNECT} /> backend websocket</h2>
 			<p>
 				Websockets are an optional transport that's preferred by default. Zzz currently relies on
-				websockets for pushed updates like filesystem changes - SSE support as an alternative will
-				be added in the future. (will it work for all usecases?)
+				websockets for pushed updates like filesystem changes -- SSE will be supported as an option
+				in the future.
 			</p>
 			<Capability_Websocket />
 		</section>

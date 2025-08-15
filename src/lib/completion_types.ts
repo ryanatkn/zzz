@@ -9,7 +9,7 @@ export type Completion_Role = z.infer<typeof Completion_Role>;
 
 export const Completion_Message = z.object({
 	role: Completion_Role,
-	content: z.string(),
+	content: z.string(), // TODO maybe rename to `text` or something, see the APIs, they have different names
 });
 export type Completion_Message = z.infer<typeof Completion_Message>;
 
@@ -19,6 +19,7 @@ export const Completion_Request = z
 		provider_name: Provider_Name,
 		model: z.string(),
 		prompt: z.string(),
+		// TODO rename? this API is going to change likely to fit better with the responses API
 		completion_messages: z.array(Completion_Message).optional(),
 	})
 	.strict();

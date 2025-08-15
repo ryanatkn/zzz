@@ -7,11 +7,11 @@
 
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		disabled,
+	}: {
 		disabled?: boolean | undefined;
-	}
-
-	const {disabled}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

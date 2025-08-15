@@ -2,11 +2,11 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
 
-	interface Props {
+	const {
+		chat,
+	}: {
 		chat: Chat;
-	}
-
-	const {chat}: Props = $props();
+	} = $props();
 
 	const {app} = $derived(chat);
 
@@ -44,12 +44,9 @@
 					<!-- TODO index this -->
 					{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
 					<Confirm_Button
-						attrs={{
-							disabled: !tapes_with_tag.length,
-							class:
-								'w_100 font_size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600',
-							style: 'min-height: 0;',
-						}}
+						disabled={!tapes_with_tag.length}
+						class="w_100 font_size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600"
+						style="min-height: 0;"
 						onconfirm={() => {
 							chat.remove_tapes_by_model_tag(tag);
 						}}

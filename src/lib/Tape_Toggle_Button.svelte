@@ -3,12 +3,13 @@
 
 	import type {Tape} from '$lib/tape.svelte.js';
 
-	interface Props {
+	const {
+		tape,
+		attrs,
+	}: {
 		tape: Tape;
 		attrs?: SvelteHTMLElements['input'] | undefined;
-	}
-
-	const {tape, attrs}: Props = $props();
+	} = $props();
 </script>
 
 <input

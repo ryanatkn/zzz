@@ -1,24 +1,23 @@
 import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
+import {strip_start} from '@ryanatkn/belt/string.js';
 
 import {Uuid, Datetime, Datetime_Now, create_uuid} from '$lib/zod_helpers.js';
 import {
 	Diskfile_Change_Type,
+	Diskfile_Directory_Path,
 	Diskfile_Path,
 	Serializable_Source_File,
-	Zzz_Dir,
 	type Diskfile_Json,
 } from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
-import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
-
-export const to_zzz_cache_dir = (
-	dir: Zzz_Dir,
-	dirname: string = ZZZ_CACHE_DIRNAME,
-): Diskfile_Path => Diskfile_Path.parse(dir + dirname);
 
 // TODO probably extract to `@ryanatkn/belt/path.js`
 export const is_path_absolute = (path: string): boolean => path[0] === '/';
+
+// TODO hacky, refactor path helpers with `@ryanatkn/belt/path.js`
+export const to_relative_path = (path: string, parent: string): string =>
+	strip_start(strip_start(path, parent), '/');
 
 /**
  * Maps watcher change types to diskfile change types
@@ -71,7 +70,7 @@ export const to_serializable_source_file = (
 	dir: string,
 ): Serializable_Source_File => ({
 	id: source_file.id as Diskfile_Path,
-	source_dir: dir as Diskfile_Path,
+	source_dir: dir as Diskfile_Directory_Path,
 	contents: source_file.contents,
 	ctime: source_file.ctime,
 	mtime: source_file.mtime,

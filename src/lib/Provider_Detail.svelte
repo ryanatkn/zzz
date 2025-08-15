@@ -2,6 +2,7 @@
 	import {base} from '$app/paths';
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
+	import {format_url} from '@ryanatkn/belt/url.js';
 
 	import type {Provider} from '$lib/provider.svelte.js';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
@@ -12,16 +13,20 @@
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 
-	interface Props {
+	const {
+		provider,
+		attrs,
+	}: {
 		provider: Provider;
 		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
-
-	const {provider, attrs}: Props = $props();
+	} = $props();
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
 	const app = frontend_context.get();
+
+	// TODO @many get and display Ollama version, JS API client doesnt have it but the REST API does
+	// maybe at `<Glyph glyph={GLYPH_PROVIDER} />{provider.name}`
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
@@ -33,18 +38,19 @@
 					{provider.title}
 				</h1>
 			{:else}
-				<h2>
+				<h2 class="mb_md">
 					<External_Link href={provider.url}>{provider.title}</External_Link>
 				</h2>
 			{/if}
-			<div>
-				<div class="mb_md">
-					<Glyph glyph={GLYPH_PROVIDER} />{provider.name}
-				</div>
-				<div>
-					<External_Link href={provider.url}>docs</External_Link>
-				</div>
-			</div>
+			<p class="mb_md">
+				<Glyph glyph={GLYPH_PROVIDER} />{provider.name}
+			</p>
+			<p class="mb_md">
+				<External_Link href={provider.homepage}>{format_url(provider.homepage)}</External_Link>
+			</p>
+			<p class="mb_md">
+				<External_Link href={provider.url}>docs</External_Link>
+			</p>
 		</div>
 	</section>
 	{#if provider.name === 'ollama'}

@@ -2,14 +2,14 @@ import {z} from 'zod';
 
 import {Uuid} from '$lib/zod_helpers.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
-import {Bit_Json, type Bit_Type} from '$lib/bit.svelte.js';
+import {Bit_Json, type Bit_Union} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {format_prompt_content} from '$lib/prompt_helpers.js';
 
 export interface Prompt_Message {
-	role: 'user' | 'system';
+	role: 'user' | 'system'; // TODO assistant? string? eh?
 	content: Array<Prompt_Action_Content>;
 }
 
@@ -28,7 +28,7 @@ export interface Prompt_Options extends Cell_Options<typeof Prompt_Json> {
 
 export class Prompt extends Cell<typeof Prompt_Json> {
 	name: string = $state()!;
-	bits: Array<Bit_Type> = $state()!;
+	bits: Array<Bit_Union> = $state()!;
 
 	readonly content: string = $derived(format_prompt_content(this.bits));
 
@@ -44,7 +44,7 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	/**
 	 * Add a bit to this prompt.
 	 */
-	add_bit(bit: Bit_Type): Bit_Type {
+	add_bit(bit: Bit_Union): Bit_Union {
 		this.bits.push(bit);
 		return bit;
 	}

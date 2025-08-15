@@ -6,11 +6,11 @@
 	import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 	import Strip_Contextmenu from '$lib/Strip_Contextmenu.svelte';
 
-	interface Props {
+	const {
+		strip,
+	}: {
 		strip: Strip;
-	}
-
-	const {strip}: Props = $props();
+	} = $props();
 </script>
 
 <Strip_Contextmenu {strip}>

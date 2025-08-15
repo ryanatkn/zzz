@@ -4,24 +4,42 @@
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Tape_Contextmenu from '$lib/Tape_Contextmenu.svelte';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		tape,
+		chat,
+	}: {
 		tape: Tape;
 		chat: Chat;
-	}
-
-	const {tape, chat}: Props = $props();
+	} = $props();
 
 	const strip_count = $derived(tape.strips.size);
+
+	// TODO hacky but is the desired UX for now
+	const selectable = $derived(chat.view_mode === 'simple');
+	const selected = $derived(selectable && chat.selected_tape_id === tape.id);
 </script>
 
 <Tape_Contextmenu {tape}>
-	<div class="tape_summary panel p_xs" class:dormant={!tape.enabled}>
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div
+		class="tape_listitem p_xs2"
+		class:dormant={!tape.enabled}
+		class:selected
+		onclick={selectable ? () => chat.select_tape(tape.id) : undefined}
+		onkeydown={selectable ? (e) => e.key === 'Enter' && chat.select_tape(tape.id) : undefined}
+		role={selectable ? 'button' : undefined}
+		tabindex={selectable ? 0 : undefined}
+	>
 		<div class="row justify_content_space_between gap_xs">
 			<div class="flex_1">
-				<div class="font_weight_600">{tape.model_name}</div>
+				<div class="font_weight_400">
+					<Provider_Logo name={tape.model.provider_name} size="var(--font_size_md)" />
+					{tape.model_name}
+				</div>
 				<div class="display_flex gap_xs">
 					{#if strip_count > 0}
 						<small
@@ -30,18 +48,15 @@
 								? 's'
 								: ''}</small
 						>
-					{:else}&nbsp;
-					{/if}
+					{:else}&nbsp;{/if}
 				</div>
 			</div>
 			<div class="display_flex gap_xs">
 				<Tape_Toggle_Button {tape} />
 				<Confirm_Button
 					onconfirm={() => chat.remove_tape(tape.id)}
-					attrs={{
-						class: 'icon_button plain',
-						title: 'delete tape',
-					}}
+					class="icon_button plain"
+					title="delete tape"
 				>
 					<Glyph glyph={GLYPH_REMOVE} />
 				</Confirm_Button>
@@ -51,7 +66,15 @@
 </Tape_Contextmenu>
 
 <style>
-	.tape_summary:hover {
+	/* TODO hacky styles, see usage, extract reusable parts (classes/components and border variables) */
+	.tape_listitem {
+		border-radius: var(--border_radius_xs);
+		border: var(--border_width_2) var(--border_style) transparent;
+	}
+	.tape_listitem.selected {
+		border-color: var(--border_color_a);
+	}
+	.tape_listitem:hover {
 		background-color: var(--bg_1);
 	}
 </style>

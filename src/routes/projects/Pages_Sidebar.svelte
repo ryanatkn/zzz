@@ -20,7 +20,7 @@
 				class="plain justify_content_start flex_1"
 				onclick={() => project_viewmodel.create_new_page()}
 			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new page
+				<Glyph glyph={GLYPH_ADD} />&nbsp; new page
 			</button>
 		</div>
 
@@ -32,7 +32,7 @@
 							<Nav_Link
 								href="{base}/projects/{project_viewmodel.project_id}/pages/{page.id}"
 								selected={page.id === projects.current_page_id}
-								attrs={{title: page.title}}
+								title={page.title}
 							>
 								<span class="ellipsis">{page.title}</span>
 							</Nav_Link>

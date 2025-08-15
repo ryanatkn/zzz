@@ -5,16 +5,16 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
-	import {GLYPH_ADD, GLYPH_PLACEHOLDER, GLYPH_REMOVE} from '$lib/glyphs.js';
+	import {GLYPH_ADD, GLYPH_PLACEHOLDER, GLYPH_REMOVE, GLYPH_SEND} from '$lib/glyphs.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		chat,
+	}: {
 		chat: Chat;
-	}
-
-	const {chat}: Props = $props();
+	} = $props();
 
 	let content_input: {focus: () => void} | undefined;
 	let pending = $state(false); // TODO refactor request state
@@ -60,19 +60,19 @@
 				disabled={!count ? true : undefined}
 				attrs={{class: 'plain'}}
 			>
-				send to {count}
+				<Glyph glyph={GLYPH_SEND} /> to {count}
 			</Pending_Button>
 		</Content_Editor>
 
 		<div class="display_flex mt_lg">
 			<button type="button" class="plain" onclick={() => (show_model_picker = true)}>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add tape
+				<Glyph glyph={GLYPH_ADD} />&nbsp; add tape
 			</button>
 			<Confirm_Button
 				onconfirm={() => chat.remove_all_tapes()}
 				position="right"
-				attrs={{disabled: !count, class: 'plain'}}
-				><Glyph glyph={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all</Confirm_Button
+				disabled={!count}
+				class="plain"><Glyph glyph={GLYPH_REMOVE} />&nbsp; remove all</Confirm_Button
 			>
 		</div>
 		<ul class="tapes unstyled mt_lg">

@@ -39,7 +39,7 @@
 							class="color_a"
 							onclick={() => project_viewmodel.create_new_page()}
 						>
-							<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create your first page
+							<Glyph glyph={GLYPH_ADD} />&nbsp; create your first page
 						</button>
 					</p>
 				{:else}
@@ -74,7 +74,7 @@
 							class="color_a"
 							onclick={() => project_viewmodel.create_new_page()}
 						>
-							<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new page
+							<Glyph glyph={GLYPH_ADD} />&nbsp; new page
 						</button>
 					</div>
 				{/if}

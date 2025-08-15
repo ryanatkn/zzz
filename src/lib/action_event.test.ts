@@ -237,6 +237,30 @@ describe('Action_Event', () => {
 				"cannot handle from step 'initial' - must be 'parsed'",
 			);
 		});
+
+		test('is no-op when already failed', async () => {
+			const env = new Test_Environment([create_completion_action_spec]);
+			const invalid_input = {
+				completion_request: {
+					// Missing required fields
+					prompt: 'test',
+				},
+			};
+
+			const event = create_action_event(env, create_completion_action_spec, invalid_input);
+			event.parse();
+
+			// Should be failed after parsing invalid input
+			expect(event.data.step).toBe('failed');
+			const original_error = event.data.error;
+
+			// handle_async should be no-op
+			await event.handle_async();
+
+			// State should remain unchanged
+			expect(event.data.step).toBe('failed');
+			expect(event.data.error).toBe(original_error);
+		});
 	});
 
 	describe('handle_sync()', () => {
@@ -263,6 +287,25 @@ describe('Action_Event', () => {
 			expect(() => event.handle_sync()).toThrow(
 				'handle_sync can only be used with synchronous local_call actions',
 			);
+		});
+
+		test('is no-op when already failed', () => {
+			const env = new Test_Environment([toggle_main_menu_action_spec]);
+
+			// Force a failure by providing invalid input - show must be boolean
+			const event = create_action_event(env, toggle_main_menu_action_spec, {show: 'not-a-boolean'});
+			event.parse();
+
+			// Should be failed after parsing invalid input
+			expect(event.data.step).toBe('failed');
+			const original_error = event.data.error;
+
+			// handle_sync should be no-op
+			event.handle_sync();
+
+			// State should remain unchanged
+			expect(event.data.step).toBe('failed');
+			expect(event.data.error).toBe(original_error);
 		});
 	});
 
@@ -336,6 +379,31 @@ describe('Action_Event', () => {
 			expect(event.data.response).toBeDefined();
 			expect(event.data.response).toHaveProperty('result');
 		});
+
+		test('is no-op when already failed', async () => {
+			const env = new Test_Environment([ping_action_spec]);
+
+			env.add_handler('ping', 'send_request', () => {
+				throw new Error('handler error to force failure');
+			});
+
+			const event = create_action_event(env, ping_action_spec, undefined);
+			event.parse();
+			await event.handle_async();
+
+			// Should be failed after handler error
+			expect(event.data.step).toBe('failed');
+			const original_error = event.data.error;
+			const original_phase = event.data.phase;
+
+			// transition should be no-op
+			event.transition('receive_response');
+
+			// State should remain unchanged
+			expect(event.data.step).toBe('failed');
+			expect(event.data.phase).toBe(original_phase);
+			expect(event.data.error).toBe(original_error);
+		});
 	});
 
 	describe('protocol setters', () => {
@@ -383,6 +451,45 @@ describe('Action_Event', () => {
 
 			expect(event.data.response).toEqual(response);
 			expect(event.data.output).toEqual(response.result);
+		});
+
+		test('error response transitions to failed state on parse', () => {
+			const env = new Test_Environment([ping_action_spec]);
+
+			const event = create_action_event(env, ping_action_spec, undefined);
+			event.parse();
+			// Need to handle and transition first
+			event.handle_sync = () => {
+				// Mock sync handling
+			};
+			event.data.step = 'handled';
+			event.data.request = {
+				jsonrpc: '2.0',
+				id: create_uuid(),
+				method: 'ping',
+			};
+
+			event.transition('receive_response');
+
+			const errorResponse = {
+				jsonrpc: '2.0',
+				id: event.data.request.id,
+				error: {
+					code: -32603,
+					message: 'Internal error',
+					data: {details: 'Test error'},
+				},
+			} as const;
+
+			event.set_response(errorResponse);
+
+			// Parse should detect the error and transition to failed
+			event.parse();
+
+			expect(event.data.step).toBe('failed');
+			expect(event.data.error).toEqual(errorResponse.error);
+			expect(event.data.response).toEqual(errorResponse);
+			expect(event.data.output).toBe(null);
 		});
 
 		test('set_notification() sets notification data', () => {
@@ -632,10 +739,9 @@ describe('Action_Event', () => {
 			expect(event.data.error?.code).toBe(-32602);
 			expect(event.data.error?.message).toContain('failed to parse input');
 
-			// Should not be able to handle after parse failure
-			await expect(() => event.handle_async()).rejects.toThrow(
-				"cannot handle from step 'failed' - must be 'parsed'",
-			);
+			// Should be a no-op when handling after parse failure
+			await event.handle_async();
+			expect(event.data.step).toBe('failed'); // Still failed, no change
 		});
 
 		test('remote_notification creates notification in send phase', async () => {

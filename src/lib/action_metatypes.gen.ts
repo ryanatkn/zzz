@@ -6,6 +6,8 @@ import * as action_specs from '$lib/action_specs.js';
 import {is_action_spec} from '$lib/action_spec.js';
 import {Action_Registry} from '$lib/action_registry.js';
 
+// TODO some of these can probably be declared differently without codegen
+
 /**
  * Outputs a file with generated types and schemas using the action specs as the source of truth.
  */
@@ -78,12 +80,10 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) => {
 					const innermost_type_name = get_innermost_type_name(spec.input);
-					const has_input =
-						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodNull &&
-						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
+					const has_input = innermost_type_name !== 'null' && innermost_type_name !== 'void';
 					return `${spec.method}: (${
 						has_input
-							? `input${spec.input.isOptional() ? '?' : ''}: Action_Inputs['${spec.method}']`
+							? `input${spec.input.safeParse(undefined).success ? '?' : ''}: Action_Inputs['${spec.method}']`
 							: 'input?: void'
 					}) => ${
 						spec.kind === 'request_response' || spec.async

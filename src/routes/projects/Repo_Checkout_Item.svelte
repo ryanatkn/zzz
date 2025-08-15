@@ -5,15 +5,19 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import type {Repo_Checkout} from '$routes/projects/repo.svelte.js';
 
-	interface Props {
+	const {
+		checkout,
+		index,
+		on_remove,
+		on_add_tag,
+		on_remove_tag,
+	}: {
 		checkout: Repo_Checkout;
 		index: number;
 		on_remove: (index: number) => void;
 		on_add_tag: (index: number, tag: string) => void;
 		on_remove_tag: (index: number, tag_index: number) => void;
-	}
-
-	const {checkout, index, on_remove, on_add_tag, on_remove_tag}: Props = $props();
+	} = $props();
 
 	let tag_input = $state('');
 	let tag_el: HTMLInputElement | undefined = $state();
@@ -85,7 +89,7 @@
 
 	<div class="display_flex justify_content_end">
 		<button type="button" class="color_c" onclick={() => on_remove(index)}>
-			<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete checkout
+			<Glyph glyph={GLYPH_DELETE} />&nbsp; delete checkout
 		</button>
 	</div>
 </div>

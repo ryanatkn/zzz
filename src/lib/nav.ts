@@ -32,23 +32,24 @@ export interface Nav_Item {
 // if any, when not on the route directly.
 // See also the `onNavigate` fix in the root layout for nulling out the value
 // when navigating directly to the base route.
-export const to_nav_link_href = (app: Frontend, link: Nav_Link_Item): string => {
+export const to_nav_link_href = (app: Frontend, label: string, href: string): string => {
 	if (
-		link.label === 'chats' &&
+		label === 'chats' &&
 		app.chats.selected_id_last_non_null &&
-		!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
+		!(page.url.pathname === href || page.url.pathname.startsWith(href + '/'))
 	) {
-		return link.href + '/' + app.chats.selected_id_last_non_null;
+		return href + '/' + app.chats.selected_id_last_non_null;
 	} else if (
-		link.label === 'prompts' &&
+		label === 'prompts' &&
 		app.prompts.selected_id_last_non_null &&
-		!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
+		!(page.url.pathname === href || page.url.pathname.startsWith(href + '/'))
 	) {
-		return link.href + '/' + app.prompts.selected_id_last_non_null;
+		return href + '/' + app.prompts.selected_id_last_non_null;
 	}
-	return link.href;
+	return href;
 };
 
+// TODO make this configurable
 export const main_nav_items_default: Array<Nav_Item> = [
 	{
 		group: 'main',
@@ -70,7 +71,7 @@ export const main_nav_items_default: Array<Nav_Item> = [
 		items: [
 			{label: 'about', href: `${base}/about`, icon: zzz_logo},
 			{label: 'capabilities', href: `${base}/capabilities`, icon: GLYPH_CAPABILITY},
-			{label: 'log', href: `${base}/log`, icon: GLYPH_LOG},
+			{label: 'actions', href: `${base}/actions`, icon: GLYPH_LOG},
 			{label: 'settings', href: `${base}/settings`, icon: GLYPH_SETTINGS},
 		],
 	},

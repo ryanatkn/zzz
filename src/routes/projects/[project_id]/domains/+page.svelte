@@ -38,7 +38,7 @@
 								class="color_a"
 								onclick={() => project_viewmodel.create_new_domain()}
 							>
-								<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add your first domain
+								<Glyph glyph={GLYPH_ADD} />&nbsp; add your first domain
 							</button>
 						</p>
 					</div>
@@ -87,7 +87,7 @@
 						class="color_a"
 						onclick={() => project_viewmodel.create_new_domain()}
 					>
-						<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new domain
+						<Glyph glyph={GLYPH_ADD} />&nbsp; new domain
 					</button>
 				</div>
 			</div>

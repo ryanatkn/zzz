@@ -21,7 +21,7 @@
 				void goto(`${base}/projects/${project.id}`);
 			}}
 		>
-			<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new project
+			<Glyph glyph={GLYPH_ADD} />&nbsp; new project
 		</button>
 	</div>
 
@@ -32,7 +32,7 @@
 					<Nav_Link
 						href="{base}/projects/{project.id}"
 						selected={project.id === projects.current_project_id}
-						attrs={{title: project.name}}
+						title={project.name}
 					>
 						<span class="ellipsis">{project.name}</span>
 					</Nav_Link>
@@ -41,5 +41,7 @@
 		</ul>
 	</nav>
 
-	<aside>⚠️⚠️ speculative demo</aside>
+	<aside title="huh I might take quality vibecoded PRs, but probably in a new repo">
+		⚠️ <small>speculative demo</small> ⚠️
+	</aside>
 </aside>

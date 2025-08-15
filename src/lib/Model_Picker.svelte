@@ -8,19 +8,17 @@
 	const app = frontend_context.get();
 	const {models} = app;
 
-	interface Props {
-		onpick: (model: Model | undefined) => boolean | void;
-		items?: Array<Model>;
-		filter?: ((model: Model) => boolean) | undefined;
-		heading?: string | null;
-	}
-
 	const {
 		items = models.ordered_by_name,
 		onpick,
 		filter,
 		heading = 'pick a model',
-	}: Props = $props();
+	}: {
+		onpick: (model: Model | undefined) => boolean | void;
+		items?: Array<Model>;
+		filter?: ((model: Model) => boolean) | undefined;
+		heading?: string | null;
+	} = $props();
 </script>
 
 <Picker

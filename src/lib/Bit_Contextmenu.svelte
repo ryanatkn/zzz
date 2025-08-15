@@ -6,7 +6,7 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import {GLYPH_BIT, GLYPH_DELETE, GLYPH_EDIT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
@@ -15,11 +15,12 @@
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 	import Contextmenu_Entry_Toggle from '$lib/Contextmenu_Entry_Toggle.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
-		bit: Bit_Type;
-	}
-
-	const {bit, ...rest}: Props = $props();
+	const {
+		bit,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
+		bit: Bit_Union;
+	} = $props();
 
 	const app = frontend_context.get();
 

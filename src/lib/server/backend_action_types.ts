@@ -54,13 +54,75 @@ export interface Backend_Action_Handlers {
 			action_event: Action_Event<'load_session', Backend, 'send_response', 'handling'>,
 		) => void | Promise<void>;
 	};
-	ollama_copy?: never;
-	ollama_create?: never;
-	ollama_delete?: never;
-	ollama_list?: never;
-	ollama_ps?: never;
-	ollama_pull?: never;
-	ollama_show?: never;
+	ollama_copy?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_copy', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_copy'] | Promise<Action_Outputs['ollama_copy']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_copy', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_create?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_create', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_create'] | Promise<Action_Outputs['ollama_create']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_create', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_delete?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_delete', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_delete'] | Promise<Action_Outputs['ollama_delete']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_delete', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_list?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_list', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_list'] | Promise<Action_Outputs['ollama_list']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_list', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_progress?: {
+		send?: (
+			action_event: Action_Event<'ollama_progress', Backend, 'send', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_ps?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_ps', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_ps'] | Promise<Action_Outputs['ollama_ps']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_ps', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_pull?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_pull', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_pull'] | Promise<Action_Outputs['ollama_pull']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_pull', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_show?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_show', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_show'] | Promise<Action_Outputs['ollama_show']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_show', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_unload?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_unload', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_unload'] | Promise<Action_Outputs['ollama_unload']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_unload', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
 	ping?: {
 		send_request?: (
 			action_event: Action_Event<'ping', Backend, 'send_request', 'handling'>,

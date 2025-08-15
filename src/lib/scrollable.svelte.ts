@@ -1,6 +1,6 @@
-// @slop Claude Sonnet 3.7
+// @slop Claude Sonnet 4
 
-import type {Action} from 'svelte/action';
+import type {Attachment} from 'svelte/attachments';
 import {on} from 'svelte/events';
 
 // TODO upstream to Fuz, and see the global `.scrolled` style
@@ -15,7 +15,7 @@ export interface Scrollable_Parameters {
 }
 
 /**
- * Manages scroll state and provides actions for scroll detection and styling.
+ * Manages scroll state and provides attachments for scroll detection and styling.
  */
 export class Scrollable {
 	/** CSS class name to apply when scrolled. */
@@ -35,10 +35,11 @@ export class Scrollable {
 		this.threshold = params?.threshold ?? 0;
 	}
 
+	// TODO maybe change the API to take params and return attachments like `reorderable` does?
 	/**
-	 * Action for the scrollable container - detects scrolling and updates state.
+	 * Attachment for the scrollable container - detects scrolling and updates state.
 	 */
-	container: Action<Element> = (element) => {
+	container: Attachment = (element) => {
 		const computed_style = window.getComputedStyle(element);
 
 		const onscroll = () => {
@@ -50,37 +51,25 @@ export class Scrollable {
 
 		onscroll();
 
-		return {
-			destroy: () => {
-				cleanup();
-			},
+		return () => {
+			cleanup();
 		};
 	};
 
 	/**
-	 * Action for the element that should receive the scrolled class.
+	 * Attachment for the element that should receive the scrolled class.
+	 * Since attachments run in effects, the class updates will be reactive automatically.
 	 */
-	target: Action<Element> = (element) => {
+	target: Attachment = (element) => {
+		// the attachment runs in an effect, so this will re-run when scrolled changes
 		if (this.scrolled) {
 			element.classList.add(this.target_class);
+		} else {
+			element.classList.remove(this.target_class);
 		}
 
-		// TODO better pattern without effect, maybe require a param? but then the state isn't synced
-		const cleanup = $effect.root(() => {
-			$effect(() => {
-				if (this.scrolled) {
-					element.classList.add(this.target_class);
-				} else {
-					element.classList.remove(this.target_class);
-				}
-			});
-		});
-
-		return {
-			destroy: () => {
-				element.classList.remove(this.target_class);
-				cleanup();
-			},
+		return () => {
+			element.classList.remove(this.target_class);
 		};
 	};
 }

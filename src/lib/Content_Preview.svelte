@@ -1,21 +1,19 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	interface Props {
-		content: string;
-		height?: string | undefined;
-		min_height?: string | undefined;
-		max_height?: string | undefined;
-		attrs?: SvelteHTMLElements['pre'] | undefined;
-	}
-
 	const {
 		content,
 		height = '200px',
 		min_height = height,
 		max_height = height,
 		attrs,
-	}: Props = $props();
+	}: {
+		content: string;
+		height?: string | undefined;
+		min_height?: string | undefined;
+		max_height?: string | undefined;
+		attrs?: SvelteHTMLElements['pre'] | undefined;
+	} = $props();
 </script>
 
 <pre

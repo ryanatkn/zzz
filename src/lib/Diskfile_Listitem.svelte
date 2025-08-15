@@ -6,17 +6,21 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 
-	interface Props {
+	const {
+		diskfile,
+		selected = false,
+		attrs,
+		onselect,
+	}: {
 		diskfile: Diskfile;
 		selected?: boolean | undefined;
 		attrs?: Record<string, unknown>;
 		/**
-		 * `hard` indicates a "hard select" like a doubleclick or enter keypress.
+		 * `open_not_preview` indicates a "open_not_preview select"
+		 * like a doubleclick or enter keypress.
 		 */
-		onselect?: (diskfile: Diskfile, hard: boolean) => void;
-	}
-
-	const {diskfile, selected = false, attrs, onselect}: Props = $props();
+		onselect?: (diskfile: Diskfile, open_not_preview: boolean) => void;
+	} = $props();
 
 	// TODO add a visible status when open in a tab
 </script>

@@ -14,14 +14,14 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Ollama_Model_Details from '$lib/Ollama_Model_Details.svelte';
-	import {format_gigabytes} from '$lib/format_helpers.js';
 
-	interface Props {
+	const {
+		model,
+		attrs,
+	}: {
 		model: Model;
 		attrs?: SvelteHTMLElements['span'] | undefined;
-	}
-
-	const {model, attrs}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
@@ -38,7 +38,8 @@
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
 	const provider = $derived(app.providers.find_by_name(model.provider_name));
 
-	// TODO get spec data mapped to model fields for the frontier providers
+	// TODO get model metadata, probably both at build time and runtime for the best UX
+
 	// TODO add custom models/providers, show in the UI when they're in a bad state
 </script>
 
@@ -58,7 +59,7 @@
 				</h2>
 			{/if}
 			<div class="display_flex font_family_mono ml_sm mb_md font_size_lg">
-				<Provider_Link {provider} attrs={{class: 'row gap_sm'}} icon="svg" />
+				<Provider_Link {provider} icon="svg" />
 			</div>
 			{#if model.downloaded !== undefined}
 				<div class="mb_lg">
@@ -82,12 +83,21 @@
 	</section>
 
 	{#if model.provider_name === 'ollama'}
-		<Ollama_Model_Details {model} onshow={() => app.api.ollama_show({model: model.name})}>
+		<Ollama_Model_Details
+			{model}
+			onshow={() => app.api.ollama_show({model: model.name})}
+			ondelete={async (m) => {
+				await app.ollama.delete(m.name);
+			}}
+		>
 			{#snippet header()}{/snippet}
 		</Ollama_Model_Details>
 	{:else}
-		<aside class="mt_xl3">
-			⚠️ This information is incomplete and may be incorrect or outdated.
+		<aside class="mt_xl3 width_md">
+			⚠️ This should show model info, but the APIs for ChatGPT and Claude do not provide metadata
+			like context window size, output token limit, and other details. Gemini however does. It looks
+			like we'll have to maintain hardcoded metadata for models, probably extending what we can
+			retrieve from each API.
 		</aside>
 		<section class="display_flex gap_xs">
 			<button
@@ -95,10 +105,11 @@
 				class="color_d"
 				onclick={() => app.chats.add(undefined, true).add_tape(model)}
 			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
+				<Glyph glyph={GLYPH_ADD} />&nbsp; create a new chat
 			</button>
 		</section>
-		<section>
+		<!-- TODo do something like this when the warning above is addressed -->
+		<!-- <section>
 			<div>
 				{#if model.context_window}
 					<div>
@@ -176,7 +187,7 @@
 					{/if}
 				</section>
 			{/if}
-		</section>
+		</section> -->
 	{/if}
 </Model_Contextmenu>
 

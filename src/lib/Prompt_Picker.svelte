@@ -6,14 +6,17 @@
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
-	interface Props {
+	const {
+		onpick,
+		filter,
+		exclude_ids,
+		selected_ids,
+	}: {
 		onpick: (prompt: Prompt | undefined) => boolean | void;
 		filter?: ((prompt: Prompt) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 		selected_ids?: Array<Uuid> | undefined;
-	}
-
-	const {onpick, filter, exclude_ids, selected_ids}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {prompts} = app;

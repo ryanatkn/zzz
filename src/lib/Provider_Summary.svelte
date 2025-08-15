@@ -7,12 +7,13 @@
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import External_Link from '$lib/External_Link.svelte';
 
-	interface Props {
+	const {
+		provider,
+		attrs,
+	}: {
 		provider: Provider;
 		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
-
-	const {provider, attrs}: Props = $props();
+	} = $props();
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 </script>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {swallow, is_editable} from '@ryanatkn/belt/dom.js';
+	import {random_item} from '@ryanatkn/belt/random.js';
 
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Diskfile_Explorer from '$lib/Diskfile_Explorer.svelte';
@@ -20,6 +21,27 @@
 	);
 
 	let show_diskfile_picker = $state(false);
+
+	// TODO NEXT here and elsewhere, detect when session is loaded via state and show loaders until then, but error messages if the request fails (no backend capability)
+
+	// TODO @many this is very hacky and duplicated, refactor into cell methods
+	// TODO @many improve UX to not use alert/prompt
+	const create_file = async () => {
+		if (!app.zzz_cache_dir) {
+			alert('cannot create file: filesystem is not available'); // eslint-disable-line no-alert
+			return;
+		}
+
+		const filename = prompt('new file name:'); // eslint-disable-line no-alert
+		if (!filename) return;
+
+		try {
+			await diskfiles.create_file(filename);
+		} catch (error) {
+			console.error('failed to create file:', error);
+			alert(`failed to create file: ${error}`); // eslint-disable-line no-alert
+		}
+	};
 </script>
 
 <svelte:window
@@ -28,7 +50,7 @@
 			return;
 		}
 
-		// ctrl+q: Close tab
+		// ctrl+q: close tab
 		if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === 'q') {
 			swallow(e);
 			const selected_tab = editor.tabs.selected_tab;
@@ -37,7 +59,7 @@
 			}
 		}
 
-		// ctrl+shift+Q: Reopen last closed tab
+		// ctrl+shift+Q: reopen last closed tab
 		if (e.ctrlKey && e.shiftKey && e.key === 'Q') {
 			swallow(e);
 			editor.reopen_last_closed_tab();
@@ -51,29 +73,35 @@
 	</div>
 
 	<div class="flex_1 column overflow_auto h_100">
-		<!-- Tab Bar -->
-		<ul
+		<!-- tabs -->
+		<menu
 			class="unstyled display_flex overflow_x_auto scrollbar_width_thin"
-			use:tabs_reorderable.list={{
+			{@attach tabs_reorderable.list({
 				onreorder: (from_index, to_index) => editor.reorder_tabs(from_index, to_index),
-			}}
+			})}
 		>
 			{#each editor.tabs.ordered_tabs as tab, index (tab.id)}
 				<li class="display_flex py_xs3 px_xs4">
-					<div class="display_flex" use:tabs_reorderable.item={{index}}>
+					<div class="display_flex" {@attach tabs_reorderable.item({index})}>
 						<!-- TODO notice the different APIs here, needs fixing, diskfiles is higher in the tree -->
 						<Diskfile_Tab_Listitem
 							{tab}
 							onselect={(tab) => diskfiles.select(tab.diskfile_id)}
-							onclose={(tab) => editor.close_tab(tab.id)}
+							onclose={(tab) => {
+								// TODO does this logic belong in a `diskfiles` method that wraps editor.close_tab?
+								if (tab.diskfile_id === selected_diskfile?.id) {
+									diskfiles.select(null);
+								}
+								editor.close_tab(tab.id);
+							}}
 							onopen={(tab) => editor.open_tab(tab.id)}
 						/>
 					</div>
 				</li>
 			{/each}
-		</ul>
+		</menu>
 
-		<!-- Editor content area -->
+		<!-- editor content area -->
 		{#if selected_tab}
 			{#if selected_diskfile}
 				<Diskfile_Editor_View
@@ -82,12 +110,12 @@
 				/>
 			{:else}
 				<!-- TODO think this through - maybe the tabs should be more flexible than 1:1 with a diskfile? maybe `Diskfile_Editor_View` should have UI to create a file if there is none? -->
-				<div class="display_flex align_items_center justify_content_center h_100">
+				<div class="box h_100">
 					<p>Something went wrong, this tab has no diskfile</p>
 				</div>
 			{/if}
-		{:else}
-			<div class="display_flex align_items_center justify_content_center h_100">
+		{:else if diskfiles.items.size > 0}
+			<div class="box h_100">
 				<p>
 					<button
 						type="button"
@@ -95,7 +123,24 @@
 						onclick={() => {
 							show_diskfile_picker = true;
 						}}>select</button
-					> a file from the list to view and edit its content
+					>
+					a file from the list or
+					<button
+						type="button"
+						class="inline color_f"
+						onclick={() => {
+							const diskfile = random_item(app.diskfiles.items.values);
+							diskfiles.select(diskfile.id);
+						}}>go fish</button
+					> to view and edit its content
+				</p>
+			</div>
+		{:else}
+			<div class="box h_100">
+				<p>
+					no files yet, <button type="button" class="inline color_d" onclick={create_file}
+						>create a new file</button
+					>?
 				</p>
 			</div>
 		{/if}
@@ -106,7 +151,7 @@
 	bind:show={show_diskfile_picker}
 	onpick={(diskfile) => {
 		if (!diskfile) return false;
-		editor.open_diskfile(diskfile.id);
+		diskfiles.select(diskfile.id);
 		return true;
 	}}
 />

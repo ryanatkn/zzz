@@ -19,7 +19,7 @@ export interface Providers_Options extends Cell_Options<typeof Providers_Json> {
 export class Providers extends Cell<typeof Providers_Json> {
 	items: Array<Provider> = $state()!; // TODO probably make an indexed collection for convenient querying, despite small N
 
-	names: ReadonlyArray<Provider_Name> = $derived(this.items.map((p) => p.name));
+	readonly names: ReadonlyArray<Provider_Name> = $derived(this.items.map((p) => p.name));
 
 	constructor(options: Providers_Options) {
 		super(Providers_Json, options);

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {format_timestamp} from '$lib/time_helpers.js';
 
-	interface Props {
+	const {
+		value,
+	}: {
 		value: Date;
-	}
-
-	const {value}: Props = $props();
+	} = $props();
 
 	const timestamp = format_timestamp(value);
 	const [time_number_part, time_am_pm_part] = timestamp.split(' ');

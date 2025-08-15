@@ -7,25 +7,24 @@
 	import {GLYPH_CHAT} from '$lib/glyphs.js';
 	import type {Chat} from '$lib/chat.svelte.js';
 
-	interface Props {
+	const {
+		chat,
+		selected,
+	}: {
 		chat: Chat;
 		selected?: boolean | undefined;
-	}
-
-	const {chat, selected}: Props = $props();
+	} = $props();
 </script>
 
 <Chat_Contextmenu {chat}>
 	<Nav_Link
 		href="{base}/chats/{chat.id}"
 		{selected}
-		attrs={{
-			class: 'justify_content_space_between',
-			style: 'min-height: 0;',
-		}}
+		class="justify_content_space_between"
+		style="min-height: 0;"
 	>
 		<div class="ellipsis">
-			<Glyph attrs={{class: 'mr_xs2'}} glyph={GLYPH_CHAT} />
+			<Glyph glyph={GLYPH_CHAT} />&nbsp;
 			<span>{chat.name}</span>
 		</div>
 		{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}

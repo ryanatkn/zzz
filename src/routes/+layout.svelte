@@ -4,18 +4,16 @@
 	import '$routes/moss.css';
 	import '$routes/style.css';
 
-	import Themed from '@ryanatkn/fuz/Themed.svelte';
 	import {onMount, type Snippet} from 'svelte';
-	import Contextmenu_Root from '@ryanatkn/fuz/Contextmenu_Root.svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
-	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
+	import {parse_pkg} from '@ryanatkn/belt/pkg.js';
 	import {BROWSER} from 'esm-env';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import {App} from '$lib/app.svelte.js';
-	import Zzz_Root from '$lib/Zzz_Root.svelte';
+	import Frontend_Root from '$lib/Frontend_Root.svelte';
 	import {pkg_context} from '$lib/pkg.js';
 	import {package_json, src_json} from '$lib/package.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
@@ -23,11 +21,11 @@
 	import create_zzz_config from '$lib/config.js';
 	import {Model_Json} from '$lib/model.svelte.js';
 
-	interface Props {
+	const {
+		children,
+	}: {
 		children: Snippet;
-	}
-
-	const {children}: Props = $props();
+	} = $props();
 
 	// TODO think through initialization
 	onMount(() => {
@@ -38,28 +36,28 @@
 		app.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
 		app.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
 
-		// Initialize the session
+		// init the session
 		if (BROWSER) {
 			void app.api.load_session();
 		}
 
-		// Init Ollama
+		// init Ollama
 		if (BROWSER) {
 			void app.ollama.refresh();
 		}
 	});
 
-	pkg_context.set(parse_package_meta(package_json, src_json));
+	pkg_context.set(parse_pkg(package_json, src_json));
 
-	// Create our client App, which extends the Zzz class
+	// Create the frontend's App, which extends Frontend
 	const app = new App();
 
 	// Enhance schemas with metadata for deserialization - use class names
 	// Safely access Zod schema internals using type assertion
-	const prompt_json_obj = Prompt_Json as unknown as {shape?: {bits?: {_def?: {type?: any}}}};
-	if (prompt_json_obj.shape?.bits?._def?.type) {
+	const prompt_json_obj = Prompt_Json as unknown as {shape?: {bits?: {def?: {type?: any}}}};
+	if (prompt_json_obj.shape?.bits?.def?.type) {
 		// Store class name instead of schema id
-		prompt_json_obj.shape.bits._def.type.class_name = 'Bit';
+		prompt_json_obj.shape.bits.def.type.class_name = 'Bit';
 	}
 
 	if (BROWSER) (window as any).app = (window as any).app = app; // no types for this, just for runtime convenience
@@ -75,9 +73,9 @@
 	// TODO refactor this, doesn't belong here - see the comment at `to_nav_link_href`
 	onNavigate(() => {
 		const {pathname} = page.url;
-		if (pathname === `${base}/chats`) {
+		if (pathname === resolve('/chats')) {
 			app.chats.selected_id_last_non_null = null;
-		} else if (pathname === `${base}/prompts`) {
+		} else if (pathname === resolve('/prompts')) {
 			app.prompts.selected_id_last_non_null = null;
 		}
 	});
@@ -113,10 +111,6 @@
 	]}
 />
 
-<Themed>
-	<Contextmenu_Root>
-		<Zzz_Root {app}>
-			{@render children()}
-		</Zzz_Root>
-	</Contextmenu_Root>
-</Themed>
+<Frontend_Root {app}>
+	{@render children()}
+</Frontend_Root>

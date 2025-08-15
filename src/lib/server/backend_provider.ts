@@ -29,22 +29,31 @@ export interface Completion_Handler_Options {
 	completion_options: Completion_Options;
 	completion_messages: Array<Completion_Message> | undefined;
 	prompt: string;
-	backend: Backend;
+	/** Opts into streaming notifications when provided. */
 	progress_token?: Uuid;
 }
 
-export abstract class Backend_Provider {
+export abstract class Backend_Provider<T_Client = unknown> {
 	abstract readonly name: string;
+	abstract readonly client: T_Client;
 
-	abstract handle_streaming(
+	readonly backend: Backend;
+
+	constructor(backend: Backend) {
+		this.backend = backend;
+	}
+
+	abstract handle_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']>;
-	abstract handle_non_streaming(
+	abstract handle_non_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']>;
 
 	get_handler(streaming: boolean): Completion_Handler {
-		return streaming ? this.handle_streaming.bind(this) : this.handle_non_streaming.bind(this);
+		return streaming
+			? this.handle_streaming_completion.bind(this)
+			: this.handle_non_streaming_completion.bind(this);
 	}
 
 	/** Validates that progress_token is provided for streaming requests. */
@@ -56,11 +65,10 @@ export abstract class Backend_Provider {
 
 	/** Sends streaming progress notification to frontend */
 	protected async send_streaming_progress(
-		backend: Backend,
 		progress_token: Uuid,
 		chunk: Action_Inputs['completion_progress']['chunk'],
 	): Promise<void> {
-		await backend.api.completion_progress({
+		await this.backend.api.completion_progress({
 			chunk,
 			_meta: {progressToken: progress_token},
 		});

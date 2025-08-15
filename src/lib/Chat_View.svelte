@@ -19,17 +19,15 @@
 	const app = frontend_context.get();
 	const {chats} = app;
 
-	interface Props {
+	const {
+		chat,
+	}: {
 		chat: Chat;
-	}
-
-	const {chat}: Props = $props();
+	} = $props();
 
 	const tape_count = $derived(chat.tapes.length);
 
 	// TODO the add by model stuff is too noisy/overwhelming, needs some redesign
-
-	// TODO clicking tapes should select them, if none selected then default to the first
 
 	// TODO add `presets` section to the top with the custom buttons/sets (accessible via contextmenu)
 	// TODO custom buttons section - including quick local, smartest all, all, etc - custom buttons to do common things, compose them with buttons like "fill all" or "fill with tag" or at least drag
@@ -44,37 +42,34 @@
 					<Glyph glyph={GLYPH_CHAT} />
 					<Editable_Text bind:value={chat.name} />
 				</div>
-				<div class="column">
-					<small title={chat.created_formatted_datetime}
+				<div class="row">
+					<small class="flex_1" title={chat.created_formatted_datetime}
 						>created {chat.created_formatted_short_date}</small
 					>
-				</div>
-				<div class="row gap_xs py_xs">
-					<Confirm_Button
-						onconfirm={() => chat.id && chats.remove(chat.id)}
-						position="right"
-						attrs={{
-							title: `delete chat "${chat.name}"`,
-							class: 'plain icon_button',
-						}}
-					>
-						<Glyph glyph={GLYPH_DELETE} />
-						{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
-					</Confirm_Button>
-					{#if tape_count}
-						<Toggle_Button
-							active={chat.view_mode === 'simple'}
-							active_content="multi"
-							inactive_content="simple"
-							ontoggle={(active) => (chat.view_mode = active ? 'simple' : 'multi')}
-							attrs={{
-								class: 'plain compact',
-								title: `toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
-							}}
+					<div class="row gap_xs py_xs">
+						{#if tape_count}
+							<Toggle_Button
+								bind:active={
+									() => chat.view_mode === 'simple',
+									(active) => (chat.view_mode = active ? 'simple' : 'multi')
+								}
+								active_content="simple"
+								inactive_content="multi"
+								class="plain compact"
+								title="toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view"
+							>
+								<Glyph glyph={GLYPH_VIEW} class="mr_xs" />
+							</Toggle_Button>
+						{/if}
+						<Confirm_Button
+							onconfirm={() => chat.id && chats.remove(chat.id)}
+							title="delete chat {'"' + chat.name + '"'}"
+							class="plain icon_button"
 						>
-							<Glyph glyph={GLYPH_VIEW} attrs={{class: 'mr_xs'}} />
-						</Toggle_Button>
-					{/if}
+							<Glyph glyph={GLYPH_DELETE} />
+							{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
+						</Confirm_Button>
+					</div>
 				</div>
 			</section>
 		{/if}

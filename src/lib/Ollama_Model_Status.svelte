@@ -5,12 +5,13 @@
 	import type {Model} from '$lib/model.svelte.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		model,
+		ollama,
+	}: {
 		model: Model;
 		ollama: Ollama;
-	}
-
-	const {model, ollama}: Props = $props();
+	} = $props();
 
 	const running = $derived(ollama.running_model_names.has(model.name));
 

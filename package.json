@@ -1,8 +1,8 @@
 {
   "name": "@ryanatkn/zzz",
   "version": "0.0.1",
-  "description": "fullstack toolkit for adaptive web environments",
-  "motto": "nice web things",
+  "description": "fullstack web toolkit for power users and devs",
+  "motto": "nice web things for the tired",
   "glyph": "💤",
   "logo": "logo.svg",
   "logo_alt": "three sleepy z's",
@@ -39,37 +39,38 @@
   "devDependencies": {
     "@changesets/changelog-git": "^0.2.1",
     "@ryanatkn/eslint-config": "^0.8.0",
-    "@ryanatkn/fuz": "^0.144.4",
-    "@ryanatkn/gro": "^0.160.0",
-    "@ryanatkn/moss": "^0.31.0",
+    "@ryanatkn/fuz": "^0.145.0",
+    "@ryanatkn/gro": "^0.161.2",
+    "@ryanatkn/moss": "^0.32.0",
     "@sveltejs/adapter-static": "^3.0.8",
-    "@sveltejs/kit": "^2.22.2",
-    "@sveltejs/package": "^2.3.12",
-    "@sveltejs/vite-plugin-svelte": "^5.1.0",
-    "eslint": "^9.30.1",
-    "eslint-plugin-svelte": "^3.10.1",
+    "@sveltejs/kit": "^2.27.0",
+    "@sveltejs/package": "^2.4.0",
+    "@sveltejs/vite-plugin-svelte": "^6.1.0",
+    "@types/node": "^24.1.0",
+    "eslint": "^9.32.0",
+    "eslint-plugin-svelte": "^3.11.0",
     "jsdom": "^26.1.0",
     "ollama": "^0.5.16",
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
-    "svelte": "^5.35.4",
-    "svelte-check": "^4.2.2",
+    "svelte": "^5.37.3",
+    "svelte-check": "^4.3.1",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.35.1",
+    "typescript-eslint": "^8.38.0",
     "vitest": "^3.2.4",
-    "zod": "^3.25.74"
+    "zod": "^4.0.14"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.56.0",
+    "@anthropic-ai/sdk": "^0.57.0",
     "@google/generative-ai": "^0.24.1",
-    "@hono/node-server": "^1.15.0",
+    "@hono/node-server": "^1.18.1",
     "@hono/node-ws": "^1.2.0",
-    "@ryanatkn/belt": "^0.31.0",
+    "@ryanatkn/belt": "^0.33.0",
     "date-fns": "^4.1.0",
     "esm-env": "^1.2.2",
-    "hono": "^4.8.4",
-    "openai": "^5.8.2"
+    "hono": "^4.8.12",
+    "openai": "^5.11.0"
   },
   "prettier": {
     "plugins": [
@@ -108,6 +109,11 @@
       "types": "./dist/action_collections.d.ts",
       "default": "./dist/action_collections.js"
     },
+    "./Action_Contextmenu.svelte": {
+      "types": "./dist/Action_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Action_Contextmenu.svelte",
+      "default": "./dist/Action_Contextmenu.svelte"
+    },
     "./Action_Detail.svelte": {
       "types": "./dist/Action_Detail.svelte.d.ts",
       "svelte": "./dist/Action_Detail.svelte",
@@ -137,6 +143,11 @@
       "types": "./dist/Action_List.svelte.d.ts",
       "svelte": "./dist/Action_List.svelte",
       "default": "./dist/Action_List.svelte"
+    },
+    "./Action_Listitem.svelte": {
+      "types": "./dist/Action_Listitem.svelte.d.ts",
+      "svelte": "./dist/Action_Listitem.svelte",
+      "default": "./dist/Action_Listitem.svelte"
     },
     "./action_metatypes.gen.js": {
       "types": "./dist/action_metatypes.gen.d.ts",
@@ -435,6 +446,11 @@
       "svelte": "./dist/Contextmenu_Entry_Toggle.svelte",
       "default": "./dist/Contextmenu_Entry_Toggle.svelte"
     },
+    "./Dashboard_Actions.svelte": {
+      "types": "./dist/Dashboard_Actions.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Actions.svelte",
+      "default": "./dist/Dashboard_Actions.svelte"
+    },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
       "svelte": "./dist/Dashboard_Capabilities.svelte",
@@ -459,11 +475,6 @@
       "types": "./dist/Dashboard_Home.svelte.d.ts",
       "svelte": "./dist/Dashboard_Home.svelte",
       "default": "./dist/Dashboard_Home.svelte"
-    },
-    "./Dashboard_Log.svelte": {
-      "types": "./dist/Dashboard_Log.svelte.d.ts",
-      "svelte": "./dist/Dashboard_Log.svelte",
-      "default": "./dist/Dashboard_Log.svelte"
     },
     "./Dashboard_Models.svelte": {
       "types": "./dist/Dashboard_Models.svelte.d.ts",
@@ -639,6 +650,11 @@
     "./frontend_http_transport.js": {
       "types": "./dist/frontend_http_transport.d.ts",
       "default": "./dist/frontend_http_transport.js"
+    },
+    "./Frontend_Root.svelte": {
+      "types": "./dist/Frontend_Root.svelte.d.ts",
+      "svelte": "./dist/Frontend_Root.svelte",
+      "default": "./dist/Frontend_Root.svelte"
     },
     "./frontend_websocket_transport.js": {
       "types": "./dist/frontend_websocket_transport.d.ts",
@@ -1151,10 +1167,6 @@
       "types": "./dist/test_helpers.d.ts",
       "default": "./dist/test_helpers.js"
     },
-    "./test.task.js": {
-      "types": "./dist/test.task.d.ts",
-      "default": "./dist/test.task.js"
-    },
     "./time_helpers.js": {
       "types": "./dist/time_helpers.d.ts",
       "default": "./dist/time_helpers.js"
@@ -1176,6 +1188,26 @@
     "./transports.js": {
       "types": "./dist/transports.d.ts",
       "default": "./dist/transports.js"
+    },
+    "./Tutorial_For_Chats.svelte": {
+      "types": "./dist/Tutorial_For_Chats.svelte.d.ts",
+      "svelte": "./dist/Tutorial_For_Chats.svelte",
+      "default": "./dist/Tutorial_For_Chats.svelte"
+    },
+    "./Tutorial_For_Database.svelte": {
+      "types": "./dist/Tutorial_For_Database.svelte.d.ts",
+      "svelte": "./dist/Tutorial_For_Database.svelte",
+      "default": "./dist/Tutorial_For_Database.svelte"
+    },
+    "./Tutorial_For_Diskfiles.svelte": {
+      "types": "./dist/Tutorial_For_Diskfiles.svelte.d.ts",
+      "svelte": "./dist/Tutorial_For_Diskfiles.svelte",
+      "default": "./dist/Tutorial_For_Diskfiles.svelte"
+    },
+    "./Tutorial_For_Prompts.svelte": {
+      "types": "./dist/Tutorial_For_Prompts.svelte.d.ts",
+      "svelte": "./dist/Tutorial_For_Prompts.svelte",
+      "default": "./dist/Tutorial_For_Prompts.svelte"
     },
     "./ui.svelte.js": {
       "types": "./dist/ui.svelte.d.ts",
@@ -1202,11 +1234,6 @@
     "./zod_helpers.js": {
       "types": "./dist/zod_helpers.d.ts",
       "default": "./dist/zod_helpers.js"
-    },
-    "./Zzz_Root.svelte": {
-      "types": "./dist/Zzz_Root.svelte.d.ts",
-      "svelte": "./dist/Zzz_Root.svelte",
-      "default": "./dist/Zzz_Root.svelte"
     }
   }
 }

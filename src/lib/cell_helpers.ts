@@ -42,7 +42,7 @@ export interface Schema_Class_Info {
  * @param class_name The name of the class to instantiate for this schema
  * @returns The original schema with metadata attached
  */
-export const cell_class = <T extends z.ZodTypeAny>(schema: T, class_name: string): T => {
+export const cell_class = <T extends z.ZodType>(schema: T, class_name: string): T => {
 	// Instead of using transform which changes the type, just attach metadata
 	(schema as any)[ZOD_CELL_CLASS_NAME] = class_name;
 	return schema;
@@ -56,7 +56,7 @@ export const cell_class = <T extends z.ZodTypeAny>(schema: T, class_name: string
  * @param class_name The name of the class to instantiate for each element
  * @returns The original schema with metadata attached
  */
-export const cell_array = <T extends z.ZodTypeAny>(schema: T, class_name: string): T => {
+export const cell_array = <T extends z.ZodType>(schema: T, class_name: string): T => {
 	const array_schema = get_inner_array_schema(schema);
 
 	if (!array_schema) {
@@ -65,7 +65,7 @@ export const cell_array = <T extends z.ZodTypeAny>(schema: T, class_name: string
 	}
 
 	// Add the element_class property to the array schema
-	(array_schema._def as any)[ZOD_ELEMENT_CLASS_NAME] = class_name;
+	(array_schema.def as any)[ZOD_ELEMENT_CLASS_NAME] = class_name;
 	return schema;
 };
 
@@ -94,7 +94,7 @@ export type Cell_Value_Decoder<
  * This helps determine how to decode values based on their schema definition.
  */
 export const get_schema_class_info = (
-	schema: z.ZodTypeAny | null | undefined,
+	schema: z.ZodType | null | undefined,
 ): Schema_Class_Info | null => {
 	if (!schema) return null;
 
@@ -105,7 +105,7 @@ export const get_schema_class_info = (
 	if (unwrapped instanceof z.ZodArray) {
 		// Get class name from schema metadata if present
 		const element_class =
-			(unwrapped._def as any)[ZOD_ELEMENT_CLASS_NAME] ||
+			(unwrapped.def as any)[ZOD_ELEMENT_CLASS_NAME] ||
 			get_schema_class_info(unwrapped.element)?.class_name;
 		return {
 			type: 'ZodArray',
@@ -123,10 +123,10 @@ export const get_schema_class_info = (
 	// Handle ZodObject with _zMetadata property
 	if (
 		unwrapped instanceof z.ZodObject &&
-		typeof unwrapped._def.description === 'string' &&
-		unwrapped._def.description.startsWith('_zMetadata:')
+		typeof unwrapped.def.description === 'string' &&
+		unwrapped.def.description.startsWith('_zMetadata:')
 	) {
-		const class_name = unwrapped._def.description.split(':')[1];
+		const class_name = unwrapped.def.description.split(':')[1];
 		return {type: 'ZodObject', class_name, is_array: false};
 	}
 

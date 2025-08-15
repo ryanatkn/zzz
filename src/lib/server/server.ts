@@ -2,6 +2,7 @@ import {Hono} from 'hono';
 import {serve} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
 import {Logger} from '@ryanatkn/belt/log.js';
+import {ALLOWED_ORIGINS} from '$env/static/private';
 
 import {Backend} from '$lib/server/backend.js';
 import {backend_action_handlers} from '$lib/server/backend_action_handlers.js';
@@ -13,57 +14,63 @@ import {
 	API_PATH_FOR_HTTP_RPC,
 	SERVER_HOST,
 	SERVER_PROXIED_PORT,
-	SERVER_URL,
 	WEBSOCKET_PATH,
-	ZZZ_DIR,
+	ZZZ_CACHE_DIR,
 } from '$lib/constants.js';
-import {verify_origin} from '$lib/server/security.js';
+import {parse_allowed_origins, verify_request_source} from '$lib/server/security.js';
 import {handle_filer_change} from '$lib/server/backend_actions_api.js';
 import {Ollama_Backend_Provider} from '$lib/server/ollama_backend_provider.js';
 import {Claude_Backend_Provider} from '$lib/server/claude_backend_provider.js';
 import {Chatgpt_Backend_Provider} from '$lib/server/chatgpt_backend_provider.js';
 import {Gemini_Backend_Provider} from '$lib/server/gemini_backend_provider.js';
-import type {Backend_Provider} from '$lib/server/backend_provider.js';
 
 const log = new Logger('[server]');
 
 const create_server = (): void => {
 	// TODO better config
 	const config = create_config();
-	// Security: allow only the configured server URL, extend with care
-	const allowed_origins = [SERVER_URL];
 
-	// TODO from config
-	const providers: Array<Backend_Provider> = [
-		new Ollama_Backend_Provider(),
-		new Claude_Backend_Provider(),
-		new Chatgpt_Backend_Provider(),
-		new Gemini_Backend_Provider(),
-	];
+	// Security: allow only the configured server URL, extend with care
+	const allowed_origins = parse_allowed_origins(ALLOWED_ORIGINS);
 
 	// TODO better logging
 	log.info('creating server', {
 		config,
-		ZZZ_DIR,
+		ZZZ_CACHE_DIR,
 		allowed_origins,
-		providers: providers.map((p) => p.name),
 	});
 
 	const app = new Hono();
 
+	app.use(async (c, next) => {
+		log.info(
+			'req',
+			`\n\t${c.req.method} ${c.req.url}`,
+			'\n\torigin ' + c.req.header('origin'),
+			'\n\treferer ' + c.req.header('referer'),
+		);
+		await next();
+		log.info(`Finished request: ${c.req.method} ${c.req.url}`);
+	});
+
 	// Security: first verify the origin of incoming requests
-	app.use(verify_origin(allowed_origins));
+	app.use(verify_request_source(allowed_origins));
 
 	const {injectWebSocket, upgradeWebSocket} = createNodeWebSocket({app});
 
 	const backend = new Backend({
-		zzz_dir: ZZZ_DIR,
+		zzz_cache_dir: ZZZ_CACHE_DIR, // is the default
 		config,
 		action_specs,
 		action_handlers: backend_action_handlers,
-		providers,
 		handle_filer_change,
 	});
+
+	// TODO from config
+	backend.add_provider(new Ollama_Backend_Provider(backend));
+	backend.add_provider(new Claude_Backend_Provider(backend));
+	backend.add_provider(new Chatgpt_Backend_Provider(backend));
+	backend.add_provider(new Gemini_Backend_Provider(backend));
 
 	// TODO options for everything, maybe a nullable array and an enable/disable flag
 
@@ -73,7 +80,6 @@ const create_server = (): void => {
 			app,
 			backend,
 			upgradeWebSocket,
-			allowed_origins, // TODO is this good or should they be separate?
 		});
 	}
 

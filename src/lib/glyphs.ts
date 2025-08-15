@@ -20,6 +20,7 @@ export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⊝';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_PLACEHOLDER = '↳';
+export const GLYPH_SEND = '⮥'; // ⮥ ⭷ ↗
 export const GLYPH_PLAY = '▶︎';
 export const GLYPH_PAUSE = '❙❙'; // is 2 chars, should be supported by usage
 // export const GLYPH_STOP = '⏹'; // ⏹ ■ ▣ ▪
@@ -54,11 +55,13 @@ export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
 export const GLYPH_STRIP = '⎍'; // ⎎ ⎍
 export const GLYPH_FILE = '⧈'; // ⏚ ⧈ ⊞ ⌺ ▤
-export const GLYPH_LIST = '▤'; //
+// TODO looks too much like chat
+export const GLYPH_LIST = '▤';
 export const GLYPH_DIRECTORY = '▦'; // 🗁 ▦ ▥ 🗀
 export const GLYPH_CREATE_FILE = '🗎';
 export const GLYPH_CREATE_FOLDER = '🗁';
 export const GLYPH_PROMPT = '⌇'; // ⌇ ⍋  ⌭
+// TODO idk about this one, is maybe better suited for list?
 export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
 export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
@@ -122,6 +125,14 @@ export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
 // ⭍ ⏻
 //⥘ ⥙ ⇅ ⇵ ⇳ ⇊ ⇈  ⮃
 // ⬎⤣
+
+// ↗ ⤴ ⤊ ⥘ ⭡ ⭧ ⥉ ↱ ⤐ ⤏ ⥟ ⤞ ⤟ ⤠ ⎋ ⧉ ⬈ ⌁ ⍙ ⎗ ⍏ ⍟ ⍝ ⏏ ⎄ ↑ ⇧ ⮕ ⮝ ⤈ ⥁ ⥅ ⥇ ⥓ ⥖ ⥗ ⥚ ⥛ ⤊ ⤉ ⤒
+// ⇗ ⤈ ⤉ ⤒ ⥈ ⥑ ⥒ ⥔ ⥕ ⥙ ⥛ ⭦ ⭧ ⭨ ⭩ ⯁ ⯅ ⯇ ⯈ ⯊ ⯋ ⯏ ⯑ ⯓ ⯕ ⯗ ⯙ ⯛ ⯝ ⯟
+// ⇪ ⮊ ⮌ ⮎ ⮐ ⮒ ⮓ ⮕ ⮗ ⮙ ⮛ ⮝ ⮟ ⮡ ⮣ ⮥ ⮧ ⮩ ⮫ ⮭ ⮯ ⮱ ⮳ ⮵ ⮷ ⮹ ⮻ ⮽ ⮿ ⯁ ⯃ ⯅
+// ⯇ ⯈ ⯊ ⯌ ⯎ ⯐ ⯒ ⯔ ⯖ ⯘ ⯚ ⯜ ⯞ ⯠ ⯢ ⯤ ⯦ ⯨ ⯪ ⯬ ⯮ ⯰ ⯲ ⯴ ⯶ ⯸ ⯺ ⯼ ⯾ Ⰰ Ⰱ
+// Ⰲ Ⰳ Ⰴ Ⰵ Ⰶ Ⰷ Ⰸ Ⰹ Ⰺ Ⰻ Ⰼ Ⰽ Ⰾ Ⰿ Ⱀ Ⱁ Ⱂ Ⱃ Ⱄ Ⱅ Ⱆ Ⱇ Ⱈ Ⱉ Ⱊ Ⱋ Ⱌ Ⱍ Ⱎ Ⱏ
+// Ⱐ Ⱑ Ⱒ Ⱓ Ⱔ Ⱕ Ⱖ Ⱗ Ⱘ Ⱙ Ⱚ Ⱛ Ⱜ Ⱝ Ⱞ Ⱟ ⰰ ⰱ ⰲ ⰳ ⰴ ⰵ ⰶ ⰷ ⰸ ⰹ ⰺ ⰻ ⰼ ⰽ ⰾ ⰿ
+// ⱀ ⱁ ⱂ ⱃ ⱄ ⱅ ⱆ ⱇ ⱈ ⱉ ⱊ ⱋ ⱌ ⱍ ⱎ ⱏ ⱐ ⱑ ⱒ ⱓ ⱔ ⱕ ⱖ ⱗ ⱘ ⱙ ⱚ ⱛ ⱜ ⱝ ⱞ ⱟ
 
 // ⎗ ⎘
 

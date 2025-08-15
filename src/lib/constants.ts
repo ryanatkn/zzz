@@ -3,9 +3,10 @@ import {
 	PUBLIC_SERVER_PORT,
 	PUBLIC_SERVER_PROTOCOL,
 	PUBLIC_SERVER_PROXIED_PORT,
+	PUBLIC_BACKEND_ARTIFICIAL_RESPONSE_DELAY,
 	PUBLIC_SERVER_API_PATH,
 	PUBLIC_WEBSOCKET_URL,
-	PUBLIC_ZZZ_DIR,
+	PUBLIC_ZZZ_CACHE_DIR,
 } from '$env/static/public';
 
 import {
@@ -24,8 +25,6 @@ import {
 
 // TODO maybe remove the SERVER_ prefixes
 
-export const SERVER_PROXIED_PORT = parseInt(PUBLIC_SERVER_PROXIED_PORT, 10) || 8999;
-
 export const SERVER_PROTOCOL = PUBLIC_SERVER_PROTOCOL || 'http';
 
 export const SERVER_HOST = PUBLIC_SERVER_HOST || 'localhost';
@@ -36,17 +35,15 @@ export const SERVER_HOST = PUBLIC_SERVER_HOST || 'localhost';
  */
 export const SERVER_URL = `${SERVER_PROTOCOL}://${SERVER_HOST}:${PUBLIC_SERVER_PORT}`;
 
-/**
- * @relative
- * @no_trailing_slash
- */
-export const ZZZ_CACHE_DIRNAME = '.zzz';
+export const SERVER_PROXIED_PORT = parseInt(PUBLIC_SERVER_PROXIED_PORT, 10) || 8999;
+
+export const BACKEND_ARTIFICIAL_RESPONSE_DELAY =
+	parseInt(PUBLIC_BACKEND_ARTIFICIAL_RESPONSE_DELAY, 10) || 0;
 
 /**
- * @leading_slash
  * @trailing_slash
  */
-export const ZZZ_DIR = Path_With_Trailing_Slash.parse(PUBLIC_ZZZ_DIR);
+export const ZZZ_CACHE_DIR = Path_With_Trailing_Slash.parse(PUBLIC_ZZZ_CACHE_DIR || '.zzz');
 
 export const CONTENT_PREVIEW_LENGTH = 100;
 
