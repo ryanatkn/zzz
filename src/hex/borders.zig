@@ -14,10 +14,10 @@ const constants = @import("constants.zig");
 const SCREEN_WIDTH = constants.SCREEN_WIDTH;
 const SCREEN_HEIGHT = constants.SCREEN_HEIGHT;
 
-// Lifestone master colors - matches the attuned lifestone color
+// Lifestone master colors - matches the lifestone color
 const LIFESTONE_COLORS = BorderColorPair{
-    .dark = .{ .r = 0.0, .g = 100.0, .b = 100.0 },
-    .bright = .{ .r = 0.0, .g = 200.0, .b = 200.0 },
+    .dark = .{ .r = 0.0, .g = 60.0, .b = 120.0 },
+    .bright = .{ .r = 0.0, .g = 100.0, .b = 200.0 },
 };
 
 // Border color definitions for cycling

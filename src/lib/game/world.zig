@@ -32,10 +32,12 @@ pub const World = struct {
 
     pub fn init(allocator: std.mem.Allocator, max_entities: usize) !World {
         const entities_per_archetype = max_entities / 6; // Distribute capacity across archetypes
+        // Players need enough slots for entity IDs that may be allocated after other entities
+        const player_capacity = @max(100, entities_per_archetype);
 
         return World{
             .entities = try EntityAllocator.init(allocator, max_entities),
-            .players = try PlayerArchetype.init(allocator, 10), // Few players expected
+            .players = try PlayerArchetype.init(allocator, player_capacity), // Sufficient capacity for zone transitions
             .units = try UnitArchetype.init(allocator, entities_per_archetype),
             .projectiles = try ProjectileArchetype.init(allocator, entities_per_archetype),
             .obstacles = try ObstacleArchetype.init(allocator, entities_per_archetype),
@@ -217,11 +219,9 @@ pub const World = struct {
         const entity = try self.createEntity();
         errdefer self.destroyEntity(entity) catch {};
 
-        // Create visual component with proper lifestone color
-        const color = if (attuned)
-            colors.Color{ .r = 0, .g = 255, .b = 255, .a = 255 } // Cyan for attuned
-        else
-            colors.Color{ .r = 128, .g = 128, .b = 255, .a = 255 }; // Light blue for unattuned
+        // Create visual component with proper lifestone color - same shade of blue, darker base
+        const base_blue = colors.Color{ .r = 0, .g = 80, .b = 160, .a = 255 }; // Darker blue for both states
+        const color = base_blue; // Same color for both attuned and unattuned - effect system handles glow
 
         // Lifestones are circular, so create square size from radius
         const lifestone_size = components.Vec2{ .x = radius * 2.0, .y = radius * 2.0 };
