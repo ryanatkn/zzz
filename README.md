@@ -3,8 +3,7 @@
 > ⚠️ AI slop code and docs, may be unstable and bad
 
 Zzz is a GUI in Zig written by Claude Code and designed by people.
-For the companion CLI see [zz](https://github.com/ryanatkn/zz)
-and [ztack.net](https://www.ztack.net/) for a web+ stack.
+For the companion CLI see [zz](https://github.com/ryanatkn/zz).
 
 > status: vibe-engineered slop level 1
 
