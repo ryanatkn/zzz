@@ -106,37 +106,9 @@ zig build -Doptimize=ReleaseFast                          # native release
 
 ## AI Control
 
-The game includes a high-performance AI control system that allows external programs to control the game:
+The game includes a high-performance AI control system for external automation. Press `G` in-game to enable AI control, then run story-driven scenarios with different playstyles.
 
-1. **Enable AI mode**: Press `G` in-game to toggle AI control
-2. **Run controller**: Use the provided Python example or write your own controller
-3. **Protocol**: Binary commands via memory-mapped file (`.ai_commands`)
-
-Example usage:
-```bash
-# Start the game
-zig build run
-
-# In game, press G to enable AI control
-
-# In another terminal, run the story AI
-npx tsx web/ai_control/demos/story.ts
-
-# Or try different scenarios:
-npx tsx web/ai_control/demos/story.ts speedrun
-npx tsx web/ai_control/demos/story.ts pacifist
-```
-
-The AI control system features a sophisticated story-driven controller that can autonomously play through the game with different narrative scenarios. It uses a lock-free ring buffer for ultra-low latency (~50ns per command) with zero allocations.
-
-Available scenarios:
-- **Hero**: Classic hero's journey with full story arc
-- **Speedrun**: Optimized path to defeat the boss quickly  
-- **Pacifist**: Complete without combat using stealth
-- **Warrior**: Maximum aggression, defeat all enemies
-- **Explorer**: Methodical exploration of the entire world
-
-See [web/ai_control/README.md](./web/ai_control/README.md) for detailed documentation.
+See **[web/ai_control/README.md](./web/ai_control/README.md)** for complete documentation and demos.
 
 ## Creating new applications
 

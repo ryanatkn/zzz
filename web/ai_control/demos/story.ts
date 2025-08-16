@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env node --experimental-strip-types
 /**
  * Story-Driven AI Demo
  * Run autonomous playthroughs with narrative
@@ -43,7 +43,7 @@ async function main() {
 
 // Show usage if help requested
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
-  console.log('Usage: npx tsx story.ts [scenario] [--quiet]');
+  console.log('Usage: node --experimental-strip-types story.ts [scenario] [--quiet]');
   console.log('');
   console.log('Scenarios:');
   console.log('  hero      - Classic hero\'s journey (default)');

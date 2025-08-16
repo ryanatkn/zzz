@@ -7,8 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:movement": "node control_demo.ts movement",
-    "test:combat": "node control_demo.ts combat"
+    "ai:story": "node --experimental-strip-types web/ai_control/demos/story.ts",
+    "ai:movement": "node --experimental-strip-types web/ai_control/demos/movement.ts",
+    "ai:combat": "node --experimental-strip-types web/ai_control/demos/combat.ts",
+    "ai:test": "node --experimental-strip-types web/ai_control/test.ts"
   },
   "dependencies": {
     "svelte": "^5.0.0"

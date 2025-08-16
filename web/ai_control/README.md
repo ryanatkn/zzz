@@ -18,13 +18,13 @@ zig build run
 # In game, press G to enable AI control
 
 # Run story mode (in another terminal)
-npx tsx web/ai_control/demos/story.ts hero
+node --experimental-strip-types web/ai_control/demos/story.ts hero
 
 # Or try different scenarios
-npx tsx web/ai_control/demos/story.ts speedrun
-npx tsx web/ai_control/demos/story.ts pacifist
-npx tsx web/ai_control/demos/story.ts warrior
-npx tsx web/ai_control/demos/story.ts explorer
+node --experimental-strip-types web/ai_control/demos/story.ts speedrun
+node --experimental-strip-types web/ai_control/demos/story.ts pacifist
+node --experimental-strip-types web/ai_control/demos/story.ts warrior
+node --experimental-strip-types web/ai_control/demos/story.ts explorer
 ```
 
 ## Available Scenarios
@@ -39,13 +39,30 @@ npx tsx web/ai_control/demos/story.ts explorer
 
 ```bash
 # Basic movement patterns
-npx tsx web/ai_control/demos/movement.ts
+node --experimental-strip-types web/ai_control/demos/movement.ts
 
 # Combat demonstrations
-npx tsx web/ai_control/demos/combat.ts
+node --experimental-strip-types web/ai_control/demos/combat.ts
 
 # Test the control system
-npx tsx web/ai_control/test.ts
+node --experimental-strip-types web/ai_control/test.ts
+```
+
+## Using npm Scripts
+
+For convenience, you can also use the provided npm scripts:
+
+```bash
+npm run ai:story          # Run story demo (default: hero scenario)
+npm run ai:movement       # Run movement patterns demo
+npm run ai:combat         # Run combat demo
+npm run ai:test          # Run system test
+```
+
+To run story scenarios with npm, append `--` followed by the scenario:
+```bash
+npm run ai:story -- speedrun
+npm run ai:story -- pacifist --quiet
 ```
 
 ## Architecture
@@ -53,17 +70,17 @@ npx tsx web/ai_control/test.ts
 ```
 web/ai_control/
 ├── core/           # Shared types and base classes
-├── node/           # Node.js implementation
-├── browser/        # Browser implementation (WebSocket)
+├── node/           # Node.js implementation  
 ├── story/          # Story controller and behaviors
 ├── demos/          # Demo scripts
-└── ui/             # Web UI components
+├── index.ts        # Main module exports
+└── test.ts         # System test utility
 ```
 
 ## Programmatic Usage
 
 ```typescript
-import { StoryController } from './web/ai_control';
+import { StoryController } from '../story/story_controller.js';
 
 const controller = new StoryController();
 await controller.play('hero', true); // Play hero scenario with narrative
@@ -72,8 +89,8 @@ await controller.play('hero', true); // Play hero scenario with narrative
 ## Custom Behaviors
 
 ```typescript
-import { NodeAIController } from './web/ai_control/node';
-import { Behaviors } from './web/ai_control/story/behaviors';
+import { NodeAIController } from '../node/controller.js';
+import { Behaviors } from '../story/behaviors.js';
 
 const ai = new NodeAIController();
 await ai.connect();
@@ -117,3 +134,27 @@ Commands are 32-byte aligned structures:
 - Zero allocations during runtime
 - Lock-free ring buffer implementation
 - 256 command buffer capacity
+
+## Troubleshooting
+
+### Common Issues
+
+**AI control not working:**
+- Make sure to press `G` in the game first to enable AI control mode
+- The game must be running before starting any AI controller
+- Check that the `.ai_commands` file exists in the game directory
+
+**Node.js errors:**
+- Requires Node.js 22+ for `--experimental-strip-types` flag
+- For older Node versions, install `tsx` globally: `npm install -g tsx`
+- Then use `tsx` instead of `node --experimental-strip-types`
+
+**Import errors:**
+- All imports must include `.js` extension for ES modules
+- Use relative paths starting with `../` or `./`
+- Ensure you're running from the project root directory
+
+**Performance issues:**
+- Close other applications using the `.ai_commands` file
+- Reduce game graphics settings if experiencing lag
+- The AI performs best at 60+ FPS game performance

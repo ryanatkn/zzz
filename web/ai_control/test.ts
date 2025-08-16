@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env node --experimental-strip-types
 /**
  * AI Control System Test
  * Quick test to verify the system works
