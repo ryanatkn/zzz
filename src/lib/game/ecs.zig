@@ -1,43 +1,59 @@
 /// ECS (Entity Component System) barrel export
-/// Provides core abstractions for game entity management with clean zone isolation
+/// Provides both clear primitives and complex abstractions for comparison
 ///
-/// TODO @many: Evaluate complex ECS vs simple direct arrays - complex may be better for:
-/// - Dynamic component composition
-/// - Cache-friendly iteration patterns  
-/// - Easier addition of new component types
-/// - Better tooling/debugging support
-/// Need benchmark comparison and feature evaluation in followup session
-/// Currently UNUSED - hex game uses simple arrays in hex_game.zig
-pub const entity = @import("entity.zig");
-pub const storage = @import("storage.zig");
-pub const components = @import("components.zig");
-pub const component_registry = @import("component_registry.zig");
-pub const archetype_storage = @import("archetype_storage.zig");
-pub const world = @import("world.zig");
-pub const zone = @import("zone.zig");
-pub const game = @import("game.zig");
-pub const system_registry = @import("system_registry.zig");
+/// CLEAR PRIMITIVES (New, recommended):
+/// - ZonedWorld: Clear multi-zone manager
+/// - ZoneStorage: Simple array-based storage per zone
+/// - EntityId: Simple monotonic ID generation
+///
+/// COMPLEX SYSTEM (Preserved for comparison):
+/// - Game/Zone/World: Complex multi-layer abstraction
+/// - ArchetypeStorage: Metaprogramming-based storage
+/// - EntityAllocator: Generation-tracked entity system
 
-// Legacy exports (deprecated - files removed)
-// pub const legacy_world = @import("legacy_world.zig");
-// pub const zoned_world = @import("zoned_world.zig");
+// ============================================================================
+// CLEAR PRIMITIVES - Primary exports with understandable names
+// ============================================================================
 
-// Core types
-pub const EntityId = entity.EntityId;
-pub const EntityAllocator = entity.EntityAllocator;
+const zoned_world = @import("zoned_world.zig");
+const zone_storage = @import("zone_storage.zig");
+const entity_id = @import("entity_id.zig");
 
-// New composable architecture (recommended)
+// Primary clear types - these are the recommended simple approach
+pub const ZonedWorld = zoned_world.ZonedWorld;
+pub const ZoneStorage = zone_storage.ZoneStorage;
+pub const EntityId = entity_id.EntityId;
+pub const EntityIdGenerator = entity_id.EntityIdGenerator;
+pub const INVALID_ENTITY = entity_id.INVALID_ENTITY;
+
+// ============================================================================
+// COMPLEX SYSTEM - Preserved for comparison and benchmarking
+// ============================================================================
+
+const entity = @import("entity.zig");
+const storage = @import("storage.zig");
+const component_registry = @import("component_registry.zig");
+const archetype_storage = @import("archetype_storage.zig");
+const world = @import("world.zig");
+const zone = @import("zone.zig");
+const game = @import("game.zig");
+const system_registry = @import("system_registry.zig");
+
+// Complex system types (prefixed to avoid naming conflicts)
+pub const ComplexEntityId = entity.EntityId;
+pub const ComplexEntityAllocator = entity.EntityAllocator;
+
+// Complex architecture components
 pub const ComponentRegistry = component_registry.ComponentRegistry;
 pub const ArchetypeRegistry = component_registry.ArchetypeRegistry;
 pub const World = world.World;
 pub const Zone = zone.Zone;
-pub const ZoneMetadata = zone.ZoneMetadata;
 pub const Game = game.Game;
 pub const EntityWithZone = world.EntityWithZone;
 pub const SystemRegistry = system_registry.SystemRegistry;
 pub const GameSystems = system_registry.GameSystems;
 
-// Archetype storage types
+// Complex archetype storage types
 pub const PlayerArchetype = archetype_storage.PlayerArchetype;
 pub const UnitArchetype = archetype_storage.UnitArchetype;
 pub const ProjectileArchetype = archetype_storage.ProjectileArchetype;
@@ -45,16 +61,20 @@ pub const ObstacleArchetype = archetype_storage.ObstacleArchetype;
 pub const LifestoneArchetype = archetype_storage.LifestoneArchetype;
 pub const PortalArchetype = archetype_storage.PortalArchetype;
 
-// Legacy types (deprecated - temporary compatibility aliases)
-// TODO: Migrate hex game to use new Game/Zone architecture
-pub const ZonedWorld = Game; // Temporary alias for backward compatibility
-pub const ZoneStorage = World; // Temporary alias for backward compatibility
-
-// Storage types
+// Complex storage strategies
 pub const DenseStorage = storage.DenseStorage;
 pub const SparseStorage = storage.SparseStorage;
 
-// Component types
+// ============================================================================
+// SHARED COMPONENTS - Used by both systems
+// ============================================================================
+
+const components = @import("components.zig");
+
+// Zone metadata (shared between both systems)
+pub const ZoneMetadata = zone.ZoneMetadata;
+
+// Component types (shared between both systems)
 pub const Transform = components.Transform;
 pub const Health = components.Health;
 pub const Movement = components.Movement;

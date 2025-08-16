@@ -3,13 +3,14 @@
 // Zones 1-6: Dungeons arranged in hexagon around overworld
 
 .{
-    .screen_width = 1920.0,
-    .screen_height = 1080.0,
+    // Screen dimensions - must match constants.zig BASE_SCREEN_WIDTH/HEIGHT
+    .screen_width = 1920.0,  // = constants.BASE_SCREEN_WIDTH
+    .screen_height = 1080.0, // = constants.BASE_SCREEN_HEIGHT
 
     // Player starting position (overworld center)
     .player_start = .{
         .zone = 0,
-        .position = .{ .x = 960.0, .y = 540.0 },
+        .position = .{ .x = 960.0, .y = 540.0 }, // = constants.SCREEN_CENTER_X/Y
         .radius = 20.0,
     },
 
@@ -81,7 +82,7 @@
                 .{ .position = .{ .x = 580.0, .y = 540.0 }, .radius = 25.0, .destination = 3, .shape = "circle" },
             },
             .lifestones = .{
-                // Central spawn lifestone (player starts here)
+                // Central spawn lifestone (player starts here) - matches SCREEN_CENTER
                 .{ .position = .{ .x = 960.0, .y = 540.0 }, .radius = 8.0 },
                 // 6 lifestones near portals (slightly offset from portals)
                 // Northwest portal area

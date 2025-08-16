@@ -3,6 +3,7 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const hex_game_mod = @import("hex_game.zig");
 const ecs = @import("../lib/game/ecs.zig");
+const loggers = @import("../lib/debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 const EntityId = ecs.EntityId;
@@ -34,14 +35,8 @@ pub const HexSaveData = struct {
 
         pub fn init() ZoneSaveData {
             return .{
-                .lifestone_entities = std.BoundedArray(EntitySaveData, 32).init(0) catch |err| {
-                    std.log.err("Failed to initialize lifestone entities array: {}", .{err});
-                    @panic("ZoneSaveData lifestone initialization failed");
-                },
-                .unit_entities = std.BoundedArray(EntitySaveData, 256).init(0) catch |err| {
-                    std.log.err("Failed to initialize unit entities array: {}", .{err});
-                    @panic("ZoneSaveData unit initialization failed");
-                },
+                .lifestone_entities = std.BoundedArray(EntitySaveData, 32).init(0) catch unreachable, // init(0) cannot fail
+                .unit_entities = std.BoundedArray(EntitySaveData, 256).init(0) catch unreachable, // init(0) cannot fail
             };
         }
     };

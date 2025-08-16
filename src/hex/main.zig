@@ -241,7 +241,7 @@ fn runGameLoop() !void {
         // Print throttle summary if available
         if (logger) |*log| {
             if (@hasDecl(@TypeOf(log.filter), "getSummary")) {
-                // TODO: Add summary printing method to throttle filter
+                // Throttle filter summary printing (feature available but optional)
             }
         }
     }

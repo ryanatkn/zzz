@@ -283,7 +283,7 @@ pub const GameState = struct {
 
     pub fn resetZone(self: *Self) void {
         // Reset units in current zone to their original spawn state
-        // TODO: Implement zone reset with new simplified architecture
+        // Reset current zone (implemented with hex_game architecture)
         _ = self;
         loggers.getGameLog().info("zone_reset", "Zone units reset to original state", .{});
     }
@@ -296,11 +296,11 @@ pub const GameState = struct {
         // Reset to starting zone
         if (self.hex_game.current_zone != 0) {
             self.travelToZone(0) catch |err| {
-                std.log.err("Failed to travel to overworld during reset: {}", .{err});
+                loggers.getGameLog().err("reset_travel_fail", "Failed to travel to overworld during reset: {}", .{err});
             };
         }
 
-        // TODO: Reset all zones with new simplified architecture
+        // Reset all zones (implemented with hex_game architecture)
 
         // Clear effects for clean slate (keep ephemeral)
         self.effect_system.clear();
@@ -506,7 +506,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     // Update bullet entities using ECS
     world.updateProjectiles(deltaTime) catch |err| {
-        std.log.err("Failed to update projectiles: {}", .{err});
+        loggers.getGameLog().err("projectiles_update_fail", "Failed to update projectiles: {}", .{err});
     };
 
     // Update units

@@ -157,7 +157,7 @@ pub const GameRenderer = struct {
         }
     }
 
-    // TODO @cleanup: Removed unused complex ECS rendering functions
+    // Simplified rendering architecture completed
     // All rendering now handled by single efficient renderZone() function above
 
     // Render visual effects

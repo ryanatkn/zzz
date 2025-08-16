@@ -39,14 +39,14 @@ pub fn loadGameData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame) !
 
     // Set player start position
     // Create the player entity if it doesn't exist
-    std.log.info("Checking if player exists: {}", .{game.getPlayer() != null});
+    loggers.getGameLog().info("player_check", "Checking if player exists: {}", .{game.getPlayer() != null});
     if (game.getPlayer() == null) {
-        std.log.info("Creating player at position ({}, {})", .{ game_data.player_start.position.x, game_data.player_start.position.y });
+        loggers.getGameLog().info("player_create", "Creating player at position ({}, {})", .{ game_data.player_start.position.x, game_data.player_start.position.y });
         const player_id = try game.createPlayer(Vec2{
             .x = game_data.player_start.position.x,
             .y = game_data.player_start.position.y,
         }, game_data.player_start.radius);
-        std.log.info("Player created with ID: {}", .{player_id});
+        loggers.getGameLog().info("player_created", "Player created with ID: {}", .{player_id});
     } else {
         // Update existing player position
         game.setPlayerPos(Vec2{
@@ -100,7 +100,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
                 Vec2{ .x = obstacle_data.size.x, .y = obstacle_data.size.y },
                 is_deadly,
             ) catch |err| {
-                std.log.err("Failed to create obstacle entity: {}", .{err});
+                loggers.getGameLog().err("obstacle_create_fail", "Failed to create obstacle entity: {}", .{err});
                 continue;
             };
 
@@ -117,7 +117,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
                 Vec2{ .x = unit_data.position.x, .y = unit_data.position.y },
                 unit_data.radius,
             ) catch |err| {
-                std.log.err("Failed to create unit entity: {}", .{err});
+                loggers.getGameLog().err("unit_create_fail", "Failed to create unit entity: {}", .{err});
                 continue;
             };
 
@@ -135,7 +135,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
                 portal_data.radius,
                 portal_data.destination,
             ) catch |err| {
-                std.log.err("Failed to create portal entity: {}", .{err});
+                loggers.getGameLog().err("portal_create_fail", "Failed to create portal entity: {}", .{err});
                 continue;
             };
 
@@ -156,7 +156,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
                 lifestone_data.radius,
                 pre_attuned,
             ) catch |err| {
-                std.log.err("Failed to create lifestone entity: {}", .{err});
+                loggers.getGameLog().err("lifestone_create_fail", "Failed to create lifestone entity: {}", .{err});
                 continue;
             };
 

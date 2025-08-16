@@ -35,7 +35,7 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
     // Consume from bullet pool
     pool.fire();
     
-    std.log.info("Bullet fired! ID: {}, pos: {any}, target: {any}", .{ bullet_id, player_pos, target_pos });
+    game.logger.info("bullet_fired", "Bullet fired! ID: {}, pos: {any}, target: {any}", .{ bullet_id, player_pos, target_pos });
     return true;
 }
 
@@ -57,15 +57,13 @@ pub fn respawnPlayer(game_state: anytype) void {
             
             // Travel to zone with spawn position
             game_state.travelToZoneWithSpawn(result.zone_index, respawn_pos) catch |err| {
-                std.log.err("Failed to travel to zone {}: {}", .{ result.zone_index, err });
-                loggers.getGameLog().err("respawn_travel_failed", "Failed to travel for respawn: {}", .{err});
+                loggers.getGameLog().err("respawn_travel_failed", "Failed to travel to zone {} for respawn: {}", .{ result.zone_index, err });
             };
         }
     } else {
         if (world.getCurrentZoneIndex() != 0) {
             loggers.getGameLog().info("respawn_overworld", "No lifestones found, returning to overworld spawn", .{});
             game_state.travelToZone(0) catch |err| {
-                std.log.err("Failed to travel to overworld: {}", .{err});
                 loggers.getGameLog().err("respawn_overworld_failed", "Failed to travel to overworld for respawn: {}", .{err});
             };
         }

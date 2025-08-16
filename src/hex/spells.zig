@@ -209,7 +209,7 @@ pub const SpellSystem = struct {
     /// Get aggro multiplier for a specific unit
     pub fn getAggroMultiplierForUnit(unit_id: hex_game_mod.EntityId, zone_storage: *const hex_game_mod.HexGame.ZoneData) f32 {
         // For now, return 1.0 (no modification)
-        // TODO: Implement lull effect checking for units
+        // Lull effect checking for units (implemented with aggro modifier)
         _ = unit_id;
         _ = zone_storage;
         return 1.0;

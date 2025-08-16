@@ -8,6 +8,16 @@ const Vec2 = math.Vec2;
 const Color = colors.Color;
 const BulletPool = combat.BulletPool;
 
+// Logging setup
+const Logger = @import("../lib/debug/logger.zig").Logger;
+const outputs = @import("../lib/debug/outputs.zig");
+const filters = @import("../lib/debug/filters.zig");
+
+const ModuleLogger = Logger(.{
+    .output = outputs.Console,
+    .filter = filters.Throttle,
+});
+
 // Simplified entity and component system
 pub const EntityId = u32;
 const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
@@ -672,6 +682,7 @@ pub const HexGame = struct {
     bullet_pool: BulletPool,
     entity_allocator: EntityAllocator,
     allocator: std.mem.Allocator,
+    logger: ModuleLogger,
     
     pub const ZoneData = struct {
         // Direct fixed-size archetype storage - no dynamic allocation
@@ -765,6 +776,7 @@ pub const HexGame = struct {
             .bullet_pool = BulletPool.init(),
             .entity_allocator = EntityAllocator{},
             .allocator = allocator,
+            .logger = ModuleLogger.init(allocator),
         };
         
         // Initialize all zones
@@ -789,6 +801,7 @@ pub const HexGame = struct {
         for (&self.zones) |*zone| {
             zone.deinit();
         }
+        self.logger.deinit();
     }
     
     // Direct zone access - no abstraction layers
@@ -809,11 +822,11 @@ pub const HexGame = struct {
     
     pub fn setCurrentZone(self: *HexGame, zone_index: u8) void {
         if (zone_index >= MAX_ZONES) {
-            std.log.err("setCurrentZone: Invalid zone_index {}", .{zone_index});
+            self.logger.err("zone_invalid", "setCurrentZone: Invalid zone_index {}", .{zone_index});
             return;
         }
         self.current_zone = zone_index;
-        std.log.debug("Zone switched to: {}", .{zone_index});
+        self.logger.debug("zone_switched", "Zone switched to: {}", .{zone_index});
     }
     
     pub fn getCurrentZoneIndex(self: *const HexGame) u8 {
@@ -850,7 +863,7 @@ pub const HexGame = struct {
         try zone.lifestones.addEntity(entity, transform, visual, terrain, interactable);
         zone.entity_count += 1;
         
-        std.log.debug("Created lifestone in zone {} at {any}, attuned: {}", .{ zone_index, pos, attuned });
+        self.logger.debug("lifestone_created", "Created lifestone in zone {} at {any}, attuned: {}", .{ zone_index, pos, attuned });
         
         return entity;
     }
@@ -961,7 +974,7 @@ pub const HexGame = struct {
                 try self.transferPlayerToZone(player_entity, self.player_zone, zone_index, spawn_pos);
                 self.player_zone = zone_index;
                 
-                std.log.info("Player traveled from zone {} to zone {}", .{ self.current_zone, zone_index });
+                self.logger.info("player_travel", "Player traveled from zone {} to zone {}", .{ self.current_zone, zone_index });
             }
         }
         
@@ -992,7 +1005,7 @@ pub const HexGame = struct {
         const visual = source.players.getVisualMut(player_entity); // We need mutable to copy
         
         if (transform == null or health == null or visual == null) {
-            std.log.err("transferPlayerToZone: Player entity missing required components", .{});
+            self.logger.err("transfer_failed", "transferPlayerToZone: Player entity missing required components", .{});
             return;
         }
         
@@ -1010,7 +1023,7 @@ pub const HexGame = struct {
         try dest.players.addEntity(player_entity, new_transform, new_health, player_input, new_visual);
         dest.entity_count += 1;
         
-        std.log.debug("Player entity {} transferred from zone {} to zone {}", .{ player_entity, source_zone, dest_zone });
+        self.logger.debug("player_transferred", "Player entity {} transferred from zone {} to zone {}", .{ player_entity, source_zone, dest_zone });
     }
     
     // Player accessors
@@ -1230,7 +1243,7 @@ pub const HexGame = struct {
         while (lifestone_iter.next()) |_| {
             count += 1;
         }
-        std.log.debug("Zone {}: {} lifestones", .{ zone_index, count });
+        self.logger.debug("zone_lifestones", "Zone {}: {} lifestones", .{ zone_index, count });
         
         // Count units
         count = 0;
@@ -1238,7 +1251,7 @@ pub const HexGame = struct {
         while (unit_iter.next()) |_| {
             count += 1;
         }
-        std.log.debug("Zone {}: {} units", .{ zone_index, count });
+        self.logger.debug("zone_units", "Zone {}: {} units", .{ zone_index, count });
         
         // Count portals
         count = 0;
@@ -1246,8 +1259,8 @@ pub const HexGame = struct {
         while (portal_iter.next()) |_| {
             count += 1;
         }
-        std.log.debug("Zone {}: {} portals", .{ zone_index, count });
+        self.logger.debug("zone_portals", "Zone {}: {} portals", .{ zone_index, count });
         
-        std.log.debug("Zone {}: {} total entities", .{ zone_index, zone.entity_count });
+        self.logger.debug("zone_entities", "Zone {}: {} total entities", .{ zone_index, zone.entity_count });
     }
 };

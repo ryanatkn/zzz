@@ -97,14 +97,14 @@ pub fn handleSDLEvent(
             switch (event.button.button) {
                 c.sdl.SDL_BUTTON_LEFT => {
                     // Left-click shooting for single shots (burst mode)
-                    std.log.info("Left click detected at mouse position: {any}", .{game_state.input_state.getMousePos()});
+                    game_state.hex_game.logger.info("left_click", "Left click detected at mouse position: {any}", .{game_state.input_state.getMousePos()});
                     if (game_state.hex_game.getPlayerAlive()) {
                         const screen_mouse_pos = game_state.input_state.getMousePos();
                         const world_mouse_pos = game_renderer.camera.screenToWorldSafe(screen_mouse_pos);
                         const result = combat.fireBulletAtMouse(&game_state.hex_game, world_mouse_pos, &game_state.hex_game.bullet_pool);
-                        std.log.info("fireBulletAtMouse result: {}", .{result});
+                        game_state.hex_game.logger.info("bullet_result", "fireBulletAtMouse result: {}", .{result});
                     } else {
-                        std.log.info("Cannot fire: player not alive", .{});
+                        game_state.hex_game.logger.info("fire_blocked", "Cannot fire: player not alive", .{});
                     }
                 },
                 c.sdl.SDL_BUTTON_RIGHT => {
