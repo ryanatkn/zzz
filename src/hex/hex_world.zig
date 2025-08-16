@@ -305,8 +305,8 @@ pub const HexWorld = struct {
             pos,
             velocity,
             constants.BULLET_RADIUS,
-            owner,
             damage,
+            owner,
             lifetime,
         );
     }
@@ -317,7 +317,7 @@ pub const HexWorld = struct {
         pos: Vec2,
         radius: f32,
     ) !EntityId {
-        return try self.world.getCurrentZone().createUnit(pos, radius);
+        return try self.world.getCurrentZone().createUnit(pos, radius, 50); // Default unit health
     }
 
     /// Create an obstacle entity in the current zone
@@ -352,22 +352,22 @@ pub const HexWorld = struct {
 
     /// Get current zone index
     pub fn getCurrentZoneIndex(self: *const HexWorld) u32 {
-        return self.world.getCurrentZoneId();
+        return self.world.getCurrentZoneIndex();
     }
 
     /// Temporary compatibility: direct access to current_zone field
     pub fn current_zone(self: *const HexWorld) u32 {
-        return self.world.getCurrentZoneId();
+        return self.world.getCurrentZoneIndex();
     }
 
     /// Get current zone metadata
     pub fn getCurrentZone(self: *HexWorld) *Zone {
-        return &self.zones[self.world.getCurrentZoneId()];
+        return &self.zones[self.world.getCurrentZoneIndex()];
     }
 
     /// Get current zone metadata (const)
     pub fn getCurrentZoneConst(self: *const HexWorld) *const Zone {
-        return &self.zones[self.world.getCurrentZoneId()];
+        return &self.zones[self.world.getCurrentZoneIndex()];
     }
 
     // DEPRECATED: These methods provide access to the old global API
@@ -392,7 +392,7 @@ pub const HexWorld = struct {
 
     /// Get specific zone's storage
     pub fn getZoneStorageByIndex(self: *HexWorld, zone_index: u32) *World {
-        return &self.world.getZone(zone_index).?.world;
+        return &self.world.getZone(@intCast(zone_index)).?.world;
     }
 
     /// Get underlying Game (for advanced operations)
@@ -402,7 +402,7 @@ pub const HexWorld = struct {
 
     /// Get current zone (mutable) - alias for getCurrentZone
     pub fn getCurrentZoneMut(self: *HexWorld) *Zone {
-        return &self.zones[self.world.getCurrentZoneId()];
+        return &self.zones[self.world.getCurrentZoneIndex()];
     }
 
     /// Travel to a different zone
@@ -427,39 +427,54 @@ pub const HexWorld = struct {
 
         // Move player to the new zone if they exist
         if (self.player_entity) |player| {
-            std.log.info("travelToZone: Moving player entity {any} to zone {}", .{ player, zone_index });
+            const current_zone_index = self.world.getCurrentZoneIndex();
+            const target_zone_index: u8 = @intCast(zone_index);
+            
+            std.log.info("travelToZone: Moving player entity {any} from zone {} to zone {}", .{ player, current_zone_index, target_zone_index });
+            
+            // If we're already in the target zone, just update position
+            if (current_zone_index == target_zone_index) {
+                std.log.info("travelToZone: Already in target zone, just updating position", .{});
+                if (self.world.getCurrentZone().world.players.getComponentMut(player, .transform)) |transform| {
+                    transform.pos = spawn_pos;
+                    transform.vel = Vec2.ZERO;
+                }
+                return;
+            }
             
             // Store the old entity ID for reference
             const old_player_entity = player;
             
-            // Move entity to new zone (this creates a new entity ID)
-            try self.world.moveEntityToZone(player, @intCast(zone_index));
+            // Move entity to new zone (this creates a new entity ID) - pass current zone as hint
+            try self.world.moveEntityToZone(player, target_zone_index, current_zone_index);
+
+            // NOW switch to the new zone (after the entity has been moved)
+            self.world.setCurrentZone(target_zone_index);
 
             // Find the new player entity in the destination zone
-            if (self.world.getZone(@intCast(zone_index))) |new_zone| {
-                // The player should be the only player entity in the zone
-                var player_iter = new_zone.world.players.entityIterator();
-                if (player_iter.next()) |new_player_entity| {
-                    // Update our reference to the new entity ID
-                    self.player_entity = new_player_entity;
-                    std.log.info("travelToZone: Updated player entity reference from {any} to {any}", .{ old_player_entity, new_player_entity });
-                    
-                    // Update player position in new zone
-                    if (new_zone.world.players.getComponentMut(new_player_entity, .transform)) |transform| {
-                        transform.pos = spawn_pos;
-                        transform.vel = Vec2.ZERO;
-                        std.log.info("travelToZone: Set player position to {any}", .{spawn_pos});
-                    }
-                } else {
-                    std.log.err("travelToZone: No player entity found in destination zone after transfer!", .{});
-                    // Player was lost during transfer - this is a critical error
-                    self.player_entity = null;
+            const new_zone = self.world.getCurrentZone();
+            // The player should be the only player entity in the zone
+            var player_iter = new_zone.world.players.entityIterator();
+            if (player_iter.next()) |new_player_entity| {
+                // Update our reference to the new entity ID
+                self.player_entity = new_player_entity;
+                std.log.info("travelToZone: Updated player entity reference from {any} to {any}", .{ old_player_entity, new_player_entity });
+                
+                // Update player position in new zone
+                if (new_zone.world.players.getComponentMut(new_player_entity, .transform)) |transform| {
+                    transform.pos = spawn_pos;
+                    transform.vel = Vec2.ZERO;
+                    std.log.info("travelToZone: Set player position to {any}", .{spawn_pos});
                 }
+            } else {
+                std.log.err("travelToZone: No player entity found in destination zone after transfer!", .{});
+                // Player was lost during transfer - this is a critical error
+                self.player_entity = null;
             }
+        } else {
+            // No player to move, just switch zones
+            self.world.setCurrentZone(@intCast(zone_index));
         }
-
-        // Switch to the new zone
-        self.world.setCurrentZone(@intCast(zone_index));
     }
 
     /// Reset current zone (respawn units, reset state)

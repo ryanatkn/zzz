@@ -1,6 +1,6 @@
 const math = @import("../lib/math/mod.zig");
 const Vec2 = math.Vec2;
-const game_systems = @import("../lib/game/game.zig");
+const game_systems = @import("../lib/game/mod.zig");
 
 /// Hex-specific game events
 pub const HexCustomEvents = union(enum) {

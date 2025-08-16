@@ -6,6 +6,8 @@ pub const components = @import("components.zig");
 pub const component_registry = @import("component_registry.zig");
 pub const archetype_storage = @import("archetype_storage.zig");
 pub const world = @import("world.zig");
+pub const zone = @import("zone.zig");
+pub const game = @import("game.zig");
 pub const system_registry = @import("system_registry.zig");
 
 // Legacy exports (deprecated - files removed)
@@ -20,9 +22,9 @@ pub const EntityAllocator = entity.EntityAllocator;
 pub const ComponentRegistry = component_registry.ComponentRegistry;
 pub const ArchetypeRegistry = component_registry.ArchetypeRegistry;
 pub const World = world.World;
-pub const Zone = world.Zone;
-pub const ZoneMetadata = world.ZoneMetadata;
-pub const Game = world.Game;
+pub const Zone = zone.Zone;
+pub const ZoneMetadata = zone.ZoneMetadata;
+pub const Game = game.Game;
 pub const EntityWithZone = world.EntityWithZone;
 pub const SystemRegistry = system_registry.SystemRegistry;
 pub const GameSystems = system_registry.GameSystems;

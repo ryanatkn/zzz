@@ -16,7 +16,7 @@ const reactive_hud = @import("../hud/reactive_hud.zig");
 const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
-const game_systems = @import("../lib/game/game.zig");
+const game_systems = @import("../lib/game/mod.zig");
 const hex_events = @import("events.zig");
 const save_data = @import("save_data.zig");
 const ecs = @import("../lib/game/ecs.zig");
@@ -242,11 +242,20 @@ pub const GameState = struct {
     }
 
     pub fn travelToZone(self: *Self, destination_zone: usize) !void {
+        self.travelToZoneWithSpawn(destination_zone, null) catch |err| {
+            return err;
+        };
+    }
+
+    pub fn travelToZoneWithSpawn(self: *Self, destination_zone: usize, spawn_pos: ?math.Vec2) !void {
         if (destination_zone < self.world.zones.len) {
-            self.world.getZonedWorld().setCurrentZone(@intCast(destination_zone));
-            // Zone reset is handled by the loader when switching zones
-            // Clear bullets on zone travel - bullets are now ECS entities
-            try self.world.clearAllProjectiles();
+            // Get the default spawn position for the zone if not provided
+            const zone = &self.world.zones[destination_zone];
+            const actual_spawn_pos = spawn_pos orelse zone.spawn_pos;
+            
+            // Use hex_world's travelToZone which properly handles entity transfer
+            try self.world.travelToZone(destination_zone, actual_spawn_pos);
+            
             // Clear ALL effects on zone travel to prevent persistence
             self.effect_system.clear();
             // Rebuild ambient effects for new zone

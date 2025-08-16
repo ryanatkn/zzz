@@ -108,7 +108,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.getZonedWorld().setCurrentZone(old_zone);
+        world.getZonedWorld().setCurrentZone(@intCast(old_zone));
     }
 
     // Load units as ECS entities
@@ -131,7 +131,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.getZonedWorld().setCurrentZone(old_zone);
+        world.getZonedWorld().setCurrentZone(@intCast(old_zone));
     }
 
     // Load portals as ECS entities
@@ -155,7 +155,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.getZonedWorld().setCurrentZone(old_zone);
+        world.getZonedWorld().setCurrentZone(@intCast(old_zone));
     }
 
     // Load lifestones as ECS entities
@@ -193,7 +193,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.getZonedWorld().setCurrentZone(old_zone);
+        world.getZonedWorld().setCurrentZone(@intCast(old_zone));
     }
 }
 
