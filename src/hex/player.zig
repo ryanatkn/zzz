@@ -1,5 +1,6 @@
 const std = @import("std");
-const hex_world = @import("hex_world.zig");
+const hex_world = @import("hex_game.zig");
+const hex_game_mod = @import("hex_game.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
@@ -9,13 +10,14 @@ const constants = @import("constants.zig");
 
 const Vec2 = math.Vec2;
 const HexWorld = hex_world.HexWorld;
+const HexGame = hex_game_mod.HexGame;
 const InputState = input.InputState;
 
 const WALK_SPEED_MULT = constants.WALK_SPEED_MULTIPLIER; // Walking speed is 1/4 of normal
 
 /// ECS-compatible player update function
-pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *const camera.Camera, deltaTime: f32) void {
-    if (!world.getPlayerAlive()) return;
+pub fn updatePlayerECS(game: *HexGame, input_state: *const InputState, cam: *const camera.Camera, deltaTime: f32) void {
+    if (!game.getPlayerAlive()) return;
 
     var keyboard_velocity = Vec2.ZERO;
     var mouse_velocity = Vec2.ZERO;
@@ -33,8 +35,8 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
     keyboard_velocity.y = movement.y * move_speed;
 
     // Get current player position
-    const player_pos = world.getPlayerPos();
-    const player_radius = world.getPlayerRadius();
+    const player_pos = game.getPlayerPos();
+    const player_radius = game.getPlayerRadius();
 
     // Only allow mouse movement when Ctrl is held
     if (ctrl_held and input_state.isLeftMouseHeld()) {
@@ -58,7 +60,7 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
     }
 
     // Get current zone
-    const zone = world.getCurrentZoneConst();
+    const zone = game.getCurrentZoneConst();
 
     // Use screen bounds only in fixed camera mode (overworld)
     const use_screen_bounds = (zone.camera_mode == .fixed);
@@ -80,17 +82,18 @@ pub fn updatePlayerECS(world: *HexWorld, input_state: *const InputState, cam: *c
     }
 
     // Check collision with obstacles before moving
-    if (physics.canPlayerMoveTo(world, new_pos, player_radius)) {
+    if (physics.canPlayerMoveTo(game, new_pos, player_radius)) {
         // No collision, safe to move
-        world.setPlayerPos(new_pos);
+        game.setPlayerPos(new_pos);
     } else {
         // Collision detected, don't move (or try sliding along walls)
         // For now, just stop movement completely
     }
-    world.setPlayerVel(velocity);
+    game.setPlayerVel(velocity);
 }
 
 /// ECS-compatible movement direction getter
-pub fn getPlayerMovementDirectionECS(world: *const HexWorld) Vec2 {
-    return math.vec2_normalize(world.getPlayerVelConst());
+pub fn getPlayerMovementDirectionECS(game: *const HexGame) Vec2 {
+    _ = game; // TODO: HexGame doesn't have getPlayerVelConst yet, return zero for now
+    return Vec2.ZERO;
 }

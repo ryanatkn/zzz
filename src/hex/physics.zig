@@ -3,6 +3,8 @@ const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const hex_world = @import("hex_world.zig");
+const hex_game_mod = @import("hex_game.zig");
+const HexGame = hex_game_mod.HexGame;
 const constants = @import("constants.zig");
 
 // Basic circle-circle collision
@@ -13,31 +15,28 @@ pub fn checkCircleCollision(pos1: math.Vec2, radius1: f32, pos2: math.Vec2, radi
 }
 
 // Check if player can move to position (obstacle collision)
-pub fn canPlayerMoveTo(world: *hex_world.HexWorld, new_pos: math.Vec2, player_radius: f32) bool {
-    const zone_storage = world.getZoneStorage();
+pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) bool {
+    const zone = game.getCurrentZone();
     
-    // Use idiomatic Zig iterator pattern
-    var obstacle_iter = world.iterateObstaclesInCurrentZone();
-    while (obstacle_iter.next()) |entity_id| {
-        if (zone_storage.obstacles.getComponent(entity_id, .terrain)) |terrain| {
-            // Only check solid terrain for movement blocking
-            if (!terrain.solid) continue;
+    // Check collision with all obstacles in current zone
+    for (0..zone.obstacles.count) |i| {
+        const terrain = &zone.obstacles.terrains[i];
+        // Only check solid terrain for movement blocking
+        if (!terrain.solid) continue;
 
-            if (zone_storage.obstacles.getComponent(entity_id, .transform)) |transform| {
-                // Check collision with this obstacle
-                const circle = collision.Shape{ .circle = .{ .center = new_pos, .radius = player_radius } };
-                const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
-                if (collision.checkCollision(circle, rect)) {
-                    return false;
-                }
-            }
+        const transform = &zone.obstacles.transforms[i];
+        // Check collision with this obstacle
+        const circle = collision.Shape{ .circle = .{ .center = new_pos, .radius = player_radius } };
+        const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
+        if (collision.checkCollision(circle, rect)) {
+            return false;
         }
     }
     return true;
 }
 
 // ECS player-unit collision check
-pub fn checkPlayerUnitCollisionECS(world: *hex_world.HexWorld) bool {
+pub fn checkPlayerUnitCollisionECS(world: *hex_game_mod.HexGame) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
     const zone_storage = world.getZoneStorage();
@@ -61,12 +60,12 @@ pub fn checkPlayerUnitCollisionECS(world: *hex_world.HexWorld) bool {
 }
 
 // ECS portal collision check
-pub fn checkPlayerPortalCollisionECS(player_pos: math.Vec2, player_radius: f32, portal_transform: *const ecs.components.Transform) bool {
+pub fn checkPlayerPortalCollisionECS(player_pos: math.Vec2, player_radius: f32, portal_transform: *const hex_game_mod.Transform) bool {
     return checkCircleCollision(player_pos, player_radius, portal_transform.pos, portal_transform.radius);
 }
 
 // ECS unit-obstacle collision check
-pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.EntityId, unit_transform: *ecs.Transform, unit_health: *ecs.Health, old_pos: math.Vec2) bool {
+pub fn checkUnitObstacleCollisionECS(world: *hex_game_mod.HexGame, unit_id: hex_game_mod.EntityId, unit_transform: *hex_game_mod.Transform, unit_health: *hex_game_mod.Health, old_pos: math.Vec2) bool {
     const zone_storage = world.getZoneStorage();
     
     // Use idiomatic Zig iterator pattern
@@ -98,7 +97,7 @@ pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.En
 }
 
 // Check if position collides with deadly obstacles
-pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_world.HexWorld) bool {
+pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_game_mod.HexGame) bool {
     const zone_storage = world.getZoneStorage();
     
     // Use idiomatic Zig iterator pattern
@@ -126,31 +125,31 @@ pub const LifestoneResult = struct {
     zone_index: u32,
 };
 
-// Find nearest attuned lifestone
-pub fn findNearestAttunedLifestone(world: *hex_world.HexWorld) ?LifestoneResult {
-    const player_pos = world.getPlayerPos();
+// Find nearest attuned lifestone across all zones
+pub fn findNearestAttunedLifestone(game: *HexGame) ?LifestoneResult {
+    const player_pos = game.getPlayerPos();
     var nearest_distance_sq: f32 = std.math.inf(f32);
     var nearest_lifestone: ?LifestoneResult = null;
 
-    const zone_storage = world.getZoneStorage();
-    var lifestone_iter = zone_storage.lifestones.entityIterator();
-    while (lifestone_iter.next()) |lifestone_id| {
-        if (!zone_storage.isAlive(lifestone_id)) continue;
-
-        // Get the interactable component to check if it's attuned
-        if (zone_storage.lifestones.getComponent(lifestone_id, .interactable)) |interactable| {
-            if (zone_storage.lifestones.getComponent(lifestone_id, .terrain)) |terrain| {
-                if (terrain.terrain_type == .altar and interactable.attuned) {
-                    if (zone_storage.lifestones.getComponent(lifestone_id, .transform)) |transform| {
-                        const distance_sq = math.distanceSquared(player_pos, transform.pos);
-                        if (distance_sq < nearest_distance_sq) {
-                            nearest_distance_sq = distance_sq;
-                            nearest_lifestone = LifestoneResult{
-                                .pos = transform.pos,
-                                .zone_index = @intCast(world.getCurrentZoneIndex()),
-                            };
-                        }
-                    }
+    // Search all zones for attuned lifestones
+    for (0..hex_game_mod.MAX_ZONES) |zone_index| {
+        const zone = &game.zones[zone_index];
+        
+        // Check all lifestones in this zone
+        for (0..zone.lifestones.count) |i| {
+            const interactable = &zone.lifestones.interactables[i];
+            const terrain = &zone.lifestones.terrains[i];
+            const transform = &zone.lifestones.transforms[i];
+            
+            // Check if lifestone is attuned
+            if (terrain.terrain_type == .altar and interactable.attuned) {
+                const distance_sq = math.distanceSquared(player_pos, transform.pos);
+                if (distance_sq < nearest_distance_sq) {
+                    nearest_distance_sq = distance_sq;
+                    nearest_lifestone = LifestoneResult{
+                        .pos = transform.pos,
+                        .zone_index = @intCast(zone_index),
+                    };
                 }
             }
         }

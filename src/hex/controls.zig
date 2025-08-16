@@ -65,7 +65,7 @@ pub fn handleSDLEvent(
                 c.sdl.SDL_SCANCODE_Q => game_state.spell_system.setActiveSlot(4),
                 c.sdl.SDL_SCANCODE_E => game_state.spell_system.setActiveSlot(5),
                 c.sdl.SDL_SCANCODE_R => { // R key - respawn or spell slot 6
-                    if (!game_state.world.getPlayerAlive()) {
+                    if (!game_state.hex_game.getPlayerAlive()) {
                         game_controller.handleRespawn(game_state);
                     } else {
                         game_state.spell_system.setActiveSlot(6);
@@ -96,7 +96,7 @@ pub fn handleSDLEvent(
 
             switch (event.button.button) {
                 c.sdl.SDL_BUTTON_LEFT => {
-                    if (!game_state.world.getPlayerAlive()) {
+                    if (!game_state.hex_game.getPlayerAlive()) {
                         game_controller.handleRespawn(game_state);
                     } else {
                         // Left-click shooting is handled in continuous shooting (mouse hold)
@@ -105,13 +105,13 @@ pub fn handleSDLEvent(
                 },
                 c.sdl.SDL_BUTTON_RIGHT => {
                     // Right-click casts spell (self-cast if Ctrl held)
-                    if (game_state.world.getPlayerAlive()) {
+                    if (game_state.hex_game.getPlayerAlive()) {
                         const ctrl_held = game_state.input_state.isCtrlHeld();
                         const screen_mouse_pos = game_state.input_state.getMousePos();
                         const world_mouse_pos = game_renderer.camera.screenToWorldSafe(screen_mouse_pos);
-                        const zone = game_state.world.getCurrentZoneConst();
+                        const zone = game_state.hex_game.getCurrentZoneConst();
 
-                        _ = game_state.spell_system.castActiveSpell(&game_state.world, zone, world_mouse_pos, &game_state.effect_system, ctrl_held);
+                        _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, world_mouse_pos, &game_state.effect_system, ctrl_held);
                     }
                 },
                 else => {},
@@ -122,7 +122,7 @@ pub fn handleSDLEvent(
         },
         c.sdl.SDL_EVENT_MOUSE_WHEEL => {
             // Mouse wheel zoom
-            const current_zone = game_state.world.getCurrentZoneMut();
+            const current_zone = game_state.hex_game.getCurrentZone();
             
             if (event.wheel.y > 0) {
                 // Zoom in (scroll up)

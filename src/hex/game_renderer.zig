@@ -2,6 +2,8 @@ const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
 
 const hex_world = @import("hex_world.zig");
+const hex_game_mod = @import("hex_game.zig");
+const HexGame = hex_game_mod.HexGame;
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
 const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
@@ -74,7 +76,7 @@ pub const GameRenderer = struct {
     }
 
     // Update camera based on current zone (call before game logic update)
-    pub fn updateCamera(self: *GameRenderer, world: *const hex_world.HexWorld) void {
+    pub fn updateCamera(self: *GameRenderer, game: *const HexGame) void {
         // Ensure camera has current screen dimensions (in case window resized)
         if (self.camera.screen_width != self.gpu.screen_width or
             self.camera.screen_height != self.gpu.screen_height)
@@ -83,20 +85,56 @@ pub const GameRenderer = struct {
             self.camera.screen_height = self.gpu.screen_height;
         }
 
-        const zone = world.getCurrentZoneConst();
+        const zone = game.getCurrentZoneConst();
         switch (zone.camera_mode) {
             .fixed => self.camera.setupFixed(zone.camera_scale),
-            .follow => self.camera.setupFollow(world.getPlayerPosConst(), zone.camera_scale),
+            .follow => self.camera.setupFollow(game.getPlayerPos(), zone.camera_scale),
         }
     }
 
     // Render all entities in a zone
-    pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
-        // Draw all rectangles first (obstacles)
-        self.renderObstacles(cmd_buffer, render_pass, world);
-
-        // Then draw all circles (player, enemies, bullets, etc)
-        self.renderCircles(cmd_buffer, render_pass, world);
+    pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
+        // TODO: This function should be migrated to simple_renderer.zig which already supports HexGame
+        // For now, just render using simplified approach
+        const zone = game.getCurrentZoneConst();
+        
+        // Draw rectangles (obstacles) - simple version
+        for (0..zone.obstacles.count) |i| {
+            const transform = &zone.obstacles.transforms[i];
+            const visual = &zone.obstacles.visuals[i];
+            const terrain = &zone.obstacles.terrains[i];
+            
+            // Simple rectangle rendering
+            self.gpu.drawRect(cmd_buffer, render_pass, transform.pos, terrain.size, visual.color);
+        }
+        
+        // Draw circles (units, lifestones, portals)
+        for (0..zone.units.count) |i| {
+            const transform = &zone.units.transforms[i];
+            const visual = &zone.units.visuals[i];
+            self.gpu.drawCircle(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+        }
+        
+        for (0..zone.lifestones.count) |i| {
+            const transform = &zone.lifestones.transforms[i];
+            const visual = &zone.lifestones.visuals[i];
+            self.gpu.drawCircle(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+        }
+        
+        for (0..zone.portals.count) |i| {
+            const transform = &zone.portals.transforms[i];
+            const visual = &zone.portals.visuals[i];
+            self.gpu.drawCircle(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+        }
+        
+        // Draw player
+        if (game.player_zone == game.current_zone) {
+            for (0..zone.players.count) |i| {
+                const transform = &zone.players.transforms[i];
+                const visual = &zone.players.visuals[i];
+                self.gpu.drawCircle(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+            }
+        }
     }
 
     // Render all obstacles (rectangles) using ECS queries
@@ -279,7 +317,7 @@ pub const GameRenderer = struct {
             border_stack.pushAnimated(constants.PAUSED_BORDER_BASE_WIDTH, borders.GOLD_YELLOW_COLORS, 1.5, constants.PAUSED_BORDER_PULSE_AMPLITUDE);
         }
 
-        if (!game_state.world.getPlayerAlive()) {
+        if (!game_state.hex_game.getPlayerAlive()) {
             // Animated dead border: base + pulse amplitude
             border_stack.pushAnimated(constants.DEAD_BORDER_BASE_WIDTH, borders.RED_COLORS, 1.2, constants.DEAD_BORDER_PULSE_AMPLITUDE);
         }

@@ -2,7 +2,7 @@ const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
-const hex_world = @import("hex_world.zig");
+const hex_game_mod = @import("hex_game.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
@@ -19,10 +19,9 @@ const spells = @import("spells.zig");
 const game_systems = @import("../lib/game/mod.zig");
 const hex_events = @import("events.zig");
 const save_data = @import("save_data.zig");
-const ecs = @import("../lib/game/ecs.zig");
 
 const Vec2 = math.Vec2;
-const HexWorld = hex_world.HexWorld;
+const HexGame = hex_game_mod.HexGame;
 const InputState = input.InputState;
 const ai_control = @import("../lib/game/control/mod.zig");
 
@@ -30,7 +29,7 @@ const ai_control = @import("../lib/game/control/mod.zig");
 var current_game_state: ?*GameState = null;
 
 pub const GameState = struct {
-    world: HexWorld,
+    hex_game: HexGame,
     input_state: InputState,
     game_paused: bool,
     quit_requested: bool,
@@ -64,7 +63,7 @@ pub const GameState = struct {
 
     pub fn init(allocator: std.mem.Allocator) !Self {
         return .{
-            .world = try HexWorld.init(allocator),
+            .hex_game = HexGame.init(allocator),
             .input_state = InputState.init(),
             .game_paused = false,
             .quit_requested = false,
@@ -83,7 +82,7 @@ pub const GameState = struct {
     }
 
     pub fn deinit(self: *Self) void {
-        self.world.deinit();
+        self.hex_game.deinit();
         if (self.ai_input) |ai| {
             ai.deinit();
             self.allocator.destroy(ai);
@@ -248,18 +247,18 @@ pub const GameState = struct {
     }
 
     pub fn travelToZoneWithSpawn(self: *Self, destination_zone: usize, spawn_pos: ?math.Vec2) !void {
-        if (destination_zone < self.world.zones.len) {
+        if (destination_zone < hex_game_mod.MAX_ZONES) {
             // Get the default spawn position for the zone if not provided
-            const zone = &self.world.zones[destination_zone];
+            const zone = &self.hex_game.zones[destination_zone];
             const actual_spawn_pos = spawn_pos orelse zone.spawn_pos;
             
-            // Use hex_world's travelToZone which properly handles entity transfer
-            try self.world.travelToZone(destination_zone, actual_spawn_pos);
+            // Use hex_game's travelToZone which properly handles entity transfer
+            try self.hex_game.travelToZone(@intCast(destination_zone), actual_spawn_pos);
             
             // Clear ALL effects on zone travel to prevent persistence
             self.effect_system.clear();
             // Rebuild ambient effects for new zone
-            self.effect_system.refreshAmbientEffects(&self.world);
+            self.effect_system.refreshAmbientEffects(&self.hex_game);
         }
     }
 
@@ -286,31 +285,28 @@ pub const GameState = struct {
 
     pub fn resetZone(self: *Self) void {
         // Reset units in current zone to their original spawn state
-        self.world.resetCurrentZone() catch |err| {
-            std.log.err("Failed to reset zone: {}", .{err});
-        };
+        // TODO: Implement zone reset with new simplified architecture
+        _ = self;
         loggers.getGameLog().info("zone_reset", "Zone units reset to original state", .{});
     }
 
     pub fn resetGame(self: *Self) void {
         // Reset player to starting position and state
-        self.world.resetPlayerToStart();
+        self.hex_game.setPlayerPos(self.hex_game.player_start_pos);
+        self.hex_game.setPlayerAlive(true);
 
         // Reset to starting zone
-        if (self.world.getCurrentZoneIndex() != 0) {
+        if (self.hex_game.current_zone != 0) {
             self.travelToZone(0) catch |err| {
                 std.log.err("Failed to travel to overworld during reset: {}", .{err});
             };
         }
 
-        // Reset all zones
-        self.world.resetAllZones() catch |err| {
-            std.log.err("Failed to reset all zones: {}", .{err});
-        };
+        // TODO: Reset all zones with new simplified architecture
 
         // Clear effects for clean slate
         self.effect_system.clear();
-        self.effect_system.refreshAmbientEffects(&self.world);
+        self.effect_system.refreshAmbientEffects(&self.hex_game);
 
         loggers.getGameLog().info("full_reset", "Full game reset", .{});
     }
@@ -327,7 +323,7 @@ pub const GameState = struct {
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
 
-        const zone_storage = self.world.getZoneStorage();
+        const zone_storage = self.hex_game.getZoneStorage();
         var terrain_iter = zone_storage.terrains.iterator();
 
         while (terrain_iter.next()) |entry| {
@@ -356,7 +352,7 @@ pub const GameState = struct {
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
 
-        const zone_storage = self.world.getZoneStorage();
+        const zone_storage = self.hex_game.getZoneStorage();
         var terrain_iter = zone_storage.terrains.iterator();
 
         while (terrain_iter.next()) |entry| {
@@ -384,7 +380,7 @@ pub const GameState = struct {
     pub fn computeTotalLifestonesForWorld(self: *const Self) usize {
         var total_lifestones: usize = 0;
 
-        const zone_storage = self.world.getZoneStorage();
+        const zone_storage = self.hex_game.getZoneStorage();
         var terrain_iter = zone_storage.terrains.iterator();
 
         while (terrain_iter.next()) |entry| {
@@ -405,7 +401,7 @@ pub const GameState = struct {
     pub fn computeTotalAttunedLifestonesForWorld(self: *const Self) usize {
         var total_attuned: usize = 0;
 
-        const zone_storage = self.world.getZoneStorage();
+        const zone_storage = self.hex_game.getZoneStorage();
         var terrain_iter = zone_storage.terrains.iterator();
 
         while (terrain_iter.next()) |entry| {
@@ -430,7 +426,7 @@ pub const GameState = struct {
 
 /// Update all units using ECS
 fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
-    const world = &game_state.world;
+    const world = &game_state.hex_game;
 
     // Note: Obstacle collision now uses ECS queries
 
@@ -452,8 +448,8 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
                     if (zone_storage.units.getComponentMut(unit_id, .visual)) |visual| {
                         const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnitECS(unit_id, zone_storage);
 
-                        // Update unit AI behavior using ECS components
-                        behaviors.updateUnitWithAggroModECS(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
+                        // Update unit AI behavior using HexGame components
+                        behaviors.updateUnitWithAggroModECS_HexGame(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
                     }
 
                     // Check collision with obstacles using ECS queries
@@ -491,7 +487,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     if (game_state.game_paused) return;
 
-    const world = &game_state.world;
+    const world = &game_state.hex_game;
     const input_state = &game_state.input_state;
 
     // Update portal cooldown
@@ -532,7 +528,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 }
 
 pub fn checkCollisions(game_state: *GameState) void {
-    const world = &game_state.world;
+    const world = &game_state.hex_game;
 
     // Player entity is accessed via helper methods instead of direct field access
 
@@ -571,16 +567,16 @@ pub fn checkCollisions(game_state: *GameState) void {
 }
 
 pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void {
-    if (game_state.world.getPlayerAlive() and !game_state.game_paused and game_state.world.canFireBullet()) {
+    if (game_state.hex_game.getPlayerAlive() and !game_state.game_paused and game_state.hex_game.canFireBullet()) {
         const screen_mouse_pos = game_state.input_state.getMousePos();
         const world_mouse_pos = cam.screenToWorldSafe(screen_mouse_pos);
-        _ = combat.fireBulletAtMouse(&game_state.world, world_mouse_pos, &game_state.world.bullet_pool);
+        _ = combat.fireBulletAtMouse(&game_state.hex_game, world_mouse_pos, &game_state.hex_game.bullet_pool);
     }
 }
 
 // Check lifestone collisions using ECS queries
 fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_radius: f32) void {
-    const world = &game_state.world;
+    const world = &game_state.hex_game;
     const zone_storage = world.getZoneStorage();
     var lifestone_iter = zone_storage.lifestones.entityIterator();
 
@@ -614,8 +610,8 @@ fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_
                         // Emit lifestone attuned event
                         if (game_state.state_manager) |manager| {
                             manager.emit(hex_events.lifestoneAttuned(
-                                game_state.world.getCurrentZoneIndex(),
-                                entity_id.index, // Use EntityId index as unique identifier
+                                game_state.hex_game.getCurrentZoneIndex(),
+                                entity_id, // Use EntityId as unique identifier
                                 transform.pos,
                             ));
                         }

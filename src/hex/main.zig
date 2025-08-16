@@ -12,7 +12,7 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
-const loader = @import("loader.zig");
+const simple_loader = @import("simple_loader.zig");
 const hud = @import("hud.zig");
 const game_controller = @import("game.zig");
 const combat = @import("combat.zig");
@@ -126,7 +126,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     game_hud.?.* = Hud.init();
 
     // Load game data
-    loader.loadGameData(global_allocator, &game_state.?.world) catch |err| {
+    simple_loader.loadGameData(global_allocator, &game_state.?.hex_game) catch |err| {
         if (logger) |*log| {
             log.err("zon_load_fail", "Failed to load game data from ZON file: {}", .{err});
             log.err("zon_check_msg", "Please check that game_data.zon exists and is valid", .{});
@@ -134,8 +134,20 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
         return err;
     };
 
+    // Create player entity after loading zones
+    const player_start_pos = math.Vec2{ 
+        .x = constants.SCREEN_CENTER_X, 
+        .y = constants.SCREEN_CENTER_Y 
+    };
+    _ = game_state.?.hex_game.createPlayer(player_start_pos, constants.PLAYER_RADIUS) catch |err| {
+        if (logger) |*log| {
+            log.err("player_create_fail", "Failed to create player entity: {}", .{err});
+        }
+        return err;
+    };
+
     // Initialize ambient effects for starting zone
-    game_state.?.effect_system.refreshAmbientEffects(&game_state.?.world);
+    game_state.?.effect_system.refreshAmbientEffects(&game_state.?.hex_game);
 
     // Initialize HUD system
     try game_state.?.initHud(global_allocator, game_renderer.?);
@@ -204,7 +216,7 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
 
             // Now safe to deinitialize the renderer and GPU device
             game_renderer.?.deinit();
-            loader.deinit(); // Clean up ZON data memory
+            // simple_loader doesn't need deinit - uses arena allocator
 
             // Free heap-allocated structures
             global_allocator.destroy(game_renderer.?);
@@ -255,7 +267,7 @@ fn runGameLoop() !void {
     last_time = current_time;
 
     // Update camera before game logic (for correct mouse coordinate transformation)
-    game_renderer.?.updateCamera(&game_state.?.world);
+    game_renderer.?.updateCamera(&game_state.?.hex_game);
 
     // Update game state
     // Pass camera pointer directly from the heap-allocated GameRenderer
@@ -266,14 +278,14 @@ fn runGameLoop() !void {
 }
 
 fn renderGame() !void {
-    const zone = game_state.?.world.getCurrentZone();
+    const zone = game_state.?.hex_game.getCurrentZone();
 
     // Begin GPU frame
     const cmd_buffer = try game_renderer.?.beginFrame(window);
     const render_pass = try game_renderer.?.beginRenderPass(cmd_buffer, window, zone.background_color);
 
     // Render all entities
-    game_renderer.?.renderZone(cmd_buffer, render_pass, &game_state.?.world);
+    game_renderer.?.renderZone(cmd_buffer, render_pass, &game_state.?.hex_game);
 
     // Render visual effects
     game_renderer.?.renderEffects(cmd_buffer, render_pass, &game_state.?.effect_system);

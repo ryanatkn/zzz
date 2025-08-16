@@ -16,7 +16,7 @@ pub fn updatePortalCooldown(deltaTime: f32) void {
 }
 
 pub fn checkPortalCollisions(game_state: anytype) bool {
-    const world = &game_state.world;
+    const world = &game_state.hex_game;
 
     // Skip portal checks during cooldown
     if (portal_cooldown > 0) {
