@@ -125,6 +125,12 @@ pub fn updateUnitWithAggroMod_HexGame(
             visual.color = constants.COLOR_UNIT_RETURNING;
             velocity = calculateReturnHomeVelocity_HexGame(unit_comp, transform);
         }
+    } else {
+        // Player is dead - always return home immediately, reset any chase state
+        unit_comp.chase_timer = 0;
+        unit_comp.state = .returning_home;
+        visual.color = constants.COLOR_UNIT_RETURNING;
+        velocity = calculateReturnHomeVelocity_HexGame(unit_comp, transform);
     }
 
     // Apply velocity

@@ -133,8 +133,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
         return err;
     };
 
-    // Initialize ambient effects for starting zone
-    game_state.?.effect_system.refreshAmbientEffects(&game_state.?.hex_game);
+    // Effects are ephemeral - no need for ambient effect initialization
 
     // Initialize HUD system
     try game_state.?.initHud(global_allocator, game_renderer.?);

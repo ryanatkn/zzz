@@ -255,10 +255,8 @@ pub const GameState = struct {
             // Use hex_game's travelToZone which properly handles entity transfer
             try self.hex_game.travelToZone(@intCast(destination_zone), actual_spawn_pos);
             
-            // Clear ALL effects on zone travel to prevent persistence
+            // Clear ALL effects on zone travel to keep them fully ephemeral
             self.effect_system.clear();
-            // Rebuild ambient effects for new zone
-            self.effect_system.refreshAmbientEffects(&self.hex_game);
         }
     }
 
@@ -304,9 +302,8 @@ pub const GameState = struct {
 
         // TODO: Reset all zones with new simplified architecture
 
-        // Clear effects for clean slate
+        // Clear effects for clean slate (keep ephemeral)
         self.effect_system.clear();
-        self.effect_system.refreshAmbientEffects(&self.hex_game);
 
         loggers.getGameLog().info("full_reset", "Full game reset", .{});
     }
