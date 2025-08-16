@@ -19,9 +19,9 @@ zig build run
 
 ## What it does
 
-Zzz is a graphics and media programming environment that generates all visuals through code and mathematics - no texture or sprite assets. It provides a framework for building creative tools, games, and interactive applications with procedural content generation.
-
-The library (`src/lib/`) provides core graphics and media capabilities with a capability-based architecture. The included Hex action RPG (`src/hex/`) demonstrates these capabilities as a complete game with zone-based worlds, reactive UI, and GPU-accelerated effects running at 60+ FPS.
+Zzz is a graphics and media programming environment.
+It builds on SDL3 and reinvents the rest in Zig.
+It treats the web as a backwards compat target and strives for optimal UX and DX.
 
 ## Architecture
 
@@ -164,44 +164,19 @@ const reactive = @import("../lib/reactive.zig");
 const ui = @import("../lib/ui.zig");
 ```
 
-## Technical details
-
-### GPU rendering
-- Vertex shaders: `register(b[n], space1)` for uniforms
-- Fragment shaders: `register(b[n], space0)`
-- Procedural vertex generation via `SV_VertexID`
-- Distance field techniques for anti-aliasing
-
-### Performance
-- Batch by shape type
-- Minimize pipeline state changes
-- Fixed-size memory pools
-- Zone-based spatial partitioning
-
-## System requirements
-
-- **Zig**: 0.14.1 or newer
-- **GPU**: Vulkan 1.0 or DirectX 12 support
-- **OS**: Windows 10+, Linux, macOS 10.14+
-- **RAM**: 256MB minimum
-
-### Dependencies (automatically managed)
-- **SDL3**: cross-platform window management and GPU API
-- **SDL_shadercross**: HLSL shader compilation
-- **webref**: machine-readable references of terms defined in web browser specifications
-
 ## Contributing
 
 Issues and discussions are welcome, but reviewing code is time consuming,
 so I will likely reject many well-meaning PRs, and re-implement if I agree with the idea.
 So if you don't mind the rejection and just care about getting the change in,
 PRs are very much encouraged! They are excellent for concrete discussion.
+
 Not every PR needs an issue but it's usually
 preferred to reference one or more issues and discussions.
 
 ## License
 
-See LICENSE file in project root.
+[Unlicense](./license) (public domain)
 
 ## Credits
 
