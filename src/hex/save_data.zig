@@ -65,7 +65,7 @@ pub const HexSaveData = struct {
     /// Create save data from current ECS game state
     pub fn fromGameState(world: *const HexWorld, stats: GameStatistics) !HexSaveData {
         var save = HexSaveData{
-            .player_zone = world.current_zone,
+            .player_zone = world.getCurrentZoneIndex(),
             .player_pos = world.getPlayerPosConst(),
             .player_alive = world.getPlayerAliveConst(),
             .zones = undefined,
@@ -82,16 +82,19 @@ pub const HexSaveData = struct {
             zone_data.* = ZoneSaveData.init();
         }
 
-        // Save entity state for each zone
+        // Save entity state for each zone using ECS archetype storages
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
 
-        for (world.zones, 0..) |zone, zone_idx| {
-            // Save lifestone entities
-            for (zone.lifestone_entities.items) |entity_id| {
-                if (world.world.transforms.getConst(entity_id)) |transform| {
-                    const alive = if (world.world.healths.getConst(entity_id)) |health| health.alive else true;
-                    const attuned = if (world.world.interactables.getConst(entity_id)) |interactable| interactable.attuned else false;
+        for (0..7) |zone_idx| {
+            const zone_storage = world.getZoneStorageByIndex(@intCast(zone_idx));
+            
+            // Save lifestone entities from the zone's ECS world
+            var lifestone_iter = zone_storage.lifestones.entityIterator();
+            while (lifestone_iter.next()) |entity_id| {
+                if (zone_storage.lifestones.getComponent(entity_id, .transform)) |transform| {
+                    const alive = if (zone_storage.lifestones.getComponent(entity_id, .health)) |health| health.alive else true;
+                    const attuned = if (zone_storage.lifestones.getComponent(entity_id, .interactable)) |interactable| interactable.attuned else false;
 
                     try save.zones[zone_idx].lifestone_entities.append(.{
                         .entity_id = entity_id,
@@ -107,11 +110,13 @@ pub const HexSaveData = struct {
                 }
             }
 
-            // Save unit entities
+            // Save unit entities from the zone's ECS world
             var units_killed_in_zone: usize = 0;
-            for (zone.unit_entities.items) |entity_id| {
-                if (world.world.transforms.getConst(entity_id)) |transform| {
-                    const alive = if (world.world.healths.getConst(entity_id)) |health| health.alive else true;
+            var total_units_in_zone: usize = 0;
+            var unit_iter = zone_storage.units.entityIterator();
+            while (unit_iter.next()) |entity_id| {
+                if (zone_storage.units.getComponent(entity_id, .transform)) |transform| {
+                    const alive = if (zone_storage.units.getComponent(entity_id, .health)) |health| health.alive else true;
 
                     try save.zones[zone_idx].unit_entities.append(.{
                         .entity_id = entity_id,
@@ -120,14 +125,15 @@ pub const HexSaveData = struct {
                         .attuned = false,
                     });
 
+                    total_units_in_zone += 1;
                     if (!alive) {
                         units_killed_in_zone += 1;
                     }
                 }
             }
 
-            // Update zone clear status
-            save.cached.zones_fully_cleared[zone_idx] = units_killed_in_zone == zone.unit_entities.items.len;
+            // Update zone clear status based on actual ECS data
+            save.cached.zones_fully_cleared[zone_idx] = (total_units_in_zone > 0) and (units_killed_in_zone == total_units_in_zone);
             save.cached.zones_fully_explored[zone_idx] = save.zones[zone_idx].lifestone_entities.len > 0 and
                 blk: {
                     for (save.zones[zone_idx].lifestone_entities.slice()) |entity_data| {
@@ -152,25 +158,27 @@ pub const HexSaveData = struct {
     /// Apply save data to ECS game state
     pub fn applyToGameState(self: *const HexSaveData, world: *HexWorld, stats: *GameStatistics) void {
         // Restore player state
-        world.current_zone = self.player_zone;
+        world.getZonedWorld().setCurrentZone(@intCast(self.player_zone));
         world.setPlayerPos(self.player_pos);
         world.setPlayerAlive(self.player_alive);
 
-        // Restore entity state for each zone
-        for (self.zones) |zone_data| {
+        // Restore entity state for each zone using zone-specific ECS access
+        for (self.zones, 0..) |zone_data, zone_idx| {
+            const zone_storage = world.getZoneStorageByIndex(@intCast(zone_idx));
+            
             // Restore lifestone entities
             for (zone_data.lifestone_entities.slice()) |entity_data| {
-                if (world.world.interactables.get(entity_data.entity_id)) |interactable| {
+                if (zone_storage.lifestones.getComponentMut(entity_data.entity_id, .interactable)) |interactable| {
                     interactable.attuned = entity_data.attuned;
                 }
-                if (world.world.healths.get(entity_data.entity_id)) |health| {
+                if (zone_storage.lifestones.getComponentMut(entity_data.entity_id, .health)) |health| {
                     health.alive = entity_data.alive;
                 }
-                if (world.world.transforms.get(entity_data.entity_id)) |transform| {
+                if (zone_storage.lifestones.getComponentMut(entity_data.entity_id, .transform)) |transform| {
                     transform.pos = entity_data.pos;
                 }
                 // Update visual color based on attunement
-                if (world.world.visuals.get(entity_data.entity_id)) |visual| {
+                if (zone_storage.lifestones.getComponentMut(entity_data.entity_id, .visual)) |visual| {
                     visual.color = if (entity_data.attuned)
                         constants.COLOR_LIFESTONE_ATTUNED
                     else
@@ -180,14 +188,14 @@ pub const HexSaveData = struct {
 
             // Restore unit entities
             for (zone_data.unit_entities.slice()) |entity_data| {
-                if (world.world.healths.get(entity_data.entity_id)) |health| {
+                if (zone_storage.units.getComponentMut(entity_data.entity_id, .health)) |health| {
                     health.alive = entity_data.alive;
                 }
-                if (world.world.transforms.get(entity_data.entity_id)) |transform| {
+                if (zone_storage.units.getComponentMut(entity_data.entity_id, .transform)) |transform| {
                     transform.pos = entity_data.pos;
                 }
                 // Update visual color based on alive status
-                if (world.world.visuals.get(entity_data.entity_id)) |visual| {
+                if (zone_storage.units.getComponentMut(entity_data.entity_id, .visual)) |visual| {
                     visual.color = if (entity_data.alive)
                         constants.COLOR_UNIT_ALIVE
                     else

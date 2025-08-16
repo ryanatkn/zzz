@@ -385,7 +385,16 @@ pub const HexWorld = struct {
         radius: f32,
         attuned: bool,
     ) !EntityId {
-        return try self.world.getCurrentZone().createLifestone(pos, radius, attuned);
+        // Zone validation: ensure we're creating entities in the correct zone
+        const current_zone_id = self.world.getCurrentZoneIndex();
+        std.log.debug("createLifestone: Creating lifestone in zone {} at pos {any}", .{ current_zone_id, pos });
+        
+        const entity_id = try self.world.getCurrentZone().createLifestone(pos, radius, attuned);
+        
+        // Debug validation: verify entity was created in the correct zone
+        self.validateEntityInZone(entity_id, @intCast(current_zone_id), "lifestone");
+        
+        return entity_id;
     }
 
     /// Create a portal entity in the current zone
@@ -403,6 +412,26 @@ pub const HexWorld = struct {
         return self.world.getCurrentZoneIndex();
     }
 
+    /// Zone validation helper: verify entity exists in expected zone storage
+    fn validateEntityInZone(self: *HexWorld, entity_id: EntityId, zone_index: u8, entity_type: []const u8) void {
+        const zone_storage = self.getZoneStorageByIndex(zone_index);
+        var found = false;
+        
+        // Check each archetype storage for the entity
+        if (zone_storage.players.getComponent(entity_id, .transform) != null) found = true;
+        if (zone_storage.units.getComponent(entity_id, .transform) != null) found = true;
+        if (zone_storage.projectiles.getComponent(entity_id, .transform) != null) found = true;
+        if (zone_storage.obstacles.getComponent(entity_id, .transform) != null) found = true;
+        if (zone_storage.lifestones.getComponent(entity_id, .transform) != null) found = true;
+        if (zone_storage.portals.getComponent(entity_id, .transform) != null) found = true;
+        
+        if (!found) {
+            std.log.err("validateEntityInZone: {s} entity {any} not found in zone {} storage!", .{ entity_type, entity_id, zone_index });
+        } else {
+            std.log.debug("validateEntityInZone: {s} entity {any} confirmed in zone {} storage", .{ entity_type, entity_id, zone_index });
+        }
+    }
+
     /// Temporary compatibility: direct access to current_zone field
     pub fn current_zone(self: *const HexWorld) u32 {
         return self.world.getCurrentZoneIndex();
@@ -418,23 +447,20 @@ pub const HexWorld = struct {
         return &self.zones[self.world.getCurrentZoneIndex()];
     }
 
-    // DEPRECATED: These methods provide access to the old global API
-    // Use getZoneStorage() methods for better cache locality
-    pub fn getECSWorld(self: *const HexWorld) *const World {
-        return &self.world.getCurrentZoneConst().world;
-    }
-
-    pub fn getECSWorldMut(self: *HexWorld) *World {
-        return &self.world.getCurrentZone().world;
-    }
 
     /// Get current zone's storage (preferred method)
+    /// WARNING: Only accesses entities in the current zone - ensures proper zone isolation
     pub fn getZoneStorage(self: *HexWorld) *World {
+        const current_zone_id = self.world.getCurrentZoneIndex();
+        std.log.debug("getZoneStorage: Accessing zone {} storage (zone isolation enforced)", .{current_zone_id});
         return &self.world.getCurrentZone().world;
     }
 
     /// Get current zone's storage (const version)
+    /// WARNING: Only accesses entities in the current zone - ensures proper zone isolation
     pub fn getZoneStorageConst(self: *const HexWorld) *const World {
+        const current_zone_id = self.world.getCurrentZoneIndex();
+        std.log.debug("getZoneStorageConst: Accessing zone {} storage (zone isolation enforced)", .{current_zone_id});
         return &self.world.getCurrentZoneConst().world;
     }
 
@@ -530,6 +556,9 @@ pub const HexWorld = struct {
             std.log.info("travelToZone: Successfully transferred player from {any} to {any} in zone {}", .{ 
                 result.old_entity, result.new_entity, target_zone_index 
             });
+            
+            // Zone isolation validation: verify player is in the correct zone storage
+            self.validateEntityInZone(result.new_entity, target_zone_index, "player");
         } else {
             // No player to move, just switch zones
             self.world.setCurrentZone(@intCast(zone_index));

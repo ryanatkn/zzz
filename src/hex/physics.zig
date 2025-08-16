@@ -14,16 +14,16 @@ pub fn checkCircleCollision(pos1: math.Vec2, radius1: f32, pos2: math.Vec2, radi
 
 // Check if player can move to position (obstacle collision)
 pub fn canPlayerMoveTo(world: *hex_world.HexWorld, new_pos: math.Vec2, player_radius: f32) bool {
-    const ecs_world = world.getECSWorldMut();
+    const zone_storage = world.getZoneStorage();
     
     // Use idiomatic Zig iterator pattern
     var obstacle_iter = world.iterateObstaclesInCurrentZone();
     while (obstacle_iter.next()) |entity_id| {
-        if (ecs_world.obstacles.getComponent(entity_id, .terrain)) |terrain| {
+        if (zone_storage.obstacles.getComponent(entity_id, .terrain)) |terrain| {
             // Only check solid terrain for movement blocking
             if (!terrain.solid) continue;
 
-            if (ecs_world.obstacles.getComponent(entity_id, .transform)) |transform| {
+            if (zone_storage.obstacles.getComponent(entity_id, .transform)) |transform| {
                 // Check collision with this obstacle
                 const circle = collision.Shape{ .circle = .{ .center = new_pos, .radius = player_radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
@@ -40,13 +40,13 @@ pub fn canPlayerMoveTo(world: *hex_world.HexWorld, new_pos: math.Vec2, player_ra
 pub fn checkPlayerUnitCollisionECS(world: *hex_world.HexWorld) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
-    const ecs_world = world.getECSWorldMut();
+    const zone_storage = world.getZoneStorage();
 
     // Use idiomatic Zig iterator pattern
     var unit_iter = world.iterateUnitsInCurrentZone();
     while (unit_iter.next()) |entity_id| {
-        if (ecs_world.units.getComponent(entity_id, .transform)) |transform| {
-            if (ecs_world.units.getComponent(entity_id, .health)) |health| {
+        if (zone_storage.units.getComponent(entity_id, .transform)) |transform| {
+            if (zone_storage.units.getComponent(entity_id, .health)) |health| {
                 // Only check alive units
                 if (!health.alive) continue;
                 
@@ -67,13 +67,13 @@ pub fn checkPlayerPortalCollisionECS(player_pos: math.Vec2, player_radius: f32, 
 
 // ECS unit-obstacle collision check
 pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.EntityId, unit_transform: *ecs.Transform, unit_health: *ecs.Health, old_pos: math.Vec2) bool {
-    const ecs_world = world.getECSWorldMut();
+    const zone_storage = world.getZoneStorage();
     
     // Use idiomatic Zig iterator pattern
     var obstacle_iter = world.iterateObstaclesInCurrentZone();
     while (obstacle_iter.next()) |entity_id| {
-        if (ecs_world.obstacles.getComponent(entity_id, .terrain)) |terrain| {
-            if (ecs_world.obstacles.getComponent(entity_id, .transform)) |transform| {
+        if (zone_storage.obstacles.getComponent(entity_id, .terrain)) |terrain| {
+            if (zone_storage.obstacles.getComponent(entity_id, .transform)) |transform| {
                 const circle = collision.Shape{ .circle = .{ .center = unit_transform.pos, .radius = unit_transform.radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
 
@@ -81,7 +81,7 @@ pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.En
                     // Check if it's a deadly obstacle
                     if (terrain.terrain_type == .pit) {
                         unit_health.alive = false;
-                        if (ecs_world.units.getComponentMut(unit_id, .visual)) |unit_visual| {
+                        if (zone_storage.units.getComponentMut(unit_id, .visual)) |unit_visual| {
                             unit_visual.color = constants.COLOR_DEAD;
                         }
                     } else {
@@ -99,16 +99,16 @@ pub fn checkUnitObstacleCollisionECS(world: *hex_world.HexWorld, unit_id: ecs.En
 
 // Check if position collides with deadly obstacles
 pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_world.HexWorld) bool {
-    const ecs_world = world.getECSWorldMut();
+    const zone_storage = world.getZoneStorage();
     
     // Use idiomatic Zig iterator pattern
     var obstacle_iter = world.iterateObstaclesInCurrentZone();
     while (obstacle_iter.next()) |entity_id| {
-        if (ecs_world.obstacles.getComponent(entity_id, .terrain)) |terrain| {
+        if (zone_storage.obstacles.getComponent(entity_id, .terrain)) |terrain| {
             // Only check deadly terrain
             if (terrain.terrain_type != .pit) continue;
 
-            if (ecs_world.obstacles.getComponent(entity_id, .transform)) |transform| {
+            if (zone_storage.obstacles.getComponent(entity_id, .transform)) |transform| {
                 const circle = collision.Shape{ .circle = .{ .center = pos, .radius = radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
                 if (collision.checkCollision(circle, rect)) {
@@ -132,16 +132,16 @@ pub fn findNearestAttunedLifestone(world: *hex_world.HexWorld) ?LifestoneResult 
     var nearest_distance_sq: f32 = std.math.inf(f32);
     var nearest_lifestone: ?LifestoneResult = null;
 
-    const ecs_world = world.getECSWorldMut();
-    var lifestone_iter = ecs_world.lifestones.entityIterator();
+    const zone_storage = world.getZoneStorage();
+    var lifestone_iter = zone_storage.lifestones.entityIterator();
     while (lifestone_iter.next()) |lifestone_id| {
-        if (!ecs_world.isAlive(lifestone_id)) continue;
+        if (!zone_storage.isAlive(lifestone_id)) continue;
 
         // Get the interactable component to check if it's attuned
-        if (ecs_world.lifestones.getComponent(lifestone_id, .interactable)) |interactable| {
-            if (ecs_world.lifestones.getComponent(lifestone_id, .terrain)) |terrain| {
+        if (zone_storage.lifestones.getComponent(lifestone_id, .interactable)) |interactable| {
+            if (zone_storage.lifestones.getComponent(lifestone_id, .terrain)) |terrain| {
                 if (terrain.terrain_type == .altar and interactable.attuned) {
-                    if (ecs_world.lifestones.getComponent(lifestone_id, .transform)) |transform| {
+                    if (zone_storage.lifestones.getComponent(lifestone_id, .transform)) |transform| {
                         const distance_sq = math.distanceSquared(player_pos, transform.pos);
                         if (distance_sq < nearest_distance_sq) {
                             nearest_distance_sq = distance_sq;

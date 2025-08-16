@@ -88,12 +88,12 @@ pub const GameEffectSystem = struct {
         self.core.count = write_index;
 
         // Create ambient effects for current zone entities using idiomatic iterators
-        const ecs_world = world.getECSWorld();
+        const zone_storage = world.getZoneStorageConst();
 
         // Portal ambient effects from current zone
         var portal_iter = world.iteratePortalsInCurrentZone();
         while (portal_iter.next()) |entity_id| {
-            if (@constCast(&ecs_world.portals).getComponent(entity_id, .transform)) |transform| {
+            if (@constCast(&zone_storage.portals).getComponent(entity_id, .transform)) |transform| {
                 self.addPortalAmbientEffect(transform.pos, transform.radius);
             }
         }
@@ -101,8 +101,8 @@ pub const GameEffectSystem = struct {
         // Lifestone ambient effects from current zone
         var lifestone_iter = world.iterateLifestonesInCurrentZone();
         while (lifestone_iter.next()) |entity_id| {
-            if (@constCast(&ecs_world.lifestones).getComponent(entity_id, .transform)) |transform| {
-                if (@constCast(&ecs_world.lifestones).getComponent(entity_id, .interactable)) |interactable| {
+            if (@constCast(&zone_storage.lifestones).getComponent(entity_id, .transform)) |transform| {
+                if (@constCast(&zone_storage.lifestones).getComponent(entity_id, .interactable)) |interactable| {
                     // Check if lifestone is attuned
                     const attuned = interactable.attuned;
                     self.addLifestoneGlowEffect(transform.pos, transform.radius, attuned);

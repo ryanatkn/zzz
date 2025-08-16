@@ -38,24 +38,24 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
     // Checking portal collisions
 
     // Check collisions with all portal entities using ECS
-    const ecs_world = world.getECSWorldMut();
-    var portal_iter = ecs_world.portals.entityIterator();
+    const zone_storage = world.getZoneStorage();
+    var portal_iter = zone_storage.portals.entityIterator();
     var portal_count: u32 = 0;
     while (portal_iter.next()) |portal_id| {
         portal_count += 1;
         // Found portal entity
         
-        if (!ecs_world.isAlive(portal_id)) {
+        if (!zone_storage.isAlive(portal_id)) {
             // Portal entity is not alive
             continue;
         }
 
         // Get portal interactable component for destination zone
-        if (ecs_world.portals.getComponent(portal_id, .interactable)) |interactable| {
+        if (zone_storage.portals.getComponent(portal_id, .interactable)) |interactable| {
             // Portal has interactable component
             if (interactable.destination_zone) |destination_zone| {
                 // Portal leads to destination zone
-                if (ecs_world.portals.getComponent(portal_id, .transform)) |transform| {
+                if (zone_storage.portals.getComponent(portal_id, .transform)) |transform| {
                     // Portal transform found - check collision
                     
                     if (physics.checkPlayerPortalCollisionECS(player_pos, player_radius, transform)) {

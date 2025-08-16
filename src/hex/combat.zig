@@ -93,11 +93,11 @@ pub fn handlePlayerDeathOnHazard(world: *HexWorld) void {
 
 // ECS-compatible unit death on hazard
 pub fn handleUnitDeathOnHazardECS(unit_entity: ecs.EntityId, world: *HexWorld) void {
-    const ecs_world = world.getECSWorldMut();
-    if (ecs_world.healths.get(unit_entity)) |health| {
+    const zone_storage = world.getZoneStorage();
+    if (zone_storage.healths.get(unit_entity)) |health| {
         health.alive = false;
     }
-    if (ecs_world.visuals.get(unit_entity)) |visual| {
+    if (zone_storage.visuals.get(unit_entity)) |visual| {
         visual.color = constants.COLOR_DEAD;
     }
     loggers.getGameLog().info("unit_hazard_death", "Unit died on hazard!", .{});
