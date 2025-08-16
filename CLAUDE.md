@@ -341,6 +341,7 @@ $ zig build --help       # Show all build options
 ## Notes to LLMs
 
 - Game is fully functional - focus on performance and gameplay improvements
+- Avoid magic numbers, extract constants
 - Prioritize procedural generation and performance over asset-based approaches
 - Focus on code-driven visuals and algorithmic generation
 - Test frequently with `zig build run` to ensure each step works

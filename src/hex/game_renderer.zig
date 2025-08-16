@@ -13,6 +13,7 @@ const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSy
 const font_manager = @import("../lib/font/manager.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 const loggers = @import("../lib/debug/loggers.zig");
+const geometric_text = @import("../lib/ui/geometric_text.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -321,28 +322,22 @@ pub const GameRenderer = struct {
 
     fn drawDigit(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, digit: u8, x: f32, y: f32, color: Color) void {
         if (digit > 9) return;
-
-        // Simple 3x5 digit patterns
-        const patterns = [_][15]bool{
-            .{ true, true, true, true, false, true, true, false, true, true, false, true, true, true, true }, // 0
-            .{ false, true, false, false, true, false, false, true, false, false, true, false, false, true, false }, // 1
-            .{ true, true, true, false, false, true, true, true, true, true, false, false, true, true, true }, // 2
-            .{ true, true, true, false, false, true, true, true, true, false, false, true, true, true, true }, // 3
-            .{ true, false, true, true, false, true, true, true, true, false, false, true, false, false, true }, // 4
-            .{ true, true, true, true, false, false, true, true, true, false, false, true, true, true, true }, // 5
-            .{ true, true, true, true, false, false, true, true, true, true, false, true, true, true, true }, // 6
-            .{ true, true, true, false, false, true, false, false, true, false, false, true, false, false, true }, // 7
-            .{ true, true, true, true, false, true, true, true, true, true, false, true, true, true, true }, // 8
-            .{ true, true, true, true, false, true, true, true, true, false, false, true, true, true, true }, // 9
+        
+        const config = geometric_text.TextConfig{
+            .pixel_size = constants.FPS_DIGIT_PIXEL_SIZE,
+            .char_width = 3,
+            .char_height = 5,
         };
-
-        const pattern = patterns[digit];
-        for (0..5) |row| {
-            for (0..3) |col| {
-                if (pattern[row * 3 + col]) {
-                    const px = x + @as(f32, @floatFromInt(col)) * constants.FPS_PIXEL_SIZE;
-                    const py = y + @as(f32, @floatFromInt(row)) * constants.FPS_PIXEL_SIZE;
-                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = px, .y = py }, Vec2{ .x = constants.FPS_DIGIT_PIXEL_SIZE, .y = constants.FPS_DIGIT_PIXEL_SIZE }, color);
+        
+        const pattern = geometric_text.CharacterPatterns.getDigitPattern(digit) orelse return;
+        
+        for (0..config.char_height) |row| {
+            for (0..config.char_width) |col| {
+                if (pattern[row * config.char_width + col]) {
+                    const px = x + @as(f32, @floatFromInt(col)) * config.pixel_size;
+                    const py = y + @as(f32, @floatFromInt(row)) * config.pixel_size;
+                    const pixel_size = Vec2{ .x = config.pixel_size, .y = config.pixel_size };
+                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = px, .y = py }, pixel_size, color);
                 }
             }
         }

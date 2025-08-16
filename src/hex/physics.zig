@@ -1,37 +1,42 @@
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision.zig");
+const queries = @import("../lib/physics/queries.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const hex_game_mod = @import("hex_game.zig");
 const HexGame = hex_game_mod.HexGame;
 const constants = @import("constants.zig");
 
-// Basic circle-circle collision
-pub fn checkCircleCollision(pos1: math.Vec2, radius1: f32, pos2: math.Vec2, radius2: f32) bool {
-    const distance_sq = math.distanceSquared(pos1, pos2);
-    const radius_sum = radius1 + radius2;
-    return distance_sq < radius_sum * radius_sum;
-}
-
 // Check if player can move to position (obstacle collision)
 pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) bool {
     const zone = game.getCurrentZone();
     
-    // Check collision with all obstacles in current zone
+    // Convert zone obstacles to query format
+    var obstacles: [constants.MAX_OBSTACLES]queries.ObstacleData = undefined;
+    var obstacle_count: usize = 0;
+    
     for (0..zone.obstacles.count) |i| {
         const terrain = &zone.obstacles.terrains[i];
-        // Only check solid terrain for movement blocking
-        if (!terrain.solid) continue;
-
         const transform = &zone.obstacles.transforms[i];
-        // Check collision with this obstacle
-        const circle = collision.Shape{ .circle = .{ .center = new_pos, .radius = player_radius } };
-        const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
-        if (collision.checkCollision(circle, rect)) {
-            return false;
-        }
+        
+        obstacles[obstacle_count] = queries.ObstacleData{
+            .position = transform.pos,
+            .size = terrain.size,
+            .is_solid = terrain.solid,
+            .is_deadly = terrain.terrain_type == .pit,
+        };
+        obstacle_count += 1;
     }
-    return true;
+    
+    const config = queries.ObstacleQueryConfig{ .check_solid_only = true };
+    const result = queries.PhysicsQueries.checkCircleObstacleCollision(
+        new_pos,
+        player_radius,
+        obstacles[0..obstacle_count],
+        config
+    );
+    
+    return !result.found;
 }
 
 // Player-unit collision check
@@ -49,7 +54,7 @@ pub fn checkPlayerUnitCollision(world: *hex_game_mod.HexGame) bool {
                 if (!health.alive) continue;
                 
                 // Check collision with this unit
-                if (checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
+                if (collision.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
                     return true;
                 }
             }
@@ -60,7 +65,7 @@ pub fn checkPlayerUnitCollision(world: *hex_game_mod.HexGame) bool {
 
 // Portal collision check
 pub fn checkPlayerPortalCollision(player_pos: math.Vec2, player_radius: f32, portal_transform: *const hex_game_mod.Transform) bool {
-    return checkCircleCollision(player_pos, player_radius, portal_transform.pos, portal_transform.radius);
+    return collision.checkCircleCollision(player_pos, player_radius, portal_transform.pos, portal_transform.radius);
 }
 
 // Unit-obstacle collision check
@@ -97,25 +102,37 @@ pub fn checkUnitObstacleCollision(world: *hex_game_mod.HexGame, unit_id: hex_gam
 
 // Check if position collides with deadly obstacles
 pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_game_mod.HexGame) bool {
-    const zone_storage = world.getZoneStorage();
+    const zone = world.getCurrentZone();
     
-    // Use idiomatic Zig iterator pattern
-    var obstacle_iter = world.iterateObstaclesInCurrentZone();
-    while (obstacle_iter.next()) |entity_id| {
-        if (zone_storage.obstacles.getComponent(entity_id, .terrain)) |terrain| {
-            // Only check deadly terrain
-            if (terrain.terrain_type != .pit) continue;
-
-            if (zone_storage.obstacles.getComponent(entity_id, .transform)) |transform| {
-                const circle = collision.Shape{ .circle = .{ .center = pos, .radius = radius } };
-                const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
-                if (collision.checkCollision(circle, rect)) {
-                    return true;
-                }
-            }
+    // Convert zone obstacles to query format (only deadly ones)
+    var obstacles: [constants.MAX_OBSTACLES]queries.ObstacleData = undefined;
+    var obstacle_count: usize = 0;
+    
+    for (0..zone.obstacles.count) |i| {
+        const terrain = &zone.obstacles.terrains[i];
+        const transform = &zone.obstacles.transforms[i];
+        
+        // Only include deadly obstacles
+        if (terrain.terrain_type == .pit) {
+            obstacles[obstacle_count] = queries.ObstacleData{
+                .position = transform.pos,
+                .size = terrain.size,
+                .is_solid = terrain.solid,
+                .is_deadly = true,
+            };
+            obstacle_count += 1;
         }
     }
-    return false;
+    
+    const config = queries.ObstacleQueryConfig{ .check_deadly_only = true };
+    const result = queries.PhysicsQueries.checkCircleObstacleCollision(
+        pos,
+        radius,
+        obstacles[0..obstacle_count],
+        config
+    );
+    
+    return result.found;
 }
 
 // Lifestone search result
@@ -127,8 +144,11 @@ pub const LifestoneResult = struct {
 // Find nearest attuned lifestone across all zones
 pub fn findNearestAttunedLifestone(game: *HexGame) ?LifestoneResult {
     const player_pos = game.getPlayerPos();
-    var nearest_distance_sq: f32 = std.math.inf(f32);
-    var nearest_lifestone: ?LifestoneResult = null;
+    
+    // Collect all attuned lifestones across zones
+    var lifestones: [hex_game_mod.MAX_ZONES * constants.MAX_LIFESTONES]queries.EntityData = undefined;
+    var zone_indices: [hex_game_mod.MAX_ZONES * constants.MAX_LIFESTONES]u32 = undefined;
+    var lifestone_count: usize = 0;
 
     // Search all zones for attuned lifestones
     for (0..hex_game_mod.MAX_ZONES) |zone_index| {
@@ -142,17 +162,29 @@ pub fn findNearestAttunedLifestone(game: *HexGame) ?LifestoneResult {
             
             // Check if lifestone is attuned
             if (terrain.terrain_type == .altar and interactable.attuned) {
-                const distance_sq = math.distanceSquared(player_pos, transform.pos);
-                if (distance_sq < nearest_distance_sq) {
-                    nearest_distance_sq = distance_sq;
-                    nearest_lifestone = LifestoneResult{
-                        .pos = transform.pos,
-                        .zone_index = @intCast(zone_index),
-                    };
-                }
+                lifestones[lifestone_count] = queries.EntityData{
+                    .position = transform.pos,
+                    .radius = transform.radius,
+                    .is_alive = true, // attuned lifestones are "alive"
+                };
+                zone_indices[lifestone_count] = @intCast(zone_index);
+                lifestone_count += 1;
             }
         }
     }
-
-    return nearest_lifestone;
+    
+    if (lifestone_count == 0) return null;
+    
+    const result = queries.PhysicsQueries.findNearestEntity(
+        player_pos,
+        lifestones[0..lifestone_count],
+        true
+    );
+    
+    if (!result.found) return null;
+    
+    return LifestoneResult{
+        .pos = result.position,
+        .zone_index = zone_indices[result.index],
+    };
 }

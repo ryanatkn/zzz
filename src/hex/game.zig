@@ -4,6 +4,7 @@ const Logger = @import("../lib/debug/logger.zig").Logger;
 const outputs = @import("../lib/debug/outputs.zig");
 const filters = @import("../lib/debug/filters.zig");
 const math = @import("../lib/math/mod.zig");
+const collision = @import("../lib/physics/collision.zig");
 const hex_game_mod = @import("hex_game.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
@@ -602,7 +603,7 @@ fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_rad
                     if (is_attuned) continue; // Skip already attuned lifestones
 
                     // Check collision
-                    if (physics.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
+                    if (collision.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
                         // Attune the lifestone - need mutable access
                         if (zone_storage.lifestones.getComponentMut(entity_id, .interactable)) |interactable| {
                             interactable.attuned = true;

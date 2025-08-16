@@ -2,6 +2,7 @@ const std = @import("std");
 const hex_game_mod = @import("hex_game.zig");
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
+const constants = @import("constants.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 
 const Vec2 = math.Vec2;
@@ -87,6 +88,12 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
 
     // Set camera scale (default to 1.0 if not specified)
     zone.camera_scale = data.camera_scale orelse 1.0;
+
+    // Set spawn position (default to screen center if not specified)
+    zone.spawn_pos = if (data.spawn_pos) |pos|
+        Vec2{ .x = pos.x, .y = pos.y }
+    else
+        Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
 
     // Load obstacles
     if (data.obstacles) |obstacles| {
@@ -182,6 +189,7 @@ const ZoneData = struct {
     background_color: struct { r: u8, g: u8, b: u8 },
     camera_mode: []const u8,
     camera_scale: ?f32 = null, // Optional camera scale with default value
+    spawn_pos: ?struct { x: f32, y: f32 } = null, // Optional spawn position, defaults to screen center
     obstacles: ?[]const struct {
         position: struct { x: f32, y: f32 },
         size: struct { x: f32, y: f32 },
