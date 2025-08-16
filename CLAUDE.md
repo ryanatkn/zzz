@@ -347,6 +347,7 @@ $ zig build --help       # Show all build options
 - Less is more - avoid over-engineering
 - Performance is a top priority - always optimize for the final best code
 - When working with shaders, follow the SDL3 GPU patterns documented here
+- Keep an eye towards extracting or reusing primitives in src/lib
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
 
 **Logging System Guidelines:**

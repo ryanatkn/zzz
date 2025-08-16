@@ -18,9 +18,9 @@ const Vec2 = math.Vec2;
 const Color = colors.Color;
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 
-// Entity import needed for helper functions
-const ecs = @import("../lib/game/ecs.zig");
-const EntityId = ecs.EntityId;
+// Entity types from HexGame
+const EntityId = hex_game_mod.EntityId;
+const ZoneData = hex_game_mod.HexGame.ZoneData;
 
 pub const GameRenderer = struct {
     gpu: SimpleGPURenderer,
@@ -91,169 +91,74 @@ pub const GameRenderer = struct {
         }
     }
 
-    // Render all entities in a zone
+    // Render all entities in current zone only with proper camera transforms
     pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
-        // TODO: This function should be migrated to simple_renderer.zig which already supports HexGame
-        // For now, just render using simplified approach
         const zone = game.getCurrentZoneConst();
         
-        // Draw rectangles (obstacles) - simple version
+        // Draw rectangles (obstacles) with camera transforms
         for (0..zone.obstacles.count) |i| {
             const transform = &zone.obstacles.transforms[i];
             const visual = &zone.obstacles.visuals[i];
             const terrain = &zone.obstacles.terrains[i];
             
-            // Simple rectangle rendering
-            self.gpu.drawRect(cmd_buffer, render_pass, transform.pos, terrain.size, visual.color);
+            const screen_pos = self.camera.worldToScreen(transform.pos);
+            const screen_size = Vec2{
+                .x = self.camera.worldSizeToScreen(terrain.size.x),
+                .y = self.camera.worldSizeToScreen(terrain.size.y),
+            };
+            self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, visual.color);
         }
         
-        // Draw circles (units, lifestones, portals)
+        // Draw circles (units, lifestones, portals) with camera transforms
         for (0..zone.units.count) |i| {
             const transform = &zone.units.transforms[i];
             const visual = &zone.units.visuals[i];
-            self.gpu.drawCircle(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+            const screen_pos = self.camera.worldToScreen(transform.pos);
+            const screen_radius = self.camera.worldSizeToScreen(transform.radius);
+            self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
         }
         
         for (0..zone.lifestones.count) |i| {
             const transform = &zone.lifestones.transforms[i];
             const visual = &zone.lifestones.visuals[i];
-            self.gpu.drawCircle(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+            const screen_pos = self.camera.worldToScreen(transform.pos);
+            const screen_radius = self.camera.worldSizeToScreen(transform.radius);
+            self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
         }
         
         for (0..zone.portals.count) |i| {
             const transform = &zone.portals.transforms[i];
             const visual = &zone.portals.visuals[i];
-            self.gpu.drawCircle(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+            const screen_pos = self.camera.worldToScreen(transform.pos);
+            const screen_radius = self.camera.worldSizeToScreen(transform.radius);
+            self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
         }
         
-        // Draw player
+        // Draw player (only if in current zone) with camera transforms
         if (game.player_zone == game.current_zone) {
             for (0..zone.players.count) |i| {
                 const transform = &zone.players.transforms[i];
                 const visual = &zone.players.visuals[i];
-                self.gpu.drawCircle(cmd_buffer, render_pass, transform.pos, transform.radius, visual.color);
+                const screen_pos = self.camera.worldToScreen(transform.pos);
+                const screen_radius = self.camera.worldSizeToScreen(transform.radius);
+                self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
+            }
+        }
+        
+        // Draw projectiles (bullets) with camera transforms
+        for (0..zone.projectiles.count) |i| {
+            const transform = &zone.projectiles.transforms[i];
+            const visual = &zone.projectiles.visuals[i];
+            if (visual.visible) {
+                const screen_pos = self.camera.worldToScreen(transform.pos);
+                const screen_radius = self.camera.worldSizeToScreen(transform.radius);
+                self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
             }
         }
     }
 
-    // Render all obstacles (rectangles) using zone storage
-    fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
-        // Query obstacle entities in the current zone only
-        const zone_storage = world.getZoneStorageConst();
-        var obstacle_iter = @constCast(&zone_storage.obstacles).entityIterator();
-
-        while (obstacle_iter.next()) |entity_id| {
-            // Get terrain component to check if it's an obstacle (wall/pit)
-            if (@constCast(&zone_storage.obstacles).getComponent(entity_id, .terrain)) |terrain| {
-                // Only render obstacles (wall/pit terrain)
-                if (terrain.terrain_type != .wall and terrain.terrain_type != .pit) continue;
-
-                // Get transform and visual components
-                    if (@constCast(&zone_storage.obstacles).getComponent(entity_id, .transform)) |transform| {
-                        if (@constCast(&zone_storage.obstacles).getComponent(entity_id, .visual)) |visual| {
-                        if (visual.visible) {
-                            // Render obstacles using their actual rectangular size from terrain component
-                            const screen_pos = self.camera.worldToScreen(transform.pos);
-                            const screen_size = Vec2{
-                                .x = self.camera.worldSizeToScreen(terrain.size.x),
-                                .y = self.camera.worldSizeToScreen(terrain.size.y),
-                            };
-                            self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, visual.color);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Render terrain entities as circles (lifestones, portals) using ECS queries
-    fn renderTerrainCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
-        // Only render entities from the current zone's ECS storage
-        const zone_storage = world.getZoneStorageConst();
-
-        // Render lifestones as circles from current zone only
-        var lifestone_iter = @constCast(&zone_storage.lifestones).entityIterator();
-        while (lifestone_iter.next()) |entity_id| {
-            self.renderEntityAsCircle(cmd_buffer, render_pass, zone_storage, entity_id, .lifestone);
-        }
-
-        // Render portals as circles from current zone only
-        var portal_iter = @constCast(&zone_storage.portals).entityIterator();
-        while (portal_iter.next()) |entity_id| {
-            self.renderEntityAsCircle(cmd_buffer, render_pass, zone_storage, entity_id, .portal);
-        }
-    }
-
-    // Helper to render a single circular entity
-    fn renderCircleEntity(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color) void {
-        const screen_pos = self.camera.worldToScreen(pos);
-        const screen_radius = self.camera.worldSizeToScreen(radius);
-        self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, color);
-    }
-
-    // Helper to handle the common pattern: get transform+visual, check visibility, render circle
-    fn renderEntityAsCircle(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, zone_storage: *const ecs.World, entity_id: EntityId, archetype: enum { player, unit, projectile, lifestone, portal }) void {
-        const transform = switch (archetype) {
-            .player => @constCast(&zone_storage.players).getComponent(entity_id, .transform),
-            .unit => @constCast(&zone_storage.units).getComponent(entity_id, .transform),
-            .projectile => @constCast(&zone_storage.projectiles).getComponent(entity_id, .transform),
-            .lifestone => @constCast(&zone_storage.lifestones).getComponent(entity_id, .transform),
-            .portal => @constCast(&zone_storage.portals).getComponent(entity_id, .transform),
-        };
-        
-        const visual = switch (archetype) {
-            .player => @constCast(&zone_storage.players).getComponent(entity_id, .visual),
-            .unit => @constCast(&zone_storage.units).getComponent(entity_id, .visual),
-            .projectile => @constCast(&zone_storage.projectiles).getComponent(entity_id, .visual),
-            .lifestone => @constCast(&zone_storage.lifestones).getComponent(entity_id, .visual),
-            .portal => @constCast(&zone_storage.portals).getComponent(entity_id, .visual),
-        };
-        
-        if (transform) |t| {
-            if (visual) |v| {
-                if (v.visible) {
-                    self.renderCircleEntity(cmd_buffer, render_pass, t.pos, t.radius, v.color);
-                }
-            }
-        }
-    }
-
-    // Render all projectiles (bullets) using ECS queries
-    fn renderProjectiles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
-        // Get projectiles from current zone only
-        const zone_storage = world.getZoneStorageConst();
-
-        // Count projectiles for debug
-        var count: u32 = 0;
-        var projectile_iter = @constCast(&zone_storage.projectiles).entityIterator();
-        while (projectile_iter.next()) |entity_id| {
-            count += 1;
-            self.renderEntityAsCircle(cmd_buffer, render_pass, zone_storage, entity_id, .projectile);
-        }
-        
-        if (count > 0) {
-            loggers.getGameLog().info("projectile_render", "Rendering {} projectiles", .{count});
-        }
-    }
-
-    // Render all circular entities using ECS queries
-    fn renderCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
-        // Draw lifestones and portals using ECS queries
-        self.renderTerrainCircles(cmd_buffer, render_pass, world);
-
-        // Draw units
-        self.renderUnits(cmd_buffer, render_pass, world);
-
-        // Draw player (above units) from current zone only
-        const zone_storage = world.getZoneStorageConst();
-        var player_iter = @constCast(&zone_storage.players).entityIterator();
-        while (player_iter.next()) |entity_id| {
-            self.renderEntityAsCircle(cmd_buffer, render_pass, zone_storage, entity_id, .player);
-        }
-
-        // Draw bullets LAST (top layer - always visible)
-        self.renderProjectiles(cmd_buffer, render_pass, world);
-    }
+    // TODO @cleanup: Removed unused complex ECS rendering functions
+    // All rendering now handled by single efficient renderZone() function above
 
     // Render visual effects
     pub fn renderEffects(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, effect_system: *const GameEffectSystem) void {
@@ -394,15 +299,6 @@ pub const GameRenderer = struct {
         };
     }
 
-    fn renderUnits(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
-        // Iterate units in current zone only
-        const zone_storage = world.getZoneStorageConst();
-        
-        var unit_iter = @constCast(&zone_storage.units).entityIterator();
-        while (unit_iter.next()) |entity_id| {
-            self.renderEntityAsCircle(cmd_buffer, render_pass, zone_storage, entity_id, .unit);
-        }
-    }
 
     fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
         const WHITE_LIGHT = Color{ .r = 230, .g = 230, .b = 230, .a = 255 }; // Slightly off-white

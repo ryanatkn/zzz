@@ -40,7 +40,7 @@ pub const Visual = struct {
     visible: bool = true,
     
     pub fn init(color: Color) Visual {
-        return .{ .color = color };
+        return .{ .color = color, .visible = true };
     }
 };
 
@@ -365,6 +365,32 @@ const ProjectileStorage = struct {
             if (self.entities[i] == entity_id) return true;
         }
         return false;
+    }
+    
+    pub fn getComponentMut(self: *ProjectileStorage, entity_id: EntityId, comptime component_type: enum { transform, projectile, visual }) ?*(switch (component_type) { .transform => Transform, .projectile => Projectile, .visual => Visual }) {
+        for (0..self.count) |i| {
+            if (self.entities[i] == entity_id) {
+                return switch (component_type) {
+                    .transform => &self.transforms[i],
+                    .projectile => &self.projectiles[i],
+                    .visual => &self.visuals[i],
+                };
+            }
+        }
+        return null;
+    }
+    
+    pub fn getComponent(self: *const ProjectileStorage, entity_id: EntityId, comptime component_type: enum { transform, projectile, visual }) ?*const (switch (component_type) { .transform => Transform, .projectile => Projectile, .visual => Visual }) {
+        for (0..self.count) |i| {
+            if (self.entities[i] == entity_id) {
+                return switch (component_type) {
+                    .transform => &self.transforms[i],
+                    .projectile => &self.projectiles[i],
+                    .visual => &self.visuals[i],
+                };
+            }
+        }
+        return null;
     }
 };
 
@@ -923,7 +949,7 @@ pub const HexGame = struct {
     pub fn travelToZone(self: *HexGame, zone_index: u8, spawn_pos: Vec2) !void {
         if (zone_index >= MAX_ZONES) return;
         
-        // Clear projectiles in all zones
+        // Clear projectiles in all zones (bullets should not persist across zone travel)
         for (&self.zones) |*zone| {
             zone.projectiles.clear();
         }
@@ -1105,64 +1131,62 @@ pub const HexGame = struct {
     pub fn updateProjectiles(self: *HexGame, deltaTime: f32) !void {
         const zone = self.getCurrentZone();
         
-        // Update projectile positions and check collisions
-        var i: usize = 0;
-        while (i < zone.projectiles.count) {
-            const transform = &zone.projectiles.transforms[i];
-            const projectile = &zone.projectiles.projectiles[i];
-            
-            // Update position
-            transform.pos = transform.pos.add(transform.vel.scale(deltaTime));
-            
-            // Update lifetime
-            projectile.lifetime += deltaTime;
-            
-            // Check if projectile expired
-            if (projectile.lifetime >= projectile.max_lifetime) {
-                // Remove expired projectile by swapping with last
-                if (i < zone.projectiles.count - 1) {
-                    zone.projectiles.entities[i] = zone.projectiles.entities[zone.projectiles.count - 1];
-                    zone.projectiles.transforms[i] = zone.projectiles.transforms[zone.projectiles.count - 1];
-                    zone.projectiles.projectiles[i] = zone.projectiles.projectiles[zone.projectiles.count - 1];
-                    zone.projectiles.visuals[i] = zone.projectiles.visuals[zone.projectiles.count - 1];
-                }
-                zone.projectiles.count -= 1;
-                continue; // Don't increment i since we swapped
-            }
-            
-            // Check collision with units
-            var hit_unit = false;
-            for (0..zone.units.count) |j| {
-                const unit_transform = &zone.units.transforms[j];
-                const unit_health = &zone.units.healths[j];
-                
-                if (!unit_health.alive) continue;
-                
-                const dist_sq = transform.pos.sub(unit_transform.pos).lengthSquared();
-                const collision_dist = transform.radius + unit_transform.radius;
-                
-                if (dist_sq <= collision_dist * collision_dist) {
-                    // Unit hit by bullet
-                    unit_health.alive = false;
+        // Collect projectiles to remove (avoid iterator invalidation)
+        var projectiles_to_remove = std.ArrayList(EntityId).init(std.heap.page_allocator);
+        defer projectiles_to_remove.deinit();
+        
+        // Update projectile positions and check collisions using ECS iteration
+        var projectile_iter = zone.projectiles.entityIterator();
+        while (projectile_iter.next()) |projectile_id| {
+            // Get components
+            if (zone.projectiles.getComponentMut(projectile_id, .transform)) |transform| {
+                if (zone.projectiles.getComponentMut(projectile_id, .projectile)) |projectile| {
+                    // Update position
+                    transform.pos = transform.pos.add(transform.vel.scale(deltaTime));
                     
-                    // Remove projectile by swapping with last
-                    if (i < zone.projectiles.count - 1) {
-                        zone.projectiles.entities[i] = zone.projectiles.entities[zone.projectiles.count - 1];
-                        zone.projectiles.transforms[i] = zone.projectiles.transforms[zone.projectiles.count - 1];
-                        zone.projectiles.projectiles[i] = zone.projectiles.projectiles[zone.projectiles.count - 1];
-                        zone.projectiles.visuals[i] = zone.projectiles.visuals[zone.projectiles.count - 1];
+                    // Update lifetime
+                    projectile.lifetime += deltaTime;
+                    
+                    // Check if projectile expired
+                    if (projectile.lifetime >= projectile.max_lifetime) {
+                        try projectiles_to_remove.append(projectile_id);
+                        continue;
                     }
-                    zone.projectiles.count -= 1;
-                    hit_unit = true;
-                    break;
+                    
+                    // Check collision with units using ECS iteration
+                    var unit_iter = zone.units.entityIterator();
+                    while (unit_iter.next()) |unit_id| {
+                        if (zone.units.getComponentMut(unit_id, .transform)) |unit_transform| {
+                            if (zone.units.getComponentMut(unit_id, .health)) |unit_health| {
+                                if (!unit_health.alive) continue;
+                                
+                                const dist_sq = transform.pos.sub(unit_transform.pos).lengthSquared();
+                                const collision_dist = transform.radius + unit_transform.radius;
+                                
+                                if (dist_sq <= collision_dist * collision_dist) {
+                                    // Unit hit by bullet
+                                    unit_health.alive = false;
+                                    
+                                    // Update unit visual color
+                                    if (zone.units.getComponentMut(unit_id, .visual)) |unit_visual| {
+                                        unit_visual.color = constants.COLOR_DEAD;
+                                    }
+                                    
+                                    // Remove projectile
+                                    try projectiles_to_remove.append(projectile_id);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            
-            if (hit_unit) {
-                continue; // Don't increment i since we swapped
-            }
-            
-            i += 1;
+        }
+        
+        // Remove expired/hit projectiles
+        for (projectiles_to_remove.items) |projectile_id| {
+            zone.projectiles.removeEntity(projectile_id);
+            zone.entity_count -= 1;
         }
     }
     

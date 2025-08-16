@@ -1,5 +1,13 @@
 /// ECS (Entity Component System) barrel export
 /// Provides core abstractions for game entity management with clean zone isolation
+///
+/// TODO @many: Evaluate complex ECS vs simple direct arrays - complex may be better for:
+/// - Dynamic component composition
+/// - Cache-friendly iteration patterns  
+/// - Easier addition of new component types
+/// - Better tooling/debugging support
+/// Need benchmark comparison and feature evaluation in followup session
+/// Currently UNUSED - hex game uses simple arrays in hex_game.zig
 pub const entity = @import("entity.zig");
 pub const storage = @import("storage.zig");
 pub const components = @import("components.zig");

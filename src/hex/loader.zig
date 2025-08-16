@@ -110,10 +110,6 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
 
     // Load units as ECS entities
     if (data.units) |units| {
-        // Set current zone for entity creation
-        const old_zone = game.getCurrentZoneIndex();
-        game.setCurrentZone(@intCast(zone_index));
-
         for (units) |unit_data| {
             // Create ECS unit entity with simple defaults
             const unit_id = game.createUnit(
@@ -127,17 +123,10 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
 
             _ = unit_id; // Unit created successfully as ECS entity
         }
-
-        // Restore current zone
-        game.setCurrentZone(@intCast(old_zone));
     }
 
     // Load portals as ECS entities
     if (data.portals) |portals| {
-        // Set current zone for entity creation
-        const old_zone = game.getCurrentZoneIndex();
-        game.setCurrentZone(@intCast(zone_index));
-
         for (portals) |portal_data| {
             // Create ECS portal entity
             const portal_id = game.createPortal(
@@ -152,17 +141,10 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
 
             _ = portal_id; // Entity automatically tracked in zone.portal_entities
         }
-
-        // Restore current zone
-        game.setCurrentZone(@intCast(old_zone));
     }
 
     // Load lifestones as ECS entities
     if (data.lifestones) |lifestones| {
-        // Set current zone for entity creation
-        const old_zone = game.getCurrentZoneIndex();
-        game.setCurrentZone(@intCast(zone_index));
-
         for (lifestones, 0..) |lifestone_data, lifestone_index| {
             // First lifestone in overgame (zone 0) is pre-attuned
             const pre_attuned = (lifestone_index == 0 and std.mem.eql(u8, data.name, "Overgame"));
@@ -180,9 +162,6 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
 
             _ = lifestone_id; // Entity automatically tracked in zone.lifestone_entities
         }
-
-        // Restore current zone
-        game.setCurrentZone(@intCast(old_zone));
     }
 }
 
