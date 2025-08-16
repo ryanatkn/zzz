@@ -3,7 +3,6 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const hex_game_mod = @import("hex_game.zig");
 const ecs = @import("../lib/game/ecs.zig");
-const loggers = @import("../lib/debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 const EntityId = ecs.EntityId;

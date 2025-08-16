@@ -1,6 +1,8 @@
 const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
-const loggers = @import("../lib/debug/loggers.zig");
+const Logger = @import("../lib/debug/logger.zig").Logger;
+const outputs = @import("../lib/debug/outputs.zig");
+const filters = @import("../lib/debug/filters.zig");
 const math = @import("../lib/math/mod.zig");
 const hex_game_mod = @import("hex_game.zig");
 const behaviors = @import("behaviors.zig");
@@ -58,8 +60,16 @@ pub const GameState = struct {
     ai_input: ?*ai_control.MappedInput,
     ai_enabled: bool,
     frame_counter: u32,
+    
+    // Logging system
+    logger: ModuleLogger,
 
     const Self = @This();
+    
+    const ModuleLogger = Logger(.{
+        .output = outputs.Console,
+        .filter = filters.Throttle,
+    });
 
     pub fn init(allocator: std.mem.Allocator) !Self {
         return .{
@@ -68,6 +78,7 @@ pub const GameState = struct {
             .game_paused = false,
             .quit_requested = false,
             .effect_system = GameEffectSystem.init(),
+            .logger = ModuleLogger.init(allocator),
             .spell_system = spells.SpellSystem.init(),
             .allocator = allocator,
             .hud_system = null,
@@ -83,6 +94,7 @@ pub const GameState = struct {
 
     pub fn deinit(self: *Self) void {
         self.hex_game.deinit();
+        self.logger.deinit();
         if (self.ai_input) |ai| {
             ai.deinit();
             self.allocator.destroy(ai);
@@ -99,7 +111,7 @@ pub const GameState = struct {
             ai.* = try ai_control.MappedInput.init(".ai_commands");
             self.ai_input = ai;
             self.ai_enabled = true;
-            loggers.getGameLog().info("ai_init", "AI control system initialized", .{});
+            self.logger.info("ai_init", "AI control system initialized", .{});
         }
     }
     
@@ -109,7 +121,7 @@ pub const GameState = struct {
             allocator.destroy(ai);
             self.ai_input = null;
             self.ai_enabled = false;
-            loggers.getGameLog().info("ai_deinit", "AI control system deinitialized", .{});
+            self.logger.info("ai_deinit", "AI control system deinitialized", .{});
         }
     }
     
@@ -117,9 +129,9 @@ pub const GameState = struct {
         self.ai_enabled = !self.ai_enabled;
         if (self.ai_input) |mapped| {
             const pending = mapped.buffer.pending();
-            loggers.getGameLog().info("ai_toggle", "AI control: {} (ai_input exists, {} commands pending)", .{ self.ai_enabled, pending });
+            self.logger.info("ai_toggle", "AI control: {} (ai_input exists, {} commands pending)", .{ self.ai_enabled, pending });
         } else {
-            loggers.getGameLog().info("ai_toggle", "AI control: {} (ai_input is null)", .{self.ai_enabled});
+            self.logger.info("ai_toggle", "AI control: {} (ai_input is null)", .{self.ai_enabled});
         }
     }
 
@@ -263,9 +275,9 @@ pub const GameState = struct {
     pub fn togglePause(self: *Self) void {
         self.game_paused = !self.game_paused;
         if (self.game_paused) {
-            loggers.getGameLog().info("game_paused", "Game paused", .{});
+            self.logger.info("game_paused", "Game paused", .{});
         } else {
-            loggers.getGameLog().info("game_resumed", "Game resumed", .{});
+            self.logger.info("game_resumed", "Game resumed", .{});
         }
     }
 
@@ -284,8 +296,7 @@ pub const GameState = struct {
     pub fn resetZone(self: *Self) void {
         // Reset units in current zone to their original spawn state
         // Reset current zone (implemented with hex_game architecture)
-        _ = self;
-        loggers.getGameLog().info("zone_reset", "Zone units reset to original state", .{});
+        self.logger.info("zone_reset", "Zone units reset to original state", .{});
     }
 
     pub fn resetGame(self: *Self) void {
@@ -296,7 +307,7 @@ pub const GameState = struct {
         // Reset to starting zone
         if (self.hex_game.current_zone != 0) {
             self.travelToZone(0) catch |err| {
-                loggers.getGameLog().err("reset_travel_fail", "Failed to travel to overworld during reset: {}", .{err});
+                self.logger.err("reset_travel_fail", "Failed to travel to overworld during reset: {}", .{err});
             };
         }
 
@@ -305,7 +316,7 @@ pub const GameState = struct {
         // Clear effects for clean slate (keep ephemeral)
         self.effect_system.clear();
 
-        loggers.getGameLog().info("full_reset", "Full game reset", .{});
+        self.logger.info("full_reset", "Full game reset", .{});
     }
 
     /// Check if all lifestones across all zones are attuned using ECS queries
@@ -469,7 +480,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
         if (game_state.ai_input) |mapped| {
             const pending = mapped.buffer.pending();
             if (pending > 0) {
-                loggers.getGameLog().info("ai_process", "Processing {} AI commands at frame {}", .{ pending, game_state.frame_counter });
+                game_state.logger.info("ai_process", "Processing {} AI commands at frame {}", .{ pending, game_state.frame_counter });
             }
             ai_control.processCommands(mapped.buffer, &game_state.input_state, game_state.frame_counter);
         }
@@ -506,7 +517,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     // Update bullet entities using ECS
     world.updateProjectiles(deltaTime) catch |err| {
-        loggers.getGameLog().err("projectiles_update_fail", "Failed to update projectiles: {}", .{err});
+        game_state.logger.err("projectiles_update_fail", "Failed to update projectiles: {}", .{err});
     };
 
     // Update units
@@ -534,9 +545,9 @@ pub fn checkCollisions(game_state: *GameState) void {
     if (!world.getPlayerAlive()) return;
 
     // Debug: Check if portal checking is being called
-    loggers.getGameLog().debug("game_loop", "Checking portal collisions in game loop", .{});
+    game_state.logger.debug("game_loop", "Checking portal collisions in game loop", .{});
     if (portals.checkPortalCollisions(game_state)) {
-        loggers.getGameLog().info("game_portal_activated", "Portal activated, exiting game loop", .{});
+        game_state.logger.info("game_portal_activated", "Portal activated, exiting game loop", .{});
         return;
     }
 
@@ -602,7 +613,7 @@ fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_rad
                             visual.color = constants.COLOR_LIFESTONE_ATTUNED;
                         }
 
-                        loggers.getGameLog().info("lifestone_attuned", "Lifestone attuned!", .{});
+                        game_state.logger.info("lifestone_attuned", "Lifestone attuned!", .{});
 
                         // Emit lifestone attuned event
                         if (game_state.state_manager) |manager| {

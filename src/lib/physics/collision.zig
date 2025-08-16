@@ -43,6 +43,13 @@ pub fn circleCircle(c1: Circle, c2: Circle) bool {
     return distance_sq <= radius_sum * radius_sum;
 }
 
+/// Simple circle collision check using positions and radii
+pub fn checkCircleCollision(pos1: Vec2, radius1: f32, pos2: Vec2, radius2: f32) bool {
+    const distance_sq = math.distanceSquared(pos1, pos2);
+    const radius_sum = radius1 + radius2;
+    return distance_sq < radius_sum * radius_sum;
+}
+
 /// Circle-rectangle collision detection
 pub fn circleRectangle(circle: Circle, rect: Rectangle) bool {
     // Find closest point on rectangle to circle center
@@ -419,3 +426,90 @@ pub const SpatialGrid = struct {
         }
     }
 };
+
+/// Convenience functions for common collision queries
+
+/// Check if a position is safe to move to (no collisions with obstacles)
+pub fn isPositionSafe(
+    pos: Vec2,
+    radius: f32,
+    obstacles: []const Shape,
+) bool {
+    const entity_shape = Shape{ .circle = .{ .center = pos, .radius = radius } };
+    
+    for (obstacles) |obstacle| {
+        if (checkCollision(entity_shape, obstacle)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/// Find the nearest obstacle to a position
+pub fn findNearestObstacle(
+    pos: Vec2,
+    obstacles: []const Shape,
+) ?struct { index: usize, distance_sq: f32 } {
+    var nearest_index: ?usize = null;
+    var nearest_distance_sq: f32 = std.math.inf(f32);
+    
+    for (obstacles, 0..) |obstacle, i| {
+        const obstacle_center = switch (obstacle) {
+            .circle => |c| c.center,
+            .rectangle => |r| r.center(),
+            .point => |p| p.position,
+            .line => continue, // Skip line segments for now
+        };
+        
+        const dist_sq = math.distanceSquared(pos, obstacle_center);
+        if (dist_sq < nearest_distance_sq) {
+            nearest_distance_sq = dist_sq;
+            nearest_index = i;
+        }
+    }
+    
+    if (nearest_index) |index| {
+        return .{ .index = index, .distance_sq = nearest_distance_sq };
+    }
+    return null;
+}
+
+/// Check collision between a moving circle and static obstacles
+pub fn checkMovingCircleCollision(
+    start_pos: Vec2,
+    end_pos: Vec2,
+    radius: f32,
+    obstacles: []const Shape,
+) ?Vec2 {
+    // Simple approach: check multiple points along the path
+    const step_count = 10;
+    const step = end_pos.sub(start_pos).scale(1.0 / @as(f32, @floatFromInt(step_count)));
+    
+    var current_pos = start_pos;
+    for (0..step_count + 1) |_| {
+        if (!isPositionSafe(current_pos, radius, obstacles)) {
+            return current_pos; // First collision point
+        }
+        current_pos = current_pos.add(step);
+    }
+    
+    return null; // No collision
+}
+
+/// Resolve collision by pushing an entity out of an obstacle
+pub fn resolveCollision(
+    entity_pos: Vec2,
+    entity_radius: f32,
+    obstacle: Shape,
+) ?Vec2 {
+    const entity_shape = Shape{ .circle = .{ .center = entity_pos, .radius = entity_radius } };
+    const result = checkCollisionDetailed(entity_shape, obstacle);
+    
+    if (!result.collided) return null;
+    
+    // Push entity out along collision normal
+    const push_distance = result.penetration_depth + 0.01; // Small buffer
+    const corrected_pos = entity_pos.add(result.normal.scale(push_distance));
+    
+    return corrected_pos;
+}

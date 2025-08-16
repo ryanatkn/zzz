@@ -3,10 +3,11 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const hex_game_mod = @import("hex_game.zig");
+const behaviors = @import("../lib/game/behaviors/mod.zig");
 
 const Vec2 = math.Vec2;
 
-// Unit update with aggro modifier
+// Unit update with aggro modifier (using lib utilities)
 pub fn updateUnitWithAggroMod(
     unit_comp: *ecs.components.Unit,
     transform: *ecs.components.Transform,
@@ -19,16 +20,21 @@ pub fn updateUnitWithAggroMod(
     var velocity = Vec2.ZERO;
 
     if (player_alive) {
-        const to_player = player_pos.sub(transform.pos);
-        const dist_sq_to_player = to_player.lengthSquared();
-        const effective_aggro_range = unit_comp.aggro_range * aggro_multiplier;
-        const aggro_range_sq = effective_aggro_range * effective_aggro_range;
-        const min_dist_sq = (transform.radius + constants.PLAYER_RADIUS) * (transform.radius + constants.PLAYER_RADIUS);
+        // Use simple chase behavior from lib
+        const min_distance = transform.radius + constants.PLAYER_RADIUS;
+        const chase_velocity = behaviors.simpleChase(
+            transform.pos,
+            player_pos,
+            player_alive,
+            unit_comp.aggro_range,
+            min_distance,
+            constants.UNIT_SPEED,
+            aggro_multiplier,
+        );
 
-        if (dist_sq_to_player < aggro_range_sq and dist_sq_to_player > min_dist_sq) {
-            // Chase player (aggro state)
-            const direction = to_player.normalize();
-            velocity = direction.scale(constants.UNIT_SPEED);
+        if (chase_velocity.x != 0.0 or chase_velocity.y != 0.0) {
+            // Chasing player
+            velocity = chase_velocity;
             visual.color = constants.COLOR_UNIT_AGGRO;
         } else {
             // Return home (non-aggro state)
@@ -47,22 +53,14 @@ pub fn updateUnitWithAggroMod(
     transform.pos.y += velocity.y * dt;
 }
 
-// Calculate velocity for unit returning home
+// Calculate velocity for unit returning home (using lib utility)
 fn calculateReturnHomeVelocity(unit_comp: *const ecs.components.Unit, transform: *const ecs.components.Transform) Vec2 {
-    const to_home = unit_comp.home_pos.sub(transform.pos);
-    const dist_sq = to_home.lengthSquared();
-
-    // Use squared distance to avoid sqrt when possible
-    if (dist_sq <= constants.UNIT_HOME_TOLERANCE * constants.UNIT_HOME_TOLERANCE) {
-        // At home - stop moving
-        return Vec2.ZERO;
-    }
-
-    // Move towards home
-    const direction = to_home.normalize();
-    const velocity = direction.scale(constants.UNIT_WALK_SPEED);
-
-    return velocity;
+    return behaviors.simpleReturnHome(
+        transform.pos,
+        unit_comp.home_pos,
+        constants.UNIT_HOME_TOLERANCE,
+        constants.UNIT_WALK_SPEED,
+    );
 }
 
 // HexGame unit update with aggro modifier  
@@ -138,20 +136,12 @@ pub fn updateUnitWithAggroMod_HexGame(
     transform.pos = transform.pos.add(velocity.scale(dt));
 }
 
-// Calculate velocity for hex_game unit returning home
+// Calculate velocity for hex_game unit returning home (using lib utility)
 fn calculateReturnHomeVelocity_HexGame(unit_comp: *const hex_game_mod.Unit, transform: *const hex_game_mod.Transform) Vec2 {
-    const to_home = unit_comp.home_pos.sub(transform.pos);
-    const dist_sq = to_home.lengthSquared();
-
-    // Use squared distance to avoid sqrt when possible
-    if (dist_sq <= constants.UNIT_HOME_TOLERANCE * constants.UNIT_HOME_TOLERANCE) {
-        // At home - stop moving
-        return Vec2.ZERO;
-    }
-
-    // Move towards home
-    const direction = to_home.normalize();
-    const velocity = direction.scale(constants.UNIT_WALK_SPEED);
-
-    return velocity;
+    return behaviors.simpleReturnHome(
+        transform.pos,
+        unit_comp.home_pos,
+        constants.UNIT_HOME_TOLERANCE,
+        constants.UNIT_WALK_SPEED,
+    );
 }
