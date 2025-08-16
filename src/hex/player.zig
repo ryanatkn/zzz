@@ -15,8 +15,8 @@ const InputState = input.InputState;
 
 const WALK_SPEED_MULT = constants.WALK_SPEED_MULTIPLIER; // Walking speed is 1/4 of normal
 
-/// ECS-compatible player update function
-pub fn updatePlayerECS(game: *HexGame, input_state: *const InputState, cam: *const camera.Camera, deltaTime: f32) void {
+/// Player update function
+pub fn updatePlayer(game: *HexGame, input_state: *const InputState, cam: *const camera.Camera, deltaTime: f32) void {
     if (!game.getPlayerAlive()) return;
 
     var keyboard_velocity = Vec2.ZERO;
@@ -92,8 +92,7 @@ pub fn updatePlayerECS(game: *HexGame, input_state: *const InputState, cam: *con
     game.setPlayerVel(velocity);
 }
 
-/// ECS-compatible movement direction getter
-pub fn getPlayerMovementDirectionECS(game: *const HexGame) Vec2 {
-    _ = game; // TODO: HexGame doesn't have getPlayerVelConst yet, return zero for now
-    return Vec2.ZERO;
+/// Movement direction getter
+pub fn getPlayerMovementDirection(game: *const HexGame) Vec2 {
+    return game.getPlayerVelConst().normalize();
 }

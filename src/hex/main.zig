@@ -33,7 +33,6 @@ const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
 const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));
 const Vec2 = math.Vec2;
 const Color = colors.Color;
-const HexWorld = @import("hex_world.zig").HexWorld;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const GameState = game_controller.GameState;
 const Hud = hud.Hud;
@@ -216,7 +215,8 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
 
             // Now safe to deinitialize the renderer and GPU device
             game_renderer.?.deinit();
-            // simple_loader doesn't need deinit - uses arena allocator
+            // Clean up ZON data arena allocator
+            @import("loader.zig").deinit();
 
             // Free heap-allocated structures
             global_allocator.destroy(game_renderer.?);

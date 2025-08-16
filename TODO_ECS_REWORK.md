@@ -60,11 +60,11 @@ src/hex/world_adapter.zig      # Migration bridge (old HexWorld ↔ new HexGame)
 - **🎯 ALL SYSTEMS MIGRATED**: Physics, spells, combat, effects, rendering all converted
 - **🚨 RUNTIME ISSUES DISCOVERED**: Game builds but has runtime gameplay problems
 
-### 🚨 Current Status - Runtime Debugging Needed
+### 🚨 Current Status - Cleanup Complete, Runtime Issues Discovered
 - **✅ Compilation**: 100% successful, zero errors
-- **❌ Runtime Issues**: Player movement broken, click causes death/respawn, early exit
-- **🔍 Next Priority**: Debug runtime gameplay issues with new architecture
-- **📊 Expected**: 20-30% performance improvement once runtime issues resolved
+- **✅ Cleanup**: All legacy files deleted, stub functions implemented, naming cleaned up
+- **❌ Runtime Issues**: Shooting not working, other gameplay problems discovered
+- **🔍 Next Priority**: Debug runtime combat and interaction systems
 
 ## Implementation Tasks
 
@@ -307,32 +307,34 @@ src/hex/world_adapter.zig      # Migration bridge (old HexWorld ↔ new HexGame)
 - `src/hex/world_adapter.zig` - 🗑️ DELETE (migration complete, no longer needed)
 - Legacy compatibility code in `src/lib/game/ecs.zig` - 🧹 CLEAN UP
 - Multiple TODO/stub functions in combat.zig and hex_game.zig - 🔧 IMPLEMENT PROPERLY
+- Function naming cleaned up (ECS suffixes removed) - ✅ COMPLETED
 
-## 🚨 RUNTIME ISSUES DISCOVERED (Post-Migration)
+## ✅ CLEANUP COMPLETED - 🚨 RUNTIME ISSUES DISCOVERED
 
-### Current Runtime Problems
-- **Player Movement**: Player unable to move (WASD/mouse controls not working)
-- **Click Behavior**: Left-click causes player death or respawn instead of shooting
-- **Early Exit**: Game exits unexpectedly/badly 
-- **Memory Leaks**: GPA reports memory leaks in ZON parsing
+### Completed Cleanup Tasks
+- **✅ Legacy Files**: hex_world.zig and world_adapter.zig deleted
+- **✅ Stub Functions**: updateProjectiles(), createProjectile(), fireBullet() implemented
+- **✅ Click Behavior**: Removed respawn logic from left-click (respawn only on 'R' key)
+- **✅ Memory Leaks**: Added proper arena allocator cleanup in main.zig
+- **✅ Import Updates**: All 8 files updated to use hex_game.zig
+- **✅ Function Naming**: All "ECS" suffixes removed from function names
 
-### Potential Root Causes
-1. **Player Controller**: updatePlayerECS function may have incorrect HexGame integration
-2. **Input Handling**: Mouse/keyboard input mapping broken in new architecture  
-3. **Combat System**: fireBullet functions using wrong component types
-4. **Entity Management**: Player entity creation/tracking issues in HexGame
-5. **Component Access**: getComponent/getComponentMut returning wrong types
+### 🚨 NEW RUNTIME ISSUES DISCOVERED (Post-Cleanup)
 
-### Debugging Priority
-1. **🔍 Player Entity**: Verify player is created and tracked correctly in HexGame
-2. **🔍 Input System**: Check input handling in new HexGame player controller
-3. **🔍 Combat Integration**: Verify bullet firing uses correct HexGame components
-4. **🔍 Component Methods**: Ensure getComponent* methods return properly typed pointers
-5. **🔍 Memory Management**: Fix ZON parsing memory leaks
+**Critical Issues:**
+- **❌ Shooting Not Working**: Left-click and mouse shooting not functional
+- **❌ Other Runtime Problems**: Additional gameplay issues reported by user
 
-### Next Steps
-- Debug player creation and entity tracking in HexGame
-- Test input handling with simplified movement controls
-- Verify component access methods work correctly
-- Fix memory management issues
-- Restore gameplay functionality while maintaining new architecture benefits
+**Potential Root Causes:**
+1. **Bullet Creation**: createProjectile() may have wrong zone_index or parameters
+2. **Input Handling**: Mouse click events not properly mapped to fireBullet()
+3. **Collision System**: Bullet collision detection may be broken
+4. **Entity Management**: Projectile entities not properly tracked/rendered
+5. **Combat Integration**: fireBulletAtMouse() flow may have missing steps
+
+### Next Priority: Debug Runtime Issues
+1. **🔍 Test bullet creation**: Verify createProjectile() works correctly
+2. **🔍 Debug input flow**: Check mouse click → fireBullet() → createProjectile() chain
+3. **🔍 Verify rendering**: Ensure bullets are visible when created
+4. **🔍 Check collision**: Test bullet-unit collision detection
+5. **🔍 System integration**: Validate complete combat workflow

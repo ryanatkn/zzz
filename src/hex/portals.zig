@@ -58,7 +58,7 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
                 if (zone_storage.portals.getComponent(portal_id, .transform)) |transform| {
                     // Portal transform found - check collision
                     
-                    if (physics.checkPlayerPortalCollisionECS(player_pos, player_radius, transform)) {
+                    if (physics.checkPlayerPortalCollision(player_pos, player_radius, transform)) {
                         loggers.getGameLog().info("portal_collision_detected", "Portal collision detected! Player at {any}, portal at {any}", .{ player_pos, transform.pos });
                         
                         // Set cooldown and travel

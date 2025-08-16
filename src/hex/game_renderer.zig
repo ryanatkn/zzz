@@ -1,7 +1,6 @@
 const std = @import("std");
 const c = @import("../lib/platform/sdl.zig");
 
-const hex_world = @import("hex_world.zig");
 const hex_game_mod = @import("hex_game.zig");
 const HexGame = hex_game_mod.HexGame;
 const math = @import("../lib/math/mod.zig");
@@ -19,7 +18,7 @@ const Vec2 = math.Vec2;
 const Color = colors.Color;
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 
-// ECS import needed for helper functions
+// Entity import needed for helper functions
 const ecs = @import("../lib/game/ecs.zig");
 const EntityId = ecs.EntityId;
 
@@ -137,8 +136,8 @@ pub const GameRenderer = struct {
         }
     }
 
-    // Render all obstacles (rectangles) using ECS queries
-    fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+    // Render all obstacles (rectangles) using zone storage
+    fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
         // Query obstacle entities in the current zone only
         const zone_storage = world.getZoneStorageConst();
         var obstacle_iter = @constCast(&zone_storage.obstacles).entityIterator();
@@ -168,7 +167,7 @@ pub const GameRenderer = struct {
     }
 
     // Render terrain entities as circles (lifestones, portals) using ECS queries
-    fn renderTerrainCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+    fn renderTerrainCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
         // Only render entities from the current zone's ECS storage
         const zone_storage = world.getZoneStorageConst();
 
@@ -220,7 +219,7 @@ pub const GameRenderer = struct {
     }
 
     // Render all projectiles (bullets) using ECS queries
-    fn renderProjectiles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+    fn renderProjectiles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
         // Get projectiles from current zone only
         const zone_storage = world.getZoneStorageConst();
 
@@ -232,12 +231,12 @@ pub const GameRenderer = struct {
     }
 
     // Render all circular entities using ECS queries
-    fn renderCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+    fn renderCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
         // Draw lifestones and portals using ECS queries
         self.renderTerrainCircles(cmd_buffer, render_pass, world);
 
-        // Draw units (ECS version)
-        self.renderUnitsECS(cmd_buffer, render_pass, world);
+        // Draw units
+        self.renderUnits(cmd_buffer, render_pass, world);
 
         // Draw player (above units) from current zone only
         const zone_storage = world.getZoneStorageConst();
@@ -389,7 +388,7 @@ pub const GameRenderer = struct {
         };
     }
 
-    fn renderUnitsECS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {
+    fn renderUnits(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const HexGame) void {
         // Iterate units in current zone only
         const zone_storage = world.getZoneStorageConst();
         

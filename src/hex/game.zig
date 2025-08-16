@@ -424,8 +424,8 @@ pub const GameState = struct {
     }
 };
 
-/// Update all units using ECS
-fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
+/// Update all units
+fn updateUnits(game_state: *GameState, deltaTime: f32) void {
     const world = &game_state.hex_game;
 
     // Note: Obstacle collision now uses ECS queries
@@ -446,14 +446,14 @@ fn updateUnitsECS(game_state: *GameState, deltaTime: f32) void {
                     const old_pos = transform.pos;
 
                     if (zone_storage.units.getComponentMut(unit_id, .visual)) |visual| {
-                        const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnitECS(unit_id, zone_storage);
+                        const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnit(unit_id, zone_storage);
 
                         // Update unit AI behavior using HexGame components
-                        behaviors.updateUnitWithAggroModECS_HexGame(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
+                        behaviors.updateUnitWithAggroMod_HexGame(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
                     }
 
-                    // Check collision with obstacles using ECS queries
-                    if (physics.checkUnitObstacleCollisionECS(@constCast(world), unit_id, transform, health, old_pos)) {
+                    // Check collision with obstacles
+                    if (physics.checkUnitObstacleCollision(@constCast(world), unit_id, transform, health, old_pos)) {
                         // Collision was handled by the function
                         break;
                     }
@@ -494,8 +494,8 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     portals.updatePortalCooldown(deltaTime);
 
     if (world.getPlayerAlive()) {
-        // Update player using ECS-compatible controller
-        player_controller.updatePlayerECS(world, input_state, cam, deltaTime);
+        // Update player controller
+        player_controller.updatePlayer(world, input_state, cam, deltaTime);
 
         // Handle continuous shooting on left-click hold (rhythm mode)
         // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
@@ -512,8 +512,8 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
         std.log.err("Failed to update projectiles: {}", .{err});
     };
 
-    // Update units using ECS queries
-    updateUnitsECS(game_state, deltaTime);
+    // Update units
+    updateUnits(game_state, deltaTime);
 
     checkCollisions(game_state);
 
@@ -547,16 +547,16 @@ pub fn checkCollisions(game_state: *GameState) void {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
 
-    // Check player-unit collisions (player dies on contact) - ECS version
-    if (physics.checkPlayerUnitCollisionECS(world)) {
+    // Check player-unit collisions (player dies on contact)
+    if (physics.checkPlayerUnitCollision(world)) {
         // Player dies on unit contact
         world.setPlayerAlive(false);
         world.setPlayerColor(constants.COLOR_DEAD);
         return;
     }
 
-    // Check lifestone collisions using ECS queries
-    checkLifestoneCollisionsECS(game_state, player_pos, player_radius);
+    // Check lifestone collisions
+    checkLifestoneCollisions(game_state, player_pos, player_radius);
 
     // Check collision with deadly obstacles
     if (physics.collidesWithDeadlyObstacle(player_pos, player_radius, world)) {
@@ -574,8 +574,8 @@ pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void 
     }
 }
 
-// Check lifestone collisions using ECS queries
-fn checkLifestoneCollisionsECS(game_state: *GameState, player_pos: Vec2, player_radius: f32) void {
+// Check lifestone collisions
+fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_radius: f32) void {
     const world = &game_state.hex_game;
     const zone_storage = world.getZoneStorage();
     var lifestone_iter = zone_storage.lifestones.entityIterator();

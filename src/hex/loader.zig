@@ -1,5 +1,5 @@
 const std = @import("std");
-const hex_world = @import("hex_world.zig");
+const hex_game_mod = @import("hex_game.zig");
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
 const loggers = @import("../lib/debug/loggers.zig");
@@ -19,7 +19,7 @@ pub fn deinit() void {
 }
 
 // Load game data from ZON file
-pub fn loadGameData(allocator: std.mem.Allocator, world: *hex_world.HexWorld) !void {
+pub fn loadGameData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame) !void {
     // Load game data from ZON file
     const gameDataFile = @embedFile("game_data.zon");
 
@@ -39,33 +39,33 @@ pub fn loadGameData(allocator: std.mem.Allocator, world: *hex_world.HexWorld) !v
 
     // Set player start position
     // Create the player entity if it doesn't exist
-    if (world.getPlayer() == null) {
-        _ = try world.createPlayerWithRadius(Vec2{
+    if (game.getPlayer() == null) {
+        _ = try game.createPlayer(Vec2{
             .x = game_data.player_start.position.x,
             .y = game_data.player_start.position.y,
         }, game_data.player_start.radius);
     } else {
         // Update existing player position
-        world.setPlayerPos(Vec2{
+        game.setPlayerPos(Vec2{
             .x = game_data.player_start.position.x,
             .y = game_data.player_start.position.y,
         });
         // Note: Player radius update requires recreating entity, which isn't supported yet
     }
     // Store original spawn position for full reset
-    world.player_start_pos = world.getPlayerPos();
+    game.player_start_pos = game.getPlayerPos();
 
     // Load each zone
     for (game_data.zones, 0..) |zone_data, i| {
         // Initialize zone with basic data (scale will be set in loadZone)
-        // Zone is already initialized in HexWorld.init(), just need to load data
+        // Zone is already initialized in HexGame.init(), just need to load data
         // Then load detailed data
-        try loadZone(&world.zones[i], zone_data, world, i);
+        try loadZone(&game.zones[i], zone_data, game, i);
     }
 }
 
 // Load a single zone from ZON data
-fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.HexWorld, zone_index: usize) !void {
+fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_game_mod.HexGame, zone_index: usize) !void {
     // Zone type is already set in HexWorld.init(), skip name setting
 
     zone.background_color = Color{
@@ -85,17 +85,14 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
     // Set camera scale (default to 1.0 if not specified)
     zone.camera_scale = data.camera_scale orelse 1.0;
 
-    // Load obstacles as ECS entities
+    // Load obstacles
     if (data.obstacles) |obstacles| {
-        // Set current zone for entity creation
-        const old_zone = world.getCurrentZoneIndex();
-        world.getZonedWorld().setCurrentZone(@intCast(zone_index));
-
         for (obstacles) |obstacle_data| {
             const is_deadly = std.mem.eql(u8, obstacle_data.type, "deadly");
 
-            // Create ECS obstacle entity
-            const obstacle_id = world.createObstacle(
+            // Create obstacle entity
+            const obstacle_id = game.createObstacle(
+                @intCast(zone_index),
                 Vec2{ .x = obstacle_data.position.x, .y = obstacle_data.position.y },
                 Vec2{ .x = obstacle_data.size.x, .y = obstacle_data.size.y },
                 is_deadly,
@@ -104,22 +101,19 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                 continue;
             };
 
-            _ = obstacle_id; // Entity automatically tracked in zone.obstacle_entities
+            _ = obstacle_id; // Obstacle created successfully
         }
-
-        // Restore current zone
-        world.getZonedWorld().setCurrentZone(@intCast(old_zone));
     }
 
     // Load units as ECS entities
     if (data.units) |units| {
         // Set current zone for entity creation
-        const old_zone = world.getCurrentZoneIndex();
-        world.getZonedWorld().setCurrentZone(@intCast(zone_index));
+        const old_zone = game.getCurrentZoneIndex();
+        game.getZonedWorld().setCurrentZone(@intCast(zone_index));
 
         for (units) |unit_data| {
             // Create ECS unit entity with simple defaults
-            const unit_id = world.createUnit(
+            const unit_id = game.createUnit(
                 Vec2{ .x = unit_data.position.x, .y = unit_data.position.y },
                 unit_data.radius,
             ) catch |err| {
@@ -131,18 +125,18 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.getZonedWorld().setCurrentZone(@intCast(old_zone));
+        game.getZonedWorld().setCurrentZone(@intCast(old_zone));
     }
 
     // Load portals as ECS entities
     if (data.portals) |portals| {
         // Set current zone for entity creation
-        const old_zone = world.getCurrentZoneIndex();
-        world.getZonedWorld().setCurrentZone(@intCast(zone_index));
+        const old_zone = game.getCurrentZoneIndex();
+        game.getZonedWorld().setCurrentZone(@intCast(zone_index));
 
         for (portals) |portal_data| {
             // Create ECS portal entity
-            const portal_id = world.createPortal(
+            const portal_id = game.createPortal(
                 Vec2{ .x = portal_data.position.x, .y = portal_data.position.y },
                 portal_data.radius,
                 portal_data.destination,
@@ -155,19 +149,19 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.getZonedWorld().setCurrentZone(@intCast(old_zone));
+        game.getZonedWorld().setCurrentZone(@intCast(old_zone));
     }
 
     // Load lifestones as ECS entities
     if (data.lifestones) |lifestones| {
         // Set current zone for entity creation
-        const old_zone = world.getCurrentZoneIndex();
-        world.getZonedWorld().setCurrentZone(@intCast(zone_index));
+        const old_zone = game.getCurrentZoneIndex();
+        game.getZonedWorld().setCurrentZone(@intCast(zone_index));
 
         for (lifestones) |lifestone_data| {
-            // First lifestone in overworld (zone 0) is pre-attuned
+            // First lifestone in overgame (zone 0) is pre-attuned
             // Count existing lifestones in the zone through ECS
-            const zone_storage = world.getZoneStorageByIndex(@intCast(zone_index));
+            const zone_storage = game.getZoneStorageByIndex(@intCast(zone_index));
             var lifestone_count: usize = 0;
             var lifestone_iter = zone_storage.lifestones.entityIterator();
             while (lifestone_iter.next()) |entity_id| {
@@ -177,10 +171,10 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
                     }
                 }
             }
-            const pre_attuned = (lifestone_count == 0 and std.mem.eql(u8, data.name, "Overworld"));
+            const pre_attuned = (lifestone_count == 0 and std.mem.eql(u8, data.name, "Overgame"));
 
             // Create ECS lifestone entity
-            const lifestone_id = world.createLifestone(
+            const lifestone_id = game.createLifestone(
                 Vec2{ .x = lifestone_data.position.x, .y = lifestone_data.position.y },
                 lifestone_data.radius,
                 pre_attuned,
@@ -193,7 +187,7 @@ fn loadZone(zone: *hex_world.HexWorld.Zone, data: ZoneData, world: *hex_world.He
         }
 
         // Restore current zone
-        world.getZonedWorld().setCurrentZone(@intCast(old_zone));
+        game.getZonedWorld().setCurrentZone(@intCast(old_zone));
     }
 }
 

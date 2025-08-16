@@ -6,8 +6,8 @@ const hex_game_mod = @import("hex_game.zig");
 
 const Vec2 = math.Vec2;
 
-// ECS-compatible unit update with aggro modifier
-pub fn updateUnitWithAggroModECS(
+// Unit update with aggro modifier
+pub fn updateUnitWithAggroMod(
     unit_comp: *ecs.components.Unit,
     transform: *ecs.components.Transform,
     visual: *ecs.components.Visual,
@@ -32,12 +32,12 @@ pub fn updateUnitWithAggroModECS(
             visual.color = constants.COLOR_UNIT_AGGRO;
         } else {
             // Return home (non-aggro state)
-            velocity = calculateReturnHomeVelocityECS(unit_comp, transform);
+            velocity = calculateReturnHomeVelocity(unit_comp, transform);
             visual.color = constants.COLOR_UNIT_NON_AGGRO;
         }
     } else {
         // Player dead - return home (non-aggro state)
-        velocity = calculateReturnHomeVelocityECS(unit_comp, transform);
+        velocity = calculateReturnHomeVelocity(unit_comp, transform);
         visual.color = constants.COLOR_UNIT_NON_AGGRO;
     }
 
@@ -47,8 +47,8 @@ pub fn updateUnitWithAggroModECS(
     transform.pos.y += velocity.y * dt;
 }
 
-// Calculate velocity for ECS unit returning home
-fn calculateReturnHomeVelocityECS(unit_comp: *const ecs.components.Unit, transform: *const ecs.components.Transform) Vec2 {
+// Calculate velocity for unit returning home
+fn calculateReturnHomeVelocity(unit_comp: *const ecs.components.Unit, transform: *const ecs.components.Transform) Vec2 {
     const to_home = unit_comp.home_pos.sub(transform.pos);
     const dist_sq = to_home.lengthSquared();
 
@@ -65,8 +65,8 @@ fn calculateReturnHomeVelocityECS(unit_comp: *const ecs.components.Unit, transfo
     return velocity;
 }
 
-// HexGame-compatible unit update with aggro modifier
-pub fn updateUnitWithAggroModECS_HexGame(
+// HexGame unit update with aggro modifier  
+pub fn updateUnitWithAggroMod_HexGame(
     unit_comp: *hex_game_mod.Unit,
     transform: *hex_game_mod.Transform,
     visual: *hex_game_mod.Visual,

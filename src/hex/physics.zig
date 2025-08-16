@@ -2,7 +2,6 @@ const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision.zig");
 const ecs = @import("../lib/game/ecs.zig");
-const hex_world = @import("hex_world.zig");
 const hex_game_mod = @import("hex_game.zig");
 const HexGame = hex_game_mod.HexGame;
 const constants = @import("constants.zig");
@@ -35,8 +34,8 @@ pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) b
     return true;
 }
 
-// ECS player-unit collision check
-pub fn checkPlayerUnitCollisionECS(world: *hex_game_mod.HexGame) bool {
+// Player-unit collision check
+pub fn checkPlayerUnitCollision(world: *hex_game_mod.HexGame) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
     const zone_storage = world.getZoneStorage();
@@ -59,13 +58,13 @@ pub fn checkPlayerUnitCollisionECS(world: *hex_game_mod.HexGame) bool {
     return false;
 }
 
-// ECS portal collision check
-pub fn checkPlayerPortalCollisionECS(player_pos: math.Vec2, player_radius: f32, portal_transform: *const hex_game_mod.Transform) bool {
+// Portal collision check
+pub fn checkPlayerPortalCollision(player_pos: math.Vec2, player_radius: f32, portal_transform: *const hex_game_mod.Transform) bool {
     return checkCircleCollision(player_pos, player_radius, portal_transform.pos, portal_transform.radius);
 }
 
-// ECS unit-obstacle collision check
-pub fn checkUnitObstacleCollisionECS(world: *hex_game_mod.HexGame, unit_id: hex_game_mod.EntityId, unit_transform: *hex_game_mod.Transform, unit_health: *hex_game_mod.Health, old_pos: math.Vec2) bool {
+// Unit-obstacle collision check
+pub fn checkUnitObstacleCollision(world: *hex_game_mod.HexGame, unit_id: hex_game_mod.EntityId, unit_transform: *hex_game_mod.Transform, unit_health: *hex_game_mod.Health, old_pos: math.Vec2) bool {
     const zone_storage = world.getZoneStorage();
     
     // Use idiomatic Zig iterator pattern

@@ -902,6 +902,23 @@ pub const HexGame = struct {
         return entity;
     }
     
+    pub fn createProjectile(self: *HexGame, zone_index: u8, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32) !EntityId {
+        if (zone_index >= MAX_ZONES) return error.InvalidZone;
+        
+        const zone = &self.zones[zone_index];
+        const entity = self.entity_allocator.create();
+        
+        var transform = Transform.init(pos, radius);
+        transform.vel = velocity;
+        const projectile = Projectile.init(entity, lifetime, constants.BULLET_DAMAGE);
+        const visual = Visual.init(constants.COLOR_BULLET);
+        
+        try zone.projectiles.addEntity(entity, transform, projectile, visual);
+        zone.entity_count += 1;
+        
+        return entity;
+    }
+    
     // Zone travel
     pub fn travelToZone(self: *HexGame, zone_index: u8, spawn_pos: Vec2) !void {
         if (zone_index >= MAX_ZONES) return;
@@ -1038,6 +1055,18 @@ pub const HexGame = struct {
         }
     }
     
+    pub fn getPlayerVelConst(self: *const HexGame) Vec2 {
+        if (self.player_entity) |player| {
+            if (self.player_zone == self.current_zone) {
+                const zone = &self.zones[self.current_zone];
+                if (zone.players.getTransformConst(player)) |transform| {
+                    return transform.vel;
+                }
+            }
+        }
+        return Vec2.ZERO;
+    }
+    
     pub fn setPlayerAlive(self: *HexGame, alive: bool) void {
         if (self.player_entity) |player| {
             if (self.player_zone == self.current_zone) {
@@ -1074,9 +1103,67 @@ pub const HexGame = struct {
     }
     
     pub fn updateProjectiles(self: *HexGame, deltaTime: f32) !void {
-        // TODO: Implement projectile updates for simplified HexGame architecture
-        _ = self;
-        _ = deltaTime;
+        const zone = self.getCurrentZone();
+        
+        // Update projectile positions and check collisions
+        var i: usize = 0;
+        while (i < zone.projectiles.count) {
+            const transform = &zone.projectiles.transforms[i];
+            const projectile = &zone.projectiles.projectiles[i];
+            
+            // Update position
+            transform.pos = transform.pos.add(transform.vel.scale(deltaTime));
+            
+            // Update lifetime
+            projectile.lifetime += deltaTime;
+            
+            // Check if projectile expired
+            if (projectile.lifetime >= projectile.max_lifetime) {
+                // Remove expired projectile by swapping with last
+                if (i < zone.projectiles.count - 1) {
+                    zone.projectiles.entities[i] = zone.projectiles.entities[zone.projectiles.count - 1];
+                    zone.projectiles.transforms[i] = zone.projectiles.transforms[zone.projectiles.count - 1];
+                    zone.projectiles.projectiles[i] = zone.projectiles.projectiles[zone.projectiles.count - 1];
+                    zone.projectiles.visuals[i] = zone.projectiles.visuals[zone.projectiles.count - 1];
+                }
+                zone.projectiles.count -= 1;
+                continue; // Don't increment i since we swapped
+            }
+            
+            // Check collision with units
+            var hit_unit = false;
+            for (0..zone.units.count) |j| {
+                const unit_transform = &zone.units.transforms[j];
+                const unit_health = &zone.units.healths[j];
+                
+                if (!unit_health.alive) continue;
+                
+                const dist_sq = transform.pos.sub(unit_transform.pos).lengthSquared();
+                const collision_dist = transform.radius + unit_transform.radius;
+                
+                if (dist_sq <= collision_dist * collision_dist) {
+                    // Unit hit by bullet
+                    unit_health.alive = false;
+                    
+                    // Remove projectile by swapping with last
+                    if (i < zone.projectiles.count - 1) {
+                        zone.projectiles.entities[i] = zone.projectiles.entities[zone.projectiles.count - 1];
+                        zone.projectiles.transforms[i] = zone.projectiles.transforms[zone.projectiles.count - 1];
+                        zone.projectiles.projectiles[i] = zone.projectiles.projectiles[zone.projectiles.count - 1];
+                        zone.projectiles.visuals[i] = zone.projectiles.visuals[zone.projectiles.count - 1];
+                    }
+                    zone.projectiles.count -= 1;
+                    hit_unit = true;
+                    break;
+                }
+            }
+            
+            if (hit_unit) {
+                continue; // Don't increment i since we swapped
+            }
+            
+            i += 1;
+        }
     }
     
     pub fn getZoneStorage(self: *HexGame) *ZoneData {

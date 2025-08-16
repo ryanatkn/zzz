@@ -96,12 +96,9 @@ pub fn handleSDLEvent(
 
             switch (event.button.button) {
                 c.sdl.SDL_BUTTON_LEFT => {
-                    if (!game_state.hex_game.getPlayerAlive()) {
-                        game_controller.handleRespawn(game_state);
-                    } else {
-                        // Left-click shooting is handled in continuous shooting (mouse hold)
-                        // Single-click shooting is disabled to prevent double-shooting
-                    }
+                    // Left-click shooting is handled in continuous shooting (mouse hold)
+                    // Single-click shooting is disabled to prevent double-shooting
+                    // Respawn is only triggered by 'R' key, not by clicking
                 },
                 c.sdl.SDL_BUTTON_RIGHT => {
                     // Right-click casts spell (self-cast if Ctrl held)

@@ -1,12 +1,12 @@
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
-const hex_world = @import("hex_world.zig");
+const hex_game_mod = @import("hex_game.zig");
 const ecs = @import("../lib/game/ecs.zig");
 
 const Vec2 = math.Vec2;
 const EntityId = ecs.EntityId;
-const HexWorld = hex_world.HexWorld;
+const HexGame = hex_game_mod.HexGame;
 
 /// ECS-based save data structure
 pub const HexSaveData = struct {
@@ -63,7 +63,7 @@ pub const HexSaveData = struct {
     };
 
     /// Create save data from current ECS game state
-    pub fn fromGameState(world: *const HexWorld, stats: GameStatistics) !HexSaveData {
+    pub fn fromGameState(world: *const HexGame, stats: GameStatistics) !HexSaveData {
         var save = HexSaveData{
             .player_zone = world.getCurrentZoneIndex(),
             .player_pos = world.getPlayerPosConst(),
@@ -156,7 +156,7 @@ pub const HexSaveData = struct {
     }
 
     /// Apply save data to ECS game state
-    pub fn applyToGameState(self: *const HexSaveData, world: *HexWorld, stats: *GameStatistics) void {
+    pub fn applyToGameState(self: *const HexSaveData, world: *HexGame, stats: *GameStatistics) void {
         // Restore player state
         world.getZonedWorld().setCurrentZone(@intCast(self.player_zone));
         world.setPlayerPos(self.player_pos);

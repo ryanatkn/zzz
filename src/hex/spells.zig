@@ -10,8 +10,7 @@ const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
 
 const Vec2 = math.Vec2;
-const Zone = @import("hex_world.zig").HexWorld.Zone;
-const HexWorld = @import("hex_world.zig").HexWorld;
+const ZoneData = hex_game_mod.HexGame.ZoneData;
 const HexGame = hex_game_mod.HexGame;
 const EntityId = entity.EntityId;
 const World = world_mod.World;
@@ -207,8 +206,8 @@ pub const SpellSystem = struct {
         }
     }
     
-    /// Get aggro multiplier for a specific unit (ECS version)
-    pub fn getAggroMultiplierForUnitECS(unit_id: hex_game_mod.EntityId, zone_storage: *const hex_game_mod.HexGame.ZoneData) f32 {
+    /// Get aggro multiplier for a specific unit
+    pub fn getAggroMultiplierForUnit(unit_id: hex_game_mod.EntityId, zone_storage: *const hex_game_mod.HexGame.ZoneData) f32 {
         // For now, return 1.0 (no modification)
         // TODO: Implement lull effect checking for units
         _ = unit_id;

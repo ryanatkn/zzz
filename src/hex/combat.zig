@@ -8,20 +8,35 @@ const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
 
 const Vec2 = math.Vec2;
-const HexWorld = @import("hex_world.zig").HexWorld;
 const HexGame = @import("hex_game.zig").HexGame;
 
 // Re-export BulletPool from lib/game/projectiles for compatibility
 pub const BulletPool = BulletPoolImpl;
 
-pub fn fireBullet(game: *HexGame, _: Vec2, pool: *BulletPoolImpl) bool {
+pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool {
     if (!game.getPlayerAlive()) return false;
     if (!pool.canFire()) return false;
 
-    // TODO: This function needs to be updated to use HexGame's simplified architecture
-    // For now, just consume the pool to avoid compilation errors
-    pool.fire(); // Consume the bullet
-    return false;
+    // Create bullet projectile in current zone
+    const player_pos = game.getPlayerPos();
+    const direction = target_pos.sub(player_pos).normalize();
+    const bullet_speed = constants.BULLET_SPEED;
+    const bullet_vel = direction.scale(bullet_speed);
+    
+    // Create bullet entity in current zone
+    const bullet_id = game.createProjectile(
+        game.current_zone,
+        player_pos,
+        constants.BULLET_RADIUS,
+        bullet_vel,
+        constants.BULLET_LIFETIME
+    ) catch return false;
+    
+    // Consume from bullet pool
+    pool.fire();
+    
+    _ = bullet_id; // Bullet created successfully
+    return true;
 }
 
 pub fn fireBulletAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl) bool {
@@ -66,18 +81,18 @@ pub fn respawnPlayer(game_state: anytype) void {
     loggers.getGameLog().info("player_respawn", "Player respawned!", .{});
 }
 
-pub fn handlePlayerDeath(world: *HexWorld) void {
+pub fn handlePlayerDeath(world: *HexGame) void {
     world.setPlayerAlive(false);
     loggers.getGameLog().info("player_death", "Player died! Press R or click to respawn", .{});
 }
 
-pub fn handlePlayerDeathOnHazard(world: *HexWorld) void {
+pub fn handlePlayerDeathOnHazard(world: *HexGame) void {
     world.setPlayerAlive(false);
     loggers.getGameLog().info("player_hazard_death", "Player died on hazard! Press R or click to respawn", .{});
 }
 
-// ECS-compatible unit death on hazard
-pub fn handleUnitDeathOnHazardECS(unit_entity: ecs.EntityId, world: *HexWorld) void {
+// Unit death on hazard
+pub fn handleUnitDeathOnHazard(unit_entity: ecs.EntityId, world: *HexGame) void {
     const zone_storage = world.getZoneStorage();
     if (zone_storage.healths.get(unit_entity)) |health| {
         health.alive = false;
