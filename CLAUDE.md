@@ -309,10 +309,11 @@ $ zig build --help       # Show all build options
 **AI Control System:**
 - **Architecture:** Lock-free ring buffer with memory-mapped file interface
 - **Performance:** ~50ns per command, zero allocations, cache-friendly design
-- **Protocol:** Binary format - 20 bytes per command (frame, keys, mouse, buttons)
+- **Protocol:** Binary format - 32 bytes per command (aligned structure)
 - **Integration:** Processes commands before game update, overrides InputState
 - **File:** `.ai_commands` - shared memory between game and AI controller
-- **Python API:** Example script `ai_control_example.py` demonstrates usage
+- **Story AI:** Sophisticated autonomous controller with narrative scenarios
+- **Location:** `web/ai_control/` - organized modular structure
 - **Activation:** Press G in-game to toggle AI control mode
 
 **Development Principles:**

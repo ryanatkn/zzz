@@ -119,18 +119,24 @@ zig build run
 
 # In game, press G to enable AI control
 
-# In another terminal, run the Python controller
-python3 ai_control_example.py
+# In another terminal, run the story AI
+npx tsx web/ai_control/demos/story.ts
+
+# Or try different scenarios:
+npx tsx web/ai_control/demos/story.ts speedrun
+npx tsx web/ai_control/demos/story.ts pacifist
 ```
 
-The AI control system uses a lock-free ring buffer for ultra-low latency (~50ns per command) with zero allocations during runtime. 
+The AI control system features a sophisticated story-driven controller that can autonomously play through the game with different narrative scenarios. It uses a lock-free ring buffer for ultra-low latency (~50ns per command) with zero allocations.
 
-Available controllers:
-- **Python**: `ai_control_example.py` - Command-line controller
-- **TypeScript**: `ai_control_example.ts` - Node.js/Deno controller  
-- **Web UI**: `ai_control_example.svelte` - Visual control interface (run `npm install && npm run dev`)
+Available scenarios:
+- **Hero**: Classic hero's journey with full story arc
+- **Speedrun**: Optimized path to defeat the boss quickly  
+- **Pacifist**: Complete without combat using stealth
+- **Warrior**: Maximum aggression, defeat all enemies
+- **Explorer**: Methodical exploration of the entire world
 
-See [AI_CONTROL_WEB.md](./AI_CONTROL_WEB.md) for web interface documentation.
+See [web/ai_control/README.md](./web/ai_control/README.md) for detailed documentation.
 
 ## Creating new applications
 

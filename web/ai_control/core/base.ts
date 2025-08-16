@@ -1,104 +1,11 @@
 /**
- * Core AI Controller Types and Base Class
- * 
- * Shared between Node.js and browser implementations.
- * Contains all type definitions and abstract base class.
+ * Abstract Base AI Controller
+ * Provides common functionality for all controller implementations
  */
 
-// Export types
-export interface Vec2 {
-  x: number;
-  y: number;
-}
+import { Keys, MouseButtons, type Vec2, type InputCommand, type ActionSequence } from './types.js';
 
-// SDL Scancodes for keyboard mapping
-export enum Keys {
-  A = 4,
-  B = 5,
-  C = 6,
-  D = 7,
-  E = 8,
-  F = 9,
-  G = 10,
-  H = 11,
-  I = 12,
-  J = 13,
-  K = 14,
-  L = 15,
-  M = 16,
-  N = 17,
-  O = 18,
-  P = 19,
-  Q = 20,
-  R = 21,
-  S = 22,
-  T = 23,
-  U = 24,
-  V = 25,
-  W = 26,
-  X = 27,
-  Y = 28,
-  Z = 29,
-  KEY_1 = 30,
-  KEY_2 = 31,
-  KEY_3 = 32,
-  KEY_4 = 33,
-  KEY_5 = 34,
-  KEY_6 = 35,
-  KEY_7 = 36,
-  KEY_8 = 37,
-  KEY_9 = 38,
-  KEY_0 = 39,
-  SPACE = 44,
-  LCTRL = 224,
-  LSHIFT = 225,
-  LALT = 226,
-  RCTRL = 228,
-  RSHIFT = 229,
-  RALT = 230,
-  ESCAPE = 41,
-  RETURN = 40,
-  TAB = 43,
-  BACKSPACE = 42,
-  UP = 82,
-  DOWN = 81,
-  LEFT = 80,
-  RIGHT = 79,
-  F1 = 58,
-  F2 = 59,
-  F3 = 60,
-  F4 = 61,
-  F5 = 62,
-  F6 = 63,
-  F7 = 64,
-  F8 = 65,
-  F9 = 66,
-  F10 = 67,
-  F11 = 68,
-  F12 = 69,
-}
-
-// Mouse button flags
-export enum MouseButtons {
-  LEFT = 0x01,
-  RIGHT = 0x02,
-  MIDDLE = 0x04,
-}
-
-// Command structure matching Zig's InputCommand
-export interface InputCommand {
-  frame: number;      // Target frame (0 = immediate)
-  keys: bigint;        // 64-bit keyboard state
-  mouseX: number;      // Mouse X position
-  mouseY: number;      // Mouse Y position
-  buttons: number;     // Mouse button state
-}
-
-/**
- * Abstract base class for AI Controllers
- * Provides common functionality for both Node.js and browser implementations
- */
-export abstract class AIControllerCore {
+export abstract class AIControllerBase {
   protected frameCounter: number = 0;
 
   // Abstract methods that must be implemented by subclasses
@@ -107,8 +14,6 @@ export abstract class AIControllerCore {
   abstract sendCommand(cmd: InputCommand): boolean;
   abstract getCurrentFrame(): number;
   abstract clear(): void;
-
-  // Common helper methods
 
   /**
    * Create a movement command
@@ -131,19 +36,14 @@ export abstract class AIControllerCore {
         break;
     }
     
-    // Note: LSHIFT (225) is beyond 64-bit range, so we can't use it in the bitfield
-    // The direct input system only supports scancodes 0-63
-    // We would need to use a different key or extend the system
-    if (walk) {
-      // Use a different key that's within range, or handle separately
-      // For now, we'll skip this as it's out of range
-    }
+    // Note: Modifier keys like Shift are beyond the 64-bit range
+    // Would need protocol extension to support walk modifier
     
     return {
       frame: 0,
       keys,
-      mouseX: 0,
-      mouseY: 0,
+      mouseX: 400,
+      mouseY: 300,
       buttons: 0
     };
   }
@@ -177,14 +77,6 @@ export abstract class AIControllerCore {
       keys |= 1n << BigInt(slotKeys[slot]);
     }
     
-    // Note: LCTRL (224) is beyond 64-bit range, so we can't use it in the bitfield
-    // The direct input system only supports scancodes 0-63
-    // We would need to use a different key or extend the system
-    if (selfCast) {
-      // Use a different key that's within range, or handle separately
-      // For now, we'll skip this as it's out of range
-    }
-    
     return {
       frame: 0,
       keys,
@@ -195,11 +87,23 @@ export abstract class AIControllerCore {
   }
 
   /**
-   * Navigate to a position using pathfinding
+   * Press a specific key
+   */
+  pressKey(key: Keys): InputCommand {
+    return {
+      frame: 0,
+      keys: 1n << BigInt(key),
+      mouseX: 400,
+      mouseY: 300,
+      buttons: 0
+    };
+  }
+
+  /**
+   * Navigate to a position using simple interpolation
    */
   async moveTo(position: Vec2, speed: number = 1): Promise<void> {
-    // Simplified movement - real implementation would use pathfinding
-    const steps = 60; // 1 second at 60 FPS
+    const steps = Math.floor(60 / speed); // Adjust steps based on speed
     const currentPos = { x: 400, y: 300 }; // Assume center start
     
     for (let i = 0; i < steps; i++) {
@@ -219,9 +123,6 @@ export abstract class AIControllerCore {
         keys |= 1n << BigInt(dy > 0 ? Keys.S : Keys.W);
       }
       
-      // Walk if moving slowly
-      // Note: LSHIFT is beyond 64-bit range, skipping
-      
       this.sendCommand({
         frame: 0,
         keys,
@@ -230,7 +131,7 @@ export abstract class AIControllerCore {
         buttons: 0
       });
       
-      await new Promise(r => setTimeout(r, 16));
+      await this.wait(16);
     }
     
     // Stop at destination
@@ -243,20 +144,30 @@ export abstract class AIControllerCore {
   async shootPattern(targets: Vec2[], interval: number = 150): Promise<void> {
     for (const target of targets) {
       this.sendCommand(this.shoot(target, true));
-      await new Promise(r => setTimeout(r, 50));
+      await this.wait(50);
       this.sendCommand(this.shoot(target, false));
-      await new Promise(r => setTimeout(r, interval - 50));
+      await this.wait(interval - 50);
+    }
+  }
+
+  /**
+   * Execute a burst fire at target
+   */
+  async burstFire(target: Vec2, shots: number = 3, interval: number = 100): Promise<void> {
+    for (let i = 0; i < shots; i++) {
+      this.sendCommand(this.shoot(target, true));
+      await this.wait(50);
+      this.sendCommand(this.shoot(target, false));
+      if (i < shots - 1) {
+        await this.wait(interval - 50);
+      }
     }
   }
 
   /**
    * Execute a complex action sequence
    */
-  async executeSequence(actions: Array<{
-    type: 'move' | 'shoot' | 'spell' | 'wait';
-    data?: any;
-    duration?: number;
-  }>): Promise<void> {
+  async executeSequence(actions: ActionSequence): Promise<void> {
     for (const action of actions) {
       switch (action.type) {
         case 'move':
@@ -267,18 +178,27 @@ export abstract class AIControllerCore {
             const steps = duration / 16;
             for (let i = 0; i < steps; i++) {
               this.sendCommand(this.move(action.data.direction, action.data.walk));
-              await new Promise(r => setTimeout(r, 16));
+              await this.wait(16);
             }
+            this.sendCommand(this.move('stop'));
           }
           break;
           
         case 'shoot':
-          this.sendCommand(this.shoot(action.data.target, true));
-          await new Promise(r => setTimeout(r, 50));
-          this.sendCommand(this.shoot(action.data.target, false));
+          if (action.data.burst) {
+            await this.burstFire(action.data.target);
+          } else {
+            this.sendCommand(this.shoot(action.data.target, true));
+            await this.wait(50);
+            this.sendCommand(this.shoot(action.data.target, false));
+          }
           break;
           
         case 'spell':
+          // Select spell slot
+          this.sendCommand(this.pressKey(this.getSpellKey(action.data.slot)));
+          await this.wait(100);
+          // Cast spell
           this.sendCommand(this.castSpell(
             action.data.slot,
             action.data.target,
@@ -287,9 +207,32 @@ export abstract class AIControllerCore {
           break;
           
         case 'wait':
-          await new Promise(r => setTimeout(r, action.duration || 1000));
+          await this.wait(action.duration);
+          break;
+          
+        case 'interact':
+          this.sendCommand(this.pressKey(action.data.key));
+          await this.wait(100);
           break;
       }
     }
+  }
+
+  /**
+   * Helper to get spell key for slot
+   */
+  private getSpellKey(slot: number): Keys {
+    const slotKeys = [
+      Keys.KEY_1, Keys.KEY_2, Keys.KEY_3, Keys.KEY_4,
+      Keys.Q, Keys.E, Keys.R, Keys.F
+    ];
+    return slotKeys[slot] || Keys.KEY_1;
+  }
+
+  /**
+   * Wait for specified milliseconds
+   */
+  protected wait(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
