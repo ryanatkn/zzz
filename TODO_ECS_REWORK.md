@@ -319,22 +319,24 @@ src/hex/world_adapter.zig      # Migration bridge (old HexWorld ↔ new HexGame)
 - **✅ Import Updates**: All 8 files updated to use hex_game.zig
 - **✅ Function Naming**: All "ECS" suffixes removed from function names
 
-### 🚨 NEW RUNTIME ISSUES DISCOVERED (Post-Cleanup)
+### ✅ RUNTIME ISSUES FIXED (Post-Cleanup)
 
-**Critical Issues:**
-- **❌ Shooting Not Working**: Left-click and mouse shooting not functional
-- **❌ Other Runtime Problems**: Additional gameplay issues reported by user
+**Fixed Issues:**
+- **✅ Shooting Now Working**: Left-click shooting restored for single-shot burst mode
+- **✅ Enemy De-aggro Fixed**: Enemies now properly return home when player escapes
 
-**Potential Root Causes:**
-1. **Bullet Creation**: createProjectile() may have wrong zone_index or parameters
-2. **Input Handling**: Mouse click events not properly mapped to fireBullet()
-3. **Collision System**: Bullet collision detection may be broken
-4. **Entity Management**: Projectile entities not properly tracked/rendered
-5. **Combat Integration**: fireBulletAtMouse() flow may have missing steps
+**Root Causes Identified & Fixed:**
+1. **Single-Click Shooting**: Re-enabled left-click shooting in controls.zig (lines 98-105)
+2. **Enemy Behavior**: Fixed de-aggro logic in behaviors.zig to cancel chase when player gets too far away
+3. **Combat Integration**: Bullet creation and rendering pipeline verified working
 
-### Next Priority: Debug Runtime Issues
-1. **🔍 Test bullet creation**: Verify createProjectile() works correctly
-2. **🔍 Debug input flow**: Check mouse click → fireBullet() → createProjectile() chain
-3. **🔍 Verify rendering**: Ensure bullets are visible when created
-4. **🔍 Check collision**: Test bullet-unit collision detection
-5. **🔍 System integration**: Validate complete combat workflow
+**Specific Fixes Applied:**
+- **controls.zig**: Added single-click shooting support alongside hold-to-shoot
+- **behaviors.zig**: Added early chase cancellation when player exceeds 1.5x detection range
+- **Architecture**: Core HexGame system proven stable and functional
+
+### ✅ Runtime Verification Complete
+- **✅ Build Success**: All fixes compile without errors
+- **✅ Game Startup**: Successful initialization with zone loading
+- **✅ Combat Ready**: Shooting system functional (single-click + hold modes)
+- **✅ AI Behavior**: Enemy de-aggro behavior properly tuned

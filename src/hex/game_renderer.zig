@@ -223,10 +223,16 @@ pub const GameRenderer = struct {
         // Get projectiles from current zone only
         const zone_storage = world.getZoneStorageConst();
 
-        // Iterate over projectile entities in current zone only
+        // Count projectiles for debug
+        var count: u32 = 0;
         var projectile_iter = @constCast(&zone_storage.projectiles).entityIterator();
         while (projectile_iter.next()) |entity_id| {
+            count += 1;
             self.renderEntityAsCircle(cmd_buffer, render_pass, zone_storage, entity_id, .projectile);
+        }
+        
+        if (count > 0) {
+            loggers.getGameLog().info("projectile_render", "Rendering {} projectiles", .{count});
         }
     }
 

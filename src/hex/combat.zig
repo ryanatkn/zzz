@@ -35,7 +35,7 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
     // Consume from bullet pool
     pool.fire();
     
-    _ = bullet_id; // Bullet created successfully
+    std.log.info("Bullet fired! ID: {}, pos: {any}, target: {any}", .{ bullet_id, player_pos, target_pos });
     return true;
 }
 

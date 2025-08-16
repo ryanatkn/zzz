@@ -12,7 +12,7 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
-const simple_loader = @import("simple_loader.zig");
+const loader = @import("loader.zig");
 const hud = @import("hud.zig");
 const game_controller = @import("game.zig");
 const combat = @import("combat.zig");
@@ -125,22 +125,10 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     game_hud.?.* = Hud.init();
 
     // Load game data
-    simple_loader.loadGameData(global_allocator, &game_state.?.hex_game) catch |err| {
+    loader.loadGameData(global_allocator, &game_state.?.hex_game) catch |err| {
         if (logger) |*log| {
             log.err("zon_load_fail", "Failed to load game data from ZON file: {}", .{err});
             log.err("zon_check_msg", "Please check that game_data.zon exists and is valid", .{});
-        }
-        return err;
-    };
-
-    // Create player entity after loading zones
-    const player_start_pos = math.Vec2{ 
-        .x = constants.SCREEN_CENTER_X, 
-        .y = constants.SCREEN_CENTER_Y 
-    };
-    _ = game_state.?.hex_game.createPlayer(player_start_pos, constants.PLAYER_RADIUS) catch |err| {
-        if (logger) |*log| {
-            log.err("player_create_fail", "Failed to create player entity: {}", .{err});
         }
         return err;
     };
@@ -216,7 +204,7 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
             // Now safe to deinitialize the renderer and GPU device
             game_renderer.?.deinit();
             // Clean up ZON data arena allocator
-            @import("loader.zig").deinit();
+            loader.deinit();
 
             // Free heap-allocated structures
             global_allocator.destroy(game_renderer.?);

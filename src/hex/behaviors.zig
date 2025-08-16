@@ -94,17 +94,30 @@ pub fn updateUnitWithAggroMod_HexGame(
             const direction = to_player.normalize();
             velocity = direction.scale(constants.UNIT_CHASE_SPEED);
         } else if (unit_comp.chase_timer > 0) {
-            // Continue chasing for duration
+            // Continue chasing for duration, but cancel if player gets too far away
             unit_comp.chase_timer -= dt;
-            visual.color = constants.COLOR_UNIT_AGGRESSIVE;
-
-            const to_target = unit_comp.target_pos.sub(transform.pos);
-            const direction = to_target.normalize();
-            velocity = direction.scale(constants.UNIT_CHASE_SPEED);
-
-            if (unit_comp.chase_timer <= 0) {
+            
+            // Check if player is now too far away (beyond lose aggro range)
+            // Use 15% tolerance buffer to prevent ping-ponging behavior
+            const LOSE_AGGRO_TOLERANCE = 1.15;
+            const lose_aggro_range_sq = (constants.UNIT_DETECTION_RADIUS * aggro_multiplier * LOSE_AGGRO_TOLERANCE) * (constants.UNIT_DETECTION_RADIUS * aggro_multiplier * LOSE_AGGRO_TOLERANCE);
+            if (dist_sq > lose_aggro_range_sq) {
+                // Player escaped - stop chasing immediately and return home
+                unit_comp.chase_timer = 0;
                 unit_comp.state = .returning_home;
                 visual.color = constants.COLOR_UNIT_RETURNING;
+                velocity = calculateReturnHomeVelocity_HexGame(unit_comp, transform);
+            } else {
+                // Still within lose range - continue chasing
+                visual.color = constants.COLOR_UNIT_AGGRESSIVE;
+                const to_target = unit_comp.target_pos.sub(transform.pos);
+                const direction = to_target.normalize();
+                velocity = direction.scale(constants.UNIT_CHASE_SPEED);
+
+                if (unit_comp.chase_timer <= 0) {
+                    unit_comp.state = .returning_home;
+                    visual.color = constants.COLOR_UNIT_RETURNING;
+                }
             }
         } else {
             // Return home
