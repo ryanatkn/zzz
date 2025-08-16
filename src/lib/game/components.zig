@@ -324,6 +324,7 @@ pub const Terrain = struct {
     }
 };
 
+// TODO maybe rename to `Living`?
 /// Awakeable - enables terrain/objects to come alive
 /// Sparse storage - only potentially living entities have this
 pub const Awakeable = struct {

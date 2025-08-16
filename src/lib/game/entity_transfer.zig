@@ -5,8 +5,191 @@ const Zone = @import("zone.zig").Zone;
 const components = @import("components.zig");
 const archetype_storage = @import("archetype_storage.zig");
 
+/// Data needed to transfer an entity between zones (stateless)
+pub const TransferData = struct {
+    archetype: World.ArchetypeType,
+    
+    // Core components (always present)
+    transform: components.Transform,
+    visual: components.Visual,
+    
+    // Components by archetype
+    health: ?components.Health = null,
+    movement: ?components.Movement = null,
+    player_input: ?components.PlayerInput = null,
+    combat: ?components.Combat = null,
+    unit: ?components.Unit = null,
+    projectile: ?components.Projectile = null,
+    terrain: ?components.Terrain = null,
+    interactable: ?components.Interactable = null,
+    effects: ?components.Effects = null,
+    
+    // Metadata
+    is_player: bool = false,
+};
+
+/// Result of a transfer operation
+pub const TransferResult = struct {
+    old_entity: EntityId,
+    new_entity: EntityId,
+    zone_id: u8,
+};
+
 /// Transfer entity between zones
 pub const EntityTransfer = struct {
+    /// Extract transfer data from an entity (for stateless transfer)
+    pub fn extractTransferData(zone: *const Zone, entity: EntityId) !TransferData {
+        const world = &zone.world;
+        
+        // Determine archetype
+        const archetype = getEntityArchetype(world, entity) orelse return error.EntityNotFound;
+        
+        var data = TransferData{
+            .archetype = archetype,
+            .transform = undefined,
+            .visual = undefined,
+        };
+        
+        // Extract components based on archetype
+        switch (archetype) {
+            .player => {
+                const transform_ptr = world.players.getComponent(entity, .transform) orelse return error.MissingComponent;
+                const visual_ptr = world.players.getComponent(entity, .visual) orelse return error.MissingComponent;
+                data.transform = transform_ptr.*;
+                data.visual = visual_ptr.*;
+                if (world.players.getComponent(entity, .health)) |h| data.health = h.*;
+                if (world.players.getComponent(entity, .movement)) |m| data.movement = m.*;
+                if (world.players.getComponent(entity, .player_input)) |p| data.player_input = p.*;
+                if (world.players.getComponent(entity, .combat)) |c| data.combat = c.*;
+                if (world.players.getComponent(entity, .effects)) |e| data.effects = e.*;
+                data.is_player = true;
+            },
+            .unit => {
+                const transform_ptr = world.units.getComponent(entity, .transform) orelse return error.MissingComponent;
+                const visual_ptr = world.units.getComponent(entity, .visual) orelse return error.MissingComponent;
+                data.transform = transform_ptr.*;
+                data.visual = visual_ptr.*;
+                if (world.units.getComponent(entity, .health)) |h| data.health = h.*;
+                if (world.units.getComponent(entity, .movement)) |m| data.movement = m.*;
+                if (world.units.getComponent(entity, .unit)) |u| data.unit = u.*;
+                if (world.units.getComponent(entity, .combat)) |c| data.combat = c.*;
+                if (world.units.getComponent(entity, .effects)) |e| data.effects = e.*;
+            },
+            else => {
+                // For now, other archetypes not supported for transfer
+                return error.UnsupportedArchetype;
+            }
+        }
+        
+        return data;
+    }
+    
+    /// Stateless transfer - create entity in destination from transfer data
+    pub fn createFromTransferData(dest_zone: *Zone, data: TransferData) !EntityId {
+        const world = &dest_zone.world;
+        
+        switch (data.archetype) {
+            .player => {
+                const player_input = data.player_input orelse return error.MissingComponent;
+                const health = data.health orelse return error.MissingComponent;
+                
+                const new_entity = try world.createPlayer(
+                    data.transform.pos,
+                    data.transform.radius,
+                    health.max,
+                    player_input.controller_id
+                );
+                
+                // Update components with transferred data
+                if (world.players.getComponentMut(new_entity, .transform)) |transform| {
+                    transform.vel = data.transform.vel;
+                }
+                if (world.players.getComponentMut(new_entity, .health)) |h| {
+                    h.current = health.current;
+                    h.alive = health.alive;
+                }
+                if (data.movement) |movement| {
+                    if (world.players.getComponentMut(new_entity, .movement)) |m| {
+                        m.* = movement;
+                    }
+                }
+                if (world.players.getComponentMut(new_entity, .visual)) |v| {
+                    v.* = data.visual;
+                }
+                if (data.combat) |combat| {
+                    if (world.players.getComponentMut(new_entity, .combat)) |c| {
+                        c.* = combat;
+                    }
+                }
+                if (data.effects) |effects| {
+                    try world.players.addOptionalComponent(new_entity, .effects, effects);
+                }
+                
+                return new_entity;
+            },
+            .unit => {
+                const health = data.health orelse return error.MissingComponent;
+                
+                const new_entity = try world.createUnit(
+                    data.transform.pos,
+                    data.transform.radius,
+                    health.max
+                );
+                
+                // Update components
+                if (world.units.getComponentMut(new_entity, .transform)) |transform| {
+                    transform.vel = data.transform.vel;
+                }
+                if (world.units.getComponentMut(new_entity, .health)) |h| {
+                    h.current = health.current;
+                    h.alive = health.alive;
+                }
+                if (data.unit) |unit| {
+                    if (world.units.getComponentMut(new_entity, .unit)) |u| {
+                        u.* = unit;
+                    }
+                }
+                if (world.units.getComponentMut(new_entity, .visual)) |v| {
+                    v.* = data.visual;
+                }
+                if (data.combat) |combat| {
+                    if (world.units.getComponentMut(new_entity, .combat)) |c| {
+                        c.* = combat;
+                    }
+                }
+                if (data.effects) |effects| {
+                    try world.units.addOptionalComponent(new_entity, .effects, effects);
+                }
+                
+                return new_entity;
+            },
+            else => return error.UnsupportedArchetype,
+        }
+    }
+    
+    /// Perform a stateless entity transfer
+    pub fn transferStateless(
+        source_zone: *Zone,
+        dest_zone: *Zone, 
+        entity: EntityId,
+        dest_zone_id: u8
+    ) !TransferResult {
+        // Extract data from source
+        const data = try extractTransferData(source_zone, entity);
+        
+        // Create in destination
+        const new_entity = try createFromTransferData(dest_zone, data);
+        
+        // Destroy in source
+        try source_zone.world.destroyEntity(entity);
+        
+        return TransferResult{
+            .old_entity = entity,
+            .new_entity = new_entity,
+            .zone_id = dest_zone_id,
+        };
+    }
+    
     /// Get archetype of an entity from any zone
     pub fn getEntityArchetype(world: *const World, entity: EntityId) ?World.ArchetypeType {
         // Check each archetype storage
@@ -17,155 +200,5 @@ pub const EntityTransfer = struct {
         if (world.lifestones.hasEntity(entity)) return .lifestone;
         if (world.portals.hasEntity(entity)) return .portal;
         return null;
-    }
-
-    /// Transfer player entity between zones
-    pub fn transferPlayer(source_zone: *Zone, dest_zone: *Zone, entity: EntityId) !EntityId {
-        const source_world = &source_zone.world;
-        const dest_world = &dest_zone.world;
-        
-        std.log.info("transferPlayer: Transferring player entity {any}", .{entity});
-        
-        // Extract all components from source
-        std.log.info("transferPlayer: Extracting transform component", .{});
-        const transform = source_world.players.getComponent(entity, .transform) orelse {
-            std.log.err("transferPlayer: Missing transform component", .{});
-            return error.MissingComponent;
-        };
-        std.log.info("transferPlayer: Extracting health component", .{});
-        const health = source_world.players.getComponent(entity, .health) orelse {
-            std.log.err("transferPlayer: Missing health component", .{});
-            return error.MissingComponent;
-        };
-        std.log.info("transferPlayer: Extracting movement component", .{});
-        const movement = source_world.players.getComponent(entity, .movement) orelse {
-            std.log.err("transferPlayer: Missing movement component", .{});
-            return error.MissingComponent;
-        };
-        std.log.info("transferPlayer: Extracting visual component", .{});
-        const visual = source_world.players.getComponent(entity, .visual) orelse {
-            std.log.err("transferPlayer: Missing visual component", .{});
-            return error.MissingComponent;
-        };
-        std.log.info("transferPlayer: Extracting player_input component", .{});
-        const player_input = source_world.players.getComponent(entity, .player_input) orelse {
-            std.log.err("transferPlayer: Missing player_input component", .{});
-            return error.MissingComponent;
-        };
-        std.log.info("transferPlayer: Extracting combat component", .{});
-        const combat = source_world.players.getComponent(entity, .combat) orelse {
-            std.log.err("transferPlayer: Missing combat component", .{});
-            return error.MissingComponent;
-        };
-        
-        // Check for optional components
-        std.log.info("transferPlayer: Extracting optional effects component", .{});
-        const effects = source_world.players.getComponent(entity, .effects);
-        
-        std.log.info("transferPlayer: All components extracted, creating new player in destination zone", .{});
-        // Create new player in destination zone with same components
-        const new_entity = dest_world.createPlayer(
-            transform.pos,
-            transform.radius,
-            health.max,
-            player_input.controller_id
-        ) catch |err| {
-            std.log.err("transferPlayer: Failed to create player in destination zone: {}", .{err});
-            return err;
-        };
-        std.log.info("transferPlayer: Created new player entity {any}", .{new_entity});
-        
-        // Copy remaining component data
-        std.log.info("transferPlayer: Copying component data", .{});
-        if (dest_world.players.getComponentMut(new_entity, .health)) |new_health| {
-            new_health.current = health.current;
-        }
-        if (dest_world.players.getComponentMut(new_entity, .movement)) |new_movement| {
-            new_movement.* = movement.*;
-        }
-        if (dest_world.players.getComponentMut(new_entity, .visual)) |new_visual| {
-            new_visual.* = visual.*;
-        }
-        if (dest_world.players.getComponentMut(new_entity, .combat)) |new_combat| {
-            new_combat.* = combat.*;
-        }
-        
-        // Copy optional components
-        if (effects) |eff| {
-            std.log.info("transferPlayer: Copying effects component", .{});
-            dest_world.players.addOptionalComponent(new_entity, .effects, eff.*) catch |err| {
-                std.log.err("transferPlayer: Failed to add effects component: {}", .{err});
-            };
-        }
-        
-        // Destroy original entity
-        std.log.info("transferPlayer: Component copying complete, destroying original entity", .{});
-        source_world.destroyEntity(entity) catch |err| {
-            std.log.err("transferPlayer: Failed to destroy original entity: {}", .{err});
-            // Continue anyway - entity is duplicated but at least transfer worked
-        };
-        
-        std.log.info("transferPlayer: Player transferred from entity {any} to entity {any}", .{ entity, new_entity });
-        return new_entity;
-    }
-
-    /// Transfer unit entity between zones
-    pub fn transferUnit(source_zone: *Zone, dest_zone: *Zone, entity: EntityId) !EntityId {
-        const source_world = &source_zone.world;
-        const dest_world = &dest_zone.world;
-        
-        // Extract components
-        const transform = source_world.units.getComponent(entity, .transform) orelse return error.MissingComponent;
-        const health = source_world.units.getComponent(entity, .health) orelse return error.MissingComponent;
-        const movement = source_world.units.getComponent(entity, .movement) orelse return error.MissingComponent;
-        const visual = source_world.units.getComponent(entity, .visual) orelse return error.MissingComponent;
-        const unit = source_world.units.getComponent(entity, .unit) orelse return error.MissingComponent;
-        const combat = source_world.units.getComponent(entity, .combat) orelse return error.MissingComponent;
-        // Note: awakeable is not part of unit archetype, skip it
-        const effects = source_world.units.getComponent(entity, .effects);
-        
-        // Create new unit with health
-        const new_entity = try dest_world.createUnit(transform.pos, transform.radius, health.max);
-        
-        // Copy component data
-        if (dest_world.units.getComponentMut(new_entity, .health)) |new_health| {
-            new_health.current = health.current;
-        }
-        if (dest_world.units.getComponentMut(new_entity, .movement)) |new_movement| {
-            new_movement.* = movement.*;
-        }
-        if (dest_world.units.getComponentMut(new_entity, .visual)) |new_visual| {
-            new_visual.* = visual.*;
-        }
-        if (dest_world.units.getComponentMut(new_entity, .unit)) |new_unit| {
-            new_unit.* = unit.*;
-        }
-        if (dest_world.units.getComponentMut(new_entity, .combat)) |new_combat| {
-            new_combat.* = combat.*;
-        }
-        
-        // Copy optional components
-        if (effects) |eff| {
-            try dest_world.units.addOptionalComponent(new_entity, .effects, eff.*);
-        }
-        
-        // Destroy original
-        try source_world.destroyEntity(entity);
-        
-        return new_entity;
-    }
-
-    /// Transfer any entity between zones based on its archetype
-    pub fn transferEntity(source_zone: *Zone, dest_zone: *Zone, entity: EntityId) !EntityId {
-        const archetype = getEntityArchetype(&source_zone.world, entity) orelse return error.EntityNotFound;
-        
-        return switch (archetype) {
-            .player => try transferPlayer(source_zone, dest_zone, entity),
-            .unit => try transferUnit(source_zone, dest_zone, entity),
-            .projectile => return error.ProjectilesCannotTransfer, // Projectiles shouldn't transfer zones
-            .obstacle => return error.ObstaclesCannotTransfer, // Obstacles are zone-specific
-            .lifestone => return error.LifestonesCannotTransfer, // Lifestones are zone-specific
-            .portal => return error.PortalsCannotTransfer, // Portals are zone-specific
-        };
     }
 };

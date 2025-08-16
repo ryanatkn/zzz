@@ -24,6 +24,7 @@ pub const HexWorld = struct {
 
     // Game-specific tracking
     player_entity: ?EntityId,
+    player_zone: u8, // Which zone the player is currently in
     player_start_pos: Vec2, // Original spawn position for full reset (matching old interface)
     zones: [7]Zone, // Zone metadata only (entities now stored in world.zones)
 
@@ -76,6 +77,7 @@ pub const HexWorld = struct {
         var hex_world = HexWorld{
             .world = Game.init(allocator), // Game manages multiple zones
             .player_entity = null,
+            .player_zone = 0, // Start in overworld (zone 0)
             .player_start_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y },
             .zones = undefined,
             .allocator = allocator,
@@ -116,6 +118,7 @@ pub const HexWorld = struct {
     pub fn createPlayerWithRadius(self: *HexWorld, pos: Vec2, radius: f32) !EntityId {
         const player = try self.world.getCurrentZone().createPlayer(pos, radius, 100, 0);
         self.player_entity = player;
+        self.player_zone = @intCast(self.world.getCurrentZoneIndex());
         self.player_start_pos = pos; // Remember initial position
         return player;
     }
@@ -124,160 +127,205 @@ pub const HexWorld = struct {
     pub fn getPlayer(self: *HexWorld) ?EntityId {
         return self.player_entity;
     }
+    
+    /// Fast player getter - uses cached zone info for validation
+    pub fn getPlayerFast(self: *const HexWorld) ?EntityId {
+        // Check if player is in current zone using cache
+        if (self.player_zone != self.world.getCurrentZoneIndex()) {
+            return null; // Player not in current zone
+        }
+        return self.player_entity;
+    }
+    
+    /// Get player with zone validation (for safety)
+    pub fn getPlayerValidated(self: *HexWorld) ?EntityId {
+        // Fast path: check cache
+        if (self.player_zone == self.world.getCurrentZoneIndex()) {
+            if (self.player_entity) |player| {
+                // Validate entity is still alive
+                const zone = self.world.getCurrentZone();
+                if (zone.world.isAlive(player)) {
+                    return player;
+                }
+            }
+        }
+        
+        // Slow path: search for player (shouldn't happen normally)
+        std.log.warn("getPlayerValidated: Cache miss, searching for player", .{});
+        const zone = self.world.getCurrentZone();
+        var player_iter = zone.world.players.entityIterator();
+        if (player_iter.next()) |player| {
+            // Update cache
+            self.player_entity = player;
+            self.player_zone = @intCast(self.world.getCurrentZoneIndex());
+            return player;
+        }
+        
+        return null;
+    }
 
     // Player access helper methods (matching old interface)
-
-    /// Get player position (returns Vec2{0,0} if no player)
-    pub fn getPlayerPos(self: *HexWorld) Vec2 {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponent(player, .transform)) |transform| {
-                return transform.pos;
+    
+    // Helper for read-only access from mutable self
+    inline fn withPlayerComponentRead(
+        self: *HexWorld,
+        comptime component_type: ecs.ComponentRegistry.ComponentType,
+        comptime ComponentType: type,
+        comptime ReturnType: type,
+        comptime action: fn (component: *const ComponentType) ReturnType,
+        default: ReturnType,
+    ) ReturnType {
+        if (self.player_zone == self.world.getCurrentZoneIndex()) {
+            if (self.player_entity) |player| {
+                const zone = self.world.getCurrentZone();
+                if (zone.world.players.getComponent(player, component_type)) |component| {
+                    return action(component);
+                }
             }
         }
-        return Vec2.ZERO;
+        return default;
     }
 
-    /// Get player position (const version)
-    pub fn getPlayerPosConst(self: *const HexWorld) Vec2 {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZoneConst();
-            if (zone.world.players.getComponent(player, .transform)) |transform| {
-                return transform.pos;
+    // Helper for read-only access from const self
+    inline fn withPlayerComponentConst(
+        self: *const HexWorld,
+        comptime component_type: ecs.ComponentRegistry.ComponentType,
+        comptime ComponentType: type,
+        comptime ReturnType: type,
+        comptime action: fn (component: *const ComponentType) ReturnType,
+        default: ReturnType,
+    ) ReturnType {
+        if (self.player_zone == self.world.getCurrentZoneIndex()) {
+            if (self.player_entity) |player| {
+                const zone = self.world.getCurrentZoneConst();
+                if (zone.world.players.getComponent(player, component_type)) |component| {
+                    return action(component);
+                }
             }
         }
-        return Vec2.ZERO;
+        return default;
     }
 
-    /// Set player position
-    pub fn setPlayerPos(self: *HexWorld, pos: Vec2) void {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponentMut(player, .transform)) |transform| {
-                transform.pos = pos;
-            }
-        }
-    }
-
-    /// Get player velocity
-    pub fn getPlayerVel(self: *HexWorld) Vec2 {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponent(player, .transform)) |transform| {
-                return transform.vel;
-            }
-        }
-        return Vec2.ZERO;
-    }
-
-    /// Get player velocity (const version)
-    pub fn getPlayerVelConst(self: *const HexWorld) Vec2 {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZoneConst();
-            if (zone.world.players.getComponent(player, .transform)) |transform| {
-                return transform.vel;
-            }
-        }
-        return Vec2.ZERO;
-    }
-
-    /// Set player velocity
-    pub fn setPlayerVel(self: *HexWorld, vel: Vec2) void {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponentMut(player, .transform)) |transform| {
-                transform.vel = vel;
-            }
-        }
-    }
-
-    /// Check if player is alive
-    pub fn getPlayerAlive(self: *HexWorld) bool {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponent(player, .health)) |health| {
-                return health.alive;
-            }
-        }
-        return false;
-    }
-
-    /// Check if player is alive (const version)
-    pub fn getPlayerAliveConst(self: *const HexWorld) bool {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZoneConst();
-            if (zone.world.players.getComponent(player, .health)) |health| {
-                return health.alive;
-            }
-        }
-        return false;
-    }
-
-    /// Set player alive status
-    pub fn setPlayerAlive(self: *HexWorld, alive: bool) void {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponentMut(player, .health)) |health| {
-                health.alive = alive;
-                if (alive) {
-                    health.current = health.max; // Full heal on resurrection
+    // Mutable version for setters with data parameter
+    inline fn withPlayerComponentMut(
+        self: *HexWorld,
+        comptime component_type: ecs.ComponentRegistry.ComponentType,
+        comptime ComponentType: type,
+        comptime DataType: type,
+        data: DataType,
+        comptime action: fn (component: *ComponentType, data: DataType) void,
+    ) void {
+        if (self.player_zone == self.world.getCurrentZoneIndex()) {
+            if (self.player_entity) |player| {
+                const zone = self.world.getCurrentZone();
+                if (zone.world.players.getComponentMut(player, component_type)) |component| {
+                    action(component, data);
                 }
             }
         }
     }
 
+    /// Get player position (returns Vec2{0,0} if no player)
+    pub fn getPlayerPos(self: *HexWorld) Vec2 {
+        return self.withPlayerComponentRead(.transform, components.Transform, Vec2, struct {
+            fn get(t: *const components.Transform) Vec2 { return t.pos; }
+        }.get, Vec2.ZERO);
+    }
+
+    /// Get player position (const version)
+    pub fn getPlayerPosConst(self: *const HexWorld) Vec2 {
+        return self.withPlayerComponentConst(.transform, components.Transform, Vec2, struct {
+            fn get(t: *const components.Transform) Vec2 { return t.pos; }
+        }.get, Vec2.ZERO);
+    }
+
+    /// Set player position
+    pub fn setPlayerPos(self: *HexWorld, pos: Vec2) void {
+        self.withPlayerComponentMut(.transform, components.Transform, Vec2, pos, struct {
+            fn set(t: *components.Transform, p: Vec2) void { t.pos = p; }
+        }.set);
+    }
+
+    /// Get player velocity
+    pub fn getPlayerVel(self: *HexWorld) Vec2 {
+        return self.withPlayerComponentRead(.transform, components.Transform, Vec2, struct {
+            fn get(t: *const components.Transform) Vec2 { return t.vel; }
+        }.get, Vec2.ZERO);
+    }
+
+    /// Get player velocity (const version)
+    pub fn getPlayerVelConst(self: *const HexWorld) Vec2 {
+        return self.withPlayerComponentConst(.transform, components.Transform, Vec2, struct {
+            fn get(t: *const components.Transform) Vec2 { return t.vel; }
+        }.get, Vec2.ZERO);
+    }
+
+    /// Set player velocity
+    pub fn setPlayerVel(self: *HexWorld, vel: Vec2) void {
+        self.withPlayerComponentMut(.transform, components.Transform, Vec2, vel, struct {
+            fn set(t: *components.Transform, v: Vec2) void { t.vel = v; }
+        }.set);
+    }
+
+    /// Check if player is alive
+    pub fn getPlayerAlive(self: *HexWorld) bool {
+        return self.withPlayerComponentRead(.health, components.Health, bool, struct {
+            fn get(h: *const components.Health) bool { return h.alive; }
+        }.get, false);
+    }
+
+    /// Check if player is alive (const version)
+    pub fn getPlayerAliveConst(self: *const HexWorld) bool {
+        return self.withPlayerComponentConst(.health, components.Health, bool, struct {
+            fn get(h: *const components.Health) bool { return h.alive; }
+        }.get, false);
+    }
+
+    /// Set player alive status
+    pub fn setPlayerAlive(self: *HexWorld, alive: bool) void {
+        self.withPlayerComponentMut(.health, components.Health, bool, alive, struct {
+            fn set(h: *components.Health, a: bool) void { 
+                h.alive = a;
+                if (a) {
+                    h.current = h.max; // Full heal on resurrection
+                }
+            }
+        }.set);
+    }
+
     /// Get player radius
     pub fn getPlayerRadius(self: *HexWorld) f32 {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponent(player, .transform)) |transform| {
-                return transform.radius;
-            }
-        }
-        return constants.PLAYER_RADIUS;
+        return self.withPlayerComponentRead(.transform, components.Transform, f32, struct {
+            fn get(t: *const components.Transform) f32 { return t.radius; }
+        }.get, constants.PLAYER_RADIUS);
     }
 
     /// Get player radius (const version)
     pub fn getPlayerRadiusConst(self: *const HexWorld) f32 {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZoneConst();
-            if (zone.world.players.getComponent(player, .transform)) |transform| {
-                return transform.radius;
-            }
-        }
-        return constants.PLAYER_RADIUS;
+        return self.withPlayerComponentConst(.transform, components.Transform, f32, struct {
+            fn get(t: *const components.Transform) f32 { return t.radius; }
+        }.get, constants.PLAYER_RADIUS);
     }
 
     /// Get player color (from Visual component)
     pub fn getPlayerColor(self: *HexWorld) Color {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponent(player, .visual)) |visual| {
-                return visual.color;
-            }
-        }
-        return constants.COLOR_PLAYER_ALIVE;
+        return self.withPlayerComponentRead(.visual, components.Visual, Color, struct {
+            fn get(v: *const components.Visual) Color { return v.color; }
+        }.get, constants.COLOR_PLAYER_ALIVE);
     }
 
     /// Get player color (const version)
     pub fn getPlayerColorConst(self: *const HexWorld) Color {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZoneConst();
-            if (zone.world.players.getComponent(player, .visual)) |visual| {
-                return visual.color;
-            }
-        }
-        return constants.COLOR_PLAYER_ALIVE;
+        return self.withPlayerComponentConst(.visual, components.Visual, Color, struct {
+            fn get(v: *const components.Visual) Color { return v.color; }
+        }.get, constants.COLOR_PLAYER_ALIVE);
     }
 
     /// Set player color
     pub fn setPlayerColor(self: *HexWorld, color: Color) void {
-        if (self.player_entity) |player| {
-            const zone = self.world.getCurrentZone();
-            if (zone.world.players.getComponentMut(player, .visual)) |visual| {
-                visual.color = color;
-            }
-        }
+        self.withPlayerComponentMut(.visual, components.Visual, Color, color, struct {
+            fn set(v: *components.Visual, c: Color) void { v.color = c; }
+        }.set);
     }
 
     /// Reset player to start position (full reset functionality)
@@ -442,35 +490,46 @@ pub const HexWorld = struct {
                 return;
             }
             
-            // Store the old entity ID for reference
-            const old_player_entity = player;
+            // Use stateless transfer - we know exactly where the player is
+            const source_zone = self.world.getZone(current_zone_index) orelse {
+                std.log.err("travelToZone: Source zone {} not found", .{current_zone_index});
+                return;
+            };
+            const dest_zone = self.world.getZone(target_zone_index) orelse {
+                std.log.err("travelToZone: Destination zone {} not found", .{target_zone_index});
+                return;
+            };
             
-            // Move entity to new zone (this creates a new entity ID) - pass current zone as hint
-            try self.world.moveEntityToZone(player, target_zone_index, current_zone_index);
-
-            // NOW switch to the new zone (after the entity has been moved)
+            const entity_transfer = @import("../lib/game/entity_transfer.zig");
+            
+            // Perform stateless transfer
+            const result = entity_transfer.EntityTransfer.transferStateless(
+                source_zone,
+                dest_zone,
+                player,
+                target_zone_index
+            ) catch |err| {
+                std.log.err("travelToZone: Failed to transfer player: {}", .{err});
+                return;
+            };
+            
+            // Update our cached references
+            self.player_entity = result.new_entity;
+            self.player_zone = target_zone_index;
+            
+            // Switch to the new zone
             self.world.setCurrentZone(target_zone_index);
-
-            // Find the new player entity in the destination zone
-            const new_zone = self.world.getCurrentZone();
-            // The player should be the only player entity in the zone
-            var player_iter = new_zone.world.players.entityIterator();
-            if (player_iter.next()) |new_player_entity| {
-                // Update our reference to the new entity ID
-                self.player_entity = new_player_entity;
-                std.log.info("travelToZone: Updated player entity reference from {any} to {any}", .{ old_player_entity, new_player_entity });
-                
-                // Update player position in new zone
-                if (new_zone.world.players.getComponentMut(new_player_entity, .transform)) |transform| {
-                    transform.pos = spawn_pos;
-                    transform.vel = Vec2.ZERO;
-                    std.log.info("travelToZone: Set player position to {any}", .{spawn_pos});
-                }
-            } else {
-                std.log.err("travelToZone: No player entity found in destination zone after transfer!", .{});
-                // Player was lost during transfer - this is a critical error
-                self.player_entity = null;
+            
+            // Update player position in new zone
+            if (dest_zone.world.players.getComponentMut(result.new_entity, .transform)) |transform| {
+                transform.pos = spawn_pos;
+                transform.vel = Vec2.ZERO;
+                std.log.info("travelToZone: Set player position to {any}", .{spawn_pos});
             }
+            
+            std.log.info("travelToZone: Successfully transferred player from {any} to {any} in zone {}", .{ 
+                result.old_entity, result.new_entity, target_zone_index 
+            });
         } else {
             // No player to move, just switch zones
             self.world.setCurrentZone(@intCast(zone_index));
