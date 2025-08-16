@@ -7,7 +7,7 @@
    */
   
   import { onMount, onDestroy } from 'svelte';
-  import AIController, { type Vec2, Keys, MouseButtons } from './ai_control_example';
+  import AIController, { type Vec2, Keys } from './ai_control_client.ts';
   
   // Reactive state using Svelte 5 runes
   let controller = $state<AIController | null>(null);
@@ -31,7 +31,7 @@
   // Combat state
   let shooting = $state(false);
   let autoShoot = $state(false);
-  let shootInterval: number | null = null;
+  let shootInterval: ReturnType<typeof setInterval> | null = null;
   
   // Macros
   let macros = $state([
@@ -42,7 +42,7 @@
   ]);
   
   // Frame update interval
-  let frameInterval: number | null = null;
+  let frameInterval: ReturnType<typeof setInterval> | null = null;
   
   onMount(async () => {
     controller = new AIController();
@@ -366,7 +366,7 @@
   });
 </script>
 
-<svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
+<svelte:window onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
 
 <div class="ai-control-panel">
   <h1>🎮 Hex Game AI Control</h1>
@@ -387,9 +387,9 @@
     <section>
       <h2>Connection</h2>
       <div class="button-group">
-        <button on:click={connect} disabled={connected}>Connect</button>
-        <button on:click={disconnect} disabled={!connected}>Disconnect</button>
-        <button on:click={clearCommands} disabled={!connected}>Clear Buffer</button>
+        <button onclick={connect} disabled={connected}>Connect</button>
+        <button onclick={disconnect} disabled={!connected}>Disconnect</button>
+        <button onclick={clearCommands} disabled={!connected}>Clear Buffer</button>
       </div>
     </section>
     
@@ -400,31 +400,31 @@
         <button 
           class="dpad-up" 
           class:active={movement.up}
-          on:pointerdown={() => { movement.up = true; sendMovement(); }}
-          on:pointerup={() => { movement.up = false; sendMovement(); }}
+          onpointerdown={() => { movement.up = true; sendMovement(); }}
+          onpointerup={() => { movement.up = false; sendMovement(); }}
         >W</button>
         <button 
           class="dpad-left"
           class:active={movement.left}
-          on:pointerdown={() => { movement.left = true; sendMovement(); }}
-          on:pointerup={() => { movement.left = false; sendMovement(); }}
+          onpointerdown={() => { movement.left = true; sendMovement(); }}
+          onpointerup={() => { movement.left = false; sendMovement(); }}
         >A</button>
         <button 
           class="dpad-center"
           class:active={movement.walk}
-          on:click={() => { movement.walk = !movement.walk; sendMovement(); }}
+          onclick={() => { movement.walk = !movement.walk; sendMovement(); }}
         >Walk</button>
         <button 
           class="dpad-right"
           class:active={movement.right}
-          on:pointerdown={() => { movement.right = true; sendMovement(); }}
-          on:pointerup={() => { movement.right = false; sendMovement(); }}
+          onpointerdown={() => { movement.right = true; sendMovement(); }}
+          onpointerup={() => { movement.right = false; sendMovement(); }}
         >D</button>
         <button 
           class="dpad-down"
           class:active={movement.down}
-          on:pointerdown={() => { movement.down = true; sendMovement(); }}
-          on:pointerup={() => { movement.down = false; sendMovement(); }}
+          onpointerdown={() => { movement.down = true; sendMovement(); }}
+          onpointerup={() => { movement.down = false; sendMovement(); }}
         >S</button>
       </div>
     </section>
@@ -436,8 +436,8 @@
         id="targetCanvas"
         width="800" 
         height="600"
-        on:click={handleCanvasClick}
-      />
+        onclick={handleCanvasClick}
+      ></canvas>
     </section>
     
     <!-- Combat Controls -->
@@ -445,8 +445,8 @@
       <h2>Combat</h2>
       <div class="button-group">
         <button 
-          on:pointerdown={startShooting}
-          on:pointerup={stopShooting}
+          onpointerdown={startShooting}
+          onpointerup={stopShooting}
           disabled={!connected}
           class:active={shooting}
         >
@@ -466,17 +466,17 @@
         {#each [0, 1, 2, 3, 4, 5, 6, 7] as slot}
           <button 
             class:selected={selectedSpell === slot}
-            on:click={() => selectedSpell = slot}
+            onclick={() => selectedSpell = slot}
           >
             {slot + 1}
           </button>
         {/each}
       </div>
       <div class="button-group">
-        <button on:click={() => castSpell(false)} disabled={!connected}>
+        <button onclick={() => castSpell(false)} disabled={!connected}>
           Cast at Target
         </button>
-        <button on:click={() => castSpell(true)} disabled={!connected}>
+        <button onclick={() => castSpell(true)} disabled={!connected}>
           Self Cast
         </button>
       </div>
@@ -487,7 +487,7 @@
       <h2>Macros</h2>
       <div class="button-group">
         {#each macros as macro}
-          <button on:click={macro.fn} disabled={!connected}>
+          <button onclick={macro.fn} disabled={!connected}>
             {macro.name}
           </button>
         {/each}
@@ -498,13 +498,13 @@
     <section>
       <h2>Recording</h2>
       <div class="button-group">
-        <button on:click={toggleRecording} disabled={!connected} class:recording={isRecording}>
+        <button onclick={toggleRecording} disabled={!connected} class:recording={isRecording}>
           {isRecording ? 'Stop Recording' : 'Start Recording'}
         </button>
-        <button on:click={playRecording} disabled={!connected || recordedCommands.length === 0}>
+        <button onclick={playRecording} disabled={!connected || recordedCommands.length === 0}>
           Play ({recordedCommands.length})
         </button>
-        <button on:click={() => recordedCommands = []}>
+        <button onclick={() => recordedCommands = []}>
           Clear
         </button>
       </div>

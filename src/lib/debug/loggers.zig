@@ -45,10 +45,10 @@ pub const DebugLogger = Logger(.{
     .formatter = formatters.Timestamped,
 });
 
-/// Font/text system logger - console only with moderate throttling
+/// Font/text system logger - console only with level filtering to reduce spam
 pub const FontLogger = Logger(.{
     .output = outputs.Console,
-    .filter = filters.Throttle,
+    .filter = filters.Level(.{ .min_level = config.font_log.min_level }),
     .formatter = formatters.Passthrough,
 });
 

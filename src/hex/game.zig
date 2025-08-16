@@ -93,6 +93,9 @@ pub const GameState = struct {
     
     pub fn initAIControl(self: *Self, allocator: std.mem.Allocator) !void {
         if (self.ai_input == null) {
+            // Log the memory layout that Zig expects
+            ai_control.DirectInputBuffer.InputCommand.debugLayout();
+            
             const ai = try allocator.create(ai_control.MappedInput);
             ai.* = try ai_control.MappedInput.init(".ai_commands");
             self.ai_input = ai;
@@ -113,7 +116,12 @@ pub const GameState = struct {
     
     pub fn toggleAIControl(self: *Self) void {
         self.ai_enabled = !self.ai_enabled;
-        loggers.getGameLog().info("ai_toggle", "AI control: {}", .{self.ai_enabled});
+        if (self.ai_input) |mapped| {
+            const pending = mapped.buffer.pending();
+            loggers.getGameLog().info("ai_toggle", "AI control: {} (ai_input exists, {} commands pending)", .{ self.ai_enabled, pending });
+        } else {
+            loggers.getGameLog().info("ai_toggle", "AI control: {} (ai_input is null)", .{self.ai_enabled});
+        }
     }
 
     pub fn initStateManager(self: *Self, allocator: std.mem.Allocator) !void {
@@ -457,6 +465,10 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     // Process AI commands if enabled
     if (game_state.ai_enabled and game_state.ai_input != null) {
         if (game_state.ai_input) |mapped| {
+            const pending = mapped.buffer.pending();
+            if (pending > 0) {
+                loggers.getGameLog().info("ai_process", "Processing {} AI commands at frame {}", .{ pending, game_state.frame_counter });
+            }
             ai_control.processCommands(mapped.buffer, &game_state.input_state, game_state.frame_counter);
         }
     }

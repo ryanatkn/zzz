@@ -6,7 +6,7 @@ Zzz is a GUI in Zig written by Claude Code and designed by people.
 For the companion CLI see [zz](https://github.com/ryanatkn/zz)
 and [ztack.net](https://www.ztack.net/) for a web+ stack.
 
-> status: unstable vibe engineered slop
+> status: vibe-engineered slop level 1
 
 ## Quick start
 
@@ -124,7 +124,14 @@ zig build run
 python3 ai_control_example.py
 ```
 
-The AI control system uses a lock-free ring buffer for ultra-low latency (~50ns per command) with zero allocations during runtime. See `ai_control_example.py` for implementation details.
+The AI control system uses a lock-free ring buffer for ultra-low latency (~50ns per command) with zero allocations during runtime. 
+
+Available controllers:
+- **Python**: `ai_control_example.py` - Command-line controller
+- **TypeScript**: `ai_control_example.ts` - Node.js/Deno controller  
+- **Web UI**: `ai_control_example.svelte` - Visual control interface (run `npm install && npm run dev`)
+
+See [AI_CONTROL_WEB.md](./AI_CONTROL_WEB.md) for web interface documentation.
 
 ## Creating new applications
 
@@ -193,7 +200,7 @@ See LICENSE file in project root.
 
 ## Credits
 
-Built with:
+Built with (see [./deps](./deps)):
 - [Zig](https://ziglang.org/) - systems programming language
 - [SDL3](https://libsdl.org/) - cross-platform GPU API
 - [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross) - shader compilation

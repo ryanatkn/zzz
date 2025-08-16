@@ -282,6 +282,9 @@ fn renderGame() !void {
     if (game_hud.?.visible) {
         const fps = reactive_time.getFPS();
         game_renderer.?.drawFPS(cmd_buffer, render_pass, fps);
+        
+        // Draw AI mode indicator if enabled
+        game_renderer.?.drawAIMode(game_state.?.ai_enabled);
     }
 
     // Render HUD overlay if open

@@ -29,7 +29,7 @@ pub const DirectInputBuffer = extern struct {
     
     pub const BUFFER_SIZE = 256;
     
-    /// Single input command (20 bytes, cache-line friendly)
+    /// Single input command (24 bytes with padding, cache-line friendly)
     pub const InputCommand = extern struct {
         /// Target frame number (0 = immediate)
         frame: u32,
@@ -70,6 +70,13 @@ pub const DirectInputBuffer = extern struct {
         
         pub fn setValid(self: *InputCommand) void {
             self.buttons |= 0x80;
+        }
+        
+        pub fn debugLayout() void {
+            const loggers = @import("../../debug/loggers.zig");
+            loggers.getGameLog().info("ai_layout", "InputCommand layout: size={}, frame@{}, keys@{}, mouse_x@{}, mouse_y@{}, buttons@{}, padding@{}", 
+                .{ @sizeOf(InputCommand), @offsetOf(InputCommand, "frame"), @offsetOf(InputCommand, "keys_down"), 
+                   @offsetOf(InputCommand, "mouse_x"), @offsetOf(InputCommand, "mouse_y"), @offsetOf(InputCommand, "buttons"), @offsetOf(InputCommand, "_padding") });
         }
     };
     
@@ -164,8 +171,19 @@ pub const DirectInputBuffer = extern struct {
 
 /// Apply command to input state
 pub fn applyCommand(cmd: DirectInputBuffer.InputCommand, state: *input.InputState) void {
+    const loggers = @import("../../debug/loggers.zig");
+    
+    // Log raw command bytes for debugging
+    const cmd_bytes = @as([*]const u8, @ptrCast(&cmd))[0..@sizeOf(DirectInputBuffer.InputCommand)];
+    loggers.getGameLog().debug("ai_raw_cmd", "Raw command bytes: {}", .{std.fmt.fmtSliceHexLower(cmd_bytes)});
+    loggers.getGameLog().debug("ai_cmd_fields", "Command fields: frame={}, keys=0x{x:0>16}, mouse=({d:.1},{d:.1}), buttons=0x{x:0>2}", 
+        .{ cmd.frame, cmd.keys_down, cmd.mouse_x, cmd.mouse_y, cmd.buttons });
+    
     // Skip invalid commands
-    if (!cmd.isValid()) return;
+    if (!cmd.isValid()) {
+        loggers.getGameLog().warn("ai_invalid_cmd", "Skipping invalid command: buttons=0x{x:0>2} (need 0x80 flag)", .{cmd.buttons});
+        return;
+    }
     
     // Apply mouse position
     state.mouse_pos.x = cmd.mouse_x;
@@ -177,30 +195,50 @@ pub fn applyCommand(cmd: DirectInputBuffer.InputCommand, state: *input.InputStat
     
     // Apply keyboard keys (first 64 scancodes)
     state.keys_down = std.StaticBitSet(512).initEmpty();
-    var i: u6 = 0;
+    var i: u32 = 0;
     while (i < 64) : (i += 1) {
-        if (cmd.keys_down & (@as(u64, 1) << i) != 0) {
-            state.keys_down.set(i);
+        if (cmd.keys_down & (@as(u64, 1) << @intCast(i)) != 0) {
+            state.keys_down.set(@intCast(i));
         }
     }
 }
 
 /// Process all pending commands for the current frame
 pub fn processCommands(buffer: *DirectInputBuffer, state: *input.InputState, current_frame: u32) void {
+    const loggers = @import("../../debug/loggers.zig");
+    
     // Update frame counter in buffer
     buffer.setCurrentFrame(current_frame);
     
+    var commands_processed: u32 = 0;
+    
     // Process all commands for current or past frames
     while (buffer.peekCommand()) |cmd| {
-        if (cmd.frame == 0 or cmd.frame <= current_frame) {
+        // Accept immediate commands (frame=0) or commands for current/past frames
+        // Also handle corrupted frame numbers by processing them as immediate
+        const should_process = cmd.frame == 0 or cmd.frame <= current_frame or cmd.frame > 1000000; // Treat large corrupt values as immediate
+        
+        if (should_process) {
             // Apply this command
             if (buffer.readCommand()) |actual_cmd| {
+                if (actual_cmd.frame > 1000000) {
+                    loggers.getGameLog().warn("ai_corrupt_frame", "Processing command with corrupted frame {}, treating as immediate", .{actual_cmd.frame});
+                }
+                loggers.getGameLog().debug("ai_apply_cmd", "Applying command: frame={}, buttons=0x{x:0>2}, keys=0x{x:0>16}, mouse=({d:.0},{d:.0})", 
+                    .{ actual_cmd.frame, actual_cmd.buttons, actual_cmd.keys_down, actual_cmd.mouse_x, actual_cmd.mouse_y });
                 applyCommand(actual_cmd, state);
+                commands_processed += 1;
             }
         } else {
             // Future command, stop processing
+            loggers.getGameLog().debug("ai_future_cmd", "Stopping at future command: frame={} > current={}", .{ cmd.frame, current_frame });
             break;
         }
+    }
+    
+    if (commands_processed > 0) {
+        loggers.getGameLog().info("ai_cmds_done", "Processed {} commands, buffer state: read={}, pending={}", 
+            .{ commands_processed, buffer.read_index, buffer.pending() });
     }
 }
 

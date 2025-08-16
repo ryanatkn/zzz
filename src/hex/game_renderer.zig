@@ -306,7 +306,7 @@ pub const GameRenderer = struct {
 
     // FPS rendering using PERSISTENT MODE to eliminate flashing
     pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
-
+        
         // Use white color for FPS display
         const WHITE = colors.WHITE;
 
@@ -330,6 +330,24 @@ pub const GameRenderer = struct {
         };
 
         loggers.getGameLog().debug("fps_queued", "✓ FPS text queued for persistent rendering", .{});
+    }
+    
+    pub fn drawAIMode(self: *GameRenderer, ai_enabled: bool) void {
+        if (!ai_enabled) return;
+        
+        // Use bright green color for AI mode indicator
+        const AI_COLOR = colors.Color{ .r = 0, .g = 255, .b = 128, .a = 255 };
+        
+        // Position below FPS display
+        const ai_x = constants.FPS_POSITION_X;
+        const ai_y = constants.FPS_POSITION_Y + 30.0;
+        
+        const ai_text = "AI MODE ACTIVE";
+        
+        // Queue using persistent mode
+        self.gpu.text_renderer.queuePersistentText(ai_text, .{ .x = ai_x, .y = ai_y }, self.font_manager, .sans, @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(), AI_COLOR) catch |err| {
+            loggers.getGameLog().debug("ai_mode_error", "Failed to queue AI mode text: {}", .{err});
+        };
     }
 
     fn renderUnitsECS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const hex_world.HexWorld) void {

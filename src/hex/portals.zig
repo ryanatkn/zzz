@@ -22,20 +22,20 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
     if (portal_cooldown > 0) {
         // Only log this occasionally to avoid spam
         if (@mod(@as(u32, @intFromFloat(portal_cooldown * 10)), 10) == 0) {
-            loggers.getGameLog().debug("portal_cooldown", "Portal cooldown active: {d:.1}s remaining", .{portal_cooldown});
+            // Portal cooldown active but not logging to reduce spam
         }
         return false;
     }
 
     if (!world.getPlayerAlive()) {
-        loggers.getGameLog().debug("portal_player_dead", "Player not alive, skipping portal checks", .{});
+        // Player not alive, skipping portal checks
         return false;
     }
 
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
     
-    loggers.getGameLog().debug("portal_check", "Checking portal collisions: player at {any} (radius: {d})", .{ player_pos, player_radius });
+    // Checking portal collisions
 
     // Check collisions with all portal entities using ECS
     const ecs_world = world.getECSWorldMut();
@@ -43,24 +43,20 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
     var portal_count: u32 = 0;
     while (portal_iter.next()) |portal_id| {
         portal_count += 1;
-        loggers.getGameLog().debug("portal_found", "Found portal entity: {any}", .{portal_id});
+        // Found portal entity
         
         if (!ecs_world.isAlive(portal_id)) {
-            loggers.getGameLog().debug("portal_dead", "Portal entity {any} is not alive", .{portal_id});
+            // Portal entity is not alive
             continue;
         }
 
         // Get portal interactable component for destination zone
         if (ecs_world.portals.getComponent(portal_id, .interactable)) |interactable| {
-            loggers.getGameLog().debug("portal_interactable", "Portal {any} has interactable component", .{portal_id});
+            // Portal has interactable component
             if (interactable.destination_zone) |destination_zone| {
-                loggers.getGameLog().debug("portal_destination", "Portal {any} leads to zone {}", .{ portal_id, destination_zone });
+                // Portal leads to destination zone
                 if (ecs_world.portals.getComponent(portal_id, .transform)) |transform| {
-                    loggers.getGameLog().debug("portal_transform", "Portal {any} at pos {any} (radius: {d})", .{ portal_id, transform.pos, transform.radius });
-                    
-                    const distance = math.distance(player_pos, transform.pos);
-                    const collision_distance = player_radius + transform.radius;
-                    loggers.getGameLog().debug("portal_distance", "Distance to portal {any}: {d} (collision at: {d})", .{ portal_id, distance, collision_distance });
+                    // Portal transform found - check collision
                     
                     if (physics.checkPlayerPortalCollisionECS(player_pos, player_radius, transform)) {
                         loggers.getGameLog().info("portal_collision_detected", "Portal collision detected! Player at {any}, portal at {any}", .{ player_pos, transform.pos });
@@ -89,16 +85,16 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
 
                         return true;
                     } else {
-                        loggers.getGameLog().debug("portal_no_collision", "No collision with portal {any} (distance: {d} > collision: {d})", .{ portal_id, distance, collision_distance });
+                        // No collision with portal
                     }
                 } else {
-                    loggers.getGameLog().debug("portal_no_transform", "Portal {any} missing transform component", .{portal_id});
+                    // Portal missing transform component
                 }
             } else {
-                loggers.getGameLog().debug("portal_no_destination", "Portal {any} has no destination zone", .{portal_id});
+                // Portal has no destination zone
             }
         } else {
-            loggers.getGameLog().debug("portal_no_interactable", "Portal {any} missing interactable component", .{portal_id});
+            // Portal missing interactable component
         }
     }
     
