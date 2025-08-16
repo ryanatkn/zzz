@@ -3,12 +3,16 @@
 /// This module provides all mathematical functionality used across the engine:
 /// - Vec2 operations and 2D vector math
 /// - Scalar math utilities (lerp, clamp, etc.)
+/// - Easing functions for animations
+/// - Interpolation utilities (bezier, hermite, etc.)
 /// - Geometric shapes (Rectangle, Circle, Line, Bounds)
 /// - Distance calculations and transformations
 /// - Coordinate system conversions
 pub const Vec2 = @import("vec2.zig").Vec2;
 pub const scalar = @import("scalar.zig");
 pub const shapes = @import("shapes.zig");
+pub const easing = @import("easing.zig");
+pub const interpolation = @import("interpolation.zig");
 
 // Re-export scalar utilities
 pub const lerp = scalar.lerp;

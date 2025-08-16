@@ -4,24 +4,24 @@ const ecs = @import("../lib/game/ecs.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const loggers = @import("../lib/debug/loggers.zig");
+const cooldowns = @import("../lib/game/cooldowns.zig");
 
 // Portal cooldown to prevent re-triggering after travel
-var portal_cooldown: f32 = 0;
+var portal_cooldown = cooldowns.Cooldown.init(1.0); // 1 second cooldown
 
 // Update portal cooldown timer
 pub fn updatePortalCooldown(deltaTime: f32) void {
-    if (portal_cooldown > 0) {
-        portal_cooldown = @max(0, portal_cooldown - deltaTime);
-    }
+    portal_cooldown.update(deltaTime);
 }
 
 pub fn checkPortalCollisions(game_state: anytype) bool {
     const world = &game_state.hex_game;
 
     // Skip portal checks during cooldown
-    if (portal_cooldown > 0) {
+    if (!portal_cooldown.isReady()) {
         // Only log this occasionally to avoid spam
-        if (@mod(@as(u32, @intFromFloat(portal_cooldown * 10)), 10) == 0) {
+        const remaining_time = portal_cooldown.getRemaining();
+        if (@mod(@as(u32, @intFromFloat(remaining_time * 10)), 10) == 0) {
             // Portal cooldown active but not logging to reduce spam
         }
         return false;
@@ -62,7 +62,7 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
                         loggers.getGameLog().info("portal_collision_detected", "Portal collision detected! Player at {any}, portal at {any}", .{ player_pos, transform.pos });
                         
                         // Set cooldown and travel
-                        portal_cooldown = 1.0; // 1 second cooldown
+                        portal_cooldown.start(); // Start 1 second cooldown
 
                         // Add portal travel effect
                         game_state.effect_system.addPortalTravelEffect(player_pos, player_radius);

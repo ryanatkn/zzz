@@ -14,6 +14,8 @@ const font_manager = @import("../lib/font/manager.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const geometric_text = @import("../lib/ui/geometric_text.zig");
+const time_utils = @import("../lib/core/time.zig");
+const animated_borders = @import("../lib/ui/animated_borders.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -166,9 +168,7 @@ pub const GameRenderer = struct {
         const active_effects = effect_system.getActiveEffects();
 
         // Get current time for shader animations
-        const current_time = c.sdl.SDL_GetPerformanceCounter();
-        const frequency = c.sdl.SDL_GetPerformanceFrequency();
-        const time_sec = @as(f32, @floatFromInt(current_time)) / @as(f32, @floatFromInt(frequency));
+        const time_sec = time_utils.Time.getTimeSec();
 
         for (active_effects) |effect| {
             const screen_pos = self.camera.worldToScreen(effect.pos);
@@ -183,41 +183,37 @@ pub const GameRenderer = struct {
 
     // Draw border system with stacking support
     pub fn drawBorders(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game_state: anytype) void {
-        var border_stack = borders.BorderStack.init();
+        const border_config = animated_borders.BorderConfig{
+            .max_layers = constants.MAX_BORDER_LAYERS,
+            .screen_width = constants.SCREEN_WIDTH,
+            .screen_height = constants.SCREEN_HEIGHT,
+            .visibility_threshold = constants.VISIBILITY_THRESHOLD,
+        };
+        var border_stack = animated_borders.BorderStack(constants.MAX_BORDER_LAYERS).init(border_config);
 
         // Iris wipe effect (highest priority - renders over everything)
         if (game_state.iris_wipe_active) {
-            const current_time = c.sdl.SDL_GetPerformanceCounter();
-            const frequency = c.sdl.SDL_GetPerformanceFrequency();
-            const elapsed_sec = @as(f32, @floatFromInt(current_time - game_state.iris_wipe_start_time)) / @as(f32, @floatFromInt(frequency));
-            const wipe_duration = constants.IRIS_WIPE_DURATION;
-
-            if (elapsed_sec < wipe_duration) {
-                const progress = elapsed_sec / wipe_duration; // 0.0 to 1.0
-                // Strong ease-out curve: fast at start, very slow at end
-                const eased_progress = 1.0 - (1.0 - progress) * (1.0 - progress) * (1.0 - progress) * (1.0 - progress); // Quartic ease-out
-                const shrink_factor = 1.0 - eased_progress; // 1.0 to 0.0 (shrinking with strong ease-out)
-
-                // Create iris wipe bands using color constants
-                const wipe_colors = [_]Color{
-                    colors.BLUE_BRIGHT,
-                    colors.GREEN_BRIGHT,
-                    colors.YELLOW_BRIGHT,
-                    colors.ORANGE_BRIGHT,
-                    colors.PURPLE_BRIGHT,
-                    colors.CYAN,
-                };
-
-                for (wipe_colors) |wipe_color| {
-                    const max_width = constants.IRIS_WIPE_BAND_WIDTH;
-                    const current_width = max_width * shrink_factor;
-
-                    if (current_width > constants.VISIBILITY_THRESHOLD) { // Only render if visible
-                        border_stack.pushStatic(current_width, wipe_color);
-                    }
-                }
-            } else {
-                // End iris wipe
+            const elapsed_sec = time_utils.Time.getElapsedSec(game_state.iris_wipe_start_time);
+            
+            const wipe_colors = [_]Color{
+                colors.BLUE_BRIGHT,
+                colors.GREEN_BRIGHT,
+                colors.YELLOW_BRIGHT,
+                colors.ORANGE_BRIGHT,
+                colors.PURPLE_BRIGHT,
+                colors.CYAN,
+            };
+            
+            const iris_wipe = animated_borders.IrisWipe{
+                .colors = &wipe_colors,
+                .band_width = constants.IRIS_WIPE_BAND_WIDTH,
+                .duration = constants.IRIS_WIPE_DURATION,
+                .easing_fn = animated_borders.Easing.quarticEaseOut,
+            };
+            
+            iris_wipe.getBorders(elapsed_sec, &border_stack);
+            
+            if (elapsed_sec >= constants.IRIS_WIPE_DURATION) {
                 @constCast(game_state).iris_wipe_active = false;
             }
         }
@@ -225,24 +221,27 @@ pub const GameRenderer = struct {
         // Game state borders (lower priority)
         if (game_state.isPaused()) {
             // Animated paused border: base + pulse amplitude
-            border_stack.pushAnimated(constants.PAUSED_BORDER_BASE_WIDTH, borders.GOLD_YELLOW_COLORS, 1.5, constants.PAUSED_BORDER_PULSE_AMPLITUDE);
+            border_stack.pushAnimated(constants.PAUSED_BORDER_BASE_WIDTH, animated_borders.ColorPairs.GOLD_YELLOW, 1.5, constants.PAUSED_BORDER_PULSE_AMPLITUDE);
         }
 
         if (!game_state.hex_game.getPlayerAlive()) {
             // Animated dead border: base + pulse amplitude
-            border_stack.pushAnimated(constants.DEAD_BORDER_BASE_WIDTH, borders.RED_COLORS, 1.2, constants.DEAD_BORDER_PULSE_AMPLITUDE);
+            border_stack.pushAnimated(constants.DEAD_BORDER_BASE_WIDTH, animated_borders.ColorPairs.RED, 1.2, constants.DEAD_BORDER_PULSE_AMPLITUDE);
         }
 
         // Render all borders with automatic offset calculation based on current animated widths
+        const current_time_ms = time_utils.Time.getTimeMs();
         var current_offset: f32 = 0;
 
         for (0..border_stack.count) |i| {
             const spec = &border_stack.specs[i];
-            const current_width = spec.getCurrentWidth();
-            const current_color = spec.getCurrentColor();
+            const current_width = spec.getCurrentWidth(current_time_ms);
+            const current_color = spec.getCurrentColor(current_time_ms);
 
-            self.drawBorderWithOffset(cmd_buffer, render_pass, current_color, current_width, current_offset);
-            current_offset += current_width;
+            if (current_width > constants.VISIBILITY_THRESHOLD) {
+                self.drawBorderWithOffset(cmd_buffer, render_pass, current_color, current_width, current_offset);
+                current_offset += current_width;
+            }
         }
     }
 

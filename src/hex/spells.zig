@@ -8,6 +8,7 @@ const world_mod = @import("../lib/game/world.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
+const cooldowns = @import("../lib/game/cooldowns.zig");
 
 const Vec2 = math.Vec2;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
@@ -31,29 +32,33 @@ pub const SpellType = enum {
 
 pub const SpellSlot = struct {
     spell_type: SpellType,
-    cooldown: f32,
-    cooldown_remaining: f32,
+    cooldown_timer: cooldowns.Cooldown,
 
     pub fn init(spell_type: SpellType) SpellSlot {
         return .{
             .spell_type = spell_type,
-            .cooldown = getSpellCooldown(spell_type),
-            .cooldown_remaining = 0,
+            .cooldown_timer = cooldowns.Cooldown.init(getSpellCooldown(spell_type)),
         };
     }
 
     pub fn canCast(self: *const SpellSlot) bool {
-        return self.cooldown_remaining <= 0 and self.spell_type != .None;
+        return self.cooldown_timer.isReady() and self.spell_type != .None;
     }
 
     pub fn startCooldown(self: *SpellSlot) void {
-        self.cooldown_remaining = self.cooldown;
+        self.cooldown_timer.start();
     }
 
     pub fn update(self: *SpellSlot, deltaTime: f32) void {
-        if (self.cooldown_remaining > 0) {
-            self.cooldown_remaining -= deltaTime;
-        }
+        self.cooldown_timer.update(deltaTime);
+    }
+
+    pub fn getRemainingTime(self: *const SpellSlot) f32 {
+        return self.cooldown_timer.getRemaining();
+    }
+
+    pub fn getProgress(self: *const SpellSlot) f32 {
+        return self.cooldown_timer.getProgress();
     }
 };
 
