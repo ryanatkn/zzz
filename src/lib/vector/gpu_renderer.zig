@@ -24,11 +24,7 @@ pub const GPUVectorRenderer = struct {
     vector_ps: ?*c.sdl.SDL_GPUShader,
     vector_pipeline: ?*c.sdl.SDL_GPUGraphicsPipeline,
 
-    // Simplified rendering - no tessellation configuration needed
-
-    // Vertex data for batching
-    vertex_buffer: std.ArrayList(Vec2),
-    color_buffer: std.ArrayList(Color),
+    // Pure procedural rendering - no vertex buffers needed
 
     const Self = @This();
 
@@ -41,9 +37,6 @@ pub const GPUVectorRenderer = struct {
             .vector_vs = null,
             .vector_ps = null,
             .vector_pipeline = null,
-            // tessellation_config removed - using simplified rendering
-            .vertex_buffer = std.ArrayList(Vec2).init(allocator),
-            .color_buffer = std.ArrayList(Color).init(allocator),
         };
     }
 
@@ -52,9 +45,6 @@ pub const GPUVectorRenderer = struct {
         if (self.vector_pipeline) |pipeline| c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, pipeline);
         if (self.vector_vs) |shader| c.sdl.SDL_ReleaseGPUShader(self.device, shader);
         if (self.vector_ps) |shader| c.sdl.SDL_ReleaseGPUShader(self.device, shader);
-
-        self.vertex_buffer.deinit();
-        self.color_buffer.deinit();
     }
 
     pub fn updateScreenSize(self: *Self, width: f32, height: f32) void {
@@ -78,190 +68,63 @@ pub const GPUVectorRenderer = struct {
         path: *const VectorPath,
         color: Color,
     ) !void {
-        // Clear vertex buffers for this path
-        self.vertex_buffer.clearRetainingCapacity();
-        self.color_buffer.clearRetainingCapacity();
+        _ = cmd_buffer; // No longer needed
+        _ = render_pass; // No longer needed
 
-        // Tessellate all contours in the path
+        // For each contour, render as lines using addCircleToTrace for line endpoints
         for (path.contours.items) |*contour| {
-            try self.tessellateContour(contour, color);
+            try self.renderContourAsCircles(simple_gpu_renderer, contour, color);
         }
-
-        // For now, render as individual lines using the simple GPU renderer
-        // In the future, this could be optimized with a dedicated vector shader
-        try self.renderAsLines(simple_gpu_renderer, cmd_buffer, render_pass);
     }
 
     /// Draw a single quadratic bezier curve
     pub fn drawQuadraticCurve(self: *Self, simple_gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, curve: QuadraticCurve, color: Color, stroke_width: f32) !void {
-        // Clear buffers
-        self.vertex_buffer.clearRetainingCapacity();
-        self.color_buffer.clearRetainingCapacity();
-
-        // Simplified curve rendering - just draw straight line approximation
-        try self.vertex_buffer.append(curve.start);
-        try self.vertex_buffer.append(curve.end);
-        try self.color_buffer.append(color);
-        try self.color_buffer.append(color);
-
-        // Render as thick lines
-        try self.renderAsThickLines(simple_gpu_renderer, cmd_buffer, render_pass, stroke_width);
+        _ = self;
+        _ = cmd_buffer;
+        _ = render_pass;
+        
+        // Simple line approximation using circles at endpoints
+        const radius = stroke_width * 0.5;
+        simple_gpu_renderer.addCircleToTrace(curve.start, radius, color);
+        simple_gpu_renderer.addCircleToTrace(curve.end, radius, color);
     }
 
     /// Draw a polygon from a set of points
     pub fn drawPolygon(self: *Self, simple_gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, points: []const Vec2, color: Color, filled: bool) !void {
+        _ = self;
+        _ = cmd_buffer;
+        _ = render_pass;
+        
         if (points.len < 3) return; // Need at least 3 points for a polygon
 
-        self.vertex_buffer.clearRetainingCapacity();
-        self.color_buffer.clearRetainingCapacity();
-
         if (filled) {
-            // Triangulate the polygon (simple fan triangulation for convex polygons)
-            for (1..points.len - 1) |i| {
-                try self.vertex_buffer.append(points[0]);
-                try self.vertex_buffer.append(points[i]);
-                try self.vertex_buffer.append(points[i + 1]);
-                try self.color_buffer.append(color);
-                try self.color_buffer.append(color);
-                try self.color_buffer.append(color);
+            // Simple approximation: draw circles at each vertex
+            for (points) |point| {
+                simple_gpu_renderer.addCircleToTrace(point, 2.0, color);
             }
-            try self.renderAsTriangles(simple_gpu_renderer, cmd_buffer, render_pass);
         } else {
-            // Draw as outline
-            for (0..points.len) |i| {
-                const next_i = (i + 1) % points.len;
-                try self.vertex_buffer.append(points[i]);
-                try self.vertex_buffer.append(points[next_i]);
-                try self.color_buffer.append(color);
-                try self.color_buffer.append(color);
+            // Draw outline as small circles at vertices
+            for (points) |point| {
+                simple_gpu_renderer.addCircleToTrace(point, 1.0, color);
             }
-            try self.renderAsLines(simple_gpu_renderer, cmd_buffer, render_pass);
         }
     }
 
-    /// Tessellate a contour into line segments
-    fn tessellateContour(self: *Self, contour: *const vector_path.Contour, color: Color) !void {
+    /// Render a contour as circles at key points (pure procedural)
+    fn renderContourAsCircles(self: *Self, simple_gpu_renderer: anytype, contour: *const vector_path.Contour, color: Color) !void {
+        _ = self;
+        
         if (contour.points.items.len < 2) return;
 
-        // Simplified curve rendering - no tessellation needed
-        // tessellator removed - using simplified rendering
-
-        // Process each segment in the contour
-        var i: usize = 0;
-        while (i < contour.points.items.len) {
-            const current = contour.points.items[i];
-            const next_index = (i + 1) % contour.points.items.len;
-            const next = contour.points.items[next_index];
-
-            if (current.on_curve and next.on_curve) {
-                // Straight line segment
-                try self.vertex_buffer.append(current.position);
-                try self.vertex_buffer.append(next.position);
-                try self.color_buffer.append(color);
-                try self.color_buffer.append(color);
-                i += 1;
-            } else if (current.on_curve and !next.on_curve) {
-                // Quadratic curve: current -> next (control) -> next+1
-                const control = next.position;
-                const end_index = (i + 2) % contour.points.items.len;
-                const end = contour.points.items[end_index].position;
-
-                const curve = QuadraticCurve{
-                    .start = current.position,
-                    .control = control,
-                    .end = end,
-                };
-
-                // Simplified curve rendering - just draw straight line approximation
-                try self.vertex_buffer.append(curve.start);
-                try self.vertex_buffer.append(curve.end);
-                try self.color_buffer.append(color);
-                try self.color_buffer.append(color);
-
-                i += 2; // Skip the control point and end point
-            } else {
-                // Other cases (off-curve to on-curve, etc.)
-                try self.vertex_buffer.append(current.position);
-                try self.vertex_buffer.append(next.position);
-                try self.color_buffer.append(color);
-                try self.color_buffer.append(color);
-                i += 1;
+        // Render key points as small circles for visualization
+        for (contour.points.items) |point| {
+            if (point.on_curve) {
+                simple_gpu_renderer.addCircleToTrace(point.position, 1.5, color);
             }
         }
     }
 
-    /// Render accumulated vertex data as lines
-    fn renderAsLines(self: *Self, simple_gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
-        // Render line pairs
-        var i: usize = 0;
-        while (i + 1 < self.vertex_buffer.items.len) : (i += 2) {
-            const start = self.vertex_buffer.items[i];
-            const end = self.vertex_buffer.items[i + 1];
-            const color = self.color_buffer.items[i]; // Use first vertex color
-
-            // Draw as very thin rectangle (line approximation)
-            const line_vec = Vec2{
-                .x = end.x - start.x,
-                .y = end.y - start.y,
-            };
-            const length = line_vec.length();
-
-            if (length > 0.001) { // Avoid zero-length lines
-                simple_gpu_renderer.drawRect(cmd_buffer, render_pass, start, Vec2{ .x = length, .y = 1.0 }, color);
-            }
-        }
-    }
-
-    /// Render accumulated vertex data as thick lines
-    fn renderAsThickLines(self: *Self, simple_gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, thickness: f32) !void {
-        var i: usize = 0;
-        while (i + 1 < self.vertex_buffer.items.len) : (i += 2) {
-            const start = self.vertex_buffer.items[i];
-            const end = self.vertex_buffer.items[i + 1];
-            const color = self.color_buffer.items[i];
-
-            const line_vec = Vec2{
-                .x = end.x - start.x,
-                .y = end.y - start.y,
-            };
-            const length = line_vec.length();
-
-            if (length > 0.001) {
-                // Draw thick line as rectangle
-                const center = Vec2{
-                    .x = (start.x + end.x) * 0.5,
-                    .y = (start.y + end.y) * 0.5,
-                };
-
-                simple_gpu_renderer.drawRect(cmd_buffer, render_pass, Vec2{
-                    .x = center.x - length * 0.5,
-                    .y = center.y - thickness * 0.5,
-                }, Vec2{ .x = length, .y = thickness }, color);
-            }
-        }
-    }
-
-    /// Render accumulated vertex data as triangles (for filled shapes)
-    fn renderAsTriangles(self: *Self, simple_gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
-        // For now, approximate triangles as small rectangles
-        // In the future, this could use a proper triangle rendering pipeline
-        var i: usize = 0;
-        while (i + 2 < self.vertex_buffer.items.len) : (i += 3) {
-            const v0 = self.vertex_buffer.items[i];
-            const v1 = self.vertex_buffer.items[i + 1];
-            const v2 = self.vertex_buffer.items[i + 2];
-            const color = self.color_buffer.items[i];
-
-            // Calculate triangle bounds
-            const min_x = @min(@min(v0.x, v1.x), v2.x);
-            const max_x = @max(@max(v0.x, v1.x), v2.x);
-            const min_y = @min(@min(v0.y, v1.y), v2.y);
-            const max_y = @max(@max(v0.y, v1.y), v2.y);
-
-            // Draw bounding rectangle (approximation)
-            simple_gpu_renderer.drawRect(cmd_buffer, render_pass, Vec2{ .x = min_x, .y = min_y }, Vec2{ .x = max_x - min_x, .y = max_y - min_y }, color);
-        }
-    }
+    // All rendering methods removed - now using pure procedural generation via addCircleToTrace/addRectToTrace
 };
 
 /// Utility functions for vector graphics

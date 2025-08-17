@@ -57,6 +57,8 @@ pub const GameRenderer = struct {
 
     // Begin a new frame
     pub fn beginFrame(self: *GameRenderer, window: *c.sdl.SDL_Window) !*c.sdl.SDL_GPUCommandBuffer {
+        // Start performance monitoring
+        self.gpu.startFrameTiming();
         return try self.gpu.beginFrame(window);
     }
 
@@ -75,6 +77,8 @@ pub const GameRenderer = struct {
     // End frame
     pub fn endFrame(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer) void {
         self.gpu.endFrame(cmd_buffer);
+        // End performance monitoring and log stats
+        self.gpu.endFrameTiming();
     }
 
     // Update camera based on current zone (call before game logic update)
@@ -268,7 +272,6 @@ pub const GameRenderer = struct {
         const fps_text = std.fmt.bufPrintZ(&fps_buf, "FPS: {d}", .{fps}) catch "FPS: ??";
 
         // Use persistent text rendering to eliminate flashing
-        loggers.getGameLog().debug("queue_fps", "Queuing FPS text for persistent rendering: '{s}'", .{fps_text});
 
         // Queue using persistent mode - texture will be cached and reused
         self.gpu.text_renderer.queuePersistentText(fps_text, .{ .x = fps_x, .y = fps_y }, self.font_manager, .sans, @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(), WHITE) catch |err| {
@@ -278,7 +281,6 @@ pub const GameRenderer = struct {
             return;
         };
 
-        loggers.getGameLog().debug("fps_queued", "✓ FPS text queued for persistent rendering", .{});
     }
 
     pub fn drawAIMode(self: *GameRenderer, ai_enabled: bool) void {
@@ -294,8 +296,8 @@ pub const GameRenderer = struct {
         const ai_text = "AI MODE ACTIVE";
 
         // Queue using persistent mode
-        self.gpu.text_renderer.queuePersistentText(ai_text, .{ .x = ai_x, .y = ai_y }, self.font_manager, .sans, @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(), AI_COLOR) catch |err| {
-            loggers.getGameLog().debug("ai_mode_error", "Failed to queue AI mode text: {}", .{err});
+        self.gpu.text_renderer.queuePersistentText(ai_text, .{ .x = ai_x, .y = ai_y }, self.font_manager, .sans, @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(), AI_COLOR) catch {
+            // AI mode text failed - fallback to no display
         };
     }
 

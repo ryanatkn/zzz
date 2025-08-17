@@ -52,6 +52,31 @@ const EffectUniforms = extern struct {
     // Total: 64 bytes
 };
 
+// Frame uniforms for instanced rendering
+const FrameUniforms = extern struct {
+    screen_size: [2]f32,
+    camera_transform: [4]f32, // [offset_x, offset_y, zoom, rotation]
+    time: f32,
+    _padding: f32,
+};
+
+// Instance data for circle batching
+const CircleInstance = extern struct {
+    center: [2]f32,
+    radius: f32,
+    color: [4]f32, // r, g, b, a
+};
+
+// Instance data for rectangle batching
+const RectInstance = extern struct {
+    position: [2]f32,
+    size: [2]f32,
+    color: [4]f32, // r, g, b, a
+};
+
+// Maximum instances per batch
+const MAX_INSTANCES_PER_BATCH = 1024;
+
 pub const SimpleGPURenderer = struct {
     allocator: std.mem.Allocator,
     device: *c.sdl.SDL_GPUDevice,
@@ -81,6 +106,23 @@ pub const SimpleGPURenderer = struct {
     // Current frame data
     screen_width: f32,
     screen_height: f32,
+
+    // Instance batching buffers
+    circle_instances: std.ArrayList(CircleInstance),
+    rect_instances: std.ArrayList(RectInstance),
+    effect_instances: std.ArrayList(CircleInstance), // Effects reuse circle data
+    
+    // Instance buffers for GPU upload
+    circle_instance_buffer: ?*c.sdl.SDL_GPUBuffer,
+    rect_instance_buffer: ?*c.sdl.SDL_GPUBuffer,
+    effect_instance_buffer: ?*c.sdl.SDL_GPUBuffer,
+
+    // Performance monitoring
+    frame_start_time: i128,
+    draw_call_count: u32,
+    individual_draw_calls: u32,
+    batched_draw_calls: u32,
+    frame_time_ms: f32,
 
     const Self = @This();
 
@@ -144,10 +186,22 @@ pub const SimpleGPURenderer = struct {
             .vector_renderer = undefined,
             .screen_width = @import("../core/constants.zig").SCREEN.BASE_WIDTH,
             .screen_height = @import("../core/constants.zig").SCREEN.BASE_HEIGHT,
+            .circle_instances = std.ArrayList(CircleInstance).init(allocator),
+            .rect_instances = std.ArrayList(RectInstance).init(allocator),
+            .effect_instances = std.ArrayList(CircleInstance).init(allocator),
+            .circle_instance_buffer = null,
+            .rect_instance_buffer = null,
+            .effect_instance_buffer = null,
+            .frame_start_time = 0,
+            .draw_call_count = 0,
+            .individual_draw_calls = 0,
+            .batched_draw_calls = 0,
+            .frame_time_ms = 0.0,
         };
 
         try self.createShaders();
         try self.createPipelines();
+        try self.createInstanceBuffers();
 
         // Initialize text renderer
         self.text_renderer = try TextRenderer.init(self.device, allocator, self.screen_width, self.screen_height);
@@ -160,6 +214,15 @@ pub const SimpleGPURenderer = struct {
     }
 
     pub fn deinit(self: *Self) void {
+        // Clean up instance buffers
+        if (self.circle_instance_buffer) |buffer| c.sdl.SDL_ReleaseGPUBuffer(self.device, buffer);
+        if (self.rect_instance_buffer) |buffer| c.sdl.SDL_ReleaseGPUBuffer(self.device, buffer);
+        if (self.effect_instance_buffer) |buffer| c.sdl.SDL_ReleaseGPUBuffer(self.device, buffer);
+        
+        self.circle_instances.deinit();
+        self.rect_instances.deinit();
+        self.effect_instances.deinit();
+
         // Clean up text renderer
         self.text_renderer.deinit();
         self.vector_renderer.deinit();
@@ -433,6 +496,38 @@ pub const SimpleGPURenderer = struct {
         loggers.getRenderLog().info("pipeline_create_success", "Simple graphics pipelines created successfully", .{});
     }
 
+    fn createInstanceBuffers(self: *Self) !void {
+        loggers.getRenderLog().info("instance_buffer_create", "Creating instance buffers for batching", .{});
+
+        // Create instance buffers for batched rendering
+        const buffer_create_info = c.sdl.SDL_GPUBufferCreateInfo{
+            .usage = c.sdl.SDL_GPU_BUFFERUSAGE_VERTEX,
+            .size = MAX_INSTANCES_PER_BATCH * @sizeOf(CircleInstance),
+        };
+
+        self.circle_instance_buffer = c.sdl.SDL_CreateGPUBuffer(self.device, &buffer_create_info) orelse {
+            loggers.getRenderLog().err("circle_buffer_fail", "Failed to create circle instance buffer", .{});
+            return error.BufferCreationFailed;
+        };
+
+        const rect_buffer_create_info = c.sdl.SDL_GPUBufferCreateInfo{
+            .usage = c.sdl.SDL_GPU_BUFFERUSAGE_VERTEX,
+            .size = MAX_INSTANCES_PER_BATCH * @sizeOf(RectInstance),
+        };
+
+        self.rect_instance_buffer = c.sdl.SDL_CreateGPUBuffer(self.device, &rect_buffer_create_info) orelse {
+            loggers.getRenderLog().err("rect_buffer_fail", "Failed to create rectangle instance buffer", .{});
+            return error.BufferCreationFailed;
+        };
+
+        self.effect_instance_buffer = c.sdl.SDL_CreateGPUBuffer(self.device, &buffer_create_info) orelse {
+            loggers.getRenderLog().err("effect_buffer_fail", "Failed to create effect instance buffer", .{});
+            return error.BufferCreationFailed;
+        };
+
+        loggers.getRenderLog().info("instance_buffer_success", "Instance buffers created successfully", .{});
+    }
+
     // Begin frame and get command buffer ready for rendering
     pub fn beginFrame(self: *Self, window: *c.sdl.SDL_Window) !*c.sdl.SDL_GPUCommandBuffer {
         // Update screen size
@@ -482,8 +577,66 @@ pub const SimpleGPURenderer = struct {
         return error.SwapchainFailed;
     }
 
+    // === PERFORMANCE MONITORING ===
+    
+    // Start frame timing
+    pub fn startFrameTiming(self: *Self) void {
+        self.frame_start_time = std.time.nanoTimestamp();
+        self.draw_call_count = 0;
+        self.individual_draw_calls = 0;
+        self.batched_draw_calls = 0;
+    }
+
+    // End frame timing and calculate stats
+    pub fn endFrameTiming(self: *Self) void {
+        const frame_end_time = std.time.nanoTimestamp();
+        const frame_duration_ns = frame_end_time - self.frame_start_time;
+        self.frame_time_ms = @as(f32, @floatFromInt(frame_duration_ns)) / 1_000_000.0;
+        
+        // Static frame counter (simpler than struct)
+        const static = struct {
+            var frame_count: u32 = 0;
+        };
+        static.frame_count += 1;
+        
+        // One-time log on first frame to confirm monitoring is active
+        if (static.frame_count == 1) {
+            loggers.getGameLog().info("gpu_perf_init", "🎯 GPU performance monitoring started - first frame: {d:.2}ms", .{self.frame_time_ms});
+        }
+        
+        // Log performance summary every 60 frames (1 second at 60fps)
+        if (static.frame_count % 60 == 0) {
+            loggers.getGameLog().info("gpu_perf", "📊 Frame: {d:.2}ms | Draw calls: {d} (individual: {d}, batched: {d}) | Frames: {d}", .{
+                self.frame_time_ms,
+                self.draw_call_count,
+                self.individual_draw_calls,
+                self.batched_draw_calls,
+                static.frame_count,
+            });
+        }
+    }
+
+    // Get performance stats
+    pub fn getPerformanceStats(self: *Self) struct { frame_time_ms: f32, draw_calls: u32, individual_calls: u32, batched_calls: u32 } {
+        return .{
+            .frame_time_ms = self.frame_time_ms,
+            .draw_calls = self.draw_call_count,
+            .individual_calls = self.individual_draw_calls,
+            .batched_calls = self.batched_draw_calls,
+        };
+    }
+
+    // === END PERFORMANCE MONITORING ===
+
     // Draw a single circle with distance field anti-aliasing
     pub fn drawCircle(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color) void {
+        self.individual_draw_calls += 1;
+        self.draw_call_count += 1;
+        
+        // Debug: verify draw calls are being counted (first few only)
+        if (self.draw_call_count <= 3) {
+        }
+        
         // Prepare uniform data
         const uniform_data = CircleUniforms{
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
@@ -506,6 +659,9 @@ pub const SimpleGPURenderer = struct {
 
     // Draw a single rectangle
     pub fn drawRect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, size: Vec2, color: Color) void {
+        self.individual_draw_calls += 1;
+        self.draw_call_count += 1;
+        
         // Removed debug logging for white rectangles investigation
 
         // Prepare uniform data - swap R and B for BGR swapchain format
@@ -554,6 +710,9 @@ pub const SimpleGPURenderer = struct {
 
     // Draw a visual effect with animated rings and pulsing
     pub fn drawEffect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
+        self.individual_draw_calls += 1;
+        self.draw_call_count += 1;
+        
         // Prepare uniform data for effect shader
         const uniform_data = EffectUniforms{
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
@@ -575,6 +734,165 @@ pub const SimpleGPURenderer = struct {
         c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.effect_pipeline);
         c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for larger quad (effects need more space)
     }
+
+    // === BATCHED RENDERING API ===
+    
+    // Add a circle to the current batch
+    pub fn addCircleToTrace(self: *Self, pos: Vec2, radius: f32, color: Color) void {
+        const instance = CircleInstance{
+            .center = [2]f32{ pos.x, pos.y },
+            .radius = radius,
+            .color = [4]f32{
+                @as(f32, @floatFromInt(color.r)) / 255.0,
+                @as(f32, @floatFromInt(color.g)) / 255.0,
+                @as(f32, @floatFromInt(color.b)) / 255.0,
+                @as(f32, @floatFromInt(color.a)) / 255.0,
+            },
+        };
+        self.circle_instances.append(instance) catch {
+            loggers.getRenderLog().warn("circle_batch_full", "Circle instance buffer full, skipping", .{});
+        };
+    }
+
+    // Add a rectangle to the current batch
+    pub fn addRectToTrace(self: *Self, pos: Vec2, size: Vec2, color: Color) void {
+        const instance = RectInstance{
+            .position = [2]f32{ pos.x, pos.y },
+            .size = [2]f32{ size.x, size.y },
+            .color = [4]f32{
+                @as(f32, @floatFromInt(color.r)) / 255.0,
+                @as(f32, @floatFromInt(color.g)) / 255.0,
+                @as(f32, @floatFromInt(color.b)) / 255.0,
+                @as(f32, @floatFromInt(color.a)) / 255.0,
+            },
+        };
+        self.rect_instances.append(instance) catch {
+            loggers.getRenderLog().warn("rect_batch_full", "Rectangle instance buffer full, skipping", .{});
+        };
+    }
+
+    // Add an effect to the current batch
+    pub fn addEffectToTrace(self: *Self, pos: Vec2, radius: f32, color: Color, intensity: f32) void {
+        const instance = CircleInstance{
+            .center = [2]f32{ pos.x, pos.y },
+            .radius = radius * intensity, // Scale radius by intensity
+            .color = [4]f32{
+                @as(f32, @floatFromInt(color.r)) / 255.0,
+                @as(f32, @floatFromInt(color.g)) / 255.0,
+                @as(f32, @floatFromInt(color.b)) / 255.0,
+                (@as(f32, @floatFromInt(color.a)) / 255.0) * intensity, // Apply intensity to alpha
+            },
+        };
+        self.effect_instances.append(instance) catch {
+            loggers.getRenderLog().warn("effect_batch_full", "Effect instance buffer full, skipping", .{});
+        };
+    }
+
+    // Render all batched circles in a single draw call
+    pub fn flushCircles(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        if (self.circle_instances.items.len == 0) return;
+
+        // Count as one batched call (even though we're still doing individual draws for now)
+        self.batched_draw_calls += 1;
+        self.draw_call_count += @intCast(self.circle_instances.items.len);
+
+        // For now, render each circle individually using existing simple_circle pipeline
+        // TODO: Create proper instanced circle shader
+        for (self.circle_instances.items) |instance| {
+            const uniform_data = CircleUniforms{
+                .screen_size = [2]f32{ self.screen_width, self.screen_height },
+                .circle_center = [2]f32{ instance.center[0], instance.center[1] },
+                .circle_size = [2]f32{ instance.radius, 0.0 },
+                .circle_color_r = instance.color[0],
+                .circle_color_g = instance.color[1],
+                .circle_color_b = instance.color[2],
+                .circle_color_a = instance.color[3],
+                ._padding = 0.0,
+            };
+
+            // Push uniform data BEFORE binding pipeline
+            c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(CircleUniforms));
+
+            // Bind pipeline and draw
+            c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.circle_pipeline);
+            c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for quad
+        }
+
+        // Clear for next frame
+        self.circle_instances.clearRetainingCapacity();
+    }
+
+    // Render all batched rectangles in a single draw call
+    pub fn flushRects(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        if (self.rect_instances.items.len == 0) return;
+
+        // Count as one batched call
+        self.batched_draw_calls += 1;
+        self.draw_call_count += @intCast(self.rect_instances.items.len);
+
+        // For now, render each rectangle individually using existing simple_rect pipeline
+        // TODO: Create proper instanced rectangle shader
+        for (self.rect_instances.items) |instance| {
+            const uniform_data = RectUniforms{
+                .screen_size = [2]f32{ self.screen_width, self.screen_height },
+                .rect_position = [2]f32{ instance.position[0], instance.position[1] },
+                .rect_size = [2]f32{ instance.size[0], instance.size[1] },
+                .rect_color_r = instance.color[0],
+                .rect_color_g = instance.color[1],
+                .rect_color_b = instance.color[2],
+                .rect_color_a = instance.color[3],
+                ._padding = 0.0,
+            };
+
+            // Push uniform data BEFORE binding pipeline
+            c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(RectUniforms));
+
+            // Bind pipeline and draw
+            c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.rect_pipeline);
+            c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for quad
+        }
+
+        // Clear for next frame
+        self.rect_instances.clearRetainingCapacity();
+    }
+
+    // Render all batched effects in a single draw call
+    pub fn flushEffects(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, time: f32) void {
+        if (self.effect_instances.items.len == 0) return;
+
+        // Count as one batched call
+        self.batched_draw_calls += 1;
+        self.draw_call_count += @intCast(self.effect_instances.items.len);
+
+        // For now, render each effect individually using existing effect pipeline
+        // TODO: Create proper instanced effect shader
+        for (self.effect_instances.items) |instance| {
+            const uniform_data = EffectUniforms{
+                .screen_size = [2]f32{ self.screen_width, self.screen_height },
+                .center = [2]f32{ instance.center[0], instance.center[1] },
+                .radius = instance.radius,
+                .color_r = instance.color[0],
+                .color_g = instance.color[1],
+                .color_b = instance.color[2],
+                .color_a = instance.color[3],
+                .intensity = 1.0, // Default intensity
+                .time = time,
+                ._padding = [3]f32{ 0.0, 0.0, 0.0 },
+            };
+
+            // Push uniform data BEFORE binding pipeline
+            c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(EffectUniforms));
+
+            // Bind pipeline and draw
+            c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.effect_pipeline);
+            c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for quad
+        }
+
+        // Clear for next frame
+        self.effect_instances.clearRetainingCapacity();
+    }
+
+    // === END BATCHED RENDERING API ===
 
     // End render pass
     pub fn endRenderPass(self: *Self, render_pass: *c.sdl.SDL_GPURenderPass) void {
