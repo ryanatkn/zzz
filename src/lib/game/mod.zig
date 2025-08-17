@@ -4,7 +4,7 @@
 // Core simple helpers
 pub const ecs = @import("ecs.zig");
 pub const components = @import("components.zig");
-pub const cooldowns = @import("cooldowns.zig");
+pub const timer_patterns = @import("timer_patterns.zig");
 
 // Behaviors
 pub const behaviors = @import("behaviors/mod.zig");

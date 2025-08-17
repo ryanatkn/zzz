@@ -1,5 +1,5 @@
 const std = @import("std");
-const cooldowns = @import("../cooldowns.zig");
+const timer = @import("../../core/timer.zig");
 
 /// Generic spell slot management system
 /// Games define their own spell types and implement casting logic
@@ -82,19 +82,19 @@ pub fn SpellSlot(comptime SpellType: type) type {
         const Self = @This();
 
         spell_type: SpellType,
-        cooldown_timer: cooldowns.Cooldown,
+        cooldown_timer: timer.Cooldown,
 
         pub fn init(spell_type: SpellType) Self {
             return .{
                 .spell_type = spell_type,
-                .cooldown_timer = cooldowns.Cooldown.init(0.0), // No cooldown by default
+                .cooldown_timer = timer.Cooldown.init(0.0), // No cooldown by default
             };
         }
 
         pub fn initWithCooldown(spell_type: SpellType, cooldown_duration: f32) Self {
             return .{
                 .spell_type = spell_type,
-                .cooldown_timer = cooldowns.Cooldown.init(cooldown_duration),
+                .cooldown_timer = timer.Cooldown.init(cooldown_duration),
             };
         }
 

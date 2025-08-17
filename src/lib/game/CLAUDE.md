@@ -72,7 +72,7 @@ We deleted the over-engineered ECS system including:
 
 ```zig
 // Import generic systems
-const cooldowns = @import("lib/game/cooldowns.zig");
+const timer_patterns = @import("lib/game/timer_patterns.zig");
 const bullet_pool = @import("lib/game/projectiles/bullet_pool.zig");
 const spell_slots = @import("lib/game/abilities/spell_slots.zig");
 
@@ -89,8 +89,9 @@ const MySpell = struct {
 
 The hex game demonstrates proper usage:
 - Uses `bullet_pool.zig` for combat system
-- Uses `cooldowns.zig` for spell cooldowns
+- Uses `timer_patterns.zig` for spell cooldowns
 - Uses `control/` for AI integration
+- Uses `abilities/` for spell casting and effect management
 - Implements hex-specific logic (zones, portals, specific spells) in `src/hex/`
 
 ## Separation of Concerns

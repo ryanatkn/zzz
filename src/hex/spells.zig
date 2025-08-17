@@ -6,6 +6,8 @@ const ecs = @import("../lib/game/ecs.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
 const game_abilities = @import("../lib/game/abilities/mod.zig");
+const spell_casting = game_abilities.spell_casting;
+const effect_manager = game_abilities.effect_manager;
 const HexGameContext = @import("hex_context.zig").HexGameContext;
 
 const Vec2 = math.Vec2;
@@ -29,24 +31,33 @@ pub const SpellType = enum {
 const SpellSlotSystem = game_abilities.spell_slots.SpellSlotSystem(SpellType, 8);
 pub const SpellSlot = game_abilities.spell_slots.SpellSlot(SpellType);
 
-pub const LullEffect = struct {
-    pos: Vec2,
-    radius: f32,
-    duration: f32,
-    active: bool,
+// Hex-specific effect types for the generic effect manager
+pub const HexEffectType = enum {
+    lull,
+    blink_trail,
+    shield_aura,
+    haste_boost,
+    damage_zone,
+    heal_zone,
 };
+
+// Use generic effect manager for hex effects
+const HexEffectManager = effect_manager.EffectManager(HexEffectType, constants.MAX_LULL_EFFECTS);
+const HexEffect = effect_manager.TimedEffect(HexEffectType);
+
+// LullEffect removed - now handled by generic effect manager
 
 pub const SpellSystem = struct {
     // Use generic spell slot system
     slot_system: SpellSlotSystem,
 
-    // Active Lull effects (support multiple)
-    lull_effects: [constants.MAX_LULL_EFFECTS]LullEffect,
+    // Use generic effect manager for all spell effects
+    effect_manager: HexEffectManager,
 
     pub fn init() SpellSystem {
         var system = SpellSystem{
             .slot_system = SpellSlotSystem.init(),
-            .lull_effects = std.mem.zeroes([constants.MAX_LULL_EFFECTS]LullEffect),
+            .effect_manager = HexEffectManager.init(),
         };
 
         // Initialize spell slots with specific spells and cooldowns
@@ -65,15 +76,8 @@ pub const SpellSystem = struct {
         // Update all spell cooldowns using generic system
         self.slot_system.update(deltaTime);
 
-        // Update lull effects
-        for (0..self.lull_effects.len) |i| {
-            if (self.lull_effects[i].active) {
-                self.lull_effects[i].duration -= deltaTime;
-                if (self.lull_effects[i].duration <= 0) {
-                    self.lull_effects[i].active = false;
-                }
-            }
-        }
+        // Update all spell effects using generic effect manager
+        self.effect_manager.updateAll(deltaTime);
     }
 
     pub fn setActiveSlot(self: *SpellSystem, slot: usize) void {
@@ -108,11 +112,19 @@ pub const SpellSystem = struct {
     }
 
     pub fn castSpell(self: *SpellSystem, spell: SpellType, game: *HexGame, zone: *const hex_game_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
-        _ = self;
         switch (spell) {
             .None => return false,
 
             .Lull => {
+                // Add lull effect using generic effect manager
+                _ = self.effect_manager.addAoEEffect(
+                    .lull,
+                    target_pos,
+                    constants.LULL_RADIUS,
+                    constants.LULL_DURATION,
+                    1.0, // Standard intensity
+                );
+                
                 // Apply lull effect to all units in area using ECS Effects
                 applyLullEffectToUnitsInArea(game, target_pos, constants.LULL_RADIUS, constants.LULL_DURATION, effect_system);
 
@@ -144,6 +156,13 @@ pub const SpellSystem = struct {
                     game.setPlayerPos(target_pos);
                 }
 
+                // Add blink trail effect using effect manager
+                _ = self.effect_manager.addInstantEffect(
+                    .blink_trail,
+                    player_pos,
+                    1.0, // Standard intensity
+                );
+                
                 // Visual effects
                 effect_system.addPortalTravelEffect(game.getPlayerPos(), game.getPlayerRadius());
                 loggers.getGameLog().info("blink_teleport", "Blink teleport", .{});

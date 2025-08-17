@@ -9,7 +9,7 @@ pub const INVALID_ENTITY: EntityId = @import("std").math.maxInt(u32);
 pub const components = @import("components.zig");
 
 // Useful game helpers that are actually used
-pub const cooldowns = @import("cooldowns.zig");
+pub const timer_patterns = @import("timer_patterns.zig");
 pub const behaviors = @import("behaviors/mod.zig");
 pub const bullet_pool = @import("projectiles/bullet_pool.zig");
 pub const ai_control = @import("control/mod.zig");

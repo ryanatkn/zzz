@@ -1,6 +1,6 @@
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const cooldowns = @import("../cooldowns.zig");
+const timer = @import("../../core/timer.zig");
 
 const Vec2 = math.Vec2;
 
@@ -79,13 +79,13 @@ pub const TeleporterInterface = struct {
             
             teleporters: [max_teleporters]TeleporterData,
             teleporter_count: usize,
-            global_cooldown: cooldowns.Cooldown,
+            global_cooldown: timer.Cooldown,
             
             pub fn init(cooldown_duration: f32) Self {
                 return .{
                     .teleporters = undefined,
                     .teleporter_count = 0,
-                    .global_cooldown = cooldowns.Cooldown.init(cooldown_duration),
+                    .global_cooldown = timer.Cooldown.init(cooldown_duration),
                 };
             }
             
