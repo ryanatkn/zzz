@@ -1,7 +1,7 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
-const reactive = @import("../reactive.zig");
+const reactive = @import("../reactive/mod.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
