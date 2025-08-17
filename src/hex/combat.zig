@@ -6,6 +6,7 @@ const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
+const game_systems = @import("../lib/game/systems/mod.zig");
 
 const Vec2 = math.Vec2;
 const HexGame = @import("hex_game.zig").HexGame;
@@ -43,26 +44,53 @@ pub fn fireBulletAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl)
     return fireBullet(game, mouse_pos, pool);
 }
 
+/// Convert hex lifestone to generic checkpoint data
+fn lifestoneToCheckpoint(lifestone_result: physics.LifestoneResult) game_systems.respawn.RespawnInterface.CheckpointData {
+    return game_systems.respawn.RespawnInterface.CheckpointData
+        .init(lifestone_result.pos)
+        .withZone(lifestone_result.zone_index);
+}
+
+/// Find best respawn checkpoint using generic patterns applied to hex lifestones
+fn findBestRespawnCheckpoint(game: *HexGame) ?game_systems.respawn.RespawnInterface.CheckpointResult {
+    const player_pos = game.getPlayerPos();
+    
+    // Use hex-specific lifestone search
+    if (physics.findNearestAttunedLifestone(game)) |lifestone_result| {
+        const checkpoint = lifestoneToCheckpoint(lifestone_result);
+        return game_systems.respawn.RespawnInterface.CheckpointResult.init(checkpoint, player_pos);
+    }
+    
+    return null;
+}
+
 pub fn respawnPlayer(game_state: anytype) void {
     const world = &game_state.hex_game;
     const effect_system = &game_state.effect_system;
-    const nearest: ?physics.LifestoneResult = physics.findNearestAttunedLifestone(world);
-
+    
+    // Use generic checkpoint finding with hex-specific lifestone implementation
+    const checkpoint_result = findBestRespawnCheckpoint(world);
     var respawn_pos: Vec2 = undefined;
 
-    if (nearest) |result| {
-        respawn_pos = result.pos;
-        if (result.zone_index != world.getCurrentZoneIndex()) {
-            loggers.getGameLog().info("respawn_travel", "Respawning: traveling to zone {} for nearest lifestone at {any}", .{result.zone_index, respawn_pos});
-            
-            // Travel to zone with spawn position
-            game_state.travelToZoneWithSpawn(result.zone_index, respawn_pos) catch |err| {
-                loggers.getGameLog().err("respawn_travel_failed", "Failed to travel to zone {} for respawn: {}", .{ result.zone_index, err });
-            };
+    if (checkpoint_result) |result| {
+        const checkpoint = result.checkpoint;
+        respawn_pos = checkpoint.position;
+        
+        // Handle zone travel if checkpoint is in different zone
+        if (checkpoint.zone_index) |target_zone| {
+            if (target_zone != world.getCurrentZoneIndex()) {
+                loggers.getGameLog().info("respawn_travel", "Respawning: traveling to zone {} for checkpoint at {any}", .{target_zone, respawn_pos});
+                
+                // Travel to zone with spawn position
+                game_state.travelToZoneWithSpawn(target_zone, respawn_pos) catch |err| {
+                    loggers.getGameLog().err("respawn_travel_failed", "Failed to travel to zone {} for respawn: {}", .{ target_zone, err });
+                };
+            }
         }
     } else {
+        // No checkpoints found - use fallback respawn logic
         if (world.getCurrentZoneIndex() != 0) {
-            loggers.getGameLog().info("respawn_overworld", "No lifestones found, returning to overworld spawn", .{});
+            loggers.getGameLog().info("respawn_overworld", "No checkpoints found, returning to overworld spawn", .{});
             game_state.travelToZone(0) catch |err| {
                 loggers.getGameLog().err("respawn_overworld_failed", "Failed to travel to overworld for respawn: {}", .{err});
             };
@@ -70,13 +98,15 @@ pub fn respawnPlayer(game_state: anytype) void {
         respawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
     }
 
-    // Common respawn logic
+    // Common respawn logic - create respawn effects
+    const respawn_effect = game_systems.respawn.RespawnEffects.RespawnEffectData.init(respawn_pos, world.getPlayerRadius());
+    
     // Set player position and alive status using ECS
     world.setPlayerPos(respawn_pos);
     world.setPlayerAlive(true);
     world.setPlayerColor(constants.COLOR_PLAYER_ALIVE);
-    effect_system.addPlayerSpawnEffect(respawn_pos, world.getPlayerRadius());
-    loggers.getGameLog().info("player_respawn", "Player respawned!", .{});
+    effect_system.addPlayerSpawnEffect(respawn_effect.position, respawn_effect.radius);
+    loggers.getGameLog().info("player_respawn", "Player respawned at checkpoint!", .{});
 }
 
 pub fn handlePlayerDeath(world: *HexGame) void {

@@ -18,6 +18,8 @@ The game uses a zone-based world system (NOT traditional ECS):
 - **Simple arrays** for entity storage
 - **Travel metaphor** between zones via portals
 
+**Separation Strategy:** Hex uses generic systems from `lib/game` for reusable functionality while implementing all hex-specific behavior locally. This keeps the game extremely customizable while benefiting from shared infrastructure.
+
 ## File Structure
 
 ```
@@ -43,30 +45,33 @@ hex/
 
 ## Key Systems
 
-### Zone System
-- Zones combine environment + entities
-- Each zone has camera mode (fixed/follow)
-- Data-driven via `game_data.zon`
-- Portal-based travel between zones
+### What Hex Implements (Game-Specific)
+- **Zone System:** Environment + entity ownership, camera modes, portal travel
+- **Specific Spells:** Lull (aggro reduction), Blink (teleport), future spells
+- **Unit Behaviors:** Chase, patrol, flee, aggro mechanics
+- **World Data:** Zone layouts, spawn points, obstacle placement
+- **Game Constants:** Damage values, speeds, sizes, colors
 
-### Combat System
-```zig
-// Bullet pool pattern
-const BulletPool = struct {
-    bullets: [6]Bullet,      // Fixed pool
-    recharge_rate: f32 = 2,  // Per second
-    recharge_timer: f32,
-};
-```
+### What Hex Uses from lib/game (Generic Systems)
+- **Bullet Pool:** Rate-limited projectile management (`lib/game/projectiles/`)
+- **Cooldowns:** Timer management for abilities (`lib/game/cooldowns.zig`)
+- **AI Control:** External input injection (`lib/game/control/`)
+- **Basic Components:** Transform, Health, Visual (`lib/game/components.zig`)
+- **Future:** Save system, spell slots, respawn interface, input patterns
 
-### Spell System
+### Example Integration
 ```zig
-// 8 slots, independent cooldowns
-const SpellSlots = struct {
-    spells: [8]SpellType,
-    cooldowns: [8]f32,
-    active_slot: u8,
-};
+// Hex uses generic bullet pool
+const BulletPool = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
+
+// But implements hex-specific combat logic
+pub fn fireBullet(game: *HexGame, target: Vec2, pool: *BulletPool) bool {
+    // Hex-specific: player alive check, zone-based projectiles
+    if (!game.getPlayerAlive()) return false;
+    if (!pool.canFire()) return false;
+    
+    // Create hex-specific projectile entity...
+}
 ```
 
 ## Common Modifications

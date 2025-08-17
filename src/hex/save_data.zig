@@ -3,6 +3,7 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const hex_game_mod = @import("hex_game.zig");
 const ecs = @import("../lib/game/ecs.zig");
+const game_persistence = @import("../lib/game/persistence/mod.zig");
 
 const Vec2 = math.Vec2;
 const EntityId = ecs.EntityId;
@@ -208,6 +209,7 @@ pub const HexSaveData = struct {
 };
 
 /// Game statistics that should persist
+/// Uses generic StatisticsInterface for common operations
 pub const GameStatistics = struct {
     total_deaths: usize = 0,
     total_bullets_fired: usize = 0,
@@ -216,4 +218,28 @@ pub const GameStatistics = struct {
     play_time_ms: u64 = 0,
     lifestones_attuned: usize = 0,
     all_lifestones_attuned: bool = false,
+
+    // Use generic statistics interface
+    pub usingnamespace game_persistence.statistics.StatisticsInterface;
+
+    // Hex-specific convenience methods
+    pub fn incrementDeath(self: *GameStatistics) void {
+        self.increment("total_deaths");
+    }
+
+    pub fn incrementBullet(self: *GameStatistics) void {
+        self.increment("total_bullets_fired");
+    }
+
+    pub fn incrementSpell(self: *GameStatistics) void {
+        self.increment("total_spells_cast");
+    }
+
+    pub fn incrementPortal(self: *GameStatistics) void {
+        self.increment("total_portals_used");
+    }
+
+    pub fn incrementLifestone(self: *GameStatistics) void {
+        self.increment("lifestones_attuned");
+    }
 };

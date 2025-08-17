@@ -9,11 +9,32 @@ const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
 const spells = @import("spells.zig");
+const game_input = @import("../lib/game/input/mod.zig");
 
 const Vec2 = math.Vec2;
 const GameState = game_controller.GameState;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const Hud = hud.Hud;
+
+// Configure dead player handler for hex game behavior
+const dead_player_handler = game_input.dead_player_handler.DeadPlayerHandler.init(game_input.dead_player_handler.DeadPlayerConfigs.STANDARD);
+
+/// Map SDL input to generic input type for dead player handling
+fn mapSDLInputToType(event: *const c.sdl.SDL_Event) game_input.input_patterns.InputType {
+    return switch (event.type) {
+        c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => .MouseClick,
+        c.sdl.SDL_EVENT_KEY_DOWN => switch (event.key.scancode) {
+            c.sdl.SDL_SCANCODE_R => .RespawnKey,
+            c.sdl.SDL_SCANCODE_GRAVE => .MenuKey,
+            c.sdl.SDL_SCANCODE_ESCAPE => .QuitKey,
+            c.sdl.SDL_SCANCODE_W, c.sdl.SDL_SCANCODE_A, c.sdl.SDL_SCANCODE_S, c.sdl.SDL_SCANCODE_D => .MovementKey,
+            c.sdl.SDL_SCANCODE_1, c.sdl.SDL_SCANCODE_2, c.sdl.SDL_SCANCODE_3, c.sdl.SDL_SCANCODE_4,
+            c.sdl.SDL_SCANCODE_Q, c.sdl.SDL_SCANCODE_E, c.sdl.SDL_SCANCODE_F => .SpellKey,
+            else => .Unknown,
+        },
+        else => .Unknown,
+    };
+}
 
 /// Create coordinate context from camera state
 fn createCoordinateContext(camera: *const @import("../lib/rendering/camera.zig").Camera) coordinates.CoordinateContext {
@@ -71,12 +92,8 @@ pub fn handleSDLEvent(
                 },
                 c.sdl.SDL_SCANCODE_Q => game_state.spell_system.setActiveSlot(4),
                 c.sdl.SDL_SCANCODE_E => game_state.spell_system.setActiveSlot(5),
-                c.sdl.SDL_SCANCODE_R => { // R key - respawn or spell slot 6
-                    if (!game_state.hex_game.getPlayerAlive()) {
-                        game_controller.handleRespawn(game_state);
-                    } else {
-                        game_state.spell_system.setActiveSlot(6);
-                    }
+                c.sdl.SDL_SCANCODE_R => { // R key - always respawn
+                    game_controller.handleRespawn(game_state);
                 },
                 c.sdl.SDL_SCANCODE_F => game_state.spell_system.setActiveSlot(7),
                 c.sdl.SDL_SCANCODE_G => { // G key - toggle AI control
@@ -101,20 +118,45 @@ pub fn handleSDLEvent(
                 }
             }
 
+            // Check if dead player input handling should be used
+            if (!game_state.hex_game.getPlayerAlive()) {
+                const input_type = mapSDLInputToType(event);
+                const dead_result = dead_player_handler.handleDeadInput(input_type);
+                
+                switch (dead_result) {
+                    .Respawn => {
+                        game_state.hex_game.logger.info("respawn_click", "Dead player input respawn triggered", .{});
+                        game_controller.handleRespawn(game_state);
+                        return c.sdl.SDL_APP_CONTINUE;
+                    },
+                    .Block => return c.sdl.SDL_APP_CONTINUE,
+                    .OpenMenu => {
+                        if (game_state.hud_system) |*hud_sys| {
+                            hud_sys.toggle();
+                        }
+                        return c.sdl.SDL_APP_CONTINUE;
+                    },
+                    .Quit => {
+                        game_state.requestQuit();
+                        return c.sdl.SDL_APP_SUCCESS;
+                    },
+                    .Ignore => {}, // Continue with normal processing
+                }
+            }
+
             switch (event.button.button) {
                 c.sdl.SDL_BUTTON_LEFT => {
-                    // Left-click shooting for single shots (burst mode)
-                    game_state.hex_game.logger.info("left_click", "Left click detected at mouse position: {any}", .{game_state.input_state.getMousePos()});
                     if (game_state.hex_game.getPlayerAlive()) {
+                        // Left-click shooting for single shots (burst mode)
+                        game_state.hex_game.logger.info("left_click", "Left click detected at mouse position: {any}", .{game_state.input_state.getMousePos()});
                         const screen_mouse_pos = game_state.input_state.getMousePos();
                         
                         const coord_context = createCoordinateContext(&game_renderer.camera);
                         const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
                         const result = combat.fireBulletAtMouse(&game_state.hex_game, world_mouse_pos, &game_state.hex_game.bullet_pool);
                         game_state.hex_game.logger.info("bullet_result", "fireBulletAtMouse result: {}", .{result});
-                    } else {
-                        game_state.hex_game.logger.info("fire_blocked", "Cannot fire: player not alive", .{});
                     }
+                    // Dead player handling already processed above
                 },
                 c.sdl.SDL_BUTTON_RIGHT => {
                     // Right-click casts spell (self-cast if Ctrl held)

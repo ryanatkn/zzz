@@ -2,18 +2,15 @@ const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
 const constants = @import("constants.zig");
-const components = @import("../lib/game/components.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
-const cooldowns = @import("../lib/game/cooldowns.zig");
+const game_abilities = @import("../lib/game/abilities/mod.zig");
 
 const Vec2 = math.Vec2;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
-
-// Import spell constants from centralized location
 
 pub const SpellType = enum {
     None,
@@ -27,37 +24,9 @@ pub const SpellType = enum {
     Fireball, // Future: AoE damage
 };
 
-pub const SpellSlot = struct {
-    spell_type: SpellType,
-    cooldown_timer: cooldowns.Cooldown,
-
-    pub fn init(spell_type: SpellType) SpellSlot {
-        return .{
-            .spell_type = spell_type,
-            .cooldown_timer = cooldowns.Cooldown.init(getSpellCooldown(spell_type)),
-        };
-    }
-
-    pub fn canCast(self: *const SpellSlot) bool {
-        return self.cooldown_timer.isReady() and self.spell_type != .None;
-    }
-
-    pub fn startCooldown(self: *SpellSlot) void {
-        self.cooldown_timer.start();
-    }
-
-    pub fn update(self: *SpellSlot, deltaTime: f32) void {
-        self.cooldown_timer.update(deltaTime);
-    }
-
-    pub fn getRemainingTime(self: *const SpellSlot) f32 {
-        return self.cooldown_timer.getRemaining();
-    }
-
-    pub fn getProgress(self: *const SpellSlot) f32 {
-        return self.cooldown_timer.getProgress();
-    }
-};
+// Use generic spell slot system from lib/game
+const SpellSlotSystem = game_abilities.spell_slots.SpellSlotSystem(SpellType, 8);
+pub const SpellSlot = game_abilities.spell_slots.SpellSlot(SpellType);
 
 pub const LullEffect = struct {
     pos: Vec2,
@@ -67,35 +36,29 @@ pub const LullEffect = struct {
 };
 
 pub const SpellSystem = struct {
-    // Player has 8 spell slots (1-4, Q, E, R, F)
-    spell_slots: [8]SpellSlot,
-    active_slot: usize,
+    // Use generic spell slot system
+    slot_system: SpellSlotSystem,
 
     // Active Lull effects (support multiple)
     lull_effects: [constants.MAX_LULL_EFFECTS]LullEffect,
 
     pub fn init() SpellSystem {
         var system = SpellSystem{
-            .spell_slots = undefined,
-            .active_slot = 0,
+            .slot_system = SpellSlotSystem.init(),
             .lull_effects = std.mem.zeroes([constants.MAX_LULL_EFFECTS]LullEffect),
         };
 
-        // Initialize spell slots
-        system.spell_slots[0] = SpellSlot.init(.Lull); // Slot 1
-        system.spell_slots[1] = SpellSlot.init(.Blink); // Slot 2
-        for (2..8) |i| {
-            system.spell_slots[i] = SpellSlot.init(.None); // Empty slots
-        }
+        // Initialize spell slots with specific spells and cooldowns
+        system.slot_system.setSpell(0, .Lull, getSpellCooldown(.Lull)); // Slot 1
+        system.slot_system.setSpell(1, .Blink, getSpellCooldown(.Blink)); // Slot 2
+        // Slots 2-7 remain as .None (default)
 
         return system;
     }
 
     pub fn update(self: *SpellSystem, deltaTime: f32) void {
-        // Update all spell cooldowns
-        for (0..8) |i| {
-            self.spell_slots[i].update(deltaTime);
-        }
+        // Update all spell cooldowns using generic system
+        self.slot_system.update(deltaTime);
 
         // Update lull effects
         for (0..self.lull_effects.len) |i| {
@@ -109,13 +72,24 @@ pub const SpellSystem = struct {
     }
 
     pub fn setActiveSlot(self: *SpellSystem, slot: usize) void {
-        if (slot < 8) {
-            self.active_slot = slot;
-        }
+        self.slot_system.setActiveSlot(slot);
+    }
+
+    // Compatibility accessors for existing hex code
+    pub fn getSlot(self: *const SpellSystem, slot_index: usize) ?*const SpellSlot {
+        return self.slot_system.getSlot(slot_index);
+    }
+
+    pub fn getSlotMut(self: *SpellSystem, slot_index: usize) ?*SpellSlot {
+        return self.slot_system.getSlotMut(slot_index);
+    }
+
+    pub fn getActiveSlot(self: *const SpellSystem) *const SpellSlot {
+        return self.slot_system.getActiveSlot();
     }
 
     pub fn castActiveSpell(self: *SpellSystem, game: *HexGame, zone: *const hex_game_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem, self_cast: bool) bool {
-        const slot = &self.spell_slots[self.active_slot];
+        const slot = self.slot_system.getActiveSlotMut();
         if (!slot.canCast()) return false;
 
         // If self-cast, target player position

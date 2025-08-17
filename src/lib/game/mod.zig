@@ -1,5 +1,5 @@
-/// Game helpers barrel export - simplified
-/// Only the actually useful utilities, no complex ECS
+/// Game systems barrel export - reusable patterns and interfaces
+/// Engine provides interfaces, games provide implementations
 
 // Core simple helpers
 pub const ecs = @import("ecs.zig");
@@ -13,11 +13,17 @@ pub const behaviors = @import("behaviors/mod.zig");
 pub const control = @import("control/mod.zig");
 
 // Projectiles
-pub const bullet_pool = @import("projectiles/bullet_pool.zig");
+pub const projectiles = @import("projectiles/bullet_pool.zig");
 
-// State management removed - depends on deleted persistence system
-// Hex game should implement its own simpler save/load
+// New generic systems
+pub const persistence = @import("persistence/mod.zig");
+pub const abilities = @import("abilities/mod.zig");
+pub const systems = @import("systems/mod.zig");
+pub const input = @import("input/mod.zig");
 
 // Simple ID generation
 pub const EntityId = ecs.EntityId;
 pub const INVALID_ENTITY = ecs.INVALID_ENTITY;
+
+// Backwards compatibility
+pub const bullet_pool = projectiles;

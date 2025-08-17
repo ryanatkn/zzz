@@ -52,7 +52,7 @@ pub const GameState = struct {
     iris_wipe_active: bool,
     iris_wipe_start_time: time_utils.Timestamp,
 
-    // TODO: Implement simple save/load system when needed  
+    // Game statistics (uses generic StatisticsInterface from lib/game/persistence)
     game_stats: save_data.GameStatistics,
     
     // AI control system
@@ -83,7 +83,6 @@ pub const GameState = struct {
             .hud_system = null,
             .iris_wipe_active = false,
             .iris_wipe_start_time = time_utils.Time.now(),
-            // TODO: save_manager = null,
             .game_stats = .{},
             .ai_input = null,
             .ai_enabled = false,
@@ -134,11 +133,8 @@ pub const GameState = struct {
         }
     }
 
-    // TODO: Implement save/load functions when needed
-
-
-
-    // Removed complex state management callbacks - implement direct save/load instead
+    // Save/load functions can be implemented using generic persistence patterns from lib/game/persistence/
+    // when needed - GameStatistics already uses StatisticsInterface
 
     pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
         self.hud_system = try reactive_hud.ReactiveHud.init(allocator, renderer_ptr);

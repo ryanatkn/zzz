@@ -22,7 +22,11 @@ Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation), 
 ## Project Structure
 
 - `src/lib/` - Engine library with capability-based organization (see [src/lib/README.md](src/lib/README.md))
+  - **Core Principle:** Engine provides interfaces, games provide implementations
+  - Generic systems designed to be extremely open-ended
 - `src/hex/` - Hex game implementation
+  - Uses generic systems from `lib/game` for reusable functionality
+  - Implements all hex-specific behavior (zones, spells, units, portals)
 - `src/hud/` - HUD overlay system with SvelteKit-style routing
 - `src/menu/` - Menu pages and settings
 - `src/shaders/` - HLSL shaders and compilation
@@ -242,6 +246,9 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - Keep an eye towards extracting or reusing primitives in src/lib
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
+- **Architecture principle:** Engine (lib/game) provides interfaces, games (hex) provide implementations
+- **When refactoring:** Move generic patterns to lib/game, keep game-specific logic in hex
+- **Goal:** Games should be extremely open-ended and customizable
 
 **Logging System Guidelines:**
 - **New Architecture**: Composable logging with compile-time configuration (see `src/lib/debug/logger.zig`)
