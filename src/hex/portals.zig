@@ -1,10 +1,9 @@
-/// Simplified portal system using lib/game/world generic patterns
-/// This replaces the previous 113-line manual implementation with ~20 lines
+/// Simplified portal system using direct zone travel manager
+/// This replaces the portal_integration layer with direct integration
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const HexGameContext = @import("hex_context.zig").HexGameContext;
-const portal_integration = @import("portal_integration.zig");
 
 /// Update portal system (replaces updatePortalCooldown)
 pub fn updatePortalCooldown(context: HexGameContext) void {
@@ -13,7 +12,7 @@ pub fn updatePortalCooldown(context: HexGameContext) void {
     const contexts = @import("../lib/game/contexts/mod.zig");
     const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
     
-    world.portal_system.update(deltaTime);
+    world.zone_travel_manager.update(deltaTime);
 }
 
 /// Check portal collisions using generic system (replaces 80+ lines of manual collision detection)
@@ -28,8 +27,16 @@ pub fn checkPortalCollisions(context: HexGameContext) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
     
-    // Set context for travel handler functions
-    portal_integration.setGameContext(world, &game_state.effect_system);
+    // Check for portal collisions and execute travel directly
+    if (world.zone_travel_manager.checkTeleporterCollisions(world, player_pos, player_radius)) |result| {
+        if (result.success) {
+            loggers.getGameLog().info("portal_travel_success", "Portal travel completed successfully", .{});
+            return true;
+        } else {
+            loggers.getGameLog().err("portal_travel_failed", "Portal travel failed: {?}", .{result.error_info});
+            return false;
+        }
+    }
     
-    return world.portal_system.checkPortalCollisions(player_pos, player_radius);
+    return false;
 }

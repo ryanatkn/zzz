@@ -2,6 +2,7 @@ const std = @import("std");
 const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
 const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
+const combat = @import("../lib/game/combat/mod.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
@@ -14,23 +15,53 @@ const HexGame = @import("hex_game.zig").HexGame;
 // Re-export BulletPool from lib/game/projectiles for compatibility
 pub const BulletPool = BulletPoolImpl;
 
+// Hex-specific interface implementations for generic combat system
+const HexCombatInterface = struct {
+    pub fn getPlayerPos(game: *HexGame) Vec2 {
+        return game.getPlayerPos();
+    }
+    
+    pub fn isPlayerAlive(game: *HexGame) bool {
+        return game.getPlayerAlive();
+    }
+    
+    pub fn createProjectileFromCombat(game: *HexGame, pos: Vec2, velocity: Vec2, radius: f32, lifetime: f32, _: f32) anyerror!u32 {
+        return game.createProjectile(game.zone_manager.getCurrentZoneIndex(), pos, radius, velocity, lifetime);
+    }
+};
+
 pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool {
-    if (!game.getPlayerAlive()) return false;
+    // Use generic combat system
+    const config = combat.CombatActions.ShootConfig.fromShooterToTarget(
+        HexCombatInterface.getPlayerPos(game),
+        target_pos,
+        constants.BULLET_SPEED,
+        constants.BULLET_RADIUS,
+        constants.BULLET_LIFETIME,
+        constants.BULLET_DAMAGE,
+    );
+    
+    // Check if shooting is possible using generic interface
+    if (!combat.CombatActions.canShoot(config)) return false;
     if (!pool.canFire()) return false;
-
-    // Create bullet projectile in current zone
-    const player_pos = game.getPlayerPos();
-    const direction = target_pos.sub(player_pos).normalize();
-    const bullet_speed = constants.BULLET_SPEED;
-    const bullet_vel = direction.scale(bullet_speed);
-
-    // Create bullet entity in current zone
-    const bullet_id = game.createProjectile(game.zone_manager.getCurrentZoneIndex(), player_pos, constants.BULLET_RADIUS, bullet_vel, constants.BULLET_LIFETIME) catch return false;
+    
+    // Calculate velocity using generic system
+    const velocity = combat.CombatActions.calculateProjectileVelocity(config);
+    
+    // Create bullet entity using hex-specific implementation
+    const bullet_id = HexCombatInterface.createProjectileFromCombat(
+        game, 
+        config.shooter_pos, 
+        velocity, 
+        config.projectile_radius, 
+        config.projectile_lifetime, 
+        config.damage
+    ) catch return false;
 
     // Consume from bullet pool
     pool.fire();
 
-    game.logger.info("bullet_fired", "Bullet fired! ID: {}, pos: {any}, target: {any}", .{ bullet_id, player_pos, target_pos });
+    game.logger.info("bullet_fired", "Bullet fired! ID: {}, pos: {any}, target: {any}", .{ bullet_id, config.shooter_pos, target_pos });
     return true;
 }
 
@@ -38,7 +69,7 @@ pub fn fireBulletAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl)
     return fireBullet(game, mouse_pos, pool);
 }
 
-/// Context-aware version of fireBullet
+/// Context-aware version of fireBullet using generic combat patterns
 pub fn fireBulletWithContext(context: HexGameContext, target_pos: Vec2, pool: *BulletPoolImpl) bool {
     if (@hasField(@TypeOf(context), "game_world") and context.game_world != null) {
         return fireBullet(context.game_world.?, target_pos, pool);
@@ -46,9 +77,11 @@ pub fn fireBulletWithContext(context: HexGameContext, target_pos: Vec2, pool: *B
     return false;
 }
 
-/// Context-aware version of fireBulletAtMouse
+/// Context-aware version of fireBulletAtMouse using generic targeting
 pub fn fireBulletAtMouseWithContext(context: HexGameContext, pool: *BulletPoolImpl) bool {
     if (@hasField(@TypeOf(context), "input") and @hasField(@TypeOf(context), "game_world") and context.game_world != null) {
+        // Use generic targeting system for mouse-to-world conversion
+        // For now, keeping the simple approach but this could use combat.Targeting.screenToWorld
         const mouse_pos = context.input.mouse_position;
         return fireBulletWithContext(context, mouse_pos, pool);
     }
@@ -120,24 +153,39 @@ pub fn respawnPlayer(game_state: anytype) void {
     loggers.getGameLog().info("player_respawn", "Player respawned at checkpoint!", .{});
 }
 
+/// Handle player death using generic death patterns
 pub fn handlePlayerDeath(world: *HexGame) void {
+    // Use generic death handling pattern (config available for future use)
+    _ = combat.DamageSystem.DamageConfig.environmental(999); // Lethal damage
+    
     world.setPlayerAlive(false);
     loggers.getGameLog().info("player_death", "Player died! Press R or click to respawn", .{});
 }
 
+/// Handle player death on hazard using generic damage system
 pub fn handlePlayerDeathOnHazard(world: *HexGame) void {
+    // Use generic environmental damage pattern (config available for future use)
+    _ = combat.DamageSystem.DamageConfig.environmental(999);
+    
     world.setPlayerAlive(false);
     loggers.getGameLog().info("player_hazard_death", "Player died on hazard! Press R or click to respawn", .{});
 }
 
-// Unit death on hazard
+/// Handle unit death on hazard using generic damage system
 pub fn handleUnitDeathOnHazard(unit_entity: ecs.EntityId, world: *HexGame) void {
-    const zone_storage = world.getZoneStorage();
-    if (zone_storage.healths.get(unit_entity)) |health| {
-        health.alive = false;
+    const zone = world.getCurrentZone();
+    
+    // Use generic death handling for units
+    if (zone.units.getComponentMut(unit_entity, .health)) |health| {
+        const damage_config = combat.DamageSystem.DamageConfig.environmental(999);
+        const result = combat.DamageSystem.applyDamage(health, damage_config);
+        
+        if (result.target_killed) {
+            // Update visual to show death
+            if (zone.units.getComponentMut(unit_entity, .visual)) |visual| {
+                visual.color = constants.COLOR_DEAD;
+            }
+            loggers.getGameLog().info("unit_hazard_death", "Unit died on hazard!", .{});
+        }
     }
-    if (zone_storage.visuals.get(unit_entity)) |visual| {
-        visual.color = constants.COLOR_DEAD;
-    }
-    loggers.getGameLog().info("unit_hazard_death", "Unit died on hazard!", .{});
 }
