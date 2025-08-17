@@ -87,8 +87,8 @@ pub const GameState = struct {
     });
 
     pub fn init(allocator: std.mem.Allocator) !Self {
-        // Initialize behavior system
-        behaviors.initBehaviors();
+        // Initialize behavior system with allocator
+        behaviors.initBehaviors(allocator);
 
         var game_state = Self{
             .hex_game = HexGame.init(allocator),
@@ -347,7 +347,7 @@ fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
                     }
 
                     // Check collision with obstacles
-                    if (physics.checkUnitObstacleCollision(@constCast(world), unit_id, transform, health, old_pos)) {
+                    if (physics.checkUnitObstacleCollision(world, unit_id, transform, health, old_pos)) {
                         // Collision was handled by the function
                         break;
                     }

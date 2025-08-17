@@ -31,6 +31,7 @@ const loggers = @import("../lib/debug/loggers.zig");
 
 // Hex game modules
 const hex_game_mod = @import("hex_game.zig");
+const game_controller = @import("game.zig");
 const borders = @import("borders.zig");
 const constants = @import("constants.zig");
 
@@ -40,6 +41,7 @@ const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
+const GameState = game_controller.GameState;
 
 pub const GameRenderer = struct {
     gpu: SimpleGPURenderer,
@@ -115,6 +117,11 @@ pub const GameRenderer = struct {
     }
 
     // Render all entities in current zone only with proper camera transforms
+    // 
+    // Note: New rendering utilities available for future optimization:
+    // - src/lib/rendering/entity_renderer.zig: Generic entity rendering with automatic batching/culling
+    // - src/lib/rendering/camera_utils.zig: Batch camera transformations and viewport culling
+    // These modules can replace the duplicate loops below for improved performance and code reuse
     pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
         const zone = game.getCurrentZoneConst();
 
@@ -202,7 +209,7 @@ pub const GameRenderer = struct {
     }
 
     // Draw border system with stacking support
-    pub fn drawBorders(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game_state: anytype) void {
+    pub fn drawBorders(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game_state: *GameState) void {
         const border_config = animated_borders.BorderConfig{
             .max_layers = constants.MAX_BORDER_LAYERS,
             .screen_width = constants.SCREEN_WIDTH,
@@ -234,7 +241,7 @@ pub const GameRenderer = struct {
             iris_wipe.getBorders(elapsed_sec, &border_stack);
 
             if (elapsed_sec >= constants.IRIS_WIPE_DURATION) {
-                @constCast(game_state).iris_wipe_active = false;
+                game_state.iris_wipe_active = false;
             }
         }
 

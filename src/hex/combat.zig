@@ -9,8 +9,10 @@ const game_systems = @import("../lib/game/systems/mod.zig");
 
 const Vec2 = math.Vec2;
 const hex_game_mod = @import("hex_game.zig");
+const game_controller = @import("game.zig");
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
+const GameState = game_controller.GameState;
 
 // Re-export BulletPool from lib/game/projectiles for compatibility
 pub const BulletPool = BulletPoolImpl;
@@ -90,7 +92,7 @@ fn findBestRespawnCheckpoint(game: *HexGame) ?game_systems.respawn.RespawnInterf
     return null;
 }
 
-pub fn respawnPlayer(game_state: anytype) void {
+pub fn respawnPlayer(game_state: *GameState) void {
     const world = &game_state.hex_game;
     const effect_system = &game_state.effect_system;
 

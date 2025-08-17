@@ -23,27 +23,36 @@ const FrameContext = frame.FrameContext;
 // Import BehaviorProfile from hex_game.zig to avoid circular dependency
 const BehaviorProfile = hex_game_mod.BehaviorProfile;
 
-/// Unit behavior state storage (games need to manage this)
-/// Note: Using page_allocator for now but should accept allocator parameter in production
-var unit_behavior_states = std.AutoHashMap(u32, unit_behavior.UnitBehaviorState).init(std.heap.page_allocator);
-var unit_behavior_configs = std.AutoHashMap(u32, unit_behavior.UnitBehaviorConfig).init(std.heap.page_allocator);
+/// Unit behavior state storage with proper allocator management
+var unit_behavior_states: ?std.AutoHashMap(u32, unit_behavior.UnitBehaviorState) = null;
+var unit_behavior_configs: ?std.AutoHashMap(u32, unit_behavior.UnitBehaviorConfig) = null;
+var behaviors_allocator: ?std.mem.Allocator = null;
 
 /// Static fallback state for error recovery (memory-safe alternative to @constCast)
 var fallback_state = unit_behavior.UnitBehaviorState.init(Vec2.ZERO, &[_]Vec2{}, 0);
 var fallback_config = unit_behavior.UnitBehaviorConfig.aggressive(Vec2.ZERO, 100.0, 50.0);
 
-/// Initialize behavior system
-pub fn initBehaviors() void {
+/// Initialize behavior system with proper allocator
+pub fn initBehaviors(allocator: std.mem.Allocator) void {
     // Clear any existing state
     deinitBehaviors();
-    unit_behavior_states = std.AutoHashMap(u32, unit_behavior.UnitBehaviorState).init(std.heap.page_allocator);
-    unit_behavior_configs = std.AutoHashMap(u32, unit_behavior.UnitBehaviorConfig).init(std.heap.page_allocator);
+    
+    behaviors_allocator = allocator;
+    unit_behavior_states = std.AutoHashMap(u32, unit_behavior.UnitBehaviorState).init(allocator);
+    unit_behavior_configs = std.AutoHashMap(u32, unit_behavior.UnitBehaviorConfig).init(allocator);
 }
 
 /// Cleanup behavior system
 pub fn deinitBehaviors() void {
-    unit_behavior_states.deinit();
-    unit_behavior_configs.deinit();
+    if (unit_behavior_states) |*states| {
+        states.deinit();
+    }
+    if (unit_behavior_configs) |*configs| {
+        configs.deinit();
+    }
+    unit_behavior_states = null;
+    unit_behavior_configs = null;
+    behaviors_allocator = null;
 }
 
 /// Create behavior configuration for specific profile with consistent parameters
@@ -111,7 +120,13 @@ pub fn createBehaviorConfig(profile: BehaviorProfile, home_pos: Vec2) unit_behav
 
 /// Get or create behavior state for a unit entity
 fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: BehaviorProfile) *unit_behavior.UnitBehaviorState {
-    const state_result = unit_behavior_states.getOrPut(entity_id) catch {
+    if (unit_behavior_states == null) {
+        std.log.err("Behavior system not initialized, using fallback for entity {}", .{entity_id});
+        fallback_state = unit_behavior.UnitBehaviorState.init(unit_comp.base.home_pos, &[_]Vec2{}, entity_id);
+        return &fallback_state;
+    }
+    
+    const state_result = unit_behavior_states.?.getOrPut(entity_id) catch {
         std.log.err("Failed to get or create behavior state for entity {}, using fallback", .{entity_id});
         // Update fallback state and return reference to it (memory-safe)
         fallback_state = unit_behavior.UnitBehaviorState.init(unit_comp.base.home_pos, &[_]Vec2{}, entity_id);
@@ -137,7 +152,13 @@ fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: Beh
 
 /// Get or create behavior config for a unit entity
 fn getOrCreateBehaviorConfig(entity_id: u32, unit_comp: *const Unit, profile: BehaviorProfile) *unit_behavior.UnitBehaviorConfig {
-    const config_result = unit_behavior_configs.getOrPut(entity_id) catch {
+    if (unit_behavior_configs == null) {
+        std.log.err("Behavior system not initialized, using fallback for entity {}", .{entity_id});
+        fallback_config = createConfigForProfile(profile, unit_comp.base.home_pos);
+        return &fallback_config;
+    }
+    
+    const config_result = unit_behavior_configs.?.getOrPut(entity_id) catch {
         std.log.err("Failed to get or create behavior config for entity {}, using fallback", .{entity_id});
         // Update fallback config and return reference to it (memory-safe)
         fallback_config = createConfigForProfile(profile, unit_comp.base.home_pos);
