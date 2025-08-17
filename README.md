@@ -5,7 +5,7 @@
 Zzz is a GUI in Zig written by Claude Code and designed by people.
 For the companion CLI see [zz](https://github.com/ryanatkn/zz).
 
-> **status**: [vibe-engineered](https://github.com/ryanatkn/zz/blob/main/docs/vibe-engineering.md) slop level 1
+> **status**: [vibe-engineered](./docs/vibe-engineering.md) slop level 1
 
 ## Quick start
 

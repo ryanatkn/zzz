@@ -10,29 +10,26 @@ const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
 const spells = @import("spells.zig");
+
+// Import new input system modules
 const game_input = @import("../lib/game/input/mod.zig");
+const input_actions = game_input.actions;
+const input_modifiers = game_input.modifiers;
+const dead_player_handler = game_input.dead_player_handler;
 
 const Vec2 = math.Vec2;
 const GameState = game_controller.GameState;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const Hud = hud.Hud;
+const GameAction = input_actions.GameAction;
 
-// Configure dead player handler for hex game behavior
-const dead_player_handler = game_input.dead_player_handler.DeadPlayerHandler.init(game_input.dead_player_handler.DeadPlayerConfigs.STANDARD);
-
-/// Map SDL input to generic input type for dead player handling
-fn mapSDLInputToType(event: *const c.sdl.SDL_Event) game_input.input_patterns.InputType {
+/// Extract game action from SDL event
+fn extractGameAction(event: *const c.sdl.SDL_Event) GameAction {
     return switch (event.type) {
-        c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => .MouseClick,
-        c.sdl.SDL_EVENT_KEY_DOWN => switch (event.key.scancode) {
-            c.sdl.SDL_SCANCODE_R => .RespawnKey,
-            c.sdl.SDL_SCANCODE_GRAVE => .MenuKey,
-            c.sdl.SDL_SCANCODE_ESCAPE => .QuitKey,
-            c.sdl.SDL_SCANCODE_W, c.sdl.SDL_SCANCODE_A, c.sdl.SDL_SCANCODE_S, c.sdl.SDL_SCANCODE_D => .MovementKey,
-            c.sdl.SDL_SCANCODE_1, c.sdl.SDL_SCANCODE_2, c.sdl.SDL_SCANCODE_3, c.sdl.SDL_SCANCODE_4, c.sdl.SDL_SCANCODE_Q, c.sdl.SDL_SCANCODE_E, c.sdl.SDL_SCANCODE_F => .SpellKey,
-            else => .Unknown,
-        },
-        else => .Unknown,
+        c.sdl.SDL_EVENT_KEY_DOWN => input_actions.mapScancodeToAction(event.key.scancode),
+        c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => input_actions.mapMouseButtonToAction(event.button.button),
+        c.sdl.SDL_EVENT_MOUSE_WHEEL => input_actions.mapMouseWheelToAction(event.wheel.y),
+        else => .None,
     };
 }
 
@@ -63,12 +60,29 @@ pub fn handleSDLEvent(
         },
         c.sdl.SDL_EVENT_KEY_DOWN => {
             game_state.input_state.handleKeyDown(event.key.scancode);
-            switch (event.key.scancode) {
-                c.sdl.SDL_SCANCODE_ESCAPE => {
+            
+            // Extract action from keypress
+            const action = extractGameAction(event);
+            
+            // Create action context
+            const action_context = input_actions.ActionContext.init()
+                .withPlayerState(game_state.hex_game.getPlayerAlive())
+                .withMenuState(if (game_state.hud_system) |*hud_sys| hud_sys.is_open() else false)
+                .withPauseState(game_state.game_paused);
+            
+            // Check if action should be processed
+            const priority = input_actions.getActionPriority(action);
+            if (!action_context.shouldAllowAction(action, priority)) {
+                return c.sdl.SDL_APP_CONTINUE;
+            }
+            
+            // Process the action
+            switch (action) {
+                .Quit => {
                     game_state.requestQuit();
                     return c.sdl.SDL_APP_SUCCESS;
                 },
-                c.sdl.SDL_SCANCODE_GRAVE => { // Backtick key - toggle HUD/system menu
+                .ToggleMenu => {
                     if (game_state.hud_system) |*hud_sys| {
                         hud_sys.toggle();
                     } else {
@@ -76,28 +90,27 @@ pub fn handleSDLEvent(
                         game_hud.toggle();
                     }
                 },
-                c.sdl.SDL_SCANCODE_SPACE => { // Space key - pause toggle
+                .TogglePause => {
                     game_state.togglePause();
                 },
-                c.sdl.SDL_SCANCODE_T => { // T key - reset current zone units
+                .ResetZone => {
                     game_state.resetZone();
                 },
-                c.sdl.SDL_SCANCODE_Y => { // Y key - full game reset
+                .ResetGame => {
                     game_state.resetGame();
                 },
-                // Spell slot keybindings (1-4 number keys)
-                c.sdl.SDL_SCANCODE_1, c.sdl.SDL_SCANCODE_2, c.sdl.SDL_SCANCODE_3, c.sdl.SDL_SCANCODE_4 => {
-                    const slot = event.key.scancode - c.sdl.SDL_SCANCODE_1;
-                    game_state.spell_system.setActiveSlot(slot);
-                },
-                c.sdl.SDL_SCANCODE_Q => game_state.spell_system.setActiveSlot(4),
-                c.sdl.SDL_SCANCODE_E => game_state.spell_system.setActiveSlot(5),
-                c.sdl.SDL_SCANCODE_R => { // R key - always respawn
+                .Respawn => {
                     game_controller.handleRespawn(game_state);
                 },
-                c.sdl.SDL_SCANCODE_F => game_state.spell_system.setActiveSlot(7),
-                c.sdl.SDL_SCANCODE_G => { // G key - toggle AI control
+                .ToggleAI => {
                     game_state.toggleAIControl();
+                },
+                // Spell selection actions
+                .SelectSpell1, .SelectSpell2, .SelectSpell3, .SelectSpell4,
+                .SelectSpell5, .SelectSpell6, .SelectSpell7, .SelectSpell8 => {
+                    if (input_actions.getSpellSlotFromAction(action)) |slot| {
+                        game_state.spell_system.setActiveSlot(slot);
+                    }
                 },
                 else => {},
             }
@@ -118,38 +131,35 @@ pub fn handleSDLEvent(
                 }
             }
 
-            // Check if dead player input handling should be used
+            // Extract action from mouse button
+            const action = extractGameAction(event);
+            
+            // Handle dead player actions
             if (!game_state.hex_game.getPlayerAlive()) {
-                const input_type = mapSDLInputToType(event);
-                const dead_result = dead_player_handler.handleDeadInput(input_type);
-
+                const dead_result = dead_player_handler.DeadPlayerHandler.handleDeadPlayerAction(action);
                 switch (dead_result) {
                     .Respawn => {
-                        game_state.hex_game.logger.info("respawn_click", "Dead player input respawn triggered", .{});
+                        game_state.hex_game.logger.info("respawn_click", "Dead player action respawn triggered", .{});
                         game_controller.handleRespawn(game_state);
                         return c.sdl.SDL_APP_CONTINUE;
                     },
                     .Block => return c.sdl.SDL_APP_CONTINUE,
-                    .OpenMenu => {
-                        if (game_state.hud_system) |*hud_sys| {
-                            hud_sys.toggle();
-                        }
-                        return c.sdl.SDL_APP_CONTINUE;
-                    },
-                    .Quit => {
-                        game_state.requestQuit();
-                        return c.sdl.SDL_APP_SUCCESS;
-                    },
-                    .Ignore => {}, // Continue with normal processing
+                    .Allow => {}, // Continue with normal processing for system actions
                 }
             }
 
-            switch (event.button.button) {
-                c.sdl.SDL_BUTTON_LEFT => {
-                    // Only shoot if Ctrl is NOT held (Ctrl+click is for movement)
-                    if (game_state.hex_game.getPlayerAlive() and !game_state.input_state.isCtrlHeld()) {
+            // Process action for living player
+            switch (action) {
+                .PrimaryAttack => {
+                    if (game_state.hex_game.getPlayerAlive()) {
+                        // Check if this should be move-to-click instead of shooting
+                        if (input_modifiers.ModifierHelpers.isMoveToClick(&game_state.input_state)) {
+                            // TODO: Implement move-to-click functionality
+                            return c.sdl.SDL_APP_CONTINUE;
+                        }
+                        
                         // Left-click shooting for single shots (burst mode)
-                        game_state.hex_game.logger.info("left_click", "Left click detected at mouse position: {any}", .{game_state.input_state.getMousePos()});
+                        game_state.hex_game.logger.info("primary_attack", "Primary attack at mouse position: {any}", .{game_state.input_state.getMousePos()});
                         const screen_mouse_pos = game_state.input_state.getMousePos();
 
                         const coord_context = createCoordinateContext(&game_renderer.camera);
@@ -157,19 +167,18 @@ pub fn handleSDLEvent(
                         const result = combat.fireBulletAtMouse(&game_state.hex_game, world_mouse_pos, &game_state.hex_game.bullet_pool);
                         game_state.hex_game.logger.info("bullet_result", "fireBulletAtMouse result: {}", .{result});
                     }
-                    // Dead player handling already processed above
                 },
-                c.sdl.SDL_BUTTON_RIGHT => {
-                    // Right-click casts spell (self-cast if Ctrl held)
+                .SecondaryAttack => {
                     if (game_state.hex_game.getPlayerAlive()) {
-                        const ctrl_held = game_state.input_state.isCtrlHeld();
+                        // Check if this should be self-cast
+                        const self_cast = input_modifiers.ModifierHelpers.isSelfCasting(&game_state.input_state);
                         const screen_mouse_pos = game_state.input_state.getMousePos();
 
                         const coord_context = createCoordinateContext(&game_renderer.camera);
                         const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
                         const zone = game_state.hex_game.getCurrentZoneConst();
 
-                        _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, world_mouse_pos, &game_state.effect_system, ctrl_held);
+                        _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, world_mouse_pos, &game_state.effect_system, self_cast);
                     }
                 },
                 else => {},
@@ -179,15 +188,17 @@ pub fn handleSDLEvent(
             game_state.input_state.handleMouseButtonUp(event.button.button);
         },
         c.sdl.SDL_EVENT_MOUSE_WHEEL => {
-            // Mouse wheel zoom
+            const action = extractGameAction(event);
             const current_zone = game_state.hex_game.getCurrentZone();
-
-            if (event.wheel.y > 0) {
-                // Zoom in (scroll up)
-                current_zone.camera_scale = @min(constants.MAX_ZOOM, current_zone.camera_scale * constants.ZOOM_FACTOR);
-            } else if (event.wheel.y < 0) {
-                // Zoom out (scroll down)
-                current_zone.camera_scale = @max(constants.MIN_ZOOM, current_zone.camera_scale / constants.ZOOM_FACTOR);
+            
+            switch (action) {
+                .ZoomIn => {
+                    current_zone.camera_scale = @min(constants.MAX_ZOOM, current_zone.camera_scale * constants.ZOOM_FACTOR);
+                },
+                .ZoomOut => {
+                    current_zone.camera_scale = @max(constants.MIN_ZOOM, current_zone.camera_scale / constants.ZOOM_FACTOR);
+                },
+                else => {},
             }
         },
         else => {},

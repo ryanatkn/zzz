@@ -6,6 +6,13 @@ const viewport = @import("../core/viewport.zig");
 
 const Vec2 = math.Vec2;
 
+/// Modifier key state as a packed struct
+pub const ModifierKeys = packed struct {
+    ctrl: bool = false,
+    shift: bool = false,
+    alt: bool = false,
+};
+
 pub const InputState = struct {
     keys_down: std.StaticBitSet(512),
     mouse_pos: Vec2,
@@ -108,6 +115,27 @@ pub const InputState = struct {
 
     pub fn isShiftHeld(self: *const Self) bool {
         return self.isKeyDown(c.sdl.SDL_SCANCODE_LSHIFT) or self.isKeyDown(c.sdl.SDL_SCANCODE_RSHIFT);
+    }
+
+    pub fn isAltHeld(self: *const Self) bool {
+        return self.isKeyDown(c.sdl.SDL_SCANCODE_LALT) or self.isKeyDown(c.sdl.SDL_SCANCODE_RALT);
+    }
+
+    /// Get all modifier keys as a packed struct
+    pub fn getModifiers(self: *const Self) ModifierKeys {
+        return ModifierKeys{
+            .ctrl = self.isCtrlHeld(),
+            .shift = self.isShiftHeld(),
+            .alt = self.isAltHeld(),
+        };
+    }
+
+    /// Clear all input state (useful for state transitions)
+    pub fn clearAllInput(self: *Self) void {
+        self.keys_down = std.StaticBitSet(512).initEmpty();
+        self.left_mouse_held = false;
+        self.right_mouse_held = false;
+        self.mouse_pos = Vec2.ZERO;
     }
 
     pub fn clearMouseHold(self: *Self) void {
