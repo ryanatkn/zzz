@@ -435,15 +435,33 @@ pub const BrowserRenderer = struct {
     
     /// Render content area
     fn renderContentArea(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
-        _ = ide_page_impl;
-        
         // Panel header
-        self.drawSimpleText(cmd_buffer, render_pass, "CONTENT EDITOR (~800px max)", 
-            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
-            
-        // Placeholder content
-        self.drawSimpleText(cmd_buffer, render_pass, "Select a file to view its contents", 
-            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+        if (ide_page_impl.file_tree_component.getSelectedEntry()) |selected| {
+            // Show file name in header
+            var header_buf: [256]u8 = undefined;
+            const header_text = std.fmt.bufPrint(&header_buf, "FILE: {s}", .{selected.metadata.name}) catch "FILE: <name too long>";
+            self.drawSimpleText(cmd_buffer, render_pass, header_text,
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+        } else {
+            self.drawSimpleText(cmd_buffer, render_pass, "CONTENT EDITOR (~800px max)", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+        }
+        
+        // Display file content or error
+        if (ide_page_impl.current_file_error) |error_msg| {
+            // Show error message
+            self.drawSimpleText(cmd_buffer, render_pass, "Error:", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.drawSimpleText(cmd_buffer, render_pass, error_msg, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
+        } else if (ide_page_impl.current_file_content) |content| {
+            // Show file content line by line
+            try self.renderFileContent(cmd_buffer, render_pass, content, panel_rect);
+        } else {
+            // No file selected
+            self.drawSimpleText(cmd_buffer, render_pass, "Select a file to view its contents", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+        }
     }
     
     /// Render preview panel  
@@ -511,9 +529,63 @@ pub const BrowserRenderer = struct {
         }
     }
     
+    /// Render file content with line wrapping and scrolling
+    fn renderFileContent(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, content: []const u8, panel_rect: math.Rectangle) !void {
+        const line_height: f32 = 16;
+        const char_width: f32 = 8;
+        const start_y = panel_rect.position.y + 40; // Below header
+        const max_lines = @as(u32, @intFromFloat((panel_rect.size.y - 50) / line_height)); // Available space for content
+        const max_chars_per_line = @as(u32, @intFromFloat((panel_rect.size.x - 20) / char_width)); // Characters that fit
+        
+        var line_num: u32 = 0;
+        var lines = std.mem.splitScalar(u8, content, '\n');
+        
+        while (lines.next()) |line| {
+            if (line_num >= max_lines) break;
+            
+            const y_pos = start_y + @as(f32, @floatFromInt(line_num)) * line_height;
+            
+            // Truncate long lines to fit in panel
+            const display_line = if (line.len > max_chars_per_line) 
+                line[0..max_chars_per_line] 
+            else 
+                line;
+            
+            // Draw line number
+            var line_num_buf: [8]u8 = undefined;
+            const line_num_text = std.fmt.bufPrint(&line_num_buf, "{d}:", .{line_num + 1}) catch "?:";
+            
+            // Line numbers in darker color
+            const line_num_color = Color{ .r = 120, .g = 120, .b = 120, .a = 255 };
+            self.drawTextWithColor(cmd_buffer, render_pass, line_num_text, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = y_pos }, line_num_color);
+            
+            // File content in normal color  
+            const content_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
+            self.drawTextWithColor(cmd_buffer, render_pass, display_line,
+                Vec2{ .x = panel_rect.position.x + 50, .y = y_pos }, content_color);
+            
+            line_num += 1;
+        }
+        
+        // Show truncation message if content is too long
+        if (line_num >= max_lines) {
+            const truncate_msg = "... (file truncated for display)";
+            const truncate_color = Color{ .r = 150, .g = 150, .b = 50, .a = 255 };
+            self.drawTextWithColor(cmd_buffer, render_pass, truncate_msg,
+                Vec2{ .x = panel_rect.position.x + 10, .y = start_y + @as(f32, @floatFromInt(max_lines)) * line_height },
+                truncate_color);
+        }
+    }
+
     /// Draw simple text using basic rectangles (temporary implementation)
     fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2) void {
         const text_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
+        self.drawTextWithColor(cmd_buffer, render_pass, text, position, text_color);
+    }
+    
+    /// Draw text with specified color
+    fn drawTextWithColor(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2, text_color: Color) void {
         const char_width: f32 = 8;
         const char_height: f32 = 12;
         

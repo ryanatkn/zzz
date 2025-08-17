@@ -73,8 +73,13 @@ fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
 }
 
 fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
-    _ = allocator;
     const ide: *IDEPage = @fieldParentPtr("base", self);
+    
+    // Clean up file content
+    if (ide.current_file_content) |content| {
+        allocator.free(content);
+        ide.current_file_content = null;
+    }
     
     // Clean up file tree
     ide.file_tree_component.deinit();
@@ -142,7 +147,71 @@ pub fn handleFileTreeClick(self: *IDEPage, point: Vec2) !bool {
         .y = point.y - explorer_rect.y 
     };
     
-    return try self.file_tree_component.handleClick(relative_point);
+    const clicked = try self.file_tree_component.handleClick(relative_point);
+    
+    // If a file was selected, try to load its content
+    if (clicked) {
+        if (self.getSelectedEntry()) |selected| {
+            if (!selected.metadata.is_directory) {
+                try self.loadFileContent(selected);
+            }
+        }
+    }
+    
+    return clicked;
+}
+
+/// Load file content safely with size and error handling
+fn loadFileContent(self: *IDEPage, entry: *DirectoryEntry) !void {
+    // Clear previous content and errors
+    if (self.current_file_content) |old_content| {
+        self.allocator.free(old_content);
+        self.current_file_content = null;
+    }
+    self.current_file_error = null;
+    
+    // Safety limits
+    const MAX_FILE_SIZE = 1024 * 1024; // 1MB limit
+    
+    // Check file size first
+    if (entry.metadata.size > MAX_FILE_SIZE) {
+        self.current_file_error = "File too large (max 1MB)";
+        return;
+    }
+    
+    // Try to open and read the file
+    const file = std.fs.cwd().openFile(entry.metadata.full_path, .{}) catch |err| {
+        self.current_file_error = switch (err) {
+            error.FileNotFound => "File not found",
+            error.AccessDenied => "Access denied",
+            error.IsDir => "Cannot read directory",
+            else => "Failed to open file",
+        };
+        return;
+    };
+    defer file.close();
+    
+    // Read file content
+    const content = file.readToEndAlloc(self.allocator, MAX_FILE_SIZE) catch |err| {
+        self.current_file_error = switch (err) {
+            error.OutOfMemory => "Out of memory",
+            error.FileTooBig => "File too large",
+            else => "Failed to read file",
+        };
+        return;
+    };
+    
+    self.current_file_content = content;
+}
+
+/// Get current file content for display
+pub fn getCurrentFileContent(self: *const IDEPage) ?[]const u8 {
+    return self.current_file_content;
+}
+
+/// Get current file error for display
+pub fn getCurrentFileError(self: *const IDEPage) ?[]const u8 {
+    return self.current_file_error;
 }
 
 /// Render the dashboard UI components using the provided renderer  
