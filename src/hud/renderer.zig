@@ -352,9 +352,9 @@ pub const BrowserRenderer = struct {
         // Render preview panel
         try self.renderPreviewPanel(cmd_buffer, render_pass, ide_page_impl, preview_rect);
             
-        // Add a simple test text to verify font rendering is working
-        self.drawSimpleText(cmd_buffer, render_pass, "*** IDE TEST TEXT ***", 
-            Vec2{ .x = 20, .y = 20 });
+        
+        // Render search and filter controls in header
+        try self.renderSearchControls(cmd_buffer, render_pass, ide_page_impl, screen_size);
         
         // Draw resolution info in header
         var resolution_buf: [64]u8 = undefined;
@@ -641,15 +641,75 @@ pub const BrowserRenderer = struct {
         self.drawTextWithColor(text, position, text_color);
     }
     
-    /// Draw text with specified color using MenuTextRenderer (exact same as working buttons)
+    /// Draw text with specified color using MenuTextRenderer (16pt font for compatibility)
     fn drawTextWithColor(self: *BrowserRenderer, text: []const u8, position: Vec2, text_color: Color) void {
-        const log = std.log.scoped(.ide_text);
-        log.debug("IDE text queuing: '{s}' at ({d:.1}, {d:.1}) font_size={d:.1}", .{ text, position.x, position.y, ide_constants.TEXT.CONTENT_FONT_SIZE });
-        
-        // Use the exact same approach as working buttons
+        // Use the same approach as working buttons - 16pt font renders reliably
         var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
-        
-        // Use queueCustomText like the working buttons do
         menu_renderer.queueCustomText(text, position, ide_constants.TEXT.CONTENT_FONT_SIZE, text_color);
+    }
+
+    /// Render search and filter controls in header
+    fn renderSearchControls(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, screen_size: Vec2) !void {
+        _ = screen_size; // May be used later for responsive layout
+        const search_x = 20.0;
+        const search_y = 15.0;
+        const search_width = 200.0;
+        const search_height = 30.0;
+        
+        // Search input background
+        self.base_renderer.gpu.drawRect(
+            cmd_buffer,
+            render_pass,
+            Vec2{ .x = search_x, .y = search_y },
+            Vec2{ .x = search_width, .y = search_height },
+            Color{ .r = 40, .g = 45, .b = 50, .a = 255 }
+        );
+        
+        // Search input border
+        self.base_renderer.gpu.drawRect(
+            cmd_buffer,
+            render_pass,
+            Vec2{ .x = search_x, .y = search_y },
+            Vec2{ .x = search_width, .y = 2 },
+            Color{ .r = 80, .g = 85, .b = 90, .a = 255 }
+        );
+        
+        // Search placeholder or actual text
+        const search_text = if (ide_page_impl.getSearchQuery().len > 0) 
+            ide_page_impl.getSearchQuery() 
+        else 
+            "🔍 Search files...";
+            
+        self.drawSimpleText(cmd_buffer, render_pass, search_text,
+            Vec2{ .x = search_x + 8, .y = search_y + 8 });
+        
+        // Filter dropdown
+        const filter_x = search_x + search_width + 20.0;
+        const filter_width = 120.0;
+        
+        // Filter background
+        self.base_renderer.gpu.drawRect(
+            cmd_buffer,
+            render_pass,
+            Vec2{ .x = filter_x, .y = search_y },
+            Vec2{ .x = filter_width, .y = search_height },
+            Color{ .r = 40, .g = 45, .b = 50, .a = 255 }
+        );
+        
+        // Filter border  
+        self.base_renderer.gpu.drawRect(
+            cmd_buffer,
+            render_pass,
+            Vec2{ .x = filter_x, .y = search_y },
+            Vec2{ .x = filter_width, .y = 2 },
+            Color{ .r = 80, .g = 85, .b = 90, .a = 255 }
+        );
+        
+        // Filter text
+        var filter_text_buf: [32]u8 = undefined;
+        const filter_text = std.fmt.bufPrint(&filter_text_buf, "Filter: {s} ▼", .{ide_page_impl.getFileTypeFilter().getDisplayName()}) catch "Filter: All ▼";
+        
+        self.drawSimpleText(cmd_buffer, render_pass, filter_text,
+            Vec2{ .x = filter_x + 8, .y = search_y + 8 });
     }
 };
