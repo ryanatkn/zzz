@@ -260,7 +260,7 @@ pub const TextArea = struct {
 pub fn createTextArea(allocator: std.mem.Allocator, position: Vec2, size: Vec2) !*Component {
     const area = try allocator.create(TextArea);
     
-    var props = try ComponentProps.init(allocator, position, size);
+    const props = try ComponentProps.init(allocator, position, size);
     
     area.* = TextArea{
         .base = Component{

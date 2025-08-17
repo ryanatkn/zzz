@@ -301,7 +301,7 @@ pub const ListView = struct {
 pub fn createListView(allocator: std.mem.Allocator, position: Vec2, size: Vec2) !*Component {
     const list = try allocator.create(ListView);
     
-    var props = try ComponentProps.init(allocator, position, size);
+    const props = try ComponentProps.init(allocator, position, size);
     
     list.* = ListView{
         .base = Component{

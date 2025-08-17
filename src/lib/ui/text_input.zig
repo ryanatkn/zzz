@@ -1,7 +1,7 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
-const reactive = @import("../reactive.zig");
+const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
 
 const Vec2 = math.Vec2;
@@ -286,7 +286,7 @@ pub const TextInput = struct {
 pub fn createTextInput(allocator: std.mem.Allocator, position: Vec2, size: Vec2) !*Component {
     const input = try allocator.create(TextInput);
     
-    var props = try ComponentProps.init(allocator, position, size);
+    const props = try ComponentProps.init(allocator, position, size);
     
     input.* = TextInput{
         .base = Component{

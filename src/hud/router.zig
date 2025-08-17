@@ -11,6 +11,7 @@ const settings_fonts_save_page = @import("../menu/settings/fonts/save/+page.zig"
 const stats_page = @import("../menu/stats/+page.zig");
 const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
 const vector_test_page = @import("../menu/vector_test/+page.zig");
+const ide_page = @import("../menu/ide/+page.zig");
 
 pub const Router = struct {
     allocator: std.mem.Allocator,
@@ -125,6 +126,14 @@ pub const Router = struct {
 
             // Load vector test page
             self.current_page = try vector_test_page.create(self.allocator);
+        } else if (std.mem.eql(u8, path, "/ide")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+
+            // Load IDE page
+            self.current_page = try ide_page.create(self.allocator);
         } else {
             // Default to index for unknown paths
             // Load root layout

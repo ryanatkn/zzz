@@ -1,7 +1,7 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
-const reactive = @import("../reactive.zig");
+const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
 
 const Vec2 = math.Vec2;
@@ -151,7 +151,6 @@ pub const PanelLayout = struct {
         
         if (!self.props.visible.get()) return;
         
-        const bounds = self.props.getBounds();
         const divider_rect = layout.getDividerBounds();
         
         if (@hasDecl(@TypeOf(renderer), "drawRect")) {
@@ -177,11 +176,11 @@ pub const PanelLayout = struct {
             } else if (@hasField(@TypeOf(event), "mouse_released") and event.mouse_released) {
                 layout.is_dragging = false;
             } else if (layout.is_dragging) {
-                const bounds = self.props.getBounds();
+                const comp_bounds = self.props.getBounds();
                 const delta = if (layout.split_direction.get() == .horizontal)
-                    (mouse_pos.x - layout.drag_start_pos.x) / bounds.size.x
+                    (mouse_pos.x - layout.drag_start_pos.x) / comp_bounds.size.x
                 else
-                    (mouse_pos.y - layout.drag_start_pos.y) / bounds.size.y;
+                    (mouse_pos.y - layout.drag_start_pos.y) / comp_bounds.size.y;
                 
                 const new_ratio = std.math.clamp(layout.drag_start_ratio + delta, 0.1, 0.9);
                 layout.split_ratio.set(new_ratio);
@@ -275,7 +274,7 @@ pub const PanelLayout = struct {
 pub fn createPanel(allocator: std.mem.Allocator, position: Vec2, size: Vec2) !*Component {
     const panel = try allocator.create(Panel);
     
-    var props = try ComponentProps.init(allocator, position, size);
+    const props = try ComponentProps.init(allocator, position, size);
     props.background_color.set(Color{ .r = 40, .g = 40, .b = 40, .a = 255 });
     
     panel.* = Panel{
@@ -309,7 +308,7 @@ pub fn createPanelLayout(
 ) !*Component {
     const layout = try allocator.create(PanelLayout);
     
-    var props = try ComponentProps.init(allocator, position, size);
+    const props = try ComponentProps.init(allocator, position, size);
     
     layout.* = PanelLayout{
         .base = Component{
