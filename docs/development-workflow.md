@@ -30,19 +30,6 @@ Active development uses TODO documents for task tracking and planning:
 - Commit completion status updates
 - Use git history for granular progress tracking
 
-## Session Workflow (WORKFLOW.md)
-
-Standard development session pattern:
-
-1. Assess TODO_DOC.md
-2. Do the thing:
-   - Submit optional elicitations to the user for context
-   - Use `zz prompt` for language-aware information extraction
-   - Run tests and get output
-   - Iterate as needed
-3. Update TODO_DOC.md
-4. Commit with clear message
-
 ## Import Guidelines
 
 ### Library Import Patterns

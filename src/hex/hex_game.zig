@@ -12,6 +12,7 @@ const storage = @import("../lib/game/storage/mod.zig");
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 const BulletPool = combat.BulletPool;
+const EntityIterator = storage.hex_archetypes.EntityIterator;
 
 // Logging setup
 const Logger = @import("../lib/debug/logger.zig").Logger;
@@ -115,211 +116,12 @@ pub const HexProjectile = struct {
 // For compatibility with existing code that expects direct field access
 pub const Projectile = HexProjectile;
 
-// Simple fixed-size storage for each archetype
-const PlayerStorage = struct {
-    entities: [MAX_ENTITIES_PER_ARCHETYPE]EntityId,
-    transforms: [MAX_ENTITIES_PER_ARCHETYPE]Transform,
-    healths: [MAX_ENTITIES_PER_ARCHETYPE]Health,
-    player_inputs: [MAX_ENTITIES_PER_ARCHETYPE]PlayerInput,
-    visuals: [MAX_ENTITIES_PER_ARCHETYPE]Visual,
-    movements: [MAX_ENTITIES_PER_ARCHETYPE]Movement,
-    count: usize,
+// Use generic archetype storages from lib/game/storage
+const PlayerStorage = storage.PlayerStorage(MAX_ENTITIES_PER_ARCHETYPE);
 
-    pub fn init() PlayerStorage {
-        return .{
-            .entities = [_]EntityId{INVALID_ENTITY} ** MAX_ENTITIES_PER_ARCHETYPE,
-            .transforms = undefined,
-            .healths = undefined,
-            .player_inputs = undefined,
-            .visuals = undefined,
-            .movements = undefined,
-            .count = 0,
-        };
-    }
+const UnitStorage = storage.UnitStorage(MAX_ENTITIES_PER_ARCHETYPE, Unit);
 
-    pub fn addEntity(self: *PlayerStorage, entity: EntityId, transform: Transform, health: Health, player_input: PlayerInput, visual: Visual) !void {
-        if (self.count >= MAX_ENTITIES_PER_ARCHETYPE) return error.StorageFull;
-        const index = self.count;
-        self.entities[index] = entity;
-        self.transforms[index] = transform;
-        self.healths[index] = health;
-        self.player_inputs[index] = player_input;
-        self.visuals[index] = visual;
-        self.count += 1;
-    }
-
-    pub fn removeEntity(self: *PlayerStorage, entity: EntityId) void {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) {
-                // Swap remove
-                const last = self.count - 1;
-                self.entities[i] = self.entities[last];
-                self.transforms[i] = self.transforms[last];
-                self.healths[i] = self.healths[last];
-                self.player_inputs[i] = self.player_inputs[last];
-                self.visuals[i] = self.visuals[last];
-                self.count -= 1;
-                return;
-            }
-        }
-    }
-
-    pub fn getTransformMut(self: *PlayerStorage, entity: EntityId) ?*Transform {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) return &self.transforms[i];
-        }
-        return null;
-    }
-
-    pub fn getHealthMut(self: *PlayerStorage, entity: EntityId) ?*Health {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) return &self.healths[i];
-        }
-        return null;
-    }
-
-    pub fn getVisualMut(self: *PlayerStorage, entity: EntityId) ?*Visual {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) return &self.visuals[i];
-        }
-        return null;
-    }
-
-    pub fn getTransform(self: *const PlayerStorage, entity: EntityId) ?*const Transform {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) return &self.transforms[i];
-        }
-        return null;
-    }
-
-    pub fn getHealth(self: *const PlayerStorage, entity: EntityId) ?*const Health {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) return &self.healths[i];
-        }
-        return null;
-    }
-
-    pub fn entityIterator(self: *const PlayerStorage) EntityIterator {
-        return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
-    }
-
-    pub fn clear(self: *PlayerStorage) void {
-        self.count = 0;
-    }
-
-    pub fn containsEntity(self: *const PlayerStorage, entity_id: EntityId) bool {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) return true;
-        }
-        return false;
-    }
-};
-
-const UnitStorage = struct {
-    entities: [MAX_ENTITIES_PER_ARCHETYPE]EntityId,
-    transforms: [MAX_ENTITIES_PER_ARCHETYPE]Transform,
-    healths: [MAX_ENTITIES_PER_ARCHETYPE]Health,
-    units: [MAX_ENTITIES_PER_ARCHETYPE]Unit,
-    visuals: [MAX_ENTITIES_PER_ARCHETYPE]Visual,
-    count: usize,
-
-    pub fn init() UnitStorage {
-        return .{
-            .entities = [_]EntityId{INVALID_ENTITY} ** MAX_ENTITIES_PER_ARCHETYPE,
-            .transforms = undefined,
-            .healths = undefined,
-            .units = undefined,
-            .visuals = undefined,
-            .count = 0,
-        };
-    }
-
-    pub fn addEntity(self: *UnitStorage, entity: EntityId, transform: Transform, health: Health, unit: Unit, visual: Visual) !void {
-        if (self.count >= MAX_ENTITIES_PER_ARCHETYPE) return error.StorageFull;
-        const index = self.count;
-        self.entities[index] = entity;
-        self.transforms[index] = transform;
-        self.healths[index] = health;
-        self.units[index] = unit;
-        self.visuals[index] = visual;
-        self.count += 1;
-    }
-
-    pub fn removeEntity(self: *UnitStorage, entity: EntityId) void {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) {
-                const last = self.count - 1;
-                self.entities[i] = self.entities[last];
-                self.transforms[i] = self.transforms[last];
-                self.healths[i] = self.healths[last];
-                self.units[i] = self.units[last];
-                self.visuals[i] = self.visuals[last];
-                self.count -= 1;
-                return;
-            }
-        }
-    }
-
-    pub fn entityIterator(self: *const UnitStorage) EntityIterator {
-        return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
-    }
-
-    pub fn clear(self: *UnitStorage) void {
-        self.count = 0;
-    }
-
-    pub fn containsEntity(self: *const UnitStorage, entity_id: EntityId) bool {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) return true;
-        }
-        return false;
-    }
-
-    pub fn getComponentMut(self: *UnitStorage, entity_id: EntityId, comptime component_type: enum { transform, health, unit, visual }) ?*(switch (component_type) {
-        .transform => Transform,
-        .health => Health,
-        .unit => Unit,
-        .visual => Visual,
-    }) {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) {
-                return switch (component_type) {
-                    .transform => &self.transforms[i],
-                    .health => &self.healths[i],
-                    .unit => &self.units[i],
-                    .visual => &self.visuals[i],
-                };
-            }
-        }
-        return null;
-    }
-
-    pub fn getComponent(self: *const UnitStorage, entity_id: EntityId, comptime component_type: enum { transform, health, unit, visual }) ?*const (switch (component_type) {
-        .transform => Transform,
-        .health => Health,
-        .unit => Unit,
-        .visual => Visual,
-    }) {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) {
-                return switch (component_type) {
-                    .transform => &self.transforms[i],
-                    .health => &self.healths[i],
-                    .unit => &self.units[i],
-                    .visual => &self.visuals[i],
-                };
-            }
-        }
-        return null;
-    }
-};
-
-const ProjectileStorage = struct {
-    entities: [MAX_ENTITIES_PER_ARCHETYPE]EntityId,
-    transforms: [MAX_ENTITIES_PER_ARCHETYPE]Transform,
-    projectiles: [MAX_ENTITIES_PER_ARCHETYPE]HexProjectile,
-    visuals: [MAX_ENTITIES_PER_ARCHETYPE]Visual,
-    count: usize,
+const ProjectileStorage = storage.ProjectileStorage(MAX_ENTITIES_PER_ARCHETYPE, HexProjectile);
 
     pub fn init() ProjectileStorage {
         return .{
@@ -387,289 +189,13 @@ const ProjectileStorage = struct {
         return null;
     }
 
-    pub fn getComponent(self: *const ProjectileStorage, entity_id: EntityId, comptime component_type: enum { transform, projectile, visual }) ?*const (switch (component_type) {
-        .transform => Transform,
-        .projectile => HexProjectile,
-        .visual => Visual,
-    }) {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) {
-                return switch (component_type) {
-                    .transform => &self.transforms[i],
-                    .projectile => &self.projectiles[i],
-                    .visual => &self.visuals[i],
-                };
-            }
-        }
-        return null;
-    }
-};
+const ObstacleStorage = storage.TerrainStorage(MAX_ENTITIES_PER_ARCHETYPE);
 
-const ObstacleStorage = struct {
-    entities: [MAX_ENTITIES_PER_ARCHETYPE]EntityId,
-    transforms: [MAX_ENTITIES_PER_ARCHETYPE]Transform,
-    terrains: [MAX_ENTITIES_PER_ARCHETYPE]Terrain,
-    visuals: [MAX_ENTITIES_PER_ARCHETYPE]Visual,
-    count: usize,
+const LifestoneStorage = storage.InteractiveStorage(MAX_ENTITIES_PER_ARCHETYPE);
 
-    pub fn init() ObstacleStorage {
-        return .{
-            .entities = [_]EntityId{INVALID_ENTITY} ** MAX_ENTITIES_PER_ARCHETYPE,
-            .transforms = undefined,
-            .terrains = undefined,
-            .visuals = undefined,
-            .count = 0,
-        };
-    }
+const PortalStorage = storage.InteractiveStorage(MAX_ENTITIES_PER_ARCHETYPE);
 
-    pub fn addEntity(self: *ObstacleStorage, entity: EntityId, transform: Transform, terrain: Terrain, visual: Visual) !void {
-        if (self.count >= MAX_ENTITIES_PER_ARCHETYPE) return error.StorageFull;
-        const index = self.count;
-        self.entities[index] = entity;
-        self.transforms[index] = transform;
-        self.terrains[index] = terrain;
-        self.visuals[index] = visual;
-        self.count += 1;
-    }
-
-    pub fn removeEntity(self: *ObstacleStorage, entity: EntityId) void {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) {
-                const last = self.count - 1;
-                self.entities[i] = self.entities[last];
-                self.transforms[i] = self.transforms[last];
-                self.terrains[i] = self.terrains[last];
-                self.visuals[i] = self.visuals[last];
-                self.count -= 1;
-                return;
-            }
-        }
-    }
-
-    pub fn entityIterator(self: *const ObstacleStorage) EntityIterator {
-        return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
-    }
-
-    pub fn clear(self: *ObstacleStorage) void {
-        self.count = 0;
-    }
-
-    pub fn containsEntity(self: *const ObstacleStorage, entity_id: EntityId) bool {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) return true;
-        }
-        return false;
-    }
-
-    pub fn getComponent(self: *const ObstacleStorage, entity_id: EntityId, comptime component_type: enum { transform, terrain, visual }) ?*const (switch (component_type) {
-        .transform => Transform,
-        .terrain => Terrain,
-        .visual => Visual,
-    }) {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) {
-                return switch (component_type) {
-                    .transform => &self.transforms[i],
-                    .terrain => &self.terrains[i],
-                    .visual => &self.visuals[i],
-                };
-            }
-        }
-        return null;
-    }
-};
-
-const LifestoneStorage = struct {
-    entities: [MAX_ENTITIES_PER_ARCHETYPE]EntityId,
-    transforms: [MAX_ENTITIES_PER_ARCHETYPE]Transform,
-    visuals: [MAX_ENTITIES_PER_ARCHETYPE]Visual,
-    terrains: [MAX_ENTITIES_PER_ARCHETYPE]Terrain,
-    interactables: [MAX_ENTITIES_PER_ARCHETYPE]Interactable,
-    count: usize,
-
-    pub fn init() LifestoneStorage {
-        return .{
-            .entities = [_]EntityId{INVALID_ENTITY} ** MAX_ENTITIES_PER_ARCHETYPE,
-            .transforms = undefined,
-            .visuals = undefined,
-            .terrains = undefined,
-            .interactables = undefined,
-            .count = 0,
-        };
-    }
-
-    pub fn addEntity(self: *LifestoneStorage, entity: EntityId, transform: Transform, visual: Visual, terrain: Terrain, interactable: Interactable) !void {
-        if (self.count >= MAX_ENTITIES_PER_ARCHETYPE) return error.StorageFull;
-        const index = self.count;
-        self.entities[index] = entity;
-        self.transforms[index] = transform;
-        self.visuals[index] = visual;
-        self.terrains[index] = terrain;
-        self.interactables[index] = interactable;
-        self.count += 1;
-    }
-
-    pub fn removeEntity(self: *LifestoneStorage, entity: EntityId) void {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) {
-                const last = self.count - 1;
-                self.entities[i] = self.entities[last];
-                self.transforms[i] = self.transforms[last];
-                self.visuals[i] = self.visuals[last];
-                self.terrains[i] = self.terrains[last];
-                self.interactables[i] = self.interactables[last];
-                self.count -= 1;
-                return;
-            }
-        }
-    }
-
-    pub fn entityIterator(self: *const LifestoneStorage) EntityIterator {
-        return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
-    }
-
-    pub fn clear(self: *LifestoneStorage) void {
-        self.count = 0;
-    }
-
-    pub fn containsEntity(self: *const LifestoneStorage, entity_id: EntityId) bool {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) return true;
-        }
-        return false;
-    }
-
-    pub fn getComponent(self: *const LifestoneStorage, entity_id: EntityId, comptime component_type: enum { transform, visual, terrain, interactable }) ?*const (switch (component_type) {
-        .transform => Transform,
-        .visual => Visual,
-        .terrain => Terrain,
-        .interactable => Interactable,
-    }) {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) {
-                return switch (component_type) {
-                    .transform => &self.transforms[i],
-                    .visual => &self.visuals[i],
-                    .terrain => &self.terrains[i],
-                    .interactable => &self.interactables[i],
-                };
-            }
-        }
-        return null;
-    }
-
-    pub fn getComponentMut(self: *LifestoneStorage, entity_id: EntityId, comptime component_type: enum { transform, visual, terrain, interactable }) ?*(switch (component_type) {
-        .transform => Transform,
-        .visual => Visual,
-        .terrain => Terrain,
-        .interactable => Interactable,
-    }) {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) {
-                return switch (component_type) {
-                    .transform => &self.transforms[i],
-                    .visual => &self.visuals[i],
-                    .terrain => &self.terrains[i],
-                    .interactable => &self.interactables[i],
-                };
-            }
-        }
-        return null;
-    }
-};
-
-const PortalStorage = struct {
-    entities: [MAX_ENTITIES_PER_ARCHETYPE]EntityId,
-    transforms: [MAX_ENTITIES_PER_ARCHETYPE]Transform,
-    visuals: [MAX_ENTITIES_PER_ARCHETYPE]Visual,
-    terrains: [MAX_ENTITIES_PER_ARCHETYPE]Terrain,
-    interactables: [MAX_ENTITIES_PER_ARCHETYPE]Interactable,
-    count: usize,
-
-    pub fn init() PortalStorage {
-        return .{
-            .entities = [_]EntityId{INVALID_ENTITY} ** MAX_ENTITIES_PER_ARCHETYPE,
-            .transforms = undefined,
-            .visuals = undefined,
-            .terrains = undefined,
-            .interactables = undefined,
-            .count = 0,
-        };
-    }
-
-    pub fn addEntity(self: *PortalStorage, entity: EntityId, transform: Transform, visual: Visual, terrain: Terrain, interactable: Interactable) !void {
-        if (self.count >= MAX_ENTITIES_PER_ARCHETYPE) return error.StorageFull;
-        const index = self.count;
-        self.entities[index] = entity;
-        self.transforms[index] = transform;
-        self.visuals[index] = visual;
-        self.terrains[index] = terrain;
-        self.interactables[index] = interactable;
-        self.count += 1;
-    }
-
-    pub fn removeEntity(self: *PortalStorage, entity: EntityId) void {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) {
-                const last = self.count - 1;
-                self.entities[i] = self.entities[last];
-                self.transforms[i] = self.transforms[last];
-                self.visuals[i] = self.visuals[last];
-                self.terrains[i] = self.terrains[last];
-                self.interactables[i] = self.interactables[last];
-                self.count -= 1;
-                return;
-            }
-        }
-    }
-
-    pub fn entityIterator(self: *const PortalStorage) EntityIterator {
-        return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
-    }
-
-    pub fn clear(self: *PortalStorage) void {
-        self.count = 0;
-    }
-
-    pub fn containsEntity(self: *const PortalStorage, entity_id: EntityId) bool {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) return true;
-        }
-        return false;
-    }
-
-    pub fn getComponent(self: *const PortalStorage, entity_id: EntityId, comptime component_type: enum { transform, visual, terrain, interactable }) ?*const (switch (component_type) {
-        .transform => Transform,
-        .visual => Visual,
-        .terrain => Terrain,
-        .interactable => Interactable,
-    }) {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) {
-                return switch (component_type) {
-                    .transform => &self.transforms[i],
-                    .visual => &self.visuals[i],
-                    .terrain => &self.terrains[i],
-                    .interactable => &self.interactables[i],
-                };
-            }
-        }
-        return null;
-    }
-};
-
-// Simple entity iterator
-const EntityIterator = struct {
-    entities: []const EntityId,
-    index: usize,
-
-    pub fn next(self: *EntityIterator) ?EntityId {
-        if (self.index >= self.entities.len) return null;
-        const entity = self.entities[self.index];
-        self.index += 1;
-        return entity;
-    }
-};
+// EntityIterator is now provided by storage module
 
 // Portal iterator removed - using EntityIterator instead
 
@@ -703,6 +229,7 @@ pub const HexGame = struct {
     allocator: std.mem.Allocator,
     logger: ModuleLogger,
     frame_pool: object_pools.FramePool,
+    portal_system: @import("portal_integration.zig").HexPortalIntegration,
 
     pub const ZoneData = struct {
         // Direct fixed-size archetype storage - no dynamic allocation
@@ -797,6 +324,7 @@ pub const HexGame = struct {
             .allocator = allocator,
             .logger = ModuleLogger.init(allocator),
             .frame_pool = object_pools.FramePool.init(allocator),
+            .portal_system = @import("portal_integration.zig").HexPortalIntegration.init(),
         };
 
         // Initialize all zones
@@ -813,6 +341,9 @@ pub const HexGame = struct {
         for (&game.zone_manager.zones, zone_types) |*zone, zone_type| {
             zone.* = ZoneData.init(zone_type);
         }
+
+        // Setup portal system with game reference
+        game.portal_system.setupWithGame(&game);
 
         return game;
     }
@@ -951,8 +482,9 @@ pub const HexGame = struct {
         const health = Health.init(100);
         const player_input = PlayerInput.init(0);
         const visual = Visual.init(constants.COLOR_PLAYER_ALIVE);
+        const movement = Movement.init(constants.PLAYER_SPEED);
 
-        try zone.players.addEntity(entity, transform, health, player_input, visual);
+        try zone.players.addEntity(entity, transform, health, player_input, visual, movement);
         zone.entity_count += 1;
 
         self.player_entity = entity;
@@ -1001,11 +533,16 @@ pub const HexGame = struct {
 
         self.setCurrentZone(zone_index);
 
+        // Reload portals from new zone into portal system
+        self.portal_system.loadPortalsFromZone(self) catch |err| {
+            self.logger.err("portal_reload_failed", "Failed to reload portals after zone travel: {}", .{err});
+        };
+
         // Update player position in new zone if no transfer was needed
         if (self.player_entity) |player| {
             if (self.player_zone == zone_index) {
                 const zone = self.getCurrentZone();
-                if (zone.players.getTransformMut(player)) |transform| {
+                if (zone.players.getComponentMut(player, .transform)) |transform| {
                     transform.pos = spawn_pos;
                     transform.vel = Vec2.ZERO;
                 }
@@ -1021,9 +558,9 @@ pub const HexGame = struct {
         const dest = self.zone_manager.getZone(dest_zone);
 
         // Extract player components from source zone
-        const transform = source.players.getTransform(player_entity);
-        const health = source.players.getHealth(player_entity);
-        const visual = source.players.getVisualMut(player_entity); // We need mutable to copy
+        const transform = source.players.getComponent(player_entity, .transform);
+        const health = source.players.getComponent(player_entity, .health);
+        const visual = source.players.getComponent(player_entity, .visual); // We need mutable to copy
 
         if (transform == null or health == null or visual == null) {
             self.logger.err("transfer_failed", "transferPlayerToZone: Player entity missing required components", .{});
@@ -1041,7 +578,8 @@ pub const HexGame = struct {
         source.entity_count -%= 1;
 
         // Add to destination zone
-        try dest.players.addEntity(player_entity, new_transform, new_health, player_input, new_visual);
+        const movement = Movement.init(constants.PLAYER_SPEED);
+        try dest.players.addEntity(player_entity, new_transform, new_health, player_input, new_visual, movement);
         dest.entity_count += 1;
 
         self.logger.debug("player_transferred", "Player entity {} transferred from zone {} to zone {}", .{ player_entity, source_zone, dest_zone });
@@ -1052,7 +590,7 @@ pub const HexGame = struct {
         if (self.player_entity) |player| {
             if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZoneConst();
-                if (zone.players.getTransform(player)) |transform| {
+                if (zone.players.getComponent(player, .transform)) |transform| {
                     return transform.pos;
                 }
             }
@@ -1064,7 +602,7 @@ pub const HexGame = struct {
         if (self.player_entity) |player| {
             if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZoneConst();
-                if (zone.players.getTransform(player)) |transform| {
+                if (zone.players.getComponent(player, .transform)) |transform| {
                     return transform.radius;
                 }
             }
@@ -1076,7 +614,7 @@ pub const HexGame = struct {
         if (self.player_entity) |player| {
             if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZoneConst();
-                if (zone.players.getHealth(player)) |health| {
+                if (zone.players.getComponent(player, .health)) |health| {
                     return health.alive;
                 }
             }
@@ -1097,7 +635,7 @@ pub const HexGame = struct {
         if (self.player_entity) |player| {
             if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZone();
-                if (zone.players.getTransformMut(player)) |transform| {
+                if (zone.players.getComponentMut(player, .transform)) |transform| {
                     transform.pos = pos;
                 }
             }
@@ -1108,7 +646,7 @@ pub const HexGame = struct {
         if (self.player_entity) |player| {
             if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZone();
-                if (zone.players.getTransformMut(player)) |transform| {
+                if (zone.players.getComponentMut(player, .transform)) |transform| {
                     transform.vel = vel;
                 }
             }
@@ -1131,13 +669,13 @@ pub const HexGame = struct {
         if (self.player_entity) |player| {
             if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZone();
-                if (zone.players.getHealthMut(player)) |health| {
+                if (zone.players.getComponentMut(player, .health)) |health| {
                     health.alive = alive;
                     if (alive) {
                         health.current = health.max;
                     }
                 }
-                if (zone.players.getVisualMut(player)) |visual| {
+                if (zone.players.getComponentMut(player, .visual)) |visual| {
                     visual.color = if (alive)
                         constants.COLOR_PLAYER_ALIVE
                     else
@@ -1151,7 +689,7 @@ pub const HexGame = struct {
         if (self.player_entity) |player| {
             if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZone();
-                if (zone.players.getVisualMut(player)) |visual| {
+                if (zone.players.getComponentMut(player, .visual)) |visual| {
                     visual.color = color;
                 }
             }

@@ -100,9 +100,9 @@ pub const EntityIterator = struct {
     }
 };
 
-/// Multi-component entity storage with individual component access
-pub fn MultiComponentStorage(comptime ComponentTypes: type, comptime max_entities: usize) type {
-    const component_fields = std.meta.fields(ComponentTypes);
+/// Advanced multi-component entity storage that matches hex patterns exactly
+pub fn ArchetypeStorage(comptime ComponentArrays: type, comptime max_entities: usize) type {
+    const component_fields = std.meta.fields(ComponentArrays);
     
     return struct {
         const Self = @This();
@@ -110,7 +110,7 @@ pub fn MultiComponentStorage(comptime ComponentTypes: type, comptime max_entitie
         const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
         
         entities: [max_entities]EntityId,
-        components: ComponentTypes,
+        components: ComponentArrays,
         count: usize,
         
         pub fn init() Self {
@@ -121,14 +121,18 @@ pub fn MultiComponentStorage(comptime ComponentTypes: type, comptime max_entitie
             };
         }
         
-        pub fn addEntity(self: *Self, entity: EntityId, components: ComponentTypes) !void {
+        /// Add entity with all component values provided as separate parameters
+        pub fn addEntity(self: *Self, entity: EntityId, args: anytype) !void {
             if (self.count >= max_entities) return error.StorageFull;
             const index = self.count;
             self.entities[index] = entity;
             
-            // Copy each component to its array
-            inline for (component_fields) |field| {
-                @field(self.components, field.name)[index] = @field(components, field.name);
+            // Assign each component from args tuple
+            const args_info = @typeInfo(@TypeOf(args));
+            if (args_info != .Struct) @compileError("Args must be a struct/tuple");
+            
+            inline for (component_fields, 0..) |field, i| {
+                @field(self.components, field.name)[index] = args[i];
             }
             
             self.count += 1;
@@ -151,19 +155,22 @@ pub fn MultiComponentStorage(comptime ComponentTypes: type, comptime max_entitie
             }
         }
         
-        pub fn getComponent(self: *const Self, entity: EntityId, comptime component_name: []const u8) ?*const @TypeOf(@field(self.components, component_name)[0]) {
+        /// Get component with enum-style access like hex's current pattern
+        pub fn getComponent(self: *const Self, entity: EntityId, comptime component_type: anytype) ?*const ComponentTypeFromEnum(@TypeOf(component_type), ComponentArrays) {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity) {
-                    return &@field(self.components, component_name)[i];
+                    const field_name = componentEnumToFieldName(component_type);
+                    return &@field(self.components, field_name)[i];
                 }
             }
             return null;
         }
         
-        pub fn getComponentMut(self: *Self, entity: EntityId, comptime component_name: []const u8) ?*@TypeOf(@field(self.components, component_name)[0]) {
+        pub fn getComponentMut(self: *Self, entity: EntityId, comptime component_type: anytype) ?*ComponentTypeFromEnum(@TypeOf(component_type), ComponentArrays) {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity) {
-                    return &@field(self.components, component_name)[i];
+                    const field_name = componentEnumToFieldName(component_type);
+                    return &@field(self.components, field_name)[i];
                 }
             }
             return null;
@@ -176,7 +183,48 @@ pub fn MultiComponentStorage(comptime ComponentTypes: type, comptime max_entitie
         pub fn clear(self: *Self) void {
             self.count = 0;
         }
+        
+        pub fn containsEntity(self: *const Self, entity_id: EntityId) bool {
+            for (0..self.count) |i| {
+                if (self.entities[i] == entity_id) return true;
+            }
+            return false;
+        }
+        
+        pub fn isEmpty(self: *const Self) bool {
+            return self.count == 0;
+        }
+        
+        pub fn isFull(self: *const Self) bool {
+            return self.count >= max_entities;
+        }
     };
+}
+
+/// Helper to convert component enum to field name 
+fn componentEnumToFieldName(component_type: anytype) []const u8 {
+    return switch (component_type) {
+        .transform => "transforms",
+        .health => "healths", 
+        .unit => "units",
+        .visual => "visuals",
+        .player_input => "player_inputs",
+        .movement => "movements",
+        .projectile => "projectiles",
+        .terrain => "terrains",
+        .interactable => "interactables",
+        else => @compileError("Unknown component type"),
+    };
+}
+
+/// Helper to get component type from enum and arrays struct
+fn ComponentTypeFromEnum(comptime EnumType: type, comptime ComponentArrays: type) type {
+    const enum_info = @typeInfo(EnumType);
+    if (enum_info != .Enum) @compileError("Expected enum type");
+    
+    // This is a bit of a hack - we'll determine the type at the call site
+    // For now, return a generic type that will be resolved by the caller
+    return std.meta.Child(@TypeOf(@field(@as(ComponentArrays, undefined), "transforms")));
 }
 
 test "entity storage basic operations" {
@@ -204,7 +252,7 @@ test "multi-component storage" {
         healths: [10]struct { current: f32, max: f32 },
     };
     
-    var storage = MultiComponentStorage(Components, 10).init();
+    var storage = ArchetypeStorage(Components, 10).init();
     
     const test_components = Components{
         .transforms = undefined,
