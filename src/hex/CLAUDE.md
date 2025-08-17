@@ -43,6 +43,51 @@ hex/
 └── game_data.zon      # Zone definitions
 ```
 
+## Import Conventions
+
+**Capability-Based Organization:** Imports are grouped by functionality to make dependencies clear and maintainable.
+
+```zig
+const std = @import("std");
+
+// Core capabilities (math, types, time)
+const math = @import("../lib/math/mod.zig");
+const colors = @import("../lib/core/colors.zig");
+const frame = @import("../lib/core/frame.zig");
+
+// Platform capabilities (SDL, input)
+const c = @import("../lib/platform/sdl.zig");
+const input = @import("../lib/platform/input.zig");
+
+// Rendering capabilities
+const camera = @import("../lib/rendering/camera.zig");
+const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
+
+// Game system capabilities
+const game_systems = @import("../lib/game/mod.zig");
+const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+
+// Debug capabilities
+const loggers = @import("../lib/debug/loggers.zig");
+
+// Hex game modules (local)
+const hex_game_mod = @import("hex_game.zig");
+const constants = @import("constants.zig");
+const behaviors = @import("behaviors.zig");
+
+// Type aliases after imports
+const Vec2 = math.Vec2;
+const FrameContext = frame.FrameContext;
+const HexGame = hex_game_mod.HexGame;
+```
+
+**Rules:**
+- **Never inline imports** in function signatures or function bodies
+- **Group by capability** not alphabetically - shows architecture dependencies
+- **Use descriptive aliases** for commonly used types
+- **Module-level only** - all imports at the top
+- **Comment groups** to make structure clear
+
 ## Key Systems
 
 ### What Hex Implements (Game-Specific)

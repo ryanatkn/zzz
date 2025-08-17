@@ -1,17 +1,29 @@
 const std = @import("std");
+
+// Core capabilities
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
-const constants = @import("constants.zig");
-const combat = @import("combat.zig");
+const frame = @import("../lib/core/frame.zig");
 const object_pools = @import("../lib/core/object_pools.zig");
+
+// Game system capabilities
 const components = @import("../lib/game/components.zig");
 const zones = @import("../lib/game/zones/mod.zig");
 const storage = @import("../lib/game/storage/mod.zig");
 const world = @import("../lib/game/world/mod.zig");
+const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+
+// Debug capabilities
+const loggers = @import("../lib/debug/loggers.zig");
+
+// Hex game modules
+const constants = @import("constants.zig");
+const combat = @import("combat.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 const BulletPool = combat.BulletPool;
+const FrameContext = frame.FrameContext;
 const EntityIterator = storage.EntityIterator;
 
 // Logging setup
@@ -138,7 +150,6 @@ pub const MAX_ENTITIES_PER_ARCHETYPE = 256;
 
 // Hex-specific travel interface implementations for the generic zone travel manager
 const HexTravelInterface = struct {
-    const loggers = @import("../lib/debug/loggers.zig");
     
     pub fn validateZone(zone_index: usize) bool {
         return zone_index < MAX_ZONES;
@@ -210,7 +221,7 @@ pub const HexGame = struct {
     zone_travel_manager: world.ZoneTravelManager(HexGame, MAX_ENTITIES_PER_ARCHETYPE),
     
     // Optional effect system reference for travel effects
-    effect_system_ref: ?*@import("../lib/effects/game_effects.zig").GameEffectSystem,
+    effect_system_ref: ?*GameEffectSystem,
 
     pub const ZoneData = struct {
         // Direct fixed-size archetype storage - no dynamic allocation
@@ -338,7 +349,7 @@ pub const HexGame = struct {
     }
     
     /// Set the effect system reference for travel effects
-    pub fn setEffectSystemRef(self: *HexGame, effect_system: *@import("../lib/effects/game_effects.zig").GameEffectSystem) void {
+    pub fn setEffectSystemRef(self: *HexGame, effect_system: *GameEffectSystem) void {
         self.effect_system_ref = effect_system;
     }
 
@@ -706,7 +717,7 @@ pub const HexGame = struct {
     }
 
     /// Context-aware projectiles update function  
-    pub fn updateProjectiles(self: *HexGame, frame_ctx: @import("../lib/core/frame.zig").FrameContext) void {
+    pub fn updateProjectiles(self: *HexGame, frame_ctx: FrameContext) void {
         const deltaTime = frame_ctx.effectiveDelta();
         
         const zone = self.getCurrentZone();
@@ -828,7 +839,7 @@ pub const HexGame = struct {
     }
 
     /// Context-aware bullet pool update function
-    pub fn updateBulletPool(self: *HexGame, frame_ctx: @import("../lib/core/frame.zig").FrameContext) void {
+    pub fn updateBulletPool(self: *HexGame, frame_ctx: FrameContext) void {
         const deltaTime = frame_ctx.effectiveDelta();
         self.bullet_pool.update(deltaTime);
     }

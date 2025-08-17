@@ -1,27 +1,43 @@
 const std = @import("std");
-const c = @import("../lib/platform/sdl.zig");
 
-const hex_game_mod = @import("hex_game.zig");
-const HexGame = hex_game_mod.HexGame;
+// Core capabilities
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
+const time_utils = @import("../lib/core/time.zig");
+
+// Platform capabilities
+const c = @import("../lib/platform/sdl.zig");
+
+// Rendering capabilities
 const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
 const camera = @import("../lib/rendering/camera.zig");
+
+// Font capabilities
+const font_manager = @import("../lib/font/manager.zig");
+const font_config = @import("../lib/font/config.zig");
+
+// Game system capabilities
+const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+
+// Reactive capabilities
+const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
+
+// UI capabilities
+const geometric_text = @import("../lib/ui/geometric_text.zig");
+const animated_borders = @import("../lib/ui/animated_borders.zig");
+
+// Debug capabilities
+const loggers = @import("../lib/debug/loggers.zig");
+
+// Hex game modules
+const hex_game_mod = @import("hex_game.zig");
 const borders = @import("borders.zig");
 const constants = @import("constants.zig");
-const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
-const font_manager = @import("../lib/font/manager.zig");
-const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
-const loggers = @import("../lib/debug/loggers.zig");
-const geometric_text = @import("../lib/ui/geometric_text.zig");
-const time_utils = @import("../lib/core/time.zig");
-const animated_borders = @import("../lib/ui/animated_borders.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
-
-// Entity types from HexGame
+const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
 
@@ -274,7 +290,7 @@ pub const GameRenderer = struct {
         // Use persistent text rendering to eliminate flashing
 
         // Queue using persistent mode - texture will be cached and reused
-        self.gpu.text_renderer.queuePersistentText(fps_text, .{ .x = fps_x, .y = fps_y }, self.font_manager, .sans, @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(), WHITE) catch |err| {
+        self.gpu.text_renderer.queuePersistentText(fps_text, .{ .x = fps_x, .y = fps_y }, self.font_manager, .sans, font_config.getGlobalConfig().fpsFontSize(), WHITE) catch |err| {
             loggers.getGameLog().err("fps_error", "Failed to queue persistent FPS text: {}", .{err});
             // Fall back to geometric rendering
             self.drawFPSGeometric(cmd_buffer, render_pass, fps);
@@ -296,7 +312,7 @@ pub const GameRenderer = struct {
         const ai_text = "AI MODE ACTIVE";
 
         // Queue using persistent mode
-        self.gpu.text_renderer.queuePersistentText(ai_text, .{ .x = ai_x, .y = ai_y }, self.font_manager, .sans, @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(), AI_COLOR) catch {
+        self.gpu.text_renderer.queuePersistentText(ai_text, .{ .x = ai_x, .y = ai_y }, self.font_manager, .sans, font_config.getGlobalConfig().fpsFontSize(), AI_COLOR) catch {
             // AI mode text failed - fallback to no display
         };
     }

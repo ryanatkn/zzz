@@ -2,6 +2,8 @@ const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const hex_game_mod = @import("hex_game.zig");
+const frame = @import("../lib/core/frame.zig");
+const colors = @import("../lib/core/colors.zig");
 const behaviors_mod = @import("../lib/game/behaviors/mod.zig");
 
 // Import all behavior types from the library
@@ -16,6 +18,7 @@ const Vec2 = math.Vec2;
 const Unit = hex_game_mod.Unit;
 const Transform = hex_game_mod.Transform;
 const Visual = hex_game_mod.Visual;
+const FrameContext = frame.FrameContext;
 
 // Import BehaviorProfile from hex_game.zig to avoid circular dependency
 const BehaviorProfile = hex_game_mod.BehaviorProfile;
@@ -192,7 +195,7 @@ pub fn updateUnitWithAggroMod(
     player_pos: Vec2,
     player_alive: bool,
     aggro_multiplier: f32,
-    frame_ctx: @import("../lib/core/frame.zig").FrameContext,
+    frame_ctx: FrameContext,
 ) void {
     const dt = frame_ctx.effectiveDelta();
     
@@ -242,7 +245,6 @@ pub fn updateUnitWithAggroMod(
 
 /// Get color for behavior and profile combination
 fn getBehaviorColor(behavior: unit_behavior.BehaviorType, profile: BehaviorProfile) @TypeOf(constants.COLOR_UNIT_AGGRESSIVE) {
-    const colors = @import("../lib/core/colors.zig");
 
     return switch (behavior) {
         .chase => switch (profile) {

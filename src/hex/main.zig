@@ -1,5 +1,6 @@
 const std = @import("std");
 const loggers = @import("../lib/debug/loggers.zig");
+const log_config = @import("../lib/debug/config.zig");
 const c = @import("../lib/platform/sdl.zig");
 
 // Engine imports
@@ -95,7 +96,6 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     try loggers.initGlobalLoggers(global_allocator);
 
     // Load optional runtime config overrides from .zz/log-config.zon
-    const log_config = @import("../lib/debug/config.zig");
     if (log_config.loadOverrides(global_allocator)) |overrides| {
         defer if (@hasDecl(@TypeOf(overrides), "deinit")) overrides.deinit(global_allocator);
         overrides.apply();

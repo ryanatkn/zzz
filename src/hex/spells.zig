@@ -4,6 +4,7 @@ const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSy
 const constants = @import("constants.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
+const frame = @import("../lib/core/frame.zig");
 const game_abilities = @import("../lib/game/abilities/mod.zig");
 const spell_casting = game_abilities.spell_casting;
 const effect_manager = game_abilities.effect_manager;
@@ -12,6 +13,7 @@ const Vec2 = math.Vec2;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
+const FrameContext = frame.FrameContext;
 
 pub const SpellType = enum {
     None,
@@ -67,7 +69,7 @@ pub const SpellSystem = struct {
     }
 
     /// Spell system update function with frame context
-    pub fn update(self: *SpellSystem, frame_ctx: @import("../lib/core/frame.zig").FrameContext) void {
+    pub fn update(self: *SpellSystem, frame_ctx: FrameContext) void {
         const deltaTime = frame_ctx.effectiveDelta();
         // Update all spell cooldowns using generic system
         self.slot_system.update(deltaTime);

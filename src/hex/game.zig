@@ -1,31 +1,49 @@
 const std = @import("std");
+
+// Core capabilities
+const math = @import("../lib/math/mod.zig");
+const time_utils = @import("../lib/core/time.zig");
+const frame = @import("../lib/core/frame.zig");
+
+// Platform capabilities
 const c = @import("../lib/platform/sdl.zig");
+const input = @import("../lib/platform/input.zig");
+
+// Rendering capabilities
+const camera = @import("../lib/rendering/camera.zig");
+
+// Physics capabilities
+const collision = @import("../lib/physics/collision.zig");
+
+// Game system capabilities
+const game_systems = @import("../lib/game/mod.zig");
+const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+
+// Debug capabilities
 const Logger = @import("../lib/debug/logger.zig").Logger;
 const outputs = @import("../lib/debug/outputs.zig");
 const filters = @import("../lib/debug/filters.zig");
-const math = @import("../lib/math/mod.zig");
-const collision = @import("../lib/physics/collision.zig");
+
+// Hex game modules
 const hex_game_mod = @import("hex_game.zig");
-const time_utils = @import("../lib/core/time.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
-const input = @import("../lib/platform/input.zig");
 const player_controller = @import("player.zig");
 const combat = @import("combat.zig");
 const portals = @import("portals.zig");
-const camera = @import("../lib/rendering/camera.zig");
-const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
-const hud = @import("../hud/hud.zig");
-const reactive_hud = @import("../hud/reactive_hud.zig");
 const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
-const game_systems = @import("../lib/game/mod.zig");
 const save_data = @import("save_data.zig");
+
+// HUD modules
+const hud = @import("../hud/hud.zig");
+const reactive_hud = @import("../hud/reactive_hud.zig");
 
 const Vec2 = math.Vec2;
 const HexGame = hex_game_mod.HexGame;
 const InputState = input.InputState;
+const FrameContext = frame.FrameContext;
 const ai_control = @import("../lib/game/control/mod.zig");
 
 pub const GameState = struct {
@@ -301,7 +319,7 @@ pub const GameState = struct {
 };
 
 /// Context-aware update all units function
-fn updateUnits(game_state: *GameState, frame_ctx: @import("../lib/core/frame.zig").FrameContext) void {
+fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
     const world = &game_state.hex_game;
 
     // Note: Obstacle collision now uses ECS queries
@@ -346,7 +364,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     // Create minimal frame context
     const frame_allocator = game_state.hex_game.frame_pool.allocator();
-    const frame_ctx = @import("../lib/core/frame.zig").FrameContext.init(
+    const frame_ctx = FrameContext.init(
         frame_allocator, 
         deltaTime, 
         game_state.frame_counter,

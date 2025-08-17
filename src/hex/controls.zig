@@ -5,6 +5,7 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const game_controller = @import("game.zig");
 const coordinates = @import("../lib/core/coordinates.zig");
+const camera = @import("../lib/rendering/camera.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
@@ -36,9 +37,9 @@ fn mapSDLInputToType(event: *const c.sdl.SDL_Event) game_input.input_patterns.In
 }
 
 /// Create coordinate context from camera state
-fn createCoordinateContext(camera: *const @import("../lib/rendering/camera.zig").Camera) coordinates.CoordinateContext {
-    return coordinates.CoordinateContext.init(camera.screen_width, camera.screen_height)
-        .withCamera(math.Vec2{ .x = camera.view_x + camera.view_width / 2.0, .y = camera.view_y + camera.view_height / 2.0 }, camera.scale);
+fn createCoordinateContext(cam: *const camera.Camera) coordinates.CoordinateContext {
+    return coordinates.CoordinateContext.init(cam.screen_width, cam.screen_height)
+        .withCamera(math.Vec2{ .x = cam.view_x + cam.view_width / 2.0, .y = cam.view_y + cam.view_height / 2.0 }, cam.scale);
 }
 
 pub fn handleSDLEvent(

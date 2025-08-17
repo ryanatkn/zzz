@@ -1,21 +1,21 @@
 const std = @import("std");
-const hex_world = @import("hex_game.zig");
 const hex_game_mod = @import("hex_game.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
 const math = @import("../lib/math/mod.zig");
 const camera = @import("../lib/rendering/camera.zig");
 const constants = @import("constants.zig");
+const frame = @import("../lib/core/frame.zig");
 
 const Vec2 = math.Vec2;
-const HexWorld = hex_world.HexWorld;
 const HexGame = hex_game_mod.HexGame;
 const InputState = input.InputState;
+const FrameContext = frame.FrameContext;
 
 const WALK_SPEED_MULT = constants.WALK_SPEED_MULTIPLIER; // Walking speed is 1/4 of normal
 
 /// Player update function with frame context and direct parameters
-pub fn updatePlayer(game: *HexGame, frame_ctx: @import("../lib/core/frame.zig").FrameContext, input_state: *const InputState, cam: *const camera.Camera) void {
+pub fn updatePlayer(game: *HexGame, frame_ctx: FrameContext, input_state: *const InputState, cam: *const camera.Camera) void {
     const deltaTime = frame_ctx.effectiveDelta();
     
     if (!game.getPlayerAlive()) return;
