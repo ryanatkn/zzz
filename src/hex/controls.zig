@@ -9,7 +9,6 @@ const camera = @import("../lib/rendering/camera.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
-const spells = @import("spells.zig");
 
 // Import new input system modules
 const game_input = @import("../lib/game/input/mod.zig");
@@ -154,7 +153,7 @@ pub fn handleSDLEvent(
                     if (game_state.hex_game.getPlayerAlive()) {
                         // Check if this should be move-to-click instead of shooting
                         if (input_modifiers.ModifierHelpers.isMoveToClick(&game_state.input_state)) {
-                            // TODO: Implement move-to-click functionality
+                            // Move-to-click not implemented yet - just ignore Ctrl+click for now
                             return c.sdl.SDL_APP_CONTINUE;
                         }
                         
