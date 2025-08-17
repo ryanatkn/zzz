@@ -3,8 +3,6 @@ const math = @import("../lib/math/mod.zig");
 const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
 const constants = @import("constants.zig");
 const components = @import("../lib/game/components.zig");
-const entity = @import("../lib/game/entity.zig");
-const world_mod = @import("../lib/game/world.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
@@ -13,8 +11,7 @@ const cooldowns = @import("../lib/game/cooldowns.zig");
 const Vec2 = math.Vec2;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
 const HexGame = hex_game_mod.HexGame;
-const EntityId = entity.EntityId;
-const World = world_mod.World;
+const EntityId = hex_game_mod.EntityId;
 
 // Import spell constants from centralized location
 

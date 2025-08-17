@@ -214,4 +214,6 @@ pub const GameStatistics = struct {
     total_spells_cast: usize = 0,
     total_portals_used: usize = 0,
     play_time_ms: u64 = 0,
+    lifestones_attuned: usize = 0,
+    all_lifestones_attuned: bool = false,
 };

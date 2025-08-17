@@ -7,7 +7,7 @@ const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision.zig");
 const hex_game_mod = @import("hex_game.zig");
 const time_utils = @import("../lib/core/time.zig");
-const contexts = @import("../lib/game/contexts.zig");
+const contexts = @import("contexts.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
@@ -22,7 +22,8 @@ const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
 const game_systems = @import("../lib/game/mod.zig");
-const hex_events = @import("events.zig");
+// const hex_events = @import("events.zig"); // Removed - depends on deleted event system
+const simple_save = @import("simple_save.zig");
 const save_data = @import("save_data.zig");
 
 const Vec2 = math.Vec2;
@@ -55,8 +56,8 @@ pub const GameState = struct {
     iris_wipe_active: bool,
     iris_wipe_start_time: time_utils.Timestamp,
 
-    // State management system
-    state_manager: ?*game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents),
+    // State management system - simplified
+    save_manager: ?*simple_save.HexSaveManager,
     game_stats: save_data.GameStatistics,
     
     // AI control system
@@ -87,7 +88,7 @@ pub const GameState = struct {
             .hud_system = null,
             .iris_wipe_active = false,
             .iris_wipe_start_time = time_utils.Time.now(),
-            .state_manager = null,
+            .save_manager = null,
             .game_stats = .{},
             .ai_input = null,
             .ai_enabled = false,
@@ -138,23 +139,13 @@ pub const GameState = struct {
         }
     }
 
-    pub fn initStateManager(self: *Self, allocator: std.mem.Allocator) !void {
-        const manager = try allocator.create(game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents));
-        manager.* = try game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents).init(
-            allocator,
-            "zzz",
-            "hex",
-        );
-        self.state_manager = manager;
-
+    pub fn initSaveManager(self: *Self, allocator: std.mem.Allocator) !void {
+        const manager = try allocator.create(simple_save.HexSaveManager);
+        manager.* = try simple_save.HexSaveManager.init(allocator);
+        self.save_manager = manager;
+        
         // Set global reference for compute callbacks
         current_game_state = self;
-
-        // Register compute callbacks for expensive operations
-        try self.registerComputeCallbacks();
-
-        // Set up event listeners
-        try self.setupEventListeners();
     }
 
     pub fn deinitStateManager(self: *Self, allocator: std.mem.Allocator) void {
@@ -170,79 +161,8 @@ pub const GameState = struct {
         }
     }
 
-    fn registerComputeCallbacks(self: *Self) !void {
-        if (self.state_manager) |manager| {
-            // Register callback to compute all_lifestones_attuned
-            try manager.registerCompute("all_lifestones_attuned", computeAllLifestonesAttuned);
-            try manager.registerCompute("total_lifestones", computeTotalLifestones);
-            try manager.registerCompute("total_lifestones_attuned", computeTotalLifestonesAttuned);
-        }
-    }
 
-    fn setupEventListeners(self: *Self) !void {
-        if (self.state_manager) |manager| {
-            // Listen for lifestone attunement to invalidate cache
-            try manager.on(.custom, onCustomEvent, self);
-        }
-    }
-
-    fn onCustomEvent(event: hex_events.HexEvents, ctx: ?*anyopaque) void {
-        if (ctx) |context| {
-            const self = @as(*Self, @ptrCast(@alignCast(context)));
-            if (self.state_manager) |manager| {
-                switch (event) {
-                    .custom => |custom| {
-                        switch (custom) {
-                            .lifestone_attuned => {
-                                // Invalidate cached values
-                                manager.invalidate("all_lifestones_attuned");
-                                manager.invalidate("total_lifestones_attuned");
-
-                                // Check if this was the last one
-                                if (manager.queryBool("all_lifestones_attuned") catch false) {
-                                    // Emit all lifestones attuned event
-                                    const total = manager.queryInt("total_lifestones") catch 0;
-                                    manager.emit(hex_events.allLifestonesAttuned(@intCast(total)));
-                                }
-                            },
-                            else => {},
-                        }
-                    },
-                    else => {},
-                }
-            }
-        }
-    }
-
-    fn computeAllLifestonesAttuned(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
-        if (current_game_state) |game_state| {
-            const all_attuned = game_state.computeAllLifestonesAttunedForWorld();
-            try manager.cache.setBool("all_lifestones_attuned", all_attuned);
-        } else {
-            // Fallback if no game state available
-            try manager.cache.setBool("all_lifestones_attuned", false);
-        }
-    }
-
-    fn computeTotalLifestones(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
-        if (current_game_state) |game_state| {
-            const total = game_state.computeTotalLifestonesForWorld();
-            try manager.cache.setInt("total_lifestones", @intCast(total));
-        } else {
-            // Fallback value from game_data.zon
-            try manager.cache.setInt("total_lifestones", 91);
-        }
-    }
-
-    fn computeTotalLifestonesAttuned(manager: *game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents)) !void {
-        if (current_game_state) |game_state| {
-            const total_attuned = game_state.computeTotalAttunedLifestonesForWorld();
-            try manager.cache.setInt("total_lifestones_attuned", @intCast(total_attuned));
-        } else {
-            // Fallback value
-            try manager.cache.setInt("total_lifestones_attuned", 0);
-        }
-    }
+    // Removed complex state management callbacks - implement direct save/load instead
 
     pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
         self.hud_system = try reactive_hud.ReactiveHud.init(allocator, renderer_ptr);
@@ -322,35 +242,28 @@ pub const GameState = struct {
         self.logger.info("full_reset", "Full game reset", .{});
     }
 
-    /// Check if all lifestones across all zones are attuned using ECS queries
+    /// Check if all lifestones across all zones are attuned
     pub fn hasAttunedAllLifestones(self: *const Self) bool {
-        // Use cached value if state manager is available
-        if (self.state_manager) |manager| {
-            // For now, fall back to direct computation since cache doesn't have world access
-            _ = manager;
-        }
-
-        // Direct computation using ECS queries
+        // Direct computation - no complex caching
         var total_lifestones: usize = 0;
         var total_attuned: usize = 0;
 
-        const zone_storage = self.hex_game.getZoneStorage();
-        var terrain_iter = zone_storage.terrains.iterator();
-
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
-
-            // Only count lifestones (altar terrain with interactable component)
-            if (terrain.terrain_type != .altar) continue;
-            if (!zone_storage.interactables.has(entity_id)) continue;
-
-            total_lifestones += 1;
-
-            // Check if lifestone is attuned (using transformable state as attuned indicator)
-            if (zone_storage.interactables.getConst(entity_id)) |interactable| {
-                if (interactable.interaction_type == .transformable) {
-                    total_attuned += 1;
+        // Check all zones
+        for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
+            const zone = &self.hex_game.zones[zone_idx];
+            
+            // Count lifestones in this zone
+            for (0..zone.lifestones.count) |i| {
+                const entity_id = zone.lifestones.entities[i];
+                if (entity_id == std.math.maxInt(u32)) continue;
+                
+                total_lifestones += 1;
+                
+                // Check if attuned
+                if (zone.lifestones.getComponent(entity_id, .interactable)) |interactable| {
+                    if (interactable.attuned) {
+                        total_attuned += 1;
+                    }
                 }
             }
         }
@@ -358,51 +271,25 @@ pub const GameState = struct {
         return total_lifestones > 0 and total_attuned == total_lifestones;
     }
 
-    /// Properly compute all lifestones attuned for the cache using ECS queries
+    /// Properly compute all lifestones attuned for the cache
     pub fn computeAllLifestonesAttunedForWorld(self: *const Self) bool {
-        var total_lifestones: usize = 0;
-        var total_attuned: usize = 0;
-
-        const zone_storage = self.hex_game.getZoneStorage();
-        var terrain_iter = zone_storage.terrains.iterator();
-
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
-
-            // Only count lifestones (altar terrain with interactable component)
-            if (terrain.terrain_type != .altar) continue;
-            if (!zone_storage.interactables.has(entity_id)) continue;
-
-            total_lifestones += 1;
-
-            // Check if lifestone is attuned (using transformable state as attuned indicator)
-            if (zone_storage.interactables.getConst(entity_id)) |interactable| {
-                if (interactable.interaction_type == .transformable) {
-                    total_attuned += 1;
-                }
-            }
-        }
-
-        return total_lifestones > 0 and total_attuned == total_lifestones;
+        return self.hasAttunedAllLifestones();
     }
 
     /// Get total number of lifestones in the world
     pub fn computeTotalLifestonesForWorld(self: *const Self) usize {
         var total_lifestones: usize = 0;
 
-        const zone_storage = self.hex_game.getZoneStorage();
-        var terrain_iter = zone_storage.terrains.iterator();
-
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
-
-            // Only count lifestones (altar terrain with interactable component)
-            if (terrain.terrain_type != .altar) continue;
-            if (!zone_storage.interactables.has(entity_id)) continue;
-
-            total_lifestones += 1;
+        // Check all zones
+        for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
+            const zone = &self.hex_game.zones[zone_idx];
+            
+            // Count lifestones in this zone
+            for (0..zone.lifestones.count) |i| {
+                const entity_id = zone.lifestones.entities[i];
+                if (entity_id == std.math.maxInt(u32)) continue;
+                total_lifestones += 1;
+            }
         }
 
         return total_lifestones;
@@ -412,21 +299,20 @@ pub const GameState = struct {
     pub fn computeTotalAttunedLifestonesForWorld(self: *const Self) usize {
         var total_attuned: usize = 0;
 
-        const zone_storage = self.hex_game.getZoneStorage();
-        var terrain_iter = zone_storage.terrains.iterator();
-
-        while (terrain_iter.next()) |entry| {
-            const entity_id = entry.key_ptr.*;
-            const terrain = entry.value_ptr.*;
-
-            // Only count lifestones (altar terrain with interactable component)
-            if (terrain.terrain_type != .altar) continue;
-            if (!zone_storage.interactables.has(entity_id)) continue;
-
-            // Check if lifestone is attuned (using attuned flag)
-            if (zone_storage.interactables.getConst(entity_id)) |interactable| {
-                if (interactable.attuned) {
-                    total_attuned += 1;
+        // Check all zones
+        for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
+            const zone = &self.hex_game.zones[zone_idx];
+            
+            // Count attuned lifestones in this zone
+            for (0..zone.lifestones.count) |i| {
+                const entity_id = zone.lifestones.entities[i];
+                if (entity_id == std.math.maxInt(u32)) continue;
+                
+                // Check if attuned
+                if (zone.lifestones.getComponent(entity_id, .interactable)) |interactable| {
+                    if (interactable.attuned) {
+                        total_attuned += 1;
+                    }
                 }
             }
         }
@@ -634,13 +520,13 @@ fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_rad
 
                         game_state.logger.info("lifestone_attuned", "Lifestone attuned!", .{});
 
-                        // Emit lifestone attuned event
-                        if (game_state.state_manager) |manager| {
-                            manager.emit(hex_events.lifestoneAttuned(
-                                game_state.hex_game.getCurrentZoneIndex(),
-                                entity_id, // Use EntityId as unique identifier
-                                transform.pos,
-                            ));
+                        // Track lifestone attunement for save system
+                        game_state.game_stats.lifestones_attuned += 1;
+                        
+                        // Check if all lifestones are now attuned
+                        if (game_state.hasAttunedAllLifestones()) {
+                            game_state.logger.info("achievement", "All lifestones attuned!", .{});
+                            game_state.game_stats.all_lifestones_attuned = true;
                         }
 
                         // Add inner effect for newly attuned lifestone

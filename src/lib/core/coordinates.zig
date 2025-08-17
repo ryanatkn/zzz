@@ -3,12 +3,10 @@
 
 const std = @import("std");
 const constants = @import("constants.zig");
+const math = @import("../math/mod.zig");
 
-// Local Vec2 definition for standalone testing
-const Vec2 = extern struct {
-    x: f32,
-    y: f32,
-};
+// Use standard Vec2 from math module
+const Vec2 = math.Vec2;
 
 // ========================
 // COORDINATE SPACES

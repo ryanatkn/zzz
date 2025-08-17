@@ -4,8 +4,7 @@ const colors = @import("../core/colors.zig");
 pub const Vec2 = math.Vec2;
 const Color = colors.Color;
 const BoundedArray = std.BoundedArray;
-const entity = @import("entity.zig");
-const EntityId = entity.EntityId;
+const EntityId = u32;
 
 /// Transform - universal positioning component
 /// Dense storage - almost all entities have this
