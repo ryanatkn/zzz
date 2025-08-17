@@ -142,8 +142,8 @@ pub const SimpleGPURenderer = struct {
             .effect_pipeline = undefined,
             .text_renderer = undefined,
             .vector_renderer = undefined,
-            .screen_width = @import("../../hex/constants.zig").BASE_SCREEN_WIDTH,
-            .screen_height = @import("../../hex/constants.zig").BASE_SCREEN_HEIGHT,
+            .screen_width = @import("../core/constants.zig").SCREEN.BASE_WIDTH,
+            .screen_height = @import("../core/constants.zig").SCREEN.BASE_HEIGHT,
         };
 
         try self.createShaders();

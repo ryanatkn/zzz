@@ -32,18 +32,20 @@ DirectoryScanner -> FileFilter -> ContentProcessor -> ResultAggregator
 
 ## Implementation Plan
 
-1. **Entity/Component foundation** - Core ECS primitives
-2. **File system integration** - Directory traversal as ECS pipeline
+1. **Entity/Component foundation** - Core ECS primitives ✅ **Object pools now available**
+2. **File system integration** - Directory traversal as ECS pipeline 
 3. **AST processing** - Tree-sitter operations as components
-4. **Parallel execution** - Worker pools and job scheduling
-5. **Memory optimization** - Component pooling and recycling
+4. **Parallel execution** - Worker pools and job scheduling ✅ **Context system available**
+5. **Memory optimization** - Component pooling and recycling ✅ **Generic ObjectPool(T) implemented**
 
 ## Integration Points
 
 - Replace `src/lib/traversal.zig` with ECS traversal system
-- Migrate AST operations to component-based architecture
+- Migrate AST operations to component-based architecture  
 - Parallel prompt generation using ECS job system
 - Cache system as ECS components with LRU eviction
+- **✅ Use new object pools** - `src/lib/core/object_pools.zig` for entity/component recycling
+- **✅ Use context system** - `src/lib/game/contexts.zig` for frame-based processing
 
 ## Benefits
 
@@ -52,3 +54,11 @@ DirectoryScanner -> FileFilter -> ContentProcessor -> ResultAggregator
 - **Modularity**: Clean separation of concerns
 - **Performance**: Cache-friendly data layout
 - **Scalability**: Easy addition of new processing stages
+
+## 🔮 Future Work
+
+### ECS Architecture Evaluation
+- Benchmark complex ECS vs simple arrays
+- Profile memory allocation patterns (32+ allocations vs 0)
+- Measure cache performance and iteration speed
+- Document decision with data-backed rationale

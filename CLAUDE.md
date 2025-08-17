@@ -383,7 +383,6 @@ $ zig build --help       # Show all build options
       .filter = filters.Throttle,
   });
   ```
-- **Legacy System**: `log_throttle.zig` still exists for gradual migration
 - **File Output**: Automatic session tracking with timestamps in `game.log`
 - **Performance**: Compile-time composition ensures zero runtime overhead
 

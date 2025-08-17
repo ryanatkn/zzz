@@ -1,23 +1,15 @@
 const colors = @import("../lib/core/colors.zig");
+const constants = @import("../lib/core/constants.zig");
 
-// Base screen dimensions - single source of truth for UI coordinate system
-pub const BASE_SCREEN_WIDTH = 1920.0;
-pub const BASE_SCREEN_HEIGHT = 1080.0;
+// Game-specific screen utilities derived from engine constants  
+pub const SCREEN_WIDTH = constants.SCREEN.BASE_WIDTH;
+pub const SCREEN_HEIGHT = constants.SCREEN.BASE_HEIGHT;
+pub const SCREEN_CENTER_X = constants.SCREEN.centerX(SCREEN_WIDTH);
+pub const SCREEN_CENTER_Y = constants.SCREEN.centerY(SCREEN_HEIGHT);
+pub const ASPECT_RATIO = constants.SCREEN.ASPECT_RATIO;
 
-// Screen/Window dimensions (derived from base)
-pub const SCREEN_WIDTH = BASE_SCREEN_WIDTH;
-pub const SCREEN_HEIGHT = BASE_SCREEN_HEIGHT;
-pub const SCREEN_CENTER_X = SCREEN_WIDTH / 2.0;
-pub const SCREEN_CENTER_Y = SCREEN_HEIGHT / 2.0;
-
-// Screen scaling utilities for UI coordinate conversion
-pub fn scaleFromBase(coord: f32, is_x: bool, target_width: f32, target_height: f32) f32 {
-    if (is_x) {
-        return coord * (target_width / BASE_SCREEN_WIDTH);
-    } else {
-        return coord * (target_height / BASE_SCREEN_HEIGHT);
-    }
-}
+// Re-export engine utilities for convenience
+pub const scaleFromBase = constants.SCREEN.scaleFromBase;
 
 // Entity limits (moved from entities.zig)
 pub const MAX_UNITS = 12;
@@ -42,10 +34,10 @@ pub const BULLET_DAMAGE = 150.0; // One-shot kill damage
 pub const BULLET_LIFETIME = 4.0; // Bullet lifetime in seconds
 pub const PORTAL_SPAWN_OFFSET = 10.0; // Extra distance when spawning near portals
 
-// Camera/zoom constants
-pub const ZOOM_FACTOR = 1.1; // 10% zoom per wheel tick
-pub const MAX_ZOOM = 10.0;
-pub const MIN_ZOOM = 0.1;
+// Camera/zoom constants (game-specific limits)
+pub const ZOOM_FACTOR = constants.CAMERA.ZOOM_FACTOR;
+pub const MAX_ZOOM = constants.CAMERA.MAX_ZOOM;
+pub const MIN_ZOOM = constants.CAMERA.MIN_ZOOM;
 
 // Border/visual effect constants
 pub const BORDER_PULSE_PAUSED = 1.5;
@@ -60,17 +52,17 @@ pub const CameraMode = enum {
     follow,
 };
 
-// UI/HUD positioning constants
-pub const FPS_POSITION_X = 100.0; // FPS display left margin
-pub const FPS_POSITION_Y = 100.0; // FPS display top margin
-pub const FPS_FALLBACK_X = 1840.0; // Fallback geometric FPS position
-pub const FPS_FALLBACK_Y = 1060.0; // Fallback geometric FPS position
-pub const FPS_DIGIT_SPACING = 12.0; // Spacing between FPS digits
-pub const FPS_PIXEL_SIZE = 2.0; // Size of each pixel in geometric FPS
-pub const FPS_DIGIT_PIXEL_SIZE = 1.5; // Size of individual digit pixels
+// UI/HUD positioning constants  
+pub const FPS_POSITION_X = constants.UI.HUD_MARGIN_X;
+pub const FPS_POSITION_Y = constants.UI.HUD_MARGIN_Y;
+pub const FPS_FALLBACK_X = constants.UI.FALLBACK_POSITION_X;
+pub const FPS_FALLBACK_Y = constants.UI.FALLBACK_POSITION_Y;
+pub const FPS_DIGIT_SPACING = constants.UI.DIGIT_SPACING;
+pub const FPS_PIXEL_SIZE = 2.0; // Game-specific pixel size for FPS
+pub const FPS_DIGIT_PIXEL_SIZE = constants.UI.TEXT_PIXEL_SIZE;
 
 // Animation/visual constants
-pub const VISIBILITY_THRESHOLD = 0.5; // Minimum width for border visibility
+pub const VISIBILITY_THRESHOLD = constants.RENDERING.VISIBILITY_THRESHOLD;
 pub const PAUSED_BORDER_BASE_WIDTH = 6.0; // Base width of paused border
 pub const PAUSED_BORDER_PULSE_AMPLITUDE = 4.0; // Pulse amplitude for paused border
 pub const DEAD_BORDER_BASE_WIDTH = 9.0; // Base width of dead border  
@@ -78,7 +70,7 @@ pub const DEAD_BORDER_PULSE_AMPLITUDE = 5.0; // Pulse amplitude for dead border
 
 // Player movement constants
 pub const WALK_SPEED_MULTIPLIER = 0.25; // Walking speed is 1/4 of normal
-pub const PLAYER_BOUNDARY_MARGIN = 10.0; // Extra margin for boundary checks
+pub const PLAYER_BOUNDARY_MARGIN = constants.CAMERA.BOUNDARY_MARGIN;
 
 // Spell system constants
 pub const LULL_RADIUS = 150.0; // Base AoE radius - can be upgraded
@@ -90,9 +82,8 @@ pub const BLINK_COOLDOWN = 3.0;
 pub const MAX_LULL_EFFECTS = 10;
 
 // Border system constants
-pub const ASPECT_RATIO = 16.0 / 9.0;
-pub const MAX_BORDER_LAYERS = 8;
-pub const COLOR_CYCLE_FREQ = 4.0;
+pub const MAX_BORDER_LAYERS = constants.RENDERING.MAX_BORDER_LAYERS;
+pub const COLOR_CYCLE_FREQ = constants.ANIMATION.COLOR_CYCLE_FREQUENCY;
 
 // Color constants (imported from shared colors module)
 pub const COLOR_PLAYER_ALIVE = colors.PLAYER_ALIVE;

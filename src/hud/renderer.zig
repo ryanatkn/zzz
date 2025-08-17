@@ -171,9 +171,9 @@ pub const BrowserRenderer = struct {
     }
 
     pub fn renderNavigationBar(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_path: []const u8, can_go_back: bool, can_go_forward: bool) !void {
-        const constants = @import("../hex/constants.zig");
-        const screen_width = constants.BASE_SCREEN_WIDTH;
-        const screen_height = constants.BASE_SCREEN_HEIGHT;
+        const constants = @import("../lib/core/constants.zig");
+        const screen_width = constants.SCREEN.BASE_WIDTH;
+        const screen_height = constants.SCREEN.BASE_HEIGHT;
 
         const bar_height = 50.0;
         const bar_y = screen_height * 0.1 - bar_height / 2.0;

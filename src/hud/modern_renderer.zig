@@ -354,9 +354,9 @@ pub fn makeResponsive(
     hardcoded_height: f32
 ) struct { position: Vec2, size: Vec2 } {
     // Convert hardcoded coordinates to responsive using constants
-    const constants = @import("../hex/constants.zig");
-    const screen_width_1920 = constants.BASE_SCREEN_WIDTH;
-    const screen_height_1080 = constants.BASE_SCREEN_HEIGHT;
+    const constants = @import("../lib/core/constants.zig");
+    const screen_width_1920 = constants.SCREEN.BASE_WIDTH;
+    const screen_height_1080 = constants.SCREEN.BASE_HEIGHT;
     
     const relative_x = hardcoded_x / screen_width_1920;
     const relative_y = hardcoded_y / screen_height_1080;

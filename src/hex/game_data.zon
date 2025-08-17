@@ -3,9 +3,9 @@
 // Zones 1-6: Dungeons arranged in hexagon around overworld
 
 .{
-    // Screen dimensions - must match constants.zig BASE_SCREEN_WIDTH/HEIGHT
-    .screen_width = 1920.0,  // = constants.BASE_SCREEN_WIDTH
-    .screen_height = 1080.0, // = constants.BASE_SCREEN_HEIGHT
+    // Screen dimensions - must match engine constants SCREEN.BASE_WIDTH/HEIGHT
+    .screen_width = 1920.0,  // = engine.SCREEN.BASE_WIDTH
+    .screen_height = 1080.0, // = engine.SCREEN.BASE_HEIGHT
 
     // Player starting position (overworld center)
     .player_start = .{

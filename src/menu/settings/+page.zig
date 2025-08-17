@@ -20,9 +20,9 @@ const SettingsPage = struct {
     }
 
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
-        const constants = @import("../../hex/constants.zig");
-        const screen_width = constants.BASE_SCREEN_WIDTH;
-        const screen_height = constants.BASE_SCREEN_HEIGHT;
+        const constants = @import("../../hud/constants.zig");
+        const screen_width = constants.SCREEN.BASE_WIDTH;
+        const screen_height = constants.SCREEN.BASE_HEIGHT;
         _ = self;
 
         const center_x = screen_width / 2.0;
