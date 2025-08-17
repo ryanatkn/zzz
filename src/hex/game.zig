@@ -321,7 +321,7 @@ fn updateUnits(game_state: *GameState, deltaTime: f32) void {
                         const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnit(unit_id, zone_storage);
 
                         // Update unit AI behavior using HexGame components
-                        behaviors.updateUnitWithAggroMod_HexGame(unit_id, unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
+                        behaviors.updateUnitWithAggroMod(unit_id, unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
                     }
 
                     // Check collision with obstacles

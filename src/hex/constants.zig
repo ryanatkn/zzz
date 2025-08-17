@@ -85,6 +85,37 @@ pub const MAX_LULL_EFFECTS = 10;
 pub const MAX_BORDER_LAYERS = constants.RENDERING.MAX_BORDER_LAYERS;
 pub const COLOR_CYCLE_FREQ = constants.ANIMATION.COLOR_CYCLE_FREQUENCY;
 
+// Behavior configuration constants
+pub const BEHAVIOR_IDLE_MIN_DISTANCE = 20.0;
+pub const BEHAVIOR_IDLE_WALK_SPEED_MULT = 0.5;
+pub const BEHAVIOR_IDLE_CHASE_DURATION = 1.5;
+pub const BEHAVIOR_IDLE_HOME_TOLERANCE = 15.0;
+pub const BEHAVIOR_IDLE_LOSE_TOLERANCE = 1.05;
+
+pub const BEHAVIOR_DEFENSIVE_SPEED_MULT = 1.2; // Flee faster
+pub const BEHAVIOR_WANDERING_DETECTION_MULT = 0.8; // Smaller detection
+pub const BEHAVIOR_WANDERING_WALK_SPEED_MULT = 0.7; // Walk slower
+pub const BEHAVIOR_WANDERING_CHASE_DURATION = 2.0;
+pub const BEHAVIOR_WANDERING_LOSE_TOLERANCE = 1.0; // No lose tolerance
+
+pub const BEHAVIOR_GUARDIAN_DETECTION_MULT = 1.2; // Larger detection
+pub const BEHAVIOR_GUARDIAN_MIN_DISTANCE_OFFSET = 15.0; // Extra min distance
+pub const BEHAVIOR_GUARDIAN_CHASE_DURATION = 5.0;
+pub const BEHAVIOR_GUARDIAN_HOME_TOLERANCE_MULT = 0.5; // Stay closer to home
+pub const BEHAVIOR_GUARDIAN_LOSE_TOLERANCE = 1.25;
+
+// Patrol waypoint pattern constants
+pub const PATROL_WAYPOINT_OFFSET_X = 100.0;
+pub const PATROL_WAYPOINT_OFFSET_Y = 100.0;
+
+// Patrol pattern types
+pub const PatrolPattern = enum {
+    square,    // 4-point square pattern
+    line,      // 2-point back-and-forth
+    triangle,  // 3-point triangle
+    circle,    // 4-point circular approximation
+};
+
 // Color constants (imported from shared colors module)
 pub const COLOR_PLAYER_ALIVE = colors.PLAYER_ALIVE;
 pub const COLOR_UNIT_DEFAULT = colors.UNIT_DEFAULT;

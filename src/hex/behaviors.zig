@@ -21,8 +21,13 @@ const Visual = hex_game_mod.Visual;
 const BehaviorProfile = hex_game_mod.BehaviorProfile;
 
 /// Unit behavior state storage (games need to manage this)
+/// Note: Using page_allocator for now but should accept allocator parameter in production
 var unit_behavior_states = std.AutoHashMap(u32, unit_behavior.UnitBehaviorState).init(std.heap.page_allocator);
 var unit_behavior_configs = std.AutoHashMap(u32, unit_behavior.UnitBehaviorConfig).init(std.heap.page_allocator);
+
+/// Static fallback state for error recovery (memory-safe alternative to @constCast)
+var fallback_state = unit_behavior.UnitBehaviorState.init(Vec2.ZERO, &[_]Vec2{}, 0);
+var fallback_config = unit_behavior.UnitBehaviorConfig.aggressive(Vec2.ZERO, 100.0, 50.0);
 
 /// Initialize behavior system
 pub fn initBehaviors() void {
@@ -38,49 +43,39 @@ pub fn deinitBehaviors() void {
     unit_behavior_configs.deinit();
 }
 
-/// Create idle behavior config (basic aggro, returns home)
-pub fn idle(home_pos: Vec2, detection_range: f32, chase_speed: f32) unit_behavior.UnitBehaviorConfig {
-    var config = unit_behavior.UnitBehaviorConfig.init(home_pos, detection_range, 20.0, // min_distance
-        chase_speed, chase_speed * 0.5, // walk_speed
-        1.5, // chase_duration (short)
-        15.0, // home_tolerance
-        1.05 // lose_tolerance (tight)
-    );
-    config.behavior_priorities.chase = .low; // Will chase but not aggressively
-    config.behavior_priorities.return_home = .normal; // Returns home when player leaves
-    config.behavior_priorities.wander = .lowest; // Minimal wandering
-    return config;
-}
-
-/// Create behavior config based on profile
-pub fn createBehaviorConfig(profile: BehaviorProfile, home_pos: Vec2) unit_behavior.UnitBehaviorConfig {
+/// Create behavior configuration for specific profile with consistent parameters
+fn createConfigForProfile(profile: BehaviorProfile, home_pos: Vec2) unit_behavior.UnitBehaviorConfig {
+    const base_detection = constants.UNIT_DETECTION_RADIUS;
+    const base_chase_speed = constants.UNIT_CHASE_SPEED;
+    const base_walk_speed = constants.UNIT_WALK_SPEED;
+    
     return switch (profile) {
-        .idle => idle(home_pos, constants.UNIT_DETECTION_RADIUS, constants.UNIT_CHASE_SPEED),
-        .aggressive => unit_behavior.UnitBehaviorConfig.aggressive(
-            home_pos,
-            constants.UNIT_DETECTION_RADIUS,
-            constants.UNIT_CHASE_SPEED,
-        ),
-        .defensive => unit_behavior.UnitBehaviorConfig.defensive(
-            home_pos,
-            constants.UNIT_DETECTION_RADIUS,
-            constants.UNIT_CHASE_SPEED * 1.2, // Flee faster
-        ),
-        .patrolling => unit_behavior.UnitBehaviorConfig.patrolling(
-            home_pos,
-            constants.UNIT_DETECTION_RADIUS,
-            constants.UNIT_WALK_SPEED,
-        ),
+        .idle => blk: {
+            var config = unit_behavior.UnitBehaviorConfig.init(
+                home_pos, base_detection, constants.BEHAVIOR_IDLE_MIN_DISTANCE,
+                base_chase_speed, base_chase_speed * constants.BEHAVIOR_IDLE_WALK_SPEED_MULT,
+                constants.BEHAVIOR_IDLE_CHASE_DURATION,
+                constants.BEHAVIOR_IDLE_HOME_TOLERANCE,
+                constants.BEHAVIOR_IDLE_LOSE_TOLERANCE
+            );
+            config.behavior_priorities.chase = .low;
+            config.behavior_priorities.return_home = .normal;
+            config.behavior_priorities.wander = .lowest;
+            break :blk config;
+        },
+        .aggressive => unit_behavior.UnitBehaviorConfig.aggressive(home_pos, base_detection, base_chase_speed),
+        .defensive => unit_behavior.UnitBehaviorConfig.defensive(home_pos, base_detection, base_chase_speed * constants.BEHAVIOR_DEFENSIVE_SPEED_MULT),
+        .patrolling => unit_behavior.UnitBehaviorConfig.patrolling(home_pos, base_detection, base_walk_speed),
         .wandering => blk: {
             var config = unit_behavior.UnitBehaviorConfig.init(
                 home_pos,
-                constants.UNIT_DETECTION_RADIUS * 0.8, // Smaller detection
+                base_detection * constants.BEHAVIOR_WANDERING_DETECTION_MULT,
                 constants.PLAYER_RADIUS + 10.0,
-                constants.UNIT_WALK_SPEED,
-                constants.UNIT_WALK_SPEED * 0.7, // Walk slower
-                2.0, // Short chase duration
+                base_walk_speed,
+                base_walk_speed * constants.BEHAVIOR_WANDERING_WALK_SPEED_MULT,
+                constants.BEHAVIOR_WANDERING_CHASE_DURATION,
                 constants.UNIT_HOME_TOLERANCE,
-                1.0, // No lose tolerance
+                constants.BEHAVIOR_WANDERING_LOSE_TOLERANCE,
             );
             config.behavior_priorities.wander = .high;
             config.behavior_priorities.flee = .critical;
@@ -90,13 +85,13 @@ pub fn createBehaviorConfig(profile: BehaviorProfile, home_pos: Vec2) unit_behav
         .guardian => blk: {
             var config = unit_behavior.UnitBehaviorConfig.init(
                 home_pos,
-                constants.UNIT_DETECTION_RADIUS * 1.2, // Larger detection
-                constants.PLAYER_RADIUS + 15.0,
-                constants.UNIT_CHASE_SPEED,
-                constants.UNIT_WALK_SPEED,
-                5.0, // Long chase duration
-                constants.UNIT_HOME_TOLERANCE * 0.5, // Stay closer to home
-                1.25, // Larger lose tolerance
+                base_detection * constants.BEHAVIOR_GUARDIAN_DETECTION_MULT,
+                constants.PLAYER_RADIUS + constants.BEHAVIOR_GUARDIAN_MIN_DISTANCE_OFFSET,
+                base_chase_speed,
+                base_walk_speed,
+                constants.BEHAVIOR_GUARDIAN_CHASE_DURATION,
+                constants.UNIT_HOME_TOLERANCE * constants.BEHAVIOR_GUARDIAN_HOME_TOLERANCE_MULT,
+                constants.BEHAVIOR_GUARDIAN_LOSE_TOLERANCE,
             );
             config.behavior_priorities.guard = .critical;
             config.behavior_priorities.chase = .high;
@@ -106,24 +101,24 @@ pub fn createBehaviorConfig(profile: BehaviorProfile, home_pos: Vec2) unit_behav
     };
 }
 
+/// Create behavior config based on profile (public API)
+pub fn createBehaviorConfig(profile: BehaviorProfile, home_pos: Vec2) unit_behavior.UnitBehaviorConfig {
+    return createConfigForProfile(profile, home_pos);
+}
+
 /// Get or create behavior state for a unit entity
 fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: BehaviorProfile) *unit_behavior.UnitBehaviorState {
     const state_result = unit_behavior_states.getOrPut(entity_id) catch {
-        std.log.err("Failed to get or create behavior state for entity {}", .{entity_id});
-        // Return a default state as fallback
-        const default_state = unit_behavior.UnitBehaviorState.init(unit_comp.home_pos, &[_]Vec2{}, entity_id);
-        return @constCast(&default_state);
+        std.log.err("Failed to get or create behavior state for entity {}, using fallback", .{entity_id});
+        // Update fallback state and return reference to it (memory-safe)
+        fallback_state = unit_behavior.UnitBehaviorState.init(unit_comp.home_pos, &[_]Vec2{}, entity_id);
+        return &fallback_state;
     };
 
     if (!state_result.found_existing) {
         // Create new state with appropriate waypoints based on profile
         const waypoints = switch (profile) {
-            .patrolling => &[_]Vec2{
-                unit_comp.home_pos,
-                Vec2{ .x = unit_comp.home_pos.x + 100, .y = unit_comp.home_pos.y },
-                Vec2{ .x = unit_comp.home_pos.x + 100, .y = unit_comp.home_pos.y + 100 },
-                Vec2{ .x = unit_comp.home_pos.x, .y = unit_comp.home_pos.y + 100 },
-            },
+            .patrolling => generatePatrolWaypoints(unit_comp.home_pos, .square), // Default to square pattern
             else => &[_]Vec2{}, // No waypoints for other profiles
         };
 
@@ -140,22 +135,51 @@ fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: Beh
 /// Get or create behavior config for a unit entity
 fn getOrCreateBehaviorConfig(entity_id: u32, unit_comp: *const Unit, profile: BehaviorProfile) *unit_behavior.UnitBehaviorConfig {
     const config_result = unit_behavior_configs.getOrPut(entity_id) catch {
-        std.log.err("Failed to get or create behavior config for entity {}", .{entity_id});
-        // Return a default config as fallback
-        const default_config = createBehaviorConfig(.aggressive, unit_comp.home_pos);
-        return @constCast(&default_config);
+        std.log.err("Failed to get or create behavior config for entity {}, using fallback", .{entity_id});
+        // Update fallback config and return reference to it (memory-safe)
+        fallback_config = createConfigForProfile(profile, unit_comp.home_pos);
+        return &fallback_config;
     };
 
     if (!config_result.found_existing) {
-        config_result.value_ptr.* = createBehaviorConfig(profile, unit_comp.home_pos);
+        config_result.value_ptr.* = createConfigForProfile(profile, unit_comp.home_pos);
     }
 
     return config_result.value_ptr;
 }
 
+/// Generate patrol waypoints based on pattern and home position
+fn generatePatrolWaypoints(home_pos: Vec2, pattern: constants.PatrolPattern) []const Vec2 {
+    const offset_x = constants.PATROL_WAYPOINT_OFFSET_X;
+    const offset_y = constants.PATROL_WAYPOINT_OFFSET_Y;
+    
+    return switch (pattern) {
+        .square => &[_]Vec2{
+            home_pos,
+            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y },
+            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y + offset_y },
+            Vec2{ .x = home_pos.x, .y = home_pos.y + offset_y },
+        },
+        .line => &[_]Vec2{
+            home_pos,
+            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y },
+        },
+        .triangle => &[_]Vec2{
+            home_pos,
+            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y },
+            Vec2{ .x = home_pos.x + offset_x * 0.5, .y = home_pos.y + offset_y },
+        },
+        .circle => &[_]Vec2{
+            home_pos,
+            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y },
+            Vec2{ .x = home_pos.x, .y = home_pos.y + offset_y },
+            Vec2{ .x = home_pos.x - offset_x, .y = home_pos.y },
+        },
+    };
+}
+
 /// Determine behavior profile from stored unit data (not entity ID)
-fn determineBehaviorProfile(entity_id: u32, unit_comp: *const Unit) BehaviorProfile {
-    _ = entity_id; // No longer needed - use stored behavior
+fn determineBehaviorProfile(unit_comp: *const Unit) BehaviorProfile {
     return unit_comp.behavior_profile; // Use stored value from ZON
 }
 
@@ -171,7 +195,7 @@ pub fn updateUnitWithAggroMod(
     aggro_multiplier: f32,
 ) void {
     // Determine behavior profile for this unit
-    const profile = determineBehaviorProfile(entity_id, unit_comp);
+    const profile = determineBehaviorProfile(unit_comp);
 
     // Get or create behavior state and config
     const state = getOrCreateBehaviorState(entity_id, unit_comp, profile);
@@ -235,50 +259,6 @@ fn getBehaviorColor(behavior: unit_behavior.BehaviorType, profile: BehaviorProfi
     };
 }
 
-/// Simple unit update using basic chase behavior (for compatibility)
-pub fn updateUnitWithAggroMod_Simple(
-    unit_comp: *Unit,
-    transform: *Transform,
-    visual: *Visual,
-    player_pos: Vec2,
-    player_alive: bool,
-    dt: f32,
-    aggro_multiplier: f32,
-) void {
-    var velocity = Vec2.ZERO;
-
-    if (player_alive) {
-        // Use simple chase behavior from lib
-        const min_distance = transform.radius + constants.PLAYER_RADIUS;
-        const chase_velocity = chase_behavior.simpleChase(
-            transform.pos,
-            player_pos,
-            player_alive,
-            constants.UNIT_DETECTION_RADIUS,
-            min_distance,
-            constants.UNIT_CHASE_SPEED,
-            aggro_multiplier,
-        );
-
-        if (chase_velocity.x != 0.0 or chase_velocity.y != 0.0) {
-            // Chasing player
-            velocity = chase_velocity;
-            visual.color = constants.COLOR_UNIT_AGGRESSIVE;
-        } else {
-            // Return home (non-aggro state)
-            velocity = calculateReturnHomeVelocity(unit_comp, transform);
-            visual.color = constants.COLOR_UNIT_NON_AGGRO;
-        }
-    } else {
-        // Player dead - return home (non-aggro state)
-        velocity = calculateReturnHomeVelocity(unit_comp, transform);
-        visual.color = constants.COLOR_UNIT_NON_AGGRO;
-    }
-
-    // Apply velocity
-    transform.vel = velocity;
-    transform.pos = transform.pos.add(velocity.scale(dt));
-}
 
 /// Calculate velocity for unit returning home (using lib utility)
 fn calculateReturnHomeVelocity(unit_comp: *const Unit, transform: *const Transform) Vec2 {
@@ -290,16 +270,3 @@ fn calculateReturnHomeVelocity(unit_comp: *const Unit, transform: *const Transfo
     );
 }
 
-/// Backwards compatibility wrapper for HexGame units
-pub fn updateUnitWithAggroMod_HexGame(
-    entity_id: u32,
-    unit_comp: *hex_game_mod.Unit,
-    transform: *hex_game_mod.Transform,
-    visual: *hex_game_mod.Visual,
-    player_pos: Vec2,
-    player_alive: bool,
-    dt: f32,
-    aggro_multiplier: f32,
-) void {
-    updateUnitWithAggroMod(entity_id, unit_comp, transform, visual, player_pos, player_alive, dt, aggro_multiplier);
-}
