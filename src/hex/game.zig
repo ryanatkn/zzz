@@ -22,8 +22,6 @@ const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
 const game_systems = @import("../lib/game/mod.zig");
-// const hex_events = @import("events.zig"); // Removed - depends on deleted event system
-const simple_save = @import("simple_save.zig");
 const save_data = @import("save_data.zig");
 
 const Vec2 = math.Vec2;
@@ -31,8 +29,6 @@ const HexGame = hex_game_mod.HexGame;
 const InputState = input.InputState;
 const ai_control = @import("../lib/game/control/mod.zig");
 
-// Module-level reference to current GameState for compute callbacks
-var current_game_state: ?*GameState = null;
 
 pub const GameState = struct {
     hex_game: HexGame,
@@ -56,8 +52,7 @@ pub const GameState = struct {
     iris_wipe_active: bool,
     iris_wipe_start_time: time_utils.Timestamp,
 
-    // State management system - simplified
-    save_manager: ?*simple_save.HexSaveManager,
+    // TODO: Implement simple save/load system when needed  
     game_stats: save_data.GameStatistics,
     
     // AI control system
@@ -88,7 +83,7 @@ pub const GameState = struct {
             .hud_system = null,
             .iris_wipe_active = false,
             .iris_wipe_start_time = time_utils.Time.now(),
-            .save_manager = null,
+            // TODO: save_manager = null,
             .game_stats = .{},
             .ai_input = null,
             .ai_enabled = false,
@@ -139,27 +134,8 @@ pub const GameState = struct {
         }
     }
 
-    pub fn initSaveManager(self: *Self, allocator: std.mem.Allocator) !void {
-        const manager = try allocator.create(simple_save.HexSaveManager);
-        manager.* = try simple_save.HexSaveManager.init(allocator);
-        self.save_manager = manager;
-        
-        // Set global reference for compute callbacks
-        current_game_state = self;
-    }
+    // TODO: Implement save/load functions when needed
 
-    pub fn deinitStateManager(self: *Self, allocator: std.mem.Allocator) void {
-        if (self.state_manager) |manager| {
-            manager.deinit();
-            allocator.destroy(manager);
-            self.state_manager = null;
-            
-            // Clear global reference
-            if (current_game_state == self) {
-                current_game_state = null;
-            }
-        }
-    }
 
 
     // Removed complex state management callbacks - implement direct save/load instead

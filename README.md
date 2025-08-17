@@ -120,10 +120,10 @@ See [CLAUDE.md](./CLAUDE.md) for detailed development guidelines.
 
 ## Contributing
 
-Issues and discussions are welcome, but reviewing code is time consuming,
-so I will likely reject many well-meaning PRs, and re-implement if I agree with the idea.
-So if you don't mind the rejection and just care about getting the change in,
-PRs are very much encouraged! They are excellent for concrete discussion.
+Issues and discussions and **deleted code** are all very welcome!
+PRs are encouraged for concrete discussion, 
+but I will probably re-implement rather than merge
+most code additions for various reasons (including security).
 
 Not every PR needs an issue but it's usually
 preferred to reference one or more issues and discussions.

@@ -1,17 +1,19 @@
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
-const ecs = @import("../lib/game/ecs.zig");
 const hex_game_mod = @import("hex_game.zig");
 const behaviors = @import("../lib/game/behaviors/mod.zig");
 
 const Vec2 = math.Vec2;
+const Unit = hex_game_mod.Unit;
+const Transform = hex_game_mod.Transform;
+const Visual = hex_game_mod.Visual;
 
 // Unit update with aggro modifier (using lib utilities)
 pub fn updateUnitWithAggroMod(
-    unit_comp: *ecs.components.Unit,
-    transform: *ecs.components.Transform,
-    visual: *ecs.components.Visual,
+    unit_comp: *Unit,
+    transform: *Transform,
+    visual: *Visual,
     player_pos: Vec2,
     player_alive: bool,
     dt: f32,
@@ -54,7 +56,7 @@ pub fn updateUnitWithAggroMod(
 }
 
 // Calculate velocity for unit returning home (using lib utility)
-fn calculateReturnHomeVelocity(unit_comp: *const ecs.components.Unit, transform: *const ecs.components.Transform) Vec2 {
+fn calculateReturnHomeVelocity(unit_comp: *const Unit, transform: *const Transform) Vec2 {
     return behaviors.simpleReturnHome(
         transform.pos,
         unit_comp.home_pos,
