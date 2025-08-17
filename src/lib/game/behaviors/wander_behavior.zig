@@ -120,6 +120,13 @@ pub const WanderState = struct {
         }
     }
 
+    /// Update timers and handle state transitions using context
+    pub fn updateWithContext(self: *WanderState, config: WanderConfig, context: anytype) void {
+        const ContextUtils = @import("../contexts/context_utils.zig").ContextUtils;
+        const dt = ContextUtils.effectiveDeltaTime(context);
+        self.update(config, dt);
+    }
+
     /// Reset wander state to home position
     pub fn reset(self: *WanderState, home_pos: Vec2) void {
         self.home_pos = home_pos;

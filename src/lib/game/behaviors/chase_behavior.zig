@@ -78,6 +78,13 @@ pub const ChaseState = struct {
             }
         }
     }
+
+    /// Update chase timer and state using context
+    pub fn updateWithContext(self: *ChaseState, context: anytype, use_timer: bool) void {
+        const ContextUtils = @import("../contexts/context_utils.zig").ContextUtils;
+        const dt = ContextUtils.effectiveDeltaTime(context);
+        self.update(dt, use_timer);
+    }
 };
 
 /// Result of chase behavior evaluation
@@ -170,6 +177,21 @@ pub fn evaluateChase(
     }
 
     return result;
+}
+
+/// Context-aware version of evaluateChase
+pub fn evaluateChaseWithContext(
+    chaser_pos: Vec2,
+    target_pos: Vec2,
+    target_alive: bool,
+    state: *ChaseState,
+    config: ChaseConfig,
+    aggro_multiplier: f32,
+    context: anytype,
+) ChaseResult {
+    const ContextUtils = @import("../contexts/context_utils.zig").ContextUtils;
+    const dt = ContextUtils.effectiveDeltaTime(context);
+    return evaluateChase(chaser_pos, target_pos, target_alive, state, config, aggro_multiplier, dt);
 }
 
 /// Simplified chase behavior for basic AI (stateless)

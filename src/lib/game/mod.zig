@@ -9,6 +9,9 @@ pub const cooldowns = @import("cooldowns.zig");
 // Behaviors
 pub const behaviors = @import("behaviors/mod.zig");
 
+// Context system for structured parameter passing
+pub const contexts = @import("contexts/mod.zig");
+
 // Control systems
 pub const control = @import("control/mod.zig");
 

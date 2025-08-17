@@ -5,16 +5,20 @@ const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const cooldowns = @import("../lib/game/cooldowns.zig");
+const HexGameContext = @import("hex_context.zig").HexGameContext;
 
 // Portal cooldown to prevent re-triggering after travel
 var portal_cooldown = cooldowns.Cooldown.init(1.0); // 1 second cooldown
 
 // Update portal cooldown timer
-pub fn updatePortalCooldown(deltaTime: f32) void {
+pub fn updatePortalCooldown(context: HexGameContext) void {
+    const contexts = @import("../lib/game/contexts/mod.zig");
+    const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
     portal_cooldown.update(deltaTime);
 }
 
-pub fn checkPortalCollisions(game_state: anytype) bool {
+pub fn checkPortalCollisions(context: HexGameContext) bool {
+    const game_state = context.game_state orelse return false;
     const world = &game_state.hex_game;
 
     // Skip portal checks during cooldown

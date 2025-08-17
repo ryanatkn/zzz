@@ -6,6 +6,7 @@ const input = @import("../lib/platform/input.zig");
 const math = @import("../lib/math/mod.zig");
 const camera = @import("../lib/rendering/camera.zig");
 const constants = @import("constants.zig");
+const HexGameContext = @import("hex_context.zig").HexGameContext;
 
 const Vec2 = math.Vec2;
 const HexWorld = hex_world.HexWorld;
@@ -14,8 +15,15 @@ const InputState = input.InputState;
 
 const WALK_SPEED_MULT = constants.WALK_SPEED_MULTIPLIER; // Walking speed is 1/4 of normal
 
-/// Player update function
-pub fn updatePlayer(game: *HexGame, input_state: *const InputState, cam: *const camera.Camera, deltaTime: f32) void {
+/// Context-aware player update function
+pub fn updatePlayer(game: *HexGame, context: HexGameContext) void {
+    const contexts = @import("../lib/game/contexts/mod.zig");
+    
+    // Extract needed data from context
+    const input_state = if (context.input.platform_input_state) |platform| platform else return;
+    const cam = if (@hasField(@TypeOf(context), "camera") and context.camera != null) context.camera.? else return;
+    const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
+    
     if (!game.getPlayerAlive()) return;
 
     var keyboard_velocity = Vec2.ZERO;

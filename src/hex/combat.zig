@@ -6,6 +6,7 @@ const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");
 const game_systems = @import("../lib/game/systems/mod.zig");
+const HexGameContext = @import("hex_context.zig").HexGameContext;
 
 const Vec2 = math.Vec2;
 const HexGame = @import("hex_game.zig").HexGame;
@@ -35,6 +36,23 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
 
 pub fn fireBulletAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl) bool {
     return fireBullet(game, mouse_pos, pool);
+}
+
+/// Context-aware version of fireBullet
+pub fn fireBulletWithContext(context: HexGameContext, target_pos: Vec2, pool: *BulletPoolImpl) bool {
+    if (@hasField(@TypeOf(context), "game_world") and context.game_world != null) {
+        return fireBullet(context.game_world.?, target_pos, pool);
+    }
+    return false;
+}
+
+/// Context-aware version of fireBulletAtMouse
+pub fn fireBulletAtMouseWithContext(context: HexGameContext, pool: *BulletPoolImpl) bool {
+    if (@hasField(@TypeOf(context), "input") and @hasField(@TypeOf(context), "game_world") and context.game_world != null) {
+        const mouse_pos = context.input.mouse_position;
+        return fireBulletWithContext(context, mouse_pos, pool);
+    }
+    return false;
 }
 
 /// Convert hex lifestone to generic checkpoint data

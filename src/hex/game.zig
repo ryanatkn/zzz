@@ -7,7 +7,8 @@ const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision.zig");
 const hex_game_mod = @import("hex_game.zig");
 const time_utils = @import("../lib/core/time.zig");
-const contexts = @import("contexts.zig");
+const contexts = @import("../lib/game/contexts/mod.zig");
+const hex_context = @import("hex_context.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
@@ -28,6 +29,7 @@ const Vec2 = math.Vec2;
 const HexGame = hex_game_mod.HexGame;
 const InputState = input.InputState;
 const ai_control = @import("../lib/game/control/mod.zig");
+const HexGameContext = hex_context.HexGameContext;
 
 pub const GameState = struct {
     hex_game: HexGame,
@@ -296,8 +298,8 @@ pub const GameState = struct {
     }
 };
 
-/// Update all units
-fn updateUnits(game_state: *GameState, deltaTime: f32) void {
+/// Context-aware update all units function
+fn updateUnits(game_state: *GameState, context: HexGameContext) void {
     const world = &game_state.hex_game;
 
     // Note: Obstacle collision now uses ECS queries
@@ -320,8 +322,8 @@ fn updateUnits(game_state: *GameState, deltaTime: f32) void {
                     if (zone_storage.units.getComponentMut(unit_id, .visual)) |visual| {
                         const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnit(unit_id, zone_storage);
 
-                        // Update unit AI behavior using HexGame components
-                        behaviors.updateUnitWithAggroMod(unit_id, unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
+                        // Update unit AI behavior using HexGame components with context
+                        behaviors.updateUnitWithAggroMod(unit_id, unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, context);
                     }
 
                     // Check collision with obstacles
@@ -335,6 +337,13 @@ fn updateUnits(game_state: *GameState, deltaTime: f32) void {
     }
 }
 
+/// Context-aware version of updateUnits
+fn updateUnitsWithContext(context: HexGameContext) void {
+    const game_state = if (@hasField(@TypeOf(context), "game_state") and context.game_state != null) 
+        context.game_state.? else return;
+    updateUnits(game_state, context);
+}
+
 pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: f32) void {
     // Reset frame pool for this frame's temporary allocations
     game_state.hex_game.frame_pool.reset();
@@ -344,10 +353,28 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     const update_ctx = contexts.UpdateContext.init(frame_allocator, deltaTime, game_state.frame_counter)
         .withPause(game_state.game_paused);
 
+    const world = &game_state.hex_game;
+    const input_state = &game_state.input_state;
+    
+    // Create input context with platform integration
+    const input_ctx = contexts.InputContext.init(update_ctx)
+        .withPlatformInput(input_state)
+        .withMousePosition(input_state.getMousePos());
+    
     // Create graphics context with camera information for future viewport-aware updates
+    const camera_pos = math.Vec2.init(cam.view_x + cam.view_width / 2.0, cam.view_y + cam.view_height / 2.0);
     const graphics_ctx = contexts.GraphicsContext.init(update_ctx, cam.screen_width, cam.screen_height)
-        .withCamera(cam.view_x + cam.view_width / 2.0, cam.view_y + cam.view_height / 2.0, cam.scale);
-    _ = graphics_ctx; // Reserved for future viewport-aware optimizations
+        .withCamera(camera_pos, cam.scale)
+        .withEngineCamera(cam);
+    
+    // Create physics context
+    const physics_ctx = contexts.PhysicsContext.init(update_ctx);
+    
+    // Create unified hex game context
+    const hex_ctx = hex_context.createHexContext(
+        update_ctx, input_ctx, graphics_ctx, physics_ctx,
+        game_state, world, cam
+    );
 
     // Increment frame counter
     game_state.frame_counter += 1;
@@ -372,50 +399,42 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     if (game_state.game_paused) return;
 
-    const world = &game_state.hex_game;
-    const input_state = &game_state.input_state;
-
     // Update portal cooldown
-    portals.updatePortalCooldown(deltaTime);
+    portals.updatePortalCooldown(hex_ctx);
 
     if (world.getPlayerAlive()) {
         // Update player controller
-        player_controller.updatePlayer(world, input_state, cam, deltaTime);
+        player_controller.updatePlayer(world, hex_ctx);
 
         // Handle continuous shooting on left-click hold (rhythm mode)
         // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
         if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and world.canFireBullet()) {
-            // Direct camera coordinate conversion - no viewport indirection
-            const screen_mouse_pos = input_state.getMousePos();
-            const world_mouse_pos = cam.screenToWorldSafe(screen_mouse_pos);
-            _ = combat.fireBulletAtMouse(world, world_mouse_pos, &world.bullet_pool);
+            // Use context-aware bullet firing
+            _ = combat.fireBulletAtMouseWithContext(hex_ctx, &world.bullet_pool);
         }
     }
 
-    // Use context for consistent delta time access
-    const effective_delta = contexts.ContextUtils.effectiveDeltaTime(update_ctx);
-
     // Update bullet entities using ECS
-    world.updateProjectiles(effective_delta) catch |err| {
+    world.updateProjectiles(hex_ctx) catch |err| {
         game_state.logger.err("projectiles_update_fail", "Failed to update projectiles: {}", .{err});
     };
 
-    // Update units
-    updateUnits(game_state, effective_delta);
+    // Update units with context
+    updateUnitsWithContext(hex_ctx);
 
-    checkCollisions(game_state);
+    checkCollisions(game_state, hex_ctx);
 
     // Update visual effects
     game_state.effect_system.update();
 
-    // Update spell system
-    game_state.spell_system.update(effective_delta);
+    // Update spell system with context
+    game_state.spell_system.update(hex_ctx);
 
-    // Update bullet pool (manages firing rate limiting)
-    world.updateBulletPool(effective_delta);
+    // Update bullet pool with context
+    world.updateBulletPool(hex_ctx);
 }
 
-pub fn checkCollisions(game_state: *GameState) void {
+pub fn checkCollisions(game_state: *GameState, hex_ctx: HexGameContext) void {
     const world = &game_state.hex_game;
 
     // Player entity is accessed via helper methods instead of direct field access
@@ -426,7 +445,7 @@ pub fn checkCollisions(game_state: *GameState) void {
 
     // Debug: Check if portal checking is being called
     game_state.logger.debug("game_loop", "Checking portal collisions in game loop", .{});
-    if (portals.checkPortalCollisions(game_state)) {
+    if (portals.checkPortalCollisions(hex_ctx)) {
         game_state.logger.info("game_portal_activated", "Portal activated, exiting game loop", .{});
         return;
     }

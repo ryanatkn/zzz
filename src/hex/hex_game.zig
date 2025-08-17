@@ -4,6 +4,7 @@ const colors = @import("../lib/core/colors.zig");
 const constants = @import("constants.zig");
 const combat = @import("combat.zig");
 const object_pools = @import("../lib/core/object_pools.zig");
+const HexGameContext = @import("hex_context.zig").HexGameContext;
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -1194,7 +1195,11 @@ pub const HexGame = struct {
         return self.bullet_pool.canFire();
     }
 
-    pub fn updateProjectiles(self: *HexGame, deltaTime: f32) !void {
+    /// Context-aware projectiles update function  
+    pub fn updateProjectiles(self: *HexGame, context: HexGameContext) !void {
+        const contexts = @import("../lib/game/contexts/mod.zig");
+        const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
+        
         const zone = self.getCurrentZone();
 
         // Use frame pool for temporary allocation - no frame-by-frame heap allocation
@@ -1280,7 +1285,10 @@ pub const HexGame = struct {
         return self.getCurrentZone().obstacles.entityIterator();
     }
 
-    pub fn updateBulletPool(self: *HexGame, deltaTime: f32) void {
+    /// Context-aware bullet pool update function
+    pub fn updateBulletPool(self: *HexGame, context: HexGameContext) void {
+        const contexts = @import("../lib/game/contexts/mod.zig");
+        const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
         self.bullet_pool.update(deltaTime);
     }
 
