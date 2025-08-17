@@ -62,7 +62,6 @@ The white rectangles issue was NOT due to:
 ### Phase 1: Establish Testing Foundation
 ```
 [ ] Create test harness for individual components
-    [ ] TTF parser test suite with known fonts
     [ ] Glyph extractor test with visual output
     [ ] Rasterizer test with bitmap verification
     [ ] Create test/fonts/ directory with sample TTFs
