@@ -16,6 +16,9 @@ const camera = @import("../lib/rendering/camera.zig");
 const font_manager = @import("../lib/font/manager.zig");
 const font_config = @import("../lib/font/config.zig");
 
+// Text capabilities
+const text_alignment = @import("../lib/text/alignment.zig");
+
 // Game system capabilities
 const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
 
@@ -312,14 +315,24 @@ pub const GameRenderer = struct {
         // Use bright green color for AI mode indicator
         const AI_COLOR = colors.Color{ .r = 0, .g = 255, .b = 128, .a = 255 };
 
-        // Position below FPS display (both at bottom right)
-        const ai_x = constants.FPS_POSITION_X;
-        const ai_y = constants.FPS_POSITION_Y + 30.0;
-
         const ai_text = "AI MODE ACTIVE";
+        const font_size = font_config.getGlobalConfig().fpsFontSize();
+        
+        // Calculate text width for right alignment (rough estimation)
+        const estimated_text_width = @as(f32, @floatFromInt(ai_text.len)) * font_size * 0.6;
+        
+        // Position near bottom right, ensuring we have enough margin for the text
+        const margin = 40.0; // Increased margin to move text further left
+        const base_position = Vec2{ 
+            .x = constants.SCREEN_WIDTH - margin, // Right edge with more margin for text
+            .y = constants.SCREEN_HEIGHT - 50.0  // Above bottom edge 
+        };
+        
+        // Apply right alignment to position text correctly from the right edge
+        const aligned_position = text_alignment.applyAlignment(base_position, .right, estimated_text_width);
 
-        // Queue using persistent mode
-        self.gpu.text_renderer.queuePersistentText(ai_text, .{ .x = ai_x, .y = ai_y }, self.font_manager, .sans, font_config.getGlobalConfig().fpsFontSize(), AI_COLOR) catch {
+        // Queue using persistent mode with proper alignment
+        self.gpu.text_renderer.queuePersistentText(ai_text, aligned_position, self.font_manager, .sans, font_size, AI_COLOR) catch {
             // AI mode text failed - fallback to no display
         };
     }

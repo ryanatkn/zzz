@@ -193,3 +193,22 @@ pub fn getCenteredTextPos(rect: Rectangle, text: []const u8, char_width: f32, ch
         .y = rect.position.y + (rect.size.y - text_bounds.y) / 2.0,
     };
 }
+
+/// Get left-aligned text position within a rectangle (with padding)
+pub fn getLeftAlignedTextPos(rect: Rectangle, text: []const u8, char_width: f32, char_height: f32, padding: f32) Vec2 {
+    _ = text; // Text width not needed for left alignment
+    _ = char_width; // Not needed for left alignment position calculation
+    return Vec2{
+        .x = rect.position.x + padding,
+        .y = rect.position.y + (rect.size.y - char_height) / 2.0, // Vertically centered
+    };
+}
+
+/// Get right-aligned text position within a rectangle (with padding)
+pub fn getRightAlignedTextPos(rect: Rectangle, text: []const u8, char_width: f32, char_height: f32, padding: f32) Vec2 {
+    const text_bounds = getTextBounds(text, char_width, char_height);
+    return Vec2{
+        .x = rect.position.x + rect.size.x - text_bounds.x - padding,
+        .y = rect.position.y + (rect.size.y - char_height) / 2.0, // Vertically centered
+    };
+}

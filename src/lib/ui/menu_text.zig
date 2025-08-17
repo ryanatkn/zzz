@@ -61,6 +61,11 @@ pub const MenuTextRenderer = struct {
 
     /// Queue button text centered within a rectangle
     pub fn queueButtonText(self: *Self, text: []const u8, rect: Rectangle, is_hovered: bool) void {
+        self.queueAlignedButtonText(text, rect, is_hovered, .center);
+    }
+
+    /// Queue button text with specified alignment
+    pub fn queueAlignedButtonText(self: *Self, text: []const u8, rect: Rectangle, is_hovered: bool, alignment: enum { left, center, right }) void {
         // Skip empty text to prevent crashes
         if (text.len == 0) {
             loggers.getUILog().debug("empty_button", "Skipping empty button text", .{});
@@ -70,7 +75,11 @@ pub const MenuTextRenderer = struct {
         const style = MenuTextStyles.button;
         const text_color = if (is_hovered) style.hovered_color else style.normal_color;
 
-        const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
+        const text_pos = switch (alignment) {
+            .center => drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size()),
+            .left => drawing.getLeftAlignedTextPos(rect, text, style.char_width(), style.font_size(), 8.0), // 8px padding
+            .right => drawing.getRightAlignedTextPos(rect, text, style.char_width(), style.font_size(), 8.0), // 8px padding
+        };
 
         // Debug logging disabled to reduce spam
         // loggers.getUILog().debug("queue_button", "Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{ text, text_pos.x, text_pos.y, rect.size.x, rect.size.y });

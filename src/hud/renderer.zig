@@ -15,6 +15,7 @@ const ide_constants = @import("../menu/ide/constants.zig");
 const directory_scanner = @import("../lib/platform/directory_scanner.zig");
 const syntax_highlighter = @import("../menu/ide/syntax_highlighter.zig");
 const bitmap_simple = @import("../lib/font/renderers/bitmap_simple.zig");
+const text_alignment = @import("../lib/text/alignment.zig");
 
 // Throttled logging to prevent spam
 const Logger = @import("../lib/debug/logger.zig").Logger;
@@ -184,7 +185,14 @@ pub const BrowserRenderer = struct {
                 .size = link.bounds.size,
             };
             var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
-            menu_renderer.queueButtonText(link.text, link_rect, is_hovered);
+            
+            // Use left alignment for filesystem buttons (IDE file/directory listings)
+            const is_filesystem_link = std.mem.startsWith(u8, link.path, "/ide?");
+            if (is_filesystem_link) {
+                menu_renderer.queueAlignedButtonText(link.text, link_rect, is_hovered, .left);
+            } else {
+                menu_renderer.queueButtonText(link.text, link_rect, is_hovered);
+            }
         }
     }
 
@@ -620,6 +628,11 @@ pub const BrowserRenderer = struct {
     
     /// Queue text using the proper persistent text system (like working buttons)
     fn queueTextForRender(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2, text_color: Color) void {
+        self.queueAlignedTextForRender(cmd_buffer, render_pass, text, position, text_color, .left);
+    }
+
+    /// Queue text for rendering with specified alignment
+    fn queueAlignedTextForRender(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2, text_color: Color, alignment: text_alignment.TextAlign) void {
         _ = cmd_buffer;
         _ = render_pass;
         
@@ -628,13 +641,21 @@ pub const BrowserRenderer = struct {
             return;
         }
         
+        const font_size = 16.0; // Use 16pt font size (proven to work)
+        
+        // Calculate text width for alignment (rough estimation)
+        const estimated_text_width = @as(f32, @floatFromInt(text.len)) * font_size * 0.6;
+        
+        // Apply alignment to position
+        const aligned_position = text_alignment.applyAlignment(position, alignment, estimated_text_width);
+        
         // Use the exact same approach as working navigation text
         self.base_renderer.gpu.text_renderer.queuePersistentText(
             text, 
-            position, 
+            aligned_position, 
             self.base_renderer.font_manager, 
             .sans, 
-            16.0, // Use 16pt font size (proven to work)
+            font_size,
             text_color
         ) catch |err| {
             const log = std.log.scoped(.ide_text);

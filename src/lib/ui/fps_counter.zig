@@ -10,6 +10,7 @@ const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
 const loggers = @import("../debug/loggers.zig");
+const text_alignment = @import("../text/alignment.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -21,6 +22,8 @@ pub const FPSCounterData = struct {
     position: Vec2,
     font_size: f32,
     color: Color,
+    alignment: text_alignment.TextAlign,
+    screen_width: f32, // For alignment calculations
 
     // Reactive signals
     current_fps: *signal.Signal(u32),
@@ -36,7 +39,7 @@ pub const FPSCounterData = struct {
 
     const Self = @This();
 
-    pub fn init(allocator: std.mem.Allocator, position: Vec2, font_size: f32, color: Color, update_interval_ms: u64) !Self {
+    pub fn init(allocator: std.mem.Allocator, position: Vec2, font_size: f32, color: Color, update_interval_ms: u64, alignment: text_alignment.TextAlign, screen_width: f32) !Self {
         // Create reactive signals
         const current_fps_signal = try allocator.create(signal.Signal(u32));
         current_fps_signal.* = try signal.Signal(u32).init(allocator, 0);
@@ -52,6 +55,8 @@ pub const FPSCounterData = struct {
             .position = position,
             .font_size = font_size,
             .color = color,
+            .alignment = alignment,
+            .screen_width = screen_width,
             .current_fps = current_fps_signal,
             .is_visible = is_visible_signal,
             .last_update_time = last_update_signal,
@@ -136,11 +141,17 @@ pub const FPSCounterData = struct {
         // Get current FPS text (this will use cached value if FPS hasn't changed)
         const fps_text = self.fps_text.get();
 
+        // Calculate text width for alignment (rough estimation)
+        const estimated_text_width = @as(f32, @floatFromInt(fps_text.len)) * self.font_size * 0.6;
+        
+        // Calculate aligned position
+        const aligned_position = text_alignment.applyAlignment(self.position, self.alignment, estimated_text_width);
+
         // Use persistent text rendering for optimal performance
         // This follows the rendering mode guidelines - FPS changes ~1-3 times per second
-        try renderer.queuePersistentText(fps_text, self.position, font_manager, font_category, self.font_size, self.color);
+        try renderer.queuePersistentText(fps_text, aligned_position, font_manager, font_category, self.font_size, self.color);
 
-        loggers.getUILog().debug("render", "FPS counter rendered: '{s}' at ({d:.1}, {d:.1})", .{ fps_text, self.position.x, self.position.y });
+        loggers.getUILog().debug("render", "FPS counter rendered: '{s}' at ({d:.1}, {d:.1}) (aligned: {})", .{ fps_text, aligned_position.x, aligned_position.y, self.alignment });
     }
 
     pub fn deinit(self: *Self) void {
@@ -206,8 +217,8 @@ pub const FPSCounter = struct {
 
     const Self = @This();
 
-    pub fn init(allocator: std.mem.Allocator, position: Vec2, font_size: f32, color: Color, update_interval_ms: u64) !Self {
-        const counter_data = try FPSCounterData.init(allocator, position, font_size, color, update_interval_ms);
+    pub fn init(allocator: std.mem.Allocator, position: Vec2, font_size: f32, color: Color, update_interval_ms: u64, alignment: text_alignment.TextAlign, screen_width: f32) !Self {
+        const counter_data = try FPSCounterData.init(allocator, position, font_size, color, update_interval_ms, alignment, screen_width);
 
         const component = try createComponent(FPSCounterData, allocator, counter_data, FPSCounterData.vtable);
 
@@ -249,13 +260,17 @@ pub const FPSCounterPresets = struct {
         pub const font_size = 48.0;
         pub const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
         pub const update_interval_ms = 500; // Update twice per second
+        pub const alignment = text_alignment.TextAlign.left;
+        pub const screen_width = 1920.0;
     };
 
     pub const debug_overlay = struct {
-        pub const position = Vec2{ .x = 1840.0, .y = 1060.0 };
+        pub const position = Vec2{ .x = 1910.0, .y = 1060.0 }; // Right edge with margin
         pub const font_size = 24.0;
         pub const color = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
         pub const update_interval_ms = 1000; // Update once per second
+        pub const alignment = text_alignment.TextAlign.right; // Right-aligned
+        pub const screen_width = 1920.0;
     };
 
     pub const small_corner = struct {
@@ -263,22 +278,39 @@ pub const FPSCounterPresets = struct {
         pub const font_size = 18.0;
         pub const color = Color{ .r = 200, .g = 200, .b = 200, .a = 180 };
         pub const update_interval_ms = 1000; // Update once per second
+        pub const alignment = text_alignment.TextAlign.left;
+        pub const screen_width = 1920.0;
+    };
+
+    /// New right-aligned top corner preset
+    pub const top_right_corner = struct {
+        pub const position = Vec2{ .x = 1910.0, .y = 10.0 }; // Top-right with margin
+        pub const font_size = 18.0;
+        pub const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+        pub const update_interval_ms = 1000; // Update once per second
+        pub const alignment = text_alignment.TextAlign.right; // Right-aligned
+        pub const screen_width = 1920.0;
     };
 };
 
 /// Create FPS counter with default settings
 pub fn createDefault(allocator: std.mem.Allocator) !FPSCounter {
-    return FPSCounter.init(allocator, FPSCounterPresets.default_white.position, FPSCounterPresets.default_white.font_size, FPSCounterPresets.default_white.color, FPSCounterPresets.default_white.update_interval_ms);
+    return FPSCounter.init(allocator, FPSCounterPresets.default_white.position, FPSCounterPresets.default_white.font_size, FPSCounterPresets.default_white.color, FPSCounterPresets.default_white.update_interval_ms, FPSCounterPresets.default_white.alignment, FPSCounterPresets.default_white.screen_width);
 }
 
-/// Create debug overlay FPS counter
+/// Create debug overlay FPS counter (right-aligned)
 pub fn createDebugOverlay(allocator: std.mem.Allocator) !FPSCounter {
-    return FPSCounter.init(allocator, FPSCounterPresets.debug_overlay.position, FPSCounterPresets.debug_overlay.font_size, FPSCounterPresets.debug_overlay.color, FPSCounterPresets.debug_overlay.update_interval_ms);
+    return FPSCounter.init(allocator, FPSCounterPresets.debug_overlay.position, FPSCounterPresets.debug_overlay.font_size, FPSCounterPresets.debug_overlay.color, FPSCounterPresets.debug_overlay.update_interval_ms, FPSCounterPresets.debug_overlay.alignment, FPSCounterPresets.debug_overlay.screen_width);
 }
 
 /// Create small corner FPS counter
 pub fn createSmallCorner(allocator: std.mem.Allocator) !FPSCounter {
-    return FPSCounter.init(allocator, FPSCounterPresets.small_corner.position, FPSCounterPresets.small_corner.font_size, FPSCounterPresets.small_corner.color, FPSCounterPresets.small_corner.update_interval_ms);
+    return FPSCounter.init(allocator, FPSCounterPresets.small_corner.position, FPSCounterPresets.small_corner.font_size, FPSCounterPresets.small_corner.color, FPSCounterPresets.small_corner.update_interval_ms, FPSCounterPresets.small_corner.alignment, FPSCounterPresets.small_corner.screen_width);
+}
+
+/// Create top-right corner FPS counter (right-aligned)
+pub fn createTopRightCorner(allocator: std.mem.Allocator) !FPSCounter {
+    return FPSCounter.init(allocator, FPSCounterPresets.top_right_corner.position, FPSCounterPresets.top_right_corner.font_size, FPSCounterPresets.top_right_corner.color, FPSCounterPresets.top_right_corner.update_interval_ms, FPSCounterPresets.top_right_corner.alignment, FPSCounterPresets.top_right_corner.screen_width);
 }
 
 /// Performance analysis for FPS counter
@@ -322,6 +354,9 @@ test "FPS counter creation and basic operations" {
     counter.setPosition(new_pos);
     try std.testing.expectEqual(new_pos.x, counter_data.position.x);
     try std.testing.expectEqual(new_pos.y, counter_data.position.y);
+
+    // Test alignment
+    try std.testing.expectEqual(text_alignment.TextAlign.left, counter_data.alignment);
 }
 
 test "FPS counter presets" {
@@ -337,11 +372,21 @@ test "FPS counter presets" {
     var corner_counter = try createSmallCorner(allocator);
     defer corner_counter.deinit();
 
+    var top_right_counter = try createTopRightCorner(allocator);
+    defer top_right_counter.deinit();
+
     // Verify different positions
     const default_data = default_counter.getCounterData();
     const debug_data = debug_counter.getCounterData();
     const corner_data = corner_counter.getCounterData();
+    const top_right_data = top_right_counter.getCounterData();
 
     try std.testing.expect(default_data.position.x != debug_data.position.x);
     try std.testing.expect(debug_data.position.x != corner_data.position.x);
+    
+    // Test alignment settings
+    try std.testing.expectEqual(text_alignment.TextAlign.left, default_data.alignment);
+    try std.testing.expectEqual(text_alignment.TextAlign.right, debug_data.alignment);
+    try std.testing.expectEqual(text_alignment.TextAlign.left, corner_data.alignment);
+    try std.testing.expectEqual(text_alignment.TextAlign.right, top_right_data.alignment);
 }
