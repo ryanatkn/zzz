@@ -18,18 +18,18 @@ pub const TextAlign = enum {
     right,
 };
 
+/// Constants for text colors
+const NORMAL_COLOR = Color{ .r = 255, .g = 255, .b = 255, .a = 255 }; // White
+const HOVER_COLOR = Color{ .r = 200, .g = 200, .b = 255, .a = 255 }; // Light blue
+const DISABLED_COLOR = Color{ .r = 128, .g = 128, .b = 128, .a = 255 }; // Gray
+
 /// Text styling options
 pub const TextStyle = struct {
     font_size: f32 = 14.0,
-    font_category: fonts.FontCategory = .sans,
+    font_category: font_config.FontCategory = .sans,
     // White by default
     color: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
-    align: TextAlign = .left,
-    
-    // Remove debug colors that cause yellow flashing
-    const NORMAL_COLOR = Color{ .r = 255, .g = 255, .b = 255, .a = 255 }; // White
-    const HOVER_COLOR = Color{ .r = 200, .g = 200, .b = 255, .a = 255 }; // Light blue
-    const DISABLED_COLOR = Color{ .r = 128, .g = 128, .b = 128, .a = 255 }; // Gray
+    text_align: TextAlign = .left,
     
     pub fn getDisplayColor(self: *const TextStyle, hovered: bool, enabled: bool) Color {
         if (!enabled) return DISABLED_COLOR;
@@ -58,6 +58,7 @@ pub const Text = struct {
     const Self = @This();
     
     pub fn init(self: *Component, allocator: std.mem.Allocator, props: ComponentProps) !void {
+        _ = props;
         const text: *Text = @fieldParentPtr("base", self);
         
         // Initialize text-specific signals
@@ -80,6 +81,7 @@ pub const Text = struct {
     }
     
     pub fn deinit(self: *Component, allocator: std.mem.Allocator) void {
+        _ = allocator;
         const text: *Text = @fieldParentPtr("base", self);
         
         // Cleanup text-specific signals
@@ -261,7 +263,7 @@ pub const Text = struct {
     /// Set text alignment
     pub fn setAlignment(self: *Text, alignment: TextAlign) void {
         var current_style = self.style.get();
-        current_style.align = alignment;
+        current_style.text_align = alignment;
         self.style.set(current_style);
     }
     
@@ -286,7 +288,7 @@ pub fn createText(
         .y = style.font_size * 1.2,
     };
     
-    var props = try ComponentProps.init(allocator, position, estimated_size);
+    const props = try ComponentProps.init(allocator, position, estimated_size);
     
     text.* = Text{
         .base = Component{
@@ -325,7 +327,7 @@ pub fn createLabel(
     const style = TextStyle{
         .font_size = font_size,
         .color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, // White
-        .align = .left,
+        .text_align = .left,
     };
     
     return try createText(allocator, content, position, style);
@@ -341,7 +343,7 @@ pub fn createTitle(
     const style = TextStyle{
         .font_size = font_size,
         .color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, // White
-        .align = .center,
+        .text_align = .center,
     };
     
     return try createText(allocator, content, position, style);

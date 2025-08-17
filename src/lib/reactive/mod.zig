@@ -87,12 +87,12 @@
 //! - Effect roots manage child effect lifecycles
 //! - Snapshots are plain values with no cleanup needed
 
-const context_mod = @import("reactive/context.zig");
-const signal_mod = @import("reactive/signal.zig");
-const derived_mod = @import("reactive/derived.zig");
-const effect_mod = @import("reactive/effect.zig");
-const batch_mod = @import("reactive/batch.zig");
-const collections_mod = @import("reactive/collections.zig");
+const context_mod = @import("context.zig");
+const signal_mod = @import("signal.zig");
+const derived_mod = @import("derived.zig");
+const effect_mod = @import("effect.zig");
+const batch_mod = @import("batch.zig");
+const collections_mod = @import("collections.zig");
 
 // Re-export core types with new names
 pub const Signal = signal_mod.Signal; // Reactive state with shallow equality (Svelte 5 $state)

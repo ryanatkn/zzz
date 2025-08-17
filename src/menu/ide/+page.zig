@@ -1,9 +1,44 @@
 const std = @import("std");
 const page = @import("../../hud/page.zig");
+const math = @import("../../lib/math/mod.zig");
+const colors = @import("../../lib/core/colors.zig");
+const panel = @import("../../lib/ui/panel.zig");
+const tree_view = @import("../../lib/ui/tree_view.zig");
+const text_area = @import("../../lib/ui/text_area.zig");
+const layout = @import("../../lib/ui/layout.zig");
+const reactive = @import("../../lib/reactive/mod.zig");
+const directory_scanner = @import("../../lib/platform/directory_scanner.zig");
+const file_tree = @import("../../lib/ui/file_tree.zig");
 
-const IDEPage = struct {
+const Vec2 = math.Vec2;
+const Color = colors.Color;
+const Component = @import("../../lib/ui/component.zig").Component;
+const ComponentProps = @import("../../lib/ui/component.zig").ComponentProps;
+const DirectoryScanner = directory_scanner.DirectoryScanner;
+const DirectoryEntry = directory_scanner.DirectoryEntry;
+const FileTreeComponent = file_tree.FileTreeComponent;
+
+pub const IDEPage = struct {
     base: page.Page,
     allocator: std.mem.Allocator,
+    
+    // File system state
+    directory_scanner: DirectoryScanner,
+    file_tree_component: FileTreeComponent,
+    root_directory: ?*DirectoryEntry = null,
+    
+    // UI state
+    initialized: bool = false,
+    loading: bool = false,
+    error_message: ?[]const u8 = null,
+    
+    // File content state
+    current_file_content: ?[]const u8 = null,
+    current_file_error: ?[]const u8 = null,
+    
+    // Display settings
+    screen_width: f32 = 2560.0,  // Assume high-res display
+    screen_height: f32 = 1440.0,
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
@@ -18,84 +53,103 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
                 .destroy = destroy,
             },
             .path = "/ide",
-            .title = "IDE",
+            .title = "Modern IDE Dashboard",
         },
         .allocator = allocator,
+        .directory_scanner = DirectoryScanner.init(allocator),
+        .file_tree_component = FileTreeComponent.init(allocator),
     };
     return &ide_page.base;
 }
 
 fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
-    _ = self;
     _ = allocator;
+    const ide: *IDEPage = @fieldParentPtr("base", self);
+    
+    // Load directory structure
+    try loadDirectory(ide);
+    
+    ide.initialized = true;
 }
 
 fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
-    _ = self;
     _ = allocator;
+    const ide: *IDEPage = @fieldParentPtr("base", self);
+    
+    // Clean up file tree
+    ide.file_tree_component.deinit();
+    
+    // Clean up directory tree
+    if (ide.root_directory) |root| {
+        ide.directory_scanner.freeTree(root);
+        ide.root_directory = null;
+    }
+    
+    ide.initialized = false;
 }
 
 fn update(self: *page.Page, dt: f32) void {
-    _ = self;
     _ = dt;
+    _ = self;
 }
 
 fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
     _ = self;
 
-    // Simple layout with three panels described via text
+    // Simple navigation - actual UI is rendered via GPU in renderPageContent
     try links.append(page.createLink("< Back to Menu", "/", 20, 20, 150, 30));
-
-    // File Explorer Panel
-    try links.append(page.createLink("FILE EXPLORER", "", 100, 100, 200, 30));
-    try links.append(page.createLink("src/", "", 120, 150, 180, 25));
-    try links.append(page.createLink("  lib/", "", 140, 180, 180, 25));
-    try links.append(page.createLink("    ui/", "", 160, 210, 180, 25));
-    try links.append(page.createLink("      panel.zig", "", 180, 240, 180, 25));
-    try links.append(page.createLink("      tree_view.zig", "", 180, 270, 180, 25));
-    try links.append(page.createLink("      text_area.zig", "", 180, 300, 180, 25));
-    try links.append(page.createLink("  hex/", "", 140, 330, 180, 25));
-    try links.append(page.createLink("  menu/", "", 140, 360, 180, 25));
-    try links.append(page.createLink("README.md", "", 120, 390, 180, 25));
-    try links.append(page.createLink("CLAUDE.md", "", 120, 420, 180, 25));
-
-    // Text Editor Panel
-    try links.append(page.createLink("TEXT EDITOR", "", 600, 100, 200, 30));
-    try links.append(page.createLink("// Welcome to the Zzz IDE", "", 620, 150, 500, 25));
-    try links.append(page.createLink("// Select a file from the explorer to begin", "", 620, 180, 500, 25));
-    try links.append(page.createLink("//", "", 620, 210, 500, 25));
-    try links.append(page.createLink("// Features:", "", 620, 240, 500, 25));
-    try links.append(page.createLink("// - File Explorer (left panel)", "", 620, 270, 500, 25));
-    try links.append(page.createLink("// - Text Editor (center panel)", "", 620, 300, 500, 25));
-    try links.append(page.createLink("// - Terminal (right panel)", "", 620, 330, 500, 25));
-    try links.append(page.createLink("//", "", 620, 360, 500, 25));
-    try links.append(page.createLink("// TODOs:", "", 620, 390, 500, 25));
-    try links.append(page.createLink("// - Implement file I/O operations", "", 620, 420, 500, 25));
-    try links.append(page.createLink("// - Add syntax highlighting", "", 620, 450, 500, 25));
-    try links.append(page.createLink("// - Terminal command execution", "", 620, 480, 500, 25));
-    try links.append(page.createLink("// - Copy/paste support", "", 620, 510, 500, 25));
-    try links.append(page.createLink("// - Search and replace", "", 620, 540, 500, 25));
-
-    // Terminal Panel
-    try links.append(page.createLink("TERMINAL", "", 1300, 100, 200, 30));
-    try links.append(page.createLink("$ Zzz Terminal v0.1.0", "", 1320, 150, 400, 25));
-    try links.append(page.createLink("$ Type 'help' for commands", "", 1320, 180, 400, 25));
-    try links.append(page.createLink("$ > help", "", 1320, 210, 400, 25));
-    try links.append(page.createLink("$ Available commands:", "", 1320, 240, 400, 25));
-    try links.append(page.createLink("$   help - Show this help", "", 1320, 270, 400, 25));
-    try links.append(page.createLink("$   clear - Clear terminal", "", 1320, 300, 400, 25));
-    try links.append(page.createLink("$   ls - List files (TODO)", "", 1320, 330, 400, 25));
-    try links.append(page.createLink("$   pwd - Show directory (TODO)", "", 1320, 360, 400, 25));
-    try links.append(page.createLink("$   cat - View file (TODO)", "", 1320, 390, 400, 25));
-    try links.append(page.createLink("$ > _", "", 1320, 420, 400, 25));
-
-    // Info panel at bottom
-    try links.append(page.createLink("IDE components created in src/lib/ui/", "", 100, 650, 500, 25));
-    try links.append(page.createLink("Panel, ScrollableView, TreeView, TextInput, TextArea, ListView", "", 100, 680, 700, 25));
-    try links.append(page.createLink("Ready for integration with actual file I/O and editing", "", 100, 710, 600, 25));
 }
 
 fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
     const ide: *IDEPage = @fieldParentPtr("base", self);
     allocator.destroy(ide);
+}
+
+/// Load directory structure (hardcoded to src/ for now)
+fn loadDirectory(self: *IDEPage) !void {
+    self.loading = true;
+    self.error_message = null;
+    
+    // Scan src directory
+    self.root_directory = self.directory_scanner.scanDirectory("src") catch |err| {
+        const error_msg = switch (err) {
+            error.FileNotFound => "Directory 'src' not found",
+            error.AccessDenied => "Access denied to 'src' directory", 
+            else => "Failed to scan directory",
+        };
+        self.error_message = error_msg;
+        self.loading = false;
+        return err;
+    };
+    
+    // Set up file tree component
+    try self.file_tree_component.setRootEntry(self.root_directory);
+    
+    self.loading = false;
+}
+
+/// Get currently selected file entry
+pub fn getSelectedEntry(self: *const IDEPage) ?*DirectoryEntry {
+    return self.file_tree_component.getSelectedEntry();
+}
+
+/// Handle mouse interaction with file tree
+pub fn handleFileTreeClick(self: *IDEPage, point: Vec2) !bool {
+    // Adjust point to be relative to file explorer panel
+    const explorer_rect = Vec2{ .x = 8 + 8, .y = 60 + 8 + 30 }; // panel position + header + margin
+    const relative_point = Vec2{ 
+        .x = point.x - explorer_rect.x, 
+        .y = point.y - explorer_rect.y 
+    };
+    
+    return try self.file_tree_component.handleClick(relative_point);
+}
+
+/// Render the dashboard UI components using the provided renderer  
+pub fn renderDashboard(self: *IDEPage, renderer: anytype) !void {
+    _ = renderer;
+    if (!self.initialized) return;
+    
+    // TODO: Implement actual dashboard rendering with properly typed components
+    // For now this is a placeholder that will be expanded in later phases
 }

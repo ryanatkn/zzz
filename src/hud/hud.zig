@@ -79,6 +79,22 @@ pub const Hud = struct {
                         return true;
                     },
                     c.sdl.SDL_BUTTON_LEFT => {
+                        const mouse_x = button_event.x;
+                        const mouse_y = button_event.y;
+                        
+                        // Check IDE page-specific interactions first
+                        if (self.router.getCurrentPage()) |current_page| {
+                            if (std.mem.eql(u8, current_page.path, "/ide")) {
+                                const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
+                                
+                                // Try file tree interaction first
+                                const point = @import("../lib/math/mod.zig").Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
+                                if (ide_page_impl.handleFileTreeClick(point) catch false) {
+                                    return true; // File tree handled the click
+                                }
+                            }
+                        }
+                        
                         // Check if clicking a link
                         if (self.hovered_link) |link_index| {
                             const link = self.links.items[link_index];
@@ -89,9 +105,6 @@ pub const Hud = struct {
                         const screen_size = self.renderer.getScreenSize();
                         const bar_y = screen_size.y * 0.1;
                         const button_margin = 50.0;
-
-                        const mouse_x = button_event.x;
-                        const mouse_y = button_event.y;
 
                         // Back button bounds (circle at button_margin, bar_y with radius 15)
                         if (mouse_x >= button_margin - 15 and mouse_x <= button_margin + 15 and
@@ -122,6 +135,24 @@ pub const Hud = struct {
                 const motion_event = event.motion;
                 const mouse_x = motion_event.x;
                 const mouse_y = motion_event.y;
+
+                // Check IDE page-specific hover first
+                if (self.router.getCurrentPage()) |current_page| {
+                    if (std.mem.eql(u8, current_page.path, "/ide")) {
+                        const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
+                        
+                        const point = @import("../lib/math/mod.zig").Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
+                        
+                        // Adjust point to be relative to file explorer panel (same as in handleFileTreeClick)
+                        const explorer_rect = @import("../lib/math/mod.zig").Vec2{ .x = 8 + 8, .y = 60 + 8 + 30 };
+                        const relative_point = @import("../lib/math/mod.zig").Vec2{ 
+                            .x = point.x - explorer_rect.x, 
+                            .y = point.y - explorer_rect.y 
+                        };
+                        
+                        ide_page_impl.file_tree_component.handleHover(relative_point);
+                    }
+                }
 
                 // Check which link is hovered
                 self.hovered_link = null;
@@ -182,6 +213,11 @@ pub const Hud = struct {
 
         // Render current page with layouts
         try self.router.renderWithLayouts(&self.links);
+
+        // Render special page content (like IDE dashboard)
+        if (self.router.getCurrentPage()) |current_page| {
+            try self.renderer.renderPageContent(cmd_buffer, render_pass, current_page);
+        }
 
         // Render links with hover states
         try self.renderer.renderLinks(cmd_buffer, render_pass, self.links.items, self.hovered_link);

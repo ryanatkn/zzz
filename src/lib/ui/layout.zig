@@ -51,6 +51,7 @@ pub const Layout = struct {
     const Self = @This();
 
     pub fn init(self: *Component, allocator: std.mem.Allocator, props: ComponentProps) !void {
+        _ = props;
         const layout: *Layout = @fieldParentPtr("base", self);
 
         // Initialize layout-specific signals

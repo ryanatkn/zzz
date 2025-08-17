@@ -10,6 +10,8 @@ const text_renderer = @import("../lib/text/renderer.zig");
 const menu_text = @import("../lib/ui/menu_text.zig");
 const drawing = @import("../lib/rendering/drawing.zig");
 const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
+const ide_page = @import("../menu/ide/+page.zig");
+const directory_scanner = @import("../lib/platform/directory_scanner.zig");
 const bitmap_simple = @import("../lib/font/renderers/bitmap_simple.zig");
 
 const Color = colors.Color;
@@ -108,6 +110,9 @@ pub const BrowserRenderer = struct {
         if (std.mem.eql(u8, current_page.path, "/font-grid-test")) {
             // Font grid test page - custom GPU rendering
             try self.renderFontGridTestContent(cmd_buffer, render_pass, current_page);
+        } else if (std.mem.eql(u8, current_page.path, "/ide")) {
+            // IDE page - dashboard rendering
+            try self.renderIDEDashboard(cmd_buffer, render_pass, current_page);
         }
         // Add other special pages here as needed
     }
@@ -255,5 +260,277 @@ pub const BrowserRenderer = struct {
         _ = render_pass;
         _ = grid_page;
         // No-op: Font grid functionality not implemented
+    }
+    
+    /// Render IDE dashboard with modern file explorer layout
+    fn renderIDEDashboard(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page) !void {
+        const ide_page_impl: *const ide_page.IDEPage = @fieldParentPtr("base", current_page);
+        
+        if (!ide_page_impl.initialized) return;
+        
+        const screen_size = self.getScreenSize();
+        
+        // Dashboard layout - optimized for 2560x1440+ displays
+        const header_height: f32 = 60;
+        const panel_gap: f32 = 8;
+        const explorer_width: f32 = 300;
+        const max_content_width: f32 = 800;
+        const preview_width: f32 = 400;
+        
+        // Calculate actual content width based on screen size
+        const available_width = screen_size.x - explorer_width - preview_width - (panel_gap * 4);
+        const content_width = @min(max_content_width, available_width);
+        
+        // Header panel
+        const header_rect = math.Rectangle{
+            .position = Vec2{ .x = 0, .y = 0 },
+            .size = Vec2{ .x = screen_size.x, .y = header_height },
+        };
+        const header_color = Color{ .r = 25, .g = 30, .b = 40, .a = 255 };
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, header_rect.position, header_rect.size, header_color);
+        
+        // File explorer panel (left)
+        const explorer_rect = math.Rectangle{
+            .position = Vec2{ .x = panel_gap, .y = header_height + panel_gap },
+            .size = Vec2{ .x = explorer_width, .y = screen_size.y - header_height - (panel_gap * 2) },
+        };
+        const panel_color = Color{ .r = 35, .g = 40, .b = 50, .a = 255 };
+        const border_color = Color{ .r = 60, .g = 65, .b = 75, .a = 255 };
+        
+        drawing.drawBorderedRect(
+            &self.base_renderer.gpu,
+            cmd_buffer,
+            render_pass,
+            explorer_rect.position,
+            explorer_rect.size,
+            panel_color,
+            border_color,
+            1.0
+        );
+        
+        // Main content panel (center, constrained width)
+        const content_x = explorer_width + (panel_gap * 2);
+        const content_rect = math.Rectangle{
+            .position = Vec2{ .x = content_x, .y = header_height + panel_gap },
+            .size = Vec2{ .x = content_width, .y = screen_size.y - header_height - (panel_gap * 2) },
+        };
+        
+        drawing.drawBorderedRect(
+            &self.base_renderer.gpu,
+            cmd_buffer,
+            render_pass,
+            content_rect.position,
+            content_rect.size,
+            panel_color,
+            border_color,
+            1.0
+        );
+        
+        // Preview panel (right)
+        const preview_x = content_x + content_width + panel_gap;
+        const preview_rect = math.Rectangle{
+            .position = Vec2{ .x = preview_x, .y = header_height + panel_gap },
+            .size = Vec2{ .x = preview_width, .y = screen_size.y - header_height - (panel_gap * 2) },
+        };
+        
+        drawing.drawBorderedRect(
+            &self.base_renderer.gpu,
+            cmd_buffer,
+            render_pass,
+            preview_rect.position,
+            preview_rect.size,
+            panel_color,
+            border_color,
+            1.0
+        );
+        
+        // Render file tree in explorer panel
+        try self.renderFileTree(cmd_buffer, render_pass, ide_page_impl, explorer_rect);
+        
+        // Render content area
+        try self.renderContentArea(cmd_buffer, render_pass, ide_page_impl, content_rect);
+        
+        // Render preview panel
+        try self.renderPreviewPanel(cmd_buffer, render_pass, ide_page_impl, preview_rect);
+            
+        // Draw resolution info in header
+        var resolution_buf: [64]u8 = undefined;
+        const resolution_text = std.fmt.bufPrint(&resolution_buf, "Resolution: {d}x{d}", .{ @as(u32, @intFromFloat(screen_size.x)), @as(u32, @intFromFloat(screen_size.y)) }) catch "Resolution: Unknown";
+        self.drawSimpleText(cmd_buffer, render_pass, resolution_text,
+            Vec2{ .x = screen_size.x - 200, .y = 15 });
+    }
+    
+    /// Render file tree in explorer panel
+    fn renderFileTree(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
+        // Panel header
+        self.drawSimpleText(cmd_buffer, render_pass, "FILE EXPLORER", 
+            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+        
+        // Check for loading or error states
+        if (ide_page_impl.loading) {
+            self.drawSimpleText(cmd_buffer, render_pass, "Loading...", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            return;
+        }
+        
+        if (ide_page_impl.error_message) |error_msg| {
+            self.drawSimpleText(cmd_buffer, render_pass, "Error:", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.drawSimpleText(cmd_buffer, render_pass, error_msg, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
+            return;
+        }
+        
+        // Render file tree items
+        const tree_items = ide_page_impl.file_tree_component.getVisibleItems();
+        const tree_state = ide_page_impl.file_tree_component.getState();
+        
+        for (tree_items) |item| {
+            const item_y = panel_rect.position.y + 30 + item.position.y;
+            const item_x = panel_rect.position.x + 10 + item.position.x;
+            
+            // Skip items outside panel bounds  
+            if (item_y > panel_rect.position.y + panel_rect.size.y - 20) break;
+            
+            // Draw selection background
+            if (tree_state.isSelected(item.entry)) {
+                const selection_color = Color{ .r = 70, .g = 130, .b = 180, .a = 100 };
+                self.base_renderer.gpu.drawRect(
+                    cmd_buffer,
+                    render_pass,
+                    Vec2{ .x = panel_rect.position.x + 5, .y = item_y - 2 },
+                    Vec2{ .x = panel_rect.size.x - 10, .y = 20 },
+                    selection_color
+                );
+            }
+            
+            // Draw hover background
+            if (tree_state.isHovered(item.entry)) {
+                const hover_color = Color{ .r = 55, .g = 60, .b = 70, .a = 150 };
+                self.base_renderer.gpu.drawRect(
+                    cmd_buffer,
+                    render_pass,
+                    Vec2{ .x = panel_rect.position.x + 5, .y = item_y - 2 },
+                    Vec2{ .x = panel_rect.size.x - 10, .y = 20 },
+                    hover_color
+                );
+            }
+            
+            // Draw file type icon
+            try self.drawFileIcon(cmd_buffer, render_pass, item.icon, 
+                Vec2{ .x = item_x, .y = item_y });
+            
+            // Draw expand/collapse indicator for directories
+            if (item.entry.metadata.is_directory) {
+                const indicator = if (item.entry.expanded) "-" else "+";
+                self.drawSimpleText(cmd_buffer, render_pass, indicator, 
+                    Vec2{ .x = item_x - 15, .y = item_y });
+            }
+            
+            // Draw file name
+            self.drawSimpleText(cmd_buffer, render_pass, item.entry.metadata.name, 
+                Vec2{ .x = item_x + 20, .y = item_y });
+        }
+    }
+    
+    /// Render content area
+    fn renderContentArea(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
+        _ = ide_page_impl;
+        
+        // Panel header
+        self.drawSimpleText(cmd_buffer, render_pass, "CONTENT EDITOR (~800px max)", 
+            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+            
+        // Placeholder content
+        self.drawSimpleText(cmd_buffer, render_pass, "Select a file to view its contents", 
+            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+    }
+    
+    /// Render preview panel  
+    fn renderPreviewPanel(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
+        // Panel header
+        self.drawSimpleText(cmd_buffer, render_pass, "PREVIEW PANEL", 
+            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+            
+        // Show selected file info
+        if (ide_page_impl.file_tree_component.getSelectedEntry()) |selected| {
+            self.drawSimpleText(cmd_buffer, render_pass, "Selected:", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.drawSimpleText(cmd_buffer, render_pass, selected.metadata.name, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
+                
+            const file_type_name = selected.metadata.file_type.getDisplayName();
+            self.drawSimpleText(cmd_buffer, render_pass, file_type_name, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 80 });
+                
+            // Show file size
+            var size_buf: [32]u8 = undefined;
+            const size_text = directory_scanner.formatFileSize(selected.metadata.size, &size_buf) catch "Unknown size";
+            self.drawSimpleText(cmd_buffer, render_pass, size_text, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 100 });
+        } else {
+            self.drawSimpleText(cmd_buffer, render_pass, "No file selected", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+        }
+    }
+    
+    /// Draw file type icon
+    fn drawFileIcon(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, icon: @import("../lib/ui/file_tree.zig").FileIcon, position: Vec2) !void {
+        const icon_color = icon.getColor();
+        const icon_size: f32 = 12;
+        
+        switch (icon) {
+            .folder_closed, .folder_open => {
+                // Draw folder icon - rectangle with slight indent at top
+                self.base_renderer.gpu.drawRect(
+                    cmd_buffer,
+                    render_pass,
+                    Vec2{ .x = position.x, .y = position.y + 2 },
+                    Vec2{ .x = icon_size, .y = icon_size - 2 },
+                    icon_color
+                );
+                // Draw folder tab
+                self.base_renderer.gpu.drawRect(
+                    cmd_buffer,
+                    render_pass,
+                    position,
+                    Vec2{ .x = icon_size - 3, .y = 3 },
+                    icon_color
+                );
+            },
+            else => {
+                // Draw file icon - simple rectangle
+                self.base_renderer.gpu.drawRect(
+                    cmd_buffer,
+                    render_pass,
+                    position,
+                    Vec2{ .x = icon_size, .y = icon_size },
+                    icon_color
+                );
+            }
+        }
+    }
+    
+    /// Draw simple text using basic rectangles (temporary implementation)
+    fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2) void {
+        const text_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
+        const char_width: f32 = 8;
+        const char_height: f32 = 12;
+        
+        for (text, 0..) |char, i| {
+            if (char == ' ') continue;
+            
+            const char_x = position.x + @as(f32, @floatFromInt(i)) * char_width;
+            const char_y = position.y;
+            
+            // Draw a simple rectangle for each character
+            self.base_renderer.gpu.drawRect(
+                cmd_buffer,
+                render_pass,
+                Vec2{ .x = char_x, .y = char_y },
+                Vec2{ .x = char_width - 1, .y = char_height },
+                text_color
+            );
+        }
     }
 };
