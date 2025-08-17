@@ -355,4 +355,4 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 ### AI Control
 - [AI Control System](web/ai_control/README.md) - External automation interface
 
-NOTE: See WORKFLOW.md for session patterns
+*Remember: Performance is the top priority. Every cycle and byte count.*

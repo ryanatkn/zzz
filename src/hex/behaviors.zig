@@ -17,14 +17,8 @@ const Unit = hex_game_mod.Unit;
 const Transform = hex_game_mod.Transform;
 const Visual = hex_game_mod.Visual;
 
-/// Behavior profile types for hex units
-pub const BehaviorProfile = enum {
-    aggressive,  // Chase-focused, minimal flee
-    defensive,   // Flee-focused, guard home
-    patrolling,  // Patrol routes, guard when threatened
-    wandering,   // Wander randomly, flee when threatened
-    guardian,    // Guard specific area, intercept threats
-};
+// Import BehaviorProfile from hex_game.zig to avoid circular dependency
+const BehaviorProfile = hex_game_mod.BehaviorProfile;
 
 /// Unit behavior state storage (games need to manage this)
 var unit_behavior_states = std.AutoHashMap(u32, unit_behavior.UnitBehaviorState).init(std.heap.page_allocator);
@@ -44,9 +38,28 @@ pub fn deinitBehaviors() void {
     unit_behavior_configs.deinit();
 }
 
+/// Create idle behavior config (basic aggro, returns home)
+pub fn idle(home_pos: Vec2, detection_range: f32, chase_speed: f32) unit_behavior.UnitBehaviorConfig {
+    var config = unit_behavior.UnitBehaviorConfig.init(
+        home_pos, 
+        detection_range, 
+        20.0, // min_distance
+        chase_speed, 
+        chase_speed * 0.5, // walk_speed
+        1.5, // chase_duration (short)
+        15.0, // home_tolerance
+        1.05 // lose_tolerance (tight)
+    );
+    config.behavior_priorities.chase = .low;         // Will chase but not aggressively
+    config.behavior_priorities.return_home = .normal; // Returns home when player leaves
+    config.behavior_priorities.wander = .lowest;     // Minimal wandering
+    return config;
+}
+
 /// Create behavior config based on profile
 pub fn createBehaviorConfig(profile: BehaviorProfile, home_pos: Vec2) unit_behavior.UnitBehaviorConfig {
     return switch (profile) {
+        .idle => idle(home_pos, constants.UNIT_DETECTION_RADIUS, constants.UNIT_CHASE_SPEED),
         .aggressive => unit_behavior.UnitBehaviorConfig.aggressive(
             home_pos,
             constants.UNIT_DETECTION_RADIUS,
@@ -144,19 +157,10 @@ fn getOrCreateBehaviorConfig(entity_id: u32, unit_comp: *const Unit, profile: Be
     return config_result.value_ptr;
 }
 
-/// Determine behavior profile from unit type and position (for variety)
+/// Determine behavior profile from stored unit data (not entity ID)
 fn determineBehaviorProfile(entity_id: u32, unit_comp: *const Unit) BehaviorProfile {
-    _ = unit_comp; // Unit component unused for now, but available for future logic
-    // Use entity ID for deterministic variety
-    const profile_index = entity_id % 5;
-    return switch (profile_index) {
-        0 => .aggressive,
-        1 => .defensive,
-        2 => .patrolling,
-        3 => .wandering,
-        4 => .guardian,
-        else => .aggressive,
-    };
+    _ = entity_id; // No longer needed - use stored behavior
+    return unit_comp.behavior_profile; // Use stored value from ZON
 }
 
 /// Main hex-specific unit update function using library behaviors

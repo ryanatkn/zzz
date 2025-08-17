@@ -55,8 +55,19 @@ pub const Visual = struct {
     }
 };
 
+/// Behavior profile types for hex units
+pub const BehaviorProfile = enum {
+    idle,        // Default - basic aggro when player in range
+    aggressive,  // Chase-focused, minimal flee
+    defensive,   // Flee-focused, guard home
+    patrolling,  // Patrol routes, guard when threatened
+    wandering,   // Wander randomly, flee when threatened
+    guardian,    // Guard specific area, intercept threats
+};
+
 pub const Unit = struct {
     unit_type: UnitType,
+    behavior_profile: BehaviorProfile = .idle,  // Default to idle
     aggro_range: f32,
     aggro_factor: f32,
     home_pos: Vec2,
@@ -70,9 +81,10 @@ pub const Unit = struct {
     pub const UnitType = enum { player, enemy, friendly, neutral };
     pub const UnitState = enum { returning_home, chasing, at_home };
     
-    pub fn init(unit_type: UnitType, home_pos: Vec2) Unit {
+    pub fn init(unit_type: UnitType, home_pos: Vec2, behavior: BehaviorProfile) Unit {
         return .{
             .unit_type = unit_type,
+            .behavior_profile = behavior,  // Store behavior from ZON
             .aggro_range = if (unit_type == .enemy) 150.0 else 0.0,
             .aggro_factor = 1.0,
             .home_pos = home_pos,
@@ -872,7 +884,7 @@ pub const HexGame = struct {
         return entity;
     }
     
-    pub fn createUnit(self: *HexGame, zone_index: u8, pos: Vec2, radius: f32) !EntityId {
+    pub fn createUnit(self: *HexGame, zone_index: u8, pos: Vec2, radius: f32, behavior: BehaviorProfile) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
         
         const zone = &self.zones[zone_index];
@@ -880,7 +892,7 @@ pub const HexGame = struct {
         
         const transform = Transform.init(pos, radius);
         const health = Health.init(50);
-        const unit = Unit.init(.enemy, pos);
+        const unit = Unit.init(.enemy, pos, behavior);  // Use provided behavior
         const visual = Visual.init(constants.COLOR_UNIT_DEFAULT);
         
         try zone.units.addEntity(entity, transform, health, unit, visual);
