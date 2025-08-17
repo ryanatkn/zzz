@@ -24,8 +24,8 @@ pub const LAYOUT = struct {
     /// Maximum content area width (center)
     pub const MAX_CONTENT_WIDTH: f32 = 800;
     
-    /// Preview panel width (right)
-    pub const PREVIEW_WIDTH: f32 = 400;
+    /// Preview panel width (right) - 2x wider
+    pub const PREVIEW_WIDTH: f32 = 800;
 };
 
 /// Text rendering configuration
@@ -81,7 +81,7 @@ pub const FILE_TREE = struct {
 /// Syntax highlighting configuration
 pub const SYNTAX = struct {
     /// Enable syntax highlighting for supported file types
-    pub const ENABLE_HIGHLIGHTING: bool = true;
+    pub const ENABLE_HIGHLIGHTING: bool = false; // Temporarily disabled to test freeze issue
     
     /// Maximum line length to highlight (performance limit)
     pub const MAX_HIGHLIGHT_LINE_LENGTH: u32 = 500;

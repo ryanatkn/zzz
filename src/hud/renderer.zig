@@ -16,8 +16,19 @@ const directory_scanner = @import("../lib/platform/directory_scanner.zig");
 const syntax_highlighter = @import("../menu/ide/syntax_highlighter.zig");
 const bitmap_simple = @import("../lib/font/renderers/bitmap_simple.zig");
 
+// Throttled logging to prevent spam
+const Logger = @import("../lib/debug/logger.zig").Logger;
+const outputs = @import("../lib/debug/outputs.zig");
+const filters = @import("../lib/debug/filters.zig");
+
 const Color = colors.Color;
 const Vec2 = math.Vec2;
+
+// Configure throttled logger for rendering (compile-time)
+const ThrottledLogger = Logger(.{
+    .output = outputs.Console,
+    .filter = filters.Throttle,
+});
 
 /// Configuration for font grid test rendering
 const FontGridConfig = struct {
@@ -268,7 +279,9 @@ pub const BrowserRenderer = struct {
     fn renderIDEDashboard(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page) !void {
         const ide_page_impl: *const ide_page.IDEPage = @fieldParentPtr("base", current_page);
         
-        if (!ide_page_impl.initialized) return;
+        if (!ide_page_impl.initialized) {
+            return;
+        }
         
         const screen_size = self.getScreenSize();
         
@@ -343,18 +356,10 @@ pub const BrowserRenderer = struct {
             1.0
         );
         
-        // Render file tree in explorer panel
+        // Render the actual panel content
         try self.renderFileTree(cmd_buffer, render_pass, ide_page_impl, explorer_rect);
-        
-        // Render content area
         try self.renderContentArea(cmd_buffer, render_pass, ide_page_impl, content_rect);
-        
-        // Render preview panel
         try self.renderPreviewPanel(cmd_buffer, render_pass, ide_page_impl, preview_rect);
-            
-        
-        // Render search and filter controls in header
-        try self.renderSearchControls(cmd_buffer, render_pass, ide_page_impl, screen_size);
         
         // Draw resolution info in header
         var resolution_buf: [64]u8 = undefined;
@@ -363,75 +368,35 @@ pub const BrowserRenderer = struct {
             Vec2{ .x = screen_size.x - 200, .y = 15 });
     }
     
-    /// Render file tree in explorer panel
+    /// Render file tree in explorer panel using Link system
     fn renderFileTree(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
-        // Panel header
-        self.drawSimpleText(cmd_buffer, render_pass, "FILE EXPLORER", 
-            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+        
+        // Panel header - queue for rendering
+        self.queueTextForRender(cmd_buffer, render_pass, "FILE EXPLORER", 
+            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 },
+            ide_constants.COLORS.TEXT_NORMAL);
         
         // Check for loading or error states
         if (ide_page_impl.loading) {
-            self.drawSimpleText(cmd_buffer, render_pass, "Loading...", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.queueTextForRender(cmd_buffer, render_pass, "Loading...", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 },
+                ide_constants.COLORS.TEXT_NORMAL);
             return;
         }
         
         if (ide_page_impl.error_message) |error_msg| {
-            self.drawSimpleText(cmd_buffer, render_pass, "Error:", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
-            self.drawSimpleText(cmd_buffer, render_pass, error_msg, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
+            self.queueTextForRender(cmd_buffer, render_pass, "Error:", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 },
+                ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, error_msg, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 },
+                ide_constants.COLORS.TEXT_NORMAL);
             return;
         }
         
-        // Render file tree items
-        const tree_items = ide_page_impl.file_tree_component.getVisibleItems();
-        const tree_state = ide_page_impl.file_tree_component.getState();
-        
-        for (tree_items) |item| {
-            const item_y = panel_rect.position.y + 30 + item.position.y;
-            const item_x = panel_rect.position.x + 10 + item.position.x;
-            
-            // Skip items outside panel bounds  
-            if (item_y > panel_rect.position.y + panel_rect.size.y - 20) break;
-            
-            // Draw selection background
-            if (tree_state.isSelected(item.entry)) {
-                self.base_renderer.gpu.drawRect(
-                    cmd_buffer,
-                    render_pass,
-                    Vec2{ .x = panel_rect.position.x + 5, .y = item_y - 2 },
-                    Vec2{ .x = panel_rect.size.x - 10, .y = 20 },
-                    ide_constants.COLORS.SELECTION_BG
-                );
-            }
-            
-            // Draw hover background
-            if (tree_state.isHovered(item.entry)) {
-                self.base_renderer.gpu.drawRect(
-                    cmd_buffer,
-                    render_pass,
-                    Vec2{ .x = panel_rect.position.x + 5, .y = item_y - 2 },
-                    Vec2{ .x = panel_rect.size.x - 10, .y = 20 },
-                    ide_constants.COLORS.HOVER_BG
-                );
-            }
-            
-            // Draw file type icon
-            try self.drawFileIcon(cmd_buffer, render_pass, item.icon, 
-                Vec2{ .x = item_x, .y = item_y });
-            
-            // Draw expand/collapse indicator for directories
-            if (item.entry.metadata.is_directory) {
-                const indicator = if (item.entry.expanded) "-" else "+";
-                self.drawSimpleText(cmd_buffer, render_pass, indicator, 
-                    Vec2{ .x = item_x - 15, .y = item_y });
-            }
-            
-            // Draw file name
-            self.drawSimpleText(cmd_buffer, render_pass, item.entry.metadata.name, 
-                Vec2{ .x = item_x + 20, .y = item_y });
-        }
+        // Create Links for file tree items (handled by HUD link system)
+        // This is much simpler and leverages the working button/link system
+        // Links will be added by the IDE page's render function
     }
     
     /// Render content area
@@ -441,27 +406,27 @@ pub const BrowserRenderer = struct {
             // Show file name in header
             var header_buf: [256]u8 = undefined;
             const header_text = std.fmt.bufPrint(&header_buf, "FILE: {s}", .{selected.metadata.name}) catch "FILE: <name too long>";
-            self.drawSimpleText(cmd_buffer, render_pass, header_text,
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+            self.queueTextForRender(cmd_buffer, render_pass, header_text,
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 }, ide_constants.COLORS.TEXT_NORMAL);
         } else {
-            self.drawSimpleText(cmd_buffer, render_pass, "CONTENT EDITOR (~800px max)", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+            self.queueTextForRender(cmd_buffer, render_pass, "CONTENT EDITOR (~800px max)", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 }, ide_constants.COLORS.TEXT_NORMAL);
         }
         
         // Display file content or error
         if (ide_page_impl.current_file_error) |error_msg| {
             // Show error message
-            self.drawSimpleText(cmd_buffer, render_pass, "Error:", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
-            self.drawSimpleText(cmd_buffer, render_pass, error_msg, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
+            self.queueTextForRender(cmd_buffer, render_pass, "Error:", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 }, ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, error_msg, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 }, ide_constants.COLORS.TEXT_NORMAL);
         } else if (ide_page_impl.current_file_content) |content| {
             // Show file content line by line
             try self.renderFileContentWithHighlighting(cmd_buffer, render_pass, content, panel_rect, ide_page_impl);
         } else {
             // No file selected
-            self.drawSimpleText(cmd_buffer, render_pass, "Select a file to view its contents", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.queueTextForRender(cmd_buffer, render_pass, "Select a file to view its contents", 
+                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 }, ide_constants.COLORS.TEXT_NORMAL);
         }
     }
     
@@ -643,73 +608,38 @@ pub const BrowserRenderer = struct {
     
     /// Draw text with specified color using MenuTextRenderer (16pt font for compatibility)
     fn drawTextWithColor(self: *BrowserRenderer, text: []const u8, position: Vec2, text_color: Color) void {
+        // Skip rendering empty or whitespace-only text to avoid texture creation failures
+        if (text.len == 0 or std.mem.trim(u8, text, " \t\r\n").len == 0) {
+            return;
+        }
+        
         // Use the same approach as working buttons - 16pt font renders reliably
         var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
         menu_renderer.queueCustomText(text, position, ide_constants.TEXT.CONTENT_FONT_SIZE, text_color);
     }
-
-    /// Render search and filter controls in header
-    fn renderSearchControls(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, screen_size: Vec2) !void {
-        _ = screen_size; // May be used later for responsive layout
-        const search_x = 20.0;
-        const search_y = 15.0;
-        const search_width = 200.0;
-        const search_height = 30.0;
+    
+    /// Queue text using the proper persistent text system (like working buttons)
+    fn queueTextForRender(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2, text_color: Color) void {
+        _ = cmd_buffer;
+        _ = render_pass;
         
-        // Search input background
-        self.base_renderer.gpu.drawRect(
-            cmd_buffer,
-            render_pass,
-            Vec2{ .x = search_x, .y = search_y },
-            Vec2{ .x = search_width, .y = search_height },
-            Color{ .r = 40, .g = 45, .b = 50, .a = 255 }
-        );
+        // Skip rendering empty or whitespace-only text to avoid texture creation failures
+        if (text.len == 0 or std.mem.trim(u8, text, " \t\r\n").len == 0) {
+            return;
+        }
         
-        // Search input border
-        self.base_renderer.gpu.drawRect(
-            cmd_buffer,
-            render_pass,
-            Vec2{ .x = search_x, .y = search_y },
-            Vec2{ .x = search_width, .y = 2 },
-            Color{ .r = 80, .g = 85, .b = 90, .a = 255 }
-        );
-        
-        // Search placeholder or actual text
-        const search_text = if (ide_page_impl.getSearchQuery().len > 0) 
-            ide_page_impl.getSearchQuery() 
-        else 
-            "🔍 Search files...";
-            
-        self.drawSimpleText(cmd_buffer, render_pass, search_text,
-            Vec2{ .x = search_x + 8, .y = search_y + 8 });
-        
-        // Filter dropdown
-        const filter_x = search_x + search_width + 20.0;
-        const filter_width = 120.0;
-        
-        // Filter background
-        self.base_renderer.gpu.drawRect(
-            cmd_buffer,
-            render_pass,
-            Vec2{ .x = filter_x, .y = search_y },
-            Vec2{ .x = filter_width, .y = search_height },
-            Color{ .r = 40, .g = 45, .b = 50, .a = 255 }
-        );
-        
-        // Filter border  
-        self.base_renderer.gpu.drawRect(
-            cmd_buffer,
-            render_pass,
-            Vec2{ .x = filter_x, .y = search_y },
-            Vec2{ .x = filter_width, .y = 2 },
-            Color{ .r = 80, .g = 85, .b = 90, .a = 255 }
-        );
-        
-        // Filter text
-        var filter_text_buf: [32]u8 = undefined;
-        const filter_text = std.fmt.bufPrint(&filter_text_buf, "Filter: {s} ▼", .{ide_page_impl.getFileTypeFilter().getDisplayName()}) catch "Filter: All ▼";
-        
-        self.drawSimpleText(cmd_buffer, render_pass, filter_text,
-            Vec2{ .x = filter_x + 8, .y = search_y + 8 });
+        // Use the exact same approach as working navigation text
+        self.base_renderer.gpu.text_renderer.queuePersistentText(
+            text, 
+            position, 
+            self.base_renderer.font_manager, 
+            .sans, 
+            16.0, // Use 16pt font size (proven to work)
+            text_color
+        ) catch |err| {
+            const log = std.log.scoped(.ide_text);
+            log.err("Failed to queue IDE text '{s}': {}", .{ text, err });
+        };
     }
+
 };

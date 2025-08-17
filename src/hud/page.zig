@@ -48,7 +48,7 @@ pub const Page = struct {
         init: *const fn (self: *Page, allocator: std.mem.Allocator) anyerror!void,
         deinit: *const fn (self: *Page, allocator: std.mem.Allocator) void,
         update: *const fn (self: *Page, dt: f32) void,
-        render: *const fn (self: *const Page, links: *std.ArrayList(Link)) anyerror!void,
+        render: *const fn (self: *const Page, links: *std.ArrayList(Link), arena: std.mem.Allocator) anyerror!void,
         destroy: *const fn (self: *Page, allocator: std.mem.Allocator) void,
     };
 
@@ -68,8 +68,8 @@ pub const Page = struct {
         self.vtable.update(self, dt);
     }
 
-    pub fn render(self: *const Page, links: *std.ArrayList(Link)) !void {
-        try self.vtable.render(self, links);
+    pub fn render(self: *const Page, links: *std.ArrayList(Link), arena: std.mem.Allocator) !void {
+        try self.vtable.render(self, links, arena);
     }
 
     pub fn destroy(self: *Page, allocator: std.mem.Allocator) void {

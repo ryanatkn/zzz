@@ -15,6 +15,7 @@ pub const Hud = struct {
     links: std.ArrayList(page.Link),
     hovered_link: ?usize,
     allocator: std.mem.Allocator,
+    link_arena: std.heap.ArenaAllocator,
 
     pub fn init(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Hud {
         var hud_sys = Hud{
@@ -25,6 +26,7 @@ pub const Hud = struct {
             .links = std.ArrayList(page.Link).init(allocator),
             .hovered_link = null,
             .allocator = allocator,
+            .link_arena = std.heap.ArenaAllocator.init(allocator),
         };
 
         // Initialize font system
@@ -43,6 +45,7 @@ pub const Hud = struct {
         self.renderer.deinitFonts(self.allocator);
         self.router.deinit();
         self.links.deinit();
+        self.link_arena.deinit();
     }
 
     pub fn toggle(self: *Hud) void {
@@ -60,6 +63,12 @@ pub const Hud = struct {
 
     pub fn handleEvent(self: *Hud, event: c.sdl.SDL_Event) !bool {
         if (!self.is_open) return false;
+        
+        // Debug: Log all mouse clicks when HUD is open
+        if (event.type == c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN) {
+            const log = std.log.scoped(.hud_click);
+            log.info("HUD click detected at ({},{})", .{ event.button.x, event.button.y });
+        }
 
         switch (event.type) {
             c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
@@ -84,7 +93,11 @@ pub const Hud = struct {
                         
                         // Check IDE page-specific interactions first
                         if (self.router.getCurrentPage()) |current_page| {
+                            const log = std.log.scoped(.hud_routing);
+                            log.info("Current page: '{s}'", .{ current_page.path });
+                            
                             if (std.mem.eql(u8, current_page.path, "/ide")) {
+                                log.info("On IDE page, handling file tree click", .{});
                                 const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
                                 
                                 // Try file tree interaction first
@@ -92,13 +105,26 @@ pub const Hud = struct {
                                 if (ide_page_impl.handleFileTreeClick(point) catch false) {
                                     return true; // File tree handled the click
                                 }
+                                
+                                // Search controls removed for simplicity
                             }
                         }
                         
                         // Check if clicking a link
                         if (self.hovered_link) |link_index| {
+                            if (link_index >= self.links.items.len) {
+                                std.log.err("Invalid hovered link index: {} >= {}", .{ link_index, self.links.items.len });
+                                self.hovered_link = null;
+                                return true;
+                            }
                             const link = self.links.items[link_index];
-                            try self.navigateTo(link.path);
+                            // Copy path to stack buffer to avoid use-after-free from arena reset
+                            var path_buffer: [512]u8 = undefined;
+                            const path_copy = std.fmt.bufPrint(&path_buffer, "{s}", .{link.path}) catch {
+                                std.log.err("Link path too long: '{s}'", .{link.path});
+                                return true;
+                            };
+                            try self.navigateTo(path_copy);
                         }
 
                         // Check navigation bar buttons
@@ -208,11 +234,14 @@ pub const Hud = struct {
         const can_go_forward = self.history.current_index < self.history.stack_size - 1;
         try self.renderer.renderNavigationBar(cmd_buffer, render_pass, self.history.getCurrentPath(), can_go_back, can_go_forward);
 
+        // Reset arena for new frame (retaining capacity for performance)
+        _ = self.link_arena.reset(.retain_capacity);
+        
         // Clear links for this frame
         self.links.clearRetainingCapacity();
 
-        // Render current page with layouts
-        try self.router.renderWithLayouts(&self.links);
+        // Render current page with layouts (passing arena for dynamic strings)
+        try self.router.renderWithLayouts(&self.links, self.link_arena.allocator());
 
         // Render special page content (like IDE dashboard)
         if (self.router.getCurrentPage()) |current_page| {

@@ -19,11 +19,12 @@ const StatsPage = struct {
         _ = dt;
     }
 
-    fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+    fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {
         const constants = @import("../../hud/constants.zig");
         const screen_width = constants.SCREEN.BASE_WIDTH;
         const screen_height = constants.SCREEN.BASE_HEIGHT;
         _ = self;
+        _ = arena;
 
         const center_x = screen_width / 2.0;
         const start_y = screen_height * 0.3;

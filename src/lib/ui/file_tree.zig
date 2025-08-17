@@ -137,6 +137,13 @@ pub const FileTreeRenderer = struct {
         try self.buildRenderListRecursive(root, 0, start_position.x, &current_y);
     }
     
+    /// Build filtered list of tree items for rendering
+    pub fn buildFilteredRenderList(self: *Self, root: *DirectoryEntry, start_position: Vec2, search_query: []const u8, file_type_filter: anytype) !void {
+        self.items.clearRetainingCapacity();
+        var current_y = start_position.y;
+        try self.buildFilteredRenderListRecursive(root, 0, start_position.x, &current_y, search_query, file_type_filter);
+    }
+    
     /// Recursively build render list
     fn buildRenderListRecursive(self: *Self, entry: *DirectoryEntry, depth: u32, x: f32, current_y: *f32) !void {
         const position = Vec2{ .x = x + @as(f32, @floatFromInt(depth)) * 20.0, .y = current_y.* };
@@ -153,13 +160,95 @@ pub const FileTreeRenderer = struct {
         }
     }
     
+    /// Recursively build filtered render list
+    fn buildFilteredRenderListRecursive(self: *Self, entry: *DirectoryEntry, depth: u32, x: f32, current_y: *f32, search_query: []const u8, file_type_filter: anytype) !void {
+        // Check if this entry matches the filter
+        var should_show = entry.metadata.is_directory or self.entryMatches(entry, search_query, file_type_filter);
+        
+        // For directories, check if any children match
+        if (entry.metadata.is_directory and !should_show) {
+            should_show = self.hasMatchingChildrenFiltered(entry, search_query, file_type_filter);
+        }
+        
+        if (should_show) {
+            const position = Vec2{ .x = x + @as(f32, @floatFromInt(depth)) * 20.0, .y = current_y.* };
+            const item = TreeItem.create(entry, depth, position);
+            try self.items.append(item);
+            current_y.* += 26.0; // Item height + spacing
+        }
+        
+        // Add children if directory is expanded and shown
+        if (entry.metadata.is_directory and entry.expanded and should_show) {
+            for (entry.children.items) |child| {
+                try self.buildFilteredRenderListRecursive(child, depth + 1, x, current_y, search_query, file_type_filter);
+            }
+        }
+    }
+    
+    /// Check if an entry matches the filter criteria
+    fn entryMatches(self: *Self, entry: *const DirectoryEntry, search_query: []const u8, file_type_filter: anytype) bool {
+        _ = self;
+        
+        // Always show directories (they might contain matching files)
+        if (entry.metadata.is_directory) return true;
+        
+        // Check file type filter
+        if (!file_type_filter.matches(entry.metadata.name)) return false;
+        
+        // Check search query (case-insensitive)
+        if (search_query.len > 0) {
+            // Simple case-insensitive substring search
+            var name_lower: [256]u8 = undefined;
+            if (entry.metadata.name.len < name_lower.len) {
+                for (entry.metadata.name, 0..) |c, i| {
+                    name_lower[i] = std.ascii.toLower(c);
+                }
+                const name_slice = name_lower[0..entry.metadata.name.len];
+                
+                var query_lower: [256]u8 = undefined;
+                for (search_query, 0..) |c, i| {
+                    query_lower[i] = std.ascii.toLower(c);
+                }
+                const query_slice = query_lower[0..search_query.len];
+                
+                return std.mem.indexOf(u8, name_slice, query_slice) != null;
+            }
+        }
+        
+        return true;
+    }
+    
+    /// Check if directory has any matching children (recursively)
+    fn hasMatchingChildrenFiltered(self: *Self, entry: *const DirectoryEntry, search_query: []const u8, file_type_filter: anytype) bool {
+        for (entry.children.items) |child| {
+            if (self.entryMatches(child, search_query, file_type_filter)) return true;
+            if (child.metadata.is_directory and self.hasMatchingChildrenFiltered(child, search_query, file_type_filter)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /// Get item at point (for mouse interaction)
     pub fn getItemAtPoint(self: *const Self, point: Vec2) ?*TreeItem {
-        for (self.items.items) |*item| {
+        const log = std.log.scoped(.file_tree_click);
+        log.info("getItemAtPoint called with point ({d:.1},{d:.1})", .{ point.x, point.y });
+        log.info("Checking {} items", .{ self.items.items.len });
+        
+        for (self.items.items, 0..) |*item, i| {
+            if (i < 3) { // Debug first 3 items
+                log.info("Item {}: '{s}' bounds ({d:.1},{d:.1}) size ({d:.1},{d:.1})", .{ 
+                    i, item.entry.metadata.name, 
+                    item.bounds.position.x, item.bounds.position.y,
+                    item.bounds.size.x, item.bounds.size.y 
+                });
+            }
             if (item.containsPoint(point)) {
+                log.info("Found matching item: '{s}'", .{ item.entry.metadata.name });
                 return item;
             }
         }
+        log.info("No item found at point", .{});
         return null;
     }
     
@@ -205,8 +294,19 @@ pub const FileTreeComponent = struct {
         if (root) |r| {
             // Auto-expand root
             r.expanded = true;
-            // Build initial render list
-            try self.renderer.buildRenderList(r, Vec2{ .x = 10.0, .y = 10.0 });
+            // Build initial render list with panel-relative coordinates
+            try self.renderer.buildRenderList(r, Vec2{ .x = 0.0, .y = 0.0 });
+        }
+    }
+    
+    /// Set root directory entry with filtering
+    pub fn setRootEntryWithFilter(self: *Self, root: ?*DirectoryEntry, search_query: []const u8, file_type_filter: anytype) !void {
+        self.root_entry = root;
+        if (root) |r| {
+            // Auto-expand root
+            r.expanded = true;
+            // Build filtered render list with panel-relative coordinates
+            try self.renderer.buildFilteredRenderList(r, Vec2{ .x = 0.0, .y = 0.0 }, search_query, file_type_filter);
         }
     }
     
@@ -221,7 +321,7 @@ pub const FileTreeComponent = struct {
                 self.renderer.toggleExpanded(item.entry);
                 // Rebuild render list after expansion change
                 if (self.root_entry) |root| {
-                    try self.renderer.buildRenderList(root, Vec2{ .x = 10.0, .y = 10.0 });
+                    try self.renderer.buildRenderList(root, Vec2{ .x = 0.0, .y = 0.0 });
                 }
             }
             

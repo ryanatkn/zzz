@@ -101,7 +101,7 @@ pub const PerformanceMonitor = struct {
 
 /// Global performance monitoring constants
 pub const Config = struct {
-    pub const DEFAULT_LOGGING_FREQUENCY: u32 = 60; // Log every 60 frames (1 second at 60fps)
+    pub const DEFAULT_LOGGING_FREQUENCY: u32 = 288; // Log every 60 frames (1 second at 60fps)
     pub const HIGH_FREQUENCY_LOGGING: u32 = 30;    // More frequent logging for debugging
     pub const LOW_FREQUENCY_LOGGING: u32 = 300;    // Less frequent logging for production
 };

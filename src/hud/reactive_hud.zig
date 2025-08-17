@@ -23,6 +23,7 @@ pub const ReactiveHudData = struct {
     renderer: browser_renderer.BrowserRenderer,
     links: std.ArrayList(page.Link),
     allocator: std.mem.Allocator,
+    link_arena: std.heap.ArenaAllocator,
 
     // Reactive state
     is_open: *signal.Signal(bool),
@@ -63,6 +64,7 @@ pub const ReactiveHudData = struct {
             .renderer = browser_renderer.BrowserRenderer.init(base_renderer),
             .links = std.ArrayList(page.Link).init(allocator),
             .allocator = allocator,
+            .link_arena = std.heap.ArenaAllocator.init(allocator),
             .is_open = is_open_signal,
             .current_path = current_path_signal,
             .hovered_link = hovered_link_signal,
@@ -196,6 +198,7 @@ pub const ReactiveHudData = struct {
         self.renderer.deinitFonts(self.allocator);
         self.router.deinit();
         self.links.deinit();
+        self.link_arena.deinit();
     }
 
     // Component vtable implementation
@@ -402,11 +405,14 @@ pub const ReactiveHud = struct {
         // Render navigation bar with reactive state
         try hud_data.renderer.renderNavigationBar(cmd_buffer, render_pass, hud_data.current_path.peek(), hud_data.can_go_back.get(), hud_data.can_go_forward.get());
 
+        // Reset arena for new frame (retaining capacity for performance)
+        _ = hud_data.link_arena.reset(.retain_capacity);
+        
         // Clear links for this frame
         hud_data.links.clearRetainingCapacity();
 
-        // Render current page with layouts
-        try hud_data.router.renderWithLayouts(&hud_data.links);
+        // Render current page with layouts (passing arena for dynamic strings)
+        try hud_data.router.renderWithLayouts(&hud_data.links, hud_data.link_arena.allocator());
 
         // Render custom GPU content for pages that need it
         if (hud_data.router.getCurrentPage()) |current_page| {

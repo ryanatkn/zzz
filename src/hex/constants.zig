@@ -52,9 +52,9 @@ pub const CameraMode = enum {
     follow,
 };
 
-// UI/HUD positioning constants
-pub const FPS_POSITION_X = constants.UI.HUD_MARGIN_X;
-pub const FPS_POSITION_Y = constants.UI.HUD_MARGIN_Y;
+// UI/HUD positioning constants (bottom right)
+pub const FPS_POSITION_X = SCREEN_WIDTH - 200.0;  // Right side with margin
+pub const FPS_POSITION_Y = SCREEN_HEIGHT - 80.0;  // Bottom with margin for FPS + AI text
 pub const FPS_FALLBACK_X = constants.UI.FALLBACK_POSITION_X;
 pub const FPS_FALLBACK_Y = constants.UI.FALLBACK_POSITION_Y;
 pub const FPS_DIGIT_SPACING = constants.UI.DIGIT_SPACING;

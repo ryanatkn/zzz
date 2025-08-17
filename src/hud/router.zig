@@ -1,5 +1,7 @@
 const std = @import("std");
 const page = @import("page.zig");
+const directory_scanner = @import("../lib/platform/directory_scanner.zig");
+const math = @import("../lib/math/mod.zig");
 
 const root_page = @import("../menu/+page.zig");
 const root_layout = @import("../menu/+layout.zig");
@@ -12,6 +14,9 @@ const stats_page = @import("../menu/stats/+page.zig");
 const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
 const vector_test_page = @import("../menu/vector_test/+page.zig");
 const ide_page = @import("../menu/ide/+page.zig");
+
+const DirectoryEntry = directory_scanner.DirectoryEntry;
+const Vec2 = math.Vec2;
 
 pub const Router = struct {
     allocator: std.mem.Allocator,
@@ -46,7 +51,29 @@ pub const Router = struct {
     }
 
     pub fn navigate(self: *Router, path: []const u8) !void {
-        // Clean up current page and layouts
+        const log = std.log.scoped(.router_navigate);
+        log.info("Router navigate called with path: '{s}'", .{path});
+        
+        // Check if we're navigating within the same page (only query parameters changed)
+        if (self.current_page) |current_page| {
+            const current_base_path = self.extractBasePath(current_page.path);
+            const new_base_path = self.extractBasePath(path);
+            
+            log.info("Current page: '{s}', base: '{s}', new base: '{s}'", .{ current_page.path, current_base_path, new_base_path });
+            
+            if (std.mem.eql(u8, current_base_path, new_base_path)) {
+                log.info("Same page navigation - handling action without page recreation", .{});
+                // Same page, just handle the action without destroying/recreating
+                if (std.mem.indexOf(u8, path, "?")) |query_start| {
+                    const query = path[query_start + 1..];
+                    log.info("Calling handleIDEAction with query: '{s}'", .{query});
+                    try self.handleIDEAction(query);
+                }
+                return;
+            }
+        }
+        
+        // Different page, clean up current page and layouts
         self.cleanupCurrent();
 
         // Route to new page based on path
@@ -126,7 +153,9 @@ pub const Router = struct {
 
             // Load vector test page
             self.current_page = try vector_test_page.create(self.allocator);
-        } else if (std.mem.eql(u8, path, "/ide")) {
+        } else if (std.mem.startsWith(u8, path, "/ide")) {
+            // Handle IDE page and IDE actions
+            
             // Load root layout
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
@@ -134,6 +163,12 @@ pub const Router = struct {
 
             // Load IDE page
             self.current_page = try ide_page.create(self.allocator);
+            
+            // Handle IDE actions (query parameters)
+            if (std.mem.indexOf(u8, path, "?")) |query_start| {
+                const query = path[query_start + 1..];
+                try self.handleIDEAction(query);
+            }
         } else {
             // Default to index for unknown paths
             // Load root layout
@@ -154,12 +189,147 @@ pub const Router = struct {
     pub fn getCurrentPage(self: *const Router) ?*page.Page {
         return self.current_page;
     }
+    
+    /// Extract base path before query parameters (e.g., "/ide?file=foo" -> "/ide")
+    fn extractBasePath(self: *Router, path: []const u8) []const u8 {
+        _ = self;
+        if (std.mem.indexOf(u8, path, "?")) |query_start| {
+            return path[0..query_start];
+        }
+        return path;
+    }
+    
+    /// Handle IDE-specific actions from query parameters
+    fn handleIDEAction(self: *Router, query: []const u8) !void {
+        if (self.current_page) |current_page| {
+            if (std.mem.eql(u8, current_page.path, "/ide")) {
+                const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
+                
+                // Parse query parameters
+                if (std.mem.startsWith(u8, query, "toggle=")) {
+                    const folder_name = query[7..]; // Skip "toggle="
+                    try self.handleFolderToggle(ide_page_impl, folder_name);
+                } else if (std.mem.startsWith(u8, query, "file=")) {
+                    const file_name = query[5..]; // Skip "file="
+                    try self.handleFileLoad(ide_page_impl, file_name);
+                } else if (std.mem.eql(u8, query, "expand_all=true")) {
+                    try self.handleExpandAll(ide_page_impl);
+                } else if (std.mem.eql(u8, query, "collapse_all=true")) {
+                    try self.handleCollapseAll(ide_page_impl);
+                }
+            }
+        }
+    }
+    
+    /// Handle folder expand/collapse
+    fn handleFolderToggle(self: *Router, ide_impl: *ide_page.IDEPage, folder_name: []const u8) !void {
+        _ = self;
+        const log = std.log.scoped(.ide_action);
+        log.info("Toggle folder: '{s}'", .{ folder_name });
+        
+        // Find and toggle the folder in the file tree
+        const tree_items = ide_impl.file_tree_component.getVisibleItems();
+        for (tree_items) |item| {
+            if (std.mem.eql(u8, item.entry.metadata.name, folder_name)) {
+                if (item.entry.metadata.is_directory) {
+                    // Toggle expansion
+                    item.entry.expanded = !item.entry.expanded;
+                    
+                    // Rebuild the tree
+                    if (ide_impl.root_directory) |root| {
+                        try ide_impl.file_tree_component.renderer.buildRenderList(root, @import("../lib/math/mod.zig").Vec2{ .x = 0.0, .y = 0.0 });
+                    }
+                    
+                    log.info("Toggled folder '{s}' to {}", .{ folder_name, item.entry.expanded });
+                    break;
+                }
+            }
+        }
+    }
+    
+    /// Handle file loading
+    fn handleFileLoad(self: *Router, ide_impl: *ide_page.IDEPage, file_name: []const u8) !void {
+        _ = self;
+        const log = std.log.scoped(.ide_action);
+        log.info("Load file: '{s}'", .{ file_name });
+        
+        log.info("File tree has {} visible items", .{ ide_impl.file_tree_component.getVisibleItems().len });
+        
+        // Find and select the file in the file tree
+        const tree_items = ide_impl.file_tree_component.getVisibleItems();
+        var found = false;
+        for (tree_items) |item| {
+            log.info("Checking tree item: '{s}' (is_dir: {}) vs looking for: '{s}'", .{ item.entry.metadata.name, item.entry.metadata.is_directory, file_name });
+            if (std.mem.eql(u8, item.entry.metadata.name, file_name)) {
+                log.info("Found matching item: '{s}', full_path: '{s}'", .{ item.entry.metadata.name, item.entry.metadata.full_path });
+                if (!item.entry.metadata.is_directory) {
+                    // Select the file
+                    ide_impl.file_tree_component.state.selectEntry(item.entry);
+                    
+                    log.info("About to load file content for: '{s}'", .{ item.entry.metadata.full_path });
+                    // Load the file content
+                    try ide_impl.loadFileContent(item.entry);
+                    
+                    log.info("Successfully loaded file '{s}'", .{ file_name });
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            log.warn("File '{s}' not found in tree with {} items", .{ file_name, tree_items.len });
+        }
+    }
+    
+    /// Handle expand all action
+    fn handleExpandAll(self: *Router, ide_impl: *ide_page.IDEPage) !void {
+        const log = std.log.scoped(.ide_action);
+        log.info("Expand all folders", .{});
+        
+        if (ide_impl.root_directory) |root| {
+            self.expandAllRecursive(root);
+            // Rebuild the tree
+            try ide_impl.file_tree_component.renderer.buildRenderList(root, Vec2{ .x = 0.0, .y = 0.0 });
+        }
+    }
+    
+    /// Handle collapse all action
+    fn handleCollapseAll(self: *Router, ide_impl: *ide_page.IDEPage) !void {
+        const log = std.log.scoped(.ide_action);
+        log.info("Collapse all folders", .{});
+        
+        if (ide_impl.root_directory) |root| {
+            self.collapseAllRecursive(root);
+            // Rebuild the tree
+            try ide_impl.file_tree_component.renderer.buildRenderList(root, Vec2{ .x = 0.0, .y = 0.0 });
+        }
+    }
+    
+    /// Recursively expand all directories
+    fn expandAllRecursive(self: *Router, entry: *DirectoryEntry) void {
+        if (entry.metadata.is_directory) {
+            entry.expanded = true;
+            for (entry.children.items) |child| {
+                self.expandAllRecursive(child);
+            }
+        }
+    }
+    
+    /// Recursively collapse all directories  
+    fn collapseAllRecursive(self: *Router, entry: *DirectoryEntry) void {
+        if (entry.metadata.is_directory) {
+            entry.expanded = false;
+            for (entry.children.items) |child| {
+                self.collapseAllRecursive(child);
+            }
+        }
+    }
 
-    pub fn renderWithLayouts(self: *const Router, links: *std.ArrayList(page.Link)) !void {
+    pub fn renderWithLayouts(self: *const Router, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {
         if (self.current_page == null) return;
 
         // For now, just render the page directly without layout composition
         // A full implementation would compose layouts
-        try self.current_page.?.render(links);
+        try self.current_page.?.render(links, arena);
     }
 };

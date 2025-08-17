@@ -312,7 +312,7 @@ pub const GameRenderer = struct {
         // Use bright green color for AI mode indicator
         const AI_COLOR = colors.Color{ .r = 0, .g = 255, .b = 128, .a = 255 };
 
-        // Position below FPS display
+        // Position below FPS display (both at bottom right)
         const ai_x = constants.FPS_POSITION_X;
         const ai_y = constants.FPS_POSITION_Y + 30.0;
 

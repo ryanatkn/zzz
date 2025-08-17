@@ -24,7 +24,8 @@ const FontsInfoPage = struct {
         _ = dt;
     }
 
-    fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+    fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {
+        _ = arena;
         const constants = @import("../../../hud/constants.zig");
         const screen_width = constants.SCREEN.BASE_WIDTH;
         const screen_height = constants.SCREEN.BASE_HEIGHT;
