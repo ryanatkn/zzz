@@ -71,7 +71,7 @@ pub const HexPortalIntegration = struct {
             }
         }
         
-        loggers.getGameLog().info("portal_system_loaded", "Loaded {} portals from zone storage", .{self.portal_manager.teleporter_manager.teleporter_count});
+        loggers.getGameLog().info("portal_system_loaded", "Loaded {} portals from zone storage for zone {}", .{ self.portal_manager.teleporter_manager.teleporter_count, game.zone_manager.getCurrentZoneIndex() });
     }
     
     /// Update portal system (called from game loop)

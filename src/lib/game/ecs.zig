@@ -5,7 +5,7 @@
 pub const EntityId = u32;
 pub const INVALID_ENTITY: EntityId = @import("std").math.maxInt(u32);
 
-// Simple components from hex game (for backwards compat during transition)
+// Generic game components
 pub const components = @import("components.zig");
 
 // Useful game helpers that are actually used

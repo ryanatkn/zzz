@@ -1,7 +1,7 @@
 const std = @import("std");
 
 /// Generic typed entity storage for component arrays
-/// This eliminates the duplication in hex's various storage types
+/// This eliminates duplication in game-specific storage types
 pub fn EntityStorage(comptime ComponentTuple: type, comptime max_entities: usize) type {
     return struct {
         const Self = @This();
@@ -100,7 +100,7 @@ pub const EntityIterator = struct {
     }
 };
 
-/// Advanced multi-component entity storage that matches hex patterns exactly
+/// Advanced multi-component entity storage with flexible component access
 pub fn ArchetypeStorage(comptime ComponentArrays: type, comptime max_entities: usize) type {
     const component_fields = std.meta.fields(ComponentArrays);
     
@@ -155,7 +155,7 @@ pub fn ArchetypeStorage(comptime ComponentArrays: type, comptime max_entities: u
             }
         }
         
-        /// Get component with enum-style access like hex's current pattern
+        /// Get component with enum-style access pattern
         pub fn getComponent(self: *const Self, entity: EntityId, comptime component_type: anytype) ?*const ComponentTypeFromEnum(@TypeOf(component_type), ComponentArrays) {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity) {

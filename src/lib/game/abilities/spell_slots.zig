@@ -132,5 +132,5 @@ pub const ExampleSpellType = enum {
     Teleport,
 };
 
-/// Example 8-slot system like hex game uses
+/// Example 8-slot system for RPG-style games
 pub const Example8SlotSystem = SpellSlotSystem(ExampleSpellType, 8);

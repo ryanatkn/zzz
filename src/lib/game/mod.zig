@@ -26,6 +26,7 @@ pub const input = @import("input/mod.zig");
 pub const zones = @import("zones/mod.zig");
 pub const storage = @import("storage/mod.zig");
 pub const world = @import("world/mod.zig");
+pub const factories = @import("factories/mod.zig");
 
 // Simple ID generation
 pub const EntityId = ecs.EntityId;

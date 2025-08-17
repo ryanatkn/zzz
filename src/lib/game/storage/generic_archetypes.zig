@@ -1,28 +1,14 @@
 const std = @import("std");
 const components = @import("../components.zig");
 
-/// Predefined archetype storages for common entity patterns
-/// This provides the exact same interface as hex's custom storage types
+/// Generic archetype storages for common entity patterns
+/// Games can instantiate these with their own component types and size limits
 
 const EntityId = u32;
 const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
 
-/// Simple entity iterator that works with all archetype storages
-pub const EntityIterator = struct {
-    entities: []const EntityId,
-    index: usize,
-    
-    pub fn next(self: *EntityIterator) ?EntityId {
-        if (self.index >= self.entities.len) return null;
-        const entity = self.entities[self.index];
-        self.index += 1;
-        return entity;
-    }
-    
-    pub fn reset(self: *EntityIterator) void {
-        self.index = 0;
-    }
-};
+// Use EntityIterator from entity_storage.zig to avoid duplication
+const EntityIterator = @import("entity_storage.zig").EntityIterator;
 
 /// Player archetype storage
 pub fn PlayerStorage(comptime max_entities: usize) type {

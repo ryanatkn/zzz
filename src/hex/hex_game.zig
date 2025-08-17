@@ -8,11 +8,12 @@ const HexGameContext = @import("hex_context.zig").HexGameContext;
 const components = @import("../lib/game/components.zig");
 const zones = @import("../lib/game/zones/mod.zig");
 const storage = @import("../lib/game/storage/mod.zig");
+const factories = @import("../lib/game/factories/mod.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 const BulletPool = combat.BulletPool;
-const EntityIterator = storage.hex_archetypes.EntityIterator;
+const EntityIterator = storage.EntityIterator;
 
 // Logging setup
 const Logger = @import("../lib/debug/logger.zig").Logger;
@@ -122,72 +123,6 @@ const PlayerStorage = storage.PlayerStorage(MAX_ENTITIES_PER_ARCHETYPE);
 const UnitStorage = storage.UnitStorage(MAX_ENTITIES_PER_ARCHETYPE, Unit);
 
 const ProjectileStorage = storage.ProjectileStorage(MAX_ENTITIES_PER_ARCHETYPE, HexProjectile);
-
-    pub fn init() ProjectileStorage {
-        return .{
-            .entities = [_]EntityId{INVALID_ENTITY} ** MAX_ENTITIES_PER_ARCHETYPE,
-            .transforms = undefined,
-            .projectiles = undefined,
-            .visuals = undefined,
-            .count = 0,
-        };
-    }
-
-    pub fn addEntity(self: *ProjectileStorage, entity: EntityId, transform: Transform, projectile: HexProjectile, visual: Visual) !void {
-        if (self.count >= MAX_ENTITIES_PER_ARCHETYPE) return error.StorageFull;
-        const index = self.count;
-        self.entities[index] = entity;
-        self.transforms[index] = transform;
-        self.projectiles[index] = projectile;
-        self.visuals[index] = visual;
-        self.count += 1;
-    }
-
-    pub fn removeEntity(self: *ProjectileStorage, entity: EntityId) void {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity) {
-                const last = self.count - 1;
-                self.entities[i] = self.entities[last];
-                self.transforms[i] = self.transforms[last];
-                self.projectiles[i] = self.projectiles[last];
-                self.visuals[i] = self.visuals[last];
-                self.count -= 1;
-                return;
-            }
-        }
-    }
-
-    pub fn entityIterator(self: *const ProjectileStorage) EntityIterator {
-        return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
-    }
-
-    pub fn clear(self: *ProjectileStorage) void {
-        self.count = 0;
-    }
-
-    pub fn containsEntity(self: *const ProjectileStorage, entity_id: EntityId) bool {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) return true;
-        }
-        return false;
-    }
-
-    pub fn getComponentMut(self: *ProjectileStorage, entity_id: EntityId, comptime component_type: enum { transform, projectile, visual }) ?*(switch (component_type) {
-        .transform => Transform,
-        .projectile => HexProjectile,
-        .visual => Visual,
-    }) {
-        for (0..self.count) |i| {
-            if (self.entities[i] == entity_id) {
-                return switch (component_type) {
-                    .transform => &self.transforms[i],
-                    .projectile => &self.projectiles[i],
-                    .visual => &self.visuals[i],
-                };
-            }
-        }
-        return null;
-    }
 
 const ObstacleStorage = storage.TerrainStorage(MAX_ENTITIES_PER_ARCHETYPE);
 
@@ -405,14 +340,12 @@ pub const HexGame = struct {
         else
             constants.COLOR_LIFESTONE_UNATTUNED;
 
-        // Create lifestone with explicit attunement
-        const transform = Transform.init(pos, radius);
-        const visual = Visual.init(color);
-        const terrain = Terrain.init(.altar, Vec2{ .x = radius * 2, .y = radius * 2 });
-        var interactable = Interactable.init(.transformable);
-        interactable.attuned = attuned;
+        // Use generic factory pattern for lifestone creation
+        var config = factories.EntityFactory.InteractiveConfig.lifestone(pos, radius, color);
+        config.attuned = attuned;
+        const components_data = factories.EntityFactory.ComponentBuilders.buildInteractiveComponents(config);
 
-        try zone.lifestones.addEntity(entity, transform, visual, terrain, interactable);
+        try zone.lifestones.addEntity(entity, components_data.transform, components_data.visual, components_data.terrain, components_data.interactable);
         zone.entity_count += 1;
 
         self.logger.debug("lifestone_created", "Created lifestone in zone {} at {any}, attuned: {}", .{ zone_index, pos, attuned });
@@ -426,12 +359,18 @@ pub const HexGame = struct {
         const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
-        const transform = Transform.init(pos, radius);
-        const health = Health.init(50);
-        const unit = Unit.init(.enemy, pos, behavior); // Use provided behavior
-        const visual = Visual.init(constants.COLOR_UNIT_DEFAULT);
+        // Use generic factory for base components, add hex-specific unit
+        const config = factories.EntityFactory.UnitConfig{
+            .position = pos,
+            .radius = radius,
+            .health_max = 50,
+            .behavior_type = .idle, // Generic type, actual behavior in HexUnit
+            .color = constants.COLOR_UNIT_DEFAULT,
+        };
+        const base_components = factories.EntityFactory.ComponentBuilders.buildBaseUnitComponents(config);
+        const unit = Unit.init(.enemy, pos, behavior); // Hex-specific HexUnit
 
-        try zone.units.addEntity(entity, transform, health, unit, visual);
+        try zone.units.addEntity(entity, base_components.transform, base_components.health, unit, base_components.visual);
         zone.entity_count += 1;
 
         return entity;
@@ -443,14 +382,16 @@ pub const HexGame = struct {
         const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
-        const terrain_type: Terrain.TerrainType = if (is_deadly) .pit else .wall;
         const color = if (is_deadly) constants.COLOR_OBSTACLE_DEADLY else constants.COLOR_OBSTACLE_BLOCKING;
 
-        const transform = Transform.init(pos, 0);
-        const terrain = Terrain.init(terrain_type, size);
-        const visual = Visual.init(color);
+        // Use generic factory pattern for obstacle creation
+        const config = if (is_deadly)
+            factories.EntityFactory.TerrainConfig.pit(pos, size, color)
+        else
+            factories.EntityFactory.TerrainConfig.wall(pos, size, color);
+        const components_data = factories.EntityFactory.ComponentBuilders.buildTerrainComponents(config);
 
-        try zone.obstacles.addEntity(entity, transform, terrain, visual);
+        try zone.obstacles.addEntity(entity, components_data.transform, components_data.terrain, components_data.visual);
         zone.entity_count += 1;
 
         return entity;
@@ -462,13 +403,11 @@ pub const HexGame = struct {
         const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
-        const transform = Transform.init(pos, radius);
-        const visual = Visual.init(constants.COLOR_PORTAL);
-        const terrain = Terrain.init(.altar, Vec2{ .x = radius * 2, .y = radius * 2 });
-        var interactable = Interactable.init(.transformable);
-        interactable.destination_zone = destination;
+        // Use generic factory pattern for portal creation
+        const config = factories.EntityFactory.InteractiveConfig.portal(pos, radius, destination, constants.COLOR_PORTAL);
+        const components_data = factories.EntityFactory.ComponentBuilders.buildInteractiveComponents(config);
 
-        try zone.portals.addEntity(entity, transform, visual, terrain, interactable);
+        try zone.portals.addEntity(entity, components_data.transform, components_data.visual, components_data.terrain, components_data.interactable);
         zone.entity_count += 1;
 
         return entity;
@@ -478,13 +417,17 @@ pub const HexGame = struct {
         const zone = self.getCurrentZone();
         const entity = self.entity_allocator.create();
 
-        const transform = Transform.init(pos, radius);
-        const health = Health.init(100);
-        const player_input = PlayerInput.init(0);
-        const visual = Visual.init(constants.COLOR_PLAYER_ALIVE);
-        const movement = Movement.init(constants.PLAYER_SPEED);
+        // Use generic factory pattern for player creation
+        const config = factories.EntityFactory.PlayerConfig{
+            .position = pos,
+            .radius = radius,
+            .health_max = 100,
+            .speed = constants.PLAYER_SPEED,
+            .color = constants.COLOR_PLAYER_ALIVE,
+        };
+        const components_data = factories.EntityFactory.ComponentBuilders.buildPlayerComponents(config);
 
-        try zone.players.addEntity(entity, transform, health, player_input, visual, movement);
+        try zone.players.addEntity(entity, components_data.transform, components_data.health, components_data.player_input, components_data.visual, components_data.movement);
         zone.entity_count += 1;
 
         self.player_entity = entity;
@@ -494,18 +437,20 @@ pub const HexGame = struct {
         return entity;
     }
 
-    pub fn createProjectile(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32) !EntityId {
+    pub fn createProjectile(self: *HexGame, zone_index: usize, pos: Vec2, _: f32, velocity: Vec2, lifetime: f32) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
         const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
-        var transform = Transform.init(pos, radius);
-        transform.vel = velocity;
+        // Use generic factory for projectile base, add hex-specific damage
+        const config = factories.EntityFactory.ProjectileConfig.bullet(pos, velocity, constants.BULLET_DAMAGE);
+        const base_components = factories.EntityFactory.ComponentBuilders.buildProjectileComponents(config, entity);
+        
+        // Create hex-specific projectile with damage
         const projectile = Projectile.init(entity, lifetime, constants.BULLET_DAMAGE);
-        const visual = Visual.init(constants.COLOR_BULLET);
 
-        try zone.projectiles.addEntity(entity, transform, projectile, visual);
+        try zone.projectiles.addEntity(entity, base_components.transform, projectile, base_components.visual);
         zone.entity_count += 1;
 
         return entity;

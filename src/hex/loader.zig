@@ -66,6 +66,11 @@ pub fn loadGameData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame) !
         // Then load detailed data
         try loadZone(game.zone_manager.getZone(i), zone_data, game, i);
     }
+    
+    // Load portals from current zone into portal system
+    game.portal_system.loadPortalsFromZone(game) catch |err| {
+        loggers.getGameLog().err("portal_load_failed", "Failed to load portals after game data loading: {}", .{err});
+    };
 }
 
 // Load a single zone from ZON data
