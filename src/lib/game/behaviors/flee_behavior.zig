@@ -75,12 +75,7 @@ pub const FleeState = struct {
         }
     }
 
-    /// Update flee timer and state using context
-    pub fn updateWithContext(self: *FleeState, context: anytype, use_timer: bool) void {
-        const ContextUtils = @import("../contexts/context_utils.zig").ContextUtils;
-        const dt = ContextUtils.effectiveDeltaTime(context);
-        self.update(dt, use_timer);
-    }
+    // Deprecated: Use update() directly with deltaTime from FrameContext
 };
 
 /// Result of flee behavior evaluation
@@ -164,20 +159,7 @@ pub fn evaluateFlee(
     return result;
 }
 
-/// Context-aware version of evaluateFlee
-pub fn evaluateFleeWithContext(
-    unit_pos: Vec2,
-    threat_pos: Vec2,
-    threat_active: bool,
-    state: *FleeState,
-    config: FleeConfig,
-    speed_multiplier: f32,
-    context: anytype,
-) FleeResult {
-    const ContextUtils = @import("../contexts/context_utils.zig").ContextUtils;
-    const dt = ContextUtils.effectiveDeltaTime(context);
-    return evaluateFlee(unit_pos, threat_pos, threat_active, state, config, speed_multiplier, dt);
-}
+// Deprecated: Use evaluateFlee() directly with deltaTime from FrameContext
 
 /// Simplified flee behavior for basic AI (stateless)
 pub fn simpleFlee(

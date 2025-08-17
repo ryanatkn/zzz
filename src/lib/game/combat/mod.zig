@@ -5,7 +5,6 @@
 pub const combat_actions = @import("combat_actions.zig");
 pub const damage_system = @import("damage_system.zig");
 pub const targeting = @import("targeting.zig");
-pub const combat_context = @import("combat_context.zig");
 
 // Re-export key types for convenience
 pub const CombatActions = combat_actions.CombatActions;
@@ -20,9 +19,6 @@ pub const Targeting = targeting.Targeting;
 pub const TargetSelection = targeting.TargetSelection;
 pub const AoETargeting = targeting.AoETargeting;
 
-pub const CombatContext = combat_context.CombatContext;
-pub const CombatActionBuilder = combat_context.CombatActionBuilder;
-pub const CombatHelpers = combat_context.CombatHelpers;
 
 // Commonly used types
 pub const ShootConfig = combat_actions.CombatActions.ShootConfig;

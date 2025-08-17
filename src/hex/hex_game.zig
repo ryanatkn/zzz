@@ -4,11 +4,9 @@ const colors = @import("../lib/core/colors.zig");
 const constants = @import("constants.zig");
 const combat = @import("combat.zig");
 const object_pools = @import("../lib/core/object_pools.zig");
-const HexGameContext = @import("hex_context.zig").HexGameContext;
 const components = @import("../lib/game/components.zig");
 const zones = @import("../lib/game/zones/mod.zig");
 const storage = @import("../lib/game/storage/mod.zig");
-const factories = @import("../lib/game/factories/mod.zig");
 const world = @import("../lib/game/world/mod.zig");
 
 const Vec2 = math.Vec2;
@@ -401,12 +399,15 @@ pub const HexGame = struct {
         else
             constants.COLOR_LIFESTONE_UNATTUNED;
 
-        // Use generic factory pattern for lifestone creation
-        var config = factories.EntityFactory.InteractiveConfig.lifestone(pos, radius, color);
-        config.attuned = attuned;
-        const components_data = factories.EntityFactory.ComponentBuilders.buildInteractiveComponents(config);
+        // Create components directly
+        const transform = components.Transform.init(pos, radius);
+        const visual = components.Visual.init(color);
+        const terrain = components.Terrain.init(.floor, Vec2.init(radius * 2, radius * 2));
+        var interactable = components.Interactable.init(.deflectable);
+        interactable.state = .normal; // Use available state
+        interactable.attuned = attuned; // Set attuned field directly
 
-        try zone.lifestones.addEntity(entity, components_data.transform, components_data.visual, components_data.terrain, components_data.interactable);
+        try zone.lifestones.addEntity(entity, transform, visual, terrain, interactable);
         zone.entity_count += 1;
 
         self.logger.debug("lifestone_created", "Created lifestone in zone {} at {any}, attuned: {}", .{ zone_index, pos, attuned });
@@ -420,18 +421,13 @@ pub const HexGame = struct {
         const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
-        // Use generic factory for base components, add hex-specific unit
-        const config = factories.EntityFactory.UnitConfig{
-            .position = pos,
-            .radius = radius,
-            .health_max = 50,
-            .behavior_type = .idle, // Generic type, actual behavior in HexUnit
-            .color = constants.COLOR_UNIT_DEFAULT,
-        };
-        const base_components = factories.EntityFactory.ComponentBuilders.buildBaseUnitComponents(config);
+        // Create components directly
+        const transform = components.Transform.init(pos, radius);
+        const health = components.Health.init(50);
+        const visual = components.Visual.init(constants.COLOR_UNIT_DEFAULT);
         const unit = Unit.init(.enemy, pos, behavior); // Hex-specific HexUnit
 
-        try zone.units.addEntity(entity, base_components.transform, base_components.health, unit, base_components.visual);
+        try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;
 
         return entity;
@@ -446,13 +442,14 @@ pub const HexGame = struct {
         const color = if (is_deadly) constants.COLOR_OBSTACLE_DEADLY else constants.COLOR_OBSTACLE_BLOCKING;
 
         // Use generic factory pattern for obstacle creation
-        const config = if (is_deadly)
-            factories.EntityFactory.TerrainConfig.pit(pos, size, color)
-        else
-            factories.EntityFactory.TerrainConfig.wall(pos, size, color);
-        const components_data = factories.EntityFactory.ComponentBuilders.buildTerrainComponents(config);
+        // Create components directly
+        const radius = @max(size.x, size.y) / 2.0; // Convert size to radius
+        const transform = components.Transform.init(pos, radius);
+        const terrain_type: components.Terrain.TerrainType = if (is_deadly) .pit else .wall;
+        const terrain = components.Terrain.init(terrain_type, size);
+        const visual = components.Visual.init(color);
 
-        try zone.obstacles.addEntity(entity, components_data.transform, components_data.terrain, components_data.visual);
+        try zone.obstacles.addEntity(entity, transform, terrain, visual);
         zone.entity_count += 1;
 
         return entity;
@@ -465,10 +462,14 @@ pub const HexGame = struct {
         const entity = self.entity_allocator.create();
 
         // Use generic factory pattern for portal creation
-        const config = factories.EntityFactory.InteractiveConfig.portal(pos, radius, destination, constants.COLOR_PORTAL);
-        const components_data = factories.EntityFactory.ComponentBuilders.buildInteractiveComponents(config);
+        // Create components directly
+        const transform = components.Transform.init(pos, radius);
+        const visual = components.Visual.init(constants.COLOR_PORTAL);
+        const terrain = components.Terrain.init(.floor, Vec2.init(radius * 2, radius * 2));
+        var interactable = components.Interactable.init(.deflectable);
+        interactable.destination_zone = destination;
 
-        try zone.portals.addEntity(entity, components_data.transform, components_data.visual, components_data.terrain, components_data.interactable);
+        try zone.portals.addEntity(entity, transform, visual, terrain, interactable);
         zone.entity_count += 1;
 
         return entity;
@@ -478,17 +479,14 @@ pub const HexGame = struct {
         const zone = self.getCurrentZone();
         const entity = self.entity_allocator.create();
 
-        // Use generic factory pattern for player creation
-        const config = factories.EntityFactory.PlayerConfig{
-            .position = pos,
-            .radius = radius,
-            .health_max = 100,
-            .speed = constants.PLAYER_SPEED,
-            .color = constants.COLOR_PLAYER_ALIVE,
-        };
-        const components_data = factories.EntityFactory.ComponentBuilders.buildPlayerComponents(config);
+        // Create components directly
+        const transform = components.Transform.init(pos, radius);
+        const health = components.Health.init(100);
+        const player_input = components.PlayerInput.init(0); // Controller ID 0
+        const visual = components.Visual.init(constants.COLOR_PLAYER_ALIVE);
+        const movement = components.Movement.init(constants.PLAYER_SPEED);
 
-        try zone.players.addEntity(entity, components_data.transform, components_data.health, components_data.player_input, components_data.visual, components_data.movement);
+        try zone.players.addEntity(entity, transform, health, player_input, visual, movement);
         zone.entity_count += 1;
 
         self.player_entity = entity;
@@ -504,14 +502,15 @@ pub const HexGame = struct {
         const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
-        // Use generic factory for projectile base, add hex-specific damage
-        const config = factories.EntityFactory.ProjectileConfig.bullet(pos, velocity, constants.BULLET_DAMAGE);
-        const base_components = factories.EntityFactory.ComponentBuilders.buildProjectileComponents(config, entity);
+        // Create components directly  
+        var transform = components.Transform.init(pos, 3.0); // Small bullet radius
+        transform.vel = velocity;
+        const visual = components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 }); // Yellow bullet
         
         // Create hex-specific projectile with damage
         const projectile = Projectile.init(entity, lifetime, constants.BULLET_DAMAGE);
 
-        try zone.projectiles.addEntity(entity, base_components.transform, projectile, base_components.visual);
+        try zone.projectiles.addEntity(entity, transform, projectile, visual);
         zone.entity_count += 1;
 
         return entity;
@@ -707,9 +706,8 @@ pub const HexGame = struct {
     }
 
     /// Context-aware projectiles update function  
-    pub fn updateProjectiles(self: *HexGame, context: HexGameContext) void {
-        const contexts = @import("../lib/game/contexts/mod.zig");
-        const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
+    pub fn updateProjectiles(self: *HexGame, frame_ctx: @import("../lib/core/frame.zig").FrameContext) void {
+        const deltaTime = frame_ctx.effectiveDelta();
         
         const zone = self.getCurrentZone();
 
@@ -830,9 +828,8 @@ pub const HexGame = struct {
     }
 
     /// Context-aware bullet pool update function
-    pub fn updateBulletPool(self: *HexGame, context: HexGameContext) void {
-        const contexts = @import("../lib/game/contexts/mod.zig");
-        const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
+    pub fn updateBulletPool(self: *HexGame, frame_ctx: @import("../lib/core/frame.zig").FrameContext) void {
+        const deltaTime = frame_ctx.effectiveDelta();
         self.bullet_pool.update(deltaTime);
     }
 

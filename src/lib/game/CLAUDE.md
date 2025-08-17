@@ -9,9 +9,9 @@ This directory contains reusable game systems and utilities designed to be extre
 ## What's Here
 
 ### Core Helpers
-- `cooldowns.zig` - Simple cooldown timers for abilities
+- `timer_patterns.zig` - Unified timer patterns for abilities (replaces cooldowns.zig)
 - `components.zig` - Basic component definitions (Transform, Health, Visual, etc.)
-- `ecs.zig` - Minimal exports, just EntityId = u32
+- EntityId defined in `mod.zig` - Simple u32 entity identification
 - `mod.zig` - Main module exports
 
 ### Behaviors
@@ -49,13 +49,16 @@ This directory contains reusable game systems and utilities designed to be extre
 
 ## What Was Removed
 
-We deleted the over-engineered ECS system including:
+We deleted over-engineered systems including:
 - Complex archetype storage with metaprogramming
 - Dynamic component/system registries  
 - Entity generation tracking and recycling
 - Multi-layer Game→Zone→World abstractions
 - Complex persistence and event systems
 - State management with caching
+- **Context system** - 5-layer parameter bundling (UpdateContext, InputContext, GraphicsContext, PhysicsContext, GameContext)
+- **Factory system** - Unnecessary indirection for entity creation (54 files removed)
+- **ecs.zig** - Minimal module that just re-exported EntityId
 
 ## Design Philosophy
 
@@ -75,6 +78,7 @@ We deleted the over-engineered ECS system including:
 const timer_patterns = @import("lib/game/timer_patterns.zig");
 const bullet_pool = @import("lib/game/projectiles/bullet_pool.zig");
 const spell_slots = @import("lib/game/abilities/spell_slots.zig");
+const FrameContext = @import("lib/core/frame.zig").FrameContext;
 
 // Your game provides the implementation
 const MySpell = struct {
@@ -83,15 +87,23 @@ const MySpell = struct {
     damage: f32,
     effect_type: MyEffectType,
 };
+
+// Use FrameContext for timing instead of complex context system
+pub fn updateMySystem(frame_ctx: FrameContext, input_state: InputState) void {
+    const deltaTime = frame_ctx.effectiveDelta(); // Respects pause state
+    // ... update logic
+}
 ```
 
 ### How Hex Game Uses These Systems
 
 The hex game demonstrates proper usage:
 - Uses `bullet_pool.zig` for combat system
-- Uses `timer_patterns.zig` for spell cooldowns
+- Uses `timer_patterns.zig` for spell cooldowns  
 - Uses `control/` for AI integration
 - Uses `abilities/` for spell casting and effect management
+- Uses `FrameContext` for clean timing/pause handling
+- Creates components directly instead of using factories
 - Implements hex-specific logic (zones, portals, specific spells) in `src/hex/`
 
 ## Separation of Concerns

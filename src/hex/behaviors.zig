@@ -3,7 +3,6 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const hex_game_mod = @import("hex_game.zig");
 const behaviors_mod = @import("../lib/game/behaviors/mod.zig");
-const HexGameContext = @import("hex_context.zig").HexGameContext;
 
 // Import all behavior types from the library
 const chase_behavior = behaviors_mod.chase_behavior;
@@ -193,10 +192,9 @@ pub fn updateUnitWithAggroMod(
     player_pos: Vec2,
     player_alive: bool,
     aggro_multiplier: f32,
-    context: HexGameContext,
+    frame_ctx: @import("../lib/core/frame.zig").FrameContext,
 ) void {
-    const contexts = @import("../lib/game/contexts/mod.zig");
-    const dt = contexts.ContextUtils.effectiveDeltaTime(context);
+    const dt = frame_ctx.effectiveDelta();
     
     // Determine behavior profile for this unit
     const profile = determineBehaviorProfile(unit_comp);

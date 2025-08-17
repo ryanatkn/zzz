@@ -3,22 +3,15 @@
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const loggers = @import("../lib/debug/loggers.zig");
-const HexGameContext = @import("hex_context.zig").HexGameContext;
 
-/// Update portal system (replaces updatePortalCooldown)
-pub fn updatePortalCooldown(context: HexGameContext) void {
-    const game_state = context.game_state orelse return;
-    const world = &game_state.hex_game;
-    const contexts = @import("../lib/game/contexts/mod.zig");
-    const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
-    
+/// Update portal system with frame context
+pub fn updatePortalCooldown(world: *@import("hex_game.zig").HexGame, frame_ctx: @import("../lib/core/frame.zig").FrameContext) void {
+    const deltaTime = frame_ctx.effectiveDelta();
     world.zone_travel_manager.update(deltaTime);
 }
 
 /// Check portal collisions using generic system (replaces 80+ lines of manual collision detection)
-pub fn checkPortalCollisions(context: HexGameContext) bool {
-    const game_state = context.game_state orelse return false;
-    const world = &game_state.hex_game;
+pub fn checkPortalCollisions(world: *@import("hex_game.zig").HexGame) bool {
 
     if (!world.getPlayerAlive()) {
         return false;

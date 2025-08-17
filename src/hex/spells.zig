@@ -7,7 +7,6 @@ const hex_game_mod = @import("hex_game.zig");
 const game_abilities = @import("../lib/game/abilities/mod.zig");
 const spell_casting = game_abilities.spell_casting;
 const effect_manager = game_abilities.effect_manager;
-const HexGameContext = @import("hex_context.zig").HexGameContext;
 
 const Vec2 = math.Vec2;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
@@ -67,11 +66,9 @@ pub const SpellSystem = struct {
         return system;
     }
 
-    /// Context-aware spell system update function
-    pub fn update(self: *SpellSystem, context: HexGameContext) void {
-        const contexts = @import("../lib/game/contexts/mod.zig");
-        const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
-        
+    /// Spell system update function with frame context
+    pub fn update(self: *SpellSystem, frame_ctx: @import("../lib/core/frame.zig").FrameContext) void {
+        const deltaTime = frame_ctx.effectiveDelta();
         // Update all spell cooldowns using generic system
         self.slot_system.update(deltaTime);
 

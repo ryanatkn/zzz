@@ -8,8 +8,6 @@ pub const timer_patterns = @import("timer_patterns.zig");
 // Behaviors
 pub const behaviors = @import("behaviors/mod.zig");
 
-// Context system for structured parameter passing
-pub const contexts = @import("contexts/mod.zig");
 
 // Combat systems
 pub const combat = @import("combat/mod.zig");
@@ -28,7 +26,6 @@ pub const input = @import("input/mod.zig");
 pub const zones = @import("zones/mod.zig");
 pub const storage = @import("storage/mod.zig");
 pub const world = @import("world/mod.zig");
-pub const factories = @import("factories/mod.zig");
 
 // Simple entity ID type - games can define their own if needed
 pub const EntityId = u32;

@@ -390,37 +390,8 @@ pub fn updateUnitBehavior(
     return result;
 }
 
-/// Context-aware version of updateUnitBehavior that extracts dt from context
-pub fn updateUnitBehaviorWithContext(
-    unit_pos: Vec2,
-    target_pos: ?Vec2,
-    target_alive: bool,
-    threat_pos: ?Vec2,
-    threat_active: bool,
-    home_pos: Vec2,
-    aggro_multiplier: f32,
-    speed_multiplier: f32,
-    context: anytype,
-    state: *UnitBehaviorState,
-    config: UnitBehaviorConfig,
-) UnitBehaviorResult {
-    const ContextUtils = @import("../contexts/context_utils.zig").ContextUtils;
-    const dt = ContextUtils.effectiveDeltaTime(context);
-    
-    const behavior_context = BehaviorContext{
-        .unit_pos = unit_pos,
-        .target_pos = target_pos,
-        .target_alive = target_alive,
-        .threat_pos = threat_pos,
-        .threat_active = threat_active,
-        .home_pos = home_pos,
-        .aggro_multiplier = aggro_multiplier,
-        .speed_multiplier = speed_multiplier,
-        .dt = dt,
-    };
-    
-    return updateUnitBehavior(behavior_context, state, config);
-}
+// Deprecated: Use updateUnitBehavior() directly with FrameContext.effectiveDelta()
+// This function existed for the old complex context system
 
 /// Apply unit behavior result to transform and visual components
 /// This is a generic helper that games can customize

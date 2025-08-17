@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const components = @import("../components.zig");
-const factories = @import("../factories/mod.zig");
 
 const Vec2 = math.Vec2;
 
@@ -39,19 +38,6 @@ pub const CombatActions = struct {
     /// Check if shooting is possible
     pub fn canShoot(config: ShootConfig) bool {
         return config.can_shoot;
-    }
-    
-    /// Calculate projectile factory config from shoot config
-    pub fn projectileConfigFromShoot(config: ShootConfig, _: u32) factories.EntityFactory.ProjectileConfig {
-        const velocity = calculateProjectileVelocity(config);
-        return factories.EntityFactory.ProjectileConfig.withCustom(
-            config.shooter_pos,
-            velocity,
-            config.projectile_radius,
-            config.projectile_lifetime,
-            config.damage,
-            .{ .r = 255, .g = 255, .b = 0, .a = 255 }, // Default yellow bullet
-        );
     }
 };
 
