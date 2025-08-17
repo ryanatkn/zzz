@@ -11,7 +11,9 @@ const menu_text = @import("../lib/ui/menu_text.zig");
 const drawing = @import("../lib/rendering/drawing.zig");
 const font_grid_test_page = @import("../menu/font_grid_test/+page.zig");
 const ide_page = @import("../menu/ide/+page.zig");
+const ide_constants = @import("../menu/ide/constants.zig");
 const directory_scanner = @import("../lib/platform/directory_scanner.zig");
+const syntax_highlighter = @import("../menu/ide/syntax_highlighter.zig");
 const bitmap_simple = @import("../lib/font/renderers/bitmap_simple.zig");
 
 const Color = colors.Color;
@@ -271,11 +273,11 @@ pub const BrowserRenderer = struct {
         const screen_size = self.getScreenSize();
         
         // Dashboard layout - optimized for 2560x1440+ displays
-        const header_height: f32 = 60;
-        const panel_gap: f32 = 8;
-        const explorer_width: f32 = 300;
-        const max_content_width: f32 = 800;
-        const preview_width: f32 = 400;
+        const header_height = ide_constants.LAYOUT.HEADER_HEIGHT;
+        const panel_gap = ide_constants.LAYOUT.PANEL_GAP;
+        const explorer_width = ide_constants.LAYOUT.EXPLORER_WIDTH;
+        const max_content_width = ide_constants.LAYOUT.MAX_CONTENT_WIDTH;
+        const preview_width = ide_constants.LAYOUT.PREVIEW_WIDTH;
         
         // Calculate actual content width based on screen size
         const available_width = screen_size.x - explorer_width - preview_width - (panel_gap * 4);
@@ -286,16 +288,13 @@ pub const BrowserRenderer = struct {
             .position = Vec2{ .x = 0, .y = 0 },
             .size = Vec2{ .x = screen_size.x, .y = header_height },
         };
-        const header_color = Color{ .r = 25, .g = 30, .b = 40, .a = 255 };
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, header_rect.position, header_rect.size, header_color);
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, header_rect.position, header_rect.size, ide_constants.COLORS.HEADER_BG);
         
         // File explorer panel (left)
         const explorer_rect = math.Rectangle{
             .position = Vec2{ .x = panel_gap, .y = header_height + panel_gap },
             .size = Vec2{ .x = explorer_width, .y = screen_size.y - header_height - (panel_gap * 2) },
         };
-        const panel_color = Color{ .r = 35, .g = 40, .b = 50, .a = 255 };
-        const border_color = Color{ .r = 60, .g = 65, .b = 75, .a = 255 };
         
         drawing.drawBorderedRect(
             &self.base_renderer.gpu,
@@ -303,8 +302,8 @@ pub const BrowserRenderer = struct {
             render_pass,
             explorer_rect.position,
             explorer_rect.size,
-            panel_color,
-            border_color,
+            ide_constants.COLORS.PANEL_BG,
+            ide_constants.COLORS.PANEL_BORDER,
             1.0
         );
         
@@ -321,8 +320,8 @@ pub const BrowserRenderer = struct {
             render_pass,
             content_rect.position,
             content_rect.size,
-            panel_color,
-            border_color,
+            ide_constants.COLORS.PANEL_BG,
+            ide_constants.COLORS.PANEL_BORDER,
             1.0
         );
         
@@ -339,8 +338,8 @@ pub const BrowserRenderer = struct {
             render_pass,
             preview_rect.position,
             preview_rect.size,
-            panel_color,
-            border_color,
+            ide_constants.COLORS.PANEL_BG,
+            ide_constants.COLORS.PANEL_BORDER,
             1.0
         );
         
@@ -353,6 +352,10 @@ pub const BrowserRenderer = struct {
         // Render preview panel
         try self.renderPreviewPanel(cmd_buffer, render_pass, ide_page_impl, preview_rect);
             
+        // Add a simple test text to verify font rendering is working
+        self.drawSimpleText(cmd_buffer, render_pass, "*** IDE TEST TEXT ***", 
+            Vec2{ .x = 20, .y = 20 });
+        
         // Draw resolution info in header
         var resolution_buf: [64]u8 = undefined;
         const resolution_text = std.fmt.bufPrint(&resolution_buf, "Resolution: {d}x{d}", .{ @as(u32, @intFromFloat(screen_size.x)), @as(u32, @intFromFloat(screen_size.y)) }) catch "Resolution: Unknown";
@@ -394,25 +397,23 @@ pub const BrowserRenderer = struct {
             
             // Draw selection background
             if (tree_state.isSelected(item.entry)) {
-                const selection_color = Color{ .r = 70, .g = 130, .b = 180, .a = 100 };
                 self.base_renderer.gpu.drawRect(
                     cmd_buffer,
                     render_pass,
                     Vec2{ .x = panel_rect.position.x + 5, .y = item_y - 2 },
                     Vec2{ .x = panel_rect.size.x - 10, .y = 20 },
-                    selection_color
+                    ide_constants.COLORS.SELECTION_BG
                 );
             }
             
             // Draw hover background
             if (tree_state.isHovered(item.entry)) {
-                const hover_color = Color{ .r = 55, .g = 60, .b = 70, .a = 150 };
                 self.base_renderer.gpu.drawRect(
                     cmd_buffer,
                     render_pass,
                     Vec2{ .x = panel_rect.position.x + 5, .y = item_y - 2 },
                     Vec2{ .x = panel_rect.size.x - 10, .y = 20 },
-                    hover_color
+                    ide_constants.COLORS.HOVER_BG
                 );
             }
             
@@ -456,7 +457,7 @@ pub const BrowserRenderer = struct {
                 Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
         } else if (ide_page_impl.current_file_content) |content| {
             // Show file content line by line
-            try self.renderFileContent(cmd_buffer, render_pass, content, panel_rect);
+            try self.renderFileContentWithHighlighting(cmd_buffer, render_pass, content, panel_rect, ide_page_impl);
         } else {
             // No file selected
             self.drawSimpleText(cmd_buffer, render_pass, "Select a file to view its contents", 
@@ -495,7 +496,7 @@ pub const BrowserRenderer = struct {
     /// Draw file type icon
     fn drawFileIcon(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, icon: @import("../lib/ui/file_tree.zig").FileIcon, position: Vec2) !void {
         const icon_color = icon.getColor();
-        const icon_size: f32 = 12;
+        const icon_size = ide_constants.FILE_TREE.ICON_SIZE;
         
         switch (icon) {
             .folder_closed, .folder_open => {
@@ -529,13 +530,18 @@ pub const BrowserRenderer = struct {
         }
     }
     
-    /// Render file content with line wrapping and scrolling
-    fn renderFileContent(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, content: []const u8, panel_rect: math.Rectangle) !void {
-        const line_height: f32 = 16;
-        const char_width: f32 = 8;
+    /// Render file content with syntax highlighting support
+    fn renderFileContentWithHighlighting(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, content: []const u8, panel_rect: math.Rectangle, ide_page_impl: *const ide_page.IDEPage) !void {
+        _ = cmd_buffer;
+        _ = render_pass;
+        const line_height = ide_constants.TEXT.LINE_HEIGHT;
+        const char_width = ide_constants.TEXT.CHAR_WIDTH;
         const start_y = panel_rect.position.y + 40; // Below header
         const max_lines = @as(u32, @intFromFloat((panel_rect.size.y - 50) / line_height)); // Available space for content
         const max_chars_per_line = @as(u32, @intFromFloat((panel_rect.size.x - 20) / char_width)); // Characters that fit
+        
+        // Check if syntax highlighting should be enabled
+        const enable_highlighting = ide_constants.SYNTAX.ENABLE_HIGHLIGHTING and ide_page_impl.*.shouldHighlightCurrentFile();
         
         var line_num: u32 = 0;
         var lines = std.mem.splitScalar(u8, content, '\n');
@@ -556,14 +562,17 @@ pub const BrowserRenderer = struct {
             const line_num_text = std.fmt.bufPrint(&line_num_buf, "{d}:", .{line_num + 1}) catch "?:";
             
             // Line numbers in darker color
-            const line_num_color = Color{ .r = 120, .g = 120, .b = 120, .a = 255 };
-            self.drawTextWithColor(cmd_buffer, render_pass, line_num_text, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = y_pos }, line_num_color);
+            self.drawTextWithColor(line_num_text, 
+                Vec2{ .x = panel_rect.position.x + 10, .y = y_pos }, ide_constants.COLORS.TEXT_LINE_NUMBERS);
             
-            // File content in normal color  
-            const content_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
-            self.drawTextWithColor(cmd_buffer, render_pass, display_line,
-                Vec2{ .x = panel_rect.position.x + 50, .y = y_pos }, content_color);
+            // Render line content with or without syntax highlighting
+            const line_start_x = panel_rect.position.x + ide_constants.TEXT.LINE_NUMBER_OFFSET;
+            if (enable_highlighting and display_line.len <= ide_constants.SYNTAX.MAX_HIGHLIGHT_LINE_LENGTH) {
+                try self.renderLineWithHighlighting(display_line, Vec2{ .x = line_start_x, .y = y_pos }, ide_page_impl);
+            } else {
+                // Fallback to normal rendering
+                self.drawTextWithColor(display_line, Vec2{ .x = line_start_x, .y = y_pos }, ide_constants.COLORS.TEXT_NORMAL);
+            }
             
             line_num += 1;
         }
@@ -571,38 +580,76 @@ pub const BrowserRenderer = struct {
         // Show truncation message if content is too long
         if (line_num >= max_lines) {
             const truncate_msg = "... (file truncated for display)";
-            const truncate_color = Color{ .r = 150, .g = 150, .b = 50, .a = 255 };
-            self.drawTextWithColor(cmd_buffer, render_pass, truncate_msg,
+            self.drawTextWithColor(truncate_msg,
                 Vec2{ .x = panel_rect.position.x + 10, .y = start_y + @as(f32, @floatFromInt(max_lines)) * line_height },
-                truncate_color);
+                ide_constants.COLORS.TEXT_TRUNCATION);
+        }
+    }
+    
+    /// Render a single line with syntax highlighting
+    fn renderLineWithHighlighting(self: *BrowserRenderer, line: []const u8, position: Vec2, ide_page_impl: *const ide_page.IDEPage) !void {
+        // Get mutable access to the syntax highlighter
+        const ide_page_mut = @constCast(ide_page_impl);
+        var highlighter = ide_page_mut.*.getSyntaxHighlighter();
+        
+        // Highlight the line
+        const tokens = highlighter.highlightLine(line) catch {
+            // Fallback to normal rendering on error
+            self.drawTextWithColor(line, position, ide_constants.COLORS.TEXT_NORMAL);
+            return;
+        };
+        defer highlighter.freeTokens(tokens);
+        
+        // Render each token with its appropriate color
+        var current_x = position.x;
+        const char_width = ide_constants.TEXT.CHAR_WIDTH;
+        
+        var last_pos: u32 = 0;
+        for (tokens) |token| {
+            // Render any gap between tokens as normal text
+            if (token.start_pos > last_pos) {
+                const gap_text = line[last_pos..token.start_pos];
+                if (gap_text.len > 0) {
+                    self.drawTextWithColor(gap_text, Vec2{ .x = current_x, .y = position.y }, ide_constants.COLORS.TEXT_NORMAL);
+                    current_x += @as(f32, @floatFromInt(gap_text.len)) * char_width;
+                }
+            }
+            
+            // Render the token with its color
+            if (token.text.len > 0) {
+                self.drawTextWithColor(token.text, Vec2{ .x = current_x, .y = position.y }, token.token_type.getColor());
+                current_x += @as(f32, @floatFromInt(token.text.len)) * char_width;
+            }
+            
+            last_pos = token.end_pos;
+        }
+        
+        // Render any remaining text at the end
+        if (last_pos < line.len) {
+            const remaining_text = line[last_pos..];
+            if (remaining_text.len > 0) {
+                self.drawTextWithColor(remaining_text, Vec2{ .x = current_x, .y = position.y }, ide_constants.COLORS.TEXT_NORMAL);
+            }
         }
     }
 
-    /// Draw simple text using basic rectangles (temporary implementation)
+    /// Draw simple text using proper font rendering
     fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2) void {
+        _ = cmd_buffer;
+        _ = render_pass;
         const text_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
-        self.drawTextWithColor(cmd_buffer, render_pass, text, position, text_color);
+        self.drawTextWithColor(text, position, text_color);
     }
     
-    /// Draw text with specified color
-    fn drawTextWithColor(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2, text_color: Color) void {
-        const char_width: f32 = 8;
-        const char_height: f32 = 12;
+    /// Draw text with specified color using MenuTextRenderer (exact same as working buttons)
+    fn drawTextWithColor(self: *BrowserRenderer, text: []const u8, position: Vec2, text_color: Color) void {
+        const log = std.log.scoped(.ide_text);
+        log.debug("IDE text queuing: '{s}' at ({d:.1}, {d:.1}) font_size={d:.1}", .{ text, position.x, position.y, ide_constants.TEXT.CONTENT_FONT_SIZE });
         
-        for (text, 0..) |char, i| {
-            if (char == ' ') continue;
-            
-            const char_x = position.x + @as(f32, @floatFromInt(i)) * char_width;
-            const char_y = position.y;
-            
-            // Draw a simple rectangle for each character
-            self.base_renderer.gpu.drawRect(
-                cmd_buffer,
-                render_pass,
-                Vec2{ .x = char_x, .y = char_y },
-                Vec2{ .x = char_width - 1, .y = char_height },
-                text_color
-            );
-        }
+        // Use the exact same approach as working buttons
+        var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
+        
+        // Use queueCustomText like the working buttons do
+        menu_renderer.queueCustomText(text, position, ide_constants.TEXT.CONTENT_FONT_SIZE, text_color);
     }
 };

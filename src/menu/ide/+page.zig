@@ -9,6 +9,8 @@ const layout = @import("../../lib/ui/layout.zig");
 const reactive = @import("../../lib/reactive/mod.zig");
 const directory_scanner = @import("../../lib/platform/directory_scanner.zig");
 const file_tree = @import("../../lib/ui/file_tree.zig");
+const ide_constants = @import("constants.zig");
+const syntax_highlighter = @import("syntax_highlighter.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -17,6 +19,7 @@ const ComponentProps = @import("../../lib/ui/component.zig").ComponentProps;
 const DirectoryScanner = directory_scanner.DirectoryScanner;
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const FileTreeComponent = file_tree.FileTreeComponent;
+const ZigHighlighter = syntax_highlighter.ZigHighlighter;
 
 pub const IDEPage = struct {
     base: page.Page,
@@ -26,6 +29,9 @@ pub const IDEPage = struct {
     directory_scanner: DirectoryScanner,
     file_tree_component: FileTreeComponent,
     root_directory: ?*DirectoryEntry = null,
+    
+    // Syntax highlighting
+    syntax_highlighter: ZigHighlighter,
     
     // UI state
     initialized: bool = false,
@@ -39,6 +45,108 @@ pub const IDEPage = struct {
     // Display settings
     screen_width: f32 = 2560.0,  // Assume high-res display
     screen_height: f32 = 1440.0,
+
+    /// Get currently selected file entry
+    pub fn getSelectedEntry(self: *const IDEPage) ?*DirectoryEntry {
+        return self.file_tree_component.getSelectedEntry();
+    }
+
+    /// Handle mouse interaction with file tree
+    pub fn handleFileTreeClick(self: *IDEPage, point: Vec2) !bool {
+        // Adjust point to be relative to file explorer panel
+        const explorer_rect = Vec2{ .x = 8 + 8, .y = 60 + 8 + 30 }; // panel position + header + margin
+        const relative_point = Vec2{ 
+            .x = point.x - explorer_rect.x, 
+            .y = point.y - explorer_rect.y 
+        };
+        
+        const clicked = try self.file_tree_component.handleClick(relative_point);
+        
+        // If a file was selected, try to load its content
+        if (clicked) {
+            if (self.getSelectedEntry()) |selected| {
+                if (!selected.metadata.is_directory) {
+                    try self.loadFileContent(selected);
+                }
+            }
+        }
+        
+        return clicked;
+    }
+
+    /// Get current file content for display
+    pub fn getCurrentFileContent(self: *const IDEPage) ?[]const u8 {
+        return self.current_file_content;
+    }
+
+    /// Get current file error for display
+    pub fn getCurrentFileError(self: *const IDEPage) ?[]const u8 {
+        return self.current_file_error;
+    }
+
+    /// Check if current file should be syntax highlighted
+    pub fn shouldHighlightCurrentFile(self: *const IDEPage) bool {
+        if (self.getSelectedEntry()) |selected| {
+            if (!selected.metadata.is_directory) {
+                return syntax_highlighter.shouldHighlight(selected.metadata.name);
+            }
+        }
+        return false;
+    }
+
+    /// Get syntax highlighter reference
+    pub fn getSyntaxHighlighter(self: *IDEPage) *ZigHighlighter {
+        return &self.syntax_highlighter;
+    }
+
+    /// Render the dashboard UI components using the provided renderer  
+    pub fn renderDashboard(self: *IDEPage, renderer: anytype) !void {
+        _ = renderer;
+        if (!self.initialized) return;
+        
+        // TODO: Implement actual dashboard rendering with properly typed components
+        // For now this is a placeholder that will be expanded in later phases
+    }
+
+    /// Load file content safely with size and error handling
+    fn loadFileContent(self: *IDEPage, entry: *DirectoryEntry) !void {
+        // Clear previous content and errors
+        if (self.current_file_content) |old_content| {
+            self.allocator.free(old_content);
+            self.current_file_content = null;
+        }
+        self.current_file_error = null;
+        
+        // Check file size first
+        if (entry.metadata.size > ide_constants.FILE_LIMITS.MAX_FILE_SIZE) {
+            self.current_file_error = "File too large (max 1MB)";
+            return;
+        }
+        
+        // Try to open and read the file
+        const file = std.fs.cwd().openFile(entry.metadata.full_path, .{}) catch |err| {
+            self.current_file_error = switch (err) {
+                error.FileNotFound => "File not found",
+                error.AccessDenied => "Access denied",
+                error.IsDir => "Cannot read directory",
+                else => "Failed to open file",
+            };
+            return;
+        };
+        defer file.close();
+        
+        // Read file content
+        const content = file.readToEndAlloc(self.allocator, ide_constants.FILE_LIMITS.MAX_FILE_SIZE) catch |err| {
+            self.current_file_error = switch (err) {
+                error.OutOfMemory => "Out of memory",
+                error.FileTooBig => "File too large",
+                else => "Failed to read file",
+            };
+            return;
+        };
+        
+        self.current_file_content = content;
+    }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
@@ -58,6 +166,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
         .allocator = allocator,
         .directory_scanner = DirectoryScanner.init(allocator),
         .file_tree_component = FileTreeComponent.init(allocator),
+        .syntax_highlighter = ZigHighlighter.init(allocator),
     };
     return &ide_page.base;
 }
@@ -133,92 +242,3 @@ fn loadDirectory(self: *IDEPage) !void {
     self.loading = false;
 }
 
-/// Get currently selected file entry
-pub fn getSelectedEntry(self: *const IDEPage) ?*DirectoryEntry {
-    return self.file_tree_component.getSelectedEntry();
-}
-
-/// Handle mouse interaction with file tree
-pub fn handleFileTreeClick(self: *IDEPage, point: Vec2) !bool {
-    // Adjust point to be relative to file explorer panel
-    const explorer_rect = Vec2{ .x = 8 + 8, .y = 60 + 8 + 30 }; // panel position + header + margin
-    const relative_point = Vec2{ 
-        .x = point.x - explorer_rect.x, 
-        .y = point.y - explorer_rect.y 
-    };
-    
-    const clicked = try self.file_tree_component.handleClick(relative_point);
-    
-    // If a file was selected, try to load its content
-    if (clicked) {
-        if (self.getSelectedEntry()) |selected| {
-            if (!selected.metadata.is_directory) {
-                try self.loadFileContent(selected);
-            }
-        }
-    }
-    
-    return clicked;
-}
-
-/// Load file content safely with size and error handling
-fn loadFileContent(self: *IDEPage, entry: *DirectoryEntry) !void {
-    // Clear previous content and errors
-    if (self.current_file_content) |old_content| {
-        self.allocator.free(old_content);
-        self.current_file_content = null;
-    }
-    self.current_file_error = null;
-    
-    // Safety limits
-    const MAX_FILE_SIZE = 1024 * 1024; // 1MB limit
-    
-    // Check file size first
-    if (entry.metadata.size > MAX_FILE_SIZE) {
-        self.current_file_error = "File too large (max 1MB)";
-        return;
-    }
-    
-    // Try to open and read the file
-    const file = std.fs.cwd().openFile(entry.metadata.full_path, .{}) catch |err| {
-        self.current_file_error = switch (err) {
-            error.FileNotFound => "File not found",
-            error.AccessDenied => "Access denied",
-            error.IsDir => "Cannot read directory",
-            else => "Failed to open file",
-        };
-        return;
-    };
-    defer file.close();
-    
-    // Read file content
-    const content = file.readToEndAlloc(self.allocator, MAX_FILE_SIZE) catch |err| {
-        self.current_file_error = switch (err) {
-            error.OutOfMemory => "Out of memory",
-            error.FileTooBig => "File too large",
-            else => "Failed to read file",
-        };
-        return;
-    };
-    
-    self.current_file_content = content;
-}
-
-/// Get current file content for display
-pub fn getCurrentFileContent(self: *const IDEPage) ?[]const u8 {
-    return self.current_file_content;
-}
-
-/// Get current file error for display
-pub fn getCurrentFileError(self: *const IDEPage) ?[]const u8 {
-    return self.current_file_error;
-}
-
-/// Render the dashboard UI components using the provided renderer  
-pub fn renderDashboard(self: *IDEPage, renderer: anytype) !void {
-    _ = renderer;
-    if (!self.initialized) return;
-    
-    // TODO: Implement actual dashboard rendering with properly typed components
-    // For now this is a placeholder that will be expanded in later phases
-}
