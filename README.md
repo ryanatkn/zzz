@@ -26,7 +26,7 @@ It treats the web as a backwards compat target and strives for optimal UX and DX
 ## What's inside
 
 - **GPU-accelerated graphics** with SDL3, procedural generation, no texture assets
-- **Reactive UI system** - Svelte 5 inspired UI in Zig
+- **Reactive UI system** - UI system in Zig inspired by Svelte 5 and Solid
 - **Pure Zig font rendering** - TTF parsing and rasterization without external deps
 - **AI control interface** - Memory-mapped automation for testing and demos
 - **Zone-based world** - Travel between areas with persistent state
