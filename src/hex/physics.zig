@@ -2,7 +2,6 @@ const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision.zig");
 const queries = @import("../lib/physics/queries.zig");
-const ecs = @import("../lib/game/ecs.zig");
 const hex_game_mod = @import("hex_game.zig");
 const HexGame = hex_game_mod.HexGame;
 const constants = @import("constants.zig");

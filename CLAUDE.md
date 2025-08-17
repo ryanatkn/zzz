@@ -355,4 +355,5 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 ### AI Control
 - [AI Control System](web/ai_control/README.md) - External automation interface
 
-*Remember: Performance is the top priority -- every cycle and byte count but context is everything.*
+_Remember: Performance is the top priority -- every cycle and byte count
+but context is everything and the big picture UX matters most._

@@ -2,7 +2,6 @@ const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
 const constants = @import("constants.zig");
-const ecs = @import("../lib/game/ecs.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
 const game_abilities = @import("../lib/game/abilities/mod.zig");

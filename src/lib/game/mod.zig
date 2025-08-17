@@ -2,7 +2,6 @@
 /// Engine provides interfaces, games provide implementations
 
 // Core simple helpers
-pub const ecs = @import("ecs.zig");
 pub const components = @import("components.zig");
 pub const timer_patterns = @import("timer_patterns.zig");
 
@@ -31,9 +30,9 @@ pub const storage = @import("storage/mod.zig");
 pub const world = @import("world/mod.zig");
 pub const factories = @import("factories/mod.zig");
 
-// Simple ID generation
-pub const EntityId = ecs.EntityId;
-pub const INVALID_ENTITY = ecs.INVALID_ENTITY;
+// Simple entity ID type - games can define their own if needed
+pub const EntityId = u32;
+pub const INVALID_ENTITY: EntityId = @import("std").math.maxInt(u32);
 
 // Backwards compatibility
 pub const bullet_pool = projectiles;

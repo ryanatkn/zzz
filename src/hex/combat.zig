@@ -5,7 +5,6 @@ const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").Bullet
 const combat = @import("../lib/game/combat/mod.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
-const ecs = @import("../lib/game/ecs.zig");
 const game_systems = @import("../lib/game/systems/mod.zig");
 const HexGameContext = @import("hex_context.zig").HexGameContext;
 
@@ -172,7 +171,7 @@ pub fn handlePlayerDeathOnHazard(world: *HexGame) void {
 }
 
 /// Handle unit death on hazard using generic damage system
-pub fn handleUnitDeathOnHazard(unit_entity: ecs.EntityId, world: *HexGame) void {
+pub fn handleUnitDeathOnHazard(unit_entity: @import("hex_game.zig").EntityId, world: *HexGame) void {
     const zone = world.getCurrentZone();
     
     // Use generic death handling for units
