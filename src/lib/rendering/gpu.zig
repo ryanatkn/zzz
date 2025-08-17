@@ -880,10 +880,6 @@ pub const SimpleGPURenderer = struct {
     }
 
 
-    /// Set tessellation quality for vector graphics
-    pub fn setVectorQuality(self: *Self, quality: enum { fast, medium, high, ultra }) void {
-        self.vector_renderer.setTessellationQuality(quality);
-    }
 
     // Queue a texture-based text for drawing
     pub fn queueTextTexture(self: *Self, texture: *c.sdl.SDL_GPUTexture, position: Vec2, width: u32, height: u32, color: Color) void {

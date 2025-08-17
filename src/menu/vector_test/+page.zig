@@ -57,13 +57,13 @@ const VectorTestPage = struct {
 
         // API examples
         try links.append(page.createLink("Usage Examples:", "", 950, 400, 400, 40));
-        try links.append(page.createLink("renderer.drawVectorCircle(...)", "", 960, 440, 380, 30));
-        try links.append(page.createLink("renderer.drawQuadraticCurve(...)", "", 960, 470, 380, 30));
-        try links.append(page.createLink("renderer.setVectorQuality(.high)", "", 960, 500, 380, 30));
+        try links.append(page.createLink("renderer.drawCircle(...)", "", 960, 440, 380, 30));
+        try links.append(page.createLink("renderer.drawRect(...)", "", 960, 470, 380, 30));
+        try links.append(page.createLink("renderer.drawEffect(...)", "", 960, 500, 380, 30));
 
         // Note about implementation
-        try links.append(page.createLink("NOTE: Vector graphics rendering integrated", "", 50, 600, 500, 40));
-        try links.append(page.createLink("with font system for unified GPU pipeline", "", 50, 630, 500, 30));
+        try links.append(page.createLink("NOTE: Procedural GPU rendering system", "", 50, 600, 500, 40));
+        try links.append(page.createLink("with optimized batching and distance fields", "", 50, 630, 500, 30));
 
         // Navigation
         const center_x = screen_width / 2.0;
