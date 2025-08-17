@@ -15,10 +15,13 @@ With Phase 5's excellent performance foundation (6-7ms frames, optimized batchin
 
 ## Phase 6 Tasks
 
+- CONTROLS
+  - right click to cast spell, left click to use default attack
+
 ### 6A: Enhanced Spell System 🎯
 - [ ] **Expand spell library** - Add 6 new spells for full 8-slot system
   - [ ] Implement "Shield" - Temporary damage immunity bubble
-  - [ ] Implement "Dash" - Fast movement with trail effect  
+  - [ ] Implement "Blink" - Teleport
   - [ ] Implement "Heal" - Restore health with visual feedback
   - [ ] Implement "Lightning" - Chain damage between nearby units
   - [ ] Implement "Freeze" - Slow units in area effect

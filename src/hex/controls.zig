@@ -146,7 +146,8 @@ pub fn handleSDLEvent(
 
             switch (event.button.button) {
                 c.sdl.SDL_BUTTON_LEFT => {
-                    if (game_state.hex_game.getPlayerAlive()) {
+                    // Only shoot if Ctrl is NOT held (Ctrl+click is for movement)
+                    if (game_state.hex_game.getPlayerAlive() and !game_state.input_state.isCtrlHeld()) {
                         // Left-click shooting for single shots (burst mode)
                         game_state.hex_game.logger.info("left_click", "Left click detected at mouse position: {any}", .{game_state.input_state.getMousePos()});
                         const screen_mouse_pos = game_state.input_state.getMousePos();
