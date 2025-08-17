@@ -71,6 +71,9 @@ pub const GameState = struct {
     });
 
     pub fn init(allocator: std.mem.Allocator) !Self {
+        // Initialize behavior system
+        behaviors.initBehaviors();
+        
         return .{
             .hex_game = HexGame.init(allocator),
             .input_state = InputState.init(),
@@ -91,6 +94,7 @@ pub const GameState = struct {
     }
 
     pub fn deinit(self: *Self) void {
+        behaviors.deinitBehaviors();
         self.hex_game.deinit();
         self.logger.deinit();
         if (self.ai_input) |ai| {
@@ -318,7 +322,7 @@ fn updateUnits(game_state: *GameState, deltaTime: f32) void {
                         const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnit(unit_id, zone_storage);
 
                         // Update unit AI behavior using HexGame components
-                        behaviors.updateUnitWithAggroMod_HexGame(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
+                        behaviors.updateUnitWithAggroMod_HexGame(unit_id, unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), deltaTime, aggro_mod);
                     }
 
                     // Check collision with obstacles

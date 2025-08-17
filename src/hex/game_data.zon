@@ -51,20 +51,20 @@
                 // Overworld is now safe - no deadly hazards, only blocking obstacles for navigation challenge
             },
             .units = .{
-                // 12 overworld units positioned around the map avoiding obstacles and portals
+                // 12 overworld units with varied behaviors (ID determines behavior: id%5)
                 // Player spawns at (960, 540) - keep enemies away from center
-                .{ .position = .{ .x = 850.0, .y = 150.0 }, .radius = 8.0 },
-                .{ .position = .{ .x = 1350.0, .y = 300.0 }, .radius = 9.0 },
-                .{ .position = .{ .x = 350.0, .y = 350.0 }, .radius = 7.0 },
-                .{ .position = .{ .x = 1550.0, .y = 450.0 }, .radius = 8.0 },
-                .{ .position = .{ .x = 200.0, .y = 600.0 }, .radius = 9.0 },
-                .{ .position = .{ .x = 1450.0, .y = 650.0 }, .radius = 8.0 },
-                .{ .position = .{ .x = 600.0, .y = 950.0 }, .radius = 7.0 },
-                .{ .position = .{ .x = 1300.0, .y = 950.0 }, .radius = 9.0 },
-                .{ .position = .{ .x = 150.0, .y = 250.0 }, .radius = 8.0 },
-                .{ .position = .{ .x = 1500.0, .y = 150.0 }, .radius = 7.0 },
-                .{ .position = .{ .x = 100.0, .y = 800.0 }, .radius = 8.0 },
-                .{ .position = .{ .x = 1750.0, .y = 850.0 }, .radius = 9.0 },
+                .{ .position = .{ .x = 850.0, .y = 150.0 }, .radius = 8.0 }, // ID 0 -> aggressive (red, relentless chase)
+                .{ .position = .{ .x = 1350.0, .y = 300.0 }, .radius = 9.0 }, // ID 1 -> defensive (orange, flees when approached)
+                .{ .position = .{ .x = 350.0, .y = 350.0 }, .radius = 7.0 }, // ID 2 -> patrolling (blue, follows route around area)
+                .{ .position = .{ .x = 1550.0, .y = 450.0 }, .radius = 8.0 }, // ID 3 -> wandering (cyan, explores randomly)
+                .{ .position = .{ .x = 200.0, .y = 600.0 }, .radius = 9.0 }, // ID 4 -> guardian (purple, protects home area)
+                .{ .position = .{ .x = 1450.0, .y = 650.0 }, .radius = 8.0 }, // ID 5 -> aggressive (red)
+                .{ .position = .{ .x = 600.0, .y = 950.0 }, .radius = 7.0 }, // ID 6 -> defensive (orange)
+                .{ .position = .{ .x = 1300.0, .y = 950.0 }, .radius = 9.0 }, // ID 7 -> patrolling (blue)
+                .{ .position = .{ .x = 150.0, .y = 250.0 }, .radius = 8.0 }, // ID 8 -> wandering (cyan)
+                .{ .position = .{ .x = 1500.0, .y = 150.0 }, .radius = 7.0 }, // ID 9 -> guardian (purple)
+                .{ .position = .{ .x = 100.0, .y = 800.0 }, .radius = 8.0 }, // ID 10 -> aggressive (red)
+                .{ .position = .{ .x = 1750.0, .y = 850.0 }, .radius = 9.0 }, // ID 11 -> defensive (orange)
             },
             .portals = .{
                 // Portals to 6 dungeons arranged in regular hexagon (380px radius)
@@ -128,8 +128,8 @@
                 .{ .position = .{ .x = 1120.0, .y = 700.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
             },
             .units = .{
-                // Southeast Dungeon: 1 unit (largest size) - positioned off-center for better flow
-                .{ .position = .{ .x = 960.0, .y = 250.0 }, .radius = 30.0 },
+                // Southeast Dungeon: 1 boss unit (largest size) - positioned off-center for better flow
+                .{ .position = .{ .x = 960.0, .y = 250.0 }, .radius = 30.0 }, // ID 12 -> patrolling (blue boss, patrols circular chamber)
             },
             .portals = .{
                 // Back to overworld (Southeast dungeon - portal positioned UP-LEFT toward overworld)
@@ -160,8 +160,8 @@
             },
             .units = .{
                 // Southwest Dungeon: 2 units (second largest size)
-                .{ .position = .{ .x = 700.0, .y = 350.0 }, .radius = 25.0 },
-                .{ .position = .{ .x = 1220.0, .y = 650.0 }, .radius = 25.0 },
+                .{ .position = .{ .x = 700.0, .y = 350.0 }, .radius = 25.0 }, // ID 13 -> wandering (cyan, explores triangular layout)
+                .{ .position = .{ .x = 1220.0, .y = 650.0 }, .radius = 25.0 }, // ID 14 -> guardian (purple, guards lower area)
             },
             .portals = .{
                 // Back to overworld (Southwest dungeon - portal positioned UP-RIGHT toward overworld)
@@ -193,10 +193,10 @@
                 .{ .position = .{ .x = 1120.0, .y = 500.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
             },
             .units = .{
-                // West Dungeon: 3 units (medium size)
-                .{ .position = .{ .x = 600.0, .y = 300.0 }, .radius = 20.0 },
-                .{ .position = .{ .x = 1320.0, .y = 400.0 }, .radius = 20.0 },
-                .{ .position = .{ .x = 960.0, .y = 700.0 }, .radius = 20.0 },
+                // West Dungeon: 3 units (medium size) - square chamber combat
+                .{ .position = .{ .x = 600.0, .y = 300.0 }, .radius = 20.0 }, // ID 15 -> aggressive (red, charges across square)
+                .{ .position = .{ .x = 1320.0, .y = 400.0 }, .radius = 20.0 }, // ID 16 -> defensive (orange, retreats to corners)
+                .{ .position = .{ .x = 960.0, .y = 700.0 }, .radius = 20.0 }, // ID 17 -> patrolling (blue, patrols square perimeter)
             },
             .portals = .{
                 // Back to overworld (West dungeon - portal positioned RIGHT toward overworld)
@@ -226,11 +226,11 @@
                 .{ .position = .{ .x = 1220.0, .y = 300.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
             },
             .units = .{
-                // Northwest Dungeon: 4 units (smaller size)
-                .{ .position = .{ .x = 500.0, .y = 400.0 }, .radius = 18.0 },
-                .{ .position = .{ .x = 1420.0, .y = 400.0 }, .radius = 18.0 },
-                .{ .position = .{ .x = 700.0, .y = 600.0 }, .radius = 18.0 },
-                .{ .position = .{ .x = 1220.0, .y = 600.0 }, .radius = 18.0 },
+                // Northwest Dungeon: 4 units (smaller size) - coordinated pack
+                .{ .position = .{ .x = 500.0, .y = 400.0 }, .radius = 18.0 }, // ID 18 -> wandering (cyan, scouts area)
+                .{ .position = .{ .x = 1420.0, .y = 400.0 }, .radius = 18.0 }, // ID 19 -> guardian (purple, central defense)
+                .{ .position = .{ .x = 700.0, .y = 600.0 }, .radius = 18.0 }, // ID 20 -> aggressive (red, flanks from side)
+                .{ .position = .{ .x = 1220.0, .y = 600.0 }, .radius = 18.0 }, // ID 21 -> defensive (orange, supports others)
             },
             .portals = .{
                 // Back to overworld (Northwest dungeon - portal positioned DOWN-RIGHT toward overworld)
@@ -261,12 +261,12 @@
                 .{ .position = .{ .x = 1220.0, .y = 600.0 }, .size = .{ .x = 35.0, .y = 35.0 }, .type = "deadly" },
             },
             .units = .{
-                // Northeast Dungeon: 5 units (small size)
-                .{ .position = .{ .x = 600.0, .y = 300.0 }, .radius = 16.0 },
-                .{ .position = .{ .x = 1320.0, .y = 300.0 }, .radius = 16.0 },
-                .{ .position = .{ .x = 480.0, .y = 500.0 }, .radius = 16.0 },
-                .{ .position = .{ .x = 1440.0, .y = 500.0 }, .radius = 16.0 },
-                .{ .position = .{ .x = 960.0, .y = 700.0 }, .radius = 16.0 },
+                // Northeast Dungeon: 5 units (small size) - swarm tactics
+                .{ .position = .{ .x = 600.0, .y = 300.0 }, .radius = 16.0 }, // ID 22 -> patrolling (blue, forward patrol)
+                .{ .position = .{ .x = 1320.0, .y = 300.0 }, .radius = 16.0 }, // ID 23 -> wandering (cyan, roams widely)
+                .{ .position = .{ .x = 480.0, .y = 500.0 }, .radius = 16.0 }, // ID 24 -> guardian (purple, left guard)
+                .{ .position = .{ .x = 1440.0, .y = 500.0 }, .radius = 16.0 }, // ID 25 -> aggressive (red, right strike)
+                .{ .position = .{ .x = 960.0, .y = 700.0 }, .radius = 16.0 }, // ID 26 -> defensive (orange, rear support)
             },
             .portals = .{
                 // Back to overworld (Northeast dungeon - portal positioned DOWN-LEFT toward overworld)
@@ -297,13 +297,13 @@
                 .{ .position = .{ .x = 1220.0, .y = 500.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
             },
             .units = .{
-                // East Dungeon: 6 units (smallest size) - repositioned for better spacing
-                .{ .position = .{ .x = 450.0, .y = 280.0 }, .radius = 15.0 },
-                .{ .position = .{ .x = 1470.0, .y = 280.0 }, .radius = 15.0 },
-                .{ .position = .{ .x = 450.0, .y = 750.0 }, .radius = 15.0 },
-                .{ .position = .{ .x = 1470.0, .y = 750.0 }, .radius = 15.0 },
-                .{ .position = .{ .x = 800.0, .y = 380.0 }, .radius = 15.0 },
-                .{ .position = .{ .x = 1120.0, .y = 630.0 }, .radius = 15.0 },
+                // East Dungeon: 6 units (smallest size) - overwhelming numbers
+                .{ .position = .{ .x = 450.0, .y = 280.0 }, .radius = 15.0 }, // ID 27 -> patrolling (blue, upper left circuit)
+                .{ .position = .{ .x = 1470.0, .y = 280.0 }, .radius = 15.0 }, // ID 28 -> wandering (cyan, upper right roam)
+                .{ .position = .{ .x = 450.0, .y = 750.0 }, .radius = 15.0 }, // ID 29 -> guardian (purple, lower left guard)
+                .{ .position = .{ .x = 1470.0, .y = 750.0 }, .radius = 15.0 }, // ID 30 -> aggressive (red, lower right rush)
+                .{ .position = .{ .x = 800.0, .y = 380.0 }, .radius = 15.0 }, // ID 31 -> defensive (orange, upper center support)
+                .{ .position = .{ .x = 1120.0, .y = 630.0 }, .radius = 15.0 }, // ID 32 -> patrolling (blue, lower center circuit)
             },
             .portals = .{
                 // Back to overworld (East dungeon - portal positioned DOWN-LEFT toward overworld)

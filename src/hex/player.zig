@@ -1,7 +1,6 @@
 const std = @import("std");
 const hex_world = @import("hex_game.zig");
 const hex_game_mod = @import("hex_game.zig");
-const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
 const math = @import("../lib/math/mod.zig");

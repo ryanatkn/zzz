@@ -2,7 +2,6 @@ const std = @import("std");
 const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
 const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
-const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const ecs = @import("../lib/game/ecs.zig");

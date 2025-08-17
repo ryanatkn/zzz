@@ -10,7 +10,6 @@ const math = @import("../lib/math/mod.zig");
 
 // Game-specific imports
 const constants = @import("constants.zig");
-const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const loader = @import("loader.zig");
 const hud = @import("hud.zig");

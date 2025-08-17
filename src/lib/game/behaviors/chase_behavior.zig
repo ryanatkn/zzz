@@ -1,38 +1,55 @@
 const std = @import("std");
 const Vec2 = @import("../../math/mod.zig").Vec2;
 
-/// Generic chase behavior configuration
+/// Comprehensive chase behavior configuration
 pub const ChaseConfig = struct {
-    /// Maximum distance to detect targets (squared for performance)
-    detection_range_sq: f32,
-    /// Minimum distance to maintain from target (squared)
-    min_distance_sq: f32,
+    /// Maximum distance to detect targets
+    detection_range: f32,
+    /// Minimum distance to maintain from target
+    min_distance: f32,
     /// Speed when chasing
     chase_speed: f32,
     /// How long to continue chasing after losing target (seconds)
     chase_duration: f32,
-    /// Maximum distance to lose target completely (squared)
-    lose_range_sq: f32,
+    /// Multiplier for lose aggro range (e.g., 1.15 = 15% tolerance)
+    lose_range_multiplier: f32 = 1.15,
+    /// Whether to use timer-based chase continuation
+    use_chase_timer: bool = true,
+    /// Whether to track state changes for event handling
+    track_state_changes: bool = true,
     
-    pub fn init(detection_range: f32, min_distance: f32, chase_speed: f32, chase_duration: f32, lose_range: f32) ChaseConfig {
+    pub fn init(detection_range: f32, min_distance: f32, chase_speed: f32, chase_duration: f32, lose_tolerance: f32) ChaseConfig {
         return .{
-            .detection_range_sq = detection_range * detection_range,
-            .min_distance_sq = min_distance * min_distance,
+            .detection_range = detection_range,
+            .min_distance = min_distance,
             .chase_speed = chase_speed,
             .chase_duration = chase_duration,
-            .lose_range_sq = lose_range * lose_range,
+            .lose_range_multiplier = lose_tolerance,
+        };
+    }
+    
+    /// Create a simple chase config without timers or state tracking
+    pub fn simple(detection_range: f32, min_distance: f32, chase_speed: f32) ChaseConfig {
+        return .{
+            .detection_range = detection_range,
+            .min_distance = min_distance,
+            .chase_speed = chase_speed,
+            .chase_duration = 0,
+            .lose_range_multiplier = 1.0,
+            .use_chase_timer = false,
+            .track_state_changes = false,
         };
     }
 };
 
 /// Chase behavior state
 pub const ChaseState = struct {
-    /// Current target position (if any)
-    target_pos: ?Vec2 = null,
-    /// Time remaining in chase mode (seconds)
-    chase_timer: f32 = 0,
     /// Whether currently in active chase
     is_chasing: bool = false,
+    /// Current target position (tracked during chase)
+    target_pos: Vec2 = Vec2.ZERO,
+    /// Time remaining in chase mode (seconds)
+    chase_timer: f32 = 0,
     
     pub fn init() ChaseState {
         return .{};
@@ -40,17 +57,24 @@ pub const ChaseState = struct {
     
     /// Reset to idle state
     pub fn reset(self: *ChaseState) void {
-        self.target_pos = null;
-        self.chase_timer = 0;
         self.is_chasing = false;
+        self.target_pos = Vec2.ZERO;
+        self.chase_timer = 0;
     }
     
-    /// Update chase timer
-    pub fn update(self: *ChaseState, dt: f32) void {
-        if (self.chase_timer > 0) {
+    /// Start chasing a target
+    pub fn startChase(self: *ChaseState, target_pos: Vec2, duration: f32) void {
+        self.is_chasing = true;
+        self.target_pos = target_pos;
+        self.chase_timer = duration;
+    }
+    
+    /// Update chase timer and state
+    pub fn update(self: *ChaseState, dt: f32, use_timer: bool) void {
+        if (use_timer and self.chase_timer > 0) {
             self.chase_timer -= dt;
             if (self.chase_timer <= 0) {
-                self.reset();
+                self.is_chasing = false;
             }
         }
     }
@@ -66,6 +90,8 @@ pub const ChaseResult = struct {
     lost_target: bool,
     /// Whether currently in chase mode
     is_chasing: bool,
+    /// Whether chase state changed this frame (optional tracking)
+    state_changed: bool = false,
 };
 
 /// Evaluate chase behavior for a unit
@@ -83,15 +109,19 @@ pub fn evaluateChase(
         .detected_target = false,
         .lost_target = false,
         .is_chasing = false,
+        .state_changed = false,
     };
     
-    // Update chase timer
-    state.update(dt);
+    const old_chase_state = state.is_chasing;
+    
+    // Update chase timer if enabled
+    state.update(dt, config.use_chase_timer);
     
     // If target is not alive, abandon chase
     if (!target_alive) {
         if (state.is_chasing) {
             result.lost_target = true;
+            if (config.track_state_changes) result.state_changed = true;
         }
         state.reset();
         return result;
@@ -100,16 +130,15 @@ pub fn evaluateChase(
     const to_target = target_pos.sub(chaser_pos);
     const dist_sq = to_target.lengthSquared();
     
-    // Apply aggro multiplier to detection range
-    const effective_detection_sq = config.detection_range_sq * aggro_multiplier * aggro_multiplier;
-    const effective_lose_sq = config.lose_range_sq * aggro_multiplier * aggro_multiplier;
+    // Apply aggro multiplier to ranges
+    const effective_detection_sq = (config.detection_range * aggro_multiplier) * (config.detection_range * aggro_multiplier);
+    const effective_lose_sq = (config.detection_range * aggro_multiplier * config.lose_range_multiplier) * (config.detection_range * aggro_multiplier * config.lose_range_multiplier);
     
     // Check for new target detection
     if (!state.is_chasing and dist_sq <= effective_detection_sq) {
-        state.is_chasing = true;
-        state.target_pos = target_pos;
-        state.chase_timer = config.chase_duration;
+        state.startChase(target_pos, config.chase_duration);
         result.detected_target = true;
+        if (config.track_state_changes) result.state_changed = true;
     }
     
     // If currently chasing
@@ -117,6 +146,7 @@ pub fn evaluateChase(
         // Check if target is now too far away (lose aggro)
         if (dist_sq > effective_lose_sq) {
             result.lost_target = true;
+            if (config.track_state_changes) result.state_changed = true;
             state.reset();
             return result;
         }
@@ -125,7 +155,8 @@ pub fn evaluateChase(
         state.target_pos = target_pos;
         
         // Calculate chase velocity if not too close
-        if (dist_sq > config.min_distance_sq) {
+        const min_dist_sq = config.min_distance * config.min_distance;
+        if (dist_sq > min_dist_sq) {
             const direction = to_target.normalize();
             result.velocity = direction.scale(config.chase_speed);
         }
@@ -133,10 +164,15 @@ pub fn evaluateChase(
         result.is_chasing = true;
     }
     
+    // Check if state changed
+    if (config.track_state_changes and old_chase_state != state.is_chasing) {
+        result.state_changed = true;
+    }
+    
     return result;
 }
 
-/// Simplified chase behavior for basic AI
+/// Simplified chase behavior for basic AI (stateless)
 pub fn simpleChase(
     chaser_pos: Vec2,
     target_pos: Vec2,
@@ -165,7 +201,7 @@ pub fn simpleChase(
 
 test "chase behavior basic functionality" {
     var state = ChaseState.init();
-    const config = ChaseConfig.init(100.0, 20.0, 150.0, 3.0, 200.0);
+    const config = ChaseConfig.init(100.0, 20.0, 150.0, 3.0, 1.15);
     
     const chaser_pos = Vec2{ .x = 0, .y = 0 };
     const target_pos = Vec2{ .x = 50, .y = 0 }; // Within detection range
@@ -176,12 +212,13 @@ test "chase behavior basic functionality" {
     try std.testing.expect(result.is_chasing);
     try std.testing.expect(result.velocity.x > 0); // Should move toward target
     
-    // Test losing target when too far
-    const far_target = Vec2{ .x = 300, .y = 0 }; // Beyond lose range
+    // Test losing target when too far (beyond lose range with tolerance)
+    const far_target = Vec2{ .x = 120, .y = 0 }; // Beyond lose range (100 * 1.15 = 115)
     result = evaluateChase(chaser_pos, far_target, true, &state, config, 1.0, 0.1);
     try std.testing.expect(result.lost_target);
     try std.testing.expect(!result.is_chasing);
 }
+
 
 test "simple chase functionality" {
     const chaser_pos = Vec2{ .x = 0, .y = 0 };
@@ -199,4 +236,16 @@ test "simple chase functionality" {
     const far_target = Vec2{ .x = 200, .y = 0 };
     velocity = simpleChase(chaser_pos, far_target, true, 100.0, 10.0, 150.0, 1.0);
     try std.testing.expect(velocity.x == 0.0 and velocity.y == 0.0);
+}
+
+test "chase config variations" {
+    // Test simple config (no timers)
+    const simple_config = ChaseConfig.simple(100.0, 10.0, 150.0);
+    try std.testing.expect(!simple_config.use_chase_timer);
+    try std.testing.expect(!simple_config.track_state_changes);
+    
+    // Test full config
+    const full_config = ChaseConfig.init(100.0, 10.0, 150.0, 3.0, 1.15);
+    try std.testing.expect(full_config.use_chase_timer);
+    try std.testing.expect(full_config.track_state_changes);
 }
