@@ -34,7 +34,7 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
 
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
-    
+
     // Checking portal collisions
 
     // Check collisions with all portal entities using ECS
@@ -44,7 +44,7 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
     while (portal_iter.next()) |portal_id| {
         portal_count += 1;
         // Found portal entity
-        
+
         if (!zone_storage.isAlive(portal_id)) {
             // Portal entity is not alive
             continue;
@@ -57,10 +57,10 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
                 // Portal leads to destination zone
                 if (zone_storage.portals.getComponent(portal_id, .transform)) |transform| {
                     // Portal transform found - check collision
-                    
+
                     if (physics.checkPlayerPortalCollision(player_pos, player_radius, transform)) {
                         loggers.getGameLog().info("portal_collision_detected", "Portal collision detected! Player at {any}, portal at {any}", .{ player_pos, transform.pos });
-                        
+
                         // Set cooldown and travel
                         portal_cooldown.start(); // Start 1 second cooldown
 
@@ -70,12 +70,12 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
                         // Travel to destination zone
                         const zone = &world.zones[destination_zone];
                         loggers.getGameLog().info("portal_travel", "Portal activated: traveling to zone {} at pos {any}", .{ destination_zone, zone.spawn_pos });
-                        
+
                         world.travelToZone(destination_zone, zone.spawn_pos) catch |err| {
                             loggers.getGameLog().err("portal_travel_error", "Error: Failed to travel to zone {}: {}", .{ destination_zone, err });
                             return false;
                         };
-                        
+
                         // Verify player still exists after travel
                         if (world.getPlayer() == null) {
                             loggers.getGameLog().err("portal_travel_player_lost", "Critical error: Player entity lost during portal travel!", .{});
@@ -97,7 +97,7 @@ pub fn checkPortalCollisions(game_state: anytype) bool {
             // Portal missing interactable component
         }
     }
-    
+
     if (portal_count == 0) {
         loggers.getGameLog().debug("portal_none_found", "No portal entities found in current zone", .{});
     } else {

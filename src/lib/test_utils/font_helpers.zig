@@ -3,7 +3,6 @@ const font_types = @import("../font/font_types.zig");
 
 /// Shared test data generators for font testing
 /// Extracted from duplicated code in test files
-
 /// Create a simple rectangular glyph outline for testing
 pub fn createRectangleOutline(allocator: std.mem.Allocator, x: i32, y: i32, width: i32, height: i32) !font_types.GlyphOutline {
     const points = try allocator.alloc(font_types.Point, 4);

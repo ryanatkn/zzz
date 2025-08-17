@@ -17,7 +17,7 @@ pub fn lerpVec2(a: Vec2, b: Vec2, t: f32) Vec2 {
 /// Interpolate between two colors
 pub fn lerpColor(a: Color, b: Color, t: f32) Color {
     const clamped_t = @max(0.0, @min(1.0, t));
-    
+
     return Color{
         .r = @intFromFloat(@as(f32, @floatFromInt(a.r)) + (@as(f32, @floatFromInt(b.r)) - @as(f32, @floatFromInt(a.r))) * clamped_t),
         .g = @intFromFloat(@as(f32, @floatFromInt(a.g)) + (@as(f32, @floatFromInt(b.g)) - @as(f32, @floatFromInt(a.g))) * clamped_t),
@@ -29,7 +29,7 @@ pub fn lerpColor(a: Color, b: Color, t: f32) Color {
 /// Interpolate between colors using floating point RGB values
 pub fn lerpColorF32(a: struct { r: f32, g: f32, b: f32 }, b: struct { r: f32, g: f32, b: f32 }, t: f32) struct { r: f32, g: f32, b: f32 } {
     const clamped_t = @max(0.0, @min(1.0, t));
-    
+
     return .{
         .r = a.r + (b.r - a.r) * clamped_t,
         .g = a.g + (b.g - a.g) * clamped_t,
@@ -72,7 +72,7 @@ pub fn bezierCubic(p0: f32, p1: f32, p2: f32, p3: f32, t: f32) f32 {
     const inv_t3 = inv_t2 * inv_t;
     const t2 = clamped_t * clamped_t;
     const t3 = t2 * clamped_t;
-    
+
     return inv_t3 * p0 + 3.0 * inv_t2 * clamped_t * p1 + 3.0 * inv_t * t2 * p2 + t3 * p3;
 }
 
@@ -97,13 +97,11 @@ pub fn catmullRom(p0: f32, p1: f32, p2: f32, p3: f32, t: f32) f32 {
     const clamped_t = @max(0.0, @min(1.0, t));
     const t2 = clamped_t * clamped_t;
     const t3 = t2 * clamped_t;
-    
-    return 0.5 * (
-        2.0 * p1 +
+
+    return 0.5 * (2.0 * p1 +
         (-p0 + p2) * clamped_t +
         (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 +
-        (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3
-    );
+        (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3);
 }
 
 /// Hermite interpolation with tangents
@@ -111,12 +109,12 @@ pub fn hermite(p0: f32, p1: f32, t0: f32, t1: f32, t: f32) f32 {
     const clamped_t = @max(0.0, @min(1.0, t));
     const t2 = clamped_t * clamped_t;
     const t3 = t2 * clamped_t;
-    
+
     const h00 = 2.0 * t3 - 3.0 * t2 + 1.0;
     const h10 = t3 - 2.0 * t2 + clamped_t;
     const h01 = -2.0 * t3 + 3.0 * t2;
     const h11 = t3 - t2;
-    
+
     return h00 * p0 + h10 * t0 + h01 * p1 + h11 * t1;
 }
 
@@ -167,23 +165,23 @@ pub fn steppedLerp(a: f32, b: f32, t: f32, steps: u32) f32 {
 
 test "interpolation functions" {
     // Test basic lerp
-    try std.testing.expectApproxEqAbs(@as(f32, 5.0), lerpVec2(Vec2{.x = 0.0, .y = 0.0}, Vec2{.x = 10.0, .y = 10.0}, 0.5).x, 0.001);
-    
+    try std.testing.expectApproxEqAbs(@as(f32, 5.0), lerpVec2(Vec2{ .x = 0.0, .y = 0.0 }, Vec2{ .x = 10.0, .y = 10.0 }, 0.5).x, 0.001);
+
     // Test color interpolation
-    const red = Color{.r = 255, .g = 0, .b = 0, .a = 255};
-    const blue = Color{.r = 0, .g = 0, .b = 255, .a = 255};
+    const red = Color{ .r = 255, .g = 0, .b = 0, .a = 255 };
+    const blue = Color{ .r = 0, .g = 0, .b = 255, .a = 255 };
     const purple = lerpColor(red, blue, 0.5);
     try std.testing.expect(purple.r == 127 or purple.r == 128); // Allow for rounding
     try std.testing.expect(purple.b == 127 or purple.b == 128);
-    
+
     // Test smoothstep
     const smooth_mid = smoothstep(0.0, 10.0, 0.5);
     try std.testing.expect(smooth_mid > 4.0 and smooth_mid < 6.0); // Should be around 5 but smoother
-    
+
     // Test inverse lerp
     const t = inverseLerp(0.0, 10.0, 3.0);
     try std.testing.expectApproxEqAbs(@as(f32, 0.3), t, 0.001);
-    
+
     // Test ping pong
     const ping1 = pingPong(0.0, 10.0, 0.25); // Should be at 5.0 (going up)
     const ping2 = pingPong(0.0, 10.0, 0.75); // Should be at 5.0 (going down)
@@ -195,7 +193,7 @@ test "bezier interpolation" {
     // Test quadratic bezier - at t=0.5, should be weighted towards p1
     const bezier_result = bezierQuadratic(0.0, 10.0, 0.0, 0.5);
     try std.testing.expectApproxEqAbs(@as(f32, 5.0), bezier_result, 0.001);
-    
+
     // Test cubic bezier endpoints
     const cubic_start = bezierCubic(0.0, 3.0, 7.0, 10.0, 0.0);
     const cubic_end = bezierCubic(0.0, 3.0, 7.0, 10.0, 1.0);
@@ -207,7 +205,7 @@ test "eased interpolation" {
     // Test eased lerp with linear (should be same as regular lerp)
     const linear_result = easedLerp(0.0, 10.0, 0.5, easing.Easing.linear);
     try std.testing.expectApproxEqAbs(@as(f32, 5.0), linear_result, 0.001);
-    
+
     // Test that ease-in gives different result than linear
     const ease_in_result = easedLerp(0.0, 10.0, 0.5, easing.Easing.quadraticEaseIn);
     try std.testing.expect(ease_in_result < 5.0); // Should be less than halfway due to ease-in

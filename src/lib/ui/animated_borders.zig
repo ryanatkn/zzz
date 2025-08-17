@@ -65,7 +65,7 @@ pub const BorderAnimation = struct {
     pub fn interpolateColor(color_pair: BorderColorPair, t: f32, intensity: f32) Color {
         const clamped_t = @max(0.0, @min(1.0, t));
         const clamped_intensity = @max(0.0, @min(1.0, intensity));
-        
+
         return Color{
             .r = @intFromFloat((color_pair.dark.r + (color_pair.bright.r - color_pair.dark.r) * clamped_t) * clamped_intensity),
             .g = @intFromFloat((color_pair.dark.g + (color_pair.bright.g - color_pair.dark.g) * clamped_t) * clamped_intensity),
@@ -79,7 +79,7 @@ pub const BorderAnimation = struct {
         const pulse = calculatePulse(pulse_freq, time_ms);
         const hue_cycle = calculateColorCycle(color_freq, time_ms);
         const intensity = 0.7 + pulse * 0.3; // Base intensity + pulse variation
-        
+
         return interpolateColor(color_pair, hue_cycle, intensity);
     }
 };
@@ -132,7 +132,7 @@ pub const BorderSpec = struct {
             .b = @intFromFloat(color_pair.dark.b),
             .a = 255,
         };
-        
+
         return BorderSpec{
             .base_width = base_width,
             .base_color = base_color,
@@ -155,7 +155,7 @@ pub const BorderRect = struct {
 pub fn BorderStack(comptime max_layers: usize) type {
     return struct {
         const Self = @This();
-        
+
         specs: [max_layers]BorderSpec = undefined,
         count: usize = 0,
         config: BorderConfig,
@@ -208,7 +208,7 @@ pub fn BorderStack(comptime max_layers: usize) type {
         }
 
         /// Render all borders using a callback function
-        pub fn render(self: *const Self, time_ms: f32, drawBorderFn: fn(Color, f32, f32) void) void {
+        pub fn render(self: *const Self, time_ms: f32, drawBorderFn: fn (Color, f32, f32) void) void {
             var current_offset: f32 = 0;
 
             for (0..self.count) |i| {
@@ -275,13 +275,13 @@ test "border animation" {
 test "border stack" {
     const config = BorderConfig{};
     var stack = BorderStack(4).init(config);
-    
+
     // Test adding borders
     stack.pushStatic(10.0, colors.WHITE);
     stack.pushAnimated(5.0, ColorPairs.GOLD_YELLOW, 1.0, 2.0);
-    
+
     try std.testing.expect(stack.count == 2);
-    
+
     // Test max width calculation
     const max_width = stack.getMaxTotalWidth();
     try std.testing.expect(max_width == 17.0); // 10 + (5 + 2)
@@ -291,7 +291,7 @@ test "easing functions" {
     // Test edge cases
     try std.testing.expectApproxEqAbs(@as(f32, 0.0), Easing.quarticEaseOut(0.0), 0.001);
     try std.testing.expectApproxEqAbs(@as(f32, 1.0), Easing.quarticEaseOut(1.0), 0.001);
-    
+
     // Test smooth progression
     const mid = Easing.sineEaseInOut(0.5);
     try std.testing.expectApproxEqAbs(@as(f32, 0.5), mid, 0.001);

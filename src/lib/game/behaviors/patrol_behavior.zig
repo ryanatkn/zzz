@@ -15,7 +15,7 @@ pub const PatrolConfig = struct {
     pause_duration: f32 = 0.0,
     /// Whether to track state changes
     track_state_changes: bool = true,
-    
+
     pub fn init(patrol_speed: f32, waypoint_tolerance: f32, loop: bool) PatrolConfig {
         return .{
             .patrol_speed = patrol_speed,
@@ -23,7 +23,7 @@ pub const PatrolConfig = struct {
             .loop_patrol = loop,
         };
     }
-    
+
     /// Create a patrol config with pauses at waypoints
     pub fn withPauses(patrol_speed: f32, waypoint_tolerance: f32, pause_duration: f32) PatrolConfig {
         return .{
@@ -32,7 +32,7 @@ pub const PatrolConfig = struct {
             .pause_duration = pause_duration,
         };
     }
-    
+
     /// Create a reversing patrol (ping-pong between waypoints)
     pub fn reversing(patrol_speed: f32, waypoint_tolerance: f32) PatrolConfig {
         return .{
@@ -56,13 +56,13 @@ pub const PatrolState = struct {
     at_waypoint: bool = false,
     /// Waypoint positions
     waypoints: []const Vec2,
-    
+
     pub fn init(waypoints: []const Vec2) PatrolState {
         return .{
             .waypoints = waypoints,
         };
     }
-    
+
     /// Reset to start of patrol
     pub fn reset(self: *PatrolState) void {
         self.current_waypoint = 0;
@@ -70,18 +70,18 @@ pub const PatrolState = struct {
         self.pause_timer = 0;
         self.at_waypoint = false;
     }
-    
+
     /// Get current target waypoint position
     pub fn getCurrentWaypoint(self: *const PatrolState) ?Vec2 {
         if (self.waypoints.len == 0) return null;
         if (self.current_waypoint >= self.waypoints.len) return null;
         return self.waypoints[self.current_waypoint];
     }
-    
+
     /// Advance to next waypoint based on patrol config
     pub fn advanceWaypoint(self: *PatrolState, config: PatrolConfig) void {
         if (self.waypoints.len <= 1) return;
-        
+
         if (config.reverse_patrol) {
             // Ping-pong patrol
             if (self.forward_direction) {
@@ -108,7 +108,7 @@ pub const PatrolState = struct {
             }
         }
     }
-    
+
     /// Update pause timer
     pub fn update(self: *PatrolState, dt: f32) void {
         if (self.pause_timer > 0) {
@@ -152,58 +152,58 @@ pub fn evaluatePatrol(
         .current_waypoint = state.current_waypoint,
         .state_changed = false,
     };
-    
+
     // Update pause timer
     state.update(dt);
-    
+
     // If paused at waypoint, don't move
     if (state.at_waypoint and state.pause_timer > 0) {
         result.paused_at_waypoint = true;
         return result;
     }
-    
+
     // Get current target waypoint
     const target_pos = state.getCurrentWaypoint() orelse {
         // No waypoints to patrol
         return result;
     };
-    
+
     const to_target = target_pos.sub(unit_pos);
     const dist_sq = to_target.lengthSquared();
     const tolerance_sq = config.waypoint_tolerance * config.waypoint_tolerance;
-    
+
     // Check if reached current waypoint
     if (dist_sq <= tolerance_sq) {
         _ = state.current_waypoint; // Track waypoint for potential future use
-        
+
         // Start pause if configured
         if (config.pause_duration > 0) {
             state.at_waypoint = true;
             state.pause_timer = config.pause_duration;
             result.paused_at_waypoint = true;
         }
-        
+
         // Advance to next waypoint
         state.advanceWaypoint(config);
-        
+
         result.reached_waypoint = true;
         if (config.track_state_changes) result.state_changed = true;
-        
+
         // Check if completed full patrol
         if (!config.loop_patrol and !config.reverse_patrol) {
             if (state.current_waypoint >= state.waypoints.len - 1) {
                 result.completed_patrol = true;
             }
         }
-        
+
         result.current_waypoint = state.current_waypoint;
-        
+
         // If not paused, continue to next waypoint
         if (!state.at_waypoint) {
             const next_target = state.getCurrentWaypoint() orelse return result;
             const next_to_target = next_target.sub(unit_pos);
             const next_dist_sq = next_to_target.lengthSquared();
-            
+
             if (next_dist_sq > tolerance_sq) {
                 const direction = next_to_target.normalize();
                 result.velocity = direction.scale(config.patrol_speed * speed_multiplier);
@@ -214,7 +214,7 @@ pub fn evaluatePatrol(
         const direction = to_target.normalize();
         result.velocity = direction.scale(config.patrol_speed * speed_multiplier);
     }
-    
+
     return result;
 }
 
@@ -229,11 +229,11 @@ pub fn simplePatrol(
 ) Vec2 {
     const to_a = point_a.sub(unit_pos);
     const to_b = point_b.sub(unit_pos);
-    
+
     const dist_a_sq = to_a.lengthSquared();
     const dist_b_sq = to_b.lengthSquared();
     const tolerance_sq = tolerance * tolerance;
-    
+
     // Move toward whichever point is farther
     if (dist_a_sq > tolerance_sq and dist_b_sq > tolerance_sq) {
         // Not at either point, move to closer one
@@ -257,7 +257,7 @@ pub fn simplePatrol(
             return direction.scale(patrol_speed * speed_multiplier);
         }
     }
-    
+
     return Vec2.ZERO;
 }
 
@@ -267,17 +267,17 @@ test "patrol behavior basic functionality" {
         Vec2{ .x = 100, .y = 0 },
         Vec2{ .x = 100, .y = 100 },
     };
-    
+
     var state = PatrolState.init(&waypoints);
     const config = PatrolConfig.init(150.0, 10.0, true);
-    
+
     const unit_pos = Vec2{ .x = 5, .y = 0 }; // Near first waypoint
-    
+
     // Test reaching waypoint
     const result = evaluatePatrol(unit_pos, &state, config, 1.0, 0.1);
     try std.testing.expect(result.reached_waypoint);
     try std.testing.expect(state.current_waypoint == 1); // Advanced to next
-    
+
     // Test movement toward next waypoint
     result = evaluatePatrol(unit_pos, &state, config, 1.0, 0.1);
     try std.testing.expect(result.velocity.x > 0); // Moving toward (100,0)
@@ -288,12 +288,12 @@ test "patrol behavior with pauses" {
         Vec2{ .x = 0, .y = 0 },
         Vec2{ .x = 100, .y = 0 },
     };
-    
+
     var state = PatrolState.init(&waypoints);
     const config = PatrolConfig.withPauses(150.0, 10.0, 1.0); // 1 second pause
-    
+
     const unit_pos = Vec2{ .x = 5, .y = 0 }; // Near first waypoint
-    
+
     // Test reaching waypoint with pause
     const result = evaluatePatrol(unit_pos, &state, config, 1.0, 0.1);
     try std.testing.expect(result.reached_waypoint);
@@ -305,7 +305,7 @@ test "simple patrol functionality" {
     const point_a = Vec2{ .x = 0, .y = 0 };
     const point_b = Vec2{ .x = 100, .y = 0 };
     const unit_pos = Vec2{ .x = 5, .y = 0 }; // Near point A
-    
+
     // Should move toward point B (farther away)
     const velocity = simplePatrol(unit_pos, point_a, point_b, 150.0, 1.0, 10.0);
     try std.testing.expect(velocity.x > 0);

@@ -97,13 +97,13 @@ pub const GameRenderer = struct {
     // Render all entities in current zone only with proper camera transforms
     pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
         const zone = game.getCurrentZoneConst();
-        
+
         // Draw rectangles (obstacles) with camera transforms
         for (0..zone.obstacles.count) |i| {
             const transform = &zone.obstacles.transforms[i];
             const visual = &zone.obstacles.visuals[i];
             const terrain = &zone.obstacles.terrains[i];
-            
+
             const screen_pos = self.camera.worldToScreen(transform.pos);
             const screen_size = Vec2{
                 .x = self.camera.worldSizeToScreen(terrain.size.x),
@@ -111,7 +111,7 @@ pub const GameRenderer = struct {
             };
             self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, visual.color);
         }
-        
+
         // Draw circles (units, lifestones, portals) with camera transforms
         for (0..zone.units.count) |i| {
             const transform = &zone.units.transforms[i];
@@ -120,7 +120,7 @@ pub const GameRenderer = struct {
             const screen_radius = self.camera.worldSizeToScreen(transform.radius);
             self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
         }
-        
+
         for (0..zone.lifestones.count) |i| {
             const transform = &zone.lifestones.transforms[i];
             const visual = &zone.lifestones.visuals[i];
@@ -128,7 +128,7 @@ pub const GameRenderer = struct {
             const screen_radius = self.camera.worldSizeToScreen(transform.radius);
             self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
         }
-        
+
         for (0..zone.portals.count) |i| {
             const transform = &zone.portals.transforms[i];
             const visual = &zone.portals.visuals[i];
@@ -136,7 +136,7 @@ pub const GameRenderer = struct {
             const screen_radius = self.camera.worldSizeToScreen(transform.radius);
             self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
         }
-        
+
         // Draw player (only if in current zone) with camera transforms
         if (game.player_zone == game.current_zone) {
             for (0..zone.players.count) |i| {
@@ -147,7 +147,7 @@ pub const GameRenderer = struct {
                 self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
             }
         }
-        
+
         // Draw projectiles (bullets) with camera transforms
         for (0..zone.projectiles.count) |i| {
             const transform = &zone.projectiles.transforms[i];
@@ -194,7 +194,7 @@ pub const GameRenderer = struct {
         // Iris wipe effect (highest priority - renders over everything)
         if (game_state.iris_wipe_active) {
             const elapsed_sec = game_state.iris_wipe_start_time.getElapsedSec();
-            
+
             const wipe_colors = [_]Color{
                 colors.BLUE_BRIGHT,
                 colors.GREEN_BRIGHT,
@@ -203,16 +203,16 @@ pub const GameRenderer = struct {
                 colors.PURPLE_BRIGHT,
                 colors.CYAN,
             };
-            
+
             const iris_wipe = animated_borders.IrisWipe{
                 .colors = &wipe_colors,
                 .band_width = constants.IRIS_WIPE_BAND_WIDTH,
                 .duration = constants.IRIS_WIPE_DURATION,
                 .easing_fn = animated_borders.Easing.quarticEaseOut,
             };
-            
+
             iris_wipe.getBorders(elapsed_sec, &border_stack);
-            
+
             if (elapsed_sec >= constants.IRIS_WIPE_DURATION) {
                 @constCast(game_state).iris_wipe_active = false;
             }
@@ -255,7 +255,7 @@ pub const GameRenderer = struct {
 
     // FPS rendering using PERSISTENT MODE to eliminate flashing
     pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
-        
+
         // Use white color for FPS display
         const WHITE = colors.WHITE;
 
@@ -280,25 +280,24 @@ pub const GameRenderer = struct {
 
         loggers.getGameLog().debug("fps_queued", "✓ FPS text queued for persistent rendering", .{});
     }
-    
+
     pub fn drawAIMode(self: *GameRenderer, ai_enabled: bool) void {
         if (!ai_enabled) return;
-        
+
         // Use bright green color for AI mode indicator
         const AI_COLOR = colors.Color{ .r = 0, .g = 255, .b = 128, .a = 255 };
-        
+
         // Position below FPS display
         const ai_x = constants.FPS_POSITION_X;
         const ai_y = constants.FPS_POSITION_Y + 30.0;
-        
+
         const ai_text = "AI MODE ACTIVE";
-        
+
         // Queue using persistent mode
         self.gpu.text_renderer.queuePersistentText(ai_text, .{ .x = ai_x, .y = ai_y }, self.font_manager, .sans, @import("../lib/font/config.zig").getGlobalConfig().fpsFontSize(), AI_COLOR) catch |err| {
             loggers.getGameLog().debug("ai_mode_error", "Failed to queue AI mode text: {}", .{err});
         };
     }
-
 
     fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
         const WHITE_LIGHT = Color{ .r = 230, .g = 230, .b = 230, .a = 255 }; // Slightly off-white
@@ -318,18 +317,17 @@ pub const GameRenderer = struct {
         self.drawDigit(cmd_buffer, render_pass, @intCast(ones), fps_x + constants.FPS_DIGIT_SPACING, fps_y, WHITE_LIGHT);
     }
 
-
     fn drawDigit(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, digit: u8, x: f32, y: f32, color: Color) void {
         if (digit > 9) return;
-        
+
         const config = geometric_text.TextConfig{
             .pixel_size = constants.FPS_DIGIT_PIXEL_SIZE,
             .char_width = 3,
             .char_height = 5,
         };
-        
+
         const pattern = geometric_text.CharacterPatterns.getDigitPattern(digit) orelse return;
-        
+
         for (0..config.char_height) |row| {
             for (0..config.char_width) |col| {
                 if (pattern[row * config.char_width + col]) {

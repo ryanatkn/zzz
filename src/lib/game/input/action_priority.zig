@@ -5,13 +5,13 @@ const std = @import("std");
 pub const ActionPrioritySystem = struct {
     /// Priority levels (lower number = higher priority)
     pub const Priority = enum(u8) {
-        Critical = 0,   // Emergency actions (quit, force respawn)
-        System = 1,     // System actions (pause, menu)
-        Gameplay = 2,   // Core gameplay (respawn when dead)
-        Combat = 3,     // Combat actions (shoot, cast)
-        Movement = 4,   // Movement and positioning
-        UI = 5,         // UI interactions
-        Debug = 6,      // Debug/dev commands
+        Critical = 0, // Emergency actions (quit, force respawn)
+        System = 1, // System actions (pause, menu)
+        Gameplay = 2, // Core gameplay (respawn when dead)
+        Combat = 3, // Combat actions (shoot, cast)
+        Movement = 4, // Movement and positioning
+        UI = 5, // UI interactions
+        Debug = 6, // Debug/dev commands
 
         pub fn canOverride(self: Priority, other: Priority) bool {
             return @intFromEnum(self) <= @intFromEnum(other);
@@ -27,32 +27,32 @@ pub const ActionPrioritySystem = struct {
         // Critical actions
         ForceQuit,
         EmergencyRespawn,
-        
-        // System actions  
+
+        // System actions
         Quit,
         TogglePause,
         ToggleMenu,
-        
+
         // Gameplay actions
         Respawn,
         UseItem,
         Interact,
-        
+
         // Combat actions
         Attack,
         Cast,
         Block,
-        
+
         // Movement actions
         Move,
         Jump,
         Dash,
-        
+
         // UI actions
         OpenInventory,
         Navigate,
         Confirm,
-        
+
         // Debug actions
         ToggleDebug,
         Teleport,
@@ -76,7 +76,7 @@ pub const ActionPrioritySystem = struct {
         category: ActionCategory,
         priority: Priority,
         data: ActionData,
-        
+
         pub fn init(category: ActionCategory, data: ActionData) ActionEntry {
             return .{
                 .category = category,
@@ -84,7 +84,7 @@ pub const ActionPrioritySystem = struct {
                 .data = data,
             };
         }
-        
+
         pub fn withCustomPriority(category: ActionCategory, priority: Priority, data: ActionData) ActionEntry {
             return .{
                 .category = category,
@@ -129,7 +129,7 @@ pub const ActionPrioritySystem = struct {
             }
             insert_index = i + 1;
         }
-        
+
         try self.actions.insert(insert_index, action);
     }
 

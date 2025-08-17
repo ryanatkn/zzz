@@ -18,11 +18,11 @@ pub const AbilityCastInterface = struct {
 
     /// Standard ability target types
     pub const TargetType = enum {
-        None,       // No target required
-        Position,   // Target a world position
-        Entity,     // Target a specific entity
-        Self,       // Self-cast only
-        Area,       // Area of effect around position
+        None, // No target required
+        Position, // Target a world position
+        Entity, // Target a specific entity
+        Self, // Self-cast only
+        Area, // Area of effect around position
     };
 
     /// Generic ability cast context
@@ -31,7 +31,7 @@ pub const AbilityCastInterface = struct {
         target_pos: ?Vec2,
         target_entity: ?u32, // EntityId type varies by game
         is_self_cast: bool,
-        
+
         pub fn init(caster_pos: Vec2) CastContext {
             return .{
                 .caster_pos = caster_pos,
@@ -76,10 +76,10 @@ pub const AoEPatterns = struct {
     /// Get all positions within circular area (for grid-based games)
     pub fn getCirclePositions(allocator: std.mem.Allocator, center: Vec2, radius: f32, grid_size: f32) !std.ArrayList(Vec2) {
         var positions = std.ArrayList(Vec2).init(allocator);
-        
+
         const steps = @as(i32, @intFromFloat(@ceil(radius * 2.0 / grid_size)));
         const half_steps = steps / 2;
-        
+
         var y: i32 = -half_steps;
         while (y <= half_steps) : (y += 1) {
             var x: i32 = -half_steps;
@@ -88,13 +88,13 @@ pub const AoEPatterns = struct {
                     .x = center.x + @as(f32, @floatFromInt(x)) * grid_size,
                     .y = center.y + @as(f32, @floatFromInt(y)) * grid_size,
                 };
-                
+
                 if (isInCircle(center, pos, radius)) {
                     try positions.append(pos);
                 }
             }
         }
-        
+
         return positions;
     }
 };

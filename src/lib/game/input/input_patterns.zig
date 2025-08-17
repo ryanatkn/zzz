@@ -14,11 +14,11 @@ pub const InputPatterns = struct {
 
     /// Generic action priority system
     pub const ActionPriority = enum(u8) {
-        System = 0,     // Quit, pause, menu toggle - always highest priority
-        Respawn = 1,    // Respawn actions when dead
-        Combat = 2,     // Shooting, spells when alive
-        Movement = 3,   // Movement controls
-        UI = 4,         // HUD, inventory, etc.
+        System = 0, // Quit, pause, menu toggle - always highest priority
+        Respawn = 1, // Respawn actions when dead
+        Combat = 2, // Shooting, spells when alive
+        Movement = 3, // Movement controls
+        UI = 4, // HUD, inventory, etc.
 
         pub fn canOverride(self: ActionPriority, other: ActionPriority) bool {
             return @intFromEnum(self) <= @intFromEnum(other);
@@ -30,34 +30,34 @@ pub const InputPatterns = struct {
         player_state: PlayerState,
         menu_open: bool = false,
         has_focus: bool = true,
-        
+
         pub fn init(player_state: PlayerState) InputContext {
             return .{ .player_state = player_state };
         }
-        
+
         pub fn withMenu(self: InputContext, menu_open: bool) InputContext {
             var ctx = self;
             ctx.menu_open = menu_open;
             return ctx;
         }
-        
+
         pub fn shouldBlockGameInput(self: InputContext) bool {
             return self.menu_open or !self.has_focus;
         }
-        
+
         pub fn allowsAction(self: InputContext, priority: ActionPriority) bool {
             // System actions always allowed
             if (priority == .System) return true;
-            
+
             // Block lower priority actions when menu is open
             if (self.menu_open and priority != .UI) return false;
-            
+
             // Block all actions when no focus
             if (!self.has_focus) return false;
-            
+
             // Dead player can only respawn
             if (self.player_state == .Dead and priority != .Respawn) return false;
-            
+
             return true;
         }
     };
@@ -115,16 +115,16 @@ pub const ActionMappingPatterns = struct {
     /// Map input to action based on context
     pub fn mapInputToAction(input_type: InputType, context: InputPatterns.InputContext) ActionResult {
         const priority = getInputPriority(input_type);
-        
+
         if (!context.allowsAction(priority)) {
             return if (priority == .System) .BlockedByState else .BlockedByPriority;
         }
-        
+
         // Special handling for dead player
         if (context.player_state == .Dead) {
             return if (DeadPlayerPatterns.shouldRespawn(input_type)) .Handled else .NotHandled;
         }
-        
+
         return .Handled;
     }
 
@@ -147,23 +147,23 @@ pub const KeyCombinationPatterns = struct {
         ctrl: bool = false,
         shift: bool = false,
         alt: bool = false,
-        
+
         pub fn none() Modifiers {
             return .{};
         }
-        
+
         pub fn withCtrl() Modifiers {
             return .{ .ctrl = true };
         }
-        
+
         pub fn withShift() Modifiers {
             return .{ .shift = true };
         }
-        
+
         pub fn withCtrlShift() Modifiers {
             return .{ .ctrl = true, .shift = true };
         }
-        
+
         pub fn matches(self: Modifiers, other: Modifiers) bool {
             return std.meta.eql(self, other);
         }
@@ -173,7 +173,7 @@ pub const KeyCombinationPatterns = struct {
     pub fn isWalkModifier(modifiers: Modifiers) bool {
         return modifiers.shift and !modifiers.ctrl;
     }
-    
+
     pub fn isSelfCastModifier(modifiers: Modifiers) bool {
         return modifiers.ctrl and !modifiers.shift;
     }

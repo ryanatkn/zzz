@@ -28,8 +28,7 @@ fn mapSDLInputToType(event: *const c.sdl.SDL_Event) game_input.input_patterns.In
             c.sdl.SDL_SCANCODE_GRAVE => .MenuKey,
             c.sdl.SDL_SCANCODE_ESCAPE => .QuitKey,
             c.sdl.SDL_SCANCODE_W, c.sdl.SDL_SCANCODE_A, c.sdl.SDL_SCANCODE_S, c.sdl.SDL_SCANCODE_D => .MovementKey,
-            c.sdl.SDL_SCANCODE_1, c.sdl.SDL_SCANCODE_2, c.sdl.SDL_SCANCODE_3, c.sdl.SDL_SCANCODE_4,
-            c.sdl.SDL_SCANCODE_Q, c.sdl.SDL_SCANCODE_E, c.sdl.SDL_SCANCODE_F => .SpellKey,
+            c.sdl.SDL_SCANCODE_1, c.sdl.SDL_SCANCODE_2, c.sdl.SDL_SCANCODE_3, c.sdl.SDL_SCANCODE_4, c.sdl.SDL_SCANCODE_Q, c.sdl.SDL_SCANCODE_E, c.sdl.SDL_SCANCODE_F => .SpellKey,
             else => .Unknown,
         },
         else => .Unknown,
@@ -122,7 +121,7 @@ pub fn handleSDLEvent(
             if (!game_state.hex_game.getPlayerAlive()) {
                 const input_type = mapSDLInputToType(event);
                 const dead_result = dead_player_handler.handleDeadInput(input_type);
-                
+
                 switch (dead_result) {
                     .Respawn => {
                         game_state.hex_game.logger.info("respawn_click", "Dead player input respawn triggered", .{});
@@ -150,7 +149,7 @@ pub fn handleSDLEvent(
                         // Left-click shooting for single shots (burst mode)
                         game_state.hex_game.logger.info("left_click", "Left click detected at mouse position: {any}", .{game_state.input_state.getMousePos()});
                         const screen_mouse_pos = game_state.input_state.getMousePos();
-                        
+
                         const coord_context = createCoordinateContext(&game_renderer.camera);
                         const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
                         const result = combat.fireBulletAtMouse(&game_state.hex_game, world_mouse_pos, &game_state.hex_game.bullet_pool);
@@ -163,7 +162,7 @@ pub fn handleSDLEvent(
                     if (game_state.hex_game.getPlayerAlive()) {
                         const ctrl_held = game_state.input_state.isCtrlHeld();
                         const screen_mouse_pos = game_state.input_state.getMousePos();
-                        
+
                         const coord_context = createCoordinateContext(&game_renderer.camera);
                         const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
                         const zone = game_state.hex_game.getCurrentZoneConst();
@@ -180,7 +179,7 @@ pub fn handleSDLEvent(
         c.sdl.SDL_EVENT_MOUSE_WHEEL => {
             // Mouse wheel zoom
             const current_zone = game_state.hex_game.getCurrentZone();
-            
+
             if (event.wheel.y > 0) {
                 // Zoom in (scroll up)
                 current_zone.camera_scale = @min(constants.MAX_ZOOM, current_zone.camera_scale * constants.ZOOM_FACTOR);

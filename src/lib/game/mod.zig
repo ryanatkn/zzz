@@ -9,7 +9,7 @@ pub const cooldowns = @import("cooldowns.zig");
 // Behaviors
 pub const behaviors = @import("behaviors/mod.zig");
 
-// Control systems  
+// Control systems
 pub const control = @import("control/mod.zig");
 
 // Projectiles

@@ -91,9 +91,9 @@ pub const Easing = struct {
     /// Ease in-out quadratic
     pub fn easeInOutQuad(t: f32) f32 {
         const clamped = math.clamp(t, 0.0, 1.0);
-        return if (clamped < 0.5) 
-            2.0 * clamped * clamped 
-        else 
+        return if (clamped < 0.5)
+            2.0 * clamped * clamped
+        else
             1.0 - 2.0 * (1.0 - clamped) * (1.0 - clamped);
     }
 
@@ -101,7 +101,7 @@ pub const Easing = struct {
     pub fn easeOutElastic(t: f32) f32 {
         const clamped = math.clamp(t, 0.0, 1.0);
         if (clamped == 0.0 or clamped == 1.0) return clamped;
-        
+
         const c4 = (2.0 * std.math.pi) / 3.0;
         return std.math.pow(f32, 2.0, -10.0 * clamped) * math.sin((clamped * 10.0 - 0.75) * c4) + 1.0;
     }
@@ -132,9 +132,9 @@ pub const Sequence = struct {
     /// Ping-pong between 0.0 and 1.0 based on time and duration
     pub fn pingPong(time: f32, duration: f32) f32 {
         const cycle_time = @mod(time, duration * 2.0);
-        return if (cycle_time < duration) 
-            cycle_time / duration 
-        else 
+        return if (cycle_time < duration)
+            cycle_time / duration
+        else
             1.0 - (cycle_time - duration) / duration;
     }
 

@@ -122,7 +122,7 @@ pub const ReactiveHudData = struct {
 
     pub fn toggle(self: *Self) void {
         const new_state = !self.is_open.peek();
-        
+
         if (new_state) {
             // Reset to home when opening
             self.history = history.SimpleHistory.init();
@@ -133,7 +133,7 @@ pub const ReactiveHudData = struct {
             };
             self.current_path.set("/");
         }
-        
+
         self.is_open.set(new_state);
     }
 

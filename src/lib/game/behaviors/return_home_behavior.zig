@@ -7,7 +7,7 @@ pub const ReturnHomeConfig = struct {
     home_tolerance_sq: f32,
     /// Speed when returning home
     return_speed: f32,
-    
+
     pub fn init(home_tolerance: f32, return_speed: f32) ReturnHomeConfig {
         return .{
             .home_tolerance_sq = home_tolerance * home_tolerance,
@@ -34,7 +34,7 @@ pub fn calculateReturnHomeVelocity(
 ) ReturnHomeResult {
     const to_home = home_pos.sub(current_pos);
     const dist_sq = to_home.lengthSquared();
-    
+
     // Check if already at home
     if (dist_sq <= config.home_tolerance_sq) {
         return ReturnHomeResult{
@@ -43,11 +43,11 @@ pub fn calculateReturnHomeVelocity(
             .distance_to_home_sq = dist_sq,
         };
     }
-    
+
     // Calculate return velocity
     const direction = to_home.normalize();
     const velocity = direction.scale(config.return_speed);
-    
+
     return ReturnHomeResult{
         .velocity = velocity,
         .at_home = false,
@@ -95,7 +95,7 @@ pub const PatrolState = struct {
     current_waypoint: usize = 0,
     /// Whether currently moving to next waypoint
     moving_to_waypoint: bool = false,
-    
+
     pub fn init(waypoints: []const Vec2) PatrolState {
         return .{
             .waypoints = waypoints,
@@ -103,23 +103,23 @@ pub const PatrolState = struct {
             .moving_to_waypoint = waypoints.len > 0,
         };
     }
-    
+
     /// Get current target position
     pub fn getCurrentTarget(self: *const PatrolState) ?Vec2 {
         if (self.waypoints.len == 0) return null;
         return self.waypoints[self.current_waypoint];
     }
-    
+
     /// Move to next waypoint
     pub fn nextWaypoint(self: *PatrolState) void {
         if (self.waypoints.len == 0) return;
         self.current_waypoint = (self.current_waypoint + 1) % self.waypoints.len;
     }
-    
+
     /// Check if reached current waypoint and advance if so
     pub fn updateWaypoint(self: *PatrolState, current_pos: Vec2, tolerance: f32) bool {
         if (self.waypoints.len == 0) return false;
-        
+
         const target = self.getCurrentTarget().?;
         if (isAtHome(current_pos, target, tolerance)) {
             self.nextWaypoint();
@@ -143,7 +143,7 @@ pub fn calculatePatrolVelocity(
             .distance_to_home_sq = 0,
         };
     }
-    
+
     return calculateReturnHomeVelocity(current_pos, target.?, config);
 }
 
@@ -151,13 +151,13 @@ test "return home behavior" {
     const config = ReturnHomeConfig.init(10.0, 50.0);
     const current_pos = Vec2{ .x = 100, .y = 100 };
     const home_pos = Vec2{ .x = 0, .y = 0 };
-    
+
     // Test returning home
     var result = calculateReturnHomeVelocity(current_pos, home_pos, config);
     try std.testing.expect(!result.at_home);
     try std.testing.expect(result.velocity.x < 0); // Should move toward home
     try std.testing.expect(result.velocity.y < 0);
-    
+
     // Test at home
     const close_pos = Vec2{ .x = 5, .y = 5 };
     result = calculateReturnHomeVelocity(close_pos, home_pos, config);
@@ -172,14 +172,14 @@ test "patrol behavior" {
         Vec2{ .x = 100, .y = 100 },
         Vec2{ .x = 0, .y = 100 },
     };
-    
+
     var patrol = PatrolState.init(&waypoints);
-    
+
     // Test getting first waypoint
     const target = patrol.getCurrentTarget();
     try std.testing.expect(target != null);
     try std.testing.expect(target.?.x == 0.0 and target.?.y == 0.0);
-    
+
     // Test advancing waypoint
     patrol.nextWaypoint();
     const target2 = patrol.getCurrentTarget();
@@ -190,15 +190,15 @@ test "patrol behavior" {
 test "utility functions" {
     const pos1 = Vec2{ .x = 0, .y = 0 };
     const pos2 = Vec2{ .x = 3, .y = 4 }; // Distance = 5
-    
+
     // Test distance calculation
     const dist = getDistanceToHome(pos2, pos1);
     try std.testing.expectApproxEqAbs(@as(f32, 5.0), dist, 0.001);
-    
+
     // Test squared distance
     const dist_sq = getDistanceToHomeSquared(pos2, pos1);
     try std.testing.expectApproxEqAbs(@as(f32, 25.0), dist_sq, 0.001);
-    
+
     // Test at home check
     try std.testing.expect(!isAtHome(pos2, pos1, 4.0));
     try std.testing.expect(isAtHome(pos2, pos1, 6.0));

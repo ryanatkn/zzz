@@ -25,7 +25,6 @@ const AudioSettingsPage = struct {
         const screen_height = constants.SCREEN.BASE_HEIGHT;
         _ = self;
 
-
         const center_x = screen_width / 2.0;
         const start_y = screen_height * 0.3;
         const link_height = 50.0;

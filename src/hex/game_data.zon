@@ -4,7 +4,7 @@
 
 .{
     // Screen dimensions - must match engine constants SCREEN.BASE_WIDTH/HEIGHT
-    .screen_width = 1920.0,  // = engine.SCREEN.BASE_WIDTH
+    .screen_width = 1920.0, // = engine.SCREEN.BASE_WIDTH
     .screen_height = 1080.0, // = engine.SCREEN.BASE_HEIGHT
 
     // Player starting position (overworld center)
@@ -59,11 +59,11 @@
                 .{ .position = .{ .x = 1550.0, .y = 450.0 }, .radius = 8.0, .behavior = .wandering }, // Explores randomly
                 .{ .position = .{ .x = 200.0, .y = 600.0 }, .radius = 9.0, .behavior = .guardian }, // Protects home area
                 .{ .position = .{ .x = 1450.0, .y = 650.0 }, .radius = 8.0 }, // No behavior = idle default
-                .{ .position = .{ .x = 600.0, .y = 950.0 }, .radius = 7.0, .behavior = .defensive }, 
+                .{ .position = .{ .x = 600.0, .y = 950.0 }, .radius = 7.0, .behavior = .defensive },
                 .{ .position = .{ .x = 1300.0, .y = 950.0 }, .radius = 9.0 }, // No behavior = idle default
-                .{ .position = .{ .x = 150.0, .y = 250.0 }, .radius = 8.0, .behavior = .wandering }, 
-                .{ .position = .{ .x = 1500.0, .y = 150.0 }, .radius = 7.0, .behavior = .guardian }, 
-                .{ .position = .{ .x = 100.0, .y = 800.0 }, .radius = 8.0, .behavior = .aggressive }, 
+                .{ .position = .{ .x = 150.0, .y = 250.0 }, .radius = 8.0, .behavior = .wandering },
+                .{ .position = .{ .x = 1500.0, .y = 150.0 }, .radius = 7.0, .behavior = .guardian },
+                .{ .position = .{ .x = 100.0, .y = 800.0 }, .radius = 8.0, .behavior = .aggressive },
                 .{ .position = .{ .x = 1750.0, .y = 850.0 }, .radius = 9.0 }, // No behavior = idle default
             },
             .portals = .{

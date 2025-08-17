@@ -30,7 +30,6 @@ const FontsInfoPage = struct {
         const screen_height = constants.SCREEN.BASE_HEIGHT;
         const fonts_page: *const FontsInfoPage = @fieldParentPtr("base", self);
 
-
         const center_x = screen_width / 2.0;
         const start_y = screen_height * 0.15;
         const link_height = 35.0;

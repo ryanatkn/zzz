@@ -29,7 +29,6 @@ const HexGame = hex_game_mod.HexGame;
 const InputState = input.InputState;
 const ai_control = @import("../lib/game/control/mod.zig");
 
-
 pub const GameState = struct {
     hex_game: HexGame,
     input_state: InputState,
@@ -54,17 +53,17 @@ pub const GameState = struct {
 
     // Game statistics (uses generic StatisticsInterface from lib/game/persistence)
     game_stats: save_data.GameStatistics,
-    
+
     // AI control system
     ai_input: ?*ai_control.MappedInput,
     ai_enabled: bool,
     frame_counter: u32,
-    
+
     // Logging system
     logger: ModuleLogger,
 
     const Self = @This();
-    
+
     const ModuleLogger = Logger(.{
         .output = outputs.Console,
         .filter = filters.Throttle,
@@ -73,7 +72,7 @@ pub const GameState = struct {
     pub fn init(allocator: std.mem.Allocator) !Self {
         // Initialize behavior system
         behaviors.initBehaviors();
-        
+
         return .{
             .hex_game = HexGame.init(allocator),
             .input_state = InputState.init(),
@@ -103,12 +102,12 @@ pub const GameState = struct {
             self.ai_input = null;
         }
     }
-    
+
     pub fn initAIControl(self: *Self, allocator: std.mem.Allocator) !void {
         if (self.ai_input == null) {
             // Log the memory layout that Zig expects
             ai_control.DirectInputBuffer.InputCommand.debugLayout();
-            
+
             const ai = try allocator.create(ai_control.MappedInput);
             ai.* = try ai_control.MappedInput.init(".ai_commands");
             self.ai_input = ai;
@@ -116,7 +115,7 @@ pub const GameState = struct {
             self.logger.info("ai_init", "AI control system initialized", .{});
         }
     }
-    
+
     pub fn deinitAIControl(self: *Self, allocator: std.mem.Allocator) void {
         if (self.ai_input) |ai| {
             ai.deinit();
@@ -126,7 +125,7 @@ pub const GameState = struct {
             self.logger.info("ai_deinit", "AI control system deinitialized", .{});
         }
     }
-    
+
     pub fn toggleAIControl(self: *Self) void {
         self.ai_enabled = !self.ai_enabled;
         if (self.ai_input) |mapped| {
@@ -162,10 +161,10 @@ pub const GameState = struct {
             // Get the default spawn position for the zone if not provided
             const zone = &self.hex_game.zones[destination_zone];
             const actual_spawn_pos = spawn_pos orelse zone.spawn_pos;
-            
+
             // Use hex_game's travelToZone which properly handles entity transfer
             try self.hex_game.travelToZone(@intCast(destination_zone), actual_spawn_pos);
-            
+
             // Clear ALL effects on zone travel to keep them fully ephemeral
             self.effect_system.clear();
         }
@@ -227,14 +226,14 @@ pub const GameState = struct {
         // Check all zones
         for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
             const zone = &self.hex_game.zones[zone_idx];
-            
+
             // Count lifestones in this zone
             for (0..zone.lifestones.count) |i| {
                 const entity_id = zone.lifestones.entities[i];
                 if (entity_id == std.math.maxInt(u32)) continue;
-                
+
                 total_lifestones += 1;
-                
+
                 // Check if attuned
                 if (zone.lifestones.getComponent(entity_id, .interactable)) |interactable| {
                     if (interactable.attuned) {
@@ -259,7 +258,7 @@ pub const GameState = struct {
         // Check all zones
         for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
             const zone = &self.hex_game.zones[zone_idx];
-            
+
             // Count lifestones in this zone
             for (0..zone.lifestones.count) |i| {
                 const entity_id = zone.lifestones.entities[i];
@@ -278,12 +277,12 @@ pub const GameState = struct {
         // Check all zones
         for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
             const zone = &self.hex_game.zones[zone_idx];
-            
+
             // Count attuned lifestones in this zone
             for (0..zone.lifestones.count) |i| {
                 const entity_id = zone.lifestones.entities[i];
                 if (entity_id == std.math.maxInt(u32)) continue;
-                
+
                 // Check if attuned
                 if (zone.lifestones.getComponent(entity_id, .interactable)) |interactable| {
                     if (interactable.attuned) {
@@ -339,20 +338,20 @@ fn updateUnits(game_state: *GameState, deltaTime: f32) void {
 pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: f32) void {
     // Reset frame pool for this frame's temporary allocations
     game_state.hex_game.frame_pool.reset();
-    
+
     // Create update context for structured parameter passing
     const frame_allocator = game_state.hex_game.frame_pool.allocator();
     const update_ctx = contexts.UpdateContext.init(frame_allocator, deltaTime, game_state.frame_counter)
         .withPause(game_state.game_paused);
-    
+
     // Create graphics context with camera information for future viewport-aware updates
     const graphics_ctx = contexts.GraphicsContext.init(update_ctx, cam.screen_width, cam.screen_height)
         .withCamera(cam.view_x + cam.view_width / 2.0, cam.view_y + cam.view_height / 2.0, cam.scale);
     _ = graphics_ctx; // Reserved for future viewport-aware optimizations
-    
+
     // Increment frame counter
     game_state.frame_counter += 1;
-    
+
     // Process AI commands if enabled
     if (game_state.ai_enabled and game_state.ai_input != null) {
         if (game_state.ai_input) |mapped| {
@@ -363,7 +362,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
             ai_control.processCommands(mapped.buffer, &game_state.input_state, game_state.frame_counter);
         }
     }
-    
+
     // Update HUD system if open
     if (game_state.hud_system) |*h| {
         h.update(deltaTime);
@@ -395,7 +394,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     // Use context for consistent delta time access
     const effective_delta = contexts.ContextUtils.effectiveDeltaTime(update_ctx);
-    
+
     // Update bullet entities using ECS
     world.updateProjectiles(effective_delta) catch |err| {
         game_state.logger.err("projectiles_update_fail", "Failed to update projectiles: {}", .{err});
@@ -498,7 +497,7 @@ fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_rad
 
                         // Track lifestone attunement for save system
                         game_state.game_stats.lifestones_attuned += 1;
-                        
+
                         // Check if all lifestones are now attuned
                         if (game_state.hasAttunedAllLifestones()) {
                             game_state.logger.info("achievement", "All lifestones attuned!", .{});

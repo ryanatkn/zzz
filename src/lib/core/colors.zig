@@ -205,9 +205,9 @@ pub fn complement(color: Color) Color {
 /// Get grayscale version of color using luminance weights
 pub fn toGrayscale(color: Color) Color {
     // Standard luminance formula
-    const luminance = 0.299 * @as(f32, @floatFromInt(color.r)) + 
-                     0.587 * @as(f32, @floatFromInt(color.g)) + 
-                     0.114 * @as(f32, @floatFromInt(color.b));
+    const luminance = 0.299 * @as(f32, @floatFromInt(color.r)) +
+        0.587 * @as(f32, @floatFromInt(color.g)) +
+        0.114 * @as(f32, @floatFromInt(color.b));
     const gray_value = @as(u8, @intFromFloat(luminance));
     return Color{
         .r = gray_value,
@@ -273,7 +273,7 @@ pub fn sepia(color: Color) Color {
     const r = @as(f32, @floatFromInt(color.r));
     const g = @as(f32, @floatFromInt(color.g));
     const b = @as(f32, @floatFromInt(color.b));
-    
+
     return Color{
         .r = @intFromFloat(@min(255.0, (r * 0.393) + (g * 0.769) + (b * 0.189))),
         .g = @intFromFloat(@min(255.0, (r * 0.349) + (g * 0.686) + (b * 0.168))),
@@ -284,9 +284,9 @@ pub fn sepia(color: Color) Color {
 
 /// Get luminance value (0.0 to 1.0)
 pub fn getLuminance(color: Color) f32 {
-    return (0.299 * @as(f32, @floatFromInt(color.r)) + 
-           0.587 * @as(f32, @floatFromInt(color.g)) + 
-           0.114 * @as(f32, @floatFromInt(color.b))) / 255.0;
+    return (0.299 * @as(f32, @floatFromInt(color.r)) +
+        0.587 * @as(f32, @floatFromInt(color.g)) +
+        0.114 * @as(f32, @floatFromInt(color.b))) / 255.0;
 }
 
 /// Check if color is considered dark (luminance < 0.5)
@@ -309,18 +309,18 @@ pub fn alphaBlend(background: Color, foreground: Color) Color {
     const fg_alpha = @as(f32, @floatFromInt(foreground.a)) / 255.0;
     const bg_alpha = @as(f32, @floatFromInt(background.a)) / 255.0;
     const inv_fg_alpha = 1.0 - fg_alpha;
-    
+
     const result_alpha = fg_alpha + bg_alpha * inv_fg_alpha;
-    
+
     if (result_alpha == 0.0) return TRANSPARENT;
-    
+
     return Color{
-        .r = @intFromFloat(((@as(f32, @floatFromInt(foreground.r)) * fg_alpha) + 
-                          (@as(f32, @floatFromInt(background.r)) * bg_alpha * inv_fg_alpha)) / result_alpha),
-        .g = @intFromFloat(((@as(f32, @floatFromInt(foreground.g)) * fg_alpha) + 
-                          (@as(f32, @floatFromInt(background.g)) * bg_alpha * inv_fg_alpha)) / result_alpha),
-        .b = @intFromFloat(((@as(f32, @floatFromInt(foreground.b)) * fg_alpha) + 
-                          (@as(f32, @floatFromInt(background.b)) * bg_alpha * inv_fg_alpha)) / result_alpha),
+        .r = @intFromFloat(((@as(f32, @floatFromInt(foreground.r)) * fg_alpha) +
+            (@as(f32, @floatFromInt(background.r)) * bg_alpha * inv_fg_alpha)) / result_alpha),
+        .g = @intFromFloat(((@as(f32, @floatFromInt(foreground.g)) * fg_alpha) +
+            (@as(f32, @floatFromInt(background.g)) * bg_alpha * inv_fg_alpha)) / result_alpha),
+        .b = @intFromFloat(((@as(f32, @floatFromInt(foreground.b)) * fg_alpha) +
+            (@as(f32, @floatFromInt(background.b)) * bg_alpha * inv_fg_alpha)) / result_alpha),
         .a = @intFromFloat(result_alpha * 255.0),
     };
 }
@@ -328,11 +328,11 @@ pub fn alphaBlend(background: Color, foreground: Color) Color {
 /// Create a color from hex string (e.g., "FF0000" for red)
 pub fn fromHex(hex: []const u8) !Color {
     if (hex.len != 6) return error.InvalidHexLength;
-    
+
     const r = std.fmt.parseInt(u8, hex[0..2], 16) catch return error.InvalidHexFormat;
     const g = std.fmt.parseInt(u8, hex[2..4], 16) catch return error.InvalidHexFormat;
     const b = std.fmt.parseInt(u8, hex[4..6], 16) catch return error.InvalidHexFormat;
-    
+
     return Color{ .r = r, .g = g, .b = b, .a = 255 };
 }
 
@@ -347,15 +347,15 @@ pub const Palette = struct {
     pub fn analogous(base_color: Color, count: u8) [6]Color {
         var colors: [6]Color = undefined;
         colors[0] = base_color;
-        
+
         for (1..@min(count, 6)) |i| {
             const hue_shift = @as(f32, @floatFromInt(i)) * 30.0; // 30 degree shifts
             colors[i] = shiftHue(base_color, hue_shift);
         }
-        
+
         return colors;
     }
-    
+
     /// Generate triadic colors (120 degrees apart)
     pub fn triadic(base_color: Color) [3]Color {
         return [3]Color{
@@ -364,7 +364,7 @@ pub const Palette = struct {
             shiftHue(base_color, 240.0),
         };
     }
-    
+
     /// Generate complementary pair
     pub fn complementary(base_color: Color) [2]Color {
         return [2]Color{
@@ -372,7 +372,7 @@ pub const Palette = struct {
             complement(base_color),
         };
     }
-    
+
     /// Generate split complementary (base + two colors adjacent to complement)
     pub fn splitComplementary(base_color: Color) [3]Color {
         const comp = complement(base_color);
@@ -382,17 +382,17 @@ pub const Palette = struct {
             shiftHue(comp, 30.0),
         };
     }
-    
+
     /// Generate monochromatic palette (same hue, different brightness/saturation)
     pub fn monochromatic(base_color: Color, count: u8) [5]Color {
         var colors: [5]Color = undefined;
         colors[0] = base_color;
-        
+
         for (1..@min(count, 5)) |i| {
             const factor = 0.2 + (@as(f32, @floatFromInt(i)) * 0.2); // 0.4, 0.6, 0.8, 1.0
             colors[i] = adjustBrightness(base_color, factor);
         }
-        
+
         return colors;
     }
 };
@@ -401,39 +401,39 @@ test "color manipulation functions" {
     // Test basic color creation
     const red = Color{ .r = 255, .g = 0, .b = 0, .a = 255 };
     const blue = Color{ .r = 0, .g = 0, .b = 255, .a = 255 };
-    
+
     // Test mix
     const purple = mix(red, blue, 0.5);
     try std.testing.expect(purple.r > 100 and purple.r < 140); // Should be around 127
     try std.testing.expect(purple.b > 100 and purple.b < 140);
-    
+
     // Test complement
     const red_complement = complement(red);
     try std.testing.expect(red_complement.g > 200); // Should be cyan-ish
     try std.testing.expect(red_complement.b > 200);
-    
+
     // Test grayscale
     const gray = toGrayscale(red);
     try std.testing.expect(gray.r == gray.g and gray.g == gray.b);
-    
+
     // Test luminance
     const white_luminance = getLuminance(WHITE);
     const black_luminance = getLuminance(BLACK);
     try std.testing.expect(white_luminance > 0.9);
     try std.testing.expect(black_luminance < 0.1);
-    
+
     // Test isDark/isLight
     try std.testing.expect(isDark(BLACK));
     try std.testing.expect(isLight(WHITE));
     try std.testing.expect(getContrast(BLACK).r == 255); // Should return white
-    try std.testing.expect(getContrast(WHITE).r == 0);   // Should return black
+    try std.testing.expect(getContrast(WHITE).r == 0); // Should return black
 }
 
 test "HSV color conversion" {
     const red = Color{ .r = 255, .g = 0, .b = 0, .a = 255 };
     const hsv = toHSV(red);
     const back_to_rgb = fromHSV(hsv);
-    
+
     // Should be close to original (within rounding errors)
     try std.testing.expect(@as(i16, back_to_rgb.r) - @as(i16, red.r) <= 1);
     try std.testing.expect(@as(i16, back_to_rgb.g) - @as(i16, red.g) <= 1);
@@ -444,7 +444,7 @@ test "hex color conversion" {
     const red_hex = "FF0000";
     const red = try fromHex(red_hex);
     try std.testing.expect(red.r == 255 and red.g == 0 and red.b == 0);
-    
+
     var allocator = std.testing.allocator;
     const hex_back = try toHex(red, allocator);
     defer allocator.free(hex_back);
@@ -453,12 +453,12 @@ test "hex color conversion" {
 
 test "color palette generation" {
     const base = Color{ .r = 100, .g = 150, .b = 200, .a = 255 };
-    
+
     // Test triadic
     const triadic_colors = Palette.triadic(base);
     try std.testing.expect(triadic_colors.len == 3);
     try std.testing.expect(triadic_colors[0].r == base.r); // First should be original
-    
+
     // Test complementary
     const comp_colors = Palette.complementary(base);
     try std.testing.expect(comp_colors.len == 2);

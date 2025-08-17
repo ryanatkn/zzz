@@ -1,9 +1,8 @@
 /// Behavior system module exports
-/// 
+///
 /// This module provides reusable AI behavior patterns that can be used
 /// across different game implementations without depending on specific
 /// entity or component systems.
-
 pub const chase_behavior = @import("chase_behavior.zig");
 pub const flee_behavior = @import("flee_behavior.zig");
 pub const patrol_behavior = @import("patrol_behavior.zig");

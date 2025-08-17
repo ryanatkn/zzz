@@ -83,7 +83,7 @@ pub const HexSaveData = struct {
 
         for (0..7) |zone_idx| {
             const zone_storage = world.getZoneStorageByIndex(@intCast(zone_idx));
-            
+
             // Save lifestone entities from the zone's ECS world
             var lifestone_iter = zone_storage.lifestones.entityIterator();
             while (lifestone_iter.next()) |entity_id| {
@@ -160,7 +160,7 @@ pub const HexSaveData = struct {
         // Restore entity state for each zone using zone-specific ECS access
         for (self.zones, 0..) |zone_data, zone_idx| {
             const zone_storage = world.getZoneStorageByIndex(@intCast(zone_idx));
-            
+
             // Restore lifestone entities
             for (zone_data.lifestone_entities.slice()) |entity_data| {
                 if (zone_storage.lifestones.getComponentMut(entity_data.entity_id, .interactable)) |interactable| {

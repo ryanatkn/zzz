@@ -1,7 +1,7 @@
 const colors = @import("../lib/core/colors.zig");
 const constants = @import("../lib/core/constants.zig");
 
-// Game-specific screen utilities derived from engine constants  
+// Game-specific screen utilities derived from engine constants
 pub const SCREEN_WIDTH = constants.SCREEN.BASE_WIDTH;
 pub const SCREEN_HEIGHT = constants.SCREEN.BASE_HEIGHT;
 pub const SCREEN_CENTER_X = constants.SCREEN.centerX(SCREEN_WIDTH);
@@ -52,7 +52,7 @@ pub const CameraMode = enum {
     follow,
 };
 
-// UI/HUD positioning constants  
+// UI/HUD positioning constants
 pub const FPS_POSITION_X = constants.UI.HUD_MARGIN_X;
 pub const FPS_POSITION_Y = constants.UI.HUD_MARGIN_Y;
 pub const FPS_FALLBACK_X = constants.UI.FALLBACK_POSITION_X;
@@ -65,7 +65,7 @@ pub const FPS_DIGIT_PIXEL_SIZE = constants.UI.TEXT_PIXEL_SIZE;
 pub const VISIBILITY_THRESHOLD = constants.RENDERING.VISIBILITY_THRESHOLD;
 pub const PAUSED_BORDER_BASE_WIDTH = 6.0; // Base width of paused border
 pub const PAUSED_BORDER_PULSE_AMPLITUDE = 4.0; // Pulse amplitude for paused border
-pub const DEAD_BORDER_BASE_WIDTH = 9.0; // Base width of dead border  
+pub const DEAD_BORDER_BASE_WIDTH = 9.0; // Base width of dead border
 pub const DEAD_BORDER_PULSE_AMPLITUDE = 5.0; // Pulse amplitude for dead border
 
 // Player movement constants

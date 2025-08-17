@@ -36,7 +36,6 @@ const GameRenderer = game_renderer_mod.GameRenderer;
 const GameState = game_controller.GameState;
 const Hud = hud.Hud;
 
-
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -85,7 +84,6 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     };
     errdefer c.sdl.SDL_DestroyWindow(window);
 
-
     // Initialize reactive system
     try reactive_context.initContext(global_allocator);
     try reactive_batch.initGlobalBatcher(global_allocator);
@@ -95,7 +93,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     // Initialize loggers FIRST (before other components that might use them)
     logger = loggers.GameLogger.init(global_allocator);
     try loggers.initGlobalLoggers(global_allocator);
-    
+
     // Load optional runtime config overrides from .zz/log-config.zon
     const log_config = @import("../lib/debug/config.zig");
     if (log_config.loadOverrides(global_allocator)) |overrides| {
@@ -136,7 +134,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 
     // Initialize HUD system
     try game_state.?.initHud(global_allocator, game_renderer.?);
-    
+
     // Initialize AI control system (optional - fails silently if file doesn't exist)
     game_state.?.initAIControl(global_allocator) catch |err| {
         if (logger) |*log| {
@@ -280,7 +278,7 @@ fn renderGame() !void {
     if (game_hud.?.visible) {
         const fps = reactive_time.getFPS();
         game_renderer.?.drawFPS(cmd_buffer, render_pass, fps);
-        
+
         // Draw AI mode indicator if enabled
         game_renderer.?.drawAIMode(game_state.?.ai_enabled);
     }

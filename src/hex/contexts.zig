@@ -1,15 +1,14 @@
 /// Update context system for passing shared state through update cycles
 /// Provides a clean way to pass frame-specific data without global state
-
 const std = @import("std");
 // Simple time representation for standalone testing
 const Time = struct {
     start_time: i64,
-    
+
     pub fn now() Time {
         return .{ .start_time = std.time.milliTimestamp() };
     }
-    
+
     pub fn getElapsedSec(self: Time) f32 {
         const current_time = std.time.milliTimestamp();
         const elapsed_ms = current_time - self.start_time;
@@ -64,18 +63,18 @@ pub const UpdateContext = struct {
 /// Input context for update operations that need input state
 pub const InputContext = struct {
     base: UpdateContext,
-    
+
     // Mouse state
     mouse_position: struct { x: f32, y: f32 },
     mouse_delta: struct { x: f32, y: f32 },
     mouse_buttons: MouseButtons,
     mouse_wheel: f32,
-    
+
     // Keyboard state
     keys_pressed: KeySet,
     keys_held: KeySet,
     keys_released: KeySet,
-    
+
     // Modifiers
     modifiers: ModifierKeys,
 
@@ -109,15 +108,15 @@ pub const InputContext = struct {
 /// Graphics context for rendering operations
 pub const GraphicsContext = struct {
     base: UpdateContext,
-    
+
     // Screen dimensions
     screen_width: f32,
     screen_height: f32,
-    
+
     // Camera state
     camera_position: struct { x: f32, y: f32 },
     camera_zoom: f32,
-    
+
     // Viewport info
     viewport_bounds: struct {
         min_x: f32,
@@ -146,7 +145,7 @@ pub const GraphicsContext = struct {
         var result = self;
         result.camera_position = .{ .x = x, .y = y };
         result.camera_zoom = zoom;
-        
+
         // Update viewport bounds based on camera
         const world_width = result.screen_width / zoom;
         const world_height = result.screen_height / zoom;
@@ -156,35 +155,35 @@ pub const GraphicsContext = struct {
             .max_x = x + world_width / 2.0,
             .max_y = y + world_height / 2.0,
         };
-        
+
         return result;
     }
 
     /// Check if a point is visible in the current viewport
     pub fn isPointVisible(self: GraphicsContext, x: f32, y: f32) bool {
         return x >= self.viewport_bounds.min_x and x <= self.viewport_bounds.max_x and
-               y >= self.viewport_bounds.min_y and y <= self.viewport_bounds.max_y;
+            y >= self.viewport_bounds.min_y and y <= self.viewport_bounds.max_y;
     }
 
     /// Check if a circle is visible in the current viewport
     pub fn isCircleVisible(self: GraphicsContext, x: f32, y: f32, radius: f32) bool {
         return x + radius >= self.viewport_bounds.min_x and x - radius <= self.viewport_bounds.max_x and
-               y + radius >= self.viewport_bounds.min_y and y - radius <= self.viewport_bounds.max_y;
+            y + radius >= self.viewport_bounds.min_y and y - radius <= self.viewport_bounds.max_y;
     }
 };
 
 /// Physics context for physics update operations
 pub const PhysicsContext = struct {
     base: UpdateContext,
-    
+
     // Physics world settings
     gravity: struct { x: f32, y: f32 },
     time_scale: f32,
-    
+
     // Collision settings
     collision_iterations: u32,
     position_iterations: u32,
-    
+
     // Spatial partitioning info
     world_bounds: struct {
         min_x: f32,
@@ -275,7 +274,7 @@ pub const KeySet = struct {
     enter: bool = false,
     escape: bool = false,
     tab: bool = false,
-    
+
     // Number keys
     key_1: bool = false,
     key_2: bool = false,
@@ -287,7 +286,7 @@ pub const KeySet = struct {
     key_8: bool = false,
     key_9: bool = false,
     key_0: bool = false,
-    
+
     // Additional keys
     q: bool = false,
     e: bool = false,
@@ -295,14 +294,14 @@ pub const KeySet = struct {
     f: bool = false,
     g: bool = false,
     h: bool = false,
-    
+
     pub fn any(self: KeySet) bool {
         return self.w or self.a or self.s or self.d or self.space or
-               self.enter or self.escape or self.tab or
-               self.key_1 or self.key_2 or self.key_3 or self.key_4 or
-               self.key_5 or self.key_6 or self.key_7 or self.key_8 or
-               self.key_9 or self.key_0 or
-               self.q or self.e or self.r or self.f or self.g or self.h;
+            self.enter or self.escape or self.tab or
+            self.key_1 or self.key_2 or self.key_3 or self.key_4 or
+            self.key_5 or self.key_6 or self.key_7 or self.key_8 or
+            self.key_9 or self.key_0 or
+            self.q or self.e or self.r or self.f or self.g or self.h;
     }
 
     /// Check if movement keys are pressed
@@ -313,7 +312,7 @@ pub const KeySet = struct {
     /// Check if spell keys are pressed
     pub fn hasSpellKeys(self: KeySet) bool {
         return self.key_1 or self.key_2 or self.key_3 or self.key_4 or
-               self.q or self.e or self.r or self.f;
+            self.q or self.e or self.r or self.f;
     }
 };
 
@@ -419,11 +418,11 @@ pub fn validateContext(comptime ContextType: type) void {
 /// Runtime context validation
 pub fn validateContextRuntime(context: anytype) !void {
     const base = ContextUtils.extractBase(context);
-    
+
     if (base.delta_time < 0) {
         return error.InvalidDeltaTime;
     }
-    
+
     if (base.delta_time > 1.0) {
         return error.DeltaTimeTooLarge;
     }
@@ -436,10 +435,10 @@ pub fn validateContextRuntime(context: anytype) !void {
 test "basic context creation" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
-    
+
     const allocator = arena.allocator();
     const context = UpdateContext.init(allocator, 0.016, 42);
-    
+
     try std.testing.expectApproxEqAbs(@as(f32, 0.016), context.delta_time, 0.001);
     try std.testing.expect(context.frame_number == 42);
     try std.testing.expect(!context.is_paused);
@@ -448,13 +447,13 @@ test "basic context creation" {
 test "context builder" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
-    
+
     const allocator = arena.allocator();
     const builder = ContextBuilder.init(allocator, 0.016, 100).setPaused(true);
-    
+
     const update_context = builder.buildUpdate();
     try std.testing.expect(update_context.is_paused);
-    
+
     const input_context = builder.buildInput();
     try std.testing.expect(input_context.base.is_paused);
 }
@@ -462,11 +461,11 @@ test "context builder" {
 test "context utilities" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
-    
+
     const allocator = arena.allocator();
     const base_context = UpdateContext.init(allocator, 0.02, 50).withPause(true);
     const input_context = InputContext.init(base_context);
-    
+
     try std.testing.expect(ContextUtils.isPaused(input_context));
     try std.testing.expectApproxEqAbs(@as(f32, 0.02), ContextUtils.deltaTime(input_context), 0.001);
     try std.testing.expectApproxEqAbs(@as(f32, 0.0), ContextUtils.effectiveDeltaTime(input_context), 0.001);
@@ -476,18 +475,18 @@ test "context utilities" {
 test "graphics context visibility" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
-    
+
     const allocator = arena.allocator();
     const base_context = UpdateContext.init(allocator, 0.016, 1);
     var graphics_context = GraphicsContext.init(base_context, 800, 600);
     graphics_context = graphics_context.withCamera(100, 100, 1.0);
-    
+
     // Point at camera position should be visible
     try std.testing.expect(graphics_context.isPointVisible(100, 100));
-    
+
     // Point far outside viewport should not be visible
     try std.testing.expect(!graphics_context.isPointVisible(1000, 1000));
-    
+
     // Circle overlapping viewport should be visible
     try std.testing.expect(graphics_context.isCircleVisible(100, 100, 10));
 }
@@ -498,16 +497,16 @@ test "input state" {
         .s = true,
         .key_1 = true,
     };
-    
+
     try std.testing.expect(keys.any());
     try std.testing.expect(keys.hasMovement());
     try std.testing.expect(keys.hasSpellKeys());
-    
+
     const mouse = MouseButtons{
         .left = true,
         .right = false,
     };
-    
+
     try std.testing.expect(mouse.any());
     try std.testing.expect(mouse.primary());
     try std.testing.expect(!mouse.secondary());
@@ -516,13 +515,13 @@ test "input state" {
 test "context validation" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
-    
+
     const allocator = arena.allocator();
-    
+
     // Valid context
     const valid_context = UpdateContext.init(allocator, 0.016, 1);
     try validateContextRuntime(valid_context);
-    
+
     // Invalid delta time
     const invalid_context = UpdateContext.init(allocator, -0.1, 1);
     try std.testing.expectError(error.InvalidDeltaTime, validateContextRuntime(invalid_context));

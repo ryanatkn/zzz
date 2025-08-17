@@ -40,19 +40,15 @@ pub fn deinitBehaviors() void {
 
 /// Create idle behavior config (basic aggro, returns home)
 pub fn idle(home_pos: Vec2, detection_range: f32, chase_speed: f32) unit_behavior.UnitBehaviorConfig {
-    var config = unit_behavior.UnitBehaviorConfig.init(
-        home_pos, 
-        detection_range, 
-        20.0, // min_distance
-        chase_speed, 
-        chase_speed * 0.5, // walk_speed
+    var config = unit_behavior.UnitBehaviorConfig.init(home_pos, detection_range, 20.0, // min_distance
+        chase_speed, chase_speed * 0.5, // walk_speed
         1.5, // chase_duration (short)
         15.0, // home_tolerance
         1.05 // lose_tolerance (tight)
     );
-    config.behavior_priorities.chase = .low;         // Will chase but not aggressively
+    config.behavior_priorities.chase = .low; // Will chase but not aggressively
     config.behavior_priorities.return_home = .normal; // Returns home when player leaves
-    config.behavior_priorities.wander = .lowest;     // Minimal wandering
+    config.behavior_priorities.wander = .lowest; // Minimal wandering
     return config;
 }
 
@@ -118,7 +114,7 @@ fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: Beh
         const default_state = unit_behavior.UnitBehaviorState.init(unit_comp.home_pos, &[_]Vec2{}, entity_id);
         return @constCast(&default_state);
     };
-    
+
     if (!state_result.found_existing) {
         // Create new state with appropriate waypoints based on profile
         const waypoints = switch (profile) {
@@ -130,14 +126,14 @@ fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: Beh
             },
             else => &[_]Vec2{}, // No waypoints for other profiles
         };
-        
+
         state_result.value_ptr.* = unit_behavior.UnitBehaviorState.init(
             unit_comp.home_pos,
             waypoints,
             entity_id, // Use entity ID as random seed
         );
     }
-    
+
     return state_result.value_ptr;
 }
 
@@ -149,11 +145,11 @@ fn getOrCreateBehaviorConfig(entity_id: u32, unit_comp: *const Unit, profile: Be
         const default_config = createBehaviorConfig(.aggressive, unit_comp.home_pos);
         return @constCast(&default_config);
     };
-    
+
     if (!config_result.found_existing) {
         config_result.value_ptr.* = createBehaviorConfig(profile, unit_comp.home_pos);
     }
-    
+
     return config_result.value_ptr;
 }
 
@@ -176,11 +172,11 @@ pub fn updateUnitWithAggroMod(
 ) void {
     // Determine behavior profile for this unit
     const profile = determineBehaviorProfile(entity_id, unit_comp);
-    
+
     // Get or create behavior state and config
     const state = getOrCreateBehaviorState(entity_id, unit_comp, profile);
     const config = getOrCreateBehaviorConfig(entity_id, unit_comp, profile);
-    
+
     // Create behavior context
     const context = unit_behavior.BehaviorContext{
         .unit_pos = transform.pos,
@@ -193,24 +189,24 @@ pub fn updateUnitWithAggroMod(
         .speed_multiplier = 1.0,
         .dt = dt,
     };
-    
+
     // Evaluate behavior
     const result = unit_behavior.updateUnitBehavior(context, state, config.*);
-    
+
     // Update hex-specific unit state based on behavior result
     unit_comp.state = switch (result.active_behavior) {
         .chase => .chasing,
         .flee, .return_home => .returning_home,
         .patrol, .guard, .wander, .idle => .returning_home, // Hex game doesn't distinguish these
     };
-    
+
     // Update chase timer and target from library state
     unit_comp.chase_timer = state.chase.chase_timer;
     unit_comp.target_pos = state.chase.target_pos;
-    
+
     // Apply hex-specific colors based on behavior and profile
     visual.color = getBehaviorColor(result.active_behavior, profile);
-    
+
     // Apply velocity and position
     transform.vel = result.velocity;
     transform.pos = transform.pos.add(result.velocity.scale(dt));
@@ -219,7 +215,7 @@ pub fn updateUnitWithAggroMod(
 /// Get color for behavior and profile combination
 fn getBehaviorColor(behavior: unit_behavior.BehaviorType, profile: BehaviorProfile) @TypeOf(constants.COLOR_UNIT_AGGRESSIVE) {
     const colors = @import("../lib/core/colors.zig");
-    
+
     return switch (behavior) {
         .chase => switch (profile) {
             .aggressive => constants.COLOR_UNIT_AGGRESSIVE,

@@ -25,7 +25,6 @@ const VectorTestPage = struct {
         const screen_height = constants.SCREEN.BASE_HEIGHT;
         _ = self;
 
-
         // Page header
         try links.append(page.createLink("VECTOR GRAPHICS TEST PAGE", "", 50, 50, 600, 60));
 

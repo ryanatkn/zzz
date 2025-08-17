@@ -63,7 +63,7 @@ pub const Cooldown = struct {
 pub fn CooldownManager(comptime max_cooldowns: usize) type {
     return struct {
         const Self = @This();
-        
+
         cooldowns: [max_cooldowns]Cooldown,
         count: usize,
 
@@ -77,7 +77,7 @@ pub fn CooldownManager(comptime max_cooldowns: usize) type {
         /// Add a new cooldown and return its index
         pub fn addCooldown(self: *Self, duration: f32) ?usize {
             if (self.count >= max_cooldowns) return null;
-            
+
             self.cooldowns[self.count] = Cooldown.init(duration);
             const index = self.count;
             self.count += 1;
@@ -135,7 +135,7 @@ pub fn CooldownManager(comptime max_cooldowns: usize) type {
 /// Spell-specific cooldown system matching current game patterns
 pub const SpellCooldownSystem = struct {
     cooldowns: [8]Cooldown, // 8 spell slots
-    
+
     pub fn init() SpellCooldownSystem {
         return SpellCooldownSystem{
             .cooldowns = [_]Cooldown{Cooldown.init(0.0)} ** 8,
@@ -221,14 +221,14 @@ pub const GlobalCooldown = struct {
 test "Cooldown basic functionality" {
     var cooldown = Cooldown.init(1.0); // 1 second
     try std.testing.expect(cooldown.isReady()); // Should start ready
-    
+
     cooldown.start();
     try std.testing.expect(!cooldown.isReady()); // Should not be ready after starting
-    
+
     cooldown.update(0.5); // Update with 0.5 seconds
     try std.testing.expect(!cooldown.isReady()); // Still on cooldown
     try std.testing.expectApproxEqAbs(@as(f32, 0.5), cooldown.getRemaining(), 0.001);
-    
+
     cooldown.update(0.6); // Update with another 0.6 seconds (total 1.1s)
     try std.testing.expect(cooldown.isReady()); // Should be ready now
     try std.testing.expectApproxEqAbs(@as(f32, 0.0), cooldown.getRemaining(), 0.001);
@@ -236,36 +236,36 @@ test "Cooldown basic functionality" {
 
 test "CooldownManager functionality" {
     var manager = CooldownManager(4).init();
-    
+
     const spell_cd = manager.addCooldown(2.0); // 2 second spell cooldown
     const item_cd = manager.addCooldown(1.0); // 1 second item cooldown
-    
+
     try std.testing.expect(spell_cd != null);
     try std.testing.expect(item_cd != null);
     try std.testing.expect(manager.isReady(spell_cd.?));
     try std.testing.expect(manager.isReady(item_cd.?));
-    
+
     manager.start(spell_cd.?);
     try std.testing.expect(!manager.isReady(spell_cd.?));
     try std.testing.expect(manager.isReady(item_cd.?)); // Other cooldown unaffected
-    
+
     manager.updateAll(0.5);
     try std.testing.expectApproxEqAbs(@as(f32, 1.5), manager.getRemaining(spell_cd.?), 0.001);
 }
 
 test "SpellCooldownSystem functionality" {
     var spell_system = SpellCooldownSystem.init();
-    
+
     spell_system.setSlotCooldown(0, 3.0); // Slot 0: 3 second cooldown
     spell_system.setSlotCooldown(1, 1.5); // Slot 1: 1.5 second cooldown
-    
+
     try std.testing.expect(spell_system.canCast(0));
     try std.testing.expect(spell_system.canCast(1));
-    
+
     spell_system.startCooldown(0);
     try std.testing.expect(!spell_system.canCast(0));
     try std.testing.expect(spell_system.canCast(1)); // Other slot unaffected
-    
+
     spell_system.update(1.0);
     try std.testing.expectApproxEqAbs(@as(f32, 2.0), spell_system.getRemainingTime(0), 0.001);
 }

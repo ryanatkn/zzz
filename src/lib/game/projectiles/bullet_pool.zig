@@ -1,7 +1,7 @@
 const std = @import("std");
 
 /// BulletPool - Rate-limited bullet firing system
-/// 
+///
 /// Provides a pool of bullets with:
 /// - Rate limiting (bullets per second)
 /// - Fire cooldown (minimum time between shots)
@@ -205,7 +205,7 @@ test "BulletPool upgrade system" {
 
 test "BulletPool custom configuration" {
     var pool = BulletPool.initWithConfig(10, 5.0, 0.1);
-    
+
     try testing.expectEqual(@as(u8, 10), pool.getMaxCount());
     try testing.expectEqual(@as(f32, 5.0), pool.getRechargeRate());
 }

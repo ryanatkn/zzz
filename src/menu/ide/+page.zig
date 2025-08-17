@@ -42,10 +42,10 @@ fn update(self: *page.Page, dt: f32) void {
 
 fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
     _ = self;
-    
+
     // Simple layout with three panels described via text
     try links.append(page.createLink("< Back to Menu", "/", 20, 20, 150, 30));
-    
+
     // File Explorer Panel
     try links.append(page.createLink("FILE EXPLORER", "", 100, 100, 200, 30));
     try links.append(page.createLink("src/", "", 120, 150, 180, 25));
@@ -58,7 +58,7 @@ fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
     try links.append(page.createLink("  menu/", "", 140, 360, 180, 25));
     try links.append(page.createLink("README.md", "", 120, 390, 180, 25));
     try links.append(page.createLink("CLAUDE.md", "", 120, 420, 180, 25));
-    
+
     // Text Editor Panel
     try links.append(page.createLink("TEXT EDITOR", "", 600, 100, 200, 30));
     try links.append(page.createLink("// Welcome to the Zzz IDE", "", 620, 150, 500, 25));
@@ -75,7 +75,7 @@ fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
     try links.append(page.createLink("// - Terminal command execution", "", 620, 480, 500, 25));
     try links.append(page.createLink("// - Copy/paste support", "", 620, 510, 500, 25));
     try links.append(page.createLink("// - Search and replace", "", 620, 540, 500, 25));
-    
+
     // Terminal Panel
     try links.append(page.createLink("TERMINAL", "", 1300, 100, 200, 30));
     try links.append(page.createLink("$ Zzz Terminal v0.1.0", "", 1320, 150, 400, 25));
@@ -88,7 +88,7 @@ fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
     try links.append(page.createLink("$   pwd - Show directory (TODO)", "", 1320, 360, 400, 25));
     try links.append(page.createLink("$   cat - View file (TODO)", "", 1320, 390, 400, 25));
     try links.append(page.createLink("$ > _", "", 1320, 420, 400, 25));
-    
+
     // Info panel at bottom
     try links.append(page.createLink("IDE components created in src/lib/ui/", "", 100, 650, 500, 25));
     try links.append(page.createLink("Panel, ScrollableView, TreeView, TextInput, TextArea, ListView", "", 100, 680, 700, 25));

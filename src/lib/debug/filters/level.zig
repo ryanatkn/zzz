@@ -4,7 +4,7 @@ const std = @import("std");
 pub fn Level(comptime config: LevelConfig) type {
     return struct {
         const Self = @This();
-        
+
         /// Check if a log message should be allowed based on its level
         pub fn shouldLog(_: Self, level: std.log.Level, _: []const u8, _: []const u8) bool {
             return @intFromEnum(level) <= @intFromEnum(config.min_level);

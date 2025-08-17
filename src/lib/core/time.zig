@@ -3,7 +3,6 @@ const c = @import("../platform/sdl.zig");
 
 /// Time management utilities for SDL-based applications
 /// Provides consistent time handling and delta time calculations
-
 /// Static time utilities
 pub const Time = struct {
     /// Get current time in milliseconds
@@ -11,7 +10,7 @@ pub const Time = struct {
         return @as(f32, @floatFromInt(c.sdl.SDL_GetTicks()));
     }
 
-    /// Get high-precision current time in seconds  
+    /// Get high-precision current time in seconds
     pub fn getTimeSec() f32 {
         const current_time = c.sdl.SDL_GetPerformanceCounter();
         const frequency = c.sdl.SDL_GetPerformanceFrequency();
@@ -50,7 +49,7 @@ pub const Time = struct {
     pub fn getElapsedMs(start_time: u64) f32 {
         return getElapsedSec(start_time) * 1000.0;
     }
-    
+
     /// Create a new timestamp for current time
     pub fn now() Timestamp {
         return Timestamp{ .ticks = getPerformanceCounter() };
@@ -60,17 +59,17 @@ pub const Time = struct {
 /// Timestamp represents a point in time
 pub const Timestamp = struct {
     ticks: u64,
-    
+
     /// Get elapsed time in seconds since this timestamp
     pub fn getElapsedSec(self: Timestamp) f32 {
         return Time.getElapsedSec(self.ticks);
     }
-    
-    /// Get elapsed time in milliseconds since this timestamp  
+
+    /// Get elapsed time in milliseconds since this timestamp
     pub fn getElapsedMs(self: Timestamp) f32 {
         return Time.getElapsedMs(self.ticks);
     }
-    
+
     /// Check if elapsed time exceeds a duration
     pub fn hasElapsed(self: Timestamp, duration_sec: f32) bool {
         return self.getElapsedSec() >= duration_sec;
@@ -105,13 +104,13 @@ pub const DeltaTime = struct {
     pub fn update(self: *DeltaTime) f32 {
         const current_time = Time.getPerformanceCounter();
         const raw_delta = Time.tickDeltaToSeconds(self.last_frame_time, current_time);
-        
+
         // Clamp delta time to prevent large jumps
         const delta = @min(raw_delta, self.max_delta);
-        
+
         self.last_frame_time = current_time;
         self.accumulated_time += delta;
-        
+
         return delta;
     }
 
@@ -219,10 +218,10 @@ test "Time.getTimeMs returns positive value" {
 
 test "DeltaTime.update returns reasonable values" {
     var delta_timer = DeltaTime.init();
-    
+
     // Sleep briefly to get some delta time
     std.time.sleep(1_000_000); // 1ms
-    
+
     const delta = delta_timer.update();
     try std.testing.expect(delta > 0.0);
     try std.testing.expect(delta < 1.0); // Should be much less than 1 second
@@ -231,7 +230,7 @@ test "DeltaTime.update returns reasonable values" {
 test "Timer.isFinished works correctly" {
     var timer = Timer.init(0.001); // 1ms
     try std.testing.expect(!timer.isFinished()); // Should not be finished immediately
-    
+
     std.time.sleep(2_000_000); // 2ms
     try std.testing.expect(timer.isFinished()); // Should be finished now
 }
@@ -239,14 +238,14 @@ test "Timer.isFinished works correctly" {
 test "Cooldown system works correctly" {
     var cooldown = Cooldown.init(1.0); // 1 second
     try std.testing.expect(cooldown.isReady()); // Should start ready
-    
+
     cooldown.start();
     try std.testing.expect(!cooldown.isReady()); // Should not be ready after starting
-    
+
     cooldown.update(0.5); // Update with 0.5 seconds
     try std.testing.expect(!cooldown.isReady()); // Still on cooldown
     try std.testing.expectApproxEqAbs(@as(f32, 0.5), cooldown.getRemaining(), 0.001);
-    
+
     cooldown.update(0.6); // Update with another 0.6 seconds (total 1.1s)
     try std.testing.expect(cooldown.isReady()); // Should be ready now
     try std.testing.expectApproxEqAbs(@as(f32, 0.0), cooldown.getRemaining(), 0.001);

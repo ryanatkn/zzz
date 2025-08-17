@@ -120,25 +120,25 @@ test "scalar math operations" {
     // Test equals
     try std.testing.expect(equals(1.0, 1.001, 0.01));
     try std.testing.expect(!equals(1.0, 1.1, 0.01));
-    
+
     // Test step
     try std.testing.expect(step(0.5, 0.3) == 0.0);
     try std.testing.expect(step(0.5, 0.7) == 1.0);
     try std.testing.expect(step(0.5, 0.5) == 1.0);
-    
+
     // Test saturate
     try std.testing.expect(saturate(-0.5) == 0.0);
     try std.testing.expect(saturate(0.5) == 0.5);
     try std.testing.expect(saturate(1.5) == 1.0);
-    
+
     // Test smoothstep
     try std.testing.expect(smoothstep(0.0, 1.0, 0.0) == 0.0);
     try std.testing.expect(smoothstep(0.0, 1.0, 1.0) == 1.0);
     try std.testing.expect(equals(smoothstep(0.0, 1.0, 0.5), 0.5, 0.001));
-    
+
     // Test remap
     try std.testing.expect(equals(remap(5.0, 0.0, 10.0, 0.0, 100.0), 50.0, 0.001));
-    
+
     // Test angle conversions
     try std.testing.expect(equals(degreesToRadians(180.0), std.math.pi, 0.001));
     try std.testing.expect(equals(radiansToDegrees(std.math.pi), 180.0, 0.001));

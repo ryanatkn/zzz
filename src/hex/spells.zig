@@ -162,7 +162,7 @@ pub const SpellSystem = struct {
             const transform = &zone.units.transforms[i];
             const health = &zone.units.healths[i];
             const unit = &zone.units.units[i];
-            
+
             // Skip if unit is not alive
             if (!health.alive) continue;
 
@@ -173,15 +173,15 @@ pub const SpellSystem = struct {
             if (dist_sq <= radius_sq) {
                 // Unit is in area - apply lull effect by reducing aggro factor
                 unit.aggro_factor = 0.2; // 20% aggro as per constants
-                
+
                 // Add visual effect for this unit (optional)
                 effect_system.addUnitEffectAura(transform.pos, transform.radius, duration);
-                
+
                 loggers.getGameLog().info("lull_unit_affected", "Unit at ({d:.0}, {d:.0}) affected by lull", .{ transform.pos.x, transform.pos.y });
             }
         }
     }
-    
+
     /// Get aggro multiplier for a specific unit
     pub fn getAggroMultiplierForUnit(unit_id: hex_game_mod.EntityId, zone_storage: *const hex_game_mod.HexGame.ZoneData) f32 {
         // For now, return 1.0 (no modification)
@@ -190,7 +190,6 @@ pub const SpellSystem = struct {
         _ = zone_storage;
         return 1.0;
     }
-
 };
 
 fn getSpellCooldown(spell: SpellType) f32 {

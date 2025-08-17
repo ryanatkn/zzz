@@ -19,7 +19,7 @@ const BorderConfig = animated_borders.BorderConfig{
 
 const BorderStack = animated_borders.BorderStack(constants.MAX_BORDER_LAYERS);
 
-// Border calculation function 
+// Border calculation function
 pub fn calculateBorderRects(width: f32, offset: f32) [4]animated_borders.BorderRect {
     const border_config = BorderConfig;
     const dummy_stack = BorderStack.init(border_config);
@@ -33,21 +33,21 @@ pub fn drawScreenBorder(game_state: anytype) void {
     // Iris wipe effect (highest priority - renders over everything)
     if (game_state.iris_wipe_active) {
         const elapsed_sec = game_state.iris_wipe_start_time.getElapsedSec();
-        
+
         const wipe_colors = [_]Color{
             colors.BLUE_BRIGHT,   colors.GREEN_BRIGHT,  colors.YELLOW_BRIGHT,
             colors.ORANGE_BRIGHT, colors.PURPLE_BRIGHT, colors.CYAN,
         };
-        
+
         const iris_wipe = animated_borders.IrisWipe{
             .colors = &wipe_colors,
             .band_width = constants.IRIS_WIPE_BAND_WIDTH,
             .duration = constants.IRIS_WIPE_DURATION,
             .easing_fn = animated_borders.Easing.quarticEaseOut,
         };
-        
+
         iris_wipe.getBorders(elapsed_sec, &border_stack);
-        
+
         if (elapsed_sec >= constants.IRIS_WIPE_DURATION) {
             @constCast(game_state).iris_wipe_active = false;
         }

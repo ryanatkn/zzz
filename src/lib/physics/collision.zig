@@ -428,7 +428,6 @@ pub const SpatialGrid = struct {
 };
 
 /// Convenience functions for common collision queries
-
 /// Check if a position is safe to move to (no collisions with obstacles)
 pub fn isPositionSafe(
     pos: Vec2,
@@ -436,7 +435,7 @@ pub fn isPositionSafe(
     obstacles: []const Shape,
 ) bool {
     const entity_shape = Shape{ .circle = .{ .center = pos, .radius = radius } };
-    
+
     for (obstacles) |obstacle| {
         if (checkCollision(entity_shape, obstacle)) {
             return false;
@@ -452,7 +451,7 @@ pub fn findNearestObstacle(
 ) ?struct { index: usize, distance_sq: f32 } {
     var nearest_index: ?usize = null;
     var nearest_distance_sq: f32 = std.math.inf(f32);
-    
+
     for (obstacles, 0..) |obstacle, i| {
         const obstacle_center = switch (obstacle) {
             .circle => |c| c.center,
@@ -460,14 +459,14 @@ pub fn findNearestObstacle(
             .point => |p| p.position,
             .line => continue, // Skip line segments for now
         };
-        
+
         const dist_sq = math.distanceSquared(pos, obstacle_center);
         if (dist_sq < nearest_distance_sq) {
             nearest_distance_sq = dist_sq;
             nearest_index = i;
         }
     }
-    
+
     if (nearest_index) |index| {
         return .{ .index = index, .distance_sq = nearest_distance_sq };
     }
@@ -484,7 +483,7 @@ pub fn checkMovingCircleCollision(
     // Simple approach: check multiple points along the path
     const step_count = 10;
     const step = end_pos.sub(start_pos).scale(1.0 / @as(f32, @floatFromInt(step_count)));
-    
+
     var current_pos = start_pos;
     for (0..step_count + 1) |_| {
         if (!isPositionSafe(current_pos, radius, obstacles)) {
@@ -492,7 +491,7 @@ pub fn checkMovingCircleCollision(
         }
         current_pos = current_pos.add(step);
     }
-    
+
     return null; // No collision
 }
 
@@ -504,12 +503,12 @@ pub fn resolveCollision(
 ) ?Vec2 {
     const entity_shape = Shape{ .circle = .{ .center = entity_pos, .radius = entity_radius } };
     const result = checkCollisionDetailed(entity_shape, obstacle);
-    
+
     if (!result.collided) return null;
-    
+
     // Push entity out along collision normal
     const push_distance = result.penetration_depth + 0.01; // Small buffer
     const corrected_pos = entity_pos.add(result.normal.scale(push_distance));
-    
+
     return corrected_pos;
 }

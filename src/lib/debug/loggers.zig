@@ -10,10 +10,7 @@ const config = @import("config.zig");
 /// Full logging for game-critical modules (game state, combat, etc.)
 /// Logs to both console and file with throttling
 pub const GameLogger = Logger(.{
-    .output = outputs.Multi(.{ 
-        outputs.Console, 
-        outputs.File(.{ .path = config.game_log.file_path })
-    }),
+    .output = outputs.Multi(.{ outputs.Console, outputs.File(.{ .path = config.game_log.file_path }) }),
     .filter = filters.Throttle,
     .formatter = formatters.Timestamped,
 });
@@ -37,10 +34,7 @@ pub const RenderLogger = Logger(.{
 /// Debug logger for development - verbose output
 /// Logs everything without throttling (use sparingly)
 pub const DebugLogger = Logger(.{
-    .output = outputs.Multi(.{
-        outputs.Console,
-        outputs.File(.{ .path = config.debug_log.file_path })
-    }),
+    .output = outputs.Multi(.{ outputs.Console, outputs.File(.{ .path = config.debug_log.file_path }) }),
     .filter = filters.Passthrough,
     .formatter = formatters.Timestamped,
 });
@@ -64,7 +58,7 @@ pub var font_log: ?FontLogger = null;
 pub fn initGlobalLoggers(allocator: std.mem.Allocator) !void {
     // Clean up any existing loggers first
     deinitGlobalLoggers();
-    
+
     // Initialize new logger instances
     game_log = GameLogger.init(allocator);
     ui_log = UILogger.init(allocator);
@@ -112,4 +106,3 @@ pub fn getRenderLog() *RenderLogger {
 pub fn getFontLog() *FontLogger {
     return &(font_log orelse @panic("Global font logger not initialized. Call initGlobalLoggers() first."));
 }
-

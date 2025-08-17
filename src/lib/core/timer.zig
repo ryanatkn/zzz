@@ -113,13 +113,13 @@ pub const RechargeTimer = struct {
     /// Update the recharge timer and return how many whole units to add
     pub fn update(self: *RechargeTimer, deltaTime: f32) u32 {
         self.accumulator += self.recharge_rate * deltaTime;
-        
+
         var units_to_add: u32 = 0;
         while (self.accumulator >= 1.0) {
             units_to_add += 1;
             self.accumulator -= 1.0;
         }
-        
+
         return units_to_add;
     }
 
@@ -131,22 +131,22 @@ pub const RechargeTimer = struct {
 
 test "Timer basic functionality" {
     var timer = Timer.init(2.0);
-    
+
     // Initial state
     try std.testing.expect(timer.isFinished());
     try std.testing.expect(!timer.isRunning());
-    
+
     // Start timer
     timer.start();
     try std.testing.expect(!timer.isFinished());
     try std.testing.expect(timer.isRunning());
     try std.testing.expectApproxEqAbs(@as(f32, 0.0), timer.getProgress(), 0.01);
-    
+
     // Update partway
     timer.update(1.0);
     try std.testing.expectApproxEqAbs(@as(f32, 0.5), timer.getProgress(), 0.01);
     try std.testing.expect(timer.isRunning());
-    
+
     // Finish timer
     timer.update(1.5);
     try std.testing.expect(timer.isFinished());
@@ -156,18 +156,18 @@ test "Timer basic functionality" {
 
 test "CooldownTimer functionality" {
     var cooldown = CooldownTimer.init(1.0);
-    
+
     // Initial state - ready
     try std.testing.expect(cooldown.isReady());
-    
+
     // Trigger cooldown
     cooldown.trigger();
     try std.testing.expect(!cooldown.isReady());
-    
+
     // Update partway
     cooldown.update(0.5);
     try std.testing.expect(!cooldown.isReady());
-    
+
     // Complete cooldown
     cooldown.update(0.6);
     try std.testing.expect(cooldown.isReady());
@@ -175,16 +175,16 @@ test "CooldownTimer functionality" {
 
 test "RechargeTimer functionality" {
     var recharge = RechargeTimer.init(2.0); // 2 units per second
-    
+
     // No time passed
     try std.testing.expectEqual(@as(u32, 0), recharge.update(0.0));
-    
+
     // Half a unit worth of time
     try std.testing.expectEqual(@as(u32, 0), recharge.update(0.25));
-    
+
     // Complete one unit
     try std.testing.expectEqual(@as(u32, 1), recharge.update(0.25));
-    
+
     // Multiple units at once
     try std.testing.expectEqual(@as(u32, 2), recharge.update(1.0));
 }

@@ -100,7 +100,7 @@ const IndexPage = struct {
 
         // Add font test link
         try links.append(page.createLink("Font Test", "/font-grid-test", nav_center_x, nav_y - nav_height - 20, nav_width, nav_height));
-        
+
         // Add IDE link
         try links.append(page.createLink("IDE", "/ide", nav_center_x - nav_width * 2 - nav_spacing, nav_y - nav_height - 20, nav_width, nav_height));
 
