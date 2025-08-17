@@ -1,5 +1,7 @@
 # Vibe Engineering
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 ## Module-and-Interface Methodology
 
 Vibe engineering applies proven software engineering practices through a module-and-interface lens rather than implementation details. Where "vibe coding" relies on intuition and aesthetic choices, vibe engineering leverages data, measurement, and automated verification to drive architectural decisions.

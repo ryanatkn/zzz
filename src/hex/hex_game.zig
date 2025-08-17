@@ -3,6 +3,7 @@ const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
 const constants = @import("constants.zig");
 const combat = @import("combat.zig");
+const object_pools = @import("../lib/core/object_pools.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -683,6 +684,7 @@ pub const HexGame = struct {
     entity_allocator: EntityAllocator,
     allocator: std.mem.Allocator,
     logger: ModuleLogger,
+    frame_pool: object_pools.FramePool,
     
     pub const ZoneData = struct {
         // Direct fixed-size archetype storage - no dynamic allocation
@@ -777,6 +779,7 @@ pub const HexGame = struct {
             .entity_allocator = EntityAllocator{},
             .allocator = allocator,
             .logger = ModuleLogger.init(allocator),
+            .frame_pool = object_pools.FramePool.init(allocator),
         };
         
         // Initialize all zones
@@ -801,6 +804,7 @@ pub const HexGame = struct {
         for (&self.zones) |*zone| {
             zone.deinit();
         }
+        self.frame_pool.deinit();
         self.logger.deinit();
     }
     
@@ -1144,9 +1148,9 @@ pub const HexGame = struct {
     pub fn updateProjectiles(self: *HexGame, deltaTime: f32) !void {
         const zone = self.getCurrentZone();
         
-        // Collect projectiles to remove (avoid iterator invalidation)
-        var projectiles_to_remove = std.ArrayList(EntityId).init(std.heap.page_allocator);
-        defer projectiles_to_remove.deinit();
+        // Use frame pool for temporary allocation - no frame-by-frame heap allocation
+        const frame_allocator = self.frame_pool.allocator();
+        var projectiles_to_remove = std.ArrayList(EntityId).init(frame_allocator);
         
         // Update projectile positions and check collisions using ECS iteration
         var projectile_iter = zone.projectiles.entityIterator();

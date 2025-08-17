@@ -1,5 +1,7 @@
 # SDL VENDORING MIGRATION STATUS
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 ## TASK OBJECTIVE
 MIGRATE FROM EXTERNAL SDL DEPENDENCY (https://github.com/castholm/SDL) TO A VENDORED VERSION FOR FULLY SELF-CONTAINED BUILDS. SDL_ttf dependency eliminated via pure Zig text rendering.
 

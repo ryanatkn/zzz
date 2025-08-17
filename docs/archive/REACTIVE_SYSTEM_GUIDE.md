@@ -1,5 +1,7 @@
 # Zzz Reactive System - Comprehensive Guide
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 **Version:** Shallow Reactivity Complete | **Date:** January 13, 2025  
 **Status:** Production-Ready | Performance-First | Idiomatic Zig
 

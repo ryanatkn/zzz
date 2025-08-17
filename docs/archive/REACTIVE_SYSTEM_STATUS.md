@@ -1,5 +1,7 @@
 # Reactive System Implementation Status
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 ## ✅ Completed: Svelte 5-Style Automatic Dependency Tracking
 
 ### What Was Implemented

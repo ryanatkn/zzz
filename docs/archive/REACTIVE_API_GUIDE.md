@@ -1,5 +1,7 @@
 # Svelte 5 Reactive System API Guide
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 **Status:** Complete Production Implementation | **Coverage:** Full Svelte 5 API
 
 This guide covers the complete Svelte 5 reactive system implementation, featuring all core APIs including state management, derived values, effects, and advanced features like state snapshots and effect scopes.

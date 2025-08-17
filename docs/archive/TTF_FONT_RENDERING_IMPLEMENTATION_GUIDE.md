@@ -1,5 +1,7 @@
 # Pure Zig Text Rendering Migration Guide (SDL_ttf Replacement)
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 ## Current Status
 
 ### ✓ Completed

@@ -1,5 +1,7 @@
 # Pure Zig Text Rendering Migration Status - January 13, 2025
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 **Project:** Zzz SDL3 Game Engine  
 **Component:** Pure Zig Text Rendering System (Migrated from SDL_ttf)  
 

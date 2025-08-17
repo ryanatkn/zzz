@@ -1,103 +1,93 @@
-# HUD System - Implementation Guide
+# HUD System - AI Assistant Guide
 
-## Current State
+> ⚠️ AI slop code and docs, is unstable and full of lies
 
-**Working:**
-- ✓ Transparent overlay rendering with alpha blending
-- ✓ Page routing to static paths
-- ✓ Mouse click navigation between pages
-- ✓ Backtick (`) key toggles transparent HUD overlay
-- ✓ ESC key closes menu
-- ✓ Page interface with init/deinit/update/render lifecycle
-- ✓ History navigation with back/forward
-- ✓ Address bar showing current path
-- ✓ Simple text rendering (basic ASCII letters)
-- ✓ Button labels and link text
-- ✓ SvelteKit-style routing (`+page.zig`, `+layout.zig`)
-- ✓ Layout system with composition support
-- ✓ "Back to Menu" buttons on all non-root pages
+Transparent overlay system with SvelteKit-style routing. Provides in-game menu navigation without blocking gameplay view.
 
-**Fixed:**
-- ✓ History navigation (using SimpleHistory with fixed buffers)
-- ✓ Back/forward mouse buttons working
-- ✓ Navigation bar buttons working
-- ✓ Rectangle rendering via gpu.drawRect
-- ✓ SvelteKit migration complete
+## Quick Reference
 
-**Missing:**
-- Dynamic routes (`[param]` folders)
-- Form controls (inputs, sliders, checkboxes)
-- Transitions between pages
-- State persistence
-- Full font support (only basic letters implemented)
-- Nested layout composition (simplified for now)
+**Activation:** Press backtick (`) to toggle overlay
+**Navigation:** Click links, use back/forward buttons, or ESC to close
+**Status:** ✓ Fully functional with transparent rendering
 
-## File Structure
+## Working Features
+- Transparent overlay with alpha blending
+- SvelteKit-style routing (`+page.zig`, `+layout.zig`)
+- History navigation with back/forward
+- Address bar showing current path
+- Mouse and keyboard controls
+- Layout composition system
+
+## Architecture
 
 ```
-src/browser/
-├── browser.zig          # Main coordinator, event routing
-├── router.zig           # SvelteKit-style routing with layout support
-├── history.zig          # Navigation stack (deprecated, use simple_history)
-├── simple_history.zig   # Fixed-buffer history implementation
-├── renderer.zig         # UI rendering with rectangles and text
-├── page.zig             # Page, Layout, and RenderSlot interfaces
-├── DESIGN.md            # Architecture documentation
-└── CLAUDE.md            # This file
-
-src/routes/              # SvelteKit-style convention
-├── +layout.zig          # Root layout (wraps all pages)
-├── +page.zig            # Home page (/)
-├── settings/
-│   ├── +page.zig        # Settings index (/settings)
-│   ├── video/
-│   │   └── +page.zig    # Video settings (/settings/video)
-│   └── audio/
-│       └── +page.zig    # Audio settings (/settings/audio)
-└── stats/
-    └── +page.zig        # Statistics (/stats)
+hud/
+├── hud.zig              # Main HUD coordinator
+├── router.zig           # SvelteKit-style routing
+├── renderer.zig         # Transparent UI rendering
+├── reactive_hud.zig     # Reactive HUD integration
+├── page.zig             # Page/Layout interfaces
+└── constants.zig        # UI constants
 ```
 
-## SvelteKit Migration ✓ COMPLETE
+**Menu pages:** See [src/menu/CLAUDE.md](../menu/CLAUDE.md)
 
-The migration to SvelteKit-style routing is now complete:
+## Key Systems
 
-**What's Implemented:**
-- `+page.zig` convention for all pages
-- `+layout.zig` for root layout (extensible to nested layouts)
-- Layout and RenderSlot types in page.zig
-- Router loads layouts alongside pages
-- All pages follow new structure
-
-**How It Works:**
+### Router Pattern
 ```zig
-// Router resolves path to page and collects layouts
-"/settings/video" → 
-  - Load: root +layout.zig
-  - Load: settings/video/+page.zig
-  - Render: layout wraps page via RenderSlot
-
-// Each page exports a create function
-pub fn create(allocator: std.mem.Allocator) !*page.Page
-
-// Layouts can wrap content via slots
-pub fn render(self: *const Layout, links: *ArrayList(Link), slot: *const RenderSlot) !void
+// Path resolution
+"/settings/video" →
+  - Load root +layout.zig
+  - Load settings/video/+page.zig
+  - Render layout wrapping page
 ```
 
-**Current Limitations:**
-- Nested layouts simplified (only root layout active)
-- No dynamic routes yet (would need build-time generation)
-- Manual route registration in router.zig
+### Page Interface
+```zig
+pub fn create(allocator: Allocator) !*page.Page {
+    // Return page with vtable
+}
+```
 
-## Known Issues
+### Transparency
+- Alpha blending for overlay effect
+- Game world visible underneath
+- Semi-transparent backgrounds
 
-1. **Hardcoded Screen Size**: Using 1920x1080 constants
-   - Need: Get actual size from renderer
-   - Blocked: Renderer doesn't expose screen_size
+## Common Modifications
 
-2. **Limited Text Rendering**: Only basic ASCII letters implemented
-   - Missing: Numbers, special characters, lowercase variants
-   - Current: Using simple rectangle-based letter drawing
+### Adding HUD Elements
+1. Create component in `hud/`
+2. Add to HUD.update() and render()
+3. Use reactive patterns if needed
+4. Test transparency with game running
+
+### Modifying Router
+1. Edit `router.zig` for new routes
+2. Import page modules
+3. Add path matching logic
+4. Test navigation flow
+
+### Styling Changes
+1. Adjust alpha in `renderer.zig`
+2. Modify colors in render functions
+3. Update positioning constants
+4. Test visibility over game
+
+## Technical Notes
+
+- Fixed 1920x1080 screen dimensions
+- Manual route registration required
+- Single root layout (no nesting)
+- Basic ASCII text rendering only
+- Alpha blending for transparency
+
+## Related Documentation
+
+- [Menu System](../menu/CLAUDE.md) - Page implementations
+- [Reactive UI](../lib/CLAUDE.md) - UI components
+- [Architecture](./DESIGN.md) - System design
 
 ## Quick Tasks
 

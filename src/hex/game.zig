@@ -6,6 +6,8 @@ const filters = @import("../lib/debug/filters.zig");
 const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision.zig");
 const hex_game_mod = @import("hex_game.zig");
+const time_utils = @import("../lib/core/time.zig");
+const contexts = @import("../lib/game/contexts.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
@@ -51,7 +53,7 @@ pub const GameState = struct {
 
     // Iris wipe effect for resurrection
     iris_wipe_active: bool,
-    iris_wipe_start_time: u64,
+    iris_wipe_start_time: time_utils.Timestamp,
 
     // State management system
     state_manager: ?*game_systems.StateManager(save_data.HexSaveData, hex_events.HexEvents),
@@ -84,7 +86,7 @@ pub const GameState = struct {
             .allocator = allocator,
             .hud_system = null,
             .iris_wipe_active = false,
-            .iris_wipe_start_time = 0,
+            .iris_wipe_start_time = time_utils.Time.now(),
             .state_manager = null,
             .game_stats = .{},
             .ai_input = null,
@@ -473,6 +475,19 @@ fn updateUnits(game_state: *GameState, deltaTime: f32) void {
 }
 
 pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: f32) void {
+    // Reset frame pool for this frame's temporary allocations
+    game_state.hex_game.frame_pool.reset();
+    
+    // Create update context for structured parameter passing
+    const frame_allocator = game_state.hex_game.frame_pool.allocator();
+    const update_ctx = contexts.UpdateContext.init(frame_allocator, deltaTime, game_state.frame_counter)
+        .withPause(game_state.game_paused);
+    
+    // Create graphics context with camera information for future viewport-aware updates
+    const graphics_ctx = contexts.GraphicsContext.init(update_ctx, cam.screen_width, cam.screen_height)
+        .withCamera(cam.view_x + cam.view_width / 2.0, cam.view_y + cam.view_height / 2.0, cam.scale);
+    _ = graphics_ctx; // Reserved for future viewport-aware optimizations
+    
     // Increment frame counter
     game_state.frame_counter += 1;
     
@@ -516,13 +531,16 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
         }
     }
 
+    // Use context for consistent delta time access
+    const effective_delta = contexts.ContextUtils.effectiveDeltaTime(update_ctx);
+    
     // Update bullet entities using ECS
-    world.updateProjectiles(deltaTime) catch |err| {
+    world.updateProjectiles(effective_delta) catch |err| {
         game_state.logger.err("projectiles_update_fail", "Failed to update projectiles: {}", .{err});
     };
 
     // Update units
-    updateUnits(game_state, deltaTime);
+    updateUnits(game_state, effective_delta);
 
     checkCollisions(game_state);
 
@@ -530,10 +548,10 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     game_state.effect_system.update();
 
     // Update spell system
-    game_state.spell_system.update(deltaTime);
+    game_state.spell_system.update(effective_delta);
 
     // Update bullet pool (manages firing rate limiting)
-    world.updateBulletPool(deltaTime);
+    world.updateBulletPool(effective_delta);
 }
 
 pub fn checkCollisions(game_state: *GameState) void {
@@ -639,7 +657,7 @@ fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_rad
 pub fn handleRespawn(game_state: *GameState) void {
     // Start iris wipe effect
     game_state.iris_wipe_active = true;
-    game_state.iris_wipe_start_time = c.sdl.SDL_GetPerformanceCounter();
+    game_state.iris_wipe_start_time = time_utils.Time.now();
 
     combat.respawnPlayer(game_state);
 }

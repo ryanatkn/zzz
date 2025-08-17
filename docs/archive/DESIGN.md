@@ -1,5 +1,7 @@
 # Zzz Game Engine - Design Document
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 ## Architecture Overview
 
 **Pure Zig SDL3 GPU-based game engine with procedural rendering and reactive UI system.**

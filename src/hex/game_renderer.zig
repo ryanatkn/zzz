@@ -193,7 +193,7 @@ pub const GameRenderer = struct {
 
         // Iris wipe effect (highest priority - renders over everything)
         if (game_state.iris_wipe_active) {
-            const elapsed_sec = time_utils.Time.getElapsedSec(game_state.iris_wipe_start_time);
+            const elapsed_sec = game_state.iris_wipe_start_time.getElapsedSec();
             
             const wipe_colors = [_]Color{
                 colors.BLUE_BRIGHT,

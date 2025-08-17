@@ -1,5 +1,7 @@
 # ✅ FULLY COMPLETED: Logging System Refactor
 
+// TODO use this to update /docs/
+
 ## Current Problems
 
 The current logging system has architectural issues:

@@ -1,242 +1,221 @@
-# Zzz Library
+# Zzz Engine Library
 
-Core engine components providing SDL3-based rendering and framework functionality with capability-based organization.
+> ⚠️ AI slop code and docs, is unstable and full of lies
 
-## Architecture
+Core engine providing GPU-accelerated rendering, reactive UI, and game systems with zero external dependencies.
 
-The `src/lib/` directory contains the engine-level components that are shared across different game implementations. This separation ensures clean architecture and reusability.
+## Architecture Overview
 
-### Capability-Based Organization
+**Organization:** Capability-based - modules grouped by what they enable, not what they are
+**Philosophy:** Performance-first, procedural generation, GPU-driven design
+**Dependencies:** Zero external packages - all vendored and self-contained
 
-The library is organized by **capability** rather than implementation details, providing clear functional boundaries:
+For detailed architecture documentation, see [docs/architecture.md](../../docs/architecture.md)
 
-#### **Core (`core/`)**
-Fundamental data structures and utilities that everything else depends on:
-- **Math** (`math/mod.zig`) - Vec2, Rectangle, vector operations, distance calculations, transformations, geometric shapes  
-- **Colors** (`core/colors.zig`) - Color manipulation, HSV conversion, theming
-- **Collections** (`core/collections.zig`) - Navigation history and state management
+## Directory Structure
 
-#### **Platform (`platform/`)**
-External system integration and platform abstraction:
-- **SDL Bindings** (`platform/sdl.zig`) - SDL3 C API integration
-- **Input** (`platform/input.zig`) - Keyboard, mouse, and controller input handling
-- **Resources** (`platform/resources.zig`) - Common resource initialization patterns
-- **Window** (`platform/window.zig`) - Window and GPU device management
+### Core Capabilities (`core/`)
+Fundamental types and utilities:
+- **types.zig** - Vec2, Color, Rectangle
+- **colors.zig** - Color manipulation, HSV, theming
+- **viewport.zig** - Dependency inversion interface
+- **result.zig** - Result(T, E) error handling
+- **pool.zig** - Resource and object pooling
+- **id.zig** - Type-safe IDs, handle systems
 
-#### **Rendering (`rendering/`)**
-Complete graphics pipeline capabilities:
-- **Interface** (`rendering/interface.zig`) - Renderer abstraction for drawing operations
-- **GPU** (`rendering/gpu.zig`) - Low-level SDL3 GPU rendering implementation
-- **Shaders** (`rendering/shaders.zig`) - Shader compilation and management
-- **Camera** (`rendering/camera.zig`) - Camera system with fixed/follow modes
-- **Modes** (`rendering/modes.zig`) - Immediate vs persistent rendering guidelines
-- **Drawing** (`rendering/drawing.zig`) - High-level drawing utilities for UI
+### Platform Layer (`platform/`)
+System integration:
+- **sdl.zig** - SDL3 C bindings
+- **input.zig** - Unified input handling
+- **window.zig** - Window and GPU device management
+- **resources.zig** - Resource initialization
 
-#### **Physics (`physics/`)**
-Spatial reasoning and collision systems:
-- **Collision** (`physics/collision.zig`) - Generic collision detection with Shape enum
+### Rendering Pipeline (`rendering/`)
+GPU graphics capabilities:
+- **interface.zig** - Abstract renderer interface
+- **gpu.zig** - SDL3 GPU backend
+- **shaders.zig** - HLSL compilation and caching
+- **camera.zig** - Fixed/follow camera modes
+- **modes.zig** - Immediate vs persistent rendering
+- **drawing.zig** - High-level UI utilities
 
-#### **Game Systems (`game/`)**
-Core game engine infrastructure:
-- **ECS** (`game/ecs.zig`) - Entity Component System implementation
-- **Events** (`game/events/`) - Generic event system with listeners
-- **State** (`game/state/`) - State management and caching
-- **Control** (`game/control/`) - AI control system with lock-free ring buffer
-- **Persistence** (`game/persistence/`) - Save state management
+### Physics System (`physics/`)
+Collision and spatial reasoning:
+- **collision.zig** - Shape-to-shape collision
+- **shapes.zig** - Circle, Rectangle, Line, Point
+- **queries.zig** - Spatial queries (planned)
 
-#### **Specialized Subsystems**
-Advanced feature modules that leverage the core capabilities:
-- **Reactive** (`reactive/`) - Complete Svelte 5 reactive system implementation
-- **Font** (`font/`) - Pure Zig font processing (TTF parsing, rasterization, atlas management)
-- **Text** (`text/`) - High-level text rendering (bitmap/SDF, layout, caching)
-- **Vector** (`vector/`) - GPU-accelerated vector graphics with mathematical precision
-- **UI** (`ui/`) - Reactive UI components with automatic lifecycle management
-- **Debug** (`debug/`) - Development and debugging utilities
+### Game Systems (`game/`)
+Core game infrastructure:
+- **ecs.zig** - Entity Component System (simplified)
+- **zone.zig** - Zone-based world system
+- **events/** - Pub/sub event system
+- **state/** - State management and caching
+- **control/** - Lock-free AI control interface
+- **persistence/** - Save/load system
 
-### Engine vs Game Separation
+### Advanced Subsystems
 
-**Engine Layer (`src/lib/`):**
-- Core capabilities organized by function
-- Reusable components across different games
-- Platform abstraction and resource management
-- Reactive UI framework with automatic state management
-- GPU-accelerated rendering pipeline
+#### Reactive System (`reactive/`)
+Complete Svelte 5 implementation:
+- Signal-based state management
+- Derived values with lazy evaluation
+- Effects with lifecycle control
+- 95%+ cache hit rate
 
-**Game Layer (`src/hex/` and similar):**
-- Game-specific logic (entities, behaviors, combat)
-- Game state management
-- Game-specific rendering implementations
-- Content and data definitions
+#### Font System (`font/`)
+Pure Zig TTF rendering:
+- Complete TTF parser
+- CPU rasterization
+- GPU atlas generation
+- Zero dependencies
 
-### Key Components
+#### Text Rendering (`text/`)
+- Dual-mode: bitmap and SDF
+- Advanced layout algorithms
+- Persistent caching
 
-#### Math Types (`math/mod.zig`)
+#### Vector Graphics (`vector/`)
+- GPU-accelerated Bezier curves
+- Path tessellation
+- Glyph caching
+
+#### UI Components (`ui/`)
+- Reactive components
+- FPS counter, debug overlay
+- Layout systems
+
+#### Debug Tools (`debug/`)
+- Composable logging
+- Performance profiling
+- Visual debugging
+
+## Key Systems
+
+### Reactive System
 ```zig
-pub const Vec2 = struct { x: f32, y: f32 };
-pub const Rectangle = struct { x: f32, y: f32, w: f32, h: f32 };
-```
-
-#### Color Types (`core/colors.zig`)
-```zig
-pub const Color = struct { r: u8, g: u8, b: u8, a: u8 };
-```
-
-#### Renderer Interface (`rendering/interface.zig`)
-Provides a clean interface for drawing operations that different renderers can implement:
-```zig
-const interface = lib_renderer.createInterface(&my_renderer);
-interface.drawRect(cmd_buffer, render_pass, pos, size, color);
-interface.drawCircle(cmd_buffer, render_pass, pos, radius, color);
-```
-
-#### Camera System (`rendering/camera.zig`)
-Supports different camera modes for various game scenarios:
-- **Fixed**: Shows entire world with adjustable zoom (e.g., overworld)
-- **Follow**: Tracks player position with adjustable zoom (e.g., dungeons)
-
-#### GPU Renderer (`rendering/gpu.zig`)
-Low-level SDL3 GPU rendering implementation:
-- Shader management and compilation
-- Procedural vertex generation
-- Distance field rendering for anti-aliased shapes
-- Buffer management and command submission
-- Vector graphics integration with unified API
-
-#### Font and Text Rendering Subsystem
-Comprehensive pure Zig font rendering system:
-- **Font Processing** (`font/`) - Low-level font operations
-  - **TTF Parser** (`font/ttf_parser.zig`) - TTF file format parsing
-  - **Rasterizer Core** (`font/rasterizer_core.zig`) - Glyph bitmap generation
-  - **Font Atlas** (`font/font_atlas.zig`) - GPU texture atlas management
-  - **Font Manager** (`font/manager.zig`) - Font loading and management
-- **Text Rendering** (`text/`) - High-level text operations
-  - **Text Renderer** (`text/renderer.zig`) - Dual-mode text rendering (bitmap/SDF)
-  - **Text Layout** (`text/layout.zig`) - Advanced text positioning and alignment
-
-#### Vector Graphics System
-GPU-accelerated vector graphics with mathematical precision:
-- **Vector Graphics** (`vector/`) - Mathematical curve operations
-  - **Vector Paths** (`vector/path.zig`) - Bezier curve primitives and operations  
-  - **GPU Vector Renderer** (`vector/gpu_renderer.zig`) - GPU-accelerated vector drawing
-  - **Glyph Cache** (`vector/glyph_cache.zig`) - Advanced LRU caching system
-- **Font Supporting Systems**
-  - **Curve Tessellation** (`font/curve_tessellation.zig`) - Adaptive curve-to-line conversion
-  - **SDF Renderer** (`text/sdf_renderer.zig`) - Signed Distance Field generation
-  - **Font Metrics** (`font/font_metrics.zig`) - Comprehensive text measurement
-
-```zig
-// Vector graphics usage
-try renderer.drawQuadraticCurve(cmd_buffer, render_pass, curve, color, 2.0);
-try renderer.drawVectorCircle(cmd_buffer, render_pass, center, radius, color, 32);
-renderer.setVectorQuality(.high);
-```
-
-#### Reactive System
-Complete Svelte 5 implementation with full rune support:
-```zig
-// Reactive state management
-const counter = signal(0);
-const doubled = derived(&counter, |c| c.get() * 2);
-
-// Automatic UI updates
-const effect = createEffect(&counter, |c| {
-    std.log.info("Counter changed to: {}", .{c.get()});
+// Svelte 5 compatible reactivity
+const count = signal(0);
+const doubled = derived(&count, |c| c.get() * 2);
+const effect = createEffect(&count, |c| {
+    updateUI(c.get());
 });
 ```
 
-#### AI Control System
-High-performance external control interface:
-- **Lock-free ring buffer** - Zero contention between AI and game
-- **Memory-mapped file** - Shared memory interface (`.ai_commands`)
-- **Binary protocol** - 20-byte commands for minimal overhead
-- **Frame-accurate** - Commands can target specific frame numbers
-
+### GPU Rendering
 ```zig
-// Enable AI control in game
-game_state.initAIControl(allocator);
-
-// Process commands each frame (automatic)
-ai_control.processCommands(buffer, &input_state, frame_number);
+// Procedural vertex generation
+// No vertex buffers, use SV_VertexID
+// Distance fields for anti-aliasing
+// Batched instanced rendering
 ```
 
-Performance: ~50ns per command with zero allocations during runtime.
-
-## Usage Guidelines
-
-### Creating New Games
-
-1. **Use capability imports**: Import from `../lib/core/`, `../lib/platform/`, etc.
-2. **Implement game logic**: Create game-specific files in your game directory
-3. **Extend interfaces**: Implement renderer interfaces for custom drawing
-4. **Follow patterns**: Use existing games like Hex as reference
-
-### Engine Dependencies
-
-Games should primarily depend on:
-- `math/mod.zig` for Vec2, Rectangle and geometric operations
-- `core/colors.zig` for Color and color utilities
-- `rendering/camera.zig` for viewport management
-- `platform/input.zig` for user input handling
-- `rendering/interface.zig` for drawing interfaces
-
-Avoid importing game-specific components from engine code to maintain clean separation.
-
-### Rendering Architecture
-
-```
-Game Renderer (src/hex/game_renderer.zig)
-    ↓ implements
-Renderer Interface (src/lib/rendering/interface.zig)
-    ↓ uses
-GPU Renderer (src/lib/rendering/gpu.zig)
-    ↓ uses
-SDL3 GPU API (src/lib/platform/sdl.zig)
+### AI Control
+```zig
+// Lock-free ring buffer
+// Memory-mapped interface
+// ~50ns per command
+game.initAIControl(allocator);
 ```
 
 ## Import Patterns
 
-### From Game Code
+### Direct Capability Imports
 ```zig
-// Core utilities
-const math = @import("../lib/math/mod.zig");
-const colors = @import("../lib/core/colors.zig");
-
-// Platform integration  
+// From game code
+const types = @import("../lib/core/types.zig");
 const input = @import("../lib/platform/input.zig");
-const sdl = @import("../lib/platform/sdl.zig");
-
-// Rendering capabilities
 const camera = @import("../lib/rendering/camera.zig");
-const renderer = @import("../lib/rendering/interface.zig");
-
-// Subsystems (when needed)
-const reactive = @import("../lib/reactive.zig"); // Barrel import
-const ui = @import("../lib/ui.zig"); // Barrel import
 ```
 
-### From Library Code
+### Barrel Imports
 ```zig
-// Within same capability
-const math = @import("../math/mod.zig"); // math utilities
+// Complete subsystems
+const reactive = @import("../lib/reactive.zig");
+const ui = @import("../lib/ui.zig");
+```
 
-// Cross-capability dependencies
-const colors = @import("../core/colors.zig");
+### Within Library
+```zig
+// Same capability
+const types = @import("types.zig");
+
+// Cross-capability
 const sdl = @import("../platform/sdl.zig");
 ```
 
-## Adding New Engine Features
+## Usage Guidelines
 
-1. **Identify capability**: Determine which capability directory the feature belongs in
-2. **Core → Platform → Rendering → Physics**: Follow dependency hierarchy
-3. **Extend interfaces**: Add new interface methods if needed for drawing
-4. **Maintain compatibility**: Ensure existing games continue to work
-5. **Document changes**: Update this README and main documentation
+### Creating New Capabilities
+1. Identify capability category
+2. Create module in appropriate directory
+3. Follow existing patterns
+4. Update barrel exports if needed
+5. Add tests in same file
 
-## Performance Notes
+### Creating New Games
+1. Create directory in `src/yourgame/`
+2. Import capabilities as needed
+3. Follow Hex patterns as reference
+4. No cross-module restrictions
 
-- Engine prioritizes performance over backward compatibility
-- Use squared distances for calculations when possible
-- Leverage GPU instancing and batching in rendering
-- Cache-friendly data structures preferred
-- Fixed-size memory pools for allocation-heavy operations
-- Reactive system provides 95%+ cache hit rates for UI rendering
+### Performance Requirements
+- Zero allocations in hot paths
+- Squared distances for comparisons
+- Procedural generation over assets
+- Batch GPU operations
+- Fixed-size pools
+
+## Testing
+
+```bash
+# Run library tests
+zig test src/lib/reactive/test_expected_behavior.zig
+zig test src/lib/font/test_font_rendering.zig
+
+# Visual tests
+zig build run  # Navigate to test pages
+```
+
+## Common Tasks
+
+### Adding a Core Type
+- Place in `core/types.zig` or new file
+- Use `extern struct` for GPU compatibility
+- Add tests in same file
+
+### Creating UI Component
+- Extend `ReactiveComponent` base
+- Place in `ui/` directory
+- Use reactive primitives
+- See `fps_counter.zig` example
+
+### Adding Rendering Feature
+- Implement `RendererInterface`
+- Use procedural vertex generation
+- Follow SDL3 GPU patterns
+- Test with all backends
+
+## Performance Characteristics
+
+- **Reactive System:** 95%+ cache hit rate
+- **AI Control:** ~50ns per command
+- **Text Rendering:** Dual-mode with caching
+- **GPU Pipeline:** Batched, instanced rendering
+- **Memory:** Fixed pools, minimal allocations
+- **Target:** 60 FPS with 1000+ entities
+
+## Documentation
+
+- **AI Assistant Guide:** [CLAUDE.md](./CLAUDE.md)
+- **Architecture:** [docs/architecture.md](../../docs/architecture.md)
+- **GPU Performance:** [docs/gpu-performance.md](../../docs/gpu-performance.md)
+- **Development:** [docs/development-workflow.md](../../docs/development-workflow.md)
+
+## Philosophy
+
+- **Performance First:** Always optimize for final code
+- **Procedural Generation:** Algorithms over assets
+- **Zero Dependencies:** Everything vendored
+- **GPU-Driven:** Leverage GPU for everything
+- **Capability-Based:** Organize by function

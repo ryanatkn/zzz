@@ -1,5 +1,7 @@
 # Reactive System Fixes - January 2025
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 **Date:** January 13, 2025  
 **Status:** COMPLETED ✅  
 **Test Results:** 17/18 tests passing (94% success rate)

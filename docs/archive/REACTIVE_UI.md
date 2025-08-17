@@ -1,5 +1,7 @@
 # Reactive UI Development - Current Status
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 **Date:** January 13, 2025  
 **Session Status:** Final Phase 1 Cleanup Complete ✅ | Code Quality Optimized 🧹 | Ready for Phase 2 🚀  
 **Foundation:** ✅ Modular Architecture | ✅ Complete Svelte 5 System | ✅ Performance Optimized | ✅ Technical Debt Eliminated

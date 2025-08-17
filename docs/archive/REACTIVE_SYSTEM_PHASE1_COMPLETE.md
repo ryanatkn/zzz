@@ -1,5 +1,7 @@
 # Zzz Game Engine - Next Development Steps
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 **Date:** January 13, 2025  
 **Status:** Reactive System Fixed ✅ | UI Integration Phase 🚀  
 **Foundation:** ✅ SDL3 Vendoring | ✅ TTF Rendering | ✅ Reactive System (17/18 tests)

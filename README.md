@@ -23,18 +23,16 @@ Zzz is a graphics and media programming environment.
 It builds on SDL3 and reinvents the rest in Zig.
 It treats the web as a backwards compat target and strives for optimal UX and DX.
 
-## Architecture
+## What's inside
 
-### Engine capabilities (src/lib/)
-- **Core primitives**: types, math, colors, viewport, result handling, object pools, ID generation
-- **Platform layer**: SDL3 integration, input handling, window management, resource loading
-- **Rendering system**: GPU backend, camera, shaders, drawing utilities, render modes
-- **Physics system**: collision detection, shape definitions (circle, rectangle, line, point)
-- **Reactive UI**: complete Svelte 5 implementation with signals, effects, and derived state
-- **Font & text**: pure Zig TTF parsing, rasterization, SDF rendering, layout
-- **Vector graphics**: GPU-accelerated Bezier curves, path rendering, glyph caching
-- **Component system**: reactive UI components with automatic lifecycle management
-- **AI control**: lock-free memory-mapped input injection for external control
+- **GPU-accelerated graphics** with SDL3, procedural generation, no texture assets
+- **Reactive UI system** - Complete Svelte 5 implementation in Zig
+- **Pure Zig font rendering** - TTF parsing and rasterization without external deps
+- **AI control interface** - Memory-mapped automation for testing and demos
+- **Zone-based world** - Travel between areas with persistent state
+- **Hex demo game** - Fully playable action RPG reference implementation
+
+For technical architecture details, see [CLAUDE.md](./CLAUDE.md)
 
 ## Hex demo controls
 
@@ -82,11 +80,10 @@ For technical docs and development guidelines, see **[CLAUDE.md](./CLAUDE.md)**.
 
 ## Documentation
 
-- [Framework Architecture](./src/lib/README.md) - capability-based organization
-- [GPU Programming Guide](./src/docs/gpu.md) - SDL3 GPU API usage
-- [Shader Development](./src/docs/shader_compilation.md) - HLSL workflow
-- [Reactive Programming](./src/lib/reactive.zig) - Svelte 5 implementation
-- [Application Patterns](./src/docs/ecs.md) - entity systems and architecture
+- **For developers:** See [CLAUDE.md](./CLAUDE.md) for technical documentation
+- **Architecture:** [docs/architecture.md](./docs/architecture.md)
+- **Engine library:** [src/lib/README.md](./src/lib/README.md)
+- **AI control:** [web/ai_control/README.md](./web/ai_control/README.md)
 
 ## Building from source
 
@@ -112,29 +109,14 @@ See **[web/ai_control/README.md](./web/ai_control/README.md)** for complete docu
 
 ## Creating new applications
 
-Zzz is designed for creating games, creative tools, and interactive applications:
+Zzz provides a complete engine for games and interactive applications. To create your own:
 
-1. Create project directory: `src/myapp/`
-2. Import library components from `src/lib/`
-3. Implement your application (follow Hex patterns as reference)
-4. Update build.zig with new executable
+1. Create a directory in `src/yourapp/`
+2. Import engine capabilities from `src/lib/`
+3. Follow the Hex game as a reference implementation
+4. Add your executable to `build.zig`
 
-Example:
-```zig
-// src/myapp/main.zig
-const std = @import("std");
-
-// Import from capability directories
-const types = @import("../lib/core/types.zig");
-const maths = @import("../lib/core/maths.zig");
-const input = @import("../lib/platform/input.zig");
-const camera = @import("../lib/rendering/camera.zig");
-const collision = @import("../lib/physics/collision.zig");
-
-// Or use barrel imports for subsystems
-const reactive = @import("../lib/reactive.zig");
-const ui = @import("../lib/ui.zig");
-```
+See [CLAUDE.md](./CLAUDE.md) for detailed development guidelines.
 
 ## Contributing
 

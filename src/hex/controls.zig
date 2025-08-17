@@ -4,6 +4,7 @@ const c = @import("../lib/platform/sdl.zig");
 const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const game_controller = @import("game.zig");
+const coordinates = @import("../lib/core/coordinates.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
@@ -13,6 +14,12 @@ const Vec2 = math.Vec2;
 const GameState = game_controller.GameState;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const Hud = hud.Hud;
+
+/// Create coordinate context from camera state
+fn createCoordinateContext(camera: *const @import("../lib/rendering/camera.zig").Camera) coordinates.CoordinateContext {
+    return coordinates.CoordinateContext.init(camera.screen_width, camera.screen_height)
+        .withCamera(math.Vec2{ .x = camera.view_x + camera.view_width / 2.0, .y = camera.view_y + camera.view_height / 2.0 }, camera.scale);
+}
 
 pub fn handleSDLEvent(
     game_state: *GameState,
@@ -100,7 +107,9 @@ pub fn handleSDLEvent(
                     game_state.hex_game.logger.info("left_click", "Left click detected at mouse position: {any}", .{game_state.input_state.getMousePos()});
                     if (game_state.hex_game.getPlayerAlive()) {
                         const screen_mouse_pos = game_state.input_state.getMousePos();
-                        const world_mouse_pos = game_renderer.camera.screenToWorldSafe(screen_mouse_pos);
+                        
+                        const coord_context = createCoordinateContext(&game_renderer.camera);
+                        const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
                         const result = combat.fireBulletAtMouse(&game_state.hex_game, world_mouse_pos, &game_state.hex_game.bullet_pool);
                         game_state.hex_game.logger.info("bullet_result", "fireBulletAtMouse result: {}", .{result});
                     } else {
@@ -112,7 +121,9 @@ pub fn handleSDLEvent(
                     if (game_state.hex_game.getPlayerAlive()) {
                         const ctrl_held = game_state.input_state.isCtrlHeld();
                         const screen_mouse_pos = game_state.input_state.getMousePos();
-                        const world_mouse_pos = game_renderer.camera.screenToWorldSafe(screen_mouse_pos);
+                        
+                        const coord_context = createCoordinateContext(&game_renderer.camera);
+                        const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
                         const zone = game_state.hex_game.getCurrentZoneConst();
 
                         _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, world_mouse_pos, &game_state.effect_system, ctrl_held);

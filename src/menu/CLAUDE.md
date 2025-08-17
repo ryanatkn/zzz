@@ -1,23 +1,30 @@
-# Routes Directory - SvelteKit-Style Pages
+# Menu System - AI Assistant Guide
 
-## Overview
+> ⚠️ AI slop code and docs, is unstable and full of lies
 
-This directory contains all browser system pages following SvelteKit conventions. Each route is defined by `+page.zig` files, with optional `+layout.zig` files for shared UI.
+SvelteKit-style routing system for in-game menus. Pages are defined by `+page.zig` files with filesystem-based routing.
+
+## Quick Reference
+
+**Pattern:** SvelteKit-style filesystem routing
+**Activation:** Press backtick (`) in game
+**Navigation:** Click links or use back/forward buttons
 
 ## Directory Structure
 
 ```
-src/routes/
-├── +layout.zig          # Root layout - wraps all pages
+menu/
+├── +layout.zig          # Root layout wrapper
 ├── +page.zig            # Home page (/)
-├── settings/
-│   ├── +page.zig        # Settings menu (/settings)
-│   ├── video/
-│   │   └── +page.zig    # Video settings (/settings/video)
-│   └── audio/
-│       └── +page.zig    # Audio settings (/settings/audio)
-└── stats/
-    └── +page.zig        # Game statistics (/stats)
+├── settings/            # Settings submenu
+│   ├── +page.zig        # Settings index
+│   ├── video/+page.zig  # Video settings
+│   ├── audio/+page.zig  # Audio settings  
+│   └── fonts/+page.zig  # Font settings
+├── stats/+page.zig      # Game statistics
+├── character/+page.zig  # Character sheet
+├── font_grid_test/      # Font testing
+└── vector_test/         # Vector graphics test
 ```
 
 ## Routing Convention
@@ -244,41 +251,62 @@ const inventory_page = @import("../routes/inventory/+page.zig");
 - Placeholder for game statistics
 - Back to menu button
 
-## Limitations
+## Key Patterns
 
-### Current Implementation
-- Manual route registration required (no automatic discovery)
-- Only root layout active (nested layouts simplified)
-- No dynamic routes (`[param]` folders not supported)
-- No error boundaries
-- No state persistence between navigations
+### Page Creation
+```zig
+pub fn create(allocator: std.mem.Allocator) !*page.Page {
+    const my_page = try allocator.create(MyPage);
+    my_page.* = .{
+        .base = .{
+            .vtable = .{ ... },
+            .path = "/my-path",
+            .title = "My Page",
+        },
+    };
+    return &my_page.base;
+}
+```
 
-### Technical Constraints
-- Zig requires compile-time imports (no dynamic loading)
-- Types must be known at compile-time (no runtime reflection)
-- Fixed screen dimensions (1920x1080)
+### Adding Links
+```zig
+try links.append(page.createLink(
+    "Link Text",
+    "/target/path",
+    x, y, width, height
+));
+```
 
-## Best Practices
+## Common Tasks
 
-1. **Always include "Back to Menu"** - Users should be able to return home quickly
-2. **Use consistent positioning** - Center links horizontally, space vertically
-3. **Keep pages simple** - Focus on navigation, not complex UI
-4. **Test navigation paths** - Ensure all links work bidirectionally
-5. **Follow naming conventions** - Use lowercase, hyphenated paths
+### Adding a New Page
+1. Create directory: `mkdir -p menu/newpage`
+2. Create `+page.zig` with Page interface
+3. Register in `src/hud/router.zig`
+4. Add navigation links from parent pages
 
-## Future Enhancements
+### Modifying Layout
+1. Edit `+layout.zig` for shared UI
+2. Use slot.render() to inject child content
+3. Test with all child pages
 
-### Planned Features
-- Nested layout composition
-- Build-time route generation
-- Dynamic route parameters
-- Form controls (sliders, checkboxes)
-- State persistence
-- Transition effects
+### Testing Pages
+```bash
+zig build run
+# Press ` to open menu
+# Navigate to test page
+```
 
-### Potential Pages
-- `/inventory` - Item management
-- `/map` - World map viewer
-- `/achievements` - Achievement tracking
-- `/controls` - Key binding configuration
-- `/about` - Game information
+## Technical Notes
+
+- Manual route registration (no auto-discovery)
+- Compile-time imports required
+- Fixed 1920x1080 screen dimensions
+- No dynamic routes or parameters
+- Single root layout (no nesting)
+
+## Related Documentation
+
+- [HUD System](../hud/CLAUDE.md) - Browser implementation
+- [Reactive UI](../lib/CLAUDE.md) - UI components
+- [Development Workflow](../../docs/development-workflow.md)

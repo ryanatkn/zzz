@@ -1,5 +1,7 @@
 # SDL Dependency Vendoring System - ✅ COMPLETED
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 ## 🎯 Goal: Self-Contained Build System ✅ ACHIEVED
 Successfully created a fully self-contained build system for zzz with **zero external dependencies** beyond:
 - Standard C libraries (libc, libm, libdl, libpthread, etc.)  

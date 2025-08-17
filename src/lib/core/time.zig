@@ -3,6 +3,8 @@ const c = @import("../platform/sdl.zig");
 
 /// Time management utilities for SDL-based applications
 /// Provides consistent time handling and delta time calculations
+
+/// Static time utilities
 pub const Time = struct {
     /// Get current time in milliseconds
     pub fn getTimeMs() f32 {
@@ -48,10 +50,30 @@ pub const Time = struct {
     pub fn getElapsedMs(start_time: u64) f32 {
         return getElapsedSec(start_time) * 1000.0;
     }
+    
+    /// Create a new timestamp for current time
+    pub fn now() Timestamp {
+        return Timestamp{ .ticks = getPerformanceCounter() };
+    }
+};
 
+/// Timestamp represents a point in time
+pub const Timestamp = struct {
+    ticks: u64,
+    
+    /// Get elapsed time in seconds since this timestamp
+    pub fn getElapsedSec(self: Timestamp) f32 {
+        return Time.getElapsedSec(self.ticks);
+    }
+    
+    /// Get elapsed time in milliseconds since this timestamp  
+    pub fn getElapsedMs(self: Timestamp) f32 {
+        return Time.getElapsedMs(self.ticks);
+    }
+    
     /// Check if elapsed time exceeds a duration
-    pub fn hasElapsed(start_time: u64, duration_sec: f32) bool {
-        return getElapsedSec(start_time) >= duration_sec;
+    pub fn hasElapsed(self: Timestamp, duration_sec: f32) bool {
+        return self.getElapsedSec() >= duration_sec;
     }
 };
 

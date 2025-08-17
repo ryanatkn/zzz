@@ -1,5 +1,7 @@
 # Reactive System Issues Summary
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 ## Current Test Results
 
 ✅ **Working correctly:**

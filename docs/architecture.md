@@ -1,5 +1,7 @@
 # Zzz Architecture
 
+> ⚠️ AI slop code and docs, is unstable and full of lies
+
 ## Overview
 
 Zzz uses a **capability-based architecture** that organizes modules by what they enable rather than what they are. This creates natural dependency flows while maintaining unrestricted module access.
@@ -145,30 +147,49 @@ Collision detection and spatial reasoning:
 
 ### Reactive System (`reactive/`)
 Complete Svelte 5 implementation:
-- Signals, derived values, effects
-- Automatic dependency tracking
-- Push-pull reactivity
+- **Signals**: State management with automatic tracking
+- **Derived values**: Computed properties with lazy evaluation
+- **Effects**: Side effects with lifecycle management
+- **Push-pull reactivity**: Efficient update propagation
+- **Performance**: 95%+ cache hit rate, batched updates
 
 ### Font System (`font/`)
 Pure Zig font rendering:
-- TTF parsing
-- Rasterization
-- Atlas management
+- **TTF Parser**: Complete TrueType font format support
+- **Rasterization**: CPU-based glyph rendering
+- **Atlas Management**: GPU texture atlas generation
+- **Metrics**: Comprehensive font measurements
+- **Zero Dependencies**: No external font libraries
 
 ### Text Rendering (`text/`)
-- Dual-mode rendering (bitmap/SDF)
-- Layout algorithms
-- Caching strategies
+- **Dual-mode rendering**: Bitmap for small text, SDF for scalable
+- **Layout algorithms**: Word wrap, alignment, justification
+- **Caching strategies**: Persistent text, glyph cache
+- **Performance**: Immediate vs persistent mode selection
 
 ### Vector Graphics (`vector/`)
-- Bezier curve rendering
-- GPU-accelerated paths
-- Glyph caching
+- **Bezier curves**: Quadratic and cubic support
+- **GPU acceleration**: Shader-based rendering
+- **Path operations**: Tessellation, stroking
+- **Glyph caching**: LRU cache for vector glyphs
 
 ### UI Components (`ui/`)
-- Reactive components
-- Layout systems
-- Debug overlays
+- **Reactive components**: Automatic state synchronization
+- **Layout systems**: Flexible positioning and sizing
+- **Debug overlays**: Performance metrics, collision boxes
+- **SvelteKit routing**: Page-based navigation
+
+### Game Systems (`game/`)
+- **ECS**: Entity Component System (not traditional ECS)
+- **Zone System**: World partitioning with travel
+- **State Management**: Save/load, persistence
+- **AI Control**: Lock-free input injection
+- **Event System**: Pub/sub messaging
+
+### Debug Tools (`debug/`)
+- **Logging**: Composable, compile-time configured
+- **Profiling**: Performance metrics
+- **Visualization**: Debug rendering helpers
 
 ## Import Patterns
 
@@ -243,12 +264,21 @@ While not enforced, the natural dependency flow prevents most circular dependenc
 - **Natural Organization**: Modules naturally group by function
 - **Flexible Access**: No artificial barriers between modules
 - **Scalable**: New capabilities slot in naturally
+- **Discoverable**: Easy to find where functionality lives
 
 ### Why Not Traditional Layers?
 - Rigid layers create artificial restrictions
 - Real systems need cross-cutting concerns
 - Performance often requires breaking layers
 - Capability organization is more intuitive
+- Game development needs flexibility
+
+### Philosophy
+- **Performance First**: Always optimize for the best final code
+- **Procedural Generation**: Algorithmic content over assets
+- **Zero Dependencies**: Vendored libraries, no external packages
+- **GPU-Driven**: Leverage GPU for everything possible
+- **Data-Oriented**: Cache-friendly structures and access patterns
 
 ## Migration from Flat Structure
 
@@ -282,3 +312,36 @@ lib/
 - Natural dependency flows
 - Better scalability
 - No breaking changes for users
+
+## Key Architectural Decisions
+
+### Procedural Everything
+- No texture or sprite assets
+- All visuals generated in code/shaders
+- Distance fields for anti-aliasing
+- Mathematical beauty over static art
+
+### Reactive UI
+- Complete Svelte 5 implementation
+- Proven patterns from web development
+- Automatic state management
+- Efficient update propagation
+
+### Zone-Based World
+- Travel metaphor (not scene switching)
+- Persistent state across zones
+- Camera modes per zone
+- Data-driven configuration
+
+### Memory Management
+- Fixed-size pools for predictability
+- Reference counting where needed
+- Arena allocators for frame data
+- Minimal dynamic allocation
+
+## Related Documentation
+
+- [GPU Performance](gpu-performance.md) - Optimization strategies
+- [Game Design](game-design.md) - Zone system and mechanics
+- [Development Workflow](development-workflow.md) - Best practices
+- [Engine Library](../src/lib/README.md) - Detailed component docs

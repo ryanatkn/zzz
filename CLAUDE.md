@@ -15,119 +15,20 @@ Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation), 
 
 ## Design Philosophy
 
-**Procedural-First Approach:**
-- All visuals generated algorithmically - no texture or sprite assets
-- Shapes, effects, and animations defined entirely in code and shaders
-- Distance field techniques for high-quality anti-aliased primitives
-- Mathematical beauty over static content
-
-**GPU-First Architecture:**
-- SDL3 GPU API with Vulkan/D3D12 backends
-- Procedural vertex generation (no vertex buffers)
-- Distance field shaders for anti-aliased primitives
-- Camera system with fixed/follow modes
-
-**Performance-Focused:**
-- GPU instancing, batching, minimal state changes
-- Cache-friendly data structures
-- Fixed-size memory pools
-- Squared distance calculations
+**Procedural-First:** All visuals generated algorithmically with distance field techniques
+**GPU-First:** SDL3 GPU API, procedural vertex generation, camera system
+**Performance-Focused:** Instancing, batching, cache-friendly structures, fixed-size pools
 
 ## Project Structure
 
-```
-└── .
-    ├── .git [...]
-    ├── .zig-cache [...]
-    ├── src/                          # Source code directory
-    │   ├── lib/                      # Engine library (capability-based organization)
-    │   │   ├── README.md             # Engine architecture documentation
-    │   │   ├── core/                 # Fundamental types and utilities
-    │   │   │   ├── types.zig         # Core data types (Vec2, Color, Rectangle)
-    │   │   │   ├── maths.zig         # Math utilities with vec2_ prefixed functions
-    │   │   │   ├── colors.zig        # Centralized color system with utilities
-    │   │   │   ├── collections.zig   # Navigation history and state management
-    │   │   │   ├── viewport.zig      # Viewport interface for dependency inversion
-    │   │   │   ├── result.zig        # Result(T, E) error handling pattern
-    │   │   │   ├── pool.zig          # Object and resource pooling utilities
-    │   │   │   └── id.zig            # ID generation and handle management
-    │   │   ├── platform/             # System integration and platform abstraction
-    │   │   │   ├── sdl.zig           # SDL3 C bindings
-    │   │   │   ├── input.zig         # Input handling interface
-    │   │   │   ├── window.zig        # Window and GPU device management
-    │   │   │   └── resources.zig     # Resource initialization patterns
-    │   │   ├── rendering/            # Graphics pipeline capabilities
-    │   │   │   ├── interface.zig     # Renderer interface abstraction
-    │   │   │   ├── gpu.zig           # Low-level GPU rendering with transparency
-    │   │   │   ├── shaders.zig       # Shader compilation and management
-    │   │   │   ├── camera.zig        # Camera system (fixed/follow modes)
-    │   │   │   ├── modes.zig         # Rendering mode selection (immediate/persistent)
-    │   │   │   └── drawing.zig       # High-level drawing utilities for UI
-    │   │   ├── physics/              # Collision and spatial systems
-    │   │   │   ├── collision.zig     # Generic collision detection
-    │   │   │   └── shapes.zig        # Shape definitions (circle, rect, line, point)
-    │   │   ├── game/                 # Game engine systems
-    │   │   │   ├── control/          # AI control system
-    │   │   │   │   ├── direct_input.zig  # Lock-free ring buffer for AI commands
-    │   │   │   │   └── mod.zig           # Control module exports
-    │   │   │   ├── ecs.zig           # Entity Component System
-    │   │   │   ├── events/           # Event system
-    │   │   │   └── state/            # State management
-    │   │   ├── reactive/             # Svelte 5 reactive system implementation
-    │   │   ├── font/                 # TTF parsing and rasterization
-    │   │   ├── text/                 # Text rendering and layout
-    │   │   ├── vector/               # GPU-accelerated vector graphics
-    │   │   ├── ui/                   # Reactive UI components
-    │   │   ├── debug/                # Debug and development utilities
-    │   │   ├── reactive.zig          # Reactive system barrel export
-    │   │   └── ui.zig                # UI system barrel export
-    │   ├── hex/                      # Hex game implementation
-    │   │   ├── behaviors.zig         # Entity behavior updates
-    │   │   ├── borders.zig           # Border rendering system
-    │   │   ├── combat.zig            # Combat system with bullet pool
-    │   │   ├── constants.zig         # Game constants and configuration
-    │   │   ├── controls.zig          # Control mapping and handling
-    │   │   ├── effects.zig           # Visual effects system with AoE
-    │   │   ├── entities.zig          # Zone-based world and entity system
-    │   │   ├── game.zig              # Main game state management
-    │   │   ├── game_data.zon         # Data-driven zone configuration
-    │   │   ├── game_renderer.zig     # Game-specific renderer implementation
-    │   │   ├── hud.zig               # HUD system (FPS counter, UI)
-    │   │   ├── loader.zig            # ZON data loading and parsing
-    │   │   ├── main.zig              # Game entry point and loop
-    │   │   ├── physics.zig           # Collision detection and physics
-    │   │   ├── player.zig            # Player controller with modifiers
-    │   │   ├── portals.zig           # Portal system for zone travel
-    │   │   └── spells.zig            # Spell system (8 slots, cooldowns)
-    │   ├── hud/                      # HUD overlay system (transparent)
-    │   │   ├── hud.zig               # Main HUD coordinator
-    │   │   ├── renderer.zig          # HUD UI renderer with transparency
-    │   │   ├── router.zig            # SvelteKit-style routing
-    │   │   └── page.zig              # Page interface definitions
-    │   ├── menu/                     # Menu pages (SvelteKit-style)
-    │   │   ├── +layout.zig           # Root layout
-    │   │   ├── +page.zig             # Home page
-    │   │   ├── character/            # Character sheet page
-    │   │   ├── settings/             # Settings pages
-    │   │   └── stats/                # Statistics pages
-    │   ├── shaders/                  # HLSL shader sources
-    │   │   ├── compiled/             # Platform-specific bytecode
-    │   │   ├── source/               # HLSL source files
-    │   │   └── compile_shaders.sh    # Compilation script
-    │   └── docs/                     # Technical documentation
-    │       ├── ecs.md                # Entity system architecture
-    │       ├── gpu.md                # SDL3 GPU API patterns
-    │       └── shader_compilation.md # HLSL compilation workflow
-    ├── zig-out [...]                 # Build output directory
-    ├── .gitignore                    # Git ignore patterns
-    ├── CLAUDE.md                     # This file - AI assistant documentation
-    ├── README.md                     # User-facing documentation
-    ├── build.zig                     # Zig build configuration
-    ├── build.zig.zon                 # Package manifest and dependencies
-    └── zz.zon                        # zz tool configuration
-```
+- `src/lib/` - Engine library with capability-based organization (see [src/lib/README.md](src/lib/README.md))
+- `src/hex/` - Hex game implementation
+- `src/hud/` - HUD overlay system with SvelteKit-style routing
+- `src/menu/` - Menu pages and settings
+- `src/shaders/` - HLSL shaders and compilation
+- `docs/` - Technical documentation
 
-**Status:** ✓ Complete game engine with clean architecture separation
+For detailed architecture, see [docs/architecture.md](docs/architecture.md)
 
 ## Dependency Management
 
@@ -186,18 +87,9 @@ $ zig build --help       # Show all build options
 - **Rendering:** Pure procedural generation, no texture assets
 - **AI Control:** Lock-free memory-mapped input injection for external control
 
-## GPU Performance Strategy
+## Performance
 
-**Rendering Pipeline:**
-- **Minimize draw calls:** Batch similar primitives using instanced rendering
-- **Reduce state changes:** Group by pipeline, then by uniform data, then by vertex data
-- **Procedural generation:** Generate geometry in vertex shaders to reduce bandwidth
-- **Distance field rendering:** High-quality circles/shapes without textures
-
-**Memory & Bandwidth:**
-- **Triple buffering:** Cycle GPU buffers to avoid CPU/GPU synchronization stalls
-- **Uniform buffers:** Small frame-constant data (camera, time, screen size)
-- **Instance buffers:** Large per-object data (positions, colors, radii)
+For GPU performance strategy and optimization guidelines, see [docs/gpu-performance.md](docs/gpu-performance.md)
 - **Align data structures:** Use `extern struct` for GPU compatibility
 
 **Shader Optimization:**
@@ -438,22 +330,22 @@ $ zig build --help       # Show all build options
 - ALWAYS prefer editing an existing file to creating a new one
 - NEVER proactively create documentation files (*.md) or README files unless explicitly requested
 
-## Documentation Lifecycle Pattern
+## Documentation
 
-**Established Pattern for Active Development:**
-1. **Active Work** → Root directory MD files for current tasks (`REACTIVE_UI_STATUS.md`)
-2. **Fully Complete Work** → Move to `docs/archive/` only when entirely finished (`REACTIVE_API_GUIDE.md`)  
-3. **New APIs/Features** → Create dedicated guides in root for active development
-4. **Keep Root Clean** → Only current/active documentation in root directory
+### Technical References
+- [Architecture Overview](docs/architecture.md) - Capability-based organization
+- [Engine Library](src/lib/README.md) - Core engine components
+- [GPU Performance](docs/gpu-performance.md) - Optimization strategies
+- [Game Design](docs/game-design.md) - Zone system, combat, spells
+- [Development Workflow](docs/development-workflow.md) - TODO management, patterns
+- [Logging Guidelines](docs/logging-guidelines.md) - Logging system configuration
 
-**Important:** Files are archived only when fully complete, not after each session. Git history provides sufficient granularity for tracking progress.
+### Hex Game Documentation
+- [Entity System](docs/hex/ecs.mdz) - Module architecture
+- [GPU Patterns](docs/hex/gpu.mdz) - SDL3 GPU usage
+- [Shader Compilation](docs/hex/shader_compilation.mdz) - HLSL workflow
 
-**This Workflow Ensures:**
-- Active work is highly visible to developers and AI assistants
-- Documentation stays in root until work is entirely finished
-- Git history tracks incremental changes and progress
-- Root directory focuses on current priorities without premature archival
-- memorize this perspective: a scalable lib directory can look like, for a system that exposes all modules 
-  to all other modules without arbitrary restrictions.
+### AI Control
+- [AI Control System](web/ai_control/README.md) - External automation interface
 
-NOTE TO THE MACHINE: see ./WORKFLOW.md for dev sessions
+NOTE: See WORKFLOW.md for session patterns
