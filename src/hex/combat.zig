@@ -25,7 +25,7 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
     const bullet_vel = direction.scale(bullet_speed);
 
     // Create bullet entity in current zone
-    const bullet_id = game.createProjectile(game.current_zone, player_pos, constants.BULLET_RADIUS, bullet_vel, constants.BULLET_LIFETIME) catch return false;
+    const bullet_id = game.createProjectile(game.zone_manager.getCurrentZoneIndex(), player_pos, constants.BULLET_RADIUS, bullet_vel, constants.BULLET_LIFETIME) catch return false;
 
     // Consume from bullet pool
     pool.fire();

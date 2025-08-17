@@ -5,6 +5,9 @@ const constants = @import("constants.zig");
 const combat = @import("combat.zig");
 const object_pools = @import("../lib/core/object_pools.zig");
 const HexGameContext = @import("hex_context.zig").HexGameContext;
+const components = @import("../lib/game/components.zig");
+const zones = @import("../lib/game/zones/mod.zig");
+const storage = @import("../lib/game/storage/mod.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -24,37 +27,16 @@ const ModuleLogger = Logger(.{
 pub const EntityId = u32;
 const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
 
-// Direct component definitions - no ECS complexity
-pub const Transform = extern struct {
-    pos: Vec2,
-    vel: Vec2,
-    radius: f32,
-    _padding: f32 = 0,
-
-    pub fn init(pos: Vec2, radius: f32) Transform {
-        return .{ .pos = pos, .vel = Vec2.ZERO, .radius = radius };
-    }
-};
-
-pub const Health = struct {
-    current: f32,
-    max: f32,
-    alive: bool,
-
-    pub fn init(max_health: f32) Health {
-        return .{ .current = max_health, .max = max_health, .alive = true };
-    }
-};
-
-pub const Visual = struct {
-    color: Color,
-    scale: f32 = 1.0,
-    visible: bool = true,
-
-    pub fn init(color: Color) Visual {
-        return .{ .color = color, .visible = true };
-    }
-};
+// Use components from lib/game/components.zig
+pub const Transform = components.Transform;
+pub const Health = components.Health;
+pub const Visual = components.Visual;
+pub const Movement = components.Movement;
+pub const Combat = components.Combat;
+pub const Effects = components.Effects;
+// Remove duplicate - using HexProjectile as Projectile alias below
+pub const Terrain = components.Terrain;
+pub const Interactable = components.Interactable;
 
 /// Behavior profile types for hex units
 pub const BehaviorProfile = enum {
@@ -66,87 +48,72 @@ pub const BehaviorProfile = enum {
     guardian, // Guard specific area, intercept threats
 };
 
-pub const Unit = struct {
-    unit_type: UnitType,
-    behavior_profile: BehaviorProfile = .idle, // Default to idle
-    aggro_range: f32,
-    aggro_factor: f32,
-    home_pos: Vec2,
-    target: ?EntityId,
-
-    // AI behavior state
-    state: UnitState,
+/// Hex-specific unit component extending lib's Unit
+pub const HexUnit = struct {
+    // Core unit data from lib
+    base: components.Unit,
+    
+    // Hex-specific additions
+    behavior_profile: BehaviorProfile = .idle,
     target_pos: Vec2,
     chase_timer: f32,
 
-    pub const UnitType = enum { player, enemy, friendly, neutral };
     pub const UnitState = enum { returning_home, chasing, at_home };
+    pub const UnitType = components.Unit.UnitType;
 
-    pub fn init(unit_type: UnitType, home_pos: Vec2, behavior: BehaviorProfile) Unit {
+    pub fn init(utype: components.Unit.UnitType, home_pos: Vec2, behavior: BehaviorProfile) HexUnit {
         return .{
-            .unit_type = unit_type,
-            .behavior_profile = behavior, // Store behavior from ZON
-            .aggro_range = if (unit_type == .enemy) 150.0 else 0.0,
-            .aggro_factor = 1.0,
-            .home_pos = home_pos,
-            .target = null,
-            .state = .at_home,
+            .base = components.Unit.init(utype, home_pos),
+            .behavior_profile = behavior,
             .target_pos = home_pos,
             .chase_timer = 0.0,
         };
     }
-};
-
-const PlayerInput = struct {
-    controller_id: u8,
-
-    pub fn init(controller_id: u8) PlayerInput {
-        return .{ .controller_id = controller_id };
+    
+    // Convenience accessors for compatibility
+    pub fn getState(self: HexUnit) UnitState {
+        return switch (self.base.behavior_state) {
+            .idle => .at_home,
+            .chasing, .attacking => .chasing,
+            .fleeing, .patrolling => .returning_home,
+        };
     }
 };
 
-const Projectile = struct {
-    owner: EntityId,
-    lifetime: f32,
-    max_lifetime: f32,
+// Alias for compatibility with existing code
+pub const Unit = HexUnit;
+
+// Use PlayerInput from lib components
+pub const PlayerInput = components.PlayerInput;
+
+// Hex-specific projectile with damage field
+pub const HexProjectile = struct {
+    base: components.Projectile,
     damage: f32,
 
-    pub fn init(owner: EntityId, max_lifetime: f32, damage: f32) Projectile {
-        return .{ .owner = owner, .lifetime = 0, .max_lifetime = max_lifetime, .damage = damage };
-    }
-};
-
-const Terrain = struct {
-    terrain_type: TerrainType,
-    size: Vec2,
-    solid: bool,
-
-    pub const TerrainType = enum { wall, floor, door, water, pit, altar };
-
-    pub fn init(terrain_type: TerrainType, size: Vec2) Terrain {
+    pub fn init(owner: EntityId, max_lifetime: f32, damage: f32) HexProjectile {
         return .{
-            .terrain_type = terrain_type,
-            .size = size,
-            .solid = (terrain_type == .wall or terrain_type == .door),
+            .base = components.Projectile.init(owner, max_lifetime),
+            .damage = damage,
         };
     }
-};
-
-const Interactable = struct {
-    interaction_type: InteractionType,
-    destination_zone: ?u8,
-    attuned: bool,
-
-    pub const InteractionType = enum { deflectable, telekinetic, transformable, combinable };
-
-    pub fn init(interaction_type: InteractionType) Interactable {
-        return .{
-            .interaction_type = interaction_type,
-            .destination_zone = null,
-            .attuned = false,
-        };
+    
+    // Compatibility methods
+    pub fn update(self: *HexProjectile, dt: f32) bool {
+        return self.base.update(dt);
+    }
+    
+    pub fn canPierce(self: HexProjectile) bool {
+        return self.base.canPierce();
+    }
+    
+    pub fn pierce(self: *HexProjectile) void {
+        self.base.pierce();
     }
 };
+
+// For compatibility with existing code that expects direct field access
+pub const Projectile = HexProjectile;
 
 // Simple fixed-size storage for each archetype
 const PlayerStorage = struct {
@@ -155,6 +122,7 @@ const PlayerStorage = struct {
     healths: [MAX_ENTITIES_PER_ARCHETYPE]Health,
     player_inputs: [MAX_ENTITIES_PER_ARCHETYPE]PlayerInput,
     visuals: [MAX_ENTITIES_PER_ARCHETYPE]Visual,
+    movements: [MAX_ENTITIES_PER_ARCHETYPE]Movement,
     count: usize,
 
     pub fn init() PlayerStorage {
@@ -164,6 +132,7 @@ const PlayerStorage = struct {
             .healths = undefined,
             .player_inputs = undefined,
             .visuals = undefined,
+            .movements = undefined,
             .count = 0,
         };
     }
@@ -348,7 +317,7 @@ const UnitStorage = struct {
 const ProjectileStorage = struct {
     entities: [MAX_ENTITIES_PER_ARCHETYPE]EntityId,
     transforms: [MAX_ENTITIES_PER_ARCHETYPE]Transform,
-    projectiles: [MAX_ENTITIES_PER_ARCHETYPE]Projectile,
+    projectiles: [MAX_ENTITIES_PER_ARCHETYPE]HexProjectile,
     visuals: [MAX_ENTITIES_PER_ARCHETYPE]Visual,
     count: usize,
 
@@ -362,7 +331,7 @@ const ProjectileStorage = struct {
         };
     }
 
-    pub fn addEntity(self: *ProjectileStorage, entity: EntityId, transform: Transform, projectile: Projectile, visual: Visual) !void {
+    pub fn addEntity(self: *ProjectileStorage, entity: EntityId, transform: Transform, projectile: HexProjectile, visual: Visual) !void {
         if (self.count >= MAX_ENTITIES_PER_ARCHETYPE) return error.StorageFull;
         const index = self.count;
         self.entities[index] = entity;
@@ -403,7 +372,7 @@ const ProjectileStorage = struct {
 
     pub fn getComponentMut(self: *ProjectileStorage, entity_id: EntityId, comptime component_type: enum { transform, projectile, visual }) ?*(switch (component_type) {
         .transform => Transform,
-        .projectile => Projectile,
+        .projectile => HexProjectile,
         .visual => Visual,
     }) {
         for (0..self.count) |i| {
@@ -420,7 +389,7 @@ const ProjectileStorage = struct {
 
     pub fn getComponent(self: *const ProjectileStorage, entity_id: EntityId, comptime component_type: enum { transform, projectile, visual }) ?*const (switch (component_type) {
         .transform => Transform,
-        .projectile => Projectile,
+        .projectile => HexProjectile,
         .visual => Visual,
     }) {
         for (0..self.count) |i| {
@@ -718,15 +687,14 @@ const EntityAllocator = struct {
     }
 };
 
-/// Simplified hex game structure with direct zone access
+/// Simplified hex game structure using generic zone manager
 pub const HexGame = struct {
-    // Direct zone storage - no intermediate layers
-    zones: [MAX_ZONES]ZoneData,
-    current_zone: u8,
+    // Generic zone management from lib
+    zone_manager: zones.ZoneManager(ZoneData, MAX_ZONES),
 
     // Player tracking
     player_entity: ?EntityId,
-    player_zone: u8,
+    player_zone: usize,
     player_start_pos: Vec2,
 
     // Game systems
@@ -820,8 +788,7 @@ pub const HexGame = struct {
 
     pub fn init(allocator: std.mem.Allocator) HexGame {
         var game = HexGame{
-            .zones = undefined,
-            .current_zone = 0,
+            .zone_manager = zones.ZoneManager(ZoneData, MAX_ZONES).init(),
             .player_entity = null,
             .player_zone = 0,
             .player_start_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y },
@@ -843,7 +810,7 @@ pub const HexGame = struct {
             .dungeon_arcane,
         };
 
-        for (&game.zones, zone_types) |*zone, zone_type| {
+        for (&game.zone_manager.zones, zone_types) |*zone, zone_type| {
             zone.* = ZoneData.init(zone_type);
         }
 
@@ -851,7 +818,7 @@ pub const HexGame = struct {
     }
 
     pub fn deinit(self: *HexGame) void {
-        for (&self.zones) |*zone| {
+        for (&self.zone_manager.zones) |*zone| {
             zone.deinit();
         }
         self.frame_pool.deinit();
@@ -860,31 +827,31 @@ pub const HexGame = struct {
 
     // Direct zone access - no abstraction layers
     pub fn getCurrentZone(self: *HexGame) *ZoneData {
-        std.debug.assert(self.current_zone < MAX_ZONES);
-        return &self.zones[self.current_zone];
+        std.debug.assert(self.zone_manager.getCurrentZoneIndex() < MAX_ZONES);
+        return self.zone_manager.getCurrentZone();
     }
 
     pub fn getCurrentZoneConst(self: *const HexGame) *const ZoneData {
-        std.debug.assert(self.current_zone < MAX_ZONES);
-        return &self.zones[self.current_zone];
+        std.debug.assert(self.zone_manager.getCurrentZoneIndex() < MAX_ZONES);
+        return self.zone_manager.getCurrentZoneConst();
     }
 
-    pub fn getZone(self: *HexGame, zone_index: u8) ?*ZoneData {
+    pub fn getZone(self: *HexGame, zone_index: usize) ?*ZoneData {
         if (zone_index >= MAX_ZONES) return null;
-        return &self.zones[zone_index];
+        return self.zone_manager.getZone(zone_index);
     }
 
-    pub fn setCurrentZone(self: *HexGame, zone_index: u8) void {
+    pub fn setCurrentZone(self: *HexGame, zone_index: usize) void {
         if (zone_index >= MAX_ZONES) {
             self.logger.err("zone_invalid", "setCurrentZone: Invalid zone_index {}", .{zone_index});
             return;
         }
-        self.current_zone = zone_index;
+        self.zone_manager.current_zone_index = zone_index;
         self.logger.debug("zone_switched", "Zone switched to: {}", .{zone_index});
     }
 
-    pub fn getCurrentZoneIndex(self: *const HexGame) u8 {
-        return self.current_zone;
+    pub fn getCurrentZoneIndex(self: *const HexGame) usize {
+        return self.zone_manager.getCurrentZoneIndex();
     }
 
     // Compatibility methods for effects system
@@ -895,10 +862,10 @@ pub const HexGame = struct {
     // iteratePortalsInCurrentZone moved to use EntityIterator below
 
     // Entity creation methods
-    pub fn createLifestone(self: *HexGame, zone_index: u8, pos: Vec2, radius: f32, attuned: bool) !EntityId {
+    pub fn createLifestone(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, attuned: bool) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
-        const zone = &self.zones[zone_index];
+        const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
         // Determine color based on attunement
@@ -922,10 +889,10 @@ pub const HexGame = struct {
         return entity;
     }
 
-    pub fn createUnit(self: *HexGame, zone_index: u8, pos: Vec2, radius: f32, behavior: BehaviorProfile) !EntityId {
+    pub fn createUnit(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, behavior: BehaviorProfile) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
-        const zone = &self.zones[zone_index];
+        const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
         const transform = Transform.init(pos, radius);
@@ -939,10 +906,10 @@ pub const HexGame = struct {
         return entity;
     }
 
-    pub fn createObstacle(self: *HexGame, zone_index: u8, pos: Vec2, size: Vec2, is_deadly: bool) !EntityId {
+    pub fn createObstacle(self: *HexGame, zone_index: usize, pos: Vec2, size: Vec2, is_deadly: bool) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
-        const zone = &self.zones[zone_index];
+        const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
         const terrain_type: Terrain.TerrainType = if (is_deadly) .pit else .wall;
@@ -958,10 +925,10 @@ pub const HexGame = struct {
         return entity;
     }
 
-    pub fn createPortal(self: *HexGame, zone_index: u8, pos: Vec2, radius: f32, destination: u8) !EntityId {
+    pub fn createPortal(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, destination: usize) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
-        const zone = &self.zones[zone_index];
+        const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
         const transform = Transform.init(pos, radius);
@@ -989,16 +956,16 @@ pub const HexGame = struct {
         zone.entity_count += 1;
 
         self.player_entity = entity;
-        self.player_zone = self.current_zone;
+        self.player_zone = self.zone_manager.getCurrentZoneIndex();
         self.player_start_pos = pos;
 
         return entity;
     }
 
-    pub fn createProjectile(self: *HexGame, zone_index: u8, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32) !EntityId {
+    pub fn createProjectile(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
-        const zone = &self.zones[zone_index];
+        const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
         var transform = Transform.init(pos, radius);
@@ -1013,11 +980,11 @@ pub const HexGame = struct {
     }
 
     // Zone travel
-    pub fn travelToZone(self: *HexGame, zone_index: u8, spawn_pos: Vec2) !void {
+    pub fn travelToZone(self: *HexGame, zone_index: usize, spawn_pos: Vec2) !void {
         if (zone_index >= MAX_ZONES) return;
 
         // Clear projectiles in all zones (bullets should not persist across zone travel)
-        for (&self.zones) |*zone| {
+        for (&self.zone_manager.zones) |*zone| {
             zone.projectiles.clear();
         }
 
@@ -1028,7 +995,7 @@ pub const HexGame = struct {
                 try self.transferPlayerToZone(player_entity, self.player_zone, zone_index, spawn_pos);
                 self.player_zone = zone_index;
 
-                self.logger.info("player_travel", "Player traveled from zone {} to zone {}", .{ self.current_zone, zone_index });
+                self.logger.info("player_travel", "Player traveled from zone {} to zone {}", .{ self.zone_manager.getCurrentZoneIndex(), zone_index });
             }
         }
 
@@ -1047,11 +1014,11 @@ pub const HexGame = struct {
     }
 
     // Helper method for proper entity transfer between zones
-    fn transferPlayerToZone(self: *HexGame, player_entity: EntityId, source_zone: u8, dest_zone: u8, new_pos: Vec2) !void {
+    fn transferPlayerToZone(self: *HexGame, player_entity: EntityId, source_zone: usize, dest_zone: usize, new_pos: Vec2) !void {
         if (source_zone >= MAX_ZONES or dest_zone >= MAX_ZONES) return;
 
-        const source = &self.zones[source_zone];
-        const dest = &self.zones[dest_zone];
+        const source = self.zone_manager.getZone(source_zone);
+        const dest = self.zone_manager.getZone(dest_zone);
 
         // Extract player components from source zone
         const transform = source.players.getTransform(player_entity);
@@ -1083,7 +1050,7 @@ pub const HexGame = struct {
     // Player accessors
     pub fn getPlayerPos(self: *const HexGame) Vec2 {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZoneConst();
                 if (zone.players.getTransform(player)) |transform| {
                     return transform.pos;
@@ -1095,7 +1062,7 @@ pub const HexGame = struct {
 
     pub fn getPlayerRadius(self: *const HexGame) f32 {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZoneConst();
                 if (zone.players.getTransform(player)) |transform| {
                     return transform.radius;
@@ -1107,7 +1074,7 @@ pub const HexGame = struct {
 
     pub fn getPlayerAlive(self: *const HexGame) bool {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZoneConst();
                 if (zone.players.getHealth(player)) |health| {
                     return health.alive;
@@ -1119,7 +1086,7 @@ pub const HexGame = struct {
 
     pub fn getPlayer(self: *const HexGame) ?EntityId {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 return player;
             }
         }
@@ -1128,7 +1095,7 @@ pub const HexGame = struct {
 
     pub fn setPlayerPos(self: *HexGame, pos: Vec2) void {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZone();
                 if (zone.players.getTransformMut(player)) |transform| {
                     transform.pos = pos;
@@ -1139,7 +1106,7 @@ pub const HexGame = struct {
 
     pub fn setPlayerVel(self: *HexGame, vel: Vec2) void {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZone();
                 if (zone.players.getTransformMut(player)) |transform| {
                     transform.vel = vel;
@@ -1150,8 +1117,8 @@ pub const HexGame = struct {
 
     pub fn getPlayerVelConst(self: *const HexGame) Vec2 {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
-                const zone = &self.zones[self.current_zone];
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
+                const zone = self.zone_manager.getCurrentZone();
                 if (zone.players.getTransformConst(player)) |transform| {
                     return transform.vel;
                 }
@@ -1162,7 +1129,7 @@ pub const HexGame = struct {
 
     pub fn setPlayerAlive(self: *HexGame, alive: bool) void {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZone();
                 if (zone.players.getHealthMut(player)) |health| {
                     health.alive = alive;
@@ -1182,7 +1149,7 @@ pub const HexGame = struct {
 
     pub fn setPlayerColor(self: *HexGame, color: Color) void {
         if (self.player_entity) |player| {
-            if (self.player_zone == self.current_zone) {
+            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
                 const zone = self.getCurrentZone();
                 if (zone.players.getVisualMut(player)) |visual| {
                     visual.color = color;
@@ -1216,10 +1183,10 @@ pub const HexGame = struct {
                     transform.pos = transform.pos.add(transform.vel.scale(deltaTime));
 
                     // Update lifetime
-                    projectile.lifetime += deltaTime;
+                    projectile.base.lifetime += deltaTime;
 
                     // Check if projectile expired
-                    if (projectile.lifetime >= projectile.max_lifetime) {
+                    if (projectile.base.lifetime >= projectile.base.max_lifetime) {
                         try projectiles_to_remove.append(projectile_id);
                         continue;
                     }
@@ -1293,10 +1260,10 @@ pub const HexGame = struct {
     }
 
     // Debug helpers
-    pub fn debugLogZoneEntities(self: *HexGame, zone_index: u8) void {
+    pub fn debugLogZoneEntities(self: *HexGame, zone_index: usize) void {
         if (zone_index >= MAX_ZONES) return;
 
-        const zone = &self.zones[zone_index];
+        const zone = self.zone_manager.getZone(zone_index);
         var count: usize = 0;
 
         // Count lifestones

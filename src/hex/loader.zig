@@ -64,7 +64,7 @@ pub fn loadGameData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame) !
         // Initialize zone with basic data (scale will be set in loadZone)
         // Zone is already initialized in HexGame.init(), just need to load data
         // Then load detailed data
-        try loadZone(&game.zones[i], zone_data, game, i);
+        try loadZone(game.zone_manager.getZone(i), zone_data, game, i);
     }
 }
 
@@ -138,7 +138,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
         for (portals) |portal_data| {
             // Create ECS portal entity
             const portal_id = game.createPortal(
-                @intCast(zone_index),
+                zone_index,
                 Vec2{ .x = portal_data.position.x, .y = portal_data.position.y },
                 portal_data.radius,
                 portal_data.destination,
@@ -204,7 +204,7 @@ const ZoneData = struct {
     portals: ?[]const struct {
         position: struct { x: f32, y: f32 },
         radius: f32,
-        destination: u8,
+        destination: usize,
         shape: []const u8,
     },
     lifestones: ?[]const struct {

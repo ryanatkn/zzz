@@ -177,7 +177,7 @@ pub const SpellSystem = struct {
 
             if (dist_sq <= radius_sq) {
                 // Unit is in area - apply lull effect by reducing aggro factor
-                unit.aggro_factor = 0.2; // 20% aggro as per constants
+                unit.base.aggro_factor = 0.2; // 20% aggro as per constants
 
                 // Add visual effect for this unit (optional)
                 effect_system.addUnitEffectAura(transform.pos, transform.radius, duration);

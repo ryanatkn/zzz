@@ -142,7 +142,7 @@ pub fn findNearestAttunedLifestone(game: *HexGame) ?LifestoneResult {
 
     // Search all zones for attuned lifestones
     for (0..hex_game_mod.MAX_ZONES) |zone_index| {
-        const zone = &game.zones[zone_index];
+        const zone = game.zone_manager.getZone(zone_index);
 
         // Check all lifestones in this zone
         for (0..zone.lifestones.count) |i| {

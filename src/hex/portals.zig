@@ -72,7 +72,7 @@ pub fn checkPortalCollisions(context: HexGameContext) bool {
                         game_state.effect_system.addPortalTravelEffect(player_pos, player_radius);
 
                         // Travel to destination zone
-                        const zone = &world.zones[destination_zone];
+                        const zone = world.zone_manager.getZone(destination_zone);
                         loggers.getGameLog().info("portal_travel", "Portal activated: traveling to zone {} at pos {any}", .{ destination_zone, zone.spawn_pos });
 
                         world.travelToZone(destination_zone, zone.spawn_pos) catch |err| {

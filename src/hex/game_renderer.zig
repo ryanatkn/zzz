@@ -138,7 +138,7 @@ pub const GameRenderer = struct {
         }
 
         // Draw player (only if in current zone) with camera transforms
-        if (game.player_zone == game.current_zone) {
+        if (game.player_zone == game.zone_manager.getCurrentZoneIndex()) {
             for (0..zone.players.count) |i| {
                 const transform = &zone.players.transforms[i];
                 const visual = &zone.players.visuals[i];

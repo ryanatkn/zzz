@@ -388,7 +388,7 @@ pub const Interactable = struct {
     interaction_type: InteractionType,
     state: InteractionState,
     interaction_timer: f32,
-    destination_zone: ?u8, // For portals - zone to travel to
+    destination_zone: ?usize, // For portals - zone to travel to
     attuned: bool, // For lifestones - whether player is attuned to this lifestone
     interaction_data: union(enum) {
         deflect: struct {
@@ -417,7 +417,7 @@ pub const Interactable = struct {
         };
     }
 
-    pub fn initPortal(destination: u8) Interactable {
+    pub fn initPortal(destination: usize) Interactable {
         return .{
             .interaction_type = .telekinetic,
             .state = .normal,

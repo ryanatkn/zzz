@@ -161,11 +161,11 @@ pub const GameState = struct {
     pub fn travelToZoneWithSpawn(self: *Self, destination_zone: usize, spawn_pos: ?math.Vec2) !void {
         if (destination_zone < hex_game_mod.MAX_ZONES) {
             // Get the default spawn position for the zone if not provided
-            const zone = &self.hex_game.zones[destination_zone];
+            const zone = self.hex_game.zone_manager.getZoneConst(destination_zone);
             const actual_spawn_pos = spawn_pos orelse zone.spawn_pos;
 
             // Use hex_game's travelToZone which properly handles entity transfer
-            try self.hex_game.travelToZone(@intCast(destination_zone), actual_spawn_pos);
+            try self.hex_game.travelToZone(destination_zone, actual_spawn_pos);
 
             // Clear ALL effects on zone travel to keep them fully ephemeral
             self.effect_system.clear();
@@ -205,7 +205,7 @@ pub const GameState = struct {
         self.hex_game.setPlayerAlive(true);
 
         // Reset to starting zone
-        if (self.hex_game.current_zone != 0) {
+        if (self.hex_game.zone_manager.getCurrentZoneIndex() != 0) {
             self.travelToZone(0) catch |err| {
                 self.logger.err("reset_travel_fail", "Failed to travel to overworld during reset: {}", .{err});
             };
@@ -227,7 +227,7 @@ pub const GameState = struct {
 
         // Check all zones
         for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
-            const zone = &self.hex_game.zones[zone_idx];
+            const zone = self.hex_game.zone_manager.getZoneConst(zone_idx);
 
             // Count lifestones in this zone
             for (0..zone.lifestones.count) |i| {
@@ -259,7 +259,7 @@ pub const GameState = struct {
 
         // Check all zones
         for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
-            const zone = &self.hex_game.zones[zone_idx];
+            const zone = self.hex_game.zone_manager.getZoneConst(zone_idx);
 
             // Count lifestones in this zone
             for (0..zone.lifestones.count) |i| {
@@ -278,7 +278,7 @@ pub const GameState = struct {
 
         // Check all zones
         for (0..hex_game_mod.MAX_ZONES) |zone_idx| {
-            const zone = &self.hex_game.zones[zone_idx];
+            const zone = self.hex_game.zone_manager.getZoneConst(zone_idx);
 
             // Count attuned lifestones in this zone
             for (0..zone.lifestones.count) |i| {

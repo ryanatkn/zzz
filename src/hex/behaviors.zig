@@ -112,19 +112,19 @@ fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: Beh
     const state_result = unit_behavior_states.getOrPut(entity_id) catch {
         std.log.err("Failed to get or create behavior state for entity {}, using fallback", .{entity_id});
         // Update fallback state and return reference to it (memory-safe)
-        fallback_state = unit_behavior.UnitBehaviorState.init(unit_comp.home_pos, &[_]Vec2{}, entity_id);
+        fallback_state = unit_behavior.UnitBehaviorState.init(unit_comp.base.home_pos, &[_]Vec2{}, entity_id);
         return &fallback_state;
     };
 
     if (!state_result.found_existing) {
         // Create new state with appropriate waypoints based on profile
         const waypoints = switch (profile) {
-            .patrolling => generatePatrolWaypoints(unit_comp.home_pos, .square), // Default to square pattern
+            .patrolling => generatePatrolWaypoints(unit_comp.base.home_pos, .square), // Default to square pattern
             else => &[_]Vec2{}, // No waypoints for other profiles
         };
 
         state_result.value_ptr.* = unit_behavior.UnitBehaviorState.init(
-            unit_comp.home_pos,
+            unit_comp.base.home_pos,
             waypoints,
             entity_id, // Use entity ID as random seed
         );
@@ -138,12 +138,12 @@ fn getOrCreateBehaviorConfig(entity_id: u32, unit_comp: *const Unit, profile: Be
     const config_result = unit_behavior_configs.getOrPut(entity_id) catch {
         std.log.err("Failed to get or create behavior config for entity {}, using fallback", .{entity_id});
         // Update fallback config and return reference to it (memory-safe)
-        fallback_config = createConfigForProfile(profile, unit_comp.home_pos);
+        fallback_config = createConfigForProfile(profile, unit_comp.base.home_pos);
         return &fallback_config;
     };
 
     if (!config_result.found_existing) {
-        config_result.value_ptr.* = createConfigForProfile(profile, unit_comp.home_pos);
+        config_result.value_ptr.* = createConfigForProfile(profile, unit_comp.base.home_pos);
     }
 
     return config_result.value_ptr;
@@ -212,7 +212,7 @@ pub fn updateUnitWithAggroMod(
         .target_alive = player_alive,
         .threat_pos = if (player_alive and profile == .defensive) player_pos else null,
         .threat_active = player_alive and profile == .defensive,
-        .home_pos = unit_comp.home_pos,
+        .home_pos = unit_comp.base.home_pos,
         .aggro_multiplier = aggro_multiplier,
         .speed_multiplier = 1.0,
         .dt = dt,
@@ -222,10 +222,12 @@ pub fn updateUnitWithAggroMod(
     const result = unit_behavior.updateUnitBehavior(behavior_context, state, config.*);
 
     // Update hex-specific unit state based on behavior result
-    unit_comp.state = switch (result.active_behavior) {
+    unit_comp.base.behavior_state = switch (result.active_behavior) {
         .chase => .chasing,
-        .flee, .return_home => .returning_home,
-        .patrol, .guard, .wander, .idle => .returning_home, // Hex game doesn't distinguish these
+        .flee => .fleeing,
+        .return_home => .idle, // Returning home is considered idle state
+        .patrol => .patrolling,
+        .guard, .wander, .idle => .idle, // Default to idle for these behaviors
     };
 
     // Update chase timer and target from library state
