@@ -22,7 +22,8 @@ pub const TextAlign = enum {
 pub const TextStyle = struct {
     font_size: f32 = 14.0,
     font_category: fonts.FontCategory = .sans,
-    color: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, // White by default
+    // White by default
+    color: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
     align: TextAlign = .left,
     
     // Remove debug colors that cause yellow flashing

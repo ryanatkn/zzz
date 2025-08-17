@@ -94,7 +94,7 @@ pub const Button = struct {
         button.text_style = try reactive.signal(allocator, TextStyle, TextStyle{
             .font_size = 14.0,
             .color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, // White text
-            .align = .center,
+            // .align = .center, // TODO: Add align field to TextStyle if needed
         });
         button.state = try reactive.signal(allocator, ButtonState, .normal);
         

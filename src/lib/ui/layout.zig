@@ -311,8 +311,8 @@ pub const Layout = struct {
     }
     
     /// Set item alignment and trigger re-layout
-    pub fn setAlignItems(self: *Layout, align: AlignItems) void {
-        self.align_items.set(align);
+    pub fn setAlignItems(self: *Layout, alignment: AlignItems) void {
+        self.align_items.set(alignment);
     }
     
     /// Set gap between items and trigger re-layout
