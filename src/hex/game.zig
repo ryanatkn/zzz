@@ -75,7 +75,7 @@ pub const GameState = struct {
         // Initialize behavior system
         behaviors.initBehaviors();
 
-        return .{
+        var game_state = Self{
             .hex_game = HexGame.init(allocator),
             .input_state = InputState.init(),
             .game_paused = false,
@@ -92,6 +92,11 @@ pub const GameState = struct {
             .ai_enabled = false,
             .frame_counter = 0,
         };
+        
+        // Connect the effect system to the hex game for travel effects
+        game_state.hex_game.setEffectSystemRef(&game_state.effect_system);
+        
+        return game_state;
     }
 
     pub fn deinit(self: *Self) void {
@@ -415,9 +420,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     }
 
     // Update bullet entities using ECS
-    world.updateProjectiles(hex_ctx) catch |err| {
-        game_state.logger.err("projectiles_update_fail", "Failed to update projectiles: {}", .{err});
-    };
+    world.updateProjectiles(hex_ctx);
 
     // Update units with context
     updateUnitsWithContext(hex_ctx);

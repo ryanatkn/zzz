@@ -62,9 +62,6 @@ pub fn ZoneTravelManager(comptime GameType: type, comptime max_teleporters: usiz
         
         /// Check for teleporter collisions and execute travel
         pub fn checkTeleporterCollisions(self: *Self, game: *GameType, player_pos: Vec2, player_radius: f32) ?zone_travel.ZoneTravelInterface.TravelResult {
-            // Update cooldowns
-            self.teleporter_manager.update(0.016); // Assume 60 FPS for now
-            
             // Check for collisions
             if (self.teleporter_manager.checkTeleporterCollision(player_pos, player_radius)) |teleporter_result| {
                 if (!teleporter_result.activated) {

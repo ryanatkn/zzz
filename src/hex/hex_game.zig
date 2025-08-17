@@ -164,17 +164,21 @@ const HexTravelInterface = struct {
     }
     
     pub fn clearEffects(game: *HexGame) void {
-        // Effect system integration would go here
-        // For now, just log the action
-        _ = game;
-        loggers.getGameLog().debug("effects_cleared", "Travel effects cleared", .{});
+        if (game.effect_system_ref) |effect_system| {
+            effect_system.clear();
+            loggers.getGameLog().debug("effects_cleared", "Travel effects cleared", .{});
+        } else {
+            loggers.getGameLog().debug("effects_cleared", "Travel effects cleared (no effect system available)", .{});
+        }
     }
     
     pub fn createTravelEffects(game: *HexGame, origin_pos: Vec2, radius: f32) void {
-        // Effect system integration would go here
-        // For now, just log the action
-        _ = game;
-        loggers.getGameLog().debug("travel_effects_created", "Travel effects created at {any} with radius {}", .{ origin_pos, radius });
+        if (game.effect_system_ref) |effect_system| {
+            effect_system.addPortalTravelEffect(origin_pos, radius);
+            loggers.getGameLog().debug("travel_effects_created", "Travel effects created at {any} with radius {}", .{ origin_pos, radius });
+        } else {
+            loggers.getGameLog().debug("travel_effects_created", "Travel effects created at {any} with radius {} (no effect system available)", .{ origin_pos, radius });
+        }
     }
 };
 
@@ -206,6 +210,9 @@ pub const HexGame = struct {
     logger: ModuleLogger,
     frame_pool: object_pools.FramePool,
     zone_travel_manager: world.ZoneTravelManager(HexGame, MAX_ENTITIES_PER_ARCHETYPE),
+    
+    // Optional effect system reference for travel effects
+    effect_system_ref: ?*@import("../lib/effects/game_effects.zig").GameEffectSystem,
 
     pub const ZoneData = struct {
         // Direct fixed-size archetype storage - no dynamic allocation
@@ -311,6 +318,7 @@ pub const HexGame = struct {
                     HexTravelInterface.createTravelEffects,
                 )
             ),
+            .effect_system_ref = null,
         };
 
         // Initialize all zones
@@ -329,6 +337,11 @@ pub const HexGame = struct {
         }
 
         return game;
+    }
+    
+    /// Set the effect system reference for travel effects
+    pub fn setEffectSystemRef(self: *HexGame, effect_system: *@import("../lib/effects/game_effects.zig").GameEffectSystem) void {
+        self.effect_system_ref = effect_system;
     }
 
     pub fn deinit(self: *HexGame) void {
@@ -694,15 +707,15 @@ pub const HexGame = struct {
     }
 
     /// Context-aware projectiles update function  
-    pub fn updateProjectiles(self: *HexGame, context: HexGameContext) !void {
+    pub fn updateProjectiles(self: *HexGame, context: HexGameContext) void {
         const contexts = @import("../lib/game/contexts/mod.zig");
         const deltaTime = contexts.ContextUtils.effectiveDeltaTime(context);
         
         const zone = self.getCurrentZone();
 
-        // Use frame pool for temporary allocation - no frame-by-frame heap allocation
-        const frame_allocator = self.frame_pool.allocator();
-        var projectiles_to_remove = std.ArrayList(EntityId).init(frame_allocator);
+        // Use fixed-size array to avoid any allocations
+        var projectiles_to_remove: [MAX_ENTITIES_PER_ARCHETYPE]EntityId = undefined;
+        var remove_count: usize = 0;
 
         // Update projectile positions and check collisions using ECS iteration
         var projectile_iter = zone.projectiles.entityIterator();
@@ -718,7 +731,10 @@ pub const HexGame = struct {
 
                     // Check if projectile expired
                     if (projectile.base.lifetime >= projectile.base.max_lifetime) {
-                        try projectiles_to_remove.append(projectile_id);
+                        if (remove_count < projectiles_to_remove.len) {
+                            projectiles_to_remove[remove_count] = projectile_id;
+                            remove_count += 1;
+                        }
                         continue;
                     }
 
@@ -742,7 +758,10 @@ pub const HexGame = struct {
                                     }
 
                                     // Remove projectile
-                                    try projectiles_to_remove.append(projectile_id);
+                                    if (remove_count < projectiles_to_remove.len) {
+                                        projectiles_to_remove[remove_count] = projectile_id;
+                                        remove_count += 1;
+                                    }
                                     break;
                                 }
                             }
@@ -753,7 +772,7 @@ pub const HexGame = struct {
         }
 
         // Remove expired/hit projectiles
-        for (projectiles_to_remove.items) |projectile_id| {
+        for (projectiles_to_remove[0..remove_count]) |projectile_id| {
             zone.projectiles.removeEntity(projectile_id);
             zone.entity_count -= 1;
         }
