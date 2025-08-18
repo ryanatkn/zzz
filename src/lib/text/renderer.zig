@@ -173,9 +173,23 @@ pub const TextRenderer = struct {
         self.screen_height = height;
     }
 
+    // Simple bounds check to avoid rendering text that's mostly cut off
+    fn isTextVisible(self: *Self, position: Vec2, width: f32, height: f32) bool {
+        const margin = 10.0; // Allow some cutoff but not complete
+        return position.x + width > -margin and 
+               position.x < self.screen_width + margin and
+               position.y + height > -margin and 
+               position.y < self.screen_height + margin;
+    }
+
     // Queue a texture-based text for drawing (IMMEDIATE MODE)
     // Texture will be released after this frame
     pub fn queueTextTexture(self: *Self, texture: *c.sdl.SDL_GPUTexture, position: Vec2, width: u32, height: u32, color: Color) void {
+        // Skip rendering if text would be mostly cut off
+        if (!self.isTextVisible(position, @floatFromInt(width), @floatFromInt(height))) {
+            return;
+        }
+
         // Create a TextTexture with the shared sampler
         if (self.text_sampler) |sampler| {
             const text_texture = TextTexture{
@@ -203,6 +217,15 @@ pub const TextRenderer = struct {
     // Queue persistent text for drawing (PERSISTENT MODE)
     // Uses persistent texture system to avoid recreating textures every frame
     pub fn queuePersistentText(self: *Self, text: []const u8, position: Vec2, font_manager: anytype, font_category: anytype, font_size: f32, color: Color) !void {
+        // Quick estimate of text size for bounds check
+        const estimated_width = @as(f32, @floatFromInt(text.len)) * font_size * 0.6;
+        const estimated_height = font_size * 1.2;
+        
+        // Skip rendering if text would be mostly cut off
+        if (!self.isTextVisible(position, estimated_width, estimated_height)) {
+            return;
+        }
+
         if (persistent_text.getGlobalPersistentTextSystem()) |persistent_system| {
             if (try persistent_system.getOrCreateTexture(text, font_manager, font_category, font_size, color)) |handle| {
                 // Queue the persistent texture for rendering (but don't release it)
