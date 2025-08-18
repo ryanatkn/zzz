@@ -1,8 +1,10 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const c = @import("../platform/sdl.zig");
+const component = @import("component.zig");
 
 const Vec2 = math.Vec2;
+const Component = component.Component;
 
 /// Common UI event types
 pub const UIEvent = union(enum) {
@@ -12,19 +14,19 @@ pub const UIEvent = union(enum) {
     MouseMove: MouseMoveEvent,
     MouseEnter: MousePositionEvent,
     MouseLeave: MousePositionEvent,
-    
+
     /// Keyboard events
     KeyDown: KeyEvent,
     KeyUp: KeyEvent,
     TextInput: TextInputEvent,
-    
+
     /// Focus events
     FocusGained: FocusEvent,
     FocusLost: FocusEvent,
-    
+
     /// Window events
     WindowResize: WindowResizeEvent,
-    
+
     /// Custom events
     Custom: CustomEvent,
 };
@@ -85,7 +87,7 @@ pub const MouseButton = enum(u8) {
     Right = 3,
     X1 = 4,
     X2 = 5,
-    
+
     /// Convert from SDL mouse button
     pub fn fromSDL(sdl_button: u8) MouseButton {
         return switch (sdl_button) {
@@ -105,11 +107,11 @@ pub const EventModifiers = packed struct {
     shift: bool = false,
     alt: bool = false,
     super: bool = false, // Windows key / Cmd key
-    
+
     pub fn none() EventModifiers {
         return .{};
     }
-    
+
     pub fn fromSDL(sdl_mod: u16) EventModifiers {
         return EventModifiers{
             .ctrl = (sdl_mod & c.sdl.SDL_KMOD_CTRL) != 0,
@@ -122,16 +124,16 @@ pub const EventModifiers = packed struct {
 
 /// Event handling result
 pub const EventResult = enum {
-    Handled,      // Event was handled, stop propagation
-    NotHandled,   // Event was not handled, continue propagation
-    Consumed,     // Event was consumed but allow bubbling for side effects
+    Handled, // Event was handled, stop propagation
+    NotHandled, // Event was not handled, continue propagation
+    Consumed, // Event was consumed but allow bubbling for side effects
 };
 
 /// Event propagation phase
 pub const EventPhase = enum {
-    Capture,   // Top-down phase (parent to child)
-    Target,    // At the target component
-    Bubble,    // Bottom-up phase (child to parent)
+    Capture, // Top-down phase (parent to child)
+    Target, // At the target component
+    Bubble, // Bottom-up phase (child to parent)
 };
 
 /// Event handler function signature
@@ -201,9 +203,9 @@ pub const HitTest = struct {
     /// Check if point is inside rectangle
     pub fn pointInRect(point: Vec2, rect: math.Rectangle) bool {
         return point.x >= rect.x and point.x <= rect.x + rect.width and
-               point.y >= rect.y and point.y <= rect.y + rect.height;
+            point.y >= rect.y and point.y <= rect.y + rect.height;
     }
-    
+
     /// Check if point is inside circle
     pub fn pointInCircle(point: Vec2, center: Vec2, radius: f32) bool {
         const dx = point.x - center.x;
@@ -218,7 +220,7 @@ pub const EventDispatcher = struct {
     pub fn dispatchEvent(
         event: UIEvent,
         target_component: anytype,
-        parent_components: []const *anytype,
+        parent_components: []const *Component,
     ) EventResult {
         // Capture phase: parent to child
         for (parent_components) |parent| {
@@ -227,13 +229,13 @@ pub const EventDispatcher = struct {
                 if (result == .Handled) return .Handled;
             }
         }
-        
+
         // Target phase
         if (target_component.handleEvent) |handler| {
             const result = handler(event, .Target);
             if (result == .Handled) return .Handled;
         }
-        
+
         // Bubble phase: child to parent
         var i = parent_components.len;
         while (i > 0) {
@@ -244,7 +246,7 @@ pub const EventDispatcher = struct {
                 if (result == .Handled) return .Handled;
             }
         }
-        
+
         return .NotHandled;
     }
 };
@@ -253,42 +255,42 @@ pub const EventDispatcher = struct {
 pub const FocusManager = struct {
     current_focus: ?u32 = null,
     focus_chain: std.ArrayList(u32),
-    
+
     pub fn init(allocator: std.mem.Allocator) FocusManager {
         return FocusManager{
             .focus_chain = std.ArrayList(u32).init(allocator),
         };
     }
-    
+
     pub fn deinit(self: *FocusManager) void {
         self.focus_chain.deinit();
     }
-    
+
     /// Set focus to a component
     pub fn setFocus(self: *FocusManager, component_id: u32) !UIEvent {
         const old_focus = self.current_focus;
         self.current_focus = component_id;
-        
+
         // Add to focus chain if not already present
         for (self.focus_chain.items) |id| {
             if (id == component_id) break;
         } else {
             try self.focus_chain.append(component_id);
         }
-        
+
         if (old_focus) |old_id| {
             if (old_id != component_id) {
                 return UIEvent{ .FocusLost = FocusEvent{ .component_id = old_id } };
             }
         }
-        
+
         return UIEvent{ .FocusGained = FocusEvent{ .component_id = component_id } };
     }
-    
+
     /// Move focus to next component in chain
     pub fn focusNext(self: *FocusManager) ?UIEvent {
         if (self.focus_chain.items.len == 0) return null;
-        
+
         if (self.current_focus) |current| {
             for (self.focus_chain.items, 0..) |id, i| {
                 if (id == current) {
@@ -299,19 +301,19 @@ pub const FocusManager = struct {
                 }
             }
         }
-        
+
         // Focus first component if no current focus
         const first_id = self.focus_chain.items[0];
         self.current_focus = first_id;
         return UIEvent{ .FocusGained = FocusEvent{ .component_id = first_id } };
     }
-    
+
     /// Remove component from focus management
     pub fn removeFocus(self: *FocusManager, component_id: u32) void {
         if (self.current_focus == component_id) {
             self.current_focus = null;
         }
-        
+
         for (self.focus_chain.items, 0..) |id, i| {
             if (id == component_id) {
                 _ = self.focus_chain.swapRemove(i);

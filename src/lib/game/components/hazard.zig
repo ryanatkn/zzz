@@ -2,11 +2,11 @@
 /// Sparse storage - only dangerous entities have this
 pub const Hazard = struct {
     pub const HazardType = enum {
-        pit,        // Fall damage/death
-        spikes,     // Piercing damage
-        fire,       // Burn damage
-        poison,     // Poison damage over time
-        crushing,   // Instant death
+        pit, // Fall damage/death
+        spikes, // Piercing damage
+        fire, // Burn damage
+        poison, // Poison damage over time
+        crushing, // Instant death
         environmental, // Generic environmental hazard
     };
 

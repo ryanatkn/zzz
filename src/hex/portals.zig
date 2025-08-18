@@ -17,14 +17,13 @@ pub fn updatePortalCooldown(world: *HexGame, frame_ctx: FrameContext) void {
 
 /// Check portal collisions using generic system (replaces 80+ lines of manual collision detection)
 pub fn checkPortalCollisions(world: *HexGame) bool {
-
     if (!world.getPlayerAlive()) {
         return false;
     }
 
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
-    
+
     // Check for portal collisions and execute travel directly
     if (world.zone_travel_manager.checkTeleporterCollisions(world, player_pos, player_radius)) |result| {
         if (result.success) {
@@ -35,6 +34,6 @@ pub fn checkPortalCollisions(world: *HexGame) bool {
             return false;
         }
     }
-    
+
     return false;
 }

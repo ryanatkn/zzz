@@ -63,7 +63,7 @@ pub const Hud = struct {
 
     pub fn handleEvent(self: *Hud, event: c.sdl.SDL_Event) !bool {
         if (!self.is_open) return false;
-        
+
         // Debug: Log all mouse clicks when HUD is open
         if (event.type == c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN) {
             const log = std.log.scoped(.hud_click);
@@ -90,26 +90,26 @@ pub const Hud = struct {
                     c.sdl.SDL_BUTTON_LEFT => {
                         const mouse_x = button_event.x;
                         const mouse_y = button_event.y;
-                        
+
                         // Check IDE page-specific interactions first
                         if (self.router.getCurrentPage()) |current_page| {
                             const log = std.log.scoped(.hud_routing);
-                            log.info("Current page: '{s}'", .{ current_page.path });
-                            
+                            log.info("Current page: '{s}'", .{current_page.path});
+
                             if (std.mem.eql(u8, current_page.path, "/ide")) {
                                 log.info("On IDE page, handling file tree click", .{});
                                 const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
-                                
+
                                 // Try file tree interaction first
                                 const point = @import("../lib/math/mod.zig").Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
                                 if (ide_page_impl.handleFileTreeClick(point) catch false) {
                                     return true; // File tree handled the click
                                 }
-                                
+
                                 // Search controls removed for simplicity
                             }
                         }
-                        
+
                         // Check if clicking a link
                         if (self.hovered_link) |link_index| {
                             if (link_index >= self.links.items.len) {
@@ -166,16 +166,13 @@ pub const Hud = struct {
                 if (self.router.getCurrentPage()) |current_page| {
                     if (std.mem.eql(u8, current_page.path, "/ide")) {
                         const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
-                        
+
                         const point = @import("../lib/math/mod.zig").Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
-                        
+
                         // Adjust point to be relative to file explorer panel (same as in handleFileTreeClick)
                         const explorer_rect = @import("../lib/math/mod.zig").Vec2{ .x = 8 + 8, .y = 60 + 8 + 30 };
-                        const relative_point = @import("../lib/math/mod.zig").Vec2{ 
-                            .x = point.x - explorer_rect.x, 
-                            .y = point.y - explorer_rect.y 
-                        };
-                        
+                        const relative_point = @import("../lib/math/mod.zig").Vec2{ .x = point.x - explorer_rect.x, .y = point.y - explorer_rect.y };
+
                         ide_page_impl.file_tree_component.handleHover(relative_point);
                     }
                 }
@@ -236,7 +233,7 @@ pub const Hud = struct {
 
         // Reset arena for new frame (retaining capacity for performance)
         _ = self.link_arena.reset(.retain_capacity);
-        
+
         // Clear links for this frame
         self.links.clearRetainingCapacity();
 

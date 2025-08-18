@@ -30,26 +30,26 @@ pub fn renderCircleEntities(
     // Batch transform all entities
     var transforms: [1000]EntityTransform = undefined;
     var visible_indices: [1000]u32 = undefined;
-    
+
     // Collect world positions and radii
     var world_positions: [1000]Vec2 = undefined;
     var world_radii: [1000]f32 = undefined;
     var entity_colors: [1000]Color = undefined;
-    
+
     const actual_count = @min(count, 1000);
-    
+
     for (0..actual_count) |i| {
         world_positions[i] = storage.transforms[i].pos;
         world_radii[i] = storage.transforms[i].radius;
         entity_colors[i] = storage.visuals[i].color;
     }
-    
+
     // Efficient batch processing with culling
     const config = camera_utils.CameraUtilsConfig{
         .culling_margin = 50.0,
         .enable_depth_sorting = false,
     };
-    
+
     const visible_count = camera_utils.prepareEntitiesForRendering(
         cam,
         world_positions[0..actual_count],
@@ -58,13 +58,13 @@ pub fn renderCircleEntities(
         &transforms,
         &visible_indices,
     );
-    
+
     // Render only visible entities
     for (0..visible_count) |i| {
         const transform = transforms[i];
         const original_index = visible_indices[i];
         const color = entity_colors[original_index];
-        
+
         renderer.drawCircle(cmd_buffer, render_pass, transform.screen_pos, transform.screen_radius, color);
     }
 }
@@ -83,15 +83,15 @@ pub fn renderRectEntities(
     var world_positions: [1000]Vec2 = undefined;
     var world_sizes: [1000]Vec2 = undefined;
     var entity_colors: [1000]Color = undefined;
-    
+
     const actual_count = @min(count, 1000);
-    
+
     for (0..actual_count) |i| {
         world_positions[i] = storage.transforms[i].pos;
         world_sizes[i] = storage.terrains[i].size; // Assuming terrain component has size
         entity_colors[i] = storage.visuals[i].color;
     }
-    
+
     // Batch transform rectangles
     camera_utils.batchTransformRects(
         cam,
@@ -99,12 +99,12 @@ pub fn renderRectEntities(
         world_sizes[0..actual_count],
         transforms[0..actual_count],
     );
-    
+
     // Render all rectangles (could add culling here too)
     for (0..actual_count) |i| {
         const transform = transforms[i];
         const color = entity_colors[i];
-        
+
         renderer.drawRect(cmd_buffer, render_pass, transform.screen_pos, transform.screen_size, color);
     }
 }
@@ -127,10 +127,10 @@ pub fn renderConditionalCircleEntities(
     var world_positions: [1000]Vec2 = undefined;
     var world_radii: [1000]f32 = undefined;
     var entity_colors: [1000]Color = undefined;
-    
+
     const actual_count = @min(count, 1000);
     var valid_count: u32 = 0;
-    
+
     // Filter entities based on condition
     for (0..actual_count) |i| {
         if (condition_fn(storage, i)) {
@@ -141,7 +141,7 @@ pub fn renderConditionalCircleEntities(
             valid_count += 1;
         }
     }
-    
+
     // Transform valid entities
     camera_utils.batchTransformEntities(
         cam,
@@ -149,12 +149,12 @@ pub fn renderConditionalCircleEntities(
         world_radii[0..valid_count],
         transforms[0..valid_count],
     );
-    
+
     // Render valid entities
     for (0..valid_count) |i| {
         const transform = transforms[i];
         const color = entity_colors[i];
-        
+
         renderer.drawCircle(cmd_buffer, render_pass, transform.screen_pos, transform.screen_radius, color);
     }
 }
@@ -179,7 +179,7 @@ pub fn renderZoneEntities(
         &zone.obstacles,
         zone.obstacles.count,
     );
-    
+
     // Render units (circles)
     renderCircleEntities(
         @TypeOf(zone.units),
@@ -190,7 +190,7 @@ pub fn renderZoneEntities(
         &zone.units,
         zone.units.count,
     );
-    
+
     // Render lifestones (circles)
     renderCircleEntities(
         @TypeOf(zone.lifestones),
@@ -201,7 +201,7 @@ pub fn renderZoneEntities(
         &zone.lifestones,
         zone.lifestones.count,
     );
-    
+
     // Render portals (circles)
     renderCircleEntities(
         @TypeOf(zone.portals),
@@ -254,7 +254,7 @@ pub fn renderProjectiles(
             return storage.visuals[index].visible;
         }
     };
-    
+
     renderConditionalCircleEntities(
         @TypeOf(zone.projectiles),
         @TypeOf(VisibilityCondition.check),
@@ -282,10 +282,10 @@ pub fn renderCompleteZone(
 ) void {
     // Render all basic zone entities
     renderZoneEntities(ZoneType, renderer, cmd_buffer, render_pass, cam, zone);
-    
+
     // Render player (with zone check)
     renderPlayerInZone(ZoneType, GameType, renderer, cmd_buffer, render_pass, cam, zone, game);
-    
+
     // Render projectiles (with visibility check)
     renderProjectiles(ZoneType, renderer, cmd_buffer, render_pass, cam, zone);
 }
@@ -295,11 +295,11 @@ pub const RenderStats = struct {
     entities_culled: u32 = 0,
     entities_rendered: u32 = 0,
     draw_calls_saved: u32 = 0,
-    
+
     pub fn reset(self: *RenderStats) void {
         self.* = RenderStats{};
     }
-    
+
     pub fn getCullingEfficiency(self: RenderStats) f32 {
         const total = self.entities_culled + self.entities_rendered;
         if (total == 0) return 0.0;
@@ -311,16 +311,16 @@ pub const RenderStats = struct {
 pub const EntityRenderConfig = struct {
     /// Enable frustum culling for off-screen entities
     enable_culling: bool = true,
-    
+
     /// Culling margin in screen pixels
     culling_margin: f32 = 50.0,
-    
+
     /// Enable depth sorting for correct rendering order
     enable_depth_sorting: bool = false,
-    
+
     /// Maximum entities to process per batch
     max_batch_size: u32 = 1000,
-    
+
     /// Collect rendering statistics
     collect_stats: bool = false,
 };

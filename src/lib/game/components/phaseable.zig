@@ -29,7 +29,7 @@ pub const Phaseable = struct {
 
     pub fn update(self: *Phaseable, dt: f32) bool {
         if (!self.phased) return false;
-        
+
         self.phase_duration -= dt;
         if (self.phase_duration <= 0) {
             self.endPhase();

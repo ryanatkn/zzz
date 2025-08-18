@@ -4,16 +4,15 @@ const Vec2 = math.Vec2;
 
 /// Generic spell casting patterns and interfaces
 /// Games implement specific spell logic using these patterns
-
 /// Spell targeting types
 pub const TargetType = enum {
-    none,        // No target required
-    position,    // Target a position on the ground
-    self,        // Target the caster
-    entity,      // Target a specific entity
-    area,        // Area of effect around a position
-    direction,   // Cast in a direction
-    line,        // Line from caster in a direction
+    none, // No target required
+    position, // Target a position on the ground
+    self, // Target the caster
+    entity, // Target a specific entity
+    area, // Area of effect around a position
+    direction, // Cast in a direction
+    line, // Line from caster in a direction
 };
 
 /// Spell targeting configuration
@@ -37,7 +36,7 @@ pub const CastingRestrictions = struct {
     blocked_by_stun: bool = true,
     requires_weapon: bool = false,
     requires_clear_path: bool = false,
-    
+
     pub const ZoneTypeFilter = enum {
         overworld_only,
         dungeon_only,
@@ -82,7 +81,7 @@ pub const SpellTargeting = struct {
         // Game-specific validations would go here using context
         _ = restrictions;
         _ = context;
-        
+
         return ValidationResult.valid;
     }
 
@@ -93,11 +92,11 @@ pub const SpellTargeting = struct {
         allocator: std.mem.Allocator,
     ) !std.ArrayList(Vec2) {
         var positions = std.ArrayList(Vec2).init(allocator);
-        
+
         // Simple circular AoE - games can implement more complex shapes
         const step_size: f32 = 10.0; // 10 unit grid
         const radius_sq = radius * radius;
-        
+
         var y: f32 = -radius;
         while (y <= radius) : (y += step_size) {
             var x: f32 = -radius;
@@ -107,7 +106,7 @@ pub const SpellTargeting = struct {
                 }
             }
         }
-        
+
         return positions;
     }
 
@@ -131,7 +130,7 @@ pub const SpellTargeting = struct {
         const direction = target_pos.sub(start_pos).normalize();
         const distance = start_pos.distance(target_pos);
         const travel_time = distance / projectile_speed;
-        
+
         return SpellTrajectory{
             .start_pos = start_pos,
             .direction = direction,
@@ -149,7 +148,7 @@ pub const SpellTrajectory = struct {
     speed: f32,
     gravity: f32,
     travel_time: f32,
-    
+
     /// Get position along trajectory at time t
     pub fn getPositionAtTime(self: SpellTrajectory, time: f32) Vec2 {
         const linear_pos = self.start_pos.add(self.direction.scale(self.speed * time));
@@ -170,7 +169,7 @@ pub const SpellEffects = struct {
         // Game implements the actual effect application
         context.applyInstantEffect(target_pos, effect_value, effect_type);
     }
-    
+
     /// Apply damage over time
     pub fn applyDurationEffect(
         target_pos: Vec2,
@@ -183,7 +182,7 @@ pub const SpellEffects = struct {
         // Game implements the duration effect application
         context.applyDurationEffect(target_pos, effect_value, duration, tick_interval, effect_type);
     }
-    
+
     pub const EffectType = enum {
         damage,
         healing,
@@ -200,10 +199,10 @@ pub const SpellEffects = struct {
 pub const SpellCastingInterface = struct {
     /// Function signature for spell validation
     pub const ValidateFn = *const fn (caster: anytype, target: anytype, spell_id: anytype) ValidationResult;
-    
+
     /// Function signature for spell execution
     pub const ExecuteFn = *const fn (caster: anytype, target: anytype, spell_id: anytype) bool;
-    
+
     /// Function signature for spell effect application
     pub const ApplyEffectFn = *const fn (targets: anytype, effect: anytype) void;
 };
@@ -212,7 +211,7 @@ pub const SpellCastingInterface = struct {
 pub fn ExampleSpellImplementation(comptime GameType: type, comptime SpellId: type) type {
     return struct {
         const Self = @This();
-        
+
         /// Validate if a spell can be cast
         pub fn validateSpell(
             game: *GameType,
@@ -227,7 +226,7 @@ pub fn ExampleSpellImplementation(comptime GameType: type, comptime SpellId: typ
             _ = spell_id;
             return ValidationResult.valid;
         }
-        
+
         /// Execute spell cast
         pub fn castSpell(
             game: *GameType,

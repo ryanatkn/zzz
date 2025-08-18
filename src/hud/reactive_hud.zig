@@ -407,7 +407,7 @@ pub const ReactiveHud = struct {
 
         // Reset arena for new frame (retaining capacity for performance)
         _ = hud_data.link_arena.reset(.retain_capacity);
-        
+
         // Clear links for this frame
         hud_data.links.clearRetainingCapacity();
 

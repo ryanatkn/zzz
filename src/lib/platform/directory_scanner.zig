@@ -12,7 +12,7 @@ pub const FileType = enum {
     config_zon,
     text_file,
     unknown,
-    
+
     /// Determine file type from file extension
     pub fn fromExtension(extension: []const u8) FileType {
         if (std.mem.eql(u8, extension, ".zig")) return .zig_source;
@@ -22,7 +22,7 @@ pub const FileType = enum {
         if (std.mem.eql(u8, extension, ".txt")) return .text_file;
         return .unknown;
     }
-    
+
     /// Get display name for file type
     pub fn getDisplayName(self: FileType) []const u8 {
         return switch (self) {
@@ -35,17 +35,17 @@ pub const FileType = enum {
             .unknown => "File",
         };
     }
-    
+
     /// Get color for file type (RGB values 0-255)
     pub fn getColor(self: FileType) struct { r: u8, g: u8, b: u8 } {
         return switch (self) {
             .directory => .{ .r = 100, .g = 149, .b = 237 }, // Blue
-            .zig_source => .{ .r = 255, .g = 140, .b = 0 },   // Orange
-            .markdown => .{ .r = 50, .g = 205, .b = 50 },     // Green
+            .zig_source => .{ .r = 255, .g = 140, .b = 0 }, // Orange
+            .markdown => .{ .r = 50, .g = 205, .b = 50 }, // Green
             .shader_hlsl => .{ .r = 255, .g = 20, .b = 147 }, // Pink
-            .config_zon => .{ .r = 255, .g = 215, .b = 0 },   // Gold
-            .text_file => .{ .r = 169, .g = 169, .b = 169 },  // Gray
-            .unknown => .{ .r = 128, .g = 128, .b = 128 },    // Dark Gray
+            .config_zon => .{ .r = 255, .g = 215, .b = 0 }, // Gold
+            .text_file => .{ .r = 169, .g = 169, .b = 169 }, // Gray
+            .unknown => .{ .r = 128, .g = 128, .b = 128 }, // Dark Gray
         };
     }
 };
@@ -58,18 +58,18 @@ pub const FileMetadata = struct {
     size: u64,
     is_directory: bool,
     modification_time: i128, // nanoseconds since epoch
-    
+
     /// Create metadata for a file/directory
     pub fn create(allocator: std.mem.Allocator, name: []const u8, full_path: []const u8, stat: std.fs.File.Stat) !FileMetadata {
         const owned_name = try allocator.dupe(u8, name);
         const owned_path = try allocator.dupe(u8, full_path);
-        
+
         const is_dir = stat.kind == .directory;
         const file_type = if (is_dir) FileType.directory else blk: {
             const ext = std.fs.path.extension(name);
             break :blk FileType.fromExtension(ext);
         };
-        
+
         return FileMetadata{
             .name = owned_name,
             .full_path = owned_path,
@@ -79,7 +79,7 @@ pub const FileMetadata = struct {
             .modification_time = stat.mtime,
         };
     }
-    
+
     /// Free allocated memory
     pub fn deinit(self: *FileMetadata, allocator: std.mem.Allocator) void {
         allocator.free(self.name);
@@ -93,9 +93,9 @@ pub const DirectoryEntry = struct {
     children: std.ArrayList(*DirectoryEntry),
     parent: ?*DirectoryEntry,
     expanded: bool,
-    
+
     const Self = @This();
-    
+
     /// Create a new directory entry
     pub fn create(allocator: std.mem.Allocator, metadata: FileMetadata) !*DirectoryEntry {
         const entry = try allocator.create(DirectoryEntry);
@@ -107,7 +107,7 @@ pub const DirectoryEntry = struct {
         };
         return entry;
     }
-    
+
     /// Free entry and all children recursively
     pub fn deinit(self: *Self, allocator: std.mem.Allocator) void {
         // Free children first
@@ -115,21 +115,21 @@ pub const DirectoryEntry = struct {
             child.deinit(allocator);
         }
         self.children.deinit();
-        
+
         // Free metadata
         var metadata_copy = self.metadata;
         metadata_copy.deinit(allocator);
-        
+
         // Free self
         allocator.destroy(self);
     }
-    
+
     /// Add child entry and set parent relationship
     pub fn addChild(self: *Self, child: *DirectoryEntry) !void {
         child.parent = self;
         try self.children.append(child);
     }
-    
+
     /// Sort children by type (directories first) then alphabetically
     pub fn sortChildren(self: *Self) void {
         const SortContext = struct {
@@ -138,12 +138,12 @@ pub const DirectoryEntry = struct {
                 // Directories come first
                 if (a.metadata.is_directory and !b.metadata.is_directory) return true;
                 if (!a.metadata.is_directory and b.metadata.is_directory) return false;
-                
+
                 // Then alphabetical
                 return std.mem.lessThan(u8, a.metadata.name, b.metadata.name);
             }
         };
-        
+
         std.mem.sort(*DirectoryEntry, self.children.items, {}, SortContext.lessThan);
     }
 };
@@ -151,16 +151,16 @@ pub const DirectoryEntry = struct {
 /// Directory scanner for filesystem traversal
 pub const DirectoryScanner = struct {
     allocator: std.mem.Allocator,
-    
+
     const Self = @This();
-    
+
     /// Initialize scanner
     pub fn init(allocator: std.mem.Allocator) Self {
         return Self{
             .allocator = allocator,
         };
     }
-    
+
     /// Scan directory starting from given path
     pub fn scanDirectory(self: *Self, path: []const u8) !*DirectoryEntry {
         var dir = std.fs.cwd().openDir(path, .{ .iterate = true }) catch |err| switch (err) {
@@ -175,20 +175,20 @@ pub const DirectoryScanner = struct {
             else => return err,
         };
         defer dir.close();
-        
+
         // Get directory metadata
         const dir_stat = try dir.stat();
         const dir_metadata = try FileMetadata.create(self.allocator, std.fs.path.basename(path), path, dir_stat);
-        
+
         // Create root entry
         const root_entry = try DirectoryEntry.create(self.allocator, dir_metadata);
-        
+
         // Scan directory contents
         try self.scanDirectoryRecursive(dir, root_entry, path, 0);
-        
+
         return root_entry;
     }
-    
+
     /// Recursively scan directory contents
     fn scanDirectoryRecursive(self: *Self, dir: std.fs.Dir, parent_entry: *DirectoryEntry, current_path: []const u8, depth: u32) !void {
         // Prevent infinite recursion
@@ -197,17 +197,17 @@ pub const DirectoryScanner = struct {
             std.log.warn("Maximum directory depth exceeded for path: {s}", .{current_path});
             return;
         }
-        
+
         var iterator = dir.iterate();
-        
+
         while (try iterator.next()) |entry| {
             // Skip hidden files and directories
             if (entry.name[0] == '.') continue;
-            
+
             // Build full path
             var path_buffer: [1024]u8 = undefined;
             const full_path = try std.fmt.bufPrint(&path_buffer, "{s}/{s}", .{ current_path, entry.name });
-            
+
             // Get file metadata
             const file_stat = blk: {
                 if (entry.kind == .directory) {
@@ -226,14 +226,14 @@ pub const DirectoryScanner = struct {
                     break :blk try file.stat();
                 }
             };
-            
+
             // Create metadata for this entry
             const metadata = try FileMetadata.create(self.allocator, entry.name, full_path, file_stat);
             const dir_entry = try DirectoryEntry.create(self.allocator, metadata);
-            
+
             // Add to parent
             try parent_entry.addChild(dir_entry);
-            
+
             // Recursively scan subdirectories
             if (entry.kind == .directory) {
                 var sub_dir = dir.openDir(entry.name, .{ .iterate = true }) catch |err| {
@@ -241,15 +241,15 @@ pub const DirectoryScanner = struct {
                     continue;
                 };
                 defer sub_dir.close();
-                
+
                 try self.scanDirectoryRecursive(sub_dir, dir_entry, full_path, depth + 1);
             }
         }
-        
+
         // Sort children for consistent display
         parent_entry.sortChildren();
     }
-    
+
     /// Free all entries in a tree
     pub fn freeTree(self: *Self, root: *DirectoryEntry) void {
         root.deinit(self.allocator);

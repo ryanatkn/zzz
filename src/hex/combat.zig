@@ -22,11 +22,11 @@ const HexCombatInterface = struct {
     pub fn getPlayerPos(game: *HexGame) Vec2 {
         return game.getPlayerPos();
     }
-    
+
     pub fn isPlayerAlive(game: *HexGame) bool {
         return game.getPlayerAlive();
     }
-    
+
     pub fn createProjectileFromCombat(game: *HexGame, pos: Vec2, velocity: Vec2, radius: f32, lifetime: f32, _: f32) anyerror!u32 {
         return game.createProjectile(game.zone_manager.getCurrentZoneIndex(), pos, radius, velocity, lifetime);
     }
@@ -42,23 +42,16 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
         constants.BULLET_LIFETIME,
         constants.BULLET_DAMAGE,
     );
-    
+
     // Check if shooting is possible using generic interface
     if (!combat.CombatActions.canShoot(config)) return false;
     if (!pool.canFire()) return false;
-    
+
     // Calculate velocity using generic system
     const velocity = combat.CombatActions.calculateProjectileVelocity(config);
-    
+
     // Create bullet entity using hex-specific implementation
-    const bullet_id = HexCombatInterface.createProjectileFromCombat(
-        game, 
-        config.shooter_pos, 
-        velocity, 
-        config.projectile_radius, 
-        config.projectile_lifetime, 
-        config.damage
-    ) catch return false;
+    const bullet_id = HexCombatInterface.createProjectileFromCombat(game, config.shooter_pos, velocity, config.projectile_radius, config.projectile_lifetime, config.damage) catch return false;
 
     // Consume from bullet pool
     pool.fire();
@@ -70,7 +63,6 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
 pub fn fireBulletAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl) bool {
     return fireBullet(game, mouse_pos, pool);
 }
-
 
 /// Convert hex lifestone to generic checkpoint data
 fn lifestoneToCheckpoint(lifestone_result: physics.LifestoneResult) game_systems.respawn.RespawnInterface.CheckpointData {
@@ -141,7 +133,7 @@ pub fn respawnPlayer(game_state: *GameState) void {
 pub fn handlePlayerDeath(world: *HexGame) void {
     // Use generic death handling pattern (config available for future use)
     _ = combat.DamageSystem.DamageConfig.environmental(999); // Lethal damage
-    
+
     world.setPlayerAlive(false);
     loggers.getGameLog().info("player_death", "Player died! Press R or click to respawn", .{});
 }
@@ -150,7 +142,7 @@ pub fn handlePlayerDeath(world: *HexGame) void {
 pub fn handlePlayerDeathOnHazard(world: *HexGame) void {
     // Use generic environmental damage pattern (config available for future use)
     _ = combat.DamageSystem.DamageConfig.environmental(999);
-    
+
     world.setPlayerAlive(false);
     loggers.getGameLog().info("player_hazard_death", "Player died on hazard! Press R or click to respawn", .{});
 }
@@ -158,12 +150,12 @@ pub fn handlePlayerDeathOnHazard(world: *HexGame) void {
 /// Handle unit death on hazard using generic damage system
 pub fn handleUnitDeathOnHazard(unit_entity: EntityId, world: *HexGame) void {
     const zone = world.getCurrentZone();
-    
+
     // Use generic death handling for units
     if (zone.units.getComponentMut(unit_entity, .health)) |health| {
         const damage_config = combat.DamageSystem.DamageConfig.environmental(999);
         const result = combat.DamageSystem.applyDamage(health, damage_config);
-        
+
         if (result.target_killed) {
             // Update visual to show death
             if (zone.units.getComponentMut(unit_entity, .visual)) |visual| {

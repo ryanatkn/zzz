@@ -53,8 +53,8 @@ pub const CameraMode = enum {
 };
 
 // UI/HUD positioning constants (bottom right)
-pub const FPS_POSITION_X = SCREEN_WIDTH - 200.0;  // Right side with margin
-pub const FPS_POSITION_Y = SCREEN_HEIGHT - 80.0;  // Bottom with margin for FPS + AI text
+pub const FPS_POSITION_X = SCREEN_WIDTH - 200.0; // Right side with margin
+pub const FPS_POSITION_Y = SCREEN_HEIGHT - 80.0; // Bottom with margin for FPS + AI text
 pub const FPS_FALLBACK_X = constants.UI.FALLBACK_POSITION_X;
 pub const FPS_FALLBACK_Y = constants.UI.FALLBACK_POSITION_Y;
 pub const FPS_DIGIT_SPACING = constants.UI.DIGIT_SPACING;
@@ -150,10 +150,10 @@ pub const ObstacleType = enum {
 
 // Patrol pattern types
 pub const PatrolPattern = enum {
-    square,    // 4-point square pattern
-    line,      // 2-point back-and-forth
-    triangle,  // 3-point triangle
-    circle,    // 4-point circular approximation
+    square, // 4-point square pattern
+    line, // 2-point back-and-forth
+    triangle, // 3-point triangle
+    circle, // 4-point circular approximation
 };
 
 // Color constants (imported from shared colors module)

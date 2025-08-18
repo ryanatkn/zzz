@@ -65,7 +65,7 @@ pub const BehaviorProfile = enum {
 pub const HexUnit = struct {
     // Core unit data from lib
     base: components.Unit,
-    
+
     // Hex-specific additions
     behavior_profile: BehaviorProfile = .idle,
     target_pos: Vec2,
@@ -82,7 +82,7 @@ pub const HexUnit = struct {
             .chase_timer = 0.0,
         };
     }
-    
+
     // Convenience accessors for compatibility
     pub fn getState(self: HexUnit) UnitState {
         return switch (self.base.behavior_state) {
@@ -110,16 +110,16 @@ pub const HexProjectile = struct {
             .damage = damage,
         };
     }
-    
+
     // Compatibility methods
     pub fn update(self: *HexProjectile, dt: f32) bool {
         return self.base.update(dt);
     }
-    
+
     pub fn canPierce(self: HexProjectile) bool {
         return self.base.canPierce();
     }
-    
+
     pub fn pierce(self: *HexProjectile) void {
         self.base.pierce();
     }
@@ -150,11 +150,10 @@ pub const MAX_ENTITIES_PER_ARCHETYPE = 256;
 
 // Hex-specific travel interface implementations for the generic zone travel manager
 const HexTravelInterface = struct {
-    
     pub fn validateZone(zone_index: usize) bool {
         return zone_index < MAX_ZONES;
     }
-    
+
     pub fn getZoneSpawn(game: *HexGame, zone_index: usize) Vec2 {
         if (zone_index < MAX_ZONES) {
             const zone = game.zone_manager.getZoneConst(zone_index);
@@ -163,7 +162,7 @@ const HexTravelInterface = struct {
         // Fallback to screen center
         return Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
     }
-    
+
     pub fn transferPlayer(game: *HexGame, destination_zone: usize, spawn_pos: Vec2) world.ZoneTravelInterface.TravelResult {
         game.travelToZone(destination_zone, spawn_pos) catch |err| {
             loggers.getGameLog().err("zone_travel_failed", "Zone travel failed: {}", .{err});
@@ -171,7 +170,7 @@ const HexTravelInterface = struct {
         };
         return world.ZoneTravelInterface.TravelResult.ok();
     }
-    
+
     pub fn clearEffects(game: *HexGame) void {
         if (game.effect_system_ref) |effect_system| {
             effect_system.clear();
@@ -180,7 +179,7 @@ const HexTravelInterface = struct {
             loggers.getGameLog().debug("effects_cleared", "Travel effects cleared (no effect system available)", .{});
         }
     }
-    
+
     pub fn createTravelEffects(game: *HexGame, origin_pos: Vec2, radius: f32) void {
         if (game.effect_system_ref) |effect_system| {
             effect_system.addPortalTravelEffect(origin_pos, radius);
@@ -219,7 +218,7 @@ pub const HexGame = struct {
     logger: ModuleLogger,
     frame_pool: object_pools.FramePool,
     zone_travel_manager: world.ZoneTravelManager(HexGame, MAX_ENTITIES_PER_ARCHETYPE),
-    
+
     // Optional effect system reference for travel effects
     effect_system_ref: ?*GameEffectSystem,
 
@@ -316,8 +315,7 @@ pub const HexGame = struct {
             .allocator = allocator,
             .logger = ModuleLogger.init(allocator),
             .frame_pool = object_pools.FramePool.init(allocator),
-            .zone_travel_manager = world.ZoneTravelManager(HexGame, MAX_ENTITIES_PER_ARCHETYPE).init(
-                1.0, // 1 second cooldown
+            .zone_travel_manager = world.ZoneTravelManager(HexGame, MAX_ENTITIES_PER_ARCHETYPE).init(1.0, // 1 second cooldown
                 world.zone_travel_manager.TravelInterfaceHelpers.createTravelInterface(
                     HexGame,
                     HexTravelInterface.validateZone,
@@ -325,8 +323,7 @@ pub const HexGame = struct {
                     HexTravelInterface.transferPlayer,
                     HexTravelInterface.clearEffects,
                     HexTravelInterface.createTravelEffects,
-                )
-            ),
+                )),
             .effect_system_ref = null,
         };
 
@@ -347,7 +344,7 @@ pub const HexGame = struct {
 
         return game;
     }
-    
+
     /// Set the effect system reference for travel effects
     pub fn setEffectSystemRef(self: *HexGame, effect_system: *GameEffectSystem) void {
         self.effect_system_ref = effect_system;
@@ -515,11 +512,11 @@ pub const HexGame = struct {
         const zone = self.zone_manager.getZone(zone_index);
         const entity = self.entity_allocator.create();
 
-        // Create components directly  
+        // Create components directly
         var transform = components.Transform.init(pos, 3.0); // Small bullet radius
         transform.vel = velocity;
         const visual = components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 }); // Yellow bullet
-        
+
         // Create hex-specific projectile with damage
         const projectile = Projectile.init(entity, lifetime, constants.BULLET_DAMAGE);
 
@@ -718,10 +715,10 @@ pub const HexGame = struct {
         return self.bullet_pool.canFire();
     }
 
-    /// Context-aware projectiles update function  
+    /// Context-aware projectiles update function
     pub fn updateProjectiles(self: *HexGame, frame_ctx: FrameContext) void {
         const deltaTime = frame_ctx.effectiveDelta();
-        
+
         const zone = self.getCurrentZone();
 
         // Use fixed-size array to avoid any allocations
@@ -811,27 +808,23 @@ pub const HexGame = struct {
     /// Load portals from current zone into the zone travel manager
     pub fn loadPortalsIntoTravelManager(self: *HexGame) !void {
         self.zone_travel_manager.clear();
-        
+
         const zone = self.getCurrentZone();
         var portal_iter = zone.portals.entityIterator();
-        
+
         while (portal_iter.next()) |portal_id| {
             // Get components from hex storage
             if (zone.portals.getComponent(portal_id, .transform)) |transform| {
                 if (zone.portals.getComponent(portal_id, .interactable)) |interactable| {
                     if (interactable.destination_zone) |dest_zone| {
                         // Add portal to zone travel manager
-                        try self.zone_travel_manager.addTeleporter(
-                            transform.pos,
-                            transform.radius,
-                            dest_zone,
-                            null // Use zone default spawn
+                        try self.zone_travel_manager.addTeleporter(transform.pos, transform.radius, dest_zone, null // Use zone default spawn
                         );
                     }
                 }
             }
         }
-        
+
         self.logger.info("portals_loaded", "Loaded {} portals into zone travel manager for zone {}", .{ self.zone_travel_manager.getTeleporterCount(), self.zone_manager.getCurrentZoneIndex() });
     }
 

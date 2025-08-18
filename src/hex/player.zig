@@ -17,7 +17,7 @@ const WALK_SPEED_MULT = constants.WALK_SPEED_MULTIPLIER; // Walking speed is 1/4
 /// Player update function with frame context and direct parameters
 pub fn updatePlayer(game: *HexGame, frame_ctx: FrameContext, input_state: *const InputState, cam: *const camera.Camera) void {
     const deltaTime = frame_ctx.effectiveDelta();
-    
+
     if (!game.getPlayerAlive()) return;
 
     var keyboard_velocity = Vec2.ZERO;

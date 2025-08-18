@@ -28,7 +28,7 @@ pub const Teleportable = struct {
 
     pub fn canBlinkToPosition(self: Teleportable, from: Vec2, to: Vec2) bool {
         if (!self.can_blink) return false;
-        
+
         const distance = from.sub(to).length();
         return distance <= self.blink_range;
     }

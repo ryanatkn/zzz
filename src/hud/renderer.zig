@@ -185,7 +185,7 @@ pub const BrowserRenderer = struct {
                 .size = link.bounds.size,
             };
             var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
-            
+
             // Use left alignment for filesystem buttons (IDE file/directory listings)
             const is_filesystem_link = std.mem.startsWith(u8, link.path, "/ide?");
             if (is_filesystem_link) {
@@ -282,131 +282,95 @@ pub const BrowserRenderer = struct {
         _ = grid_page;
         // No-op: Font grid functionality not implemented
     }
-    
+
     /// Render IDE dashboard with modern file explorer layout
     fn renderIDEDashboard(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_page: *const page.Page) !void {
         const ide_page_impl: *const ide_page.IDEPage = @fieldParentPtr("base", current_page);
-        
+
         if (!ide_page_impl.initialized) {
             return;
         }
-        
+
         const screen_size = self.getScreenSize();
-        
+
         // Dashboard layout - optimized for 2560x1440+ displays
         const header_height = ide_constants.LAYOUT.HEADER_HEIGHT;
         const panel_gap = ide_constants.LAYOUT.PANEL_GAP;
         const explorer_width = ide_constants.LAYOUT.EXPLORER_WIDTH;
         const max_content_width = ide_constants.LAYOUT.MAX_CONTENT_WIDTH;
         const preview_width = ide_constants.LAYOUT.PREVIEW_WIDTH;
-        
+
         // Calculate actual content width based on screen size
         const available_width = screen_size.x - explorer_width - preview_width - (panel_gap * 4);
         const content_width = @min(max_content_width, available_width);
-        
+
         // Header panel
         const header_rect = math.Rectangle{
             .position = Vec2{ .x = 0, .y = 0 },
             .size = Vec2{ .x = screen_size.x, .y = header_height },
         };
         self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, header_rect.position, header_rect.size, ide_constants.COLORS.HEADER_BG);
-        
+
         // File explorer panel (left)
         const explorer_rect = math.Rectangle{
             .position = Vec2{ .x = panel_gap, .y = header_height + panel_gap },
             .size = Vec2{ .x = explorer_width, .y = screen_size.y - header_height - (panel_gap * 2) },
         };
-        
-        drawing.drawBorderedRect(
-            &self.base_renderer.gpu,
-            cmd_buffer,
-            render_pass,
-            explorer_rect.position,
-            explorer_rect.size,
-            ide_constants.COLORS.PANEL_BG,
-            ide_constants.COLORS.PANEL_BORDER,
-            1.0
-        );
-        
+
+        drawing.drawBorderedRect(&self.base_renderer.gpu, cmd_buffer, render_pass, explorer_rect.position, explorer_rect.size, ide_constants.COLORS.PANEL_BG, ide_constants.COLORS.PANEL_BORDER, 1.0);
+
         // Main content panel (center, constrained width)
         const content_x = explorer_width + (panel_gap * 2);
         const content_rect = math.Rectangle{
             .position = Vec2{ .x = content_x, .y = header_height + panel_gap },
             .size = Vec2{ .x = content_width, .y = screen_size.y - header_height - (panel_gap * 2) },
         };
-        
-        drawing.drawBorderedRect(
-            &self.base_renderer.gpu,
-            cmd_buffer,
-            render_pass,
-            content_rect.position,
-            content_rect.size,
-            ide_constants.COLORS.PANEL_BG,
-            ide_constants.COLORS.PANEL_BORDER,
-            1.0
-        );
-        
+
+        drawing.drawBorderedRect(&self.base_renderer.gpu, cmd_buffer, render_pass, content_rect.position, content_rect.size, ide_constants.COLORS.PANEL_BG, ide_constants.COLORS.PANEL_BORDER, 1.0);
+
         // Preview panel (right)
         const preview_x = content_x + content_width + panel_gap;
         const preview_rect = math.Rectangle{
             .position = Vec2{ .x = preview_x, .y = header_height + panel_gap },
             .size = Vec2{ .x = preview_width, .y = screen_size.y - header_height - (panel_gap * 2) },
         };
-        
-        drawing.drawBorderedRect(
-            &self.base_renderer.gpu,
-            cmd_buffer,
-            render_pass,
-            preview_rect.position,
-            preview_rect.size,
-            ide_constants.COLORS.PANEL_BG,
-            ide_constants.COLORS.PANEL_BORDER,
-            1.0
-        );
-        
+
+        drawing.drawBorderedRect(&self.base_renderer.gpu, cmd_buffer, render_pass, preview_rect.position, preview_rect.size, ide_constants.COLORS.PANEL_BG, ide_constants.COLORS.PANEL_BORDER, 1.0);
+
         // Render the actual panel content
         try self.renderFileTree(cmd_buffer, render_pass, ide_page_impl, explorer_rect);
         try self.renderContentArea(cmd_buffer, render_pass, ide_page_impl, content_rect);
         try self.renderPreviewPanel(cmd_buffer, render_pass, ide_page_impl, preview_rect);
-        
+
         // Draw resolution info in header
         var resolution_buf: [64]u8 = undefined;
         const resolution_text = std.fmt.bufPrint(&resolution_buf, "Resolution: {d}x{d}", .{ @as(u32, @intFromFloat(screen_size.x)), @as(u32, @intFromFloat(screen_size.y)) }) catch "Resolution: Unknown";
-        self.drawSimpleText(cmd_buffer, render_pass, resolution_text,
-            Vec2{ .x = screen_size.x - 200, .y = 15 });
+        self.drawSimpleText(cmd_buffer, render_pass, resolution_text, Vec2{ .x = screen_size.x - 200, .y = 15 });
     }
-    
+
     /// Render file tree in explorer panel using Link system
     fn renderFileTree(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
-        
+
         // Panel header - queue for rendering
-        self.queueTextForRender(cmd_buffer, render_pass, "FILE EXPLORER", 
-            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 },
-            ide_constants.COLORS.TEXT_NORMAL);
-        
+        self.queueTextForRender(cmd_buffer, render_pass, "FILE EXPLORER", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 }, ide_constants.COLORS.TEXT_NORMAL);
+
         // Check for loading or error states
         if (ide_page_impl.loading) {
-            self.queueTextForRender(cmd_buffer, render_pass, "Loading...", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 },
-                ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, "Loading...", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 }, ide_constants.COLORS.TEXT_NORMAL);
             return;
         }
-        
+
         if (ide_page_impl.error_message) |error_msg| {
-            self.queueTextForRender(cmd_buffer, render_pass, "Error:", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 },
-                ide_constants.COLORS.TEXT_NORMAL);
-            self.queueTextForRender(cmd_buffer, render_pass, error_msg, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 },
-                ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, "Error:", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 }, ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, error_msg, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 }, ide_constants.COLORS.TEXT_NORMAL);
             return;
         }
-        
+
         // Create Links for file tree items (handled by HUD link system)
         // This is much simpler and leverages the working button/link system
         // Links will be added by the IDE page's render function
     }
-    
+
     /// Render content area
     fn renderContentArea(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
         // Panel header
@@ -414,95 +378,66 @@ pub const BrowserRenderer = struct {
             // Show file name in header
             var header_buf: [256]u8 = undefined;
             const header_text = std.fmt.bufPrint(&header_buf, "FILE: {s}", .{selected.metadata.name}) catch "FILE: <name too long>";
-            self.queueTextForRender(cmd_buffer, render_pass, header_text,
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 }, ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, header_text, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 }, ide_constants.COLORS.TEXT_NORMAL);
         } else {
-            self.queueTextForRender(cmd_buffer, render_pass, "CONTENT EDITOR (~800px max)", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 }, ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, "CONTENT EDITOR (~800px max)", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 }, ide_constants.COLORS.TEXT_NORMAL);
         }
-        
+
         // Display file content or error
         if (ide_page_impl.current_file_error) |error_msg| {
             // Show error message
-            self.queueTextForRender(cmd_buffer, render_pass, "Error:", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 }, ide_constants.COLORS.TEXT_NORMAL);
-            self.queueTextForRender(cmd_buffer, render_pass, error_msg, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 }, ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, "Error:", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 }, ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, error_msg, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 }, ide_constants.COLORS.TEXT_NORMAL);
         } else if (ide_page_impl.current_file_content) |content| {
             // Show file content line by line
             try self.renderFileContentWithHighlighting(cmd_buffer, render_pass, content, panel_rect, ide_page_impl);
         } else {
             // No file selected
-            self.queueTextForRender(cmd_buffer, render_pass, "Select a file to view its contents", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 }, ide_constants.COLORS.TEXT_NORMAL);
+            self.queueTextForRender(cmd_buffer, render_pass, "Select a file to view its contents", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 }, ide_constants.COLORS.TEXT_NORMAL);
         }
     }
-    
-    /// Render preview panel  
+
+    /// Render preview panel
     fn renderPreviewPanel(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
         // Panel header
-        self.drawSimpleText(cmd_buffer, render_pass, "PREVIEW PANEL", 
-            Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
-            
+        self.drawSimpleText(cmd_buffer, render_pass, "PREVIEW PANEL", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+
         // Show selected file info
         if (ide_page_impl.file_tree_component.getSelectedEntry()) |selected| {
-            self.drawSimpleText(cmd_buffer, render_pass, "Selected:", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
-            self.drawSimpleText(cmd_buffer, render_pass, selected.metadata.name, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
-                
+            self.drawSimpleText(cmd_buffer, render_pass, "Selected:", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.drawSimpleText(cmd_buffer, render_pass, selected.metadata.name, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
+
             const file_type_name = selected.metadata.file_type.getDisplayName();
-            self.drawSimpleText(cmd_buffer, render_pass, file_type_name, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 80 });
-                
+            self.drawSimpleText(cmd_buffer, render_pass, file_type_name, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 80 });
+
             // Show file size
             var size_buf: [32]u8 = undefined;
             const size_text = directory_scanner.formatFileSize(selected.metadata.size, &size_buf) catch "Unknown size";
-            self.drawSimpleText(cmd_buffer, render_pass, size_text, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 100 });
+            self.drawSimpleText(cmd_buffer, render_pass, size_text, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 100 });
         } else {
-            self.drawSimpleText(cmd_buffer, render_pass, "No file selected", 
-                Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.drawSimpleText(cmd_buffer, render_pass, "No file selected", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
         }
     }
-    
+
     /// Draw file type icon
     fn drawFileIcon(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, icon: @import("../lib/ui/file_tree.zig").FileIcon, position: Vec2) !void {
         const icon_color = icon.getColor();
         const icon_size = ide_constants.FILE_TREE.ICON_SIZE;
-        
+
         switch (icon) {
             .folder_closed, .folder_open => {
                 // Draw folder icon - rectangle with slight indent at top
-                self.base_renderer.gpu.drawRect(
-                    cmd_buffer,
-                    render_pass,
-                    Vec2{ .x = position.x, .y = position.y + 2 },
-                    Vec2{ .x = icon_size, .y = icon_size - 2 },
-                    icon_color
-                );
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = position.x, .y = position.y + 2 }, Vec2{ .x = icon_size, .y = icon_size - 2 }, icon_color);
                 // Draw folder tab
-                self.base_renderer.gpu.drawRect(
-                    cmd_buffer,
-                    render_pass,
-                    position,
-                    Vec2{ .x = icon_size - 3, .y = 3 },
-                    icon_color
-                );
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, position, Vec2{ .x = icon_size - 3, .y = 3 }, icon_color);
             },
             else => {
                 // Draw file icon - simple rectangle
-                self.base_renderer.gpu.drawRect(
-                    cmd_buffer,
-                    render_pass,
-                    position,
-                    Vec2{ .x = icon_size, .y = icon_size },
-                    icon_color
-                );
-            }
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, position, Vec2{ .x = icon_size, .y = icon_size }, icon_color);
+            },
         }
     }
-    
+
     /// Render file content with syntax highlighting support
     fn renderFileContentWithHighlighting(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, content: []const u8, panel_rect: math.Rectangle, ide_page_impl: *const ide_page.IDEPage) !void {
         _ = cmd_buffer;
@@ -512,32 +447,31 @@ pub const BrowserRenderer = struct {
         const start_y = panel_rect.position.y + 40; // Below header
         const max_lines = @as(u32, @intFromFloat((panel_rect.size.y - 50) / line_height)); // Available space for content
         const max_chars_per_line = @as(u32, @intFromFloat((panel_rect.size.x - 20) / char_width)); // Characters that fit
-        
+
         // Check if syntax highlighting should be enabled
         const enable_highlighting = ide_constants.SYNTAX.ENABLE_HIGHLIGHTING and ide_page_impl.*.shouldHighlightCurrentFile();
-        
+
         var line_num: u32 = 0;
         var lines = std.mem.splitScalar(u8, content, '\n');
-        
+
         while (lines.next()) |line| {
             if (line_num >= max_lines) break;
-            
+
             const y_pos = start_y + @as(f32, @floatFromInt(line_num)) * line_height;
-            
+
             // Truncate long lines to fit in panel
-            const display_line = if (line.len > max_chars_per_line) 
-                line[0..max_chars_per_line] 
-            else 
+            const display_line = if (line.len > max_chars_per_line)
+                line[0..max_chars_per_line]
+            else
                 line;
-            
+
             // Draw line number
             var line_num_buf: [8]u8 = undefined;
             const line_num_text = std.fmt.bufPrint(&line_num_buf, "{d}:", .{line_num + 1}) catch "?:";
-            
+
             // Line numbers in darker color
-            self.drawTextWithColor(line_num_text, 
-                Vec2{ .x = panel_rect.position.x + 10, .y = y_pos }, ide_constants.COLORS.TEXT_LINE_NUMBERS);
-            
+            self.drawTextWithColor(line_num_text, Vec2{ .x = panel_rect.position.x + 10, .y = y_pos }, ide_constants.COLORS.TEXT_LINE_NUMBERS);
+
             // Render line content with or without syntax highlighting
             const line_start_x = panel_rect.position.x + ide_constants.TEXT.LINE_NUMBER_OFFSET;
             if (enable_highlighting and display_line.len <= ide_constants.SYNTAX.MAX_HIGHLIGHT_LINE_LENGTH) {
@@ -546,25 +480,23 @@ pub const BrowserRenderer = struct {
                 // Fallback to normal rendering
                 self.drawTextWithColor(display_line, Vec2{ .x = line_start_x, .y = y_pos }, ide_constants.COLORS.TEXT_NORMAL);
             }
-            
+
             line_num += 1;
         }
-        
+
         // Show truncation message if content is too long
         if (line_num >= max_lines) {
             const truncate_msg = "... (file truncated for display)";
-            self.drawTextWithColor(truncate_msg,
-                Vec2{ .x = panel_rect.position.x + 10, .y = start_y + @as(f32, @floatFromInt(max_lines)) * line_height },
-                ide_constants.COLORS.TEXT_TRUNCATION);
+            self.drawTextWithColor(truncate_msg, Vec2{ .x = panel_rect.position.x + 10, .y = start_y + @as(f32, @floatFromInt(max_lines)) * line_height }, ide_constants.COLORS.TEXT_TRUNCATION);
         }
     }
-    
+
     /// Render a single line with syntax highlighting
     fn renderLineWithHighlighting(self: *BrowserRenderer, line: []const u8, position: Vec2, ide_page_impl: *const ide_page.IDEPage) !void {
         // Get mutable access to the syntax highlighter
         const ide_page_mut = @constCast(ide_page_impl);
         var highlighter = ide_page_mut.*.getSyntaxHighlighter();
-        
+
         // Highlight the line
         const tokens = highlighter.highlightLine(line) catch {
             // Fallback to normal rendering on error
@@ -572,11 +504,11 @@ pub const BrowserRenderer = struct {
             return;
         };
         defer highlighter.freeTokens(tokens);
-        
+
         // Render each token with its appropriate color
         var current_x = position.x;
         const char_width = ide_constants.TEXT.CHAR_WIDTH;
-        
+
         var last_pos: u32 = 0;
         for (tokens) |token| {
             // Render any gap between tokens as normal text
@@ -587,16 +519,16 @@ pub const BrowserRenderer = struct {
                     current_x += @as(f32, @floatFromInt(gap_text.len)) * char_width;
                 }
             }
-            
+
             // Render the token with its color
             if (token.text.len > 0) {
                 self.drawTextWithColor(token.text, Vec2{ .x = current_x, .y = position.y }, token.token_type.getColor());
                 current_x += @as(f32, @floatFromInt(token.text.len)) * char_width;
             }
-            
+
             last_pos = token.end_pos;
         }
-        
+
         // Render any remaining text at the end
         if (last_pos < line.len) {
             const remaining_text = line[last_pos..];
@@ -613,19 +545,19 @@ pub const BrowserRenderer = struct {
         const text_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
         self.drawTextWithColor(text, position, text_color);
     }
-    
+
     /// Draw text with specified color using MenuTextRenderer (16pt font for compatibility)
     fn drawTextWithColor(self: *BrowserRenderer, text: []const u8, position: Vec2, text_color: Color) void {
         // Skip rendering empty or whitespace-only text to avoid texture creation failures
         if (text.len == 0 or std.mem.trim(u8, text, " \t\r\n").len == 0) {
             return;
         }
-        
+
         // Use the same approach as working buttons - 16pt font renders reliably
         var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
         menu_renderer.queueCustomText(text, position, ide_constants.TEXT.CONTENT_FONT_SIZE, text_color);
     }
-    
+
     /// Queue text using the proper persistent text system (like working buttons)
     fn queueTextForRender(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2, text_color: Color) void {
         self.queueAlignedTextForRender(cmd_buffer, render_pass, text, position, text_color, .left);
@@ -635,32 +567,24 @@ pub const BrowserRenderer = struct {
     fn queueAlignedTextForRender(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2, text_color: Color, alignment: text_alignment.TextAlign) void {
         _ = cmd_buffer;
         _ = render_pass;
-        
+
         // Skip rendering empty or whitespace-only text to avoid texture creation failures
         if (text.len == 0 or std.mem.trim(u8, text, " \t\r\n").len == 0) {
             return;
         }
-        
+
         const font_size = 16.0; // Use 16pt font size (proven to work)
-        
+
         // Calculate text width for alignment (rough estimation)
         const estimated_text_width = @as(f32, @floatFromInt(text.len)) * font_size * 0.6;
-        
+
         // Apply alignment to position
         const aligned_position = text_alignment.applyAlignment(position, alignment, estimated_text_width);
-        
+
         // Use the exact same approach as working navigation text
-        self.base_renderer.gpu.text_renderer.queuePersistentText(
-            text, 
-            aligned_position, 
-            self.base_renderer.font_manager, 
-            .sans, 
-            font_size,
-            text_color
-        ) catch |err| {
+        self.base_renderer.gpu.text_renderer.queuePersistentText(text, aligned_position, self.base_renderer.font_manager, .sans, font_size, text_color) catch |err| {
             const log = std.log.scoped(.ide_text);
             log.err("Failed to queue IDE text '{s}': {}", .{ text, err });
         };
     }
-
 };

@@ -58,7 +58,7 @@ pub const GameState = struct {
 
     // Spell system
     spell_system: spells.SpellSystem,
-    
+
     // Spellbar UI
     spellbar_ui: spellbar.Spellbar,
 
@@ -112,10 +112,10 @@ pub const GameState = struct {
             .ai_enabled = false,
             .frame_counter = 0,
         };
-        
+
         // Connect the effect system to the hex game for travel effects
         game_state.hex_game.setEffectSystemRef(&game_state.effect_system);
-        
+
         return game_state;
     }
 
@@ -362,19 +362,13 @@ fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
     }
 }
 
-
 pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: f32) void {
     // Reset frame pool for this frame's temporary allocations
     game_state.hex_game.frame_pool.reset();
 
     // Create minimal frame context
     const frame_allocator = game_state.hex_game.frame_pool.allocator();
-    const frame_ctx = FrameContext.init(
-        frame_allocator, 
-        deltaTime, 
-        game_state.frame_counter,
-        game_state.game_paused
-    );
+    const frame_ctx = FrameContext.init(frame_allocator, deltaTime, game_state.frame_counter, game_state.game_paused);
 
     const world = &game_state.hex_game;
     const input_state = &game_state.input_state;
@@ -485,28 +479,28 @@ pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void 
 // Check lifestone collisions
 fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_radius: f32) void {
     const world = &game_state.hex_game;
-    
+
     // Use the same approach as physics.zig for consistency
     const zone = world.getCurrentZone();
-    
+
     // Check all lifestones in this zone using direct array access like physics.zig does
     for (0..zone.lifestones.count) |i| {
         const entity_id = zone.lifestones.entities[i];
         if (entity_id == std.math.maxInt(u32)) continue;
-        
+
         const transform = &zone.lifestones.transforms[i];
         const interactable = &zone.lifestones.interactables[i];
-        
+
         // Lifestones are identified by component composition (having both Transform and Interactable with attunement capability)
         // This is more flexible than checking terrain type
-        
+
         // Check collision first (allows re-attunement when overlapping)
         if (collision.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
             const was_attuned = interactable.attuned;
-            
+
             // Attune the lifestone
             interactable.attuned = true;
-            
+
             // Update visual color for attunement
             const visual = &zone.lifestones.visuals[i];
             visual.color = constants.COLOR_LIFESTONE_ATTUNED;

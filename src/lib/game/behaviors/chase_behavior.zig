@@ -78,7 +78,6 @@ pub const ChaseState = struct {
             }
         }
     }
-
 };
 
 /// Result of chase behavior evaluation
@@ -172,7 +171,6 @@ pub fn evaluateChase(
 
     return result;
 }
-
 
 /// Simplified chase behavior for basic AI (stateless)
 pub fn simpleChase(

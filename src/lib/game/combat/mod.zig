@@ -19,7 +19,6 @@ pub const Targeting = targeting.Targeting;
 pub const TargetSelection = targeting.TargetSelection;
 pub const AoETargeting = targeting.AoETargeting;
 
-
 // Commonly used types
 pub const ShootConfig = combat_actions.CombatActions.ShootConfig;
 pub const DamageConfig = damage_system.DamageSystem.DamageConfig;

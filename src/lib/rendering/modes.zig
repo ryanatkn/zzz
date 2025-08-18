@@ -163,18 +163,7 @@ pub const UseCases = struct {
 /// Helper functions for common rendering patterns
 /// Render text using the recommended mode based on change frequency
 /// FontManager and FontCategory types are constrained to have the required methods
-pub fn renderTextWithAutoMode(
-    comptime FontManager: type, 
-    comptime FontCategory: type,
-    renderer: *text_renderer.TextRenderer, 
-    text: []const u8, 
-    position: @import("../math/vec2.zig").Vec2, 
-    font_manager: *FontManager, 
-    font_category: FontCategory, 
-    font_size: f32, 
-    color: @import("../core/colors.zig").Color, 
-    changes_per_second: f32
-) !void {
+pub fn renderTextWithAutoMode(comptime FontManager: type, comptime FontCategory: type, renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("../math/vec2.zig").Vec2, font_manager: *FontManager, font_category: FontCategory, font_size: f32, color: @import("../core/colors.zig").Color, changes_per_second: f32) !void {
     const profile = recommendModeByRate(changes_per_second);
 
     switch (profile.recommended_mode) {
@@ -192,18 +181,7 @@ pub fn renderTextWithAutoMode(
 
 /// Render text with explicit mode choice
 /// FontManager and FontCategory types are constrained to have the required methods
-pub fn renderTextExplicitMode(
-    comptime FontManager: type, 
-    comptime FontCategory: type,
-    renderer: *text_renderer.TextRenderer, 
-    text: []const u8, 
-    position: @import("../math/vec2.zig").Vec2, 
-    font_manager: *FontManager, 
-    font_category: FontCategory, 
-    font_size: f32, 
-    color: @import("../core/colors.zig").Color, 
-    mode: RenderingMode
-) !void {
+pub fn renderTextExplicitMode(comptime FontManager: type, comptime FontCategory: type, renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("../math/vec2.zig").Vec2, font_manager: *FontManager, font_category: FontCategory, font_size: f32, color: @import("../core/colors.zig").Color, mode: RenderingMode) !void {
     switch (mode) {
         .immediate => {
             const text_result = try font_manager.renderTextToTexture(text, font_category, font_size, color, renderer.device);

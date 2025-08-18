@@ -122,7 +122,7 @@ pub const GameRenderer = struct {
     }
 
     // Render all entities in current zone only with proper camera transforms
-    // 
+    //
     // Note: New rendering utilities available for future optimization:
     // - src/lib/rendering/entity_renderer.zig: Generic entity rendering with automatic batching/culling
     // - src/lib/rendering/camera_utils.zig: Batch camera transformations and viewport culling
@@ -308,7 +308,6 @@ pub const GameRenderer = struct {
             self.drawFPSGeometric(cmd_buffer, render_pass, fps);
             return;
         };
-
     }
 
     pub fn drawAIMode(self: *GameRenderer, ai_enabled: bool) void {
@@ -319,17 +318,17 @@ pub const GameRenderer = struct {
 
         const ai_text = "AI MODE ACTIVE";
         const font_size = font_config.getGlobalConfig().fpsFontSize();
-        
+
         // Calculate text width for right alignment (rough estimation)
         const estimated_text_width = @as(f32, @floatFromInt(ai_text.len)) * font_size * 0.6;
-        
+
         // Position near bottom right, ensuring we have enough margin for the text
         const margin = 40.0; // Increased margin to move text further left
-        const base_position = Vec2{ 
+        const base_position = Vec2{
             .x = constants.SCREEN_WIDTH - margin, // Right edge with more margin for text
-            .y = constants.SCREEN_HEIGHT - 50.0  // Above bottom edge 
+            .y = constants.SCREEN_HEIGHT - 50.0, // Above bottom edge
         };
-        
+
         // Apply right alignment to position text correctly from the right edge
         const aligned_position = text_alignment.applyAlignment(base_position, .right, estimated_text_width);
 
@@ -381,108 +380,70 @@ pub const GameRenderer = struct {
     }
 
     /// Draw the spellbar at the bottom center of the screen
-    pub fn drawSpellbar(
-        self: *GameRenderer, 
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, 
-        render_pass: *c.sdl.SDL_GPURenderPass,
-        spell_system: *const spells.SpellSystem,
-        spellbar_ui: *const spellbar.Spellbar
-    ) void {
+    pub fn drawSpellbar(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, spell_system: *const spells.SpellSystem, spellbar_ui: *const spellbar.Spellbar) void {
         for (0..8) |slot_index| {
             const slot_rect = spellbar_ui.getSlotRect(slot_index);
             const slot = spell_system.getSlot(slot_index);
-            
+
             // Determine slot state
             const spell_type = if (slot) |s| s.spell_type else .None;
             const is_active = spell_system.getActiveSlot().spell_type == spell_type and spell_type != .None;
             const is_hovered = spellbar_ui.hovered_slot == slot_index;
             const cooldown_progress = if (slot) |s| s.cooldown_timer.getProgress() else 0.0;
-            
+
             // Draw slot background
             const slot_color = spellbar_ui.getSlotColor(spell_type, is_hovered);
-            self.gpu.drawRect(
-                cmd_buffer, 
-                render_pass, 
-                Vec2{ .x = slot_rect.x, .y = slot_rect.y },
-                Vec2{ .x = slot_rect.width, .y = slot_rect.height },
-                slot_color
-            );
-            
+            self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y }, Vec2{ .x = slot_rect.width, .y = slot_rect.height }, slot_color);
+
             // Draw cooldown overlay if spell is on cooldown
             if (slot != null and cooldown_progress < 1.0) {
                 const overlay_height = slot_rect.height * (1.0 - cooldown_progress);
                 // Use dark spell color for cooldown overlay
                 const dark_color = spellbar.getDarkSpellColor(spell_type);
-                self.gpu.drawRect(
-                    cmd_buffer,
-                    render_pass,
-                    Vec2{ .x = slot_rect.x, .y = slot_rect.y },
-                    Vec2{ .x = slot_rect.width, .y = overlay_height },
-                    dark_color
-                );
+                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y }, Vec2{ .x = slot_rect.width, .y = overlay_height }, dark_color);
             }
-            
+
             // Draw border for active/hovered slots
             const border_color = spellbar_ui.getBorderColor(slot_index, is_active, is_hovered);
             if (border_color.a > 0) {
                 const border_width = spellbar_ui.config.border_width;
-                
+
                 // Top border
-                self.gpu.drawRect(cmd_buffer, render_pass,
-                    Vec2{ .x = slot_rect.x, .y = slot_rect.y },
-                    Vec2{ .x = slot_rect.width, .y = border_width },
-                    border_color);
-                
+                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y }, Vec2{ .x = slot_rect.width, .y = border_width }, border_color);
+
                 // Bottom border
-                self.gpu.drawRect(cmd_buffer, render_pass,
-                    Vec2{ .x = slot_rect.x, .y = slot_rect.y + slot_rect.height - border_width },
-                    Vec2{ .x = slot_rect.width, .y = border_width },
-                    border_color);
-                
+                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y + slot_rect.height - border_width }, Vec2{ .x = slot_rect.width, .y = border_width }, border_color);
+
                 // Left border
-                self.gpu.drawRect(cmd_buffer, render_pass,
-                    Vec2{ .x = slot_rect.x, .y = slot_rect.y },
-                    Vec2{ .x = border_width, .y = slot_rect.height },
-                    border_color);
-                
+                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y }, Vec2{ .x = border_width, .y = slot_rect.height }, border_color);
+
                 // Right border
-                self.gpu.drawRect(cmd_buffer, render_pass,
-                    Vec2{ .x = slot_rect.x + slot_rect.width - border_width, .y = slot_rect.y },
-                    Vec2{ .x = border_width, .y = slot_rect.height },
-                    border_color);
+                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x + slot_rect.width - border_width, .y = slot_rect.y }, Vec2{ .x = border_width, .y = slot_rect.height }, border_color);
             }
-            
+
             // Draw hotkey label
             const label = spellbar.Spellbar.getHotkeyLabel(slot_index);
             const label_x = slot_rect.x + slot_rect.width - 12.0; // Top right corner
             const label_y = slot_rect.y + 2.0;
-            
+
             // Draw label using geometric text
             self.drawHotkeyLabel(cmd_buffer, render_pass, label, label_x, label_y, colors.WHITE);
         }
     }
 
     /// Draw a single character hotkey label
-    fn drawHotkeyLabel(
-        self: *GameRenderer, 
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, 
-        render_pass: *c.sdl.SDL_GPURenderPass,
-        text: []const u8,
-        x: f32,
-        y: f32,
-        color: Color
-    ) void {
+    fn drawHotkeyLabel(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
         if (text.len == 0) return;
-        
+
         const config = geometric_text.TextConfig{
             .pixel_size = 1.5,
             .char_width = 3,
             .char_height = 5,
         };
-        
+
         const char = text[0];
         const pattern = geometric_text.CharacterPatterns.getCharPattern(char);
-        
+
         for (0..config.char_height) |row| {
             for (0..config.char_width) |col| {
                 if (pattern[row * config.char_width + col]) {

@@ -12,7 +12,6 @@ const DirectoryEntry = directory_scanner.DirectoryEntry;
 const FileTreeComponent = file_tree.FileTreeComponent;
 const ZigHighlighter = syntax_highlighter.ZigHighlighter;
 
-
 pub const IDEPage = struct {
     base: page.Page,
     allocator: std.mem.Allocator,
@@ -33,7 +32,6 @@ pub const IDEPage = struct {
     // File content state
     current_file_content: ?[]const u8 = null,
     current_file_error: ?[]const u8 = null,
-
 
     /// Get currently selected file entry
     pub fn getSelectedEntry(self: *const IDEPage) ?*DirectoryEntry {
@@ -84,7 +82,6 @@ pub const IDEPage = struct {
     pub fn getSyntaxHighlighter(self: *IDEPage) *ZigHighlighter {
         return &self.syntax_highlighter;
     }
-
 
     /// Load file content safely with size and error handling
     pub fn loadFileContent(self: *IDEPage, entry: *DirectoryEntry) !void {
@@ -190,20 +187,20 @@ fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.m
 
     // Navigation
     try links.append(page.createLink("< Back to Menu", "/", 20, 20, 150, 30));
-    
+
     // Add expand/collapse all buttons if initialized
     if (ide.initialized and !ide.loading and ide.error_message == null) {
         // File explorer panel positioning
         const panel_x: f32 = 8 + 8; // panel gap + panel border
         const panel_y: f32 = 60 + 8; // header height + panel gap
         const button_y: f32 = panel_y + 5; // Just below panel header
-        
+
         // Expand All button
         try links.append(page.createLink("Expand All", "/ide?expand_all=true", panel_x + 10, button_y, 80, 20));
-        
-        // Collapse All button  
+
+        // Collapse All button
         try links.append(page.createLink("Collapse All", "/ide?collapse_all=true", panel_x + 100, button_y, 80, 20));
-        
+
         try renderFileTreeLinks(ide, links, arena);
     }
 }
@@ -211,39 +208,31 @@ fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.m
 /// Create Links for file tree items (using the proven working link system)
 fn renderFileTreeLinks(ide: *const IDEPage, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {
     const tree_items = ide.file_tree_component.getVisibleItems();
-    
+
     // File explorer panel positioning (matching renderFileTree)
     const panel_x: f32 = 8 + 8; // panel gap + panel border
     const panel_y: f32 = 60 + 8; // header height + panel gap
     const tree_start_y: f32 = panel_y + 35; // panel header space + button space
-    
+
     for (tree_items, 0..) |item, i| {
         const item_y = tree_start_y + @as(f32, @floatFromInt(i)) * 26.0; // Item spacing
         const item_x = panel_x + 10 + @as(f32, @floatFromInt(item.depth)) * 20.0; // Indentation
-        
+
         // Create display text with indicators for directories (using arena allocation)
         const display_name = if (item.entry.metadata.is_directory)
-            std.fmt.allocPrint(arena, "[{s}] {s}", .{ 
-                if (item.entry.expanded) "-" else "+", 
-                item.entry.metadata.name 
-            }) catch item.entry.metadata.name
+            std.fmt.allocPrint(arena, "[{s}] {s}", .{ if (item.entry.expanded) "-" else "+", item.entry.metadata.name }) catch item.entry.metadata.name
         else
             item.entry.metadata.name;
-            
+
         // Create action path for this item (using arena allocation)
         const action_path = if (item.entry.metadata.is_directory)
-            std.fmt.allocPrint(arena, "/ide?toggle={s}", .{ item.entry.metadata.name }) catch "/ide"
+            std.fmt.allocPrint(arena, "/ide?toggle={s}", .{item.entry.metadata.name}) catch "/ide"
         else
-            std.fmt.allocPrint(arena, "/ide?file={s}", .{ item.entry.metadata.name }) catch "/ide";
-        
+            std.fmt.allocPrint(arena, "/ide?file={s}", .{item.entry.metadata.name}) catch "/ide";
+
         // Create the link
-        try links.append(page.createLink(
-            display_name,
-            action_path,
-            item_x,
-            item_y,
-            250.0, // Width
-            20.0   // Height
+        try links.append(page.createLink(display_name, action_path, item_x, item_y, 250.0, // Width
+            20.0 // Height
         ));
     }
 }

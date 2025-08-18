@@ -3,7 +3,6 @@ const components = @import("../components/mod.zig");
 
 /// Generic archetype storages for common entity patterns
 /// Games can instantiate these with their own component types and size limits
-
 const EntityId = u32;
 const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
 
@@ -14,7 +13,7 @@ const EntityIterator = @import("entity_storage.zig").EntityIterator;
 pub fn PlayerStorage(comptime max_entities: usize) type {
     return struct {
         const Self = @This();
-        
+
         entities: [max_entities]EntityId,
         transforms: [max_entities]components.Transform,
         healths: [max_entities]components.Health,
@@ -22,7 +21,7 @@ pub fn PlayerStorage(comptime max_entities: usize) type {
         visuals: [max_entities]components.Visual,
         movements: [max_entities]components.Movement,
         count: usize,
-        
+
         pub fn init() Self {
             return .{
                 .entities = [_]EntityId{INVALID_ENTITY} ** max_entities,
@@ -34,7 +33,7 @@ pub fn PlayerStorage(comptime max_entities: usize) type {
                 .count = 0,
             };
         }
-        
+
         pub fn addEntity(self: *Self, entity: EntityId, transform: components.Transform, health: components.Health, player_input: components.PlayerInput, visual: components.Visual, movement: components.Movement) !void {
             if (self.count >= max_entities) return error.StorageFull;
             const index = self.count;
@@ -46,7 +45,7 @@ pub fn PlayerStorage(comptime max_entities: usize) type {
             self.movements[index] = movement;
             self.count += 1;
         }
-        
+
         pub fn removeEntity(self: *Self, entity: EntityId) void {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity) {
@@ -62,7 +61,7 @@ pub fn PlayerStorage(comptime max_entities: usize) type {
                 }
             }
         }
-        
+
         pub fn getComponent(self: *const Self, entity_id: EntityId, comptime component_type: enum { transform, health, player_input, visual, movement }) ?*const (switch (component_type) {
             .transform => components.Transform,
             .health => components.Health,
@@ -83,7 +82,7 @@ pub fn PlayerStorage(comptime max_entities: usize) type {
             }
             return null;
         }
-        
+
         pub fn getComponentMut(self: *Self, entity_id: EntityId, comptime component_type: enum { transform, health, player_input, visual, movement }) ?*(switch (component_type) {
             .transform => components.Transform,
             .health => components.Health,
@@ -104,26 +103,26 @@ pub fn PlayerStorage(comptime max_entities: usize) type {
             }
             return null;
         }
-        
+
         pub fn entityIterator(self: *const Self) EntityIterator {
             return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
         }
-        
+
         pub fn clear(self: *Self) void {
             self.count = 0;
         }
-        
+
         pub fn containsEntity(self: *const Self, entity_id: EntityId) bool {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity_id) return true;
             }
             return false;
         }
-        
+
         pub fn isEmpty(self: *const Self) bool {
             return self.count == 0;
         }
-        
+
         pub fn isFull(self: *const Self) bool {
             return self.count >= max_entities;
         }
@@ -134,14 +133,14 @@ pub fn PlayerStorage(comptime max_entities: usize) type {
 pub fn UnitStorage(comptime max_entities: usize, comptime UnitType: type) type {
     return struct {
         const Self = @This();
-        
+
         entities: [max_entities]EntityId,
         transforms: [max_entities]components.Transform,
         healths: [max_entities]components.Health,
         units: [max_entities]UnitType,
         visuals: [max_entities]components.Visual,
         count: usize,
-        
+
         pub fn init() Self {
             return .{
                 .entities = [_]EntityId{INVALID_ENTITY} ** max_entities,
@@ -152,7 +151,7 @@ pub fn UnitStorage(comptime max_entities: usize, comptime UnitType: type) type {
                 .count = 0,
             };
         }
-        
+
         pub fn addEntity(self: *Self, entity: EntityId, transform: components.Transform, health: components.Health, unit: UnitType, visual: components.Visual) !void {
             if (self.count >= max_entities) return error.StorageFull;
             const index = self.count;
@@ -163,7 +162,7 @@ pub fn UnitStorage(comptime max_entities: usize, comptime UnitType: type) type {
             self.visuals[index] = visual;
             self.count += 1;
         }
-        
+
         pub fn removeEntity(self: *Self, entity: EntityId) void {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity) {
@@ -178,7 +177,7 @@ pub fn UnitStorage(comptime max_entities: usize, comptime UnitType: type) type {
                 }
             }
         }
-        
+
         pub fn getComponent(self: *const Self, entity_id: EntityId, comptime component_type: enum { transform, health, unit, visual }) ?*const (switch (component_type) {
             .transform => components.Transform,
             .health => components.Health,
@@ -197,7 +196,7 @@ pub fn UnitStorage(comptime max_entities: usize, comptime UnitType: type) type {
             }
             return null;
         }
-        
+
         pub fn getComponentMut(self: *Self, entity_id: EntityId, comptime component_type: enum { transform, health, unit, visual }) ?*(switch (component_type) {
             .transform => components.Transform,
             .health => components.Health,
@@ -216,26 +215,26 @@ pub fn UnitStorage(comptime max_entities: usize, comptime UnitType: type) type {
             }
             return null;
         }
-        
+
         pub fn entityIterator(self: *const Self) EntityIterator {
             return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
         }
-        
+
         pub fn clear(self: *Self) void {
             self.count = 0;
         }
-        
+
         pub fn containsEntity(self: *const Self, entity_id: EntityId) bool {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity_id) return true;
             }
             return false;
         }
-        
+
         pub fn isEmpty(self: *const Self) bool {
             return self.count == 0;
         }
-        
+
         pub fn isFull(self: *const Self) bool {
             return self.count >= max_entities;
         }
@@ -246,13 +245,13 @@ pub fn UnitStorage(comptime max_entities: usize, comptime UnitType: type) type {
 pub fn ProjectileStorage(comptime max_entities: usize, comptime ProjectileType: type) type {
     return struct {
         const Self = @This();
-        
+
         entities: [max_entities]EntityId,
         transforms: [max_entities]components.Transform,
         projectiles: [max_entities]ProjectileType,
         visuals: [max_entities]components.Visual,
         count: usize,
-        
+
         pub fn init() Self {
             return .{
                 .entities = [_]EntityId{INVALID_ENTITY} ** max_entities,
@@ -262,7 +261,7 @@ pub fn ProjectileStorage(comptime max_entities: usize, comptime ProjectileType: 
                 .count = 0,
             };
         }
-        
+
         pub fn addEntity(self: *Self, entity: EntityId, transform: components.Transform, projectile: ProjectileType, visual: components.Visual) !void {
             if (self.count >= max_entities) return error.StorageFull;
             const index = self.count;
@@ -272,7 +271,7 @@ pub fn ProjectileStorage(comptime max_entities: usize, comptime ProjectileType: 
             self.visuals[index] = visual;
             self.count += 1;
         }
-        
+
         pub fn removeEntity(self: *Self, entity: EntityId) void {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity) {
@@ -286,7 +285,7 @@ pub fn ProjectileStorage(comptime max_entities: usize, comptime ProjectileType: 
                 }
             }
         }
-        
+
         pub fn getComponent(self: *const Self, entity_id: EntityId, comptime component_type: enum { transform, projectile, visual }) ?*const (switch (component_type) {
             .transform => components.Transform,
             .projectile => ProjectileType,
@@ -303,7 +302,7 @@ pub fn ProjectileStorage(comptime max_entities: usize, comptime ProjectileType: 
             }
             return null;
         }
-        
+
         pub fn getComponentMut(self: *Self, entity_id: EntityId, comptime component_type: enum { transform, projectile, visual }) ?*(switch (component_type) {
             .transform => components.Transform,
             .projectile => ProjectileType,
@@ -320,26 +319,26 @@ pub fn ProjectileStorage(comptime max_entities: usize, comptime ProjectileType: 
             }
             return null;
         }
-        
+
         pub fn entityIterator(self: *const Self) EntityIterator {
             return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
         }
-        
+
         pub fn clear(self: *Self) void {
             self.count = 0;
         }
-        
+
         pub fn containsEntity(self: *const Self, entity_id: EntityId) bool {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity_id) return true;
             }
             return false;
         }
-        
+
         pub fn isEmpty(self: *const Self) bool {
             return self.count == 0;
         }
-        
+
         pub fn isFull(self: *const Self) bool {
             return self.count >= max_entities;
         }
@@ -350,13 +349,13 @@ pub fn ProjectileStorage(comptime max_entities: usize, comptime ProjectileType: 
 pub fn TerrainStorage(comptime max_entities: usize) type {
     return struct {
         const Self = @This();
-        
+
         entities: [max_entities]EntityId,
         transforms: [max_entities]components.Transform,
         terrains: [max_entities]components.Terrain,
         visuals: [max_entities]components.Visual,
         count: usize,
-        
+
         pub fn init() Self {
             return .{
                 .entities = [_]EntityId{INVALID_ENTITY} ** max_entities,
@@ -366,7 +365,7 @@ pub fn TerrainStorage(comptime max_entities: usize) type {
                 .count = 0,
             };
         }
-        
+
         pub fn addEntity(self: *Self, entity: EntityId, transform: components.Transform, terrain: components.Terrain, visual: components.Visual) !void {
             if (self.count >= max_entities) return error.StorageFull;
             const index = self.count;
@@ -376,7 +375,7 @@ pub fn TerrainStorage(comptime max_entities: usize) type {
             self.visuals[index] = visual;
             self.count += 1;
         }
-        
+
         pub fn removeEntity(self: *Self, entity: EntityId) void {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity) {
@@ -390,7 +389,7 @@ pub fn TerrainStorage(comptime max_entities: usize) type {
                 }
             }
         }
-        
+
         pub fn getComponent(self: *const Self, entity_id: EntityId, comptime component_type: enum { transform, terrain, visual }) ?*const (switch (component_type) {
             .transform => components.Transform,
             .terrain => components.Terrain,
@@ -407,7 +406,7 @@ pub fn TerrainStorage(comptime max_entities: usize) type {
             }
             return null;
         }
-        
+
         pub fn getComponentMut(self: *Self, entity_id: EntityId, comptime component_type: enum { transform, terrain, visual }) ?*(switch (component_type) {
             .transform => components.Transform,
             .terrain => components.Terrain,
@@ -424,26 +423,26 @@ pub fn TerrainStorage(comptime max_entities: usize) type {
             }
             return null;
         }
-        
+
         pub fn entityIterator(self: *const Self) EntityIterator {
             return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
         }
-        
+
         pub fn clear(self: *Self) void {
             self.count = 0;
         }
-        
+
         pub fn containsEntity(self: *const Self, entity_id: EntityId) bool {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity_id) return true;
             }
             return false;
         }
-        
+
         pub fn isEmpty(self: *const Self) bool {
             return self.count == 0;
         }
-        
+
         pub fn isFull(self: *const Self) bool {
             return self.count >= max_entities;
         }
@@ -454,14 +453,14 @@ pub fn TerrainStorage(comptime max_entities: usize) type {
 pub fn InteractiveStorage(comptime max_entities: usize) type {
     return struct {
         const Self = @This();
-        
+
         entities: [max_entities]EntityId,
         transforms: [max_entities]components.Transform,
         visuals: [max_entities]components.Visual,
         terrains: [max_entities]components.Terrain,
         interactables: [max_entities]components.Interactable,
         count: usize,
-        
+
         pub fn init() Self {
             return .{
                 .entities = [_]EntityId{INVALID_ENTITY} ** max_entities,
@@ -472,7 +471,7 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
                 .count = 0,
             };
         }
-        
+
         pub fn addEntity(self: *Self, entity: EntityId, transform: components.Transform, visual: components.Visual, terrain: components.Terrain, interactable: components.Interactable) !void {
             if (self.count >= max_entities) return error.StorageFull;
             const index = self.count;
@@ -483,7 +482,7 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
             self.interactables[index] = interactable;
             self.count += 1;
         }
-        
+
         pub fn removeEntity(self: *Self, entity: EntityId) void {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity) {
@@ -498,7 +497,7 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
                 }
             }
         }
-        
+
         pub fn getComponent(self: *const Self, entity_id: EntityId, comptime component_type: enum { transform, visual, terrain, interactable }) ?*const (switch (component_type) {
             .transform => components.Transform,
             .visual => components.Visual,
@@ -517,7 +516,7 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
             }
             return null;
         }
-        
+
         pub fn getComponentMut(self: *Self, entity_id: EntityId, comptime component_type: enum { transform, visual, terrain, interactable }) ?*(switch (component_type) {
             .transform => components.Transform,
             .visual => components.Visual,
@@ -536,30 +535,30 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
             }
             return null;
         }
-        
+
         pub fn entityIterator(self: *const Self) EntityIterator {
             return EntityIterator{ .entities = self.entities[0..self.count], .index = 0 };
         }
-        
+
         pub fn clear(self: *Self) void {
             self.count = 0;
         }
-        
+
         pub fn containsEntity(self: *const Self, entity_id: EntityId) bool {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity_id) return true;
             }
             return false;
         }
-        
+
         pub fn isEmpty(self: *const Self) bool {
             return self.count == 0;
         }
-        
+
         pub fn isFull(self: *const Self) bool {
             return self.count >= max_entities;
         }
-        
+
         pub fn isAlive(self: *const Self, entity_id: EntityId) bool {
             return self.containsEntity(entity_id);
         }

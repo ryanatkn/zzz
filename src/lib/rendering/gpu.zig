@@ -110,7 +110,7 @@ pub const SimpleGPURenderer = struct {
     circle_instances: std.ArrayList(CircleInstance),
     rect_instances: std.ArrayList(RectInstance),
     effect_instances: std.ArrayList(CircleInstance), // Effects reuse circle data
-    
+
     // Instance buffers for GPU upload
     circle_instance_buffer: ?*c.sdl.SDL_GPUBuffer,
     rect_instance_buffer: ?*c.sdl.SDL_GPUBuffer,
@@ -207,7 +207,7 @@ pub const SimpleGPURenderer = struct {
         if (self.circle_instance_buffer) |buffer| c.sdl.SDL_ReleaseGPUBuffer(self.device, buffer);
         if (self.rect_instance_buffer) |buffer| c.sdl.SDL_ReleaseGPUBuffer(self.device, buffer);
         if (self.effect_instance_buffer) |buffer| c.sdl.SDL_ReleaseGPUBuffer(self.device, buffer);
-        
+
         self.circle_instances.deinit();
         self.rect_instances.deinit();
         self.effect_instances.deinit();
@@ -565,7 +565,7 @@ pub const SimpleGPURenderer = struct {
     }
 
     // === PERFORMANCE MONITORING ===
-    
+
     // Start frame timing
     pub fn startFrameTiming(self: *Self) void {
         self.perf_monitor.startFrame();
@@ -586,8 +586,7 @@ pub const SimpleGPURenderer = struct {
     // Draw a single circle with distance field anti-aliasing
     pub fn drawCircle(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color) void {
         self.perf_monitor.recordIndividualDraw();
-        
-        
+
         // Prepare uniform data
         const uniform_data = CircleUniforms{
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
@@ -611,7 +610,7 @@ pub const SimpleGPURenderer = struct {
     // Draw a single rectangle
     pub fn drawRect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, size: Vec2, color: Color) void {
         self.perf_monitor.recordIndividualDraw();
-        
+
         // Removed debug logging for white rectangles investigation
 
         // Prepare uniform data - swap R and B for BGR swapchain format
@@ -661,7 +660,7 @@ pub const SimpleGPURenderer = struct {
     // Draw a visual effect with animated rings and pulsing
     pub fn drawEffect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
         self.perf_monitor.recordIndividualDraw();
-        
+
         // Prepare uniform data for effect shader
         const uniform_data = EffectUniforms{
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
@@ -685,7 +684,7 @@ pub const SimpleGPURenderer = struct {
     }
 
     // === BATCHED RENDERING API ===
-    
+
     // Add a circle to the current batch
     pub fn addCircleToTrace(self: *Self, pos: Vec2, radius: f32, color: Color) void {
         const instance = CircleInstance{
@@ -878,8 +877,6 @@ pub const SimpleGPURenderer = struct {
     pub fn drawPixel(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, x: f32, y: f32, color: Color) void {
         self.drawRect(cmd_buffer, render_pass, Vec2{ .x = x, .y = y }, Vec2{ .x = 1.0, .y = 1.0 }, color);
     }
-
-
 
     // Queue a texture-based text for drawing
     pub fn queueTextTexture(self: *Self, texture: *c.sdl.SDL_GPUTexture, position: Vec2, width: u32, height: u32, color: Color) void {

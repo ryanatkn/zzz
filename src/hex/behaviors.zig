@@ -36,7 +36,7 @@ var fallback_config = unit_behavior.UnitBehaviorConfig.aggressive(Vec2.ZERO, 100
 pub fn initBehaviors(allocator: std.mem.Allocator) void {
     // Clear any existing state
     deinitBehaviors();
-    
+
     behaviors_allocator = allocator;
     unit_behavior_states = std.AutoHashMap(u32, unit_behavior.UnitBehaviorState).init(allocator);
     unit_behavior_configs = std.AutoHashMap(u32, unit_behavior.UnitBehaviorConfig).init(allocator);
@@ -60,16 +60,10 @@ fn createConfigForProfile(profile: BehaviorProfile, home_pos: Vec2) unit_behavio
     const base_detection = constants.UNIT_DETECTION_RADIUS;
     const base_chase_speed = constants.UNIT_CHASE_SPEED;
     const base_walk_speed = constants.UNIT_WALK_SPEED;
-    
+
     return switch (profile) {
         .idle => blk: {
-            var config = unit_behavior.UnitBehaviorConfig.init(
-                home_pos, base_detection, constants.BEHAVIOR_IDLE_MIN_DISTANCE,
-                base_chase_speed, base_chase_speed * constants.BEHAVIOR_IDLE_WALK_SPEED_MULT,
-                constants.BEHAVIOR_IDLE_CHASE_DURATION,
-                constants.BEHAVIOR_IDLE_HOME_TOLERANCE,
-                constants.BEHAVIOR_IDLE_LOSE_TOLERANCE
-            );
+            var config = unit_behavior.UnitBehaviorConfig.init(home_pos, base_detection, constants.BEHAVIOR_IDLE_MIN_DISTANCE, base_chase_speed, base_chase_speed * constants.BEHAVIOR_IDLE_WALK_SPEED_MULT, constants.BEHAVIOR_IDLE_CHASE_DURATION, constants.BEHAVIOR_IDLE_HOME_TOLERANCE, constants.BEHAVIOR_IDLE_LOSE_TOLERANCE);
             config.behavior_priorities.chase = .low;
             config.behavior_priorities.return_home = .normal;
             config.behavior_priorities.wander = .lowest;
@@ -125,7 +119,7 @@ fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: Beh
         fallback_state = unit_behavior.UnitBehaviorState.init(unit_comp.base.home_pos, &[_]Vec2{}, entity_id);
         return &fallback_state;
     }
-    
+
     const state_result = unit_behavior_states.?.getOrPut(entity_id) catch {
         std.log.err("Failed to get or create behavior state for entity {}, using fallback", .{entity_id});
         // Update fallback state and return reference to it (memory-safe)
@@ -157,7 +151,7 @@ fn getOrCreateBehaviorConfig(entity_id: u32, unit_comp: *const Unit, profile: Be
         fallback_config = createConfigForProfile(profile, unit_comp.base.home_pos);
         return &fallback_config;
     }
-    
+
     const config_result = unit_behavior_configs.?.getOrPut(entity_id) catch {
         std.log.err("Failed to get or create behavior config for entity {}, using fallback", .{entity_id});
         // Update fallback config and return reference to it (memory-safe)
@@ -176,7 +170,7 @@ fn getOrCreateBehaviorConfig(entity_id: u32, unit_comp: *const Unit, profile: Be
 fn generatePatrolWaypoints(home_pos: Vec2, pattern: constants.PatrolPattern) []const Vec2 {
     const offset_x = constants.PATROL_WAYPOINT_OFFSET_X;
     const offset_y = constants.PATROL_WAYPOINT_OFFSET_Y;
-    
+
     return switch (pattern) {
         .square => &[_]Vec2{
             home_pos,
@@ -219,7 +213,7 @@ pub fn updateUnitWithAggroMod(
     frame_ctx: FrameContext,
 ) void {
     const dt = frame_ctx.effectiveDelta();
-    
+
     // Determine behavior profile for this unit
     const profile = determineBehaviorProfile(unit_comp);
 
@@ -266,7 +260,6 @@ pub fn updateUnitWithAggroMod(
 
 /// Get color for behavior and profile combination
 fn getBehaviorColor(behavior: unit_behavior.BehaviorType, profile: BehaviorProfile) @TypeOf(constants.COLOR_UNIT_AGGRESSIVE) {
-
     return switch (behavior) {
         .chase => switch (profile) {
             .aggressive => constants.COLOR_UNIT_AGGRESSIVE,
@@ -286,7 +279,6 @@ fn getBehaviorColor(behavior: unit_behavior.BehaviorType, profile: BehaviorProfi
     };
 }
 
-
 /// Calculate velocity for unit returning home (using lib utility)
 fn calculateReturnHomeVelocity(unit_comp: *const Unit, transform: *const Transform) Vec2 {
     return behaviors_mod.return_home_behavior.simpleReturnHome(
@@ -296,4 +288,3 @@ fn calculateReturnHomeVelocity(unit_comp: *const Unit, transform: *const Transfo
         constants.UNIT_WALK_SPEED,
     );
 }
-

@@ -188,14 +188,14 @@ pub const TextPositioning = struct {
 
 test "text alignment calculations" {
     const text_width: f32 = 100.0;
-    
+
     // Test alignment offsets
     const left_offset = calculateAlignmentOffset(.left, text_width);
     try std.testing.expectEqual(@as(f32, 0), left_offset.x);
-    
+
     const center_offset = calculateAlignmentOffset(.center, text_width);
     try std.testing.expectEqual(@as(f32, -50.0), center_offset.x);
-    
+
     const right_offset = calculateAlignmentOffset(.right, text_width);
     try std.testing.expectEqual(@as(f32, -100.0), right_offset.x);
 }
@@ -204,15 +204,15 @@ test "screen alignment helpers" {
     const screen_width: f32 = 1920.0;
     const margin: f32 = 10.0;
     const text_width: f32 = 100.0;
-    
+
     // Test right alignment from edge
     const right_pos = ScreenAlignment.rightAlignedFromEdge(screen_width, margin, text_width);
     try std.testing.expectEqual(@as(f32, 1810.0), right_pos.x); // 1920 - 10 - 100
-    
+
     // Test left alignment from edge
     const left_pos = ScreenAlignment.leftAlignedFromEdge(margin);
     try std.testing.expectEqual(@as(f32, 10.0), left_pos.x);
-    
+
     // Test center alignment
     const center_pos = ScreenAlignment.centerAligned(screen_width, text_width);
     try std.testing.expectEqual(@as(f32, 910.0), center_pos.x); // (1920 - 100) / 2
@@ -221,11 +221,11 @@ test "screen alignment helpers" {
 test "position alignment application" {
     const base_pos = Vec2{ .x = 100.0, .y = 50.0 };
     const text_width: f32 = 80.0;
-    
+
     const right_aligned = positionRightAligned(base_pos, text_width);
     try std.testing.expectEqual(@as(f32, 20.0), right_aligned.x); // 100 - 80
     try std.testing.expectEqual(@as(f32, 50.0), right_aligned.y);
-    
+
     const center_aligned = positionCenterAligned(base_pos, text_width);
     try std.testing.expectEqual(@as(f32, 60.0), center_aligned.x); // 100 - 40
     try std.testing.expectEqual(@as(f32, 50.0), center_aligned.y);
@@ -234,14 +234,14 @@ test "position alignment application" {
 test "text measurement utilities" {
     const text = "Hello World";
     const font_size: f32 = 20.0;
-    
+
     const width = TextMeasurement.estimateWidth(text, font_size);
     try std.testing.expect(width > 0);
     try std.testing.expectEqual(@as(f32, @floatFromInt(text.len)) * font_size * 0.6, width);
-    
+
     const height = TextMeasurement.estimateHeight(font_size);
     try std.testing.expectEqual(font_size * 1.2, height);
-    
+
     const bounds = TextMeasurement.estimateBounds(text, font_size);
     try std.testing.expectEqual(width, bounds.x);
     try std.testing.expectEqual(height, bounds.y);
@@ -251,12 +251,12 @@ test "UI pattern helpers" {
     const screen_width: f32 = 1920.0;
     const screen_height: f32 = 1080.0;
     const margin: f32 = 10.0;
-    
+
     // Test FPS counter positioning
     const fps_pos = UIPatterns.createFPSCounterPosition(screen_width, screen_height, margin);
     try std.testing.expectEqual(@as(f32, 1910.0), fps_pos.x);
     try std.testing.expectEqual(@as(f32, 1070.0), fps_pos.y);
-    
+
     // Test status text positioning
     const status_pos = UIPatterns.createStatusTextPosition(screen_width, screen_height, margin, 30.0);
     try std.testing.expectEqual(@as(f32, 1910.0), status_pos.x);
@@ -268,13 +268,13 @@ test "text positioning workflows" {
     const screen_height: f32 = 1080.0;
     const font_size: f32 = 24.0;
     const margin: f32 = 10.0;
-    
+
     // Test HUD right alignment
     const text = "FPS: 60";
     const hud_pos = TextPositioning.hudRightAligned(text, screen_width, screen_height, font_size, margin, 0.0);
     try std.testing.expect(hud_pos.x < screen_width); // Should be positioned to the left of the right edge
     try std.testing.expectEqual(@as(f32, 1070.0), hud_pos.y);
-    
+
     // Test panel left alignment
     const panel_pos = TextPositioning.panelLeftAligned(100.0, 50.0, margin, 20.0);
     try std.testing.expectEqual(@as(f32, 110.0), panel_pos.x); // 100 + 10

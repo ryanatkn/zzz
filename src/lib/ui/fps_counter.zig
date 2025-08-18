@@ -143,7 +143,7 @@ pub const FPSCounterData = struct {
 
         // Calculate text width for alignment (rough estimation)
         const estimated_text_width = @as(f32, @floatFromInt(fps_text.len)) * self.font_size * 0.6;
-        
+
         // Calculate aligned position
         const aligned_position = text_alignment.applyAlignment(self.position, self.alignment, estimated_text_width);
 
@@ -383,7 +383,7 @@ test "FPS counter presets" {
 
     try std.testing.expect(default_data.position.x != debug_data.position.x);
     try std.testing.expect(debug_data.position.x != corner_data.position.x);
-    
+
     // Test alignment settings
     try std.testing.expectEqual(text_alignment.TextAlign.left, default_data.alignment);
     try std.testing.expectEqual(text_alignment.TextAlign.right, debug_data.alignment);

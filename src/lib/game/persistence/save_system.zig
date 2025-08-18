@@ -21,18 +21,18 @@ pub const SaveVersion = struct {
     major: u16,
     minor: u16,
     patch: u16,
-    
+
     pub fn init(major: u16, minor: u16, patch: u16) SaveVersion {
         return .{ .major = major, .minor = minor, .patch = patch };
     }
-    
+
     pub fn isCompatible(self: SaveVersion, other: SaveVersion) bool {
         // Compatible if major version matches and this version is >= other
-        return self.major == other.major and 
-               (self.minor > other.minor or 
+        return self.major == other.major and
+            (self.minor > other.minor or
                 (self.minor == other.minor and self.patch >= other.patch));
     }
-    
+
     pub fn toString(self: SaveVersion, buffer: []u8) []const u8 {
         return std.fmt.bufPrint(buffer, "{}.{}.{}", .{ self.major, self.minor, self.patch }) catch "invalid";
     }
@@ -42,11 +42,11 @@ pub const SaveVersion = struct {
 pub fn CheckpointSystem(comptime SaveType: type, comptime max_checkpoints: usize) type {
     return struct {
         const Self = @This();
-        
+
         checkpoints: [max_checkpoints]Checkpoint,
         count: usize,
         current_checkpoint: usize,
-        
+
         pub const Checkpoint = struct {
             id: u32,
             timestamp: u64,
@@ -55,7 +55,7 @@ pub fn CheckpointSystem(comptime SaveType: type, comptime max_checkpoints: usize
             version: SaveVersion,
             is_auto: bool,
         };
-        
+
         pub fn init() Self {
             return .{
                 .checkpoints = undefined,
@@ -63,7 +63,7 @@ pub fn CheckpointSystem(comptime SaveType: type, comptime max_checkpoints: usize
                 .current_checkpoint = 0,
             };
         }
-        
+
         /// Create a new checkpoint
         pub fn createCheckpoint(
             self: *Self,
@@ -74,10 +74,10 @@ pub fn CheckpointSystem(comptime SaveType: type, comptime max_checkpoints: usize
             allocator: std.mem.Allocator,
         ) !u32 {
             const id = if (self.count > 0) self.checkpoints[self.count - 1].id + 1 else 1;
-            
+
             // Make a copy of the name
             const name_copy = try allocator.dupe(u8, name);
-            
+
             const checkpoint = Checkpoint{
                 .id = id,
                 .timestamp = std.time.timestamp(),
@@ -86,27 +86,27 @@ pub fn CheckpointSystem(comptime SaveType: type, comptime max_checkpoints: usize
                 .version = version,
                 .is_auto = is_auto,
             };
-            
+
             if (self.count >= max_checkpoints) {
                 // Remove oldest checkpoint to make room
                 if (self.checkpoints[0].name.len > 0) {
                     allocator.free(self.checkpoints[0].name);
                 }
-                
+
                 // Shift checkpoints
                 for (1..max_checkpoints) |i| {
                     self.checkpoints[i - 1] = self.checkpoints[i];
                 }
                 self.count = max_checkpoints - 1;
             }
-            
+
             self.checkpoints[self.count] = checkpoint;
             self.current_checkpoint = self.count;
             self.count += 1;
-            
+
             return id;
         }
-        
+
         /// Load a checkpoint by ID
         pub fn loadCheckpoint(self: *Self, id: u32) ?*const SaveType {
             for (0..self.count) |i| {
@@ -117,13 +117,13 @@ pub fn CheckpointSystem(comptime SaveType: type, comptime max_checkpoints: usize
             }
             return null;
         }
-        
+
         /// Get current checkpoint
         pub fn getCurrentCheckpoint(self: *const Self) ?*const Checkpoint {
             if (self.count == 0) return null;
             return &self.checkpoints[self.current_checkpoint];
         }
-        
+
         /// List all checkpoints
         pub fn listCheckpoints(self: *const Self, buffer: []Checkpoint) usize {
             const copy_count = @min(buffer.len, self.count);
@@ -132,16 +132,16 @@ pub fn CheckpointSystem(comptime SaveType: type, comptime max_checkpoints: usize
             }
             return copy_count;
         }
-        
+
         /// Remove old auto-checkpoints (keep manual ones)
         pub fn cleanOldCheckpoints(self: *Self, max_auto_age_seconds: u64, allocator: std.mem.Allocator) void {
             const current_time = std.time.timestamp();
             var write_idx: usize = 0;
-            
+
             for (0..self.count) |i| {
                 const checkpoint = &self.checkpoints[i];
                 const age = current_time - checkpoint.timestamp;
-                
+
                 // Keep if it's manual or not too old
                 if (!checkpoint.is_auto or age <= max_auto_age_seconds) {
                     if (write_idx != i) {
@@ -153,37 +153,37 @@ pub fn CheckpointSystem(comptime SaveType: type, comptime max_checkpoints: usize
                     allocator.free(checkpoint.name);
                 }
             }
-            
+
             self.count = write_idx;
             if (self.current_checkpoint >= self.count) {
                 self.current_checkpoint = if (self.count > 0) self.count - 1 else 0;
             }
         }
-        
+
         /// Get checkpoint by index
         pub fn getCheckpoint(self: *const Self, index: usize) ?*const Checkpoint {
             if (index >= self.count) return null;
             return &self.checkpoints[index];
         }
-        
+
         /// Remove checkpoint by ID
         pub fn removeCheckpoint(self: *Self, id: u32, allocator: std.mem.Allocator) bool {
             for (0..self.count) |i| {
                 if (self.checkpoints[i].id == id) {
                     // Free the name
                     allocator.free(self.checkpoints[i].name);
-                    
+
                     // Shift remaining checkpoints
                     for (i..self.count - 1) |j| {
                         self.checkpoints[j] = self.checkpoints[j + 1];
                     }
                     self.count -= 1;
-                    
+
                     // Adjust current checkpoint index
                     if (self.current_checkpoint >= i and self.current_checkpoint > 0) {
                         self.current_checkpoint -= 1;
                     }
-                    
+
                     return true;
                 }
             }
@@ -230,12 +230,12 @@ pub const DeltaSave = struct {
         // Games can implement more sophisticated delta compression
         _ = old_save;
         _ = allocator;
-        
+
         // For now, just return the full new save as "delta"
         // TODO: Implement actual delta compression if needed
         return std.mem.asBytes(&new_save);
     }
-    
+
     /// Apply delta to a save state
     pub fn applyDelta(
         comptime SaveType: type,
@@ -243,12 +243,12 @@ pub const DeltaSave = struct {
         delta_data: []const u8,
     ) !SaveType {
         _ = base_save;
-        
+
         // Simple implementation: treat delta as full save
         if (delta_data.len != @sizeOf(SaveType)) {
             return error.InvalidDelta;
         }
-        
+
         return std.mem.bytesToValue(SaveType, delta_data[0..@sizeOf(SaveType)]);
     }
 };
@@ -261,21 +261,21 @@ pub const Migration = struct {
             return error.IncompatibleSaveVersion;
         }
     }
-    
+
     /// Validate save data basic structure
     pub fn validateSaveData(comptime SaveType: type, data: []const u8) !SaveType {
         if (data.len != @sizeOf(SaveType)) {
             return error.CorruptSaveData;
         }
-        
+
         // Basic structure validation - just try to read it
         const save_data = std.mem.bytesToValue(SaveType, data[0..@sizeOf(SaveType)]);
-        
+
         // Games can add their own validation here by implementing validateSave()
         if (@hasDecl(SaveType, "validateSave")) {
             try SaveType.validateSave(save_data);
         }
-        
+
         return save_data;
     }
 };

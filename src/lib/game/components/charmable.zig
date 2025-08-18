@@ -23,7 +23,7 @@ pub const Charmable = struct {
 
     pub fn startCharm(self: *Charmable, caster: EntityId, duration: f32) bool {
         if (!self.can_be_charmed or self.charmed) return false;
-        
+
         self.charmed = true;
         self.original_controller = caster;
         // Apply resistance factor
@@ -39,7 +39,7 @@ pub const Charmable = struct {
 
     pub fn update(self: *Charmable, dt: f32) bool {
         if (!self.charmed) return false;
-        
+
         self.charm_duration -= dt;
         if (self.charm_duration <= 0) {
             self.endCharm();

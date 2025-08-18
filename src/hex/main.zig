@@ -281,7 +281,7 @@ fn renderGame() !void {
 
         // Draw AI mode indicator if enabled
         game_renderer.?.drawAIMode(game_state.?.ai_enabled);
-        
+
         // Draw spellbar
         game_renderer.?.drawSpellbar(cmd_buffer, render_pass, &game_state.?.spell_system, &game_state.?.spellbar_ui);
     }

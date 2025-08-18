@@ -12,7 +12,7 @@ const Camera = camera_mod.Camera;
 /// Useful for transforming arrays of entity positions efficiently
 pub fn worldToScreenBatch(cam: *const Camera, world_positions: []const Vec2, screen_positions: []Vec2) void {
     std.debug.assert(world_positions.len == screen_positions.len);
-    
+
     for (world_positions, screen_positions) |world_pos, *screen_pos| {
         screen_pos.* = cam.worldToScreen(world_pos);
     }
@@ -37,11 +37,11 @@ pub fn isWorldPositionVisible(cam: *const Camera, world_pos: Vec2, world_radius:
     const screen_pos = cam.worldToScreen(world_pos);
     const screen_radius = cam.worldSizeToScreen(world_radius);
     const total_radius = screen_radius + margin;
-    
+
     return screen_pos.x + total_radius >= 0 and
-           screen_pos.x - total_radius <= cam.screen_width and
-           screen_pos.y + total_radius >= 0 and
-           screen_pos.y - total_radius <= cam.screen_height;
+        screen_pos.x - total_radius <= cam.screen_width and
+        screen_pos.y + total_radius >= 0 and
+        screen_pos.y - total_radius <= cam.screen_height;
 }
 
 /// Batch visibility test for multiple entities
@@ -54,7 +54,7 @@ pub fn batchVisibilityTest(
     visible_indices: []u32,
 ) u32 {
     std.debug.assert(world_positions.len == world_radii.len);
-    
+
     var visible_count: u32 = 0;
     for (world_positions, world_radii, 0..) |world_pos, world_radius, i| {
         if (isWorldPositionVisible(cam, world_pos, world_radius, margin)) {
@@ -71,7 +71,7 @@ pub fn batchVisibilityTest(
 pub const EntityTransform = struct {
     screen_pos: Vec2,
     screen_radius: f32,
-    
+
     pub fn fromWorld(cam: *const Camera, world_pos: Vec2, world_radius: f32) EntityTransform {
         return EntityTransform{
             .screen_pos = cam.worldToScreen(world_pos),
@@ -84,7 +84,7 @@ pub const EntityTransform = struct {
 pub const RectTransform = struct {
     screen_pos: Vec2,
     screen_size: Vec2,
-    
+
     pub fn fromWorld(cam: *const Camera, world_pos: Vec2, world_size: Vec2) RectTransform {
         return RectTransform{
             .screen_pos = cam.worldToScreen(world_pos),
@@ -103,7 +103,7 @@ pub fn batchTransformEntities(
 ) void {
     std.debug.assert(world_positions.len == world_radii.len);
     std.debug.assert(world_positions.len == transforms.len);
-    
+
     for (world_positions, world_radii, transforms) |world_pos, world_radius, *transform| {
         transform.* = EntityTransform.fromWorld(cam, world_pos, world_radius);
     }
@@ -118,7 +118,7 @@ pub fn batchTransformRects(
 ) void {
     std.debug.assert(world_positions.len == world_sizes.len);
     std.debug.assert(world_positions.len == transforms.len);
-    
+
     for (world_positions, world_sizes, transforms) |world_pos, world_size, *transform| {
         transform.* = RectTransform.fromWorld(cam, world_pos, world_size);
     }
@@ -129,12 +129,12 @@ pub fn batchTransformRects(
 pub fn sortEntitiesByDepth(world_positions: []const Vec2, indices: []u32) void {
     const Context = struct {
         positions: []const Vec2,
-        
+
         pub fn lessThan(ctx: @This(), a_index: u32, b_index: u32) bool {
             return ctx.positions[a_index].y < ctx.positions[b_index].y;
         }
     };
-    
+
     const context = Context{ .positions = world_positions };
     std.sort.pdq(u32, indices, context, Context.lessThan);
 }
@@ -150,7 +150,7 @@ pub fn transformVisibleEntities(
     visible_indices: []u32,
 ) u32 {
     std.debug.assert(world_positions.len == world_radii.len);
-    
+
     var visible_count: u32 = 0;
     for (world_positions, world_radii, 0..) |world_pos, world_radius, i| {
         if (isWorldPositionVisible(cam, world_pos, world_radius, margin)) {
@@ -168,10 +168,10 @@ pub fn transformVisibleEntities(
 pub const CameraUtilsConfig = struct {
     /// Margin for off-screen culling (in screen pixels)
     culling_margin: f32 = 50.0,
-    
+
     /// Enable depth sorting for entities
     enable_depth_sorting: bool = false,
-    
+
     /// Maximum entities to process in batch operations
     max_batch_size: u32 = 1000,
 };
@@ -189,7 +189,7 @@ pub fn prepareEntitiesForRendering(
     const batch_size = @min(@min(world_positions.len, config.max_batch_size), transforms.len);
     const positions_slice = world_positions[0..batch_size];
     const radii_slice = world_radii[0..batch_size];
-    
+
     // Combine culling and transformation in single pass
     const visible_count = transformVisibleEntities(
         cam,
@@ -199,12 +199,12 @@ pub fn prepareEntitiesForRendering(
         transforms,
         visible_indices,
     );
-    
+
     // Optional depth sorting
     if (config.enable_depth_sorting and visible_count > 1) {
         const indices_slice = visible_indices[0..visible_count];
         sortEntitiesByDepth(positions_slice, indices_slice);
-        
+
         // Reorder transforms to match sorted indices
         var temp_transforms: [1000]EntityTransform = undefined;
         for (indices_slice, 0..) |index, i| {
@@ -214,6 +214,6 @@ pub fn prepareEntitiesForRendering(
             transforms[i] = EntityTransform.fromWorld(cam, positions_slice[index], radii_slice[index]);
         }
     }
-    
+
     return visible_count;
 }

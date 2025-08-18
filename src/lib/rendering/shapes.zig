@@ -14,7 +14,7 @@ pub const Shapes = struct {
     pub fn calculateBorderRects(width: f32, offset: f32) [4]Rectangle {
         const screen_width = @import("../core/constants.zig").SCREEN.BASE_WIDTH;
         const screen_height = @import("../core/constants.zig").SCREEN.BASE_HEIGHT;
-        
+
         return [4]Rectangle{
             // Top border
             Rectangle{
@@ -23,7 +23,7 @@ pub const Shapes = struct {
                 .w = screen_width,
                 .h = width,
             },
-            // Bottom border  
+            // Bottom border
             Rectangle{
                 .x = 0,
                 .y = screen_height - width - offset,
@@ -60,7 +60,7 @@ pub const Shapes = struct {
         const fill_width = bar_width * std.math.clamp(progress, 0.0, 1.0);
         const bar_x = (screen_width - bar_width) / 2.0;
         const bar_y = screen_height * 0.1 - bar_height / 2.0;
-        
+
         return ProgressBar{
             .background = Rectangle{
                 .x = bar_x,
@@ -113,12 +113,12 @@ pub const Rectangle = struct {
 
     pub fn contains(self: Rectangle, point: Vec2) bool {
         return point.x >= self.x and point.x <= self.x + self.w and
-               point.y >= self.y and point.y <= self.y + self.h;
+            point.y >= self.y and point.y <= self.y + self.h;
     }
 
     pub fn intersects(self: Rectangle, other: Rectangle) bool {
         return !(self.x + self.w < other.x or other.x + other.w < self.x or
-                 self.y + self.h < other.y or other.y + other.h < self.y);
+            self.y + self.h < other.y or other.y + other.h < self.y);
     }
 };
 
@@ -144,10 +144,10 @@ pub const Circle = struct {
         // Find closest point on rectangle to circle center
         const closest_x = std.math.clamp(self.center.x, rect.x, rect.x + rect.w);
         const closest_y = std.math.clamp(self.center.y, rect.y, rect.y + rect.h);
-        
+
         const diff = Vec2{ .x = self.center.x - closest_x, .y = self.center.y - closest_y };
         const distance_squared = diff.x * diff.x + diff.y * diff.y;
-        
+
         return distance_squared <= self.radius * self.radius;
     }
 
@@ -162,12 +162,12 @@ pub const Circle = struct {
 // Tests for shape utilities
 test "rectangle operations" {
     const rect = Rectangle{ .x = 10, .y = 20, .w = 100, .h = 50 };
-    
+
     // Test center calculation
     const center_point = rect.center();
     try std.testing.expectApproxEqAbs(@as(f32, 60.0), center_point.x, 0.1); // 10 + 100/2
     try std.testing.expectApproxEqAbs(@as(f32, 45.0), center_point.y, 0.1); // 20 + 50/2
-    
+
     // Test contains
     try std.testing.expect(rect.contains(Vec2{ .x = 50, .y = 30 }));
     try std.testing.expect(!rect.contains(Vec2{ .x = 5, .y = 30 }));
@@ -175,11 +175,11 @@ test "rectangle operations" {
 
 test "circle operations" {
     const circle = Circle{ .center = Vec2{ .x = 50, .y = 50 }, .radius = 25 };
-    
+
     // Test contains
     try std.testing.expect(circle.contains(Vec2{ .x = 60, .y = 60 })); // Inside
     try std.testing.expect(!circle.contains(Vec2{ .x = 100, .y = 100 })); // Outside
-    
+
     // Test circle intersection
     const other_circle = Circle{ .center = Vec2{ .x = 70, .y = 50 }, .radius = 20 };
     try std.testing.expect(circle.intersectsCircle(other_circle)); // Should intersect
@@ -190,7 +190,7 @@ test "shape utilities" {
     const rect_size = Vec2{ .x = 100, .y = 50 };
     const bounds_size = Vec2{ .x = 800, .y = 600 };
     const centered = Shapes.centerRect(rect_size, bounds_size);
-    
+
     try std.testing.expectApproxEqAbs(@as(f32, 350.0), centered.x, 0.1); // (800-100)/2
     try std.testing.expectApproxEqAbs(@as(f32, 275.0), centered.y, 0.1); // (600-50)/2
 }
