@@ -19,6 +19,8 @@ const loggers = @import("../lib/debug/loggers.zig");
 // Hex game modules
 const constants = @import("constants.zig");
 const combat = @import("combat.zig");
+const faction_presets = @import("faction_presets.zig");
+const faction_integration = @import("faction_integration.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -400,6 +402,11 @@ pub const HexGame = struct {
 
         try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;
+        
+        // Log faction system initialization for debugging
+        const unit_factions = faction_presets.getUnitFactions(disposition, .enemy);
+        const unit_capabilities = faction_presets.getUnitCapabilities(disposition);
+        self.logger.debug("unit_factions", "Unit created with disposition {s}, {} faction tags, attack capability: {}", .{ @tagName(disposition), unit_factions.tags.count(), unit_capabilities.can_attack });
 
         return entity;
     }
@@ -459,6 +466,11 @@ pub const HexGame = struct {
 
         try zone.players.addEntity(entity, transform, health, player_input, visual, movement);
         zone.entity_count += 1;
+        
+        // Log faction system initialization for debugging
+        const player_factions = faction_presets.getPlayerFactions();
+        const player_capabilities = faction_presets.getPlayerCapabilities();
+        self.logger.debug("player_factions", "Player created with {} faction tags and attack capability: {}", .{ player_factions.tags.count(), player_capabilities.can_attack });
 
         self.player_entity = entity;
         self.player_zone = self.zone_manager.getCurrentZoneIndex();

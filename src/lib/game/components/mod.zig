@@ -10,6 +10,7 @@ pub const Combat = @import("combat.zig").Combat;
 pub const Statuses = @import("statuses.zig").Statuses;
 pub const PlayerInput = @import("player_input.zig").PlayerInput;
 pub const Projectile = @import("projectile.zig").Projectile;
+pub const Capabilities = @import("capabilities.zig").Capabilities;
 
 // Terrain components (legacy monolithic + new decomposed)
 pub const Terrain = @import("terrain.zig").Terrain;

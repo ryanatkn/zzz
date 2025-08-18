@@ -6,6 +6,8 @@ const hex_game_mod = @import("hex_game.zig");
 const HexGame = hex_game_mod.HexGame;
 const constants = @import("constants.zig");
 const components = @import("../lib/game/components/mod.zig");
+const faction_integration = @import("faction_integration.zig");
+const factions = @import("factions.zig");
 
 /// Component-based approach to identify deadly terrain
 /// This centralizes the logic and makes it easier to extend with Hazard components later
@@ -42,11 +44,14 @@ pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) b
     return !result.found;
 }
 
-// Player-unit collision check
+// Player-unit collision check using faction-based relationships
 pub fn checkPlayerUnitCollision(world: *hex_game_mod.HexGame) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
     const zone_storage = world.getZoneStorage();
+    
+    // Get player entity ID for faction checking
+    const player_entity = world.getPlayer() orelse return false;
 
     // Use idiomatic Zig iterator pattern
     var unit_iter = world.iterateUnitsInCurrentZone();
@@ -56,9 +61,26 @@ pub fn checkPlayerUnitCollision(world: *hex_game_mod.HexGame) bool {
                 // Only check alive units
                 if (!health.alive) continue;
 
-                // Check collision with this unit
+                // Check physical collision first
                 if (collision.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
-                    return true;
+                    // Check faction relationship to determine if this should cause damage
+                    if (faction_integration.getEntityRelation(world, entity_id, player_entity)) |relation| {
+                        // Only hostile or suspicious entities with attack capability cause damage collision
+                        if ((relation == .hostile or relation == .suspicious) and faction_integration.canEntityAttack(world, entity_id)) {
+                            faction_integration.logFactionRelation(world, entity_id, player_entity, relation);
+                            return true;
+                        }
+                        // Friendly/allied/neutral units don't cause damage collision
+                        faction_integration.logFactionRelation(world, entity_id, player_entity, relation);
+                    } else {
+                        // Fallback to old behavior if faction data is missing
+                        // TODO: Remove this fallback once all entities have faction data
+                        if (zone_storage.units.getComponent(entity_id, .unit)) |unit| {
+                            if (unit.disposition == .hostile) {
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
         }

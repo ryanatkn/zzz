@@ -21,7 +21,9 @@ pub const MAX_LIFESTONES = 13;
 // Movement and gameplay constants
 pub const PLAYER_SPEED = 600.0;
 pub const PLAYER_RADIUS = 20.0;
+pub const PLAYER_DAMAGE = 25.0;
 pub const UNIT_SPEED = 80.0;
+pub const UNIT_DAMAGE = 10.0;
 pub const UNIT_WALK_SPEED = UNIT_SPEED * 0.333; // TODO should be just a multipler to current speed
 pub const UNIT_HOME_TOLERANCE = 2.0; // Distance tolerance for "at home" check
 pub const UNIT_DETECTION_RADIUS = 200.0; // Detection radius for units
