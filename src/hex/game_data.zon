@@ -51,20 +51,20 @@
                 // Overworld is now safe - no deadly hazards, only blocking obstacles for navigation challenge
             },
             .units = .{
-                // 12 overworld units with varied behaviors - mix of explicit and default
-                // Player spawns at (960, 540) - keep enemies away from center
-                .{ .position = .{ .x = 850.0, .y = 150.0 }, .radius = 8.0, .behavior = .aggressive }, // Relentless chase
-                .{ .position = .{ .x = 1350.0, .y = 300.0 }, .radius = 9.0, .behavior = .defensive }, // Flees when approached
-                .{ .position = .{ .x = 350.0, .y = 350.0 }, .radius = 7.0, .behavior = .patrolling }, // Follows route around area
-                .{ .position = .{ .x = 1650.0, .y = 450.0 }, .radius = 8.0, .behavior = .wandering }, // Explores randomly
-                .{ .position = .{ .x = 200.0, .y = 600.0 }, .radius = 9.0, .behavior = .guardian }, // Protects home area
-                .{ .position = .{ .x = 1450.0, .y = 650.0 }, .radius = 8.0 }, // No behavior = idle default
-                .{ .position = .{ .x = 600.0, .y = 950.0 }, .radius = 7.0, .behavior = .defensive },
-                .{ .position = .{ .x = 1300.0, .y = 950.0 }, .radius = 9.0 }, // No behavior = idle default
-                .{ .position = .{ .x = 150.0, .y = 250.0 }, .radius = 8.0, .behavior = .wandering },
-                .{ .position = .{ .x = 1500.0, .y = 150.0 }, .radius = 7.0, .behavior = .guardian },
-                .{ .position = .{ .x = 100.0, .y = 800.0 }, .radius = 8.0, .behavior = .aggressive },
-                .{ .position = .{ .x = 1750.0, .y = 850.0 }, .radius = 9.0 }, // No behavior = idle default
+                // 12 overworld units with simplified behaviors for clear gameplay
+                // Player spawns at (960, 540) - keep units away from center
+                .{ .position = .{ .x = 850.0, .y = 150.0 }, .radius = 8.0, .behavior = .hostile }, // Always red - chases player
+                .{ .position = .{ .x = 1350.0, .y = 300.0 }, .radius = 9.0, .behavior = .fearful }, // Always orange - flees from player
+                .{ .position = .{ .x = 350.0, .y = 350.0 }, .radius = 7.0, .behavior = .neutral }, // Gray - ignores player, returns home
+                .{ .position = .{ .x = 1650.0, .y = 450.0 }, .radius = 8.0, .behavior = .friendly }, // Green/Blue - safe, may follow
+                .{ .position = .{ .x = 200.0, .y = 600.0 }, .radius = 9.0, .behavior = .hostile }, // Red - aggressive guardian
+                .{ .position = .{ .x = 1450.0, .y = 650.0 }, .radius = 8.0, .behavior = .neutral }, // Gray - neutral behavior
+                .{ .position = .{ .x = 600.0, .y = 950.0 }, .radius = 7.0, .behavior = .fearful }, // Orange - flees when approached
+                .{ .position = .{ .x = 1300.0, .y = 950.0 }, .radius = 9.0, .behavior = .friendly }, // Green/Blue - friendly unit
+                .{ .position = .{ .x = 150.0, .y = 250.0 }, .radius = 8.0, .behavior = .neutral }, // Gray - passive wanderer
+                .{ .position = .{ .x = 1500.0, .y = 150.0 }, .radius = 7.0, .behavior = .hostile }, // Red - hostile guardian
+                .{ .position = .{ .x = 100.0, .y = 800.0 }, .radius = 8.0, .behavior = .fearful }, // Orange - fearful unit
+                .{ .position = .{ .x = 1750.0, .y = 850.0 }, .radius = 9.0, .behavior = .neutral }, // Gray - neutral default
             },
             .portals = .{
                 // Portals to 6 dungeons arranged in regular hexagon (380px radius)
@@ -129,7 +129,7 @@
             },
             .units = .{
                 // Southeast Dungeon: 1 boss unit (largest size) - positioned off-center for better flow
-                .{ .position = .{ .x = 960.0, .y = 250.0 }, .radius = 30.0, .behavior = .guardian }, // Boss guards the chamber
+                .{ .position = .{ .x = 960.0, .y = 250.0 }, .radius = 30.0, .behavior = .hostile }, // Boss - always aggressive
             },
             .portals = .{
                 // Back to overworld (Southeast dungeon - portal positioned UP-LEFT toward overworld)
@@ -160,7 +160,7 @@
             },
             .units = .{
                 // Southwest Dungeon: 2 units (second largest size)
-                .{ .position = .{ .x = 700.0, .y = 350.0 }, .radius = 25.0, .behavior = .wandering }, // Explores triangular layout
+                .{ .position = .{ .x = 700.0, .y = 350.0 }, .radius = 25.0, .behavior = .neutral }, // Explores triangular layout
                 .{ .position = .{ .x = 1220.0, .y = 650.0 }, .radius = 25.0 }, // No behavior = idle default
             },
             .portals = .{
@@ -194,9 +194,9 @@
             },
             .units = .{
                 // West Dungeon: 3 units (medium size) - square chamber combat
-                .{ .position = .{ .x = 600.0, .y = 300.0 }, .radius = 20.0, .behavior = .aggressive }, // Charges across square
-                .{ .position = .{ .x = 1320.0, .y = 400.0 }, .radius = 20.0, .behavior = .defensive }, // Retreats to corners
-                .{ .position = .{ .x = 960.0, .y = 700.0 }, .radius = 20.0, .behavior = .patrolling }, // Patrols square perimeter
+                .{ .position = .{ .x = 600.0, .y = 300.0 }, .radius = 20.0, .behavior = .hostile }, // Charges across square
+                .{ .position = .{ .x = 1320.0, .y = 400.0 }, .radius = 20.0, .behavior = .fearful }, // Retreats to corners
+                .{ .position = .{ .x = 960.0, .y = 700.0 }, .radius = 20.0, .behavior = .neutral }, // Patrols square perimeter
             },
             .portals = .{
                 // Back to overworld (West dungeon - portal positioned RIGHT toward overworld)

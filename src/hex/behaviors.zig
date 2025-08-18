@@ -20,13 +20,14 @@ const BehaviorProfile = hex_game_mod.BehaviorProfile;
 // State is stored directly in the unit component
 // Configuration is profile-based, not per-entity
 
-// Profile-based configuration - no per-entity storage needed
+// Profile-based configuration - simplified for new behavior types
 fn getDetectionRange(profile: BehaviorProfile) f32 {
     const base_detection = constants.UNIT_DETECTION_RADIUS;
     return switch (profile) {
-        .wandering => base_detection * constants.BEHAVIOR_WANDERING_DETECTION_MULT,
-        .guardian => base_detection * constants.BEHAVIOR_GUARDIAN_DETECTION_MULT,
-        else => base_detection,
+        .hostile => base_detection, // Standard detection range
+        .fearful => base_detection * 1.2, // Larger detection to flee early
+        .neutral => base_detection * 0.5, // Smaller detection since they ignore player
+        .friendly => base_detection * 0.8, // Moderate detection for following
     };
 }
 
@@ -35,7 +36,6 @@ fn getDetectionRange(profile: BehaviorProfile) f32 {
 
 // Patrol waypoints can be generated on-demand if needed
 // For now, simple patrol uses simplePatrol function
-
 
 /// Optimized hex-specific unit update using persistent state machine
 pub fn updateUnitWithAggroMod(
@@ -49,36 +49,30 @@ pub fn updateUnitWithAggroMod(
 ) void {
     const dt = frame_ctx.effectiveDelta();
     const profile = unit_comp.behavior_profile; // Direct profile access - no wrapper!
-    
+
     // Create context for state machine
-    const behavior_context = behaviors_mod.behavior_state_machine.BehaviorContext.init(
-        transform.pos,         // unit_pos
-        unit_comp.home_pos,    // home_pos - direct access!
+    const behavior_context = behaviors_mod.behavior_state_machine.BehaviorContext.init(transform.pos, // unit_pos
+        unit_comp.home_pos, // home_pos - direct access!
         if (player_alive) player_pos else null, // player_pos
-        player_alive,         // player_alive
-        aggro_multiplier,     // aggro_multiplier
-        dt                    // dt
+        player_alive, // player_alive
+        aggro_multiplier, // aggro_multiplier
+        dt // dt
     );
-    
+
     const ranges = profile.getRanges(getDetectionRange(profile));
-    
+
     // Use persistent state machine - major performance improvement!
-    const result = behaviors_mod.behavior_state_machine.updateBehaviorStateMachine(
-        &unit_comp.behavior_state_machine, // Direct access - no wrapper!
-        behavior_context,
-        profile,
-        ranges
-    );
-    
+    const result = behaviors_mod.behavior_state_machine.updateBehaviorStateMachine(&unit_comp.behavior_state_machine, // Direct access - no wrapper!
+        behavior_context, profile, ranges);
+
     // State is now managed entirely by the persistent state machine - no duplication needed!
-    
+
     // Apply hex-specific colors
     visual.color = constants.getBehaviorColor(result.active_behavior, profile);
-    
+
     // Apply movement
     transform.vel = result.velocity;
     transform.pos = transform.pos.add(result.velocity.scale(dt));
 }
-
 
 // No initialization/cleanup needed - persistent state machines manage themselves

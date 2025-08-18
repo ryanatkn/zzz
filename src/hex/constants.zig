@@ -22,7 +22,7 @@ pub const MAX_LIFESTONES = 13;
 pub const PLAYER_SPEED = 600.0;
 pub const PLAYER_RADIUS = 20.0;
 pub const UNIT_SPEED = 80.0;
-pub const UNIT_AGGRO_RANGE = 300.0;
+pub const UNIT_AGGRO_RANGE = 200.0;
 pub const UNIT_WALK_SPEED = UNIT_SPEED * 0.333; // 1/3 speed when returning home
 pub const UNIT_HOME_TOLERANCE = 2.0; // Distance tolerance for "at home" check
 pub const UNIT_DETECTION_RADIUS = UNIT_AGGRO_RANGE; // Detection radius for units
@@ -171,22 +171,19 @@ pub const COLOR_LIFESTONE_ATTUNED = colors.LIFESTONE_ATTUNED;
 pub const COLOR_LIFESTONE_UNATTUNED = colors.LIFESTONE_UNATTUNED;
 pub const COLOR_DEAD = colors.DEAD;
 
-// Behavior color mapping - centralized color logic
-pub fn getBehaviorColor(behavior: anytype, profile: anytype) @TypeOf(COLOR_UNIT_AGGRESSIVE) {
-    return switch (behavior) {
-        .chasing => switch (profile) {
-            .aggressive => COLOR_UNIT_AGGRESSIVE,
-            .guardian => COLOR_PORTAL, // Purple
-            else => COLOR_UNIT_AGGRESSIVE,
-        },
-        .fleeing => switch (profile) {
-            .defensive => COLOR_OBSTACLE_DEADLY, // Orange
-            .wandering => COLOR_BULLET, // Yellow
-            else => COLOR_OBSTACLE_DEADLY,
-        },
-        .patrolling => COLOR_PLAYER_ALIVE, // Blue
-        .guarding => COLOR_PORTAL, // Purple
-        .returning_home => COLOR_UNIT_RETURNING,
-        .idle => COLOR_UNIT_NON_AGGRO,
+// Behavior color mapping - centralized color logic for simplified profiles
+pub fn getBehaviorColor(_: anytype, profile: anytype) @TypeOf(COLOR_UNIT_AGGRESSIVE) {
+    // Primary color is determined by profile, not behavior state
+    return switch (profile) {
+        .hostile => COLOR_UNIT_AGGRESSIVE, // Always red - aggressive/dangerous
+        .fearful => COLOR_OBSTACLE_DEADLY, // Orange - runs away but still dangerous
+        .neutral => COLOR_UNIT_NON_AGGRO, // Gray - ignores player
+        .friendly => COLOR_PLAYER_ALIVE, // Green/Blue - safe to approach
     };
+
+    // Note: We could add behavior-specific shading in the future:
+    // - Slightly brighter when actively chasing/fleeing
+    // - Slightly dimmer when idle
+    // - Different shade when returning home
+    // But for now, consistent profile-based colors provide clear visual feedback
 }

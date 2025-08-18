@@ -120,7 +120,6 @@ pub const WanderState = struct {
         }
     }
 
-
     /// Reset wander state to home position
     pub fn reset(self: *WanderState, home_pos: Vec2) void {
         self.home_pos = home_pos;

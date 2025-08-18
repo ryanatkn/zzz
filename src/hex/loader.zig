@@ -200,7 +200,7 @@ const ZoneData = struct {
     units: ?[]const struct {
         position: struct { x: f32, y: f32 },
         radius: f32,
-        behavior: hex_game_mod.BehaviorProfile = .wandering,
+        behavior: hex_game_mod.BehaviorProfile = .neutral,
     },
     portals: ?[]const struct {
         position: struct { x: f32, y: f32 },
