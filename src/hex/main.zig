@@ -16,7 +16,6 @@ const loader = @import("loader.zig");
 const hud = @import("hud.zig");
 const game_controller = @import("game.zig");
 const combat = @import("combat.zig");
-const player_controller = @import("player.zig");
 const portals = @import("portals.zig");
 const controls = @import("controls.zig");
 const behaviors = @import("behaviors/mod.zig");

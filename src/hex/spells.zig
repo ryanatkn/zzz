@@ -391,26 +391,31 @@ pub const SpellSystem = struct {
         }
 
         // Component-based teleportation
-        const player_pos = game.getPlayerPos();
-        const player_entity = game.getPlayer() orelse {
-            loggers.getGameLog().info("blink_no_player", "No player entity found", .{});
+        const controlled_entity = game.getControlledEntity() orelse {
+            loggers.getGameLog().info("blink_no_controlled_entity", "No controlled entity found", .{});
+            return false;
+        };
+        
+        const entity_queries = @import("entity_queries.zig");
+        const player_pos = entity_queries.getEntityPos(game, controlled_entity) orelse {
+            loggers.getGameLog().info("blink_no_position", "Could not get controlled entity position", .{});
             return false;
         };
 
         // Check if entity has Teleportable component
-        if (!SpellHelpers.hasTeleportableComponent(player_entity, zone)) {
+        if (!SpellHelpers.hasTeleportableComponent(controlled_entity, zone)) {
             loggers.getGameLog().info("blink_not_teleportable", "Entity cannot be teleported", .{});
             return false;
         }
 
         // Perform component-based teleportation with validation
-        const final_pos = SpellHelpers.performTeleport(player_entity, player_pos, target_pos, constants.BLINK_MAX_DISTANCE, zone, game) orelse {
+        const final_pos = SpellHelpers.performTeleport(controlled_entity, player_pos, target_pos, constants.BLINK_MAX_DISTANCE, zone, game) orelse {
             loggers.getGameLog().info("blink_invalid_target", "Invalid teleport target", .{});
             return false;
         };
 
         // Execute teleportation
-        game.setPlayerPos(final_pos);
+        entity_queries.setEntityPos(game, controlled_entity, final_pos);
 
         // Add blink trail effect using effect manager
         _ = self.effect_manager.addInstantEffect(
@@ -420,21 +425,27 @@ pub const SpellSystem = struct {
         );
 
         // Visual effects
-        effect_system.addPortalTravelParticle(game.getPlayerPos(), game.getPlayerRadius());
+        const entity_radius = entity_queries.getEntityRadius(game, controlled_entity) orelse 20.0;
+        effect_system.addPortalTravelParticle(player_pos, entity_radius);
         loggers.getGameLog().info("blink_teleport", "Blink teleport to {any}", .{final_pos});
         return true;
     }
 
     /// Cast Phase spell - allow walking through solid objects
     fn castPhaseSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
-        const player_pos = game.getPlayerPos();
-        const player_entity = game.getPlayer() orelse {
-            loggers.getGameLog().info("phase_no_player", "No player entity found", .{});
+        const controlled_entity = game.getControlledEntity() orelse {
+            loggers.getGameLog().info("phase_no_controlled_entity", "No controlled entity found", .{});
+            return false;
+        };
+        
+        const entity_queries = @import("entity_queries.zig");
+        const player_pos = entity_queries.getEntityPos(game, controlled_entity) orelse {
+            loggers.getGameLog().info("phase_no_position", "Could not get controlled entity position", .{});
             return false;
         };
 
-        // Check if player has Phaseable component
-        if (!SpellHelpers.hasPhaseableComponent(player_entity, zone)) {
+        // Check if entity has Phaseable component
+        if (!SpellHelpers.hasPhaseableComponent(controlled_entity, zone)) {
             loggers.getGameLog().info("phase_not_phaseable", "Entity cannot phase", .{});
             return false;
         }
@@ -443,7 +454,7 @@ pub const SpellSystem = struct {
         const phase_duration = constants.PHASE_DURATION;
         // Note: zone parameter would need to be mutable for actual phase state modification
         // For now, just log the phase activation
-        loggers.getGameLog().info("phase_applied", "Phase state applied to entity {} for {d}s", .{ player_entity, phase_duration });
+        loggers.getGameLog().info("phase_applied", "Phase state applied to entity {} for {d}s", .{ controlled_entity, phase_duration });
 
         // Add phase effect using effect manager
         _ = self.effect_manager.addAoEEffect(
@@ -605,8 +616,8 @@ pub const SpellSystem = struct {
 
     /// Cast Charm spell - take control of target unit
     fn castCharmSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
-        const player_entity = game.getPlayer() orelse {
-            loggers.getGameLog().info("charm_no_player", "No player entity found", .{});
+        const controlled_entity = game.getControlledEntity() orelse {
+            loggers.getGameLog().info("charm_no_controlled_entity", "No controlled entity found", .{});
             return false;
         };
 
@@ -650,7 +661,7 @@ pub const SpellSystem = struct {
         const charm_duration = 8.0; // Charm duration in seconds
 
         // Apply charm effect using component system
-        if (!SpellHelpers.applyCharmEffect(target_unit.entity_id, player_entity, charm_duration, @constCast(zone))) {
+        if (!SpellHelpers.applyCharmEffect(target_unit.entity_id, controlled_entity, charm_duration, @constCast(zone))) {
             loggers.getGameLog().info("charm_failed", "Failed to charm unit {}", .{target_unit.entity_id});
             return false;
         }

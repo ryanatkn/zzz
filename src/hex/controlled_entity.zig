@@ -134,20 +134,3 @@ pub fn getEntitySpeed(game: *const HexGame, entity_id: EntityId) f32 {
     return constants.PLAYER_SPEED; // Default fallback
 }
 
-/// Legacy function for backward compatibility during migration
-/// TODO: Remove this once all calls are updated to use updateControlledEntity
-pub fn updatePlayer(game: *HexGame, frame_ctx: FrameContext, input_state: *const InputState, cam: *const camera.Camera) void {
-    // Find the player entity (should be the controlled entity)
-    if (game.player_entity) |player_entity| {
-        updateControlledEntity(game, player_entity, frame_ctx, input_state, cam);
-    }
-}
-
-/// Legacy function for backward compatibility during migration
-/// TODO: Remove this once all calls are updated
-pub fn getPlayerMovementDirection(game: *const HexGame) Vec2 {
-    if (game.player_entity) |player_entity| {
-        return getControlledEntityMovementDirection(game, player_entity);
-    }
-    return Vec2.ZERO;
-}

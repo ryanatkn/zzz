@@ -28,7 +28,7 @@ const filters = @import("../lib/debug/filters.zig");
 const hex_game_mod = @import("hex_game.zig");
 const behaviors = @import("behaviors/mod.zig");
 const physics = @import("physics.zig");
-const player_controller = @import("player.zig");
+const controlled_entity_mod = @import("controlled_entity.zig");
 const combat = @import("combat.zig");
 const portals = @import("portals.zig");
 const game_renderer = @import("game_renderer.zig");
@@ -423,20 +423,15 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     // Update portal cooldown
     portals.updatePortalCooldown(world, frame_ctx);
 
-    // Update controlled entity (new architecture) or player (legacy fallback)
+    // Update controlled entity (controller system)
     if (world.getControlledEntity()) |controlled_entity| {
-        // Use new controlled entity system
-        const controlled_entity_mod = @import("controlled_entity.zig");
         controlled_entity_mod.updateControlledEntity(world, controlled_entity, frame_ctx, input_state, cam);
-    } else if (world.getPlayerAlive()) {
-        // Legacy fallback for backward compatibility
-        player_controller.updatePlayer(world, frame_ctx, input_state, cam);
     }
+    // Note: Controller always possesses an entity at startup, so no fallback needed
 
     // Handle continuous shooting on left-click hold (rhythm mode)
     // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
-    // Check if there's a controlled entity or fallback to player alive check
-    const can_shoot = (world.hasLiveControlledEntity() or world.getPlayerAlive()) and world.canFireBullet();
+    const can_shoot = world.hasLiveControlledEntity() and world.canFireBullet();
     if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and can_shoot) {
         // Use context-aware bullet firing
         _ = combat.fireBulletAtMouse(world, input_state.getMousePos(), &world.bullet_pool);

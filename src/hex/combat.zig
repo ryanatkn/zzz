@@ -28,19 +28,9 @@ const HexCombatInterface = struct {
         return null;
     }
     
-    pub fn getPlayerPos(game: *HexGame) Vec2 {
-        // Legacy method for backward compatibility
-        return game.getPlayerPos();
-    }
-
     pub fn isShooterAlive(game: *HexGame) bool {
         // Use controlled entity instead of hardcoded player
         return game.hasLiveControlledEntity();
-    }
-
-    pub fn isPlayerAlive(game: *HexGame) bool {
-        // Legacy method for backward compatibility
-        return game.getPlayerAlive();
     }
 
     pub fn createProjectileFromCombat(game: *HexGame, pos: Vec2, velocity: Vec2, radius: f32, lifetime: f32, _: f32) anyerror!u32 {
@@ -95,11 +85,11 @@ fn lifestoneToCheckpoint(lifestone_result: physics.LifestoneResult) game_systems
 
 /// Find best respawn checkpoint using generic patterns applied to hex lifestones
 fn findBestRespawnCheckpoint(game: *HexGame) ?game_systems.respawn.RespawnInterface.CheckpointResult {
-    // Use controlled entity position, or fallback to player position for now
+    // Use controlled entity position (controller always has an entity possessed)
     const entity_pos = if (game.getControlledEntity()) |entity_id| blk: {
         const entity_queries = @import("entity_queries.zig");
-        break :blk entity_queries.getEntityPos(game, entity_id) orelse game.getPlayerPos();
-    } else game.getPlayerPos();
+        break :blk entity_queries.getEntityPos(game, entity_id) orelse return null;
+    } else return null;
 
     // Use hex-specific lifestone search
     if (physics.findNearestAttunedLifestone(game)) |lifestone_result| {
