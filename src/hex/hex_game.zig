@@ -51,15 +51,8 @@ pub const Effects = components.Effects;
 pub const Terrain = components.Terrain;
 pub const Interactable = components.Interactable;
 
-/// Behavior profile types for hex units
-pub const BehaviorProfile = enum {
-    idle, // Default - basic aggro when player in range
-    aggressive, // Chase-focused, minimal flee
-    defensive, // Flee-focused, guard home
-    patrolling, // Patrol routes, guard when threatened
-    wandering, // Wander randomly, flee when threatened
-    guardian, // Guard specific area, intercept threats
-};
+// Use behavior profiles from the library
+pub const BehaviorProfile = @import("../lib/game/behaviors/behavior_state_machine.zig").BehaviorProfile;
 
 /// Hex-specific unit component extending lib's Unit
 pub const HexUnit = struct {
@@ -67,7 +60,7 @@ pub const HexUnit = struct {
     base: components.Unit,
 
     // Hex-specific additions
-    behavior_profile: BehaviorProfile = .idle,
+    behavior_profile: BehaviorProfile = .wandering,
 
     pub const UnitState = enum { returning_home, chasing, at_home };
     pub const UnitType = components.Unit.UnitType;

@@ -34,8 +34,8 @@
 ### Architecture Impact
 ```
 Before: 450+ lines of complex priority-based behavior system with compatibility layers
-After:  200+ lines of clean state machine architecture
-Reduction: ~250 lines total, massive complexity reduction
+After:  160+ lines of clean state machine architecture
+Reduction: ~290 lines total, massive complexity reduction
 ```
 
 ## 🐛 Bug Resolution
@@ -55,6 +55,14 @@ Reduction: ~250 lines total, massive complexity reduction
 - ✅ **Removed chase_timer/target_pos fields** from HexUnit struct (unused compatibility fields)
 - ✅ **Simplified compatibility code** in behaviors.zig (removed field copying)
 - ✅ **Final build verification** - game runs perfectly after cleanup
+
+### Compatibility Layer Removal (August 18, 2025)
+- ✅ **Removed individual behavior state storage** - eliminated chase/patrol state duplication (~15 lines)
+- ✅ **Removed determineProfileFromConfig function** - eliminated reverse-engineering compatibility (~25 lines)
+- ✅ **Updated API to pass profiles directly** - cleaner, more explicit interface
+- ✅ **Updated test names and comments** - tests now accurately describe state machine behavior
+- ✅ **Unified BehaviorProfile enums** - hex game now uses library's BehaviorProfile directly
+- ✅ **Removed all deprecated comments** - eliminated references to old systems
 
 ### Testing & Validation
 - [ ] **Play test all behavior profiles** (aggressive, defensive, wandering, etc.)
@@ -90,7 +98,7 @@ if (current_state.canTransitionTo(.fleeing, context)) {
 ## ✨ Success Metrics
 
 - ✅ **Bug fixed permanently** - fleeing units never aggro
-- ✅ **Code reduced by ~250 lines** - simpler maintenance
+- ✅ **Code reduced by ~290 lines** - simpler maintenance
 - ✅ **Build time improved** - less complex compilation
 - ✅ **Architecture clarified** - single source of truth
 - ✅ **Performance enhanced** - fewer allocations and computations

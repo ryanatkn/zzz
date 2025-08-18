@@ -120,8 +120,6 @@ pub const WanderState = struct {
         }
     }
 
-    // Deprecated: Use update() directly with deltaTime from FrameContext
-    // This function existed for the old complex context system
 
     /// Reset wander state to home position
     pub fn reset(self: *WanderState, home_pos: Vec2) void {

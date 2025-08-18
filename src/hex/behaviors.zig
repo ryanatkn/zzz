@@ -62,7 +62,6 @@ fn createConfigForProfile(profile: BehaviorProfile, home_pos: Vec2) unit_behavio
     const base_walk_speed = constants.UNIT_WALK_SPEED;
 
     return switch (profile) {
-        .idle => unit_behavior.UnitBehaviorConfig.init(home_pos, base_detection, constants.BEHAVIOR_IDLE_MIN_DISTANCE, base_chase_speed, base_chase_speed * constants.BEHAVIOR_IDLE_WALK_SPEED_MULT, constants.BEHAVIOR_IDLE_CHASE_DURATION, constants.BEHAVIOR_IDLE_HOME_TOLERANCE, constants.BEHAVIOR_IDLE_LOSE_TOLERANCE),
         .aggressive => unit_behavior.UnitBehaviorConfig.aggressive(home_pos, base_detection, base_chase_speed),
         .defensive => unit_behavior.UnitBehaviorConfig.defensive(home_pos, base_detection, base_chase_speed * constants.BEHAVIOR_DEFENSIVE_SPEED_MULT),
         .patrolling => unit_behavior.UnitBehaviorConfig.patrolling(home_pos, base_detection, base_walk_speed),
@@ -217,7 +216,7 @@ pub fn updateUnitWithAggroMod(
     };
 
     // Evaluate behavior
-    const result = unit_behavior.updateUnitBehavior(behavior_context, state, config.*);
+    const result = unit_behavior.updateUnitBehavior(behavior_context, state, config.*, profile);
 
     // Update hex-specific unit state based on behavior result
     unit_comp.base.behavior_state = switch (result.active_behavior) {

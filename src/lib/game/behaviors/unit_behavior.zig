@@ -76,44 +76,35 @@ pub const UnitBehaviorConfig = struct {
         return UnitBehaviorConfig.init(home_pos, detection_range, 20.0, chase_speed, chase_speed * 0.6, 3.0, 15.0, 1.15);
     }
 
-    /// Create a defensive config (flee + guard prioritized)
+    /// Create a defensive config (optimized for fleeing behavior)
     pub fn defensive(home_pos: Vec2, detection_range: f32, flee_speed: f32) UnitBehaviorConfig {
         return UnitBehaviorConfig.init(home_pos, detection_range, 30.0, flee_speed * 0.8, flee_speed * 0.5, 2.0, 15.0, 1.0);
     }
 
-    /// Create a patrol config (patrol + guard prioritized)
+    /// Create a patrol config (balanced for patrol routes)
     pub fn patrolling(home_pos: Vec2, detection_range: f32, patrol_speed: f32) UnitBehaviorConfig {
         return UnitBehaviorConfig.init(home_pos, detection_range, 25.0, patrol_speed, patrol_speed * 0.8, 2.0, 10.0, 1.1);
     }
 };
 
-/// Simplified unit state using state machine
+/// Unit state using pure state machine architecture
 pub const UnitBehaviorState = struct {
     /// State machine for behavior transitions
     state_machine: behavior_state_machine.BehaviorStateMachine,
-    /// Minimal chase state for compatibility (chase_timer, target_pos)
-    chase: chase_behavior.ChaseState,
-    /// Patrol waypoints (if needed)
-    patrol: patrol_behavior.PatrolState,
 
     pub fn init(home_pos: Vec2, patrol_waypoints: []const Vec2, random_seed: u64) UnitBehaviorState {
         _ = home_pos;
+        _ = patrol_waypoints;
         _ = random_seed;
         return .{
             .state_machine = behavior_state_machine.BehaviorStateMachine.init(.idle),
-            .chase = chase_behavior.ChaseState.init(),
-            .patrol = patrol_behavior.PatrolState.init(patrol_waypoints),
         };
     }
 
     pub fn reset(self: *UnitBehaviorState, home_pos: Vec2) void {
         _ = home_pos;
         self.state_machine = behavior_state_machine.BehaviorStateMachine.init(.idle);
-        self.chase.reset();
-        self.patrol.reset();
     }
-
-    // Compatibility methods removed - access state_machine directly
 };
 
 /// Result of unit behavior evaluation
@@ -155,6 +146,7 @@ pub fn updateUnitBehavior(
     context: BehaviorContext,
     state: *UnitBehaviorState,
     config: UnitBehaviorConfig,
+    profile: behavior_state_machine.BehaviorProfile,
 ) UnitBehaviorResult {
     const old_behavior_state = state.state_machine.getCurrentState();
     
@@ -168,8 +160,7 @@ pub fn updateUnitBehavior(
         context.dt
     );
     
-    // Determine profile based on config priorities (simplified mapping)
-    const profile = determineProfileFromConfig(config);
+    // Use provided profile and get ranges
     const ranges = profile.getRanges(config.chase.detection_range);
     
     // Update state machine
@@ -195,31 +186,7 @@ pub fn updateUnitBehavior(
     return result;
 }
 
-/// Determine behavior profile from config characteristics
-fn determineProfileFromConfig(config: UnitBehaviorConfig) behavior_state_machine.BehaviorProfile {
-    // Use chase speed and detection range to determine profile
-    const chase_speed = config.chase.chase_speed;
-    const detection_range = config.chase.detection_range;
-    const flee_speed = config.flee.flee_speed;
-    
-    // Aggressive: high chase speed, long detection range
-    if (chase_speed >= 95.0 and detection_range >= 100.0) return .aggressive;
-    
-    // Defensive: high flee speed relative to chase
-    if (flee_speed > chase_speed * 1.1) return .defensive;
-    
-    // Guardian: very high chase speed and long range
-    if (chase_speed >= 95.0 and detection_range >= 150.0) return .guardian;
-    
-    // Patrolling: moderate speeds, balanced
-    if (chase_speed >= 80.0 and chase_speed <= 90.0) return .patrolling;
-    
-    // Default to wandering (balanced behavior)
-    return .wandering;
-}
 
-// Deprecated: Use updateUnitBehavior() directly with FrameContext.effectiveDelta()
-// This function existed for the old complex context system
 
 
 test "unit behavior basic functionality" {
@@ -241,24 +208,24 @@ test "unit behavior basic functionality" {
     };
 
     // Test initial detection
-    const result = updateUnitBehavior(context, &state, config);
+    const result = updateUnitBehavior(context, &state, config, behavior_state_machine.BehaviorProfile.aggressive);
     try std.testing.expect(result.detected_target);
-    try std.testing.expect(result.active_behavior == .chase);
+    try std.testing.expect(result.active_behavior == .chasing);
     try std.testing.expect(result.velocity.x > 0); // Should move toward target
 }
 
-test "unit behavior priority system" {
+test "unit behavior state machine transitions" {
     const home_pos = Vec2{ .x = 0, .y = 0 };
     var state = UnitBehaviorState.init(home_pos, &[_]Vec2{}, 54321);
 
-    // Create aggressive config (chase priority = critical)
+    // Create aggressive config
     const config = UnitBehaviorConfig.aggressive(home_pos, 100.0, 150.0);
 
     const unit_pos = Vec2{ .x = 50, .y = 0 };
     const target_pos = Vec2{ .x = 80, .y = 0 };
     const threat_pos = Vec2{ .x = 30, .y = 0 }; // Closer threat
 
-    // With both threat and target, should prioritize chase (critical) over flee (lowest)
+    // With both threat and target, aggressive profile should chase despite threat
     const context = BehaviorContext{
         .unit_pos = unit_pos,
         .target_pos = target_pos,
@@ -269,15 +236,15 @@ test "unit behavior priority system" {
         .dt = 0.1,
     };
 
-    const result = updateUnitBehavior(context, &state, config);
-    try std.testing.expect(result.active_behavior == .chase); // Should chase despite threat
+    const result = updateUnitBehavior(context, &state, config, behavior_state_machine.BehaviorProfile.aggressive);
+    try std.testing.expect(result.active_behavior == .chasing); // Should chase despite threat
 }
 
-test "behavior switching" {
+test "behavior state switching with defensive profile" {
     const home_pos = Vec2{ .x = 0, .y = 0 };
     var state = UnitBehaviorState.init(home_pos, &[_]Vec2{}, 98765);
 
-    // Create defensive config (flee priority = critical)
+    // Create defensive config
     const config = UnitBehaviorConfig.defensive(home_pos, 100.0, 120.0);
 
     const unit_pos = Vec2{ .x = 50, .y = 0 };
@@ -294,14 +261,14 @@ test "behavior switching" {
     };
 
     // Should start fleeing
-    var result = updateUnitBehavior(context, &state, config);
-    try std.testing.expect(result.active_behavior == .flee);
+    var result = updateUnitBehavior(context, &state, config, behavior_state_machine.BehaviorProfile.defensive);
+    try std.testing.expect(result.active_behavior == .fleeing);
     try std.testing.expect(result.behavior_changed);
 
     // Remove threat, should switch to different behavior
     context.threat_active = false;
     context.threat_pos = null;
-    result = updateUnitBehavior(context, &state, config);
-    try std.testing.expect(result.active_behavior != .flee);
+    result = updateUnitBehavior(context, &state, config, behavior_state_machine.BehaviorProfile.defensive);
+    try std.testing.expect(result.active_behavior != .fleeing);
     try std.testing.expect(result.behavior_changed);
 }
