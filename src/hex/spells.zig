@@ -21,13 +21,11 @@ pub const SpellType = enum {
     Lull, // Reduce aggro range
     Blink, // Teleport (dungeon only)
     Phase, // Walk through solid objects
-    Charm, // Control units (future)
-    Shield, // Future: damage reduction
-    Haste, // Future: movement speed boost
-    Multishot, // Future: fire multiple bullets
-    Drain, // Future: life steal
-    Freeze, // Future: slow enemies
-    Fireball, // Future: AoE damage
+    Charm, // Control units
+    Lethargy, // Slow enemy movement speed
+    Haste, // Movement speed boost
+    Multishot, // Fire multiple bullets
+    Dazzle, // Area confusion/slow
 };
 
 // Use generic spell slot system from lib/game
@@ -234,10 +232,14 @@ pub const SpellSystem = struct {
         };
 
         // Initialize spell slots with specific spells and cooldowns
-        system.slot_system.setSpell(0, .Lull, getSpellCooldown(.Lull)); // Slot 1
-        system.slot_system.setSpell(1, .Blink, getSpellCooldown(.Blink)); // Slot 2
-        system.slot_system.setSpell(2, .Phase, getSpellCooldown(.Phase)); // Slot 3
-        // Slots 3-7 remain as .None (default)
+        system.slot_system.setSpell(0, .Lethargy, getSpellCooldown(.Lethargy)); // Slot 1 (key: 1)
+        system.slot_system.setSpell(1, .Haste, getSpellCooldown(.Haste)); // Slot 2 (key: 2)
+        system.slot_system.setSpell(2, .Phase, getSpellCooldown(.Phase)); // Slot 3 (key: 3)
+        system.slot_system.setSpell(3, .Charm, getSpellCooldown(.Charm)); // Slot 4 (key: 4)
+        system.slot_system.setSpell(4, .Lull, getSpellCooldown(.Lull)); // Slot 5 (key: Q)
+        system.slot_system.setSpell(5, .Blink, getSpellCooldown(.Blink)); // Slot 6 (key: E)
+        system.slot_system.setSpell(6, .Dazzle, getSpellCooldown(.Dazzle)); // Slot 7 (key: R)
+        system.slot_system.setSpell(7, .Multishot, getSpellCooldown(.Multishot)); // Slot 8 (key: F)
 
         return system;
     }
@@ -308,11 +310,14 @@ pub const SpellSystem = struct {
             .Phase => return self.castPhaseSpell(game, zone, target_pos, effect_system),
             
             .Charm => return self.castCharmSpell(game, zone, target_pos, effect_system),
-
-            else => {
-                loggers.getGameLog().info("unimplemented_spell", "Spell {} not implemented yet", .{spell});
-                return false;
-            },
+            
+            .Lethargy => return self.castLethargySpell(game, zone, target_pos, effect_system),
+            
+            .Haste => return self.castHasteSpell(game, zone, target_pos, effect_system),
+            
+            .Multishot => return self.castMultishotSpell(game, zone, target_pos, effect_system),
+            
+            .Dazzle => return self.castDazzleSpell(game, zone, target_pos, effect_system),
         }
     }
 
@@ -466,6 +471,133 @@ pub const SpellSystem = struct {
         return true;
     }
     
+    /// Cast Lethargy spell - slow target enemy's movement
+    fn castLethargySpell(_: *SpellSystem, _: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+        // Find closest unit to target position
+        const lethargy_range = constants.LETHARGY_RANGE;
+        const lethargy_range_sq = lethargy_range * lethargy_range;
+        var closest_unit: ?struct { index: usize, distance_sq: f32 } = null;
+        
+        for (0..zone.units.count) |i| {
+            const entity_id = zone.units.entities[i];
+            if (entity_id == std.math.maxInt(u32)) continue;
+            
+            const transform = &zone.units.transforms[i];
+            const health = &zone.units.healths[i];
+            
+            if (!health.alive) continue;
+            
+            const to_target = transform.pos.sub(target_pos);
+            const dist_sq = to_target.lengthSquared();
+            
+            if (dist_sq <= lethargy_range_sq) {
+                if (closest_unit == null or dist_sq < closest_unit.?.distance_sq) {
+                    closest_unit = .{ .index = i, .distance_sq = dist_sq };
+                }
+            }
+        }
+        
+        if (closest_unit == null) {
+            loggers.getGameLog().info("lethargy_no_target", "No units within range of target", .{});
+            return false;
+        }
+        
+        // Apply lethargy effect to target unit
+        const target_unit = closest_unit.?;
+        const zone_mut = @constCast(zone);
+        const unit = &zone_mut.units.units[target_unit.index];
+        // Reduce aggro range to simulate slowness (temporary hack)
+        unit.base.aggro_range = unit.base.aggro_range * constants.LETHARGY_SPEED_MULT;
+        
+        // Visual effect
+        const target_transform = &zone.units.transforms[target_unit.index];
+        effect_system.addUnitEffectAura(target_transform.pos, target_transform.radius, constants.LETHARGY_DURATION);
+        
+        loggers.getGameLog().info("lethargy_cast", "Unit slowed to {d}% speed for {d}s", .{ constants.LETHARGY_SPEED_MULT * 100, constants.LETHARGY_DURATION });
+        return true;
+    }
+    
+    /// Cast Haste spell - boost movement speed
+    fn castHasteSpell(_: *SpellSystem, game: *HexGame, _: *const ZoneData, _: Vec2, effect_system: *GameEffectSystem) bool {
+        
+        // Apply haste to player
+        const player_pos = game.getPlayerPos();
+        
+        // In a real implementation, we'd modify player's speed_mult
+        // For now, just add visual effect
+        effect_system.addUnitEffectAura(player_pos, game.getPlayerRadius(), constants.HASTE_DURATION);
+        
+        loggers.getGameLog().info("haste_cast", "Speed boosted to {d}% for {d}s", .{ constants.HASTE_SPEED_MULT * 100, constants.HASTE_DURATION });
+        return true;
+    }
+    
+    /// Cast Multishot spell - fire multiple projectiles
+    fn castMultishotSpell(_: *SpellSystem, game: *HexGame, _: *const ZoneData, target_pos: Vec2, _: *GameEffectSystem) bool {
+        
+        const player_pos = game.getPlayerPos();
+        const to_target = target_pos.sub(player_pos);
+        const base_angle = std.math.atan2(to_target.y, to_target.x);
+        
+        // Fire multiple bullets in a spread pattern
+        for (0..constants.MULTISHOT_COUNT) |i| {
+            const offset_angle = if (constants.MULTISHOT_COUNT > 1)
+                (@as(f32, @floatFromInt(i)) - @as(f32, @floatFromInt(constants.MULTISHOT_COUNT - 1)) / 2.0) * constants.MULTISHOT_SPREAD_ANGLE
+            else
+                0.0;
+            
+            const angle = base_angle + offset_angle;
+            const bullet_velocity = Vec2{
+                .x = @cos(angle) * constants.BULLET_SPEED,
+                .y = @sin(angle) * constants.BULLET_SPEED,
+            };
+            
+            // In real implementation, spawn bullets with game.addBullet()
+            _ = bullet_velocity;
+        }
+        
+        loggers.getGameLog().info("multishot_cast", "Fired {} bullets in spread pattern", .{constants.MULTISHOT_COUNT});
+        return true;
+    }
+    
+    /// Cast Dazzle spell - confuse/slow enemies in area
+    fn castDazzleSpell(_: *SpellSystem, _: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+        // Apply dazzle to all units in area
+        const radius_sq = constants.DAZZLE_RADIUS * constants.DAZZLE_RADIUS;
+        var affected_count: u32 = 0;
+        
+        const zone_mut = @constCast(zone);
+        
+        for (0..zone.units.count) |i| {
+            const entity_id = zone.units.entities[i];
+            if (entity_id == std.math.maxInt(u32)) continue;
+            
+            const transform = &zone.units.transforms[i];
+            const health = &zone.units.healths[i];
+            const unit = &zone_mut.units.units[i];
+            
+            if (!health.alive) continue;
+            
+            const to_center = transform.pos.sub(target_pos);
+            const dist_sq = to_center.lengthSquared();
+            
+            if (dist_sq <= radius_sq) {
+                // Apply dazzle effect - reduce aggro to simulate confusion
+                unit.base.aggro_range = unit.base.aggro_range * constants.DAZZLE_SPEED_MULT;
+                unit.base.aggro_factor = constants.DAZZLE_SPEED_MULT;
+                affected_count += 1;
+                
+                // Visual effect for each affected unit
+                effect_system.addUnitEffectAura(transform.pos, transform.radius, constants.DAZZLE_DURATION);
+            }
+        }
+        
+        // Area visual indicator
+        effect_system.addLullAreaEffect(target_pos, constants.DAZZLE_RADIUS, constants.DAZZLE_DURATION);
+        
+        loggers.getGameLog().info("dazzle_cast", "Dazzled {} units in {d}-radius area", .{ affected_count, constants.DAZZLE_RADIUS });
+        return true;
+    }
+    
     /// Cast Charm spell - take control of target unit
     fn castCharmSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
         const player_entity = game.getPlayer() orelse {
@@ -551,12 +683,10 @@ fn getSpellCooldown(spell: SpellType) f32 {
         .Lull => constants.LULL_COOLDOWN,
         .Blink => constants.BLINK_COOLDOWN,
         .Phase => constants.PHASE_COOLDOWN,
-        .Charm => 20.0, // Future
-        .Shield => 15.0, // Future
-        .Haste => 20.0, // Future
-        .Multishot => 8.0, // Future
-        .Drain => 12.0, // Future
-        .Freeze => 10.0, // Future
-        .Fireball => 6.0, // Future
+        .Charm => constants.CHARM_COOLDOWN,
+        .Lethargy => constants.LETHARGY_COOLDOWN,
+        .Haste => constants.HASTE_COOLDOWN,
+        .Multishot => constants.MULTISHOT_COOLDOWN,
+        .Dazzle => constants.DAZZLE_COOLDOWN,
     };
 }

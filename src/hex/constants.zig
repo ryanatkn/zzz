@@ -77,10 +77,35 @@ pub const LULL_RADIUS = 150.0; // Base AoE radius - can be upgraded
 pub const LULL_DURATION = 12.0; // Effect duration in seconds
 pub const LULL_AGGRO_MULT = 0.3; // Reduce aggro to 30%
 pub const LULL_COOLDOWN = 10.0;
+
 pub const BLINK_MAX_DISTANCE = 200.0;
 pub const BLINK_COOLDOWN = 3.0;
+
 pub const PHASE_DURATION = 5.0; // Phase effect duration in seconds
 pub const PHASE_COOLDOWN = 15.0; // Phase spell cooldown
+
+pub const CHARM_DURATION = 8.0; // Control duration in seconds
+pub const CHARM_COOLDOWN = 20.0; // Charm spell cooldown
+pub const CHARM_RANGE = 100.0; // Max charm targeting range
+
+pub const LETHARGY_DURATION = 6.0; // Speed reduction duration
+pub const LETHARGY_COOLDOWN = 12.0; // Lethargy spell cooldown
+pub const LETHARGY_SPEED_MULT = 0.4; // Reduce speed to 40%
+pub const LETHARGY_RANGE = 150.0; // Max targeting range
+
+pub const HASTE_DURATION = 8.0; // Speed boost duration
+pub const HASTE_COOLDOWN = 12.0; // Haste spell cooldown
+pub const HASTE_SPEED_MULT = 1.5; // 50% speed increase
+
+pub const MULTISHOT_COOLDOWN = 8.0; // Multishot spell cooldown
+pub const MULTISHOT_COUNT = 3; // Number of bullets in spread
+pub const MULTISHOT_SPREAD_ANGLE = 0.3; // Radians between bullets
+
+pub const DAZZLE_RADIUS = 120.0; // Dazzle AoE radius
+pub const DAZZLE_DURATION = 5.0; // Dazzle effect duration
+pub const DAZZLE_COOLDOWN = 10.0; // Dazzle spell cooldown
+pub const DAZZLE_SPEED_MULT = 0.25; // Reduce speed to 25% (confused/dazzled)
+
 pub const MAX_LULL_EFFECTS = 10;
 
 // Border system constants

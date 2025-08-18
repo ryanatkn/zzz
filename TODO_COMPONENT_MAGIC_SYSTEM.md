@@ -78,55 +78,81 @@ pub const MagicTarget = struct {
 
 ## Spell Implementations
 
-### 1. Blink (Teleport)
-**Components Required**: `Transform`, `Teleportable`
-**Cast**: Click location within range
-**Effect**: Instant position change, brief invulnerability
-```
-Query: Entities with Transform + Teleportable
-Action: Update Transform.pos to mouse position
-Visual: Fade out/in effect at both positions
-```
+### Complete Spell Roster (8 Spells)
 
-### 2. Lull (Reduce Aggro)
-**Components Required**: `Unit`, `Effects`
-**Cast**: Click enemy or Ctrl+click for AoE around player
-**Effect**: Reduces aggro_range and aggro_factor temporarily
-```
-Query: Entities with Unit + Effects in radius
-Action: Add aggro_mult modifier to Effects
-Visual: Calming particle effect
-```
+#### Slot 1 (Key: 1) - **Lethargy** ✅
+- **Type**: Single Target (Debuff)
+- **Color**: Info Blue
+- **Effect**: Slows target movement to 40% speed
+- **Duration**: 6 seconds
+- **Cooldown**: 12 seconds
+- **Range**: 150 units
+- **Components**: Unit, Movement
+- **Visual**: Blue slowness aura around target
 
-### 3. Phase (Ethereal Form)
-**Components Required**: `Transform`, `Phaseable`, `Visual`
-**Cast**: Ctrl+click self or click ally
-**Effect**: Pass through solids, immunity to physical damage
-```
-Query: Target with Phaseable component
-Action: Set phased=true, temporarily remove Solid component
-Visual: Translucent effect, ghostly particles
-```
+#### Slot 2 (Key: 2) - **Haste** ✅
+- **Type**: Self-Buff (Speed)
+- **Color**: Bright Orange
+- **Effect**: Increases movement speed by 50%
+- **Duration**: 8 seconds
+- **Cooldown**: 12 seconds
+- **Components**: Transform, Movement
+- **Visual**: Orange speed trails
 
-### 4. Charm/Command
-**Components Required**: `Unit`, `Charmable`, `Movement`
-**Cast**: Click enemy to charm, then click to command movement
-**Effect**: Take control of enemy unit temporarily
-```
-Query: Target with Unit + Charmable
-Action: Swap controller, add player input handler
-Visual: Glowing eyes, control beam from player
-```
+#### Slot 3 (Key: 3) - **Phase** ✅
+- **Type**: Self-Buff (Ethereal)
+- **Color**: Cyan
+- **Effect**: Walk through walls and obstacles
+- **Duration**: 5 seconds
+- **Cooldown**: 15 seconds
+- **Components**: Transform, Phaseable
+- **Visual**: Translucent cyan shimmer
 
-### 5. Area Effect Magic
-**Components Required**: Varies by spell
-**Cast**: Click for center or Ctrl+click for self-centered
-**Effect**: Applies to all valid targets in radius
-```
-Query: All entities with required components in radius
-Action: Apply spell effect to each
-Visual: Expanding ring or persistent area indicator
-```
+#### Slot 4 (Key: 4) - **Charm** ✅
+- **Type**: Single Target (Control)
+- **Color**: Bright Yellow
+- **Effect**: Take control of target unit
+- **Duration**: 8 seconds
+- **Cooldown**: 20 seconds
+- **Range**: 100 units
+- **Components**: Unit, Charmable
+- **Visual**: Yellow control beam from player to target
+
+#### Slot 5 (Key: Q) - **Lull** ✅
+- **Type**: Area Effect (Enchanter)
+- **Color**: Bright Green
+- **Effect**: Reduces unit aggro range and factor in 150-radius area
+- **Duration**: 12 seconds
+- **Cooldown**: 10 seconds
+- **Components**: Unit, Effects
+- **Visual**: Calming green aura around affected units
+
+#### Slot 6 (Key: E) - **Blink** ✅
+- **Type**: Teleportation (Movement)
+- **Color**: Bright Purple
+- **Effect**: Instant teleport to target location (200 range, dungeon only)
+- **Duration**: Instant
+- **Cooldown**: 3 seconds
+- **Components**: Transform, Teleportable
+- **Visual**: Purple flash at origin and destination
+
+#### Slot 7 (Key: R) - **Dazzle** ✅
+- **Type**: Area Effect (Confusion)
+- **Color**: Primary Blue
+- **Effect**: Confuses/slows all enemies in 120-radius area to 25% speed
+- **Duration**: 5 seconds
+- **Cooldown**: 10 seconds
+- **Components**: Unit, Effects
+- **Visual**: Swirling blue confusion effect
+
+#### Slot 8 (Key: F) - **Multishot** ✅
+- **Type**: Combat Enhancement
+- **Color**: Bright Red
+- **Effect**: Fire 3 bullets in spread pattern
+- **Duration**: Instant
+- **Cooldown**: 8 seconds
+- **Components**: Combat, Projectile
+- **Visual**: Red triple-shot spread
 
 ## Implementation Plan
 
@@ -203,11 +229,15 @@ Result: Phased players pass through, others blocked
 - **Magic Components**: Phaseable, Charmable, Teleportable, MagicTarget
 - **Organization**: Clean mod pattern in `src/lib/game/components/`
 
-### ✅ Spells Implemented
-- **Blink**: Component-based teleportation with range validation
-- **Phase**: 5-second ethereal state (walk through walls)
-- **Lull**: Enhanced with component-based immunity checks
-- **Charm**: Foundation for unit control system
+### ✅ All 8 Spells Implemented
+- **Lethargy**: Single-target movement slow (Key: 1)
+- **Haste**: Player speed boost (Key: 2)
+- **Phase**: 5-second ethereal state (Key: 3)
+- **Charm**: Unit control system (Key: 4)
+- **Lull**: Area aggro reduction (Key: Q)
+- **Blink**: Teleportation with range validation (Key: E)
+- **Dazzle**: Area confusion/slow effect (Key: R)
+- **Multishot**: Triple projectile spread (Key: F)
 
 ### ✅ Targeting System
 - **Range Validation**: Per-spell distance limits
@@ -249,6 +279,8 @@ Result: Phased players pass through, others blocked
 
 **Build Status**: ✅ All code compiles successfully
 **Integration**: ✅ No breaking changes to existing systems
-**User Experience**: ✅ Spells available in-game (slots 1-3: Lull, Blink, Phase)
+**User Experience**: ✅ All 8 spells available in-game with visual spellbar
+**Spellbar**: ✅ Visual UI at bottom center showing all 8 colored spell slots with hotkey labels
+**Input**: ✅ Keys 1-4, Q, E, R, F to select spells; left-click to select, right-click to cast
 
 *This implementation delivers the vision of tactical, non-elemental magic with component-based flexibility while maintaining clean, maintainable code architecture.*

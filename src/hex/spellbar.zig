@@ -35,12 +35,10 @@ fn getSpellColor(spell_type: SpellType) Color {
         .Blink => colors.PURPLE_BRIGHT,   // Teleportation magic
         .Phase => colors.CYAN,            // Ethereal state
         .Charm => colors.YELLOW_BRIGHT,   // Control magic
-        .Shield => colors.BLUE_BRIGHT,    // Protection
+        .Lethargy => colors.INFO,         // Movement slow
         .Haste => colors.ORANGE_BRIGHT,   // Speed boost
         .Multishot => colors.RED_BRIGHT,  // Combat enhancement
-        .Drain => colors.INFO,            // Life steal
-        .Freeze => colors.PRIMARY,        // Crowd control
-        .Fireball => colors.DANGER,       // Damage spell
+        .Dazzle => colors.PRIMARY,        // Area confusion
     };
 }
 
