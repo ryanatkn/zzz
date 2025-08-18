@@ -313,6 +313,27 @@ pub const ReactiveHud = struct {
                         return true;
                     },
                     c.sdl.SDL_BUTTON_LEFT => {
+                        const mouse_x = button_event.x;
+                        const mouse_y = button_event.y;
+
+                        // Check IDE page-specific interactions first
+                        if (hud_data.router.getCurrentPage()) |current_page| {
+                            if (std.mem.eql(u8, current_page.path, "/ide")) {
+                                const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
+                                const point = @import("../lib/math/mod.zig").Vec2{ .x = mouse_x, .y = mouse_y };
+
+                                // Try terminal click first
+                                if (ide_page_impl.handleTerminalClick(point)) {
+                                    return true;
+                                }
+
+                                // Try file tree interaction
+                                if (ide_page_impl.handleFileTreeClick(point) catch false) {
+                                    return true; // File tree handled the click
+                                }
+                            }
+                        }
+
                         // Check if clicking a link
                         if (hud_data.hovered_link.peek()) |link_index| {
                             const link = hud_data.links.items[link_index];
@@ -323,9 +344,6 @@ pub const ReactiveHud = struct {
                         const screen_size = hud_data.renderer.getScreenSize();
                         const bar_y = screen_size.y * 0.1;
                         const button_margin = 50.0;
-
-                        const mouse_x = button_event.x;
-                        const mouse_y = button_event.y;
 
                         // Back button bounds
                         if (mouse_x >= button_margin - 15 and mouse_x <= button_margin + 15 and
@@ -370,12 +388,24 @@ pub const ReactiveHud = struct {
             },
             c.sdl.SDL_EVENT_KEY_DOWN => {
                 const key_event = event.key;
+                
+                // Handle system keys first
                 if (key_event.scancode == c.sdl.SDL_SCANCODE_GRAVE) { // Backtick
                     self.toggle();
                     return true;
                 } else if (key_event.scancode == c.sdl.SDL_SCANCODE_ESCAPE) {
                     hud_data.is_open.set(false);
                     return true;
+                }
+                
+                // Route to current page for input handling
+                if (hud_data.router.getCurrentPage()) |current_page| {
+                    if (std.mem.eql(u8, current_page.path, "/ide")) {
+                        const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
+                        if (ide_page_impl.handleKeyboardInput(key_event)) {
+                            return true; // IDE page handled the key
+                        }
+                    }
                 }
             },
             else => {},

@@ -5,12 +5,21 @@ const directory_scanner = @import("../../lib/platform/directory_scanner.zig");
 const file_tree = @import("../../lib/ui/file_tree.zig");
 const ide_constants = @import("constants.zig");
 const syntax_highlighter = @import("syntax_highlighter.zig");
+const terminal_ui = @import("../../lib/ui/terminal.zig");
 
 const Vec2 = math.Vec2;
 const DirectoryScanner = directory_scanner.DirectoryScanner;
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const FileTreeComponent = file_tree.FileTreeComponent;
 const ZigHighlighter = syntax_highlighter.ZigHighlighter;
+const TerminalComponent = terminal_ui.TerminalComponent;
+
+/// Which panel currently has focus for input handling
+pub const FocusedPanel = enum {
+    FileTree,
+    Content, 
+    Terminal,
+};
 
 pub const IDEPage = struct {
     base: page.Page,
@@ -32,6 +41,12 @@ pub const IDEPage = struct {
     // File content state
     current_file_content: ?[]const u8 = null,
     current_file_error: ?[]const u8 = null,
+    
+    // Terminal component (replaces info panel)
+    terminal_component: ?TerminalComponent = null,
+    
+    // Focus management
+    focused_panel: FocusedPanel = .FileTree,
 
     /// Get currently selected file entry
     pub fn getSelectedEntry(self: *const IDEPage) ?*DirectoryEntry {
@@ -48,6 +63,9 @@ pub const IDEPage = struct {
 
         // If a file was selected, try to load its content
         if (clicked) {
+            // Set focus to file tree
+            self.focused_panel = .FileTree;
+            
             if (self.getSelectedEntry()) |selected| {
                 if (!selected.metadata.is_directory) {
                     try self.loadFileContent(selected);
@@ -83,6 +101,92 @@ pub const IDEPage = struct {
         return &self.syntax_highlighter;
     }
 
+    /// Get terminal component (initialize if needed)
+    pub fn getTerminal(self: *IDEPage) !*TerminalComponent {
+        if (self.terminal_component == null) {
+            // Initialize terminal with simple bounds
+            const bounds = math.Rectangle{
+                .position = Vec2{ .x = 0, .y = 0 },
+                .size = Vec2{ .x = 400, .y = 300 },
+            };
+            
+            // Simple initialization without complex operations
+            self.terminal_component = TerminalComponent.init(self.allocator, bounds) catch |err| {
+                self.error_message = "Failed to initialize terminal";
+                return err;
+            };
+        }
+        
+        return &self.terminal_component.?;
+    }
+    
+    /// Clear terminal
+    pub fn clearTerminal(self: *IDEPage) void {
+        if (self.terminal_component) |*terminal| {
+            terminal.clear();
+        }
+    }
+    
+    /// Handle click in terminal panel area
+    pub fn handleTerminalClick(self: *IDEPage, point: Vec2) bool {
+        // Calculate terminal panel bounds (right panel)
+        const screen_width: f32 = 1920; // From constants
+        const screen_height: f32 = 1080;
+        const panel_gap: f32 = 8;
+        const header_height: f32 = 60;
+        
+        // Terminal panel is the rightmost panel (preview panel replacement)
+        const content_width = (screen_width - 4 * panel_gap) / 3; // Three equal panels
+        const terminal_x = 2 * panel_gap + 2 * content_width + panel_gap;
+        const terminal_y = header_height + panel_gap;
+        const terminal_width = content_width;
+        const terminal_height = screen_height - header_height - 2 * panel_gap;
+        
+        const terminal_bounds = math.Rectangle{
+            .position = Vec2{ .x = terminal_x, .y = terminal_y },
+            .size = Vec2{ .x = terminal_width, .y = terminal_height },
+        };
+        
+        // Check if click is within terminal bounds
+        if (point.x >= terminal_bounds.position.x and 
+            point.x <= terminal_bounds.position.x + terminal_bounds.size.x and
+            point.y >= terminal_bounds.position.y and 
+            point.y <= terminal_bounds.position.y + terminal_bounds.size.y) {
+            
+            self.focused_panel = .Terminal;
+            
+            // Ensure terminal is initialized
+            _ = self.getTerminal() catch {
+                return false;
+            };
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /// Handle keyboard input for focused panel
+    pub fn handleKeyboardInput(self: *IDEPage, key_event: @import("../../lib/platform/sdl.zig").sdl.SDL_KeyboardEvent) bool {
+        if (self.focused_panel != .Terminal) return false;
+        
+        if (self.terminal_component) |*terminal| {
+            return terminal.handleKeyPress(key_event);
+        }
+        
+        return false;
+    }
+    
+    /// Get focused panel
+    pub fn getFocusedPanel(self: *const IDEPage) FocusedPanel {
+        return self.focused_panel;
+    }
+    
+    /// Set focused panel
+    pub fn setFocusedPanel(self: *IDEPage, panel: FocusedPanel) void {
+        self.focused_panel = panel;
+    }
+    
     /// Load file content safely with size and error handling
     pub fn loadFileContent(self: *IDEPage, entry: *DirectoryEntry) !void {
         // Clear previous content and errors
@@ -165,6 +269,11 @@ fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
         ide.current_file_content = null;
     }
 
+    // Clean up terminal component
+    if (ide.terminal_component) |*terminal| {
+        terminal.deinit();
+    }
+
     // Clean up file tree
     ide.file_tree_component.deinit();
 
@@ -178,8 +287,12 @@ fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
 }
 
 fn update(self: *page.Page, dt: f32) void {
-    _ = dt;
-    _ = self;
+    const ide: *IDEPage = @fieldParentPtr("base", self);
+    
+    // Update terminal component
+    if (ide.terminal_component) |*terminal| {
+        terminal.update(dt);
+    }
 }
 
 fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {

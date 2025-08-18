@@ -202,7 +202,7 @@ pub const BrowserRenderer = struct {
         const screen_height = constants.SCREEN.BASE_HEIGHT;
 
         const bar_height = 50.0;
-        const bar_y = screen_height * 0.1 - bar_height / 2.0;
+        const bar_y = screen_height * 0.05 - bar_height / 2.0; // Moved up from 0.1 to 0.05
         const bar_width = screen_width * 0.8;
         const bar_x = (screen_width - bar_width) / 2.0;
 
@@ -397,25 +397,254 @@ pub const BrowserRenderer = struct {
         }
     }
 
-    /// Render preview panel
+    /// Render terminal panel with improved safety and error handling
     fn renderPreviewPanel(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
-        // Panel header
-        self.drawSimpleText(cmd_buffer, render_pass, "PREVIEW PANEL", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
+        const focused_panel = ide_page_impl.getFocusedPanel();
+        const is_terminal_focused = focused_panel == .Terminal;
+        
+        // Draw focus border if terminal is focused
+        if (is_terminal_focused) {
+            try self.drawFocusBorder(cmd_buffer, render_pass, panel_rect);
+        }
+        
+        // Panel header with focus indication
+        const header_text = if (is_terminal_focused) "TERMINAL [FOCUSED]" else "TERMINAL";
+        self.drawSimpleText(cmd_buffer, render_pass, header_text, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 10 });
 
-        // Show selected file info
-        if (ide_page_impl.file_tree_component.getSelectedEntry()) |selected| {
-            self.drawSimpleText(cmd_buffer, render_pass, "Selected:", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
-            self.drawSimpleText(cmd_buffer, render_pass, selected.metadata.name, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
-
-            const file_type_name = selected.metadata.file_type.getDisplayName();
-            self.drawSimpleText(cmd_buffer, render_pass, file_type_name, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 80 });
-
-            // Show file size
-            var size_buf: [32]u8 = undefined;
-            const size_text = directory_scanner.formatFileSize(selected.metadata.size, &size_buf) catch "Unknown size";
-            self.drawSimpleText(cmd_buffer, render_pass, size_text, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 100 });
+        // Check if terminal component exists and render content
+        if (ide_page_impl.terminal_component) |*terminal| {
+            try self.renderTerminalContentSafe(cmd_buffer, render_pass, terminal, panel_rect, is_terminal_focused);
         } else {
-            self.drawSimpleText(cmd_buffer, render_pass, "No file selected", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            // Fallback display when terminal not initialized
+            self.drawSimpleText(cmd_buffer, render_pass, "Terminal initializing...", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.drawSimpleText(cmd_buffer, render_pass, "Click to focus and start typing", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
+        }
+    }
+    
+    /// Draw focus border around panel
+    fn drawFocusBorder(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, panel_rect: math.Rectangle) !void {
+        const border_color = ide_constants.COLORS.SELECTION_BG;
+        const border_width = 2.0;
+        
+        // Draw border rectangles (top, bottom, left, right)
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, 
+            Vec2{ .x = panel_rect.position.x - border_width, .y = panel_rect.position.y - border_width }, 
+            Vec2{ .x = panel_rect.size.x + 2 * border_width, .y = border_width }, 
+            border_color); // Top
+            
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, 
+            Vec2{ .x = panel_rect.position.x - border_width, .y = panel_rect.position.y + panel_rect.size.y }, 
+            Vec2{ .x = panel_rect.size.x + 2 * border_width, .y = border_width }, 
+            border_color); // Bottom
+            
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, 
+            Vec2{ .x = panel_rect.position.x - border_width, .y = panel_rect.position.y }, 
+            Vec2{ .x = border_width, .y = panel_rect.size.y }, 
+            border_color); // Left
+            
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, 
+            Vec2{ .x = panel_rect.position.x + panel_rect.size.x, .y = panel_rect.position.y }, 
+            Vec2{ .x = border_width, .y = panel_rect.size.y }, 
+            border_color); // Right
+    }
+    
+    /// Render terminal content with improved safety checks
+    fn renderTerminalContentSafe(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, terminal: *const @import("../lib/ui/terminal.zig").TerminalComponent, panel_rect: math.Rectangle, is_focused: bool) !void {
+        // Get terminal content safely with error handling
+        const content = terminal.terminal_engine.getVisibleContent();
+        
+        const line_height = ide_constants.TEXT.LINE_HEIGHT;
+        const char_width = ide_constants.TEXT.CHAR_WIDTH;
+        const margin = 10;
+        const start_x = panel_rect.position.x + margin;
+        var current_y = panel_rect.position.y + 30; // Below header
+        
+        const max_lines = @as(usize, @intFromFloat(@max(0, (panel_rect.size.y - 40) / line_height)));
+        const max_chars_per_line = @as(usize, @intFromFloat(@max(0, (panel_rect.size.x - 20) / char_width)));
+        
+        // Render scrollback lines with safety checks
+        var lines_rendered: usize = 0;
+        for (content.lines) |line| {
+            if (lines_rendered >= max_lines) break;
+            if (current_y > panel_rect.position.y + panel_rect.size.y - line_height) break;
+            
+            const text = line.getText();
+            
+            // Safety checks for text content
+            if (text.len == 0) {
+                current_y += line_height;
+                lines_rendered += 1;
+                continue;
+            }
+            
+            // Safely truncate text if too long
+            const display_text = if (text.len > max_chars_per_line and max_chars_per_line > 0) 
+                text[0..max_chars_per_line] 
+            else 
+                text;
+            
+            // Additional safety: ensure text contains only printable characters
+            if (self.isTextSafe(display_text)) {
+                self.drawSimpleText(cmd_buffer, render_pass, display_text, Vec2{ .x = start_x, .y = current_y });
+            }
+            
+            current_y += line_height;
+            lines_rendered += 1;
+        }
+        
+        // Render current input line with prompt (with bounds checking)
+        if (lines_rendered < max_lines and current_y <= panel_rect.position.y + panel_rect.size.y - line_height) {
+            // Use a simple static prompt to avoid string formatting issues
+            const prompt_text = "$ ";
+            const input_text = content.current;
+            
+            // Safely combine prompt and input
+            var display_buffer: [256]u8 = undefined;
+            const prompt_len = @min(prompt_text.len, display_buffer.len);
+            @memcpy(display_buffer[0..prompt_len], prompt_text[0..prompt_len]);
+            
+            const remaining_space = if (display_buffer.len > prompt_len) display_buffer.len - prompt_len else 0;
+            const input_copy_len = @min(input_text.len, remaining_space);
+            
+            if (input_copy_len > 0 and prompt_len + input_copy_len <= display_buffer.len) {
+                @memcpy(display_buffer[prompt_len..prompt_len + input_copy_len], input_text[0..input_copy_len]);
+            }
+            
+            const total_len = prompt_len + input_copy_len;
+            const final_display = display_buffer[0..total_len];
+            
+            // Truncate if still too long
+            const truncated_display = if (final_display.len > max_chars_per_line and max_chars_per_line > 0)
+                final_display[0..max_chars_per_line]
+            else
+                final_display;
+            
+            if (self.isTextSafe(truncated_display)) {
+                self.drawSimpleText(cmd_buffer, render_pass, truncated_display, Vec2{ .x = start_x, .y = current_y });
+            }
+            
+            // Render cursor if visible and focused
+            if (is_focused and content.cursor.visible) {
+                const cursor_x = start_x + @as(f32, @floatFromInt(@min(prompt_text.len + content.cursor.x, max_chars_per_line))) * char_width;
+                if (cursor_x < panel_rect.position.x + panel_rect.size.x) {
+                    self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, 
+                        Vec2{ .x = cursor_x, .y = current_y }, 
+                        Vec2{ .x = char_width, .y = line_height }, 
+                        ide_constants.COLORS.TEXT_NORMAL);
+                }
+            }
+        }
+        
+        // Show input instructions
+        const instruction_y = current_y + line_height + 5;
+        if (instruction_y < panel_rect.position.y + panel_rect.size.y - line_height) {
+            if (is_focused) {
+                self.drawSimpleText(cmd_buffer, render_pass, "Ready for input! Try typing 'help'", Vec2{ .x = start_x, .y = instruction_y });
+            } else {
+                self.drawSimpleText(cmd_buffer, render_pass, "Click to focus and start typing", Vec2{ .x = start_x, .y = instruction_y });
+            }
+        }
+    }
+    
+    /// Check if text contains only safe printable characters
+    fn isTextSafe(self: *const BrowserRenderer, text: []const u8) bool {
+        _ = self;
+        if (text.len == 0) return false;
+        
+        for (text) |ch| {
+            // Allow printable ASCII and common whitespace
+            if (ch < 32 or ch > 126) {
+                if (ch != ' ' and ch != '\t') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    /// Render terminal content in the given bounds
+    fn renderTerminalContent(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, terminal: *const @import("../lib/ui/terminal.zig").TerminalComponent, panel_rect: math.Rectangle) !void {
+        // Get terminal content safely
+        const content = terminal.terminal_engine.getVisibleContent();
+        
+        const line_height = ide_constants.TEXT.LINE_HEIGHT;
+        const char_width = ide_constants.TEXT.CHAR_WIDTH;
+        const margin = 10;
+        const start_x = panel_rect.position.x + margin;
+        var current_y = panel_rect.position.y + 30; // Below header
+        
+        const max_lines = @as(usize, @intFromFloat((panel_rect.size.y - 40) / line_height));
+        const max_chars_per_line = @as(usize, @intFromFloat((panel_rect.size.x - 20) / char_width));
+        
+        // Render scrollback lines
+        var lines_rendered: usize = 0;
+        for (content.lines) |line| {
+            if (lines_rendered >= max_lines) break;
+            
+            const text = line.getText();
+            // Add safety check for valid text
+            if (text.len == 0) {
+                current_y += line_height;
+                lines_rendered += 1;
+                continue;
+            }
+            
+            const display_text = if (text.len > max_chars_per_line) 
+                text[0..max_chars_per_line] 
+            else 
+                text;
+                
+            // Ensure we have valid text to display
+            if (display_text.len > 0) {
+                self.drawSimpleText(cmd_buffer, render_pass, display_text, Vec2{ .x = start_x, .y = current_y });
+            }
+            
+            current_y += line_height;
+            lines_rendered += 1;
+        }
+        
+        // Render current input line with prompt
+        if (lines_rendered < max_lines and current_y < panel_rect.position.y + panel_rect.size.y - line_height) {
+            // Simple static prompt to avoid string formatting issues
+            const prompt_text = "$ ";
+            const input_text = content.current;
+            
+            // Combine prompt and input safely
+            var display_buffer: [256]u8 = undefined;
+            var display_len: usize = 0;
+            
+            // Copy prompt
+            if (prompt_text.len < display_buffer.len) {
+                @memcpy(display_buffer[0..prompt_text.len], prompt_text);
+                display_len += prompt_text.len;
+            }
+            
+            // Copy input (truncate if needed)
+            const remaining_space = display_buffer.len - display_len;
+            const input_copy_len = @min(input_text.len, remaining_space);
+            if (input_copy_len > 0 and display_len + input_copy_len < display_buffer.len) {
+                @memcpy(display_buffer[display_len..display_len + input_copy_len], input_text[0..input_copy_len]);
+                display_len += input_copy_len;
+            }
+            
+            const display_text = display_buffer[0..display_len];
+            const final_display = if (display_text.len > max_chars_per_line)
+                display_text[0..max_chars_per_line]
+            else
+                display_text;
+                
+            if (final_display.len > 0) {
+                self.drawSimpleText(cmd_buffer, render_pass, final_display, Vec2{ .x = start_x, .y = current_y });
+            }
+            
+            // Render cursor if visible
+            if (content.cursor.visible) {
+                const cursor_x = start_x + @as(f32, @floatFromInt(prompt_text.len + content.cursor.x)) * char_width;
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, 
+                    Vec2{ .x = cursor_x, .y = current_y }, 
+                    Vec2{ .x = char_width, .y = line_height }, 
+                    ide_constants.COLORS.TEXT_NORMAL);
+            }
         }
     }
 

@@ -97,11 +97,17 @@ pub const Hud = struct {
                             log.info("Current page: '{s}'", .{current_page.path});
 
                             if (std.mem.eql(u8, current_page.path, "/ide")) {
-                                log.info("On IDE page, handling file tree click", .{});
+                                log.info("On IDE page, handling IDE interactions", .{});
                                 const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
-
-                                // Try file tree interaction first
                                 const point = @import("../lib/math/mod.zig").Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
+
+                                // Try terminal click first
+                                if (ide_page_impl.handleTerminalClick(point)) {
+                                    log.info("Terminal panel clicked, focus set", .{});
+                                    return true;
+                                }
+
+                                // Try file tree interaction
                                 if (ide_page_impl.handleFileTreeClick(point) catch false) {
                                     return true; // File tree handled the click
                                 }
@@ -193,12 +199,24 @@ pub const Hud = struct {
             },
             c.sdl.SDL_EVENT_KEY_DOWN => {
                 const key_event = event.key;
+                
+                // Handle system keys first
                 if (key_event.scancode == c.sdl.SDL_SCANCODE_GRAVE) { // Backtick
                     self.toggle();
                     return true;
                 } else if (key_event.scancode == c.sdl.SDL_SCANCODE_ESCAPE) {
                     self.is_open = false;
                     return true;
+                }
+                
+                // Route to current page for input handling
+                if (self.router.getCurrentPage()) |current_page| {
+                    if (std.mem.eql(u8, current_page.path, "/ide")) {
+                        const ide_page_impl: *@import("../menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
+                        if (ide_page_impl.handleKeyboardInput(key_event)) {
+                            return true; // IDE page handled the key
+                        }
+                    }
                 }
             },
             else => {},
