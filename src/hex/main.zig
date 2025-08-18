@@ -19,7 +19,7 @@ const combat = @import("combat.zig");
 const player_controller = @import("player.zig");
 const portals = @import("portals.zig");
 const controls = @import("controls.zig");
-const behaviors = @import("behaviors.zig");
+const behaviors = @import("behaviors/mod.zig");
 
 // Reactive system imports
 const reactive_context = @import("../lib/reactive/context.zig");

@@ -26,7 +26,7 @@ const filters = @import("../lib/debug/filters.zig");
 
 // Hex game modules
 const hex_game_mod = @import("hex_game.zig");
-const behaviors = @import("behaviors.zig");
+const behaviors = @import("behaviors/mod.zig");
 const physics = @import("physics.zig");
 const player_controller = @import("player.zig");
 const combat = @import("combat.zig");

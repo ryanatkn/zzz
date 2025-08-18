@@ -73,7 +73,7 @@ const loggers = @import("../lib/debug/loggers.zig");
 // Hex game modules (local)
 const hex_game_mod = @import("hex_game.zig");
 const constants = @import("constants.zig");
-const behaviors = @import("behaviors.zig");
+const behaviors = @import("behaviors/mod.zig");
 
 // Type aliases after imports
 const Vec2 = math.Vec2;
