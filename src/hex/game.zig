@@ -345,9 +345,9 @@ fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
                     const old_pos = transform.pos;
 
                     if (zone_storage.units.getComponentMut(unit_id, .visual)) |visual| {
-                        const aggro_mod = spells.SpellSystem.getAggroMultiplierForUnit(unit_id, zone_storage);
-
                         // Update unit AI behavior using HexGame components with context
+                        // For now using 1.0 aggro modifier (no spell effects)
+                        const aggro_mod: f32 = 1.0;
                         behaviors.updateUnitWithAggroMod(unit_id, unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, frame_ctx);
                     }
 

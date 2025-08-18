@@ -6,7 +6,6 @@ const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
 const frame = @import("../lib/core/frame.zig");
 const game_abilities = @import("../lib/game/abilities/mod.zig");
-const spell_casting = game_abilities.spell_casting;
 const effect_manager = game_abilities.effect_manager;
 const components = @import("../lib/game/components/mod.zig");
 
@@ -46,9 +45,6 @@ pub const HexEffectType = enum {
 
 // Use generic effect manager for hex effects
 const HexEffectManager = effect_manager.EffectManager(HexEffectType, constants.MAX_LULL_EFFECTS);
-const HexEffect = effect_manager.TimedEffect(HexEffectType);
-
-// LullEffect removed - now handled by generic effect manager
 
 /// Component-based spell targeting and effects
 /// These helper functions enable flexible spell casting based on component composition
@@ -546,13 +542,9 @@ pub const SpellSystem = struct {
                 0.0;
             
             const angle = base_angle + offset_angle;
-            const bullet_velocity = Vec2{
-                .x = @cos(angle) * constants.BULLET_SPEED,
-                .y = @sin(angle) * constants.BULLET_SPEED,
-            };
-            
-            // In real implementation, spawn bullets with game.addBullet()
-            _ = bullet_velocity;
+            // TODO: In real implementation, spawn bullets with game.addBullet()
+            // Would calculate velocity as Vec2{@cos(angle) * speed, @sin(angle) * speed}
+            _ = angle;
         }
         
         loggers.getGameLog().info("multishot_cast", "Fired {} bullets in spread pattern", .{constants.MULTISHOT_COUNT});
@@ -667,14 +659,6 @@ pub const SpellSystem = struct {
         return true;
     }
 
-    /// Get aggro multiplier for a specific unit
-    pub fn getAggroMultiplierForUnit(unit_id: hex_game_mod.EntityId, zone_storage: *const hex_game_mod.HexGame.ZoneData) f32 {
-        // For now, return 1.0 (no modification)
-        // Lull effect checking for units (implemented with aggro modifier)
-        _ = unit_id;
-        _ = zone_storage;
-        return 1.0;
-    }
 };
 
 fn getSpellCooldown(spell: SpellType) f32 {

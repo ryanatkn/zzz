@@ -1,4 +1,3 @@
-const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
 const constants = @import("constants.zig");
@@ -7,7 +6,6 @@ const spells = @import("spells.zig");
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 const SpellType = spells.SpellType;
-const SpellSystem = spells.SpellSystem;
 
 /// Visual configuration for the spellbar
 pub const SpellbarConfig = struct {
@@ -27,8 +25,8 @@ pub const SpellbarConfig = struct {
 /// Hotkey labels for each slot (0-7)
 const HOTKEY_LABELS = [8][]const u8{ "1", "2", "3", "4", "Q", "E", "R", "F" };
 
-/// Spell-specific colors
-fn getSpellColor(spell_type: SpellType) Color {
+/// Bright spell colors (always visible base colors)
+pub fn getSpellColor(spell_type: SpellType) Color {
     return switch (spell_type) {
         .None => colors.BACKGROUND_DARK,
         .Lull => colors.GREEN_BRIGHT,     // Calming effect
@@ -40,6 +38,18 @@ fn getSpellColor(spell_type: SpellType) Color {
         .Multishot => colors.RED_BRIGHT,  // Combat enhancement
         .Dazzle => colors.PRIMARY,        // Area confusion
     };
+}
+
+/// Darker spell colors (for cooldown overlays)
+pub fn getDarkSpellColor(spell_type: SpellType) Color {
+    const bright_color = getSpellColor(spell_type);
+    
+    // Return darker version (60% darker) except for None which stays dark
+    if (spell_type == .None) {
+        return bright_color;
+    }
+    
+    return colors.darken(bright_color, 0.6);
 }
 
 /// Spellbar UI component
@@ -113,15 +123,13 @@ pub const Spellbar = struct {
         self.hovered_slot = self.getSlotAtPosition(mouse_pos);
     }
     
-    /// Get the color for a spell slot
+    /// Get the color for a spell slot (bright base color)
     pub fn getSlotColor(_: *const Spellbar, spell_type: SpellType, is_hovered: bool) Color {
         var color = getSpellColor(spell_type);
         
         // Brighten slightly on hover
         if (is_hovered and spell_type != .None) {
-            color.r = @min(255, color.r + 30);
-            color.g = @min(255, color.g + 30);
-            color.b = @min(255, color.b + 30);
+            color = colors.lighten(color, 0.2);
         }
         
         return color;

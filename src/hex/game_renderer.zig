@@ -411,12 +411,14 @@ pub const GameRenderer = struct {
             // Draw cooldown overlay if spell is on cooldown
             if (slot != null and cooldown_progress < 1.0) {
                 const overlay_height = slot_rect.height * (1.0 - cooldown_progress);
+                // Use dark spell color for cooldown overlay
+                const dark_color = spellbar.getDarkSpellColor(spell_type);
                 self.gpu.drawRect(
                     cmd_buffer,
                     render_pass,
                     Vec2{ .x = slot_rect.x, .y = slot_rect.y },
                     Vec2{ .x = slot_rect.width, .y = overlay_height },
-                    spellbar_ui.config.cooldown_overlay_color
+                    dark_color
                 );
             }
             
