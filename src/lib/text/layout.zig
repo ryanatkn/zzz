@@ -127,7 +127,7 @@ pub const TextLayoutEngine = struct {
                     .codepoint = codepoint,
                     .position = Vec2{
                         .x = cursor_x + @as(f32, @floatFromInt(glyph_info.bearing_x)),
-                        .y = cursor_y + line_height - @as(f32, @floatFromInt(glyph_info.bearing_y)),
+                        .y = cursor_y + line_height - @as(f32, @floatFromInt(glyph_info.bearing_y)) + (line_height * 0.5), // Add ascender padding offset
                     },
                     .size = Vec2{
                         .x = @floatFromInt(glyph_info.width),
@@ -153,7 +153,9 @@ pub const TextLayoutEngine = struct {
             try self.finalizeLine(&lines, &current_line_glyphs, cursor_x, cursor_y, line_height, options.alignment);
         }
 
-        const total_height = cursor_y + line_height;
+        // Add padding for ascenders that extend above the baseline
+        const ascender_padding = line_height * 0.5; // 50% padding for tall ascenders
+        const total_height = cursor_y + line_height + ascender_padding;
 
         const owned_lines = try self.allocator.alloc(LayoutedLine, lines.items.len);
         for (lines.items, 0..) |line, idx| {
