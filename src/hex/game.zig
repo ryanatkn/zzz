@@ -35,6 +35,7 @@ const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
 const save_data = @import("save_data.zig");
+const spellbar = @import("spellbar.zig");
 
 // HUD modules
 const hud = @import("../hud/hud.zig");
@@ -57,6 +58,9 @@ pub const GameState = struct {
 
     // Spell system
     spell_system: spells.SpellSystem,
+    
+    // Spellbar UI
+    spellbar_ui: spellbar.Spellbar,
 
     // Allocator for ECS world cleanup
     allocator: std.mem.Allocator,
@@ -98,6 +102,7 @@ pub const GameState = struct {
             .effect_system = GameEffectSystem.init(),
             .logger = ModuleLogger.init(allocator),
             .spell_system = spells.SpellSystem.init(),
+            .spellbar_ui = spellbar.Spellbar.init(),
             .allocator = allocator,
             .hud_system = null,
             .iris_wipe_active = false,

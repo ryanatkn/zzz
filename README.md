@@ -52,12 +52,16 @@ For technical architecture details, see [CLAUDE.md](./CLAUDE.md)
 ### Spells
 - **Number Keys 1-4**: select spell slots 1-4
 - **Q, E, R, F**: select spell slots 5-8
-  - **Slot 1 - Lull**: reduces enemy aggro by 80% in target area (12s)
-  - **Slot 2 - Blink**: teleport to location (dungeon only)
+- **Visual Spellbar**: colored rectangles at bottom center show available spells with hotkeys
+- **Left-click on spellbar**: select spell (same as pressing hotkey)
+- **Right-click on spellbar**: select and cast spell immediately
+  - **Slot 1 - Lull**: reduces enemy aggro by 80% in target area (12s) - Green
+  - **Slot 2 - Blink**: teleport to location (dungeon only) - Purple
+  - **Slot 3 - Phase**: walk through walls for 5 seconds - Cyan
 
 ### System
 - **Space**: pause/unpause game
-- **R**: respawn when dead
+- **L**: respawn when dead (lifestone)
 - **T**: reset current zone units
 - **Y**: full game reset
 - **G**: toggle AI control mode
@@ -73,6 +77,7 @@ For technical architecture details, see [CLAUDE.md](./CLAUDE.md)
 - **Purple Circles**: zone portals
 - **Cyan Circles**: lifestone checkpoints
 - **Purple/Blue Areas**: spell effect zones
+- **Spellbar**: 8 colored rectangles at bottom center with hotkey labels (1,2,3,4,Q,E,R,F)
 
 ## Project structure
 

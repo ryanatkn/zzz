@@ -119,6 +119,10 @@ pub fn handleSDLEvent(
         },
         c.sdl.SDL_EVENT_MOUSE_MOTION => {
             game_state.input_state.handleMouseMotion(event.motion.x, event.motion.y);
+            
+            // Update spellbar hover state
+            const mouse_pos = game_state.input_state.getMousePos();
+            game_state.spellbar_ui.updateHover(mouse_pos);
         },
         c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
             game_state.input_state.handleMouseButtonDown(event.button.button);
@@ -151,6 +155,15 @@ pub fn handleSDLEvent(
             switch (action) {
                 .PrimaryAttack => {
                     if (game_state.hex_game.getPlayerAlive()) {
+                        const screen_mouse_pos = game_state.input_state.getMousePos();
+                        
+                        // Check if click is on spellbar first
+                        if (game_state.spellbar_ui.getSlotAtPosition(screen_mouse_pos)) |slot_index| {
+                            // Left-click on spellbar slot = select spell
+                            game_state.spell_system.setActiveSlot(slot_index);
+                            return c.sdl.SDL_APP_CONTINUE;
+                        }
+                        
                         // Check if this should be move-to-click instead of shooting
                         if (input_modifiers.ModifierHelpers.isMoveToClick(&game_state.input_state)) {
                             // Move-to-click not implemented yet - just ignore Ctrl+click for now
@@ -158,8 +171,7 @@ pub fn handleSDLEvent(
                         }
                         
                         // Left-click shooting for single shots (burst mode)
-                        game_state.hex_game.logger.info("primary_attack", "Primary attack at mouse position: {any}", .{game_state.input_state.getMousePos()});
-                        const screen_mouse_pos = game_state.input_state.getMousePos();
+                        game_state.hex_game.logger.info("primary_attack", "Primary attack at mouse position: {any}", .{screen_mouse_pos});
 
                         const coord_context = createCoordinateContext(&game_renderer.camera);
                         const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
@@ -169,9 +181,22 @@ pub fn handleSDLEvent(
                 },
                 .SecondaryAttack => {
                     if (game_state.hex_game.getPlayerAlive()) {
+                        const screen_mouse_pos = game_state.input_state.getMousePos();
+                        
+                        // Check if right-click is on spellbar first
+                        if (game_state.spellbar_ui.getSlotAtPosition(screen_mouse_pos)) |slot_index| {
+                            // Right-click on spellbar slot = select and cast immediately
+                            game_state.spell_system.setActiveSlot(slot_index);
+                            
+                            // Cast the spell at mouse position (self-cast since clicked on slot)
+                            const zone = game_state.hex_game.getCurrentZoneConst();
+                            const player_pos = game_state.hex_game.getPlayerPos();
+                            _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, player_pos, &game_state.effect_system, true);
+                            return c.sdl.SDL_APP_CONTINUE;
+                        }
+                        
                         // Check if this should be self-cast
                         const self_cast = input_modifiers.ModifierHelpers.isSelfCasting(&game_state.input_state);
-                        const screen_mouse_pos = game_state.input_state.getMousePos();
 
                         const coord_context = createCoordinateContext(&game_renderer.camera);
                         const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);

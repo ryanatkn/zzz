@@ -124,13 +124,14 @@ pub fn mapScancodeToAction(scancode: u32) GameAction {
         c.sdl.SDL_SCANCODE_4 => .SelectSpell4,
         c.sdl.SDL_SCANCODE_Q => .SelectSpell5,
         c.sdl.SDL_SCANCODE_E => .SelectSpell6,
-        c.sdl.SDL_SCANCODE_R => .Respawn, // R has dual purpose
+        c.sdl.SDL_SCANCODE_R => .SelectSpell7,
         c.sdl.SDL_SCANCODE_F => .SelectSpell8,
         
         // System
         c.sdl.SDL_SCANCODE_SPACE => .TogglePause,
         c.sdl.SDL_SCANCODE_GRAVE => .ToggleMenu, // Backtick
         c.sdl.SDL_SCANCODE_ESCAPE => .Quit,
+        c.sdl.SDL_SCANCODE_L => .Respawn, // L for Lifestone respawn
         c.sdl.SDL_SCANCODE_T => .ResetZone,
         c.sdl.SDL_SCANCODE_Y => .ResetGame,
         c.sdl.SDL_SCANCODE_G => .ToggleAI,

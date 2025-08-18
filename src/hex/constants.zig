@@ -79,6 +79,8 @@ pub const LULL_AGGRO_MULT = 0.3; // Reduce aggro to 30%
 pub const LULL_COOLDOWN = 10.0;
 pub const BLINK_MAX_DISTANCE = 200.0;
 pub const BLINK_COOLDOWN = 3.0;
+pub const PHASE_DURATION = 5.0; // Phase effect duration in seconds
+pub const PHASE_COOLDOWN = 15.0; // Phase spell cooldown
 pub const MAX_LULL_EFFECTS = 10;
 
 // Border system constants

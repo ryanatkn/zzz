@@ -78,8 +78,8 @@ $ zig build --help       # Show all build options
 **Core Controls:**
 - **Movement:** WASD + Shift (walk) + Ctrl+mouse
 - **Combat:** Left-click shoot (burst/rhythm), Right-click cast spell  
-- **Spells:** 1-4, Q, E, R, F select slots
-- **System:** Space pause, R respawn, Y reset, ESC quit, G toggle AI control
+- **Spells:** 1-4, Q, E, R, F select slots (visual spellbar at bottom)
+- **System:** Space pause, L respawn (lifestone), Y reset, ESC quit, G toggle AI control
 - **HUD:** ` (backtick) toggle transparent menu overlay
 
 **Key Features:**

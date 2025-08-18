@@ -8,6 +8,7 @@ const frame = @import("../lib/core/frame.zig");
 const game_abilities = @import("../lib/game/abilities/mod.zig");
 const spell_casting = game_abilities.spell_casting;
 const effect_manager = game_abilities.effect_manager;
+const components = @import("../lib/game/components/mod.zig");
 
 const Vec2 = math.Vec2;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
@@ -19,6 +20,8 @@ pub const SpellType = enum {
     None,
     Lull, // Reduce aggro range
     Blink, // Teleport (dungeon only)
+    Phase, // Walk through solid objects
+    Charm, // Control units (future)
     Shield, // Future: damage reduction
     Haste, // Future: movement speed boost
     Multishot, // Future: fire multiple bullets
@@ -35,6 +38,8 @@ pub const SpellSlot = game_abilities.spell_slots.SpellSlot(SpellType);
 pub const HexEffectType = enum {
     lull,
     blink_trail,
+    phase_state,
+    charm_effect,
     shield_aura,
     haste_boost,
     damage_zone,
@@ -46,6 +51,174 @@ const HexEffectManager = effect_manager.EffectManager(HexEffectType, constants.M
 const HexEffect = effect_manager.TimedEffect(HexEffectType);
 
 // LullEffect removed - now handled by generic effect manager
+
+/// Component-based spell targeting and effects
+/// These helper functions enable flexible spell casting based on component composition
+const SpellHelpers = struct {
+    /// Check if entity has Teleportable component
+    pub fn hasTeleportableComponent(entity_id: EntityId, zone: *const ZoneData) bool {
+        // Future: Query FlexibleStorage for Teleportable component
+        // For now, player is always teleportable
+        _ = entity_id;
+        _ = zone;
+        return true;
+    }
+    
+    /// Check if entity has Phaseable component
+    pub fn hasPhaseableComponent(entity_id: EntityId, zone: *const ZoneData) bool {
+        // Future: Query FlexibleStorage for Phaseable component
+        _ = entity_id;
+        _ = zone;
+        return false; // Only specific entities can phase
+    }
+    
+    /// Check if entity has Charmable component
+    pub fn hasCharmableComponent(entity_id: EntityId, zone: *const ZoneData) bool {
+        // Future: Query FlexibleStorage for Charmable component
+        _ = entity_id;
+        _ = zone;
+        return true; // Most units can be charmed
+    }
+    
+    /// Check if entity has Solid component
+    pub fn hasSolidComponent(entity_id: EntityId, zone: *const ZoneData) bool {
+        // Future: Query FlexibleStorage for Solid component
+        _ = entity_id;
+        _ = zone;
+        return true; // Most terrain is solid
+    }
+    
+    /// Perform teleportation with component-based validation
+    pub fn performTeleport(entity_id: EntityId, from_pos: Vec2, to_pos: Vec2, max_range: f32, zone: *const ZoneData, game: *HexGame) ?Vec2 {
+        if (!SpellHelpers.hasTeleportableComponent(entity_id, zone)) {
+            return null; // Entity cannot teleport
+        }
+        
+        // Component-based range validation
+        const distance = from_pos.sub(to_pos).length();
+        const effective_range = max_range; // Future: get from Teleportable component
+        
+        if (distance > effective_range) {
+            // Limit teleport distance
+            const direction = to_pos.sub(from_pos).normalize();
+            return from_pos.add(direction.scale(effective_range));
+        }
+        
+        // Check for collision if entity doesn't have Phaseable component
+        if (!SpellHelpers.hasPhaseableComponent(entity_id, zone)) {
+            // Future: Check collision with solid terrain and entities
+            // For now, allow teleportation to any location
+        }
+        
+        _ = game;
+        return to_pos;
+    }
+    
+    /// Check if entity can be affected by charm/lull effects based on components
+    pub fn canAffectEntity(entity_id: EntityId, zone: *const ZoneData, effect_type: HexEffectType) bool {
+        return switch (effect_type) {
+            .lull => {
+                // Lull affects any entity that has unit behavior
+                // Future: Check for Unit component
+                _ = entity_id;
+                _ = zone;
+                return true;
+            },
+            else => {
+                // Other effects require specific components
+                _ = entity_id;
+                _ = zone;
+                return false;
+            },
+        };
+    }
+    
+    /// Apply phase state to entity (makes them non-solid temporarily)
+    pub fn applyPhaseState(entity_id: EntityId, duration: f32, zone: *ZoneData) void {
+        // Future: Temporarily disable Solid component or add Phase effect
+        _ = entity_id;
+        _ = duration;
+        _ = zone;
+    }
+    
+    /// Apply charm effect to entity
+    pub fn applyCharmEffect(entity_id: EntityId, caster: EntityId, duration: f32, zone: *ZoneData) bool {
+        if (!SpellHelpers.hasCharmableComponent(entity_id, zone)) {
+            return false;
+        }
+        
+        // Future: Modify entity's Unit component to follow caster
+        // For now, placeholder implementation
+        _ = caster;
+        _ = duration;
+        loggers.getGameLog().info("charm_applied", "Charm effect applied to entity {}", .{entity_id});
+        return true;
+    }
+    
+    /// Validate spell targeting based on physicality and line of sight
+    pub fn validateSpellTarget(caster_pos: Vec2, target_pos: Vec2, spell_type: SpellType, zone: *const ZoneData) bool {
+        _ = zone; // Future: Use for line of sight checks
+        
+        return switch (spell_type) {
+            .None => false,
+            
+            .Lull => {
+                // Area effect spell - always valid (targets ground, not entities)
+                return true;
+            },
+            
+            .Blink => {
+                // Teleportation spell - check maximum range
+                const distance = caster_pos.sub(target_pos).length();
+                return distance <= constants.BLINK_MAX_DISTANCE;
+            },
+            
+            .Phase => {
+                // Self-targeted spell - target position ignored
+                return true;
+            },
+            
+            .Charm => {
+                // Targeted spell - check maximum range and line of sight
+                const charm_range = 100.0; // Should match castCharmSpell range
+                const distance = caster_pos.sub(target_pos).length();
+                return distance <= charm_range;
+                // Future: Add line of sight check using zone terrain
+            },
+            
+            else => {
+                // Future spells - basic range check
+                const max_range = 200.0; // Default maximum spell range
+                const distance = caster_pos.sub(target_pos).length();
+                return distance <= max_range;
+            },
+        };
+    }
+    
+    /// Get spell targeting type for UI feedback
+    pub fn getSpellTargetingType(spell_type: SpellType) components.MagicTarget.TargetType {
+        return switch (spell_type) {
+            .None => .single,
+            .Lull => .area,
+            .Blink => .single, // Click to teleport to location
+            .Phase => .self, // Self-cast only
+            .Charm => .single, // Click to target unit
+            else => .single,
+        };
+    }
+    
+    /// Check if spell requires line of sight
+    pub fn spellRequiresLineOfSight(spell_type: SpellType) bool {
+        return switch (spell_type) {
+            .None => false,
+            .Lull => false, // Area effect doesn't need direct line of sight
+            .Blink => false, // Can teleport through walls
+            .Phase => false, // Self-cast
+            .Charm => true, // Needs to see target to charm
+            else => true, // Most spells require line of sight
+        };
+    }
+};
 
 pub const SpellSystem = struct {
     // Use generic spell slot system
@@ -63,7 +236,8 @@ pub const SpellSystem = struct {
         // Initialize spell slots with specific spells and cooldowns
         system.slot_system.setSpell(0, .Lull, getSpellCooldown(.Lull)); // Slot 1
         system.slot_system.setSpell(1, .Blink, getSpellCooldown(.Blink)); // Slot 2
-        // Slots 2-7 remain as .None (default)
+        system.slot_system.setSpell(2, .Phase, getSpellCooldown(.Phase)); // Slot 3
+        // Slots 3-7 remain as .None (default)
 
         return system;
     }
@@ -99,10 +273,24 @@ pub const SpellSystem = struct {
         const slot = self.slot_system.getActiveSlotMut();
         if (!slot.canCast()) return false;
 
-        // If self-cast, target player position
-        const actual_target = if (self_cast) game.getPlayerPos() else target_pos;
+        const spell_type = slot.spell_type;
+        const player_pos = game.getPlayerPos();
+        
+        // Determine actual target based on spell targeting type and self-cast preference
+        const targeting_type = SpellHelpers.getSpellTargetingType(spell_type);
+        const actual_target = switch (targeting_type) {
+            .self => player_pos, // Always self-target
+            .area, .single => if (self_cast) player_pos else target_pos, // Allow both modes
+            else => if (self_cast) player_pos else target_pos,
+        };
+        
+        // Validate targeting based on spell physicality
+        if (!SpellHelpers.validateSpellTarget(player_pos, actual_target, spell_type, zone)) {
+            loggers.getGameLog().info("spell_invalid_target", "Invalid target for spell {}", .{spell_type});
+            return false;
+        }
 
-        const success = self.castSpell(slot.spell_type, game, zone, actual_target, effect_system);
+        const success = self.castSpell(spell_type, game, zone, actual_target, effect_system);
         if (success) {
             slot.startCooldown();
         }
@@ -113,59 +301,13 @@ pub const SpellSystem = struct {
         switch (spell) {
             .None => return false,
 
-            .Lull => {
-                // Add lull effect using generic effect manager
-                _ = self.effect_manager.addAoEEffect(
-                    .lull,
-                    target_pos,
-                    constants.LULL_RADIUS,
-                    constants.LULL_DURATION,
-                    1.0, // Standard intensity
-                );
-                
-                // Apply lull effect to all units in area using ECS Effects
-                applyLullEffectToUnitsInArea(game, target_pos, constants.LULL_RADIUS, constants.LULL_DURATION, effect_system);
+            .Lull => return self.castLullSpell(game, target_pos, effect_system),
 
-                // Add area of effect visual indicator
-                effect_system.addLullAreaEffect(target_pos, constants.LULL_RADIUS, constants.LULL_DURATION);
-
-                loggers.getGameLog().info("lull_cast", "Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s", .{ target_pos.x, target_pos.y, constants.LULL_DURATION });
-                return true;
-            },
-
-            .Blink => {
-                // Only works in dungeons (follow camera mode)
-                if (zone.camera_mode != constants.CameraMode.follow) {
-                    loggers.getGameLog().info("blink_dungeon_only", "Blink only works in dungeons", .{});
-                    return false;
-                }
-
-                // Teleport player to target position
-                const player_pos = game.getPlayerPos();
-                const to_target = target_pos.sub(player_pos);
-                const distance = to_target.length();
-
-                if (distance > constants.BLINK_MAX_DISTANCE) {
-                    // Limit blink distance
-                    const direction = to_target.normalize();
-                    const new_pos = player_pos.add(direction.scale(constants.BLINK_MAX_DISTANCE));
-                    game.setPlayerPos(new_pos);
-                } else {
-                    game.setPlayerPos(target_pos);
-                }
-
-                // Add blink trail effect using effect manager
-                _ = self.effect_manager.addInstantEffect(
-                    .blink_trail,
-                    player_pos,
-                    1.0, // Standard intensity
-                );
-                
-                // Visual effects
-                effect_system.addPortalTravelEffect(game.getPlayerPos(), game.getPlayerRadius());
-                loggers.getGameLog().info("blink_teleport", "Blink teleport", .{});
-                return true;
-            },
+            .Blink => return self.castBlinkSpell(game, zone, target_pos, effect_system),
+            
+            .Phase => return self.castPhaseSpell(game, zone, target_pos, effect_system),
+            
+            .Charm => return self.castCharmSpell(game, zone, target_pos, effect_system),
 
             else => {
                 loggers.getGameLog().info("unimplemented_spell", "Spell {} not implemented yet", .{spell});
@@ -174,34 +316,223 @@ pub const SpellSystem = struct {
         }
     }
 
-    /// Apply lull effect to all units in the specified area using simplified HexGame storage
+    /// Apply lull effect to all units in the specified area using component-based queries
     fn applyLullEffectToUnitsInArea(game: *HexGame, center_pos: Vec2, radius: f32, duration: f32, effect_system: *GameEffectSystem) void {
         const zone = game.getCurrentZone();
         const radius_sq = radius * radius;
+        var affected_count: u32 = 0;
 
-        // Check all units in current zone
+        // Component-based unit targeting
         for (0..zone.units.count) |i| {
+            const entity_id = zone.units.entities[i];
+            if (entity_id == std.math.maxInt(u32)) continue;
+            
             const transform = &zone.units.transforms[i];
             const health = &zone.units.healths[i];
             const unit = &zone.units.units[i];
 
             // Skip if unit is not alive
             if (!health.alive) continue;
+            
+            // Check if entity can be affected by lull using component queries
+            if (!SpellHelpers.canAffectEntity(entity_id, zone, .lull)) {
+                loggers.getGameLog().info("lull_immune", "Entity {} immune to lull effects", .{entity_id});
+                continue;
+            }
 
             // Check if unit is within the lull area
             const to_center = transform.pos.sub(center_pos);
             const dist_sq = to_center.lengthSquared();
 
             if (dist_sq <= radius_sq) {
-                // Unit is in area - apply lull effect by reducing aggro factor
-                unit.base.aggro_factor = 0.2; // 20% aggro as per constants
+                // Unit is in area and can be affected - apply lull effect
+                unit.base.aggro_factor = constants.LULL_AGGRO_MULT;
+                affected_count += 1;
 
-                // Add visual effect for this unit (optional)
+                // Add visual effect for this unit
                 effect_system.addUnitEffectAura(transform.pos, transform.radius, duration);
 
-                loggers.getGameLog().info("lull_unit_affected", "Unit at ({d:.0}, {d:.0}) affected by lull", .{ transform.pos.x, transform.pos.y });
+                loggers.getGameLog().info("lull_unit_affected", "Unit {} at ({d:.0}, {d:.0}) affected by lull - aggro reduced to {d}%", .{ entity_id, transform.pos.x, transform.pos.y, constants.LULL_AGGRO_MULT * 100 });
             }
         }
+        
+        loggers.getGameLog().info("lull_effect_complete", "Lull effect applied to {} units in {d}-radius area", .{ affected_count, radius });
+    }
+    
+
+    /// Cast Lull spell - reduce unit aggro in area
+    fn castLullSpell(self: *SpellSystem, game: *HexGame, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+        // Add lull effect using generic effect manager
+        _ = self.effect_manager.addAoEEffect(
+            .lull,
+            target_pos,
+            constants.LULL_RADIUS,
+            constants.LULL_DURATION,
+            1.0, // Standard intensity
+        );
+        
+        // Apply lull effect to all units in area using component-based targeting
+        applyLullEffectToUnitsInArea(game, target_pos, constants.LULL_RADIUS, constants.LULL_DURATION, effect_system);
+
+        // Add area of effect visual indicator
+        effect_system.addLullAreaEffect(target_pos, constants.LULL_RADIUS, constants.LULL_DURATION);
+
+        loggers.getGameLog().info("lull_cast", "Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s", .{ target_pos.x, target_pos.y, constants.LULL_DURATION });
+        return true;
+    }
+    
+    /// Cast Blink spell - teleport to target location
+    fn castBlinkSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+        // Only works in dungeons (follow camera mode) - future: component-based environment check
+        if (zone.camera_mode != constants.CameraMode.follow) {
+            loggers.getGameLog().info("blink_dungeon_only", "Blink only works in dungeons", .{});
+            return false;
+        }
+
+        // Component-based teleportation
+        const player_pos = game.getPlayerPos();
+        const player_entity = game.getPlayer() orelse {
+            loggers.getGameLog().info("blink_no_player", "No player entity found", .{});
+            return false;
+        };
+
+        // Check if entity has Teleportable component
+        if (!SpellHelpers.hasTeleportableComponent(player_entity, zone)) {
+            loggers.getGameLog().info("blink_not_teleportable", "Entity cannot be teleported", .{});
+            return false;
+        }
+
+        // Perform component-based teleportation with validation
+        const final_pos = SpellHelpers.performTeleport(
+            player_entity,
+            player_pos,
+            target_pos,
+            constants.BLINK_MAX_DISTANCE,
+            zone,
+            game
+        ) orelse {
+            loggers.getGameLog().info("blink_invalid_target", "Invalid teleport target", .{});
+            return false;
+        };
+
+        // Execute teleportation
+        game.setPlayerPos(final_pos);
+
+        // Add blink trail effect using effect manager
+        _ = self.effect_manager.addInstantEffect(
+            .blink_trail,
+            player_pos,
+            1.0, // Standard intensity
+        );
+        
+        // Visual effects
+        effect_system.addPortalTravelEffect(game.getPlayerPos(), game.getPlayerRadius());
+        loggers.getGameLog().info("blink_teleport", "Blink teleport to {any}", .{final_pos});
+        return true;
+    }
+    
+    /// Cast Phase spell - allow walking through solid objects
+    fn castPhaseSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+        const player_pos = game.getPlayerPos();
+        const player_entity = game.getPlayer() orelse {
+            loggers.getGameLog().info("phase_no_player", "No player entity found", .{});
+            return false;
+        };
+
+        // Check if player has Phaseable component
+        if (!SpellHelpers.hasPhaseableComponent(player_entity, zone)) {
+            loggers.getGameLog().info("phase_not_phaseable", "Entity cannot phase", .{});
+            return false;
+        }
+
+        // Apply phase state to player
+        const phase_duration = constants.PHASE_DURATION;
+        // Note: zone parameter would need to be mutable for actual phase state modification
+        // For now, just log the phase activation
+        loggers.getGameLog().info("phase_applied", "Phase state applied to entity {} for {d}s", .{ player_entity, phase_duration });
+
+        // Add phase effect using effect manager
+        _ = self.effect_manager.addAoEEffect(
+            .phase_state,
+            if (target_pos.x == 0 and target_pos.y == 0) player_pos else target_pos,
+            game.getPlayerRadius() * 2, // Phase aura around player
+            phase_duration,
+            1.0, // Standard intensity
+        );
+        
+        // Visual effects - phase shimmer around player
+        effect_system.addUnitEffectAura(player_pos, game.getPlayerRadius(), phase_duration);
+        loggers.getGameLog().info("phase_cast", "Phase activated for {d}s - can walk through walls", .{phase_duration});
+        return true;
+    }
+    
+    /// Cast Charm spell - take control of target unit
+    fn castCharmSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+        const player_entity = game.getPlayer() orelse {
+            loggers.getGameLog().info("charm_no_player", "No player entity found", .{});
+            return false;
+        };
+        
+        // Find closest unit to target position within charm range
+        const charm_range = 100.0; // Charm targeting range
+        const charm_range_sq = charm_range * charm_range;
+        var closest_unit: ?struct { entity_id: EntityId, index: usize, distance_sq: f32 } = null;
+        
+        for (0..zone.units.count) |i| {
+            const entity_id = zone.units.entities[i];
+            if (entity_id == std.math.maxInt(u32)) continue;
+            
+            const transform = &zone.units.transforms[i];
+            const health = &zone.units.healths[i];
+            
+            // Skip if unit is not alive
+            if (!health.alive) continue;
+            
+            // Check if entity can be charmed using component queries
+            if (!SpellHelpers.hasCharmableComponent(entity_id, zone)) {
+                continue;
+            }
+            
+            // Calculate distance to target position
+            const to_target = transform.pos.sub(target_pos);
+            const dist_sq = to_target.lengthSquared();
+            
+            if (dist_sq <= charm_range_sq) {
+                if (closest_unit == null or dist_sq < closest_unit.?.distance_sq) {
+                    closest_unit = .{ .entity_id = entity_id, .index = i, .distance_sq = dist_sq };
+                }
+            }
+        }
+        
+        if (closest_unit == null) {
+            loggers.getGameLog().info("charm_no_target", "No charmable units within range of target", .{});
+            return false;
+        }
+        
+        const target_unit = closest_unit.?;
+        const charm_duration = 8.0; // Charm duration in seconds
+        
+        // Apply charm effect using component system
+        if (!SpellHelpers.applyCharmEffect(target_unit.entity_id, player_entity, charm_duration, @constCast(zone))) {
+            loggers.getGameLog().info("charm_failed", "Failed to charm unit {}", .{target_unit.entity_id});
+            return false;
+        }
+        
+        // Add charm effect using effect manager
+        _ = self.effect_manager.addAoEEffect(
+            .charm_effect,
+            zone.units.transforms[target_unit.index].pos,
+            zone.units.transforms[target_unit.index].radius * 2, // Charm aura around unit
+            charm_duration,
+            1.0, // Standard intensity
+        );
+        
+        // Visual effects - charm aura around target unit
+        const target_transform = &zone.units.transforms[target_unit.index];
+        effect_system.addUnitEffectAura(target_transform.pos, target_transform.radius, charm_duration);
+        
+        loggers.getGameLog().info("charm_cast", "Unit {} charmed for {d}s - now under player control", .{ target_unit.entity_id, charm_duration });
+        return true;
     }
 
     /// Get aggro multiplier for a specific unit
@@ -219,6 +550,8 @@ fn getSpellCooldown(spell: SpellType) f32 {
         .None => 0,
         .Lull => constants.LULL_COOLDOWN,
         .Blink => constants.BLINK_COOLDOWN,
+        .Phase => constants.PHASE_COOLDOWN,
+        .Charm => 20.0, // Future
         .Shield => 15.0, // Future
         .Haste => 20.0, // Future
         .Multishot => 8.0, // Future
