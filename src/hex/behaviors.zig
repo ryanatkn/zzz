@@ -62,48 +62,30 @@ fn createConfigForProfile(profile: BehaviorProfile, home_pos: Vec2) unit_behavio
     const base_walk_speed = constants.UNIT_WALK_SPEED;
 
     return switch (profile) {
-        .idle => blk: {
-            var config = unit_behavior.UnitBehaviorConfig.init(home_pos, base_detection, constants.BEHAVIOR_IDLE_MIN_DISTANCE, base_chase_speed, base_chase_speed * constants.BEHAVIOR_IDLE_WALK_SPEED_MULT, constants.BEHAVIOR_IDLE_CHASE_DURATION, constants.BEHAVIOR_IDLE_HOME_TOLERANCE, constants.BEHAVIOR_IDLE_LOSE_TOLERANCE);
-            config.behavior_priorities.chase = .low;
-            config.behavior_priorities.return_home = .normal;
-            config.behavior_priorities.wander = .lowest;
-            break :blk config;
-        },
+        .idle => unit_behavior.UnitBehaviorConfig.init(home_pos, base_detection, constants.BEHAVIOR_IDLE_MIN_DISTANCE, base_chase_speed, base_chase_speed * constants.BEHAVIOR_IDLE_WALK_SPEED_MULT, constants.BEHAVIOR_IDLE_CHASE_DURATION, constants.BEHAVIOR_IDLE_HOME_TOLERANCE, constants.BEHAVIOR_IDLE_LOSE_TOLERANCE),
         .aggressive => unit_behavior.UnitBehaviorConfig.aggressive(home_pos, base_detection, base_chase_speed),
         .defensive => unit_behavior.UnitBehaviorConfig.defensive(home_pos, base_detection, base_chase_speed * constants.BEHAVIOR_DEFENSIVE_SPEED_MULT),
         .patrolling => unit_behavior.UnitBehaviorConfig.patrolling(home_pos, base_detection, base_walk_speed),
-        .wandering => blk: {
-            var config = unit_behavior.UnitBehaviorConfig.init(
-                home_pos,
-                base_detection * constants.BEHAVIOR_WANDERING_DETECTION_MULT,
-                constants.PLAYER_RADIUS + 10.0,
-                base_walk_speed,
-                base_walk_speed * constants.BEHAVIOR_WANDERING_WALK_SPEED_MULT,
-                constants.BEHAVIOR_WANDERING_CHASE_DURATION,
-                constants.UNIT_HOME_TOLERANCE,
-                constants.BEHAVIOR_WANDERING_LOSE_TOLERANCE,
-            );
-            config.behavior_priorities.wander = .high;
-            config.behavior_priorities.flee = .critical;
-            config.behavior_priorities.chase = .low;
-            break :blk config;
-        },
-        .guardian => blk: {
-            var config = unit_behavior.UnitBehaviorConfig.init(
-                home_pos,
-                base_detection * constants.BEHAVIOR_GUARDIAN_DETECTION_MULT,
-                constants.PLAYER_RADIUS + constants.BEHAVIOR_GUARDIAN_MIN_DISTANCE_OFFSET,
-                base_chase_speed,
-                base_walk_speed,
-                constants.BEHAVIOR_GUARDIAN_CHASE_DURATION,
-                constants.UNIT_HOME_TOLERANCE * constants.BEHAVIOR_GUARDIAN_HOME_TOLERANCE_MULT,
-                constants.BEHAVIOR_GUARDIAN_LOSE_TOLERANCE,
-            );
-            config.behavior_priorities.guard = .critical;
-            config.behavior_priorities.chase = .high;
-            config.behavior_priorities.flee = .lowest;
-            break :blk config;
-        },
+        .wandering => unit_behavior.UnitBehaviorConfig.init(
+            home_pos,
+            base_detection * constants.BEHAVIOR_WANDERING_DETECTION_MULT,
+            constants.PLAYER_RADIUS + 10.0,
+            base_walk_speed,
+            base_walk_speed * constants.BEHAVIOR_WANDERING_WALK_SPEED_MULT,
+            constants.BEHAVIOR_WANDERING_CHASE_DURATION,
+            constants.UNIT_HOME_TOLERANCE,
+            constants.BEHAVIOR_WANDERING_LOSE_TOLERANCE,
+        ),
+        .guardian => unit_behavior.UnitBehaviorConfig.init(
+            home_pos,
+            base_detection * constants.BEHAVIOR_GUARDIAN_DETECTION_MULT,
+            constants.PLAYER_RADIUS + constants.BEHAVIOR_GUARDIAN_MIN_DISTANCE_OFFSET,
+            base_chase_speed,
+            base_walk_speed,
+            constants.BEHAVIOR_GUARDIAN_CHASE_DURATION,
+            constants.UNIT_HOME_TOLERANCE * constants.BEHAVIOR_GUARDIAN_HOME_TOLERANCE_MULT,
+            constants.BEHAVIOR_GUARDIAN_LOSE_TOLERANCE,
+        ),
     };
 }
 
@@ -239,16 +221,13 @@ pub fn updateUnitWithAggroMod(
 
     // Update hex-specific unit state based on behavior result
     unit_comp.base.behavior_state = switch (result.active_behavior) {
-        .chase => .chasing,
-        .flee => .fleeing,
-        .return_home => .idle, // Returning home is considered idle state
-        .patrol => .patrolling,
-        .guard, .wander, .idle => .idle, // Default to idle for these behaviors
+        .chasing => .chasing,
+        .fleeing => .fleeing,
+        .returning_home => .idle, // Returning home is considered idle state
+        .patrolling => .patrolling,
+        .guarding, .investigating, .idle => .idle, // Default to idle for these behaviors
     };
 
-    // Update chase timer and target from library state
-    unit_comp.chase_timer = state.chase.chase_timer;
-    unit_comp.target_pos = state.chase.target_pos;
 
     // Apply hex-specific colors based on behavior and profile
     visual.color = getBehaviorColor(result.active_behavior, profile);
@@ -259,22 +238,22 @@ pub fn updateUnitWithAggroMod(
 }
 
 /// Get color for behavior and profile combination
-fn getBehaviorColor(behavior: unit_behavior.BehaviorType, profile: BehaviorProfile) @TypeOf(constants.COLOR_UNIT_AGGRESSIVE) {
+fn getBehaviorColor(behavior: behaviors_mod.behavior_state_machine.BehaviorState, profile: BehaviorProfile) @TypeOf(constants.COLOR_UNIT_AGGRESSIVE) {
     return switch (behavior) {
-        .chase => switch (profile) {
+        .chasing => switch (profile) {
             .aggressive => constants.COLOR_UNIT_AGGRESSIVE,
             .guardian => colors.PORTAL, // Purple
             else => constants.COLOR_UNIT_AGGRESSIVE,
         },
-        .flee => switch (profile) {
+        .fleeing => switch (profile) {
             .defensive => colors.OBSTACLE_DEADLY, // Orange
             .wandering => colors.BULLET, // Yellow
             else => colors.OBSTACLE_DEADLY,
         },
-        .patrol => colors.PLAYER_ALIVE, // Blue
-        .guard => colors.PORTAL, // Purple
-        .wander => colors.GREEN_BRIGHT, // Green
-        .return_home => constants.COLOR_UNIT_RETURNING,
+        .patrolling => colors.PLAYER_ALIVE, // Blue
+        .guarding => colors.PORTAL, // Purple
+        .investigating => colors.GREEN_BRIGHT, // Green
+        .returning_home => constants.COLOR_UNIT_RETURNING,
         .idle => constants.COLOR_UNIT_NON_AGGRO,
     };
 }

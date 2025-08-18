@@ -68,8 +68,6 @@ pub const HexUnit = struct {
 
     // Hex-specific additions
     behavior_profile: BehaviorProfile = .idle,
-    target_pos: Vec2,
-    chase_timer: f32,
 
     pub const UnitState = enum { returning_home, chasing, at_home };
     pub const UnitType = components.Unit.UnitType;
@@ -78,8 +76,6 @@ pub const HexUnit = struct {
         return .{
             .base = components.Unit.init(utype, home_pos),
             .behavior_profile = behavior,
-            .target_pos = home_pos,
-            .chase_timer = 0.0,
         };
     }
 

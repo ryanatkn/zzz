@@ -8,65 +8,6 @@ const wander_behavior = @import("wander_behavior.zig");
 const return_home_behavior = @import("return_home_behavior.zig");
 const behavior_state_machine = @import("behavior_state_machine.zig");
 
-/// Behavior type enumeration (kept for compatibility)
-pub const BehaviorType = enum {
-    chase,
-    flee,
-    patrol,
-    guard,
-    wander,
-    return_home,
-    idle,
-    
-    /// Convert from new BehaviorState to old BehaviorType for compatibility
-    pub fn fromBehaviorState(state: behavior_state_machine.BehaviorState) BehaviorType {
-        return switch (state) {
-            .chasing => .chase,
-            .fleeing => .flee,
-            .patrolling => .patrol,
-            .guarding => .guard,
-            .investigating => .wander, // Map investigating to wander for compatibility
-            .returning_home => .return_home,
-            .idle => .idle,
-        };
-    }
-};
-
-/// Behavior priority levels (higher number = higher priority)
-pub const BehaviorPriority = enum(u8) {
-    lowest = 0,
-    low = 1,
-    normal = 2,
-    high = 3,
-    critical = 4,
-};
-
-/// Behavior priority configuration
-pub const BehaviorPriorities = struct {
-    chase: BehaviorPriority = .normal,
-    flee: BehaviorPriority = .high,
-    patrol: BehaviorPriority = .low,
-    guard: BehaviorPriority = .normal,
-    wander: BehaviorPriority = .lowest,
-    return_home: BehaviorPriority = .low,
-
-    pub fn default() BehaviorPriorities {
-        return .{};
-    }
-
-    pub fn getPriority(self: *const BehaviorPriorities, behavior_type: BehaviorType) BehaviorPriority {
-        return switch (behavior_type) {
-            .chase => self.chase,
-            .flee => self.flee,
-            .patrol => self.patrol,
-            .guard => self.guard,
-            .wander => self.wander,
-            .return_home => self.return_home,
-            .idle => .lowest,
-        };
-    }
-};
-
 /// Generic unit behavior configuration
 pub const UnitBehaviorConfig = struct {
     /// Chase behavior configuration
@@ -83,8 +24,6 @@ pub const UnitBehaviorConfig = struct {
     return_home: return_home_behavior.ReturnHomeConfig,
     /// Speed multiplier when walking vs running
     walk_speed_multiplier: f32 = 0.5,
-    /// Behavior priorities (can be customized per unit)
-    behavior_priorities: BehaviorPriorities = BehaviorPriorities.default(),
 
     pub fn init(
         home_pos: Vec2,
@@ -134,74 +73,47 @@ pub const UnitBehaviorConfig = struct {
 
     /// Create a simple aggressive config (chase + return home only)
     pub fn aggressive(home_pos: Vec2, detection_range: f32, chase_speed: f32) UnitBehaviorConfig {
-        var config = UnitBehaviorConfig.init(home_pos, detection_range, 20.0, chase_speed, chase_speed * 0.6, 3.0, 15.0, 1.15);
-        config.behavior_priorities.chase = .critical;
-        config.behavior_priorities.flee = .lowest;
-        return config;
+        return UnitBehaviorConfig.init(home_pos, detection_range, 20.0, chase_speed, chase_speed * 0.6, 3.0, 15.0, 1.15);
     }
 
     /// Create a defensive config (flee + guard prioritized)
     pub fn defensive(home_pos: Vec2, detection_range: f32, flee_speed: f32) UnitBehaviorConfig {
-        var config = UnitBehaviorConfig.init(home_pos, detection_range, 30.0, flee_speed * 0.8, flee_speed * 0.5, 2.0, 15.0, 1.0);
-        config.behavior_priorities.flee = .critical;
-        config.behavior_priorities.guard = .high;
-        config.behavior_priorities.chase = .low;
-        return config;
+        return UnitBehaviorConfig.init(home_pos, detection_range, 30.0, flee_speed * 0.8, flee_speed * 0.5, 2.0, 15.0, 1.0);
     }
 
     /// Create a patrol config (patrol + guard prioritized)
     pub fn patrolling(home_pos: Vec2, detection_range: f32, patrol_speed: f32) UnitBehaviorConfig {
-        var config = UnitBehaviorConfig.init(home_pos, detection_range, 25.0, patrol_speed, patrol_speed * 0.8, 2.0, 10.0, 1.1);
-        config.behavior_priorities.patrol = .high;
-        config.behavior_priorities.guard = .normal;
-        config.behavior_priorities.wander = .lowest;
-        return config;
+        return UnitBehaviorConfig.init(home_pos, detection_range, 25.0, patrol_speed, patrol_speed * 0.8, 2.0, 10.0, 1.1);
     }
 };
 
-/// Generic unit state for behavior management (now using state machine)
+/// Simplified unit state using state machine
 pub const UnitBehaviorState = struct {
     /// State machine for behavior transitions
     state_machine: behavior_state_machine.BehaviorStateMachine,
-    /// Individual behavior states (kept for compatibility with existing behaviors)
+    /// Minimal chase state for compatibility (chase_timer, target_pos)
     chase: chase_behavior.ChaseState,
-    flee: flee_behavior.FleeState,
+    /// Patrol waypoints (if needed)
     patrol: patrol_behavior.PatrolState,
-    guard: guard_behavior.GuardState,
-    wander: wander_behavior.WanderState,
-    return_home: return_home_behavior.PatrolState,
 
     pub fn init(home_pos: Vec2, patrol_waypoints: []const Vec2, random_seed: u64) UnitBehaviorState {
+        _ = home_pos;
+        _ = random_seed;
         return .{
             .state_machine = behavior_state_machine.BehaviorStateMachine.init(.idle),
             .chase = chase_behavior.ChaseState.init(),
-            .flee = flee_behavior.FleeState.init(),
             .patrol = patrol_behavior.PatrolState.init(patrol_waypoints),
-            .guard = guard_behavior.GuardState.init(),
-            .wander = wander_behavior.WanderState.init(home_pos, random_seed),
-            .return_home = return_home_behavior.PatrolState.init(&[_]Vec2{}),
         };
     }
 
     pub fn reset(self: *UnitBehaviorState, home_pos: Vec2) void {
+        _ = home_pos;
         self.state_machine = behavior_state_machine.BehaviorStateMachine.init(.idle);
         self.chase.reset();
-        self.flee.reset();
         self.patrol.reset();
-        self.guard.reset();
-        self.wander.reset(home_pos);
-        self.return_home = return_home_behavior.PatrolState.init(&[_]Vec2{});
     }
 
-    /// Get current behavior type for compatibility
-    pub fn getActiveBehavior(self: *const UnitBehaviorState) BehaviorType {
-        return BehaviorType.fromBehaviorState(self.state_machine.getCurrentState());
-    }
-    
-    /// Get previous behavior type for compatibility  
-    pub fn getPreviousBehavior(self: *const UnitBehaviorState) BehaviorType {
-        return BehaviorType.fromBehaviorState(self.state_machine.state_machine.getPreviousState());
-    }
+    // Compatibility methods removed - access state_machine directly
 };
 
 /// Result of unit behavior evaluation
@@ -209,9 +121,9 @@ pub const UnitBehaviorResult = struct {
     /// Velocity to apply to the unit
     velocity: Vec2,
     /// Current active behavior
-    active_behavior: BehaviorType,
+    active_behavior: behavior_state_machine.BehaviorState,
     /// Previous behavior (if changed this frame)
-    previous_behavior: ?BehaviorType,
+    previous_behavior: ?behavior_state_machine.BehaviorState,
     /// Whether behavior changed this frame
     behavior_changed: bool,
     /// Whether any behavior state changed internally
@@ -244,7 +156,7 @@ pub fn updateUnitBehavior(
     state: *UnitBehaviorState,
     config: UnitBehaviorConfig,
 ) UnitBehaviorResult {
-    const old_behavior = state.getActiveBehavior();
+    const old_behavior_state = state.state_machine.getCurrentState();
     
     // Create behavior context for state machine
     const behavior_context = behavior_state_machine.BehaviorContext.init(
@@ -270,8 +182,8 @@ pub fn updateUnitBehavior(
     
     const result = UnitBehaviorResult{
         .velocity = state_machine_result.velocity,
-        .active_behavior = BehaviorType.fromBehaviorState(state_machine_result.active_behavior),
-        .previous_behavior = if (state_machine_result.behavior_changed) old_behavior else null,
+        .active_behavior = state_machine_result.active_behavior,
+        .previous_behavior = if (state_machine_result.behavior_changed) old_behavior_state else null,
         .behavior_changed = state_machine_result.behavior_changed,
         .state_changed = state_machine_result.state_changed,
         .detected_target = state_machine_result.detected_target,
@@ -283,25 +195,24 @@ pub fn updateUnitBehavior(
     return result;
 }
 
-/// Determine behavior profile from config priorities (compatibility layer)
+/// Determine behavior profile from config characteristics
 fn determineProfileFromConfig(config: UnitBehaviorConfig) behavior_state_machine.BehaviorProfile {
-    // Analyze priority configuration to guess the intended profile
-    const chase_priority = @intFromEnum(config.behavior_priorities.chase);
-    const flee_priority = @intFromEnum(config.behavior_priorities.flee);
-    const guard_priority = @intFromEnum(config.behavior_priorities.guard);
-    const patrol_priority = @intFromEnum(config.behavior_priorities.patrol);
+    // Use chase speed and detection range to determine profile
+    const chase_speed = config.chase.chase_speed;
+    const detection_range = config.chase.detection_range;
+    const flee_speed = config.flee.flee_speed;
     
-    // Aggressive: high chase, low flee
-    if (chase_priority >= 3 and flee_priority <= 1) return .aggressive;
+    // Aggressive: high chase speed, long detection range
+    if (chase_speed >= 95.0 and detection_range >= 100.0) return .aggressive;
     
-    // Defensive: high flee, high guard
-    if (flee_priority >= 3 and guard_priority >= 2) return .defensive;
+    // Defensive: high flee speed relative to chase
+    if (flee_speed > chase_speed * 1.1) return .defensive;
     
-    // Patrolling: high patrol
-    if (patrol_priority >= 3) return .patrolling;
+    // Guardian: very high chase speed and long range
+    if (chase_speed >= 95.0 and detection_range >= 150.0) return .guardian;
     
-    // Guardian: high guard, high chase
-    if (guard_priority >= 3 and chase_priority >= 2) return .guardian;
+    // Patrolling: moderate speeds, balanced
+    if (chase_speed >= 80.0 and chase_speed <= 90.0) return .patrolling;
     
     // Default to wandering (balanced behavior)
     return .wandering;
@@ -310,54 +221,6 @@ fn determineProfileFromConfig(config: UnitBehaviorConfig) behavior_state_machine
 // Deprecated: Use updateUnitBehavior() directly with FrameContext.effectiveDelta()
 // This function existed for the old complex context system
 
-/// Apply unit behavior result to transform and visual components
-/// This is a generic helper that games can customize
-pub fn applyBehaviorResult(
-    transform: anytype, // Should have pos, vel fields
-    visual: anytype, // Should have color field
-    result: UnitBehaviorResult,
-    colors: BehaviorColors,
-    dt: f32,
-) void {
-    // Apply velocity
-    transform.vel = result.velocity;
-    transform.pos = transform.pos.add(result.velocity.scale(dt));
-
-    // Apply visual feedback based on active behavior
-    visual.color = switch (result.active_behavior) {
-        .chase => colors.chasing,
-        .flee => colors.fleeing,
-        .patrol => colors.patrolling,
-        .guard => colors.guarding,
-        .wander => colors.wandering,
-        .return_home => colors.returning_home,
-        .idle => colors.idle,
-    };
-}
-
-/// Color configuration for different behavior states
-pub const BehaviorColors = struct {
-    chasing: @TypeOf(@field(@import("../../core/colors.zig").Color, "RED")),
-    fleeing: @TypeOf(@field(@import("../../core/colors.zig").Color, "ORANGE")),
-    patrolling: @TypeOf(@field(@import("../../core/colors.zig").Color, "BLUE")),
-    guarding: @TypeOf(@field(@import("../../core/colors.zig").Color, "PURPLE")),
-    wandering: @TypeOf(@field(@import("../../core/colors.zig").Color, "CYAN")),
-    returning_home: @TypeOf(@field(@import("../../core/colors.zig").Color, "YELLOW")),
-    idle: @TypeOf(@field(@import("../../core/colors.zig").Color, "GRAY")),
-
-    pub fn init() BehaviorColors {
-        const Color = @import("../../core/colors.zig").Color;
-        return .{
-            .chasing = Color.RED,
-            .fleeing = Color.ORANGE,
-            .patrolling = Color.BLUE,
-            .guarding = Color.PURPLE,
-            .wandering = Color.GREEN_BRIGHT,
-            .returning_home = Color.YELLOW,
-            .idle = Color.GRAY,
-        };
-    }
-};
 
 test "unit behavior basic functionality" {
     const home_pos = Vec2{ .x = 0, .y = 0 };
