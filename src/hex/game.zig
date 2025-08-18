@@ -17,7 +17,7 @@ const collision = @import("../lib/physics/collision.zig");
 
 // Game system capabilities
 const game_systems = @import("../lib/game/mod.zig");
-const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+const GameParticleSystem = @import("../lib/particles/game_particles.zig").GameParticleSystem;
 
 // Debug capabilities
 const Logger = @import("../lib/debug/logger.zig").Logger;
@@ -54,7 +54,7 @@ pub const GameState = struct {
     quit_requested: bool,
 
     // Visual effects system
-    effect_system: GameEffectSystem,
+    particle_system: GameParticleSystem,
 
     // Spell system
     spell_system: spells.SpellSystem,
@@ -98,7 +98,7 @@ pub const GameState = struct {
             .input_state = InputState.init(),
             .game_paused = false,
             .quit_requested = false,
-            .effect_system = GameEffectSystem.init(),
+            .particle_system = GameParticleSystem.init(),
             .logger = ModuleLogger.init(allocator),
             .spell_system = spells.SpellSystem.init(),
             .spellbar_ui = spellbar.Spellbar.init(),
@@ -113,7 +113,7 @@ pub const GameState = struct {
         };
 
         // Connect the effect system to the hex game for travel effects
-        game_state.hex_game.setEffectSystemRef(&game_state.effect_system);
+        game_state.hex_game.setParticleSystemRef(&game_state.particle_system);
 
         return game_state;
     }
@@ -192,7 +192,7 @@ pub const GameState = struct {
             try self.hex_game.travelToZone(destination_zone, actual_spawn_pos);
 
             // Clear ALL effects on zone travel to keep them fully ephemeral
-            self.effect_system.clear();
+            self.particle_system.clear();
         }
     }
 
@@ -238,7 +238,7 @@ pub const GameState = struct {
         // Reset all zones (implemented with hex_game architecture)
 
         // Clear effects for clean slate (keep ephemeral)
-        self.effect_system.clear();
+        self.particle_system.clear();
 
         self.logger.info("full_reset", "Full game reset", .{});
     }
@@ -419,7 +419,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     checkCollisions(game_state);
 
     // Update visual effects
-    game_state.effect_system.update();
+    game_state.particle_system.update();
 
     // Update spell system with context
     game_state.spell_system.update(frame_ctx);
@@ -519,7 +519,7 @@ fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_rad
             }
 
             // Add inner effect for newly attuned lifestone
-            game_state.effect_system.addLifestoneInnerEffectOnly(transform.pos, transform.radius);
+            game_state.particle_system.addLifestoneInnerParticleOnly(transform.pos, transform.radius);
         }
     }
 }

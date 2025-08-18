@@ -3,9 +3,9 @@ const BoundedArray = std.BoundedArray;
 
 const EntityId = u32;
 
-/// Effects - temporary modifiers that stack
+/// Statuses - temporary modifiers that stack
 /// Sparse storage - only affected entities have this
-pub const Effects = struct {
+pub const Statuses = struct {
     pub const ModifierType = enum {
         speed_mult,
         damage_mult,
@@ -34,20 +34,20 @@ pub const Effects = struct {
 
     modifiers: BoundedArray(Modifier, 16),
 
-    pub fn init() Effects {
+    pub fn init() Statuses {
         return .{
             .modifiers = BoundedArray(Modifier, 16).init(0) catch |err| {
-                std.log.err("Failed to initialize Effects modifiers array: {}", .{err});
-                @panic("Effects component initialization failed");
+                std.log.err("Failed to initialize Statuses modifiers array: {}", .{err});
+                @panic("Statuses component initialization failed");
             },
         };
     }
 
-    pub fn addModifier(self: *Effects, modifier: Modifier) !void {
+    pub fn addModifier(self: *Statuses, modifier: Modifier) !void {
         try self.modifiers.append(modifier);
     }
 
-    pub fn update(self: *Effects, dt: f32) void {
+    pub fn update(self: *Statuses, dt: f32) void {
         var i: usize = 0;
         while (i < self.modifiers.len) {
             self.modifiers.buffer[i].duration -= dt;
@@ -59,7 +59,7 @@ pub const Effects = struct {
         }
     }
 
-    pub fn getModifiedValue(self: Effects, base: f32, modifier_type: ModifierType) f32 {
+    pub fn getModifiedValue(self: Statuses, base: f32, modifier_type: ModifierType) f32 {
         var result = base;
         var multiplicative: f32 = 1.0;
 
@@ -79,7 +79,7 @@ pub const Effects = struct {
     }
 
     /// Get aggro multiplier for this entity (1.0 = normal aggro)
-    pub fn getAggroMultiplier(self: Effects) f32 {
+    pub fn getAggroMultiplier(self: Statuses) f32 {
         return self.getModifiedValue(1.0, .aggro_mult);
     }
 };

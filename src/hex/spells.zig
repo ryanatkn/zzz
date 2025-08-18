@@ -1,6 +1,6 @@
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
-const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+const GameParticleSystem = @import("../lib/particles/game_particles.zig").GameParticleSystem;
 const constants = @import("constants.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const hex_game_mod = @import("hex_game.zig");
@@ -267,7 +267,7 @@ pub const SpellSystem = struct {
         return self.slot_system.getActiveSlot();
     }
 
-    pub fn castActiveSpell(self: *SpellSystem, game: *HexGame, zone: *const hex_game_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem, self_cast: bool) bool {
+    pub fn castActiveSpell(self: *SpellSystem, game: *HexGame, zone: *const hex_game_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem, self_cast: bool) bool {
         const slot = self.slot_system.getActiveSlotMut();
         if (!slot.canCast()) return false;
 
@@ -295,7 +295,7 @@ pub const SpellSystem = struct {
         return success;
     }
 
-    pub fn castSpell(self: *SpellSystem, spell: SpellType, game: *HexGame, zone: *const hex_game_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+    pub fn castSpell(self: *SpellSystem, spell: SpellType, game: *HexGame, zone: *const hex_game_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
         switch (spell) {
             .None => return false,
 
@@ -318,7 +318,7 @@ pub const SpellSystem = struct {
     }
 
     /// Apply lull effect to all units in the specified area using component-based queries
-    fn applyLullEffectToUnitsInArea(game: *HexGame, center_pos: Vec2, radius: f32, duration: f32, effect_system: *GameEffectSystem) void {
+    fn applyLullEffectToUnitsInArea(game: *HexGame, center_pos: Vec2, radius: f32, duration: f32, effect_system: *GameParticleSystem) void {
         const zone = game.getCurrentZone();
         const radius_sq = radius * radius;
         var affected_count: u32 = 0;
@@ -351,7 +351,7 @@ pub const SpellSystem = struct {
                 affected_count += 1;
 
                 // Add visual effect for this unit
-                effect_system.addUnitEffectAura(transform.pos, transform.radius, duration);
+                effect_system.addUnitStatusAura(transform.pos, transform.radius, duration);
 
                 loggers.getGameLog().info("lull_unit_affected", "Unit {} at ({d:.0}, {d:.0}) affected by lull - aggro reduced to {d}%", .{ entity_id, transform.pos.x, transform.pos.y, constants.LULL_AGGRO_MULT * 100 });
             }
@@ -361,7 +361,7 @@ pub const SpellSystem = struct {
     }
 
     /// Cast Lull spell - reduce unit aggro in area
-    fn castLullSpell(self: *SpellSystem, game: *HexGame, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+    fn castLullSpell(self: *SpellSystem, game: *HexGame, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
         // Add lull effect using generic effect manager
         _ = self.effect_manager.addAoEEffect(
             .lull,
@@ -375,14 +375,14 @@ pub const SpellSystem = struct {
         applyLullEffectToUnitsInArea(game, target_pos, constants.LULL_RADIUS, constants.LULL_DURATION, effect_system);
 
         // Add area of effect visual indicator
-        effect_system.addLullAreaEffect(target_pos, constants.LULL_RADIUS, constants.LULL_DURATION);
+        effect_system.addLullAreaParticle(target_pos, constants.LULL_RADIUS, constants.LULL_DURATION);
 
         loggers.getGameLog().info("lull_cast", "Lull cast at ({d:.0}, {d:.0}) - AoE aggro reduction for {d}s", .{ target_pos.x, target_pos.y, constants.LULL_DURATION });
         return true;
     }
 
     /// Cast Blink spell - teleport to target location
-    fn castBlinkSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+    fn castBlinkSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
         // Only works in dungeons (follow camera mode) - future: component-based environment check
         if (zone.camera_mode != constants.CameraMode.follow) {
             loggers.getGameLog().info("blink_dungeon_only", "Blink only works in dungeons", .{});
@@ -419,13 +419,13 @@ pub const SpellSystem = struct {
         );
 
         // Visual effects
-        effect_system.addPortalTravelEffect(game.getPlayerPos(), game.getPlayerRadius());
+        effect_system.addPortalTravelParticle(game.getPlayerPos(), game.getPlayerRadius());
         loggers.getGameLog().info("blink_teleport", "Blink teleport to {any}", .{final_pos});
         return true;
     }
 
     /// Cast Phase spell - allow walking through solid objects
-    fn castPhaseSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+    fn castPhaseSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
         const player_pos = game.getPlayerPos();
         const player_entity = game.getPlayer() orelse {
             loggers.getGameLog().info("phase_no_player", "No player entity found", .{});
@@ -454,13 +454,13 @@ pub const SpellSystem = struct {
         );
 
         // Visual effects - phase shimmer around player
-        effect_system.addUnitEffectAura(player_pos, game.getPlayerRadius(), phase_duration);
+        effect_system.addUnitStatusAura(player_pos, game.getPlayerRadius(), phase_duration);
         loggers.getGameLog().info("phase_cast", "Phase activated for {d}s - can walk through walls", .{phase_duration});
         return true;
     }
 
     /// Cast Lethargy spell - slow target enemy's movement
-    fn castLethargySpell(_: *SpellSystem, _: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+    fn castLethargySpell(_: *SpellSystem, _: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
         // Find closest unit to target position
         const lethargy_range = constants.LETHARGY_RANGE;
         const lethargy_range_sq = lethargy_range * lethargy_range;
@@ -499,28 +499,28 @@ pub const SpellSystem = struct {
 
         // Visual effect
         const target_transform = &zone.units.transforms[target_unit.index];
-        effect_system.addUnitEffectAura(target_transform.pos, target_transform.radius, constants.LETHARGY_DURATION);
+        effect_system.addUnitStatusAura(target_transform.pos, target_transform.radius, constants.LETHARGY_DURATION);
 
         loggers.getGameLog().info("lethargy_cast", "Unit slowed to {d}% speed for {d}s", .{ constants.LETHARGY_SPEED_MULT * 100, constants.LETHARGY_DURATION });
         return true;
     }
 
     /// Cast Haste spell - boost movement speed
-    fn castHasteSpell(_: *SpellSystem, game: *HexGame, _: *const ZoneData, _: Vec2, effect_system: *GameEffectSystem) bool {
+    fn castHasteSpell(_: *SpellSystem, game: *HexGame, _: *const ZoneData, _: Vec2, effect_system: *GameParticleSystem) bool {
 
         // Apply haste to player
         const player_pos = game.getPlayerPos();
 
         // In a real implementation, we'd modify player's speed_mult
         // For now, just add visual effect
-        effect_system.addUnitEffectAura(player_pos, game.getPlayerRadius(), constants.HASTE_DURATION);
+        effect_system.addUnitStatusAura(player_pos, game.getPlayerRadius(), constants.HASTE_DURATION);
 
         loggers.getGameLog().info("haste_cast", "Speed boosted to {d}% for {d}s", .{ constants.HASTE_SPEED_MULT * 100, constants.HASTE_DURATION });
         return true;
     }
 
     /// Cast Multishot spell - fire multiple projectiles
-    fn castMultishotSpell(_: *SpellSystem, game: *HexGame, _: *const ZoneData, target_pos: Vec2, _: *GameEffectSystem) bool {
+    fn castMultishotSpell(_: *SpellSystem, game: *HexGame, _: *const ZoneData, target_pos: Vec2, _: *GameParticleSystem) bool {
         const player_pos = game.getPlayerPos();
         const to_target = target_pos.sub(player_pos);
         const base_angle = std.math.atan2(to_target.y, to_target.x);
@@ -543,7 +543,7 @@ pub const SpellSystem = struct {
     }
 
     /// Cast Dazzle spell - confuse/slow enemies in area
-    fn castDazzleSpell(_: *SpellSystem, _: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+    fn castDazzleSpell(_: *SpellSystem, _: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
         // Apply dazzle to all units in area
         const radius_sq = constants.DAZZLE_RADIUS * constants.DAZZLE_RADIUS;
         var affected_count: u32 = 0;
@@ -570,19 +570,19 @@ pub const SpellSystem = struct {
                 affected_count += 1;
 
                 // Visual effect for each affected unit
-                effect_system.addUnitEffectAura(transform.pos, transform.radius, constants.DAZZLE_DURATION);
+                effect_system.addUnitStatusAura(transform.pos, transform.radius, constants.DAZZLE_DURATION);
             }
         }
 
         // Area visual indicator
-        effect_system.addLullAreaEffect(target_pos, constants.DAZZLE_RADIUS, constants.DAZZLE_DURATION);
+        effect_system.addLullAreaParticle(target_pos, constants.DAZZLE_RADIUS, constants.DAZZLE_DURATION);
 
         loggers.getGameLog().info("dazzle_cast", "Dazzled {} units in {d}-radius area", .{ affected_count, constants.DAZZLE_RADIUS });
         return true;
     }
 
     /// Cast Charm spell - take control of target unit
-    fn castCharmSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameEffectSystem) bool {
+    fn castCharmSpell(self: *SpellSystem, game: *HexGame, zone: *const ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
         const player_entity = game.getPlayer() orelse {
             loggers.getGameLog().info("charm_no_player", "No player entity found", .{});
             return false;
@@ -644,7 +644,7 @@ pub const SpellSystem = struct {
 
         // Visual effects - charm aura around target unit
         const target_transform = &zone.units.transforms[target_unit.index];
-        effect_system.addUnitEffectAura(target_transform.pos, target_transform.radius, charm_duration);
+        effect_system.addUnitStatusAura(target_transform.pos, target_transform.radius, charm_duration);
 
         loggers.getGameLog().info("charm_cast", "Unit {} charmed for {d}s - now under player control", .{ target_unit.entity_id, charm_duration });
         return true;

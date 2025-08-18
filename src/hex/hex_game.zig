@@ -11,7 +11,7 @@ const components = @import("../lib/game/components/mod.zig");
 const zones = @import("../lib/game/zones/mod.zig");
 const storage = @import("../lib/game/storage/mod.zig");
 const world = @import("../lib/game/world/mod.zig");
-const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+const GameParticleSystem = @import("../lib/particles/game_particles.zig").GameParticleSystem;
 
 // Debug capabilities
 const loggers = @import("../lib/debug/loggers.zig");
@@ -46,7 +46,7 @@ pub const Health = components.Health;
 pub const Visual = components.Visual;
 pub const Movement = components.Movement;
 pub const Combat = components.Combat;
-pub const Effects = components.Effects;
+pub const Statuses = components.Statuses;
 // Remove duplicate - using HexProjectile as Projectile alias below
 pub const Terrain = components.Terrain;
 pub const Interactable = components.Interactable;
@@ -131,21 +131,21 @@ const HexTravelInterface = struct {
         return world.ZoneTravelInterface.TravelResult.ok();
     }
 
-    pub fn clearEffects(game: *HexGame) void {
-        if (game.effect_system_ref) |effect_system| {
-            effect_system.clear();
-            loggers.getGameLog().debug("effects_cleared", "Travel effects cleared", .{});
+    pub fn clearParticles(game: *HexGame) void {
+        if (game.particle_system_ref) |particle_system| {
+            particle_system.clear();
+            loggers.getGameLog().debug("particles_cleared", "Travel particles cleared", .{});
         } else {
-            loggers.getGameLog().debug("effects_cleared", "Travel effects cleared (no effect system available)", .{});
+            loggers.getGameLog().debug("particles_cleared", "Travel particles cleared (no particle system available)", .{});
         }
     }
 
-    pub fn createTravelEffects(game: *HexGame, origin_pos: Vec2, radius: f32) void {
-        if (game.effect_system_ref) |effect_system| {
-            effect_system.addPortalTravelEffect(origin_pos, radius);
-            loggers.getGameLog().debug("travel_effects_created", "Travel effects created at {any} with radius {}", .{ origin_pos, radius });
+    pub fn createTravelParticles(game: *HexGame, origin_pos: Vec2, radius: f32) void {
+        if (game.particle_system_ref) |particle_system| {
+            particle_system.addPortalTravelParticle(origin_pos, radius);
+            loggers.getGameLog().debug("travel_particles_created", "Travel particles created at {any} with radius {}", .{ origin_pos, radius });
         } else {
-            loggers.getGameLog().debug("travel_effects_created", "Travel effects created at {any} with radius {} (no effect system available)", .{ origin_pos, radius });
+            loggers.getGameLog().debug("travel_particles_created", "Travel particles created at {any} with radius {} (no particle system available)", .{ origin_pos, radius });
         }
     }
 };
@@ -180,7 +180,7 @@ pub const HexGame = struct {
     zone_travel_manager: world.ZoneTravelManager(HexGame, MAX_ENTITIES_PER_ARCHETYPE),
 
     // Optional effect system reference for travel effects
-    effect_system_ref: ?*GameEffectSystem,
+    particle_system_ref: ?*GameParticleSystem,
 
     pub const ZoneData = struct {
         // Direct fixed-size archetype storage - no dynamic allocation
@@ -281,10 +281,10 @@ pub const HexGame = struct {
                     HexTravelInterface.validateZone,
                     HexTravelInterface.getZoneSpawn,
                     HexTravelInterface.transferPlayer,
-                    HexTravelInterface.clearEffects,
-                    HexTravelInterface.createTravelEffects,
+                    HexTravelInterface.clearParticles,
+                    HexTravelInterface.createTravelParticles,
                 )),
-            .effect_system_ref = null,
+            .particle_system_ref = null,
         };
 
         // Initialize all zones
@@ -306,8 +306,8 @@ pub const HexGame = struct {
     }
 
     /// Set the effect system reference for travel effects
-    pub fn setEffectSystemRef(self: *HexGame, effect_system: *GameEffectSystem) void {
-        self.effect_system_ref = effect_system;
+    pub fn setParticleSystemRef(self: *HexGame, particle_system: *GameParticleSystem) void {
+        self.particle_system_ref = particle_system;
     }
 
     pub fn deinit(self: *HexGame) void {

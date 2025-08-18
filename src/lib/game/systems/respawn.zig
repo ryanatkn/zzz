@@ -111,15 +111,15 @@ pub const CheckpointPatterns = struct {
     }
 };
 
-/// Generic respawn effect patterns
-pub const RespawnEffects = struct {
-    /// Standard respawn effect data
-    pub const RespawnEffectData = struct {
+/// Generic respawn visual patterns
+pub const RespawnVisuals = struct {
+    /// Standard respawn visual data
+    pub const RespawnVisualData = struct {
         position: Vec2,
         radius: f32,
         duration: f32 = 1.0,
 
-        pub fn init(position: Vec2, radius: f32) RespawnEffectData {
+        pub fn init(position: Vec2, radius: f32) RespawnVisualData {
             return .{ .position = position, .radius = radius };
         }
     };

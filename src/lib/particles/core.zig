@@ -7,9 +7,9 @@ const colors = @import("../core/colors.zig");
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 
-pub const MAX_EFFECTS = 256; // Increased pool for multiple simultaneous effects
+pub const MAX_PARTICLES = 256; // Increased pool for multiple simultaneous particles
 
-pub const EffectType = enum {
+pub const ParticleType = enum {
     player_spawn, // Dramatic ping when player respawns
     portal_travel, // Multiple pings when player travels through portal
     portal_ripple, // Subtle ripples emanating from portal
@@ -17,23 +17,23 @@ pub const EffectType = enum {
     lifestone_glow, // Gentle glow around unattuned lifestones
     lifestone_inner, // Brighter effect for attuned lifestones
     lull_area, // Area of effect indicator for Lull spell
-    unit_effect_aura, // Glowing aura around units under effects
+    unit_status_aura, // Glowing aura around units under status effects
 };
 
-pub const Effect = struct {
+pub const Particle = struct {
     pos: Vec2,
     radius: f32,
-    effect_type: EffectType,
+    particle_type: ParticleType,
     active: bool,
     start_time: u64,
     duration: f32, // 0.0 = permanent
     intensity: f32,
 
-    pub fn init(pos: Vec2, radius: f32, effect_type: EffectType, duration: f32) Effect {
+    pub fn init(pos: Vec2, radius: f32, particle_type: ParticleType, duration: f32) Particle {
         return .{
             .pos = pos,
             .radius = radius,
-            .effect_type = effect_type,
+            .particle_type = particle_type,
             .active = true,
             .start_time = c.sdl.SDL_GetPerformanceCounter(),
             .duration = duration,
@@ -41,7 +41,7 @@ pub const Effect = struct {
         };
     }
 
-    pub fn isActive(self: *const Effect) bool {
+    pub fn isActive(self: *const Particle) bool {
         if (!self.active) return false;
         if (self.duration == 0.0) return true; // Permanent effect
 
@@ -54,7 +54,7 @@ pub const Effect = struct {
         return elapsed_sec < self.duration;
     }
 
-    pub fn getElapsed(self: *const Effect) f32 {
+    pub fn getElapsed(self: *const Particle) f32 {
         const current_time = c.sdl.SDL_GetPerformanceCounter();
         // If effect hasn't started yet, return 0 elapsed time
         if (current_time < self.start_time) return 0.0;
@@ -67,10 +67,10 @@ pub const Effect = struct {
         return (std.math.sin(elapsed * frequency + phase_offset) + 1.0) * 0.5; // 0.0 to 1.0
     }
 
-    pub fn getCurrentRadius(self: *const Effect) f32 {
+    pub fn getCurrentRadius(self: *const Particle) f32 {
         const elapsed = self.getElapsed();
 
-        switch (self.effect_type) {
+        switch (self.particle_type) {
             .player_spawn => {
                 // Grow continuously for full duration, synced with fade out
                 if (self.duration > 0.0) {
@@ -129,7 +129,7 @@ pub const Effect = struct {
                 const pulse = getPulse(elapsed, 1.0, 0.0);
                 return self.radius * (0.98 + pulse * 0.04); // 98% to 102% size - very subtle
             },
-            .unit_effect_aura => {
+            .unit_status_aura => {
                 // Pulsing aura around affected units
                 const pulse = getPulse(elapsed, 2.0, 0.0); // 2 second cycle
                 return self.radius * (1.1 + pulse * 0.3); // 110% to 140% size - noticeable effect
@@ -137,10 +137,10 @@ pub const Effect = struct {
         }
     }
 
-    pub fn getCurrentIntensity(self: *const Effect) f32 {
+    pub fn getCurrentIntensity(self: *const Particle) f32 {
         const elapsed = self.getElapsed();
 
-        switch (self.effect_type) {
+        switch (self.particle_type) {
             .player_spawn => {
                 // Quick fade out over 3 seconds for dramatic ping with lower starting intensity
                 if (self.duration > 0.0) {
@@ -189,8 +189,8 @@ pub const Effect = struct {
                 const fade_in = @min(1.0, elapsed / 0.5);
                 return (0.35 + pulse * 0.10) * self.intensity * fade_in; // 0.35 to 0.45 range - much more visible
             },
-            .unit_effect_aura => {
-                // Glowing aura intensity for units under effects
+            .unit_status_aura => {
+                // Glowing aura intensity for units under status effects
                 const pulse = getPulse(elapsed, 2.0, 0.0);
                 // Fade in quickly over first 0.3 seconds
                 const fade_in = @min(1.0, elapsed / 0.3);
@@ -199,10 +199,10 @@ pub const Effect = struct {
         }
     }
 
-    pub fn getColor(self: *const Effect) Color {
+    pub fn getColor(self: *const Particle) Color {
         const intensity = self.getCurrentIntensity();
 
-        switch (self.effect_type) {
+        switch (self.particle_type) {
             .player_spawn => {
                 // Bright blue/white for dramatic effect
                 return Color{
@@ -277,7 +277,7 @@ pub const Effect = struct {
                     .a = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
                 };
             },
-            .unit_effect_aura => {
+            .unit_status_aura => {
                 // Soft green/yellow aura for units under beneficial effects
                 return Color{
                     .r = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
@@ -290,15 +290,15 @@ pub const Effect = struct {
     }
 };
 
-pub const EffectSystem = struct {
-    effects: [MAX_EFFECTS]Effect,
+pub const ParticleSystem = struct {
+    particles: [MAX_PARTICLES]Particle,
     count: usize,
 
     const Self = @This();
 
     pub fn init() Self {
         return .{
-            .effects = undefined,
+            .particles = undefined,
             .count = 0,
         };
     }
@@ -307,28 +307,28 @@ pub const EffectSystem = struct {
         self.count = 0;
     }
 
-    pub fn addEffect(self: *Self, pos: Vec2, radius: f32, effect_type: EffectType, duration: f32) void {
-        if (self.count >= MAX_EFFECTS) {
-            std.debug.print("WARNING: Effect pool full! ({} effects)\n", .{MAX_EFFECTS});
+    pub fn addParticle(self: *Self, pos: Vec2, radius: f32, particle_type: ParticleType, duration: f32) void {
+        if (self.count >= MAX_PARTICLES) {
+            std.debug.print("WARNING: Particle pool full! ({} particles)\n", .{MAX_PARTICLES});
             return;
         }
 
-        self.effects[self.count] = Effect.init(pos, radius, effect_type, duration);
+        self.particles[self.count] = Particle.init(pos, radius, particle_type, duration);
         self.count += 1;
 
         // Debug warning when approaching limit
-        if (self.count > MAX_EFFECTS * 3 / 4) {
-            std.debug.print("Effect pool usage high: {}/{}\n", .{ self.count, MAX_EFFECTS });
+        if (self.count > MAX_PARTICLES * 3 / 4) {
+            std.debug.print("Particle pool usage high: {}/{}\n", .{ self.count, MAX_PARTICLES });
         }
     }
 
     pub fn update(self: *Self) void {
-        // Remove expired effects
+        // Remove expired particles
         var write_index: usize = 0;
         for (0..self.count) |read_index| {
-            if (self.effects[read_index].isActive()) {
+            if (self.particles[read_index].isActive()) {
                 if (write_index != read_index) {
-                    self.effects[write_index] = self.effects[read_index];
+                    self.particles[write_index] = self.particles[read_index];
                 }
                 write_index += 1;
             }
@@ -336,12 +336,12 @@ pub const EffectSystem = struct {
         self.count = write_index;
     }
 
-    pub fn getActiveEffects(self: *const Self) []const Effect {
-        return self.effects[0..self.count];
+    pub fn getActiveParticles(self: *const Self) []const Particle {
+        return self.particles[0..self.count];
     }
 
-    // Effect creation methods for different gameplay events
-    pub fn addPlayerSpawnEffect(self: *Self, pos: Vec2, player_radius: f32) void {
+    // Particle creation methods for different gameplay events
+    pub fn addPlayerSpawnParticle(self: *Self, pos: Vec2, player_radius: f32) void {
         // Dramatic staggered ring expansion mimicking old visuals system
         // Multiple waves with varied timing for less uniformity and better visual drama
         const ring_configs = [_]struct { delay: f32, duration: f32, size_mult: f32, intensity: f32 }{
@@ -354,17 +354,17 @@ pub const EffectSystem = struct {
         };
 
         for (ring_configs) |config| {
-            self.addEffect(pos, player_radius * config.size_mult, .player_spawn, config.duration);
+            self.addParticle(pos, player_radius * config.size_mult, .player_spawn, config.duration);
             if (self.count > 0) {
                 // Customize the effect we just added
-                var effect = &self.effects[self.count - 1];
-                effect.start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
-                effect.intensity = config.intensity;
+                var particle = &self.particles[self.count - 1];
+                particle.start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
+                particle.intensity = config.intensity;
             }
         }
     }
 
-    pub fn addPortalTravelEffect(self: *Self, pos: Vec2, player_radius: f32) void {
+    pub fn addPortalTravelParticle(self: *Self, pos: Vec2, player_radius: f32) void {
         // Multiple staggered pings when traveling through portals - distinct from spawn
         const ring_configs = [_]struct { delay: f32, duration: f32, size_mult: f32, intensity: f32 }{
             .{ .delay = 0.0, .duration = 0.8, .size_mult = 1.8, .intensity = 1.0 }, // Initial bright ping - perfect as is
@@ -374,17 +374,17 @@ pub const EffectSystem = struct {
         };
 
         for (ring_configs) |config| {
-            self.addEffect(pos, player_radius * config.size_mult, .portal_travel, config.duration);
+            self.addParticle(pos, player_radius * config.size_mult, .portal_travel, config.duration);
             if (self.count > 0) {
                 // Customize the effect we just added
-                var effect = &self.effects[self.count - 1];
-                effect.start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
-                effect.intensity = config.intensity;
+                var particle = &self.particles[self.count - 1];
+                particle.start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
+                particle.intensity = config.intensity;
             }
         }
     }
 
-    pub fn addPortalRippleEffect(self: *Self, pos: Vec2, portal_radius: f32) void {
+    pub fn addPortalRippleParticle(self: *Self, pos: Vec2, portal_radius: f32) void {
         // Subtle ripples emanating from portal
         const ripple_configs = [_]struct { delay: f32, duration: f32, size_mult: f32, intensity: f32 }{
             .{ .delay = 0.0, .duration = 1.5, .size_mult = 1.4, .intensity = 0.5 }, // First ripple - small, quick
@@ -392,44 +392,44 @@ pub const EffectSystem = struct {
         };
 
         for (ripple_configs) |config| {
-            if (self.count >= MAX_EFFECTS) break;
+            if (self.count >= MAX_PARTICLES) break;
 
-            self.effects[self.count] = Effect.init(pos, portal_radius * config.size_mult, .portal_ripple, config.duration);
-            self.effects[self.count].start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
-            self.effects[self.count].intensity = config.intensity;
+            self.particles[self.count] = Particle.init(pos, portal_radius * config.size_mult, .portal_ripple, config.duration);
+            self.particles[self.count].start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
+            self.particles[self.count].intensity = config.intensity;
             self.count += 1;
         }
     }
 
-    pub fn addPortalAmbientEffect(self: *Self, pos: Vec2, portal_radius: f32) void {
+    pub fn addPortalAmbientParticle(self: *Self, pos: Vec2, portal_radius: f32) void {
         // Single subtle portal effect to reduce visual clutter
-        self.addEffect(pos, portal_radius * 1.3, .portal_ambient, 0.0); // Single portal aura
+        self.addParticle(pos, portal_radius * 1.3, .portal_ambient, 0.0); // Single portal aura
     }
 
-    pub fn addLifestoneGlowEffect(self: *Self, pos: Vec2, lifestone_radius: f32, attuned: bool) void {
+    pub fn addLifestoneGlowParticle(self: *Self, pos: Vec2, lifestone_radius: f32, attuned: bool) void {
         self.addLifestoneGlowEffectParts(pos, lifestone_radius, true, attuned);
     }
 
-    pub fn addLifestoneInnerEffectOnly(self: *Self, pos: Vec2, lifestone_radius: f32) void {
+    pub fn addLifestoneInnerParticleOnly(self: *Self, pos: Vec2, lifestone_radius: f32) void {
         // Add only the inner effect for newly attuned lifestones
         self.addLifestoneGlowEffectParts(pos, lifestone_radius, false, true);
     }
 
-    pub fn addLullAreaEffect(self: *Self, pos: Vec2, radius: f32, duration: f32) void {
+    pub fn addLullAreaParticle(self: *Self, pos: Vec2, radius: f32, duration: f32) void {
         // Add visible area indicator for Lull spell
-        self.addEffect(pos, radius, .lull_area, duration);
+        self.addParticle(pos, radius, .lull_area, duration);
     }
 
-    pub fn addUnitEffectAura(self: *Self, pos: Vec2, unit_radius: f32, duration: f32) void {
+    pub fn addUnitStatusAura(self: *Self, pos: Vec2, unit_radius: f32, duration: f32) void {
         // Add glowing aura around units under effects
-        self.addEffect(pos, unit_radius * 1.5, .unit_effect_aura, duration);
+        self.addParticle(pos, unit_radius * 1.5, .unit_status_aura, duration);
     }
 
     fn addLifestoneGlowEffectParts(self: *Self, pos: Vec2, lifestone_radius: f32, add_outer: bool, attuned: bool) void {
         // Single lifestone effect to reduce visual clutter
         if (add_outer) {
-            const effect_type: EffectType = if (attuned) .lifestone_inner else .lifestone_glow;
-            self.addEffect(pos, lifestone_radius * 1.5, effect_type, 0.0);
+            const particle_type: ParticleType = if (attuned) .lifestone_inner else .lifestone_glow;
+            self.addParticle(pos, lifestone_radius * 1.5, particle_type, 0.0);
         }
     }
 };

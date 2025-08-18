@@ -16,7 +16,7 @@ pub const RendererInterface = struct {
     // Function pointers for the interface
     drawRectFn: *const fn (*anyopaque, *c.sdl.SDL_GPUCommandBuffer, *c.sdl.SDL_GPURenderPass, Vec2, Vec2, Color) void,
     drawCircleFn: *const fn (*anyopaque, *c.sdl.SDL_GPUCommandBuffer, *c.sdl.SDL_GPURenderPass, Vec2, f32, Color) void,
-    drawEffectFn: *const fn (*anyopaque, *c.sdl.SDL_GPUCommandBuffer, *c.sdl.SDL_GPURenderPass, Vec2, f32, Color, f32, f32) void,
+    drawParticleFn: *const fn (*anyopaque, *c.sdl.SDL_GPUCommandBuffer, *c.sdl.SDL_GPURenderPass, Vec2, f32, Color, f32, f32) void,
 
     // Opaque pointer to the actual renderer implementation
     impl: *anyopaque,
@@ -31,9 +31,9 @@ pub const RendererInterface = struct {
         self.drawCircleFn(self.impl, cmd_buffer, render_pass, pos, radius, color);
     }
 
-    /// Draw an effect (particle/visual effect)
-    pub fn drawEffect(self: Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
-        self.drawEffectFn(self.impl, cmd_buffer, render_pass, pos, radius, color, intensity, time);
+    /// Draw a particle (visual effect)
+    pub fn drawParticle(self: Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
+        self.drawParticleFn(self.impl, cmd_buffer, render_pass, pos, radius, color, intensity, time);
     }
 };
 
@@ -54,8 +54,8 @@ pub fn createInterface(renderer: anytype) RendererInterface {
         if (!@hasDecl(PtrT, "drawCircle")) {
             @compileError("Renderer must have drawCircle method with signature: fn(*Self, *SDL_GPUCommandBuffer, *SDL_GPURenderPass, Vec2, f32, Color) void");
         }
-        if (!@hasDecl(PtrT, "drawEffect")) {
-            @compileError("Renderer must have drawEffect method with signature: fn(*Self, *SDL_GPUCommandBuffer, *SDL_GPURenderPass, Vec2, f32, Color, f32, f32) void");
+        if (!@hasDecl(PtrT, "drawParticle")) {
+            @compileError("Renderer must have drawParticle method with signature: fn(*Self, *SDL_GPUCommandBuffer, *SDL_GPURenderPass, Vec2, f32, Color, f32, f32) void");
         }
     }
 
@@ -70,16 +70,16 @@ pub fn createInterface(renderer: anytype) RendererInterface {
             self.drawCircle(cmd_buffer, render_pass, pos, radius, color);
         }
 
-        fn drawEffect(ptr: *anyopaque, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
+        fn drawParticle(ptr: *anyopaque, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
             const self: T = @ptrCast(@alignCast(ptr));
-            self.drawEffect(cmd_buffer, render_pass, pos, radius, color, intensity, time);
+            self.drawParticle(cmd_buffer, render_pass, pos, radius, color, intensity, time);
         }
     };
 
     return RendererInterface{
         .drawRectFn = impl.drawRect,
         .drawCircleFn = impl.drawCircle,
-        .drawEffectFn = impl.drawEffect,
+        .drawParticleFn = impl.drawParticle,
         .impl = renderer,
     };
 }
@@ -104,8 +104,8 @@ pub fn RendererGeneric(comptime RendererType: type) type {
             self.renderer.drawCircle(cmd_buffer, render_pass, pos, radius, color);
         }
 
-        pub fn drawEffect(self: Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
-            self.renderer.drawEffect(cmd_buffer, render_pass, pos, radius, color, intensity, time);
+        pub fn drawParticle(self: Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
+            self.renderer.drawParticle(cmd_buffer, render_pass, pos, radius, color, intensity, time);
         }
 
         /// Convert to runtime interface when needed

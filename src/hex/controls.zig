@@ -190,7 +190,7 @@ pub fn handleSDLEvent(
                             // Cast the spell at mouse position (self-cast since clicked on slot)
                             const zone = game_state.hex_game.getCurrentZoneConst();
                             const player_pos = game_state.hex_game.getPlayerPos();
-                            _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, player_pos, &game_state.effect_system, true);
+                            _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, player_pos, &game_state.particle_system, true);
                             return c.sdl.SDL_APP_CONTINUE;
                         }
 
@@ -201,7 +201,7 @@ pub fn handleSDLEvent(
                         const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
                         const zone = game_state.hex_game.getCurrentZoneConst();
 
-                        _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, world_mouse_pos, &game_state.effect_system, self_cast);
+                        _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, world_mouse_pos, &game_state.particle_system, self_cast);
                     }
                 },
                 else => {},

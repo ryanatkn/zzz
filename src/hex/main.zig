@@ -271,8 +271,8 @@ fn renderGame() !void {
     // Render all entities
     game_renderer.?.renderZone(cmd_buffer, render_pass, &game_state.?.hex_game);
 
-    // Render visual effects
-    game_renderer.?.renderEffects(cmd_buffer, render_pass, &game_state.?.effect_system);
+    // Render visual particles
+    game_renderer.?.renderParticles(cmd_buffer, render_pass, &game_state.?.particle_system);
 
     // Draw HUD
     if (game_hud.?.visible) {

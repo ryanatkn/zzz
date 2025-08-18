@@ -86,7 +86,7 @@ fn findBestRespawnCheckpoint(game: *HexGame) ?game_systems.respawn.RespawnInterf
 
 pub fn respawnPlayer(game_state: *GameState) void {
     const world = &game_state.hex_game;
-    const effect_system = &game_state.effect_system;
+    const particle_system = &game_state.particle_system;
 
     // Use generic checkpoint finding with hex-specific lifestone implementation
     const checkpoint_result = findBestRespawnCheckpoint(world);
@@ -119,13 +119,13 @@ pub fn respawnPlayer(game_state: *GameState) void {
     }
 
     // Common respawn logic - create respawn effects
-    const respawn_effect = game_systems.respawn.RespawnEffects.RespawnEffectData.init(respawn_pos, world.getPlayerRadius());
+    const respawn_effect = game_systems.respawn.RespawnVisuals.RespawnVisualData.init(respawn_pos, world.getPlayerRadius());
 
     // Set player position and alive status using ECS
     world.setPlayerPos(respawn_pos);
     world.setPlayerAlive(true);
     world.setPlayerColor(constants.COLOR_PLAYER_ALIVE);
-    effect_system.addPlayerSpawnEffect(respawn_effect.position, respawn_effect.radius);
+    particle_system.addPlayerSpawnParticle(respawn_effect.position, respawn_effect.radius);
     loggers.getGameLog().info("player_respawn", "Player respawned at checkpoint!", .{});
 }
 

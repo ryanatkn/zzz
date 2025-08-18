@@ -7,7 +7,7 @@ pub const Movement = @import("movement.zig").Movement;
 pub const Visual = @import("visual.zig").Visual;
 pub const Unit = @import("unit.zig").Unit;
 pub const Combat = @import("combat.zig").Combat;
-pub const Effects = @import("effects.zig").Effects;
+pub const Statuses = @import("statuses.zig").Statuses;
 pub const PlayerInput = @import("player_input.zig").PlayerInput;
 pub const Projectile = @import("projectile.zig").Projectile;
 

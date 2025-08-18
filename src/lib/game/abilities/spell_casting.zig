@@ -157,30 +157,30 @@ pub const SpellTrajectory = struct {
     }
 };
 
-/// Spell effect patterns
-pub const SpellEffects = struct {
+/// Spell impact patterns
+pub const SpellImpacts = struct {
     /// Apply instant damage/healing
-    pub fn applyInstantEffect(
+    pub fn applyInstantImpact(
         target_pos: Vec2,
-        effect_value: f32,
-        effect_type: EffectType,
+        impact_value: f32,
+        impact_type: EffectType,
         context: anytype,
     ) void {
-        // Game implements the actual effect application
-        context.applyInstantEffect(target_pos, effect_value, effect_type);
+        // Game implements the actual impact application
+        context.applyInstantImpact(target_pos, impact_value, impact_type);
     }
 
     /// Apply damage over time
-    pub fn applyDurationEffect(
+    pub fn applyDurationImpact(
         target_pos: Vec2,
-        effect_value: f32,
+        impact_value: f32,
         duration: f32,
         tick_interval: f32,
-        effect_type: EffectType,
+        impact_type: EffectType,
         context: anytype,
     ) void {
-        // Game implements the duration effect application
-        context.applyDurationEffect(target_pos, effect_value, duration, tick_interval, effect_type);
+        // Game implements the duration impact application
+        context.applyDurationImpact(target_pos, impact_value, duration, tick_interval, impact_type);
     }
 
     pub const EffectType = enum {

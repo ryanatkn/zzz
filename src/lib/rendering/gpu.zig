@@ -37,8 +37,8 @@ const RectUniforms = extern struct {
     // Total: 44 bytes
 };
 
-// Effect uniform buffer for GPU-based visual effects
-const EffectUniforms = extern struct {
+// Particle uniform buffer for GPU-based visual particles
+const ParticleUniforms = extern struct {
     screen_size: [2]f32, // 8 bytes
     center: [2]f32, // 8 bytes
     radius: f32, // 4 bytes
@@ -95,7 +95,7 @@ pub const SimpleGPURenderer = struct {
     // Effect rendering
     effect_vs: *c.sdl.SDL_GPUShader,
     effect_ps: *c.sdl.SDL_GPUShader,
-    effect_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
+    particle_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
 
     // Text rendering
     text_renderer: TextRenderer,
@@ -109,7 +109,7 @@ pub const SimpleGPURenderer = struct {
     // Instance batching buffers
     circle_instances: std.ArrayList(CircleInstance),
     rect_instances: std.ArrayList(RectInstance),
-    effect_instances: std.ArrayList(CircleInstance), // Effects reuse circle data
+    particle_instances: std.ArrayList(CircleInstance), // Effects reuse circle data
 
     // Instance buffers for GPU upload
     circle_instance_buffer: ?*c.sdl.SDL_GPUBuffer,
@@ -176,13 +176,13 @@ pub const SimpleGPURenderer = struct {
             .rect_pipeline = undefined,
             .effect_vs = undefined,
             .effect_ps = undefined,
-            .effect_pipeline = undefined,
+            .particle_pipeline = undefined,
             .text_renderer = undefined,
             .screen_width = @import("../core/constants.zig").SCREEN.BASE_WIDTH,
             .screen_height = @import("../core/constants.zig").SCREEN.BASE_HEIGHT,
             .circle_instances = std.ArrayList(CircleInstance).init(allocator),
             .rect_instances = std.ArrayList(RectInstance).init(allocator),
-            .effect_instances = std.ArrayList(CircleInstance).init(allocator),
+            .particle_instances = std.ArrayList(CircleInstance).init(allocator),
             .circle_instance_buffer = null,
             .rect_instance_buffer = null,
             .effect_instance_buffer = null,
@@ -210,14 +210,14 @@ pub const SimpleGPURenderer = struct {
 
         self.circle_instances.deinit();
         self.rect_instances.deinit();
-        self.effect_instances.deinit();
+        self.particle_instances.deinit();
 
         // Clean up text renderer
         self.text_renderer.deinit();
 
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.circle_pipeline);
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.rect_pipeline);
-        c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.effect_pipeline);
+        c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.particle_pipeline);
         c.sdl.SDL_ReleaseGPUShader(self.device, self.circle_vs);
         c.sdl.SDL_ReleaseGPUShader(self.device, self.circle_ps);
         c.sdl.SDL_ReleaseGPUShader(self.device, self.rect_vs);
@@ -306,13 +306,13 @@ pub const SimpleGPURenderer = struct {
             return error.FragmentShaderFailed;
         };
 
-        // Load effect shaders
-        const effect_vs_spv = @embedFile("../../shaders/compiled/vulkan/effect_vs.spv");
-        const effect_ps_spv = @embedFile("../../shaders/compiled/vulkan/effect_ps.spv");
+        // Load particle shaders
+        const particle_vs_spv = @embedFile("../../shaders/compiled/vulkan/particle_vs.spv");
+        const particle_ps_spv = @embedFile("../../shaders/compiled/vulkan/particle_ps.spv");
 
         const effect_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
-            .code_size = effect_vs_spv.len,
-            .code = @ptrCast(effect_vs_spv.ptr),
+            .code_size = particle_vs_spv.len,
+            .code = @ptrCast(particle_vs_spv.ptr),
             .entrypoint = "vs_main",
             .format = c.sdl.SDL_GPU_SHADERFORMAT_SPIRV,
             .stage = c.sdl.SDL_GPU_SHADERSTAGE_VERTEX,
@@ -323,13 +323,13 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.effect_vs = c.sdl.SDL_CreateGPUShader(self.device, &effect_vs_info) orelse {
-            loggers.getRenderLog().err("effect_vs_fail", "Failed to create effect vertex shader", .{});
+            loggers.getRenderLog().err("particle_vs_fail", "Failed to create particle vertex shader", .{});
             return error.VertexShaderFailed;
         };
 
         const effect_ps_info = c.sdl.SDL_GPUShaderCreateInfo{
-            .code_size = effect_ps_spv.len,
-            .code = @ptrCast(effect_ps_spv.ptr),
+            .code_size = particle_ps_spv.len,
+            .code = @ptrCast(particle_ps_spv.ptr),
             .entrypoint = "ps_main",
             .format = c.sdl.SDL_GPU_SHADERFORMAT_SPIRV,
             .stage = c.sdl.SDL_GPU_SHADERSTAGE_FRAGMENT,
@@ -340,7 +340,7 @@ pub const SimpleGPURenderer = struct {
         };
 
         self.effect_ps = c.sdl.SDL_CreateGPUShader(self.device, &effect_ps_info) orelse {
-            loggers.getRenderLog().err("effect_fs_fail", "Failed to create effect fragment shader", .{});
+            loggers.getRenderLog().err("particle_fs_fail", "Failed to create particle fragment shader", .{});
             return error.FragmentShaderFailed;
         };
 
@@ -457,7 +457,7 @@ pub const SimpleGPURenderer = struct {
             return error.PipelineCreationFailed;
         };
 
-        // Create effect pipeline (needs alpha blending for visual effects)
+        // Create particle pipeline (needs alpha blending for visual particles)
         const effect_target_info = c.sdl.SDL_GPUGraphicsPipelineTargetInfo{
             .color_target_descriptions = &alpha_blend_state,
             .num_color_targets = 1,
@@ -475,9 +475,9 @@ pub const SimpleGPURenderer = struct {
             .target_info = effect_target_info,
         };
 
-        self.effect_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &effect_create_info) orelse {
-            loggers.getRenderLog().err("effect_pipeline_fail", "Failed to create effect graphics pipeline", .{});
-            loggers.getRenderLog().err("effect_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
+        self.particle_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &effect_create_info) orelse {
+            loggers.getRenderLog().err("particle_pipeline_fail", "Failed to create particle graphics pipeline", .{});
+            loggers.getRenderLog().err("particle_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
             return error.PipelineCreationFailed;
         };
 
@@ -657,12 +657,12 @@ pub const SimpleGPURenderer = struct {
         c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for quad
     }
 
-    // Draw a visual effect with animated rings and pulsing
-    pub fn drawEffect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
+    // Draw a visual particle with animated rings and pulsing
+    pub fn drawParticle(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
         self.perf_monitor.recordIndividualDraw();
 
-        // Prepare uniform data for effect shader
-        const uniform_data = EffectUniforms{
+        // Prepare uniform data for particle shader
+        const uniform_data = ParticleUniforms{
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
             .center = [2]f32{ pos.x, pos.y },
             .radius = radius,
@@ -676,10 +676,10 @@ pub const SimpleGPURenderer = struct {
         };
 
         // Push uniform data BEFORE binding pipeline
-        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(EffectUniforms));
+        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(ParticleUniforms));
 
-        // Bind effect pipeline and draw with alpha blending
-        c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.effect_pipeline);
+        // Bind particle pipeline and draw with alpha blending
+        c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.particle_pipeline);
         c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for larger quad (effects need more space)
     }
 
@@ -731,7 +731,7 @@ pub const SimpleGPURenderer = struct {
                 (@as(f32, @floatFromInt(color.a)) / 255.0) * intensity, // Apply intensity to alpha
             },
         };
-        self.effect_instances.append(instance) catch {
+        self.particle_instances.append(instance) catch {
             loggers.getRenderLog().warn("effect_batch_full", "Effect instance buffer full, skipping", .{});
         };
     }
@@ -810,18 +810,18 @@ pub const SimpleGPURenderer = struct {
 
     // Render all batched effects in a single draw call
     pub fn flushEffects(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, time: f32) void {
-        if (self.effect_instances.items.len == 0) return;
+        if (self.particle_instances.items.len == 0) return;
 
         // Count as one batched call
         // Record batch with individual instance count
-        for (0..self.effect_instances.items.len) |_| {
+        for (0..self.particle_instances.items.len) |_| {
             self.perf_monitor.recordBatchedDraw();
         }
 
-        // Batch render effects: pipeline bound once, multiple draw calls
+        // Batch render particles: pipeline bound once, multiple draw calls
         // Current approach provides excellent performance (6-7ms frames)
-        for (self.effect_instances.items) |instance| {
-            const uniform_data = EffectUniforms{
+        for (self.particle_instances.items) |instance| {
+            const uniform_data = ParticleUniforms{
                 .screen_size = [2]f32{ self.screen_width, self.screen_height },
                 .center = [2]f32{ instance.center[0], instance.center[1] },
                 .radius = instance.radius,
@@ -835,15 +835,15 @@ pub const SimpleGPURenderer = struct {
             };
 
             // Push uniform data BEFORE binding pipeline
-            c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(EffectUniforms));
+            c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(ParticleUniforms));
 
             // Bind pipeline and draw
-            c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.effect_pipeline);
+            c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.particle_pipeline);
             c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for quad
         }
 
         // Clear for next frame
-        self.effect_instances.clearRetainingCapacity();
+        self.particle_instances.clearRetainingCapacity();
     }
 
     // === END BATCHED RENDERING API ===

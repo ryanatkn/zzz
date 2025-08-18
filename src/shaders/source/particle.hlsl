@@ -1,9 +1,9 @@
-// Visual effects with animated distance fields and additive blending
-// Compile with: dxc -T vs_6_0 -E vs_main effect.hlsl -Fo effect_vs.dxil  
-// Compile with: dxc -T ps_6_0 -E ps_main effect.hlsl -Fo effect_ps.dxil
+// Visual particles with animated distance fields and additive blending
+// Compile with: dxc -T vs_6_0 -E vs_main particle.hlsl -Fo particle_vs.dxil  
+// Compile with: dxc -T ps_6_0 -E ps_main particle.hlsl -Fo particle_ps.dxil
 
-// Effect uniforms - simplified to match other shaders
-cbuffer EffectUniforms : register(b0, space1) {
+// Particle uniforms - simplified to match other shaders
+cbuffer ParticleUniforms : register(b0, space1) {
     float2 screen_size;
     float2 center;
     float radius;

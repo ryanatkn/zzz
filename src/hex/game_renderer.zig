@@ -20,7 +20,7 @@ const font_config = @import("../lib/font/config.zig");
 const text_alignment = @import("../lib/text/alignment.zig");
 
 // Game system capabilities
-const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+const GameParticleSystem = @import("../lib/particles/game_particles.zig").GameParticleSystem;
 
 // Reactive capabilities
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
@@ -196,20 +196,20 @@ pub const GameRenderer = struct {
     // All rendering now handled by single efficient renderZone() function above
 
     // Render visual effects
-    pub fn renderEffects(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, effect_system: *const GameEffectSystem) void {
-        const active_effects = effect_system.getActiveEffects();
+    pub fn renderParticles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, particle_system: *const GameParticleSystem) void {
+        const active_particles = particle_system.getActiveParticles();
 
         // Get current time for shader animations
         const time_sec = time_utils.Time.getTimeSec();
 
-        for (active_effects) |effect| {
-            const screen_pos = self.camera.worldToScreen(effect.pos);
-            const current_radius = effect.getCurrentRadius(); // Use dynamic radius for ping growth
+        for (active_particles) |particle| {
+            const screen_pos = self.camera.worldToScreen(particle.pos);
+            const current_radius = particle.getCurrentRadius(); // Use dynamic radius for ping growth
             const screen_radius = self.camera.worldSizeToScreen(current_radius);
-            const color = effect.getColor();
-            const intensity = effect.getCurrentIntensity();
+            const color = particle.getColor();
+            const intensity = particle.getCurrentIntensity();
 
-            self.gpu.drawEffect(cmd_buffer, render_pass, screen_pos, screen_radius, color, intensity, time_sec);
+            self.gpu.drawParticle(cmd_buffer, render_pass, screen_pos, screen_radius, color, intensity, time_sec);
         }
     }
 
