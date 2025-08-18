@@ -273,7 +273,7 @@ fn getBehaviorColor(behavior: unit_behavior.BehaviorType, profile: BehaviorProfi
         },
         .patrol => colors.PLAYER_ALIVE, // Blue
         .guard => colors.PORTAL, // Purple
-        .wander => colors.LIFESTONE_ATTUNED, // Cyan
+        .wander => colors.GREEN_BRIGHT, // Green
         .return_home => constants.COLOR_UNIT_RETURNING,
         .idle => constants.COLOR_UNIT_NON_AGGRO,
     };

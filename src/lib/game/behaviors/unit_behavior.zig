@@ -435,7 +435,7 @@ pub const BehaviorColors = struct {
             .fleeing = Color.ORANGE,
             .patrolling = Color.BLUE,
             .guarding = Color.PURPLE,
-            .wandering = Color.CYAN,
+            .wandering = Color.GREEN_BRIGHT,
             .returning_home = Color.YELLOW,
             .idle = Color.GRAY,
         };
