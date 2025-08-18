@@ -17,7 +17,7 @@ shaders/
 ├── source/                 # HLSL source files
 │   ├── circle.hlsl        # Distance field circles
 │   ├── rectangle.hlsl     # Rectangles with borders
-│   ├── effect.hlsl        # Particle effects
+│   ├── particle.hlsl      # Particle effects
 │   ├── text.hlsl          # Bitmap text rendering
 │   ├── text_sdf.hlsl      # SDF text rendering
 │   └── triangle.hlsl      # Basic triangle test
@@ -123,8 +123,8 @@ shadercross --input source/circle.hlsl --output compiled/vulkan/circle_vs.spv \
 - `simple_circle.hlsl` - Basic filled circles
 - `simple_rectangle.hlsl` - Basic filled rectangles
 
-### Effect Shaders
-- `effect.hlsl` - Particle effects with additive blending
+### Particle Shaders
+- `particle.hlsl` - Particle effects with additive blending
 - `debug_circle.hlsl` - Debug visualization
 
 ### Text Shaders

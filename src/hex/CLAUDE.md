@@ -65,7 +65,7 @@ const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
 
 // Game system capabilities
 const game_systems = @import("../lib/game/mod.zig");
-const GameEffectSystem = @import("../lib/effects/game_effects.zig").GameEffectSystem;
+const GameParticleSystem = @import("../lib/particles/game_particles.zig").GameParticleSystem;
 
 // Debug capabilities
 const loggers = @import("../lib/debug/loggers.zig");

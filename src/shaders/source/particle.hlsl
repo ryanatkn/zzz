@@ -53,7 +53,7 @@ VertexOutput vs_main(VertexInput input) {
         else quad_corner = float2(1.0, 1.0);                  // top-right
     }
     
-    // Convert effect position from screen coordinates to NDC (same as simple_circle)
+    // Convert particle position from screen coordinates to NDC (same as simple_circle)
     float aspect_ratio = screen_size.x / screen_size.y;
     
     // Convert center from screen coordinates to NDC
@@ -84,18 +84,18 @@ float4 ps_main(VertexOutput input) : SV_Target {
     float2 precise_pos = input.local_pos;
     float dist = length(precise_pos);
     
-    // Screen-space derivative-based anti-aliasing for stable effect edges
+    // Screen-space derivative-based anti-aliasing for stable particle edges
     float delta = length(fwidth(precise_pos));
-    float edge_softness = delta * 0.8; // Slightly softer for effects
+    float edge_softness = delta * 0.8; // Slightly softer for particles
     
-    // Expand effect slightly beyond mathematical boundary for smoother edges
-    float circle_radius = 0.97; // Even softer expansion for effects
+    // Expand particle slightly beyond mathematical boundary for smoother edges
+    float circle_radius = 0.97; // Even softer expansion for particles
     float alpha = 1.0 - smoothstep(circle_radius - edge_softness, circle_radius + edge_softness, dist);
     
     // Conservative discard threshold
     if (alpha < 0.01) discard;
     
-    // Apply effect intensity and shader boosts with proper alpha clamping
+    // Apply particle intensity and shader boosts with proper alpha clamping
     float final_intensity = input.intensity * 2.0; // 2x intensity boost
     float3 bright_color = input.color.rgb * 2.0; // 2x color boost
     float final_alpha = min(1.0, alpha * input.color.a * final_intensity); // Clamp alpha to 1.0
