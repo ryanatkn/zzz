@@ -119,12 +119,12 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
     // Load units as ECS entities
     if (data.units) |units| {
         for (units) |unit_data| {
-            // Create ECS unit entity with behavior from ZON data
+            // Create ECS unit entity with disposition from ZON data
             const unit_id = game.createUnit(
                 @intCast(zone_index),
                 Vec2{ .x = unit_data.position.x, .y = unit_data.position.y },
                 unit_data.radius,
-                unit_data.behavior, // Pass enum directly, defaults to .wandering
+                unit_data.disposition, // Pass enum directly, defaults to .neutral
             ) catch |err| {
                 loggers.getGameLog().err("unit_create_fail", "Failed to create unit entity: {}", .{err});
                 continue;
@@ -200,7 +200,7 @@ const ZoneData = struct {
     units: ?[]const struct {
         position: struct { x: f32, y: f32 },
         radius: f32,
-        behavior: hex_game_mod.BehaviorProfile = .neutral,
+        disposition: hex_game_mod.Disposition = .neutral,
     },
     portals: ?[]const struct {
         position: struct { x: f32, y: f32 },

@@ -1,25 +1,25 @@
-// Extended Unit Component - Hex-specific unit with behavior profile
+// Extended Unit Component - Hex-specific unit with disposition
 // Extends the generic lib/game Unit with hex-specific fields
 
 const Unit = @import("../lib/game/components/unit.zig").Unit;
-const BehaviorProfile = @import("behavior_profile.zig").BehaviorProfile;
+const Disposition = @import("disposition.zig").Disposition;
 const Vec2 = @import("../lib/math/mod.zig").Vec2;
 
-/// Hex-specific unit extension with behavior profile and aggro
+/// Hex-specific unit extension with disposition and aggro
 pub const HexUnit = struct {
     // Base unit component
     base: Unit,
     
-    // Hex-specific behavior fields
-    behavior_profile: BehaviorProfile,
+    // Hex-specific disposition fields (temperament/personality)
+    disposition: Disposition,
     aggro_range: f32,
     aggro_factor: f32,
     entity_id: u32,
 
-    pub fn init(unit_type: Unit.UnitType, home_pos: Vec2, behavior_profile: BehaviorProfile, entity_id: u32) HexUnit {
+    pub fn init(unit_type: Unit.UnitType, home_pos: Vec2, disposition: Disposition, entity_id: u32) HexUnit {
         return .{
             .base = Unit.init(unit_type, home_pos),
-            .behavior_profile = behavior_profile,
+            .disposition = disposition,
             .aggro_range = switch (unit_type) {
                 .enemy => 150.0,
                 .friendly => 100.0,

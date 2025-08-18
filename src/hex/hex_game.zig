@@ -54,7 +54,7 @@ pub const Interactable = components.Interactable;
 // Use extended Unit with hex-specific fields
 pub const Unit = @import("unit_ext.zig").HexUnit;
 pub const UnitType = components.Unit.UnitType;
-pub const BehaviorProfile = @import("behavior_profile.zig").BehaviorProfile;
+pub const Disposition = @import("disposition.zig").Disposition;
 
 // Use PlayerInput from lib components
 pub const PlayerInput = components.PlayerInput;
@@ -385,7 +385,7 @@ pub const HexGame = struct {
         return entity;
     }
 
-    pub fn createUnit(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, behavior: BehaviorProfile) !EntityId {
+    pub fn createUnit(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, disposition: Disposition) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
         const zone = self.zone_manager.getZone(zone_index);
@@ -396,7 +396,7 @@ pub const HexGame = struct {
         const health = components.Health.init(50);
         const visual = components.Visual.init(constants.COLOR_UNIT_DEFAULT);
         const entity_id = self.entity_allocator.create();
-        const unit = Unit.init(.enemy, pos, behavior, entity_id);
+        const unit = Unit.init(.enemy, pos, disposition, entity_id);
 
         try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;

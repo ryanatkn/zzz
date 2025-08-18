@@ -7,7 +7,7 @@ const frame = @import("../../lib/core/frame.zig");
 const hex_game_mod = @import("../hex_game.zig");
 
 const BehaviorComposer = @import("composer.zig").BehaviorComposer;
-const BehaviorProfile = @import("../behavior_profile.zig").BehaviorProfile;
+const Disposition = @import("../disposition.zig").Disposition;
 const evaluators = @import("evaluators.zig");
 const UnitUpdateContext = @import("context.zig").UnitUpdateContext;
 
@@ -35,7 +35,7 @@ pub fn deinitBehaviorSystem() void {
 }
 
 /// Get or create behavior composer for an entity
-fn getOrCreateComposer(entity_id: u32, profile: BehaviorProfile, home_pos: Vec2) *BehaviorComposer {
+fn getOrCreateComposer(entity_id: u32, profile: Disposition, home_pos: Vec2) *BehaviorComposer {
     const result = composer_storage.getOrPut(entity_id) catch {
         // Fallback: return a default composer (should rarely happen)
         var default_composer = BehaviorComposer.init(profile, home_pos);
@@ -69,7 +69,7 @@ pub fn updateUnit(context: UnitUpdateContext) void {
 
 /// Evaluate unit behavior without applying any changes - pure function
 pub fn evaluateUnitBehavior(context: UnitUpdateContext) evaluators.ComposedBehaviorResult {
-    const profile = context.unit.behavior_profile;
+    const profile = context.unit.disposition;
     
     // Get behavior composer for this entity
     const composer = getOrCreateComposer(context.unit.entity_id, profile, context.unit.homePos());
@@ -97,7 +97,7 @@ pub fn applyBehaviorResult(context: UnitUpdateContext, result: evaluators.Compos
     context.transform.pos = context.transform.pos.add(result.velocity.scale(dt));
     
     // Apply visual color (caller can override this by calling evaluateUnitBehavior directly)
-    context.visual.color = result.getColor(context.unit.behavior_profile);
+    context.visual.color = result.getColor(context.unit.disposition);
 }
 
 /// Legacy function for backward compatibility - will be removed  

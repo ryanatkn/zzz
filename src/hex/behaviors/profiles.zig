@@ -1,5 +1,5 @@
-// Behavior Profiles - Configuration constants for 4 behavior profiles
-// Defines chase, flee, wander, and return_home configs per profile
+// Disposition Profiles - Configuration constants for 4 disposition types
+// Defines chase, flee, wander, and return_home configs per disposition
 
 const constants = @import("../constants.zig");
 const behaviors_mod = @import("../../lib/game/behaviors/mod.zig");
@@ -10,8 +10,8 @@ const flee_behavior = behaviors_mod.flee_behavior;
 const wander_behavior = behaviors_mod.wander_behavior;
 const return_home_behavior = behaviors_mod.return_home_behavior;
 
-/// Profile-specific behavior configurations
-/// Each profile defines which behaviors it uses and their parameters
+/// Disposition-specific behavior configurations
+/// Each disposition defines which behaviors it uses and their parameters
 pub const ProfileConfigs = struct {
     // Hostile profile: aggressive chaser
     pub const hostile = struct {

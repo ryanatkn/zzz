@@ -1,10 +1,10 @@
-// Behavior Composer - State container for unit behaviors
-// Manages individual behavior states (chase, flee, wander) per unit
+// Behavior Composer - State container for unit behaviors based on disposition
+// Manages individual behavior states (chase, flee, wander) per unit according to their temperament
 
 const std = @import("std");
 const Vec2 = @import("../../lib/math/mod.zig").Vec2;
 const behaviors_mod = @import("../../lib/game/behaviors/mod.zig");
-const BehaviorProfile = @import("../behavior_profile.zig").BehaviorProfile;
+const Disposition = @import("../disposition.zig").Disposition;
 
 // Import individual behavior modules
 const chase_behavior = behaviors_mod.chase_behavior;
@@ -28,11 +28,11 @@ pub const BehaviorComposer = struct {
     flee_state: flee_behavior.FleeState,
     wander_state: wander_behavior.WanderState,
     
-    // Profile-specific configurations (shared across units)
-    profile: BehaviorProfile,
+    // Unit disposition (temperament that influences behavior selection)
+    profile: Disposition,
     current_behavior: BehaviorType,
     
-    pub fn init(profile: BehaviorProfile, home_pos: Vec2) BehaviorComposer {
+    pub fn init(profile: Disposition, home_pos: Vec2) BehaviorComposer {
         return .{
             .chase_state = chase_behavior.ChaseState.init(),
             .flee_state = flee_behavior.FleeState.init(),

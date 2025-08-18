@@ -1,8 +1,8 @@
-// Behavior Profile - Hex-specific AI behavior types
-// Defines the 4 behavior profiles used by hex units
+// Disposition - Hex-specific AI temperament types
+// Defines the 4 disposition types that determine unit personality and behavior tendencies
 
-/// Hex-specific behavior profiles
-pub const BehaviorProfile = enum {
+/// Hex-specific unit dispositions (temperament/personality)
+pub const Disposition = enum {
     hostile,  // Always aggressive, never flees (red)
     fearful,  // Always flees from player (orange/yellow)  
     neutral,  // Ignores player, returns home when far (gray)

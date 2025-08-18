@@ -170,10 +170,10 @@ pub const COLOR_LIFESTONE_ATTUNED = colors.LIFESTONE_ATTUNED;
 pub const COLOR_LIFESTONE_UNATTUNED = colors.LIFESTONE_UNATTUNED;
 pub const COLOR_DEAD = colors.DEAD;
 
-// Behavior color mapping - centralized color logic for simplified profiles
-pub fn getBehaviorColor(_: anytype, profile: anytype) @TypeOf(COLOR_UNIT_AGGRESSIVE) {
-    // Primary color is determined by profile, not behavior state
-    return switch (profile) {
+// Disposition color mapping - centralized color logic for unit temperament
+pub fn getDispositionColor(_: anytype, disposition: anytype) @TypeOf(COLOR_UNIT_AGGRESSIVE) {
+    // Primary color is determined by disposition (temperament), not behavior state
+    return switch (disposition) {
         .hostile => COLOR_UNIT_AGGRESSIVE, // Always red - aggressive/dangerous
         .fearful => COLOR_OBSTACLE_DEADLY, // Orange - runs away but still dangerous
         .neutral => COLOR_UNIT_NON_AGGRO, // Gray - ignores player
@@ -181,8 +181,8 @@ pub fn getBehaviorColor(_: anytype, profile: anytype) @TypeOf(COLOR_UNIT_AGGRESS
     };
 
     // Note: We could add behavior-specific shading in the future:
-    // - Slightly brighter when actively chasing/fleeing
+    // - Slightly brighter when actively chasing/fleeing  
     // - Slightly dimmer when idle
     // - Different shade when returning home
-    // But for now, consistent profile-based colors provide clear visual feedback
+    // But for now, consistent disposition-based colors provide clear visual feedback
 }

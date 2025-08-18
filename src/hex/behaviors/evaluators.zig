@@ -1,4 +1,4 @@
-// Behavior Evaluators - Profile-specific behavior logic
+// Behavior Evaluators - Disposition-specific behavior logic  
 // Contains 4 evaluator functions (hostile, fearful, neutral, friendly)
 
 const std = @import("std");
@@ -6,7 +6,7 @@ const Vec2 = @import("../../lib/math/mod.zig").Vec2;
 const BehaviorComposer = @import("composer.zig").BehaviorComposer;
 const BehaviorType = @import("composer.zig").BehaviorType;
 const ProfileConfigs = @import("profiles.zig").ProfileConfigs;
-const BehaviorProfile = @import("../behavior_profile.zig").BehaviorProfile;
+const Disposition = @import("../disposition.zig").Disposition;
 const constants = @import("../constants.zig");
 const behaviors_mod = @import("../../lib/game/behaviors/mod.zig");
 
@@ -29,7 +29,7 @@ pub const ComposedBehaviorResult = struct {
     stopped_fleeing: bool = false,
     
     /// Get color for this behavior and profile (optional helper)
-    pub fn getColor(self: ComposedBehaviorResult, profile: BehaviorProfile) @import("../../lib/core/colors.zig").Color {
+    pub fn getColor(self: ComposedBehaviorResult, profile: Disposition) @import("../../lib/core/colors.zig").Color {
         return getBehaviorColor(self.active_behavior, profile);
     }
 };
@@ -270,7 +270,7 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
 }
 
 /// Get behavior color for visualization (hex-specific)
-pub fn getBehaviorColor(behavior: BehaviorType, profile: BehaviorProfile) @import("../../lib/core/colors.zig").Color {
+pub fn getBehaviorColor(behavior: BehaviorType, profile: Disposition) @import("../../lib/core/colors.zig").Color {
     // Map BehaviorType to legacy BehaviorState for color compatibility
     const legacy_behavior = switch (behavior) {
         .idle => behaviors_mod.behavior_state_machine.BehaviorState.idle,
@@ -280,5 +280,5 @@ pub fn getBehaviorColor(behavior: BehaviorType, profile: BehaviorProfile) @impor
         .returning_home => behaviors_mod.behavior_state_machine.BehaviorState.returning_home,
     };
     
-    return constants.getBehaviorColor(legacy_behavior, profile);
+    return constants.getDispositionColor(legacy_behavior, profile);
 }
