@@ -1,5 +1,5 @@
 const std = @import("std");
-const timer = @import("../../core/timer.zig");
+const timer = @import("timer.zig");
 
 /// Generic state machine for AI behaviors
 /// Games define their own state types and implement transition logic

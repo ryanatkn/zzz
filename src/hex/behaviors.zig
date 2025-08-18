@@ -3,7 +3,6 @@ const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const hex_game_mod = @import("hex_game.zig");
 const frame = @import("../lib/core/frame.zig");
-const colors = @import("../lib/core/colors.zig");
 const behaviors_mod = @import("../lib/game/behaviors/mod.zig");
 
 // No additional imports needed - using behavior_state_machine directly
@@ -49,12 +48,12 @@ pub fn updateUnitWithAggroMod(
     frame_ctx: FrameContext,
 ) void {
     const dt = frame_ctx.effectiveDelta();
-    const profile = unit_comp.behavior_profile; // Inline profile access
+    const profile = unit_comp.behavior_profile; // Direct profile access - no wrapper!
     
     // Create context for state machine
     const behavior_context = behaviors_mod.behavior_state_machine.BehaviorContext.init(
         transform.pos,         // unit_pos
-        unit_comp.base.home_pos, // home_pos
+        unit_comp.home_pos,    // home_pos - direct access!
         if (player_alive) player_pos else null, // player_pos
         player_alive,         // player_alive
         aggro_multiplier,     // aggro_multiplier
@@ -65,41 +64,21 @@ pub fn updateUnitWithAggroMod(
     
     // Use persistent state machine - major performance improvement!
     const result = behaviors_mod.behavior_state_machine.updateBehaviorStateMachine(
-        &unit_comp.base.behavior_state_machine,
+        &unit_comp.behavior_state_machine, // Direct access - no wrapper!
         behavior_context,
         profile,
         ranges
     );
     
-    // Update unit behavior state to match state machine result
-    unit_comp.base.behavior_state = result.active_behavior;
+    // State is now managed entirely by the persistent state machine - no duplication needed!
     
     // Apply hex-specific colors
-    visual.color = getBehaviorColor(result.active_behavior, profile);
+    visual.color = constants.getBehaviorColor(result.active_behavior, profile);
     
     // Apply movement
     transform.vel = result.velocity;
     transform.pos = transform.pos.add(result.velocity.scale(dt));
 }
 
-/// Get color for behavior and profile combination
-fn getBehaviorColor(behavior: behaviors_mod.behavior_state_machine.BehaviorState, profile: BehaviorProfile) @TypeOf(constants.COLOR_UNIT_AGGRESSIVE) {
-    return switch (behavior) {
-        .chasing => switch (profile) {
-            .aggressive => constants.COLOR_UNIT_AGGRESSIVE,
-            .guardian => colors.PORTAL, // Purple
-            else => constants.COLOR_UNIT_AGGRESSIVE,
-        },
-        .fleeing => switch (profile) {
-            .defensive => colors.OBSTACLE_DEADLY, // Orange
-            .wandering => colors.BULLET, // Yellow
-            else => colors.OBSTACLE_DEADLY,
-        },
-        .patrolling => colors.PLAYER_ALIVE, // Blue
-        .guarding => colors.PORTAL, // Purple
-        .returning_home => constants.COLOR_UNIT_RETURNING,
-        .idle => constants.COLOR_UNIT_NON_AGGRO,
-    };
-}
 
 // No initialization/cleanup needed - persistent state machines manage themselves

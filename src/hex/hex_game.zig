@@ -51,29 +51,10 @@ pub const Effects = components.Effects;
 pub const Terrain = components.Terrain;
 pub const Interactable = components.Interactable;
 
-// Use behavior profiles from the library
-pub const BehaviorProfile = @import("../lib/game/behaviors/behavior_state_machine.zig").BehaviorProfile;
-
-/// Hex-specific unit component extending lib's Unit
-pub const HexUnit = struct {
-    // Core unit data from lib
-    base: components.Unit,
-
-    // Hex-specific additions
-    behavior_profile: BehaviorProfile = .wandering,
-
-    pub const UnitType = components.Unit.UnitType;
-
-    pub fn init(utype: components.Unit.UnitType, home_pos: Vec2, behavior: BehaviorProfile) HexUnit {
-        return .{
-            .base = components.Unit.init(utype, home_pos),
-            .behavior_profile = behavior,
-        };
-    }
-};
-
-// Alias for compatibility with existing code
-pub const Unit = HexUnit;
+// Use Unit directly from lib components - no wrapper needed
+pub const Unit = components.Unit;
+pub const UnitType = components.Unit.UnitType;
+pub const BehaviorProfile = components.Unit.BehaviorProfile;
 
 // Use PlayerInput from lib components
 pub const PlayerInput = components.PlayerInput;
@@ -414,7 +395,7 @@ pub const HexGame = struct {
         const transform = components.Transform.init(pos, radius);
         const health = components.Health.init(50);
         const visual = components.Visual.init(constants.COLOR_UNIT_DEFAULT);
-        const unit = Unit.init(.enemy, pos, behavior); // Hex-specific HexUnit
+        const unit = Unit.init(.enemy, pos, behavior); // Direct Unit with behavior profile
 
         try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;

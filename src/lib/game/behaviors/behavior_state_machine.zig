@@ -1,6 +1,6 @@
 const std = @import("std");
 const Vec2 = @import("../../math/mod.zig").Vec2;
-const state_machine = @import("state_machine.zig");
+const state_machine = @import("../../core/state_machine.zig");
 
 // Import only complex behavior modules that need delegation
 const patrol_behavior = @import("patrol_behavior.zig");

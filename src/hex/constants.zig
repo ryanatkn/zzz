@@ -170,3 +170,23 @@ pub const COLOR_PORTAL = colors.PORTAL;
 pub const COLOR_LIFESTONE_ATTUNED = colors.LIFESTONE_ATTUNED;
 pub const COLOR_LIFESTONE_UNATTUNED = colors.LIFESTONE_UNATTUNED;
 pub const COLOR_DEAD = colors.DEAD;
+
+// Behavior color mapping - centralized color logic
+pub fn getBehaviorColor(behavior: anytype, profile: anytype) @TypeOf(COLOR_UNIT_AGGRESSIVE) {
+    return switch (behavior) {
+        .chasing => switch (profile) {
+            .aggressive => COLOR_UNIT_AGGRESSIVE,
+            .guardian => COLOR_PORTAL, // Purple
+            else => COLOR_UNIT_AGGRESSIVE,
+        },
+        .fleeing => switch (profile) {
+            .defensive => COLOR_OBSTACLE_DEADLY, // Orange
+            .wandering => COLOR_BULLET, // Yellow
+            else => COLOR_OBSTACLE_DEADLY,
+        },
+        .patrolling => COLOR_PLAYER_ALIVE, // Blue
+        .guarding => COLOR_PORTAL, // Purple
+        .returning_home => COLOR_UNIT_RETURNING,
+        .idle => COLOR_UNIT_NON_AGGRO,
+    };
+}

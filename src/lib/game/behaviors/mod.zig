@@ -9,8 +9,7 @@ pub const patrol_behavior = @import("patrol_behavior.zig");
 pub const guard_behavior = @import("guard_behavior.zig");
 pub const wander_behavior = @import("wander_behavior.zig");
 pub const return_home_behavior = @import("return_home_behavior.zig");
-pub const unit_behavior = @import("unit_behavior.zig");
-pub const state_machine = @import("state_machine.zig");
+pub const state_machine = @import("../../core/state_machine.zig");
 pub const behavior_state_machine = @import("behavior_state_machine.zig");
 
 // No re-exports - import specific modules directly

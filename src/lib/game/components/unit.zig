@@ -13,19 +13,20 @@ pub const Unit = struct {
         neutral,
     };
 
-    // Use unified BehaviorState from behavior_state_machine
+    // Behavior system imports
     pub const BehaviorState = @import("../behaviors/behavior_state_machine.zig").BehaviorState;
     const BehaviorStateMachine = @import("../behaviors/behavior_state_machine.zig").BehaviorStateMachine;
+    pub const BehaviorProfile = @import("../behaviors/behavior_state_machine.zig").BehaviorProfile;
 
     unit_type: UnitType,
     aggro_range: f32,
     aggro_factor: f32,
     home_pos: Vec2,
-    behavior_state: BehaviorState,
     behavior_state_machine: BehaviorStateMachine,
+    behavior_profile: BehaviorProfile,
     target: ?EntityId,
 
-    pub fn init(unit_type: UnitType, home_pos: Vec2) Unit {
+    pub fn init(unit_type: UnitType, home_pos: Vec2, behavior_profile: BehaviorProfile) Unit {
         return .{
             .unit_type = unit_type,
             .aggro_range = switch (unit_type) {
@@ -35,8 +36,8 @@ pub const Unit = struct {
             },
             .aggro_factor = 1.0,
             .home_pos = home_pos,
-            .behavior_state = .idle,
             .behavior_state_machine = BehaviorStateMachine.init(.idle),
+            .behavior_profile = behavior_profile,
             .target = null,
         };
     }

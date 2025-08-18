@@ -347,7 +347,7 @@ pub const SpellSystem = struct {
 
             if (dist_sq <= radius_sq) {
                 // Unit is in area and can be affected - apply lull effect
-                unit.base.aggro_factor = constants.LULL_AGGRO_MULT;
+                unit.aggro_factor = constants.LULL_AGGRO_MULT;
                 affected_count += 1;
 
                 // Add visual effect for this unit
@@ -495,7 +495,7 @@ pub const SpellSystem = struct {
         const zone_mut = @constCast(zone);
         const unit = &zone_mut.units.units[target_unit.index];
         // Reduce aggro range to simulate slowness (temporary hack)
-        unit.base.aggro_range = unit.base.aggro_range * constants.LETHARGY_SPEED_MULT;
+        unit.aggro_range = unit.aggro_range * constants.LETHARGY_SPEED_MULT;
 
         // Visual effect
         const target_transform = &zone.units.transforms[target_unit.index];
@@ -565,8 +565,8 @@ pub const SpellSystem = struct {
 
             if (dist_sq <= radius_sq) {
                 // Apply dazzle effect - reduce aggro to simulate confusion
-                unit.base.aggro_range = unit.base.aggro_range * constants.DAZZLE_SPEED_MULT;
-                unit.base.aggro_factor = constants.DAZZLE_SPEED_MULT;
+                unit.aggro_range = unit.aggro_range * constants.DAZZLE_SPEED_MULT;
+                unit.aggro_factor = constants.DAZZLE_SPEED_MULT;
                 affected_count += 1;
 
                 // Visual effect for each affected unit
