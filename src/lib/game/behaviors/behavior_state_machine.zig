@@ -2,18 +2,12 @@ const std = @import("std");
 const Vec2 = @import("../../math/mod.zig").Vec2;
 const state_machine = @import("state_machine.zig");
 
-// Import individual behavior modules for delegation
-const chase_behavior = @import("chase_behavior.zig");
-const flee_behavior = @import("flee_behavior.zig");
+// Import only complex behavior modules that need delegation
 const patrol_behavior = @import("patrol_behavior.zig");
-const guard_behavior = @import("guard_behavior.zig");
-const wander_behavior = @import("wander_behavior.zig");
-const return_home_behavior = @import("return_home_behavior.zig");
 
 /// Specific behavior states for unit AI
 pub const BehaviorState = enum {
     idle,
-    investigating,  // Moving to investigate a disturbance  
     chasing,
     fleeing,
     patrolling,
@@ -27,7 +21,6 @@ pub const BehaviorState = enum {
             .chasing => 80,         // High priority - engagement
             .guarding => 60,        // Medium-high priority - area control
             .patrolling => 40,      // Medium priority - routine activity
-            .investigating => 30,   // Low-medium priority - curiosity
             .returning_home => 20,  // Low priority - maintenance
             .idle => 0,            // Lowest priority - default state
         };
@@ -203,7 +196,7 @@ fn evaluateDesiredState(context: BehaviorContext, profile: BehaviorProfile, rang
         return switch (profile) {
             .aggressive, .guardian => .chasing,
             .defensive => if (context.distance_from_home < ranges.guard_range) .guarding else .fleeing,
-            .wandering => if (context.distance_to_player < ranges.chase_range * 0.5) .chasing else .investigating,
+            .wandering => if (context.distance_to_player < ranges.chase_range * 0.5) .chasing else .idle,
             .patrolling => .chasing,
         };
     }
@@ -237,11 +230,6 @@ fn canTransitionToState(current: BehaviorState, target: BehaviorState, context: 
     return switch (current) {
         .idle => true, // Idle can transition to anything
         
-        .investigating => switch (target) {
-            .fleeing, .chasing => true, // Investigation can be interrupted
-            .idle, .returning_home => true, // Can finish investigating  
-            else => false,
-        },
         
         .chasing => switch (target) {
             .fleeing => true, // CRITICAL: Chase can be interrupted by flee (fixes bug)
@@ -253,7 +241,6 @@ fn canTransitionToState(current: BehaviorState, target: BehaviorState, context: 
         .fleeing => switch (target) {
             .idle => true, // Can reach safety
             .returning_home => true, // Can start going home
-            .investigating => context.distance_from_home < ranges.home_tolerance,
             // CRITICAL: Fleeing CANNOT transition to chasing (prevents aggro bug)
             else => false,
         },
@@ -287,7 +274,6 @@ fn getBehaviorPriority(state: BehaviorState) state_machine.BehaviorPriority {
         .chasing => .high,
         .guarding => .normal,
         .patrolling => .normal,
-        .investigating => .low,
         .returning_home => .low,
         .idle => .lowest,
     };
@@ -302,47 +288,42 @@ fn calculateVelocityForState(
     return switch (state) {
         .idle => Vec2.ZERO,
         
-        .investigating => {
-            // Move toward player position slowly  
-            if (context.player_pos) |player_pos| {
-                return chase_behavior.simpleChase(
-                    context.unit_pos,
-                    player_pos,
-                    context.player_alive,
-                    200.0, // detection_range (investigating has longer range)
-                    10.0,  // min_distance
-                    getWalkSpeed(profile) * 0.7, // slower investigation speed
-                    context.aggro_multiplier
-                );
-            }
-            return Vec2.ZERO;
-        },
         
         .chasing => {
+            // Inlined chase behavior for performance
             if (context.player_pos) |player_pos| {
-                return chase_behavior.simpleChase(
-                    context.unit_pos,
-                    player_pos,
-                    context.player_alive,
-                    200.0, // detection_range 
-                    10.0,  // min_distance
-                    getChaseSpeed(profile),
-                    context.aggro_multiplier
-                );
+                if (!context.player_alive) return Vec2.ZERO;
+                
+                const to_target = player_pos.sub(context.unit_pos);
+                const dist_sq = to_target.lengthSquared();
+                const detection_range = 200.0;
+                const min_distance = 10.0;
+                
+                const effective_range_sq = (detection_range * context.aggro_multiplier) * (detection_range * context.aggro_multiplier);
+                const min_dist_sq = min_distance * min_distance;
+                
+                if (dist_sq <= effective_range_sq and dist_sq > min_dist_sq) {
+                    const direction = to_target.normalize();
+                    return direction.scale(getChaseSpeed(profile));
+                }
             }
             return Vec2.ZERO;
         },
         
         .fleeing => {
+            // Inlined flee behavior for performance
             if (context.player_pos) |player_pos| {
-                return flee_behavior.simpleFlee(
-                    context.unit_pos,
-                    player_pos,
-                    context.player_alive,
-                    150.0, // danger_range
-                    getFleeSpeed(profile),
-                    context.aggro_multiplier
-                );
+                if (!context.player_alive) return Vec2.ZERO;
+                
+                const to_threat = player_pos.sub(context.unit_pos);
+                const dist_sq = to_threat.lengthSquared();
+                const danger_range = 150.0;
+                const danger_sq = (danger_range * context.aggro_multiplier) * (danger_range * context.aggro_multiplier);
+                
+                if (dist_sq <= danger_sq) {
+                    const direction = to_threat.normalize().scale(-1.0); // Away from threat
+                    return direction.scale(getFleeSpeed(profile));
+                }
             }
             return Vec2.ZERO;
         },
@@ -361,22 +342,31 @@ fn calculateVelocityForState(
         },
         
         .guarding => {
-            // Guards stay mostly stationary, slight movement toward home
-            return return_home_behavior.simpleReturnHome(
-                context.unit_pos,
-                context.home_pos,
-                5.0, // small tolerance - stay very close
-                getWalkSpeed(profile) * 0.3 // very slow movement
-            );
+            // Inlined guard behavior - stay close to home position
+            const to_home = context.home_pos.sub(context.unit_pos);
+            const dist_sq = to_home.lengthSquared();
+            const tolerance = 5.0; // Small tolerance - stay very close
+            const tolerance_sq = tolerance * tolerance;
+            
+            if (dist_sq > tolerance_sq) {
+                const direction = to_home.normalize();
+                return direction.scale(getWalkSpeed(profile) * 0.3); // Very slow movement
+            }
+            return Vec2.ZERO;
         },
         
         .returning_home => {
-            return return_home_behavior.simpleReturnHome(
-                context.unit_pos,
-                context.home_pos,
-                10.0, // home_tolerance
-                getWalkSpeed(profile)
-            );
+            // Inlined return home behavior for performance
+            const to_home = context.home_pos.sub(context.unit_pos);
+            const dist_sq = to_home.lengthSquared();
+            const tolerance = 10.0;
+            const tolerance_sq = tolerance * tolerance;
+            
+            if (dist_sq > tolerance_sq) {
+                const direction = to_home.normalize();
+                return direction.scale(getWalkSpeed(profile));
+            }
+            return Vec2.ZERO;
         },
     };
 }

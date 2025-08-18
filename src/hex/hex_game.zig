@@ -62,22 +62,12 @@ pub const HexUnit = struct {
     // Hex-specific additions
     behavior_profile: BehaviorProfile = .wandering,
 
-    pub const UnitState = enum { returning_home, chasing, at_home };
     pub const UnitType = components.Unit.UnitType;
 
     pub fn init(utype: components.Unit.UnitType, home_pos: Vec2, behavior: BehaviorProfile) HexUnit {
         return .{
             .base = components.Unit.init(utype, home_pos),
             .behavior_profile = behavior,
-        };
-    }
-
-    // Convenience accessors for compatibility
-    pub fn getState(self: HexUnit) UnitState {
-        return switch (self.base.behavior_state) {
-            .idle => .at_home,
-            .chasing => .chasing,
-            .fleeing, .patrolling, .investigating, .guarding, .returning_home => .returning_home,
         };
     }
 };

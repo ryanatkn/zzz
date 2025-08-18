@@ -6,12 +6,7 @@ const frame = @import("../lib/core/frame.zig");
 const colors = @import("../lib/core/colors.zig");
 const behaviors_mod = @import("../lib/game/behaviors/mod.zig");
 
-// Import all behavior types from the library
-const chase_behavior = behaviors_mod.chase_behavior;
-const flee_behavior = behaviors_mod.flee_behavior;
-const patrol_behavior = behaviors_mod.patrol_behavior;
-const guard_behavior = behaviors_mod.guard_behavior;
-const wander_behavior = behaviors_mod.wander_behavior;
+// Import behavior types from the library  
 const unit_behavior = behaviors_mod.unit_behavior;
 
 const Vec2 = math.Vec2;
@@ -23,166 +18,32 @@ const FrameContext = frame.FrameContext;
 // Import BehaviorProfile from hex_game.zig to avoid circular dependency
 const BehaviorProfile = hex_game_mod.BehaviorProfile;
 
-/// Unit behavior state storage with proper allocator management
-var unit_behavior_states: ?std.AutoHashMap(u32, unit_behavior.UnitBehaviorState) = null;
-var unit_behavior_configs: ?std.AutoHashMap(u32, unit_behavior.UnitBehaviorConfig) = null;
-var behaviors_allocator: ?std.mem.Allocator = null;
+// Simplified behavior system - no HashMap storage needed
+// State is stored directly in the unit component
+// Configuration is profile-based, not per-entity
 
-/// Static fallback state for error recovery (memory-safe alternative to @constCast)
-var fallback_state = unit_behavior.UnitBehaviorState.init(Vec2.ZERO, &[_]Vec2{}, 0);
-var fallback_config = unit_behavior.UnitBehaviorConfig.aggressive(Vec2.ZERO, 100.0, 50.0);
-
-/// Initialize behavior system with proper allocator
-pub fn initBehaviors(allocator: std.mem.Allocator) void {
-    // Clear any existing state
-    deinitBehaviors();
-
-    behaviors_allocator = allocator;
-    unit_behavior_states = std.AutoHashMap(u32, unit_behavior.UnitBehaviorState).init(allocator);
-    unit_behavior_configs = std.AutoHashMap(u32, unit_behavior.UnitBehaviorConfig).init(allocator);
-}
-
-/// Cleanup behavior system
-pub fn deinitBehaviors() void {
-    if (unit_behavior_states) |*states| {
-        states.deinit();
-    }
-    if (unit_behavior_configs) |*configs| {
-        configs.deinit();
-    }
-    unit_behavior_states = null;
-    unit_behavior_configs = null;
-    behaviors_allocator = null;
-}
-
-/// Create behavior configuration for specific profile with consistent parameters
-fn createConfigForProfile(profile: BehaviorProfile, home_pos: Vec2) unit_behavior.UnitBehaviorConfig {
+// Profile-based configuration - no per-entity storage needed
+fn getDetectionRange(profile: BehaviorProfile) f32 {
     const base_detection = constants.UNIT_DETECTION_RADIUS;
-    const base_chase_speed = constants.UNIT_CHASE_SPEED;
-    const base_walk_speed = constants.UNIT_WALK_SPEED;
-
     return switch (profile) {
-        .aggressive => unit_behavior.UnitBehaviorConfig.aggressive(home_pos, base_detection, base_chase_speed),
-        .defensive => unit_behavior.UnitBehaviorConfig.defensive(home_pos, base_detection, base_chase_speed * constants.BEHAVIOR_DEFENSIVE_SPEED_MULT),
-        .patrolling => unit_behavior.UnitBehaviorConfig.patrolling(home_pos, base_detection, base_walk_speed),
-        .wandering => unit_behavior.UnitBehaviorConfig.init(
-            home_pos,
-            base_detection * constants.BEHAVIOR_WANDERING_DETECTION_MULT,
-            constants.PLAYER_RADIUS + 10.0,
-            base_walk_speed,
-            base_walk_speed * constants.BEHAVIOR_WANDERING_WALK_SPEED_MULT,
-            constants.BEHAVIOR_WANDERING_CHASE_DURATION,
-            constants.UNIT_HOME_TOLERANCE,
-            constants.BEHAVIOR_WANDERING_LOSE_TOLERANCE,
-        ),
-        .guardian => unit_behavior.UnitBehaviorConfig.init(
-            home_pos,
-            base_detection * constants.BEHAVIOR_GUARDIAN_DETECTION_MULT,
-            constants.PLAYER_RADIUS + constants.BEHAVIOR_GUARDIAN_MIN_DISTANCE_OFFSET,
-            base_chase_speed,
-            base_walk_speed,
-            constants.BEHAVIOR_GUARDIAN_CHASE_DURATION,
-            constants.UNIT_HOME_TOLERANCE * constants.BEHAVIOR_GUARDIAN_HOME_TOLERANCE_MULT,
-            constants.BEHAVIOR_GUARDIAN_LOSE_TOLERANCE,
-        ),
+        .wandering => base_detection * constants.BEHAVIOR_WANDERING_DETECTION_MULT,
+        .guardian => base_detection * constants.BEHAVIOR_GUARDIAN_DETECTION_MULT,
+        else => base_detection,
     };
 }
 
-/// Create behavior config based on profile (public API)
-pub fn createBehaviorConfig(profile: BehaviorProfile, home_pos: Vec2) unit_behavior.UnitBehaviorConfig {
-    return createConfigForProfile(profile, home_pos);
+// No per-entity state storage needed - state is in unit component
+// No per-entity config storage needed - use profile-based configuration
+
+// Patrol waypoints can be generated on-demand if needed
+// For now, simple patrol uses simplePatrol function
+
+/// Get behavior profile from unit component
+fn getBehaviorProfile(unit_comp: *const Unit) BehaviorProfile {
+    return unit_comp.behavior_profile;
 }
 
-/// Get or create behavior state for a unit entity
-fn getOrCreateBehaviorState(entity_id: u32, unit_comp: *const Unit, profile: BehaviorProfile) *unit_behavior.UnitBehaviorState {
-    if (unit_behavior_states == null) {
-        std.log.err("Behavior system not initialized, using fallback for entity {}", .{entity_id});
-        fallback_state = unit_behavior.UnitBehaviorState.init(unit_comp.base.home_pos, &[_]Vec2{}, entity_id);
-        return &fallback_state;
-    }
-
-    const state_result = unit_behavior_states.?.getOrPut(entity_id) catch {
-        std.log.err("Failed to get or create behavior state for entity {}, using fallback", .{entity_id});
-        // Update fallback state and return reference to it (memory-safe)
-        fallback_state = unit_behavior.UnitBehaviorState.init(unit_comp.base.home_pos, &[_]Vec2{}, entity_id);
-        return &fallback_state;
-    };
-
-    if (!state_result.found_existing) {
-        // Create new state with appropriate waypoints based on profile
-        const waypoints = switch (profile) {
-            .patrolling => generatePatrolWaypoints(unit_comp.base.home_pos, .square), // Default to square pattern
-            else => &[_]Vec2{}, // No waypoints for other profiles
-        };
-
-        state_result.value_ptr.* = unit_behavior.UnitBehaviorState.init(
-            unit_comp.base.home_pos,
-            waypoints,
-            entity_id, // Use entity ID as random seed
-        );
-    }
-
-    return state_result.value_ptr;
-}
-
-/// Get or create behavior config for a unit entity
-fn getOrCreateBehaviorConfig(entity_id: u32, unit_comp: *const Unit, profile: BehaviorProfile) *unit_behavior.UnitBehaviorConfig {
-    if (unit_behavior_configs == null) {
-        std.log.err("Behavior system not initialized, using fallback for entity {}", .{entity_id});
-        fallback_config = createConfigForProfile(profile, unit_comp.base.home_pos);
-        return &fallback_config;
-    }
-
-    const config_result = unit_behavior_configs.?.getOrPut(entity_id) catch {
-        std.log.err("Failed to get or create behavior config for entity {}, using fallback", .{entity_id});
-        // Update fallback config and return reference to it (memory-safe)
-        fallback_config = createConfigForProfile(profile, unit_comp.base.home_pos);
-        return &fallback_config;
-    };
-
-    if (!config_result.found_existing) {
-        config_result.value_ptr.* = createConfigForProfile(profile, unit_comp.base.home_pos);
-    }
-
-    return config_result.value_ptr;
-}
-
-/// Generate patrol waypoints based on pattern and home position
-fn generatePatrolWaypoints(home_pos: Vec2, pattern: constants.PatrolPattern) []const Vec2 {
-    const offset_x = constants.PATROL_WAYPOINT_OFFSET_X;
-    const offset_y = constants.PATROL_WAYPOINT_OFFSET_Y;
-
-    return switch (pattern) {
-        .square => &[_]Vec2{
-            home_pos,
-            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y },
-            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y + offset_y },
-            Vec2{ .x = home_pos.x, .y = home_pos.y + offset_y },
-        },
-        .line => &[_]Vec2{
-            home_pos,
-            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y },
-        },
-        .triangle => &[_]Vec2{
-            home_pos,
-            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y },
-            Vec2{ .x = home_pos.x + offset_x * 0.5, .y = home_pos.y + offset_y },
-        },
-        .circle => &[_]Vec2{
-            home_pos,
-            Vec2{ .x = home_pos.x + offset_x, .y = home_pos.y },
-            Vec2{ .x = home_pos.x, .y = home_pos.y + offset_y },
-            Vec2{ .x = home_pos.x - offset_x, .y = home_pos.y },
-        },
-    };
-}
-
-/// Determine behavior profile from stored unit data (not entity ID)
-fn determineBehaviorProfile(unit_comp: *const Unit) BehaviorProfile {
-    return unit_comp.behavior_profile; // Use stored value from ZON
-}
-
-/// Context-aware hex-specific unit update function using library behaviors
+/// Simplified hex-specific unit update using state machine directly
 pub fn updateUnitWithAggroMod(
     entity_id: u32,
     unit_comp: *Unit,
@@ -193,45 +54,40 @@ pub fn updateUnitWithAggroMod(
     aggro_multiplier: f32,
     frame_ctx: FrameContext,
 ) void {
+    _ = entity_id; // Not needed anymore
     const dt = frame_ctx.effectiveDelta();
-
-    // Determine behavior profile for this unit
-    const profile = determineBehaviorProfile(unit_comp);
-
-    // Get or create behavior state and config
-    const state = getOrCreateBehaviorState(entity_id, unit_comp, profile);
-    const config = getOrCreateBehaviorConfig(entity_id, unit_comp, profile);
-
-    // Create behavior context
-    const behavior_context = unit_behavior.BehaviorContext{
-        .unit_pos = transform.pos,
-        .target_pos = if (player_alive) player_pos else null,
-        .target_alive = player_alive,
-        .threat_pos = if (player_alive) player_pos else null,
-        .threat_active = player_alive,
-        .home_pos = unit_comp.base.home_pos,
-        .aggro_multiplier = aggro_multiplier,
-        .speed_multiplier = 1.0,
-        .dt = dt,
-    };
-
-    // Evaluate behavior
-    const result = unit_behavior.updateUnitBehavior(behavior_context, state, config.*, profile);
-
-    // Update hex-specific unit state based on behavior result
-    unit_comp.base.behavior_state = switch (result.active_behavior) {
-        .chasing => .chasing,
-        .fleeing => .fleeing,
-        .returning_home => .idle, // Returning home is considered idle state
-        .patrolling => .patrolling,
-        .guarding, .investigating, .idle => .idle, // Default to idle for these behaviors
-    };
-
-
-    // Apply hex-specific colors based on behavior and profile
+    const profile = getBehaviorProfile(unit_comp);
+    
+    // Create context for state machine
+    const behavior_context = behaviors_mod.behavior_state_machine.BehaviorContext.init(
+        transform.pos,         // unit_pos
+        unit_comp.base.home_pos, // home_pos
+        if (player_alive) player_pos else null, // player_pos
+        player_alive,         // player_alive
+        aggro_multiplier,     // aggro_multiplier
+        dt                    // dt
+    );
+    
+    const ranges = profile.getRanges(getDetectionRange(profile));
+    
+    // Create a temporary state machine based on current state
+    var state_machine = behaviors_mod.behavior_state_machine.BehaviorStateMachine.init(unit_comp.base.behavior_state);
+    
+    // Update state machine
+    const result = behaviors_mod.behavior_state_machine.updateBehaviorStateMachine(
+        &state_machine,
+        behavior_context,
+        profile,
+        ranges
+    );
+    
+    // Update unit behavior state to match state machine result
+    unit_comp.base.behavior_state = result.active_behavior;
+    
+    // Apply hex-specific colors
     visual.color = getBehaviorColor(result.active_behavior, profile);
-
-    // Apply velocity and position
+    
+    // Apply movement
     transform.vel = result.velocity;
     transform.pos = transform.pos.add(result.velocity.scale(dt));
 }
@@ -251,18 +107,16 @@ fn getBehaviorColor(behavior: behaviors_mod.behavior_state_machine.BehaviorState
         },
         .patrolling => colors.PLAYER_ALIVE, // Blue
         .guarding => colors.PORTAL, // Purple
-        .investigating => colors.GREEN_BRIGHT, // Green
         .returning_home => constants.COLOR_UNIT_RETURNING,
         .idle => constants.COLOR_UNIT_NON_AGGRO,
     };
 }
 
-/// Calculate velocity for unit returning home (using lib utility)
-fn calculateReturnHomeVelocity(unit_comp: *const Unit, transform: *const Transform) Vec2 {
-    return behaviors_mod.return_home_behavior.simpleReturnHome(
-        transform.pos,
-        unit_comp.home_pos,
-        constants.UNIT_HOME_TOLERANCE,
-        constants.UNIT_WALK_SPEED,
-    );
+// Simplified initialization/cleanup functions
+pub fn initBehaviors(allocator: std.mem.Allocator) void {
+    _ = allocator; // No storage needed anymore
+}
+
+pub fn deinitBehaviors() void {
+    // No cleanup needed
 }
