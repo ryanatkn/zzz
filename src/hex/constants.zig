@@ -135,6 +135,19 @@ pub const BEHAVIOR_GUARDIAN_LOSE_TOLERANCE = 1.25;
 pub const PATROL_WAYPOINT_OFFSET_X = 100.0;
 pub const PATROL_WAYPOINT_OFFSET_Y = 100.0;
 
+// Portal shape types
+pub const PortalShape = enum {
+    circle,
+    square,
+    triangle,
+};
+
+// Obstacle type for game data loading
+pub const ObstacleType = enum {
+    blocking,
+    deadly,
+};
+
 // Patrol pattern types
 pub const PatrolPattern = enum {
     square,    // 4-point square pattern

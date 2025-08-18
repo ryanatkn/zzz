@@ -19,35 +19,35 @@
         .{
             .name = "Overworld",
             .background_color = .{ .r = 10, .g = 10, .b = 15 },
-            .camera_mode = "fixed",
+            .camera_mode = .fixed,
             .camera_scale = 1.0,
             .obstacles = .{
                 // Large blocking obstacles (original size)
-                .{ .position = .{ .x = 200.0, .y = 300.0 }, .size = .{ .x = 80.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1600.0, .y = 200.0 }, .size = .{ .x = 120.0, .y = 60.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 400.0, .y = 800.0 }, .size = .{ .x = 60.0, .y = 100.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1400.0, .y = 900.0 }, .size = .{ .x = 100.0, .y = 80.0 }, .type = "blocking" },
+                .{ .position = .{ .x = 200.0, .y = 300.0 }, .size = .{ .x = 80.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1600.0, .y = 200.0 }, .size = .{ .x = 120.0, .y = 60.0 }, .type = .blocking },
+                .{ .position = .{ .x = 400.0, .y = 800.0 }, .size = .{ .x = 60.0, .y = 100.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1400.0, .y = 900.0 }, .size = .{ .x = 100.0, .y = 80.0 }, .type = .blocking },
                 // Medium blocking obstacles (~1/2 size)
-                .{ .position = .{ .x = 300.0, .y = 150.0 }, .size = .{ .x = 40.0, .y = 30.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1500.0, .y = 400.0 }, .size = .{ .x = 35.0, .y = 45.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 250.0, .y = 900.0 }, .size = .{ .x = 50.0, .y = 25.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1650.0, .y = 750.0 }, .size = .{ .x = 30.0, .y = 40.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 700.0, .y = 950.0 }, .size = .{ .x = 45.0, .y = 35.0 }, .type = "blocking" },
+                .{ .position = .{ .x = 300.0, .y = 150.0 }, .size = .{ .x = 40.0, .y = 30.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1500.0, .y = 400.0 }, .size = .{ .x = 35.0, .y = 45.0 }, .type = .blocking },
+                .{ .position = .{ .x = 250.0, .y = 900.0 }, .size = .{ .x = 50.0, .y = 25.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1650.0, .y = 750.0 }, .size = .{ .x = 30.0, .y = 40.0 }, .type = .blocking },
+                .{ .position = .{ .x = 700.0, .y = 950.0 }, .size = .{ .x = 45.0, .y = 35.0 }, .type = .blocking },
                 // Small blocking obstacles (~1/4 size)
-                .{ .position = .{ .x = 500.0, .y = 250.0 }, .size = .{ .x = 20.0, .y = 20.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1300.0, .y = 150.0 }, .size = .{ .x = 25.0, .y = 15.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 150.0, .y = 700.0 }, .size = .{ .x = 15.0, .y = 25.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1750.0, .y = 300.0 }, .size = .{ .x = 20.0, .y = 18.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 600.0, .y = 100.0 }, .size = .{ .x = 18.0, .y = 22.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1100.0, .y = 950.0 }, .size = .{ .x = 22.0, .y = 20.0 }, .type = "blocking" },
+                .{ .position = .{ .x = 500.0, .y = 250.0 }, .size = .{ .x = 20.0, .y = 20.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1300.0, .y = 150.0 }, .size = .{ .x = 25.0, .y = 15.0 }, .type = .blocking },
+                .{ .position = .{ .x = 150.0, .y = 700.0 }, .size = .{ .x = 15.0, .y = 25.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1750.0, .y = 300.0 }, .size = .{ .x = 20.0, .y = 18.0 }, .type = .blocking },
+                .{ .position = .{ .x = 600.0, .y = 100.0 }, .size = .{ .x = 18.0, .y = 22.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1100.0, .y = 950.0 }, .size = .{ .x = 22.0, .y = 20.0 }, .type = .blocking },
                 // Tiny blocking obstacles (~1/10 size)
-                .{ .position = .{ .x = 350.0, .y = 450.0 }, .size = .{ .x = 8.0, .y = 8.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1450.0, .y = 600.0 }, .size = .{ .x = 12.0, .y = 6.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 550.0, .y = 850.0 }, .size = .{ .x = 6.0, .y = 10.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1200.0, .y = 100.0 }, .size = .{ .x = 10.0, .y = 8.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 100.0, .y = 500.0 }, .size = .{ .x = 8.0, .y = 12.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1800.0, .y = 900.0 }, .size = .{ .x = 9.0, .y = 9.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 450.0, .y = 200.0 }, .size = .{ .x = 7.0, .y = 8.0 }, .type = "blocking" },
+                .{ .position = .{ .x = 350.0, .y = 450.0 }, .size = .{ .x = 8.0, .y = 8.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1450.0, .y = 600.0 }, .size = .{ .x = 12.0, .y = 6.0 }, .type = .blocking },
+                .{ .position = .{ .x = 550.0, .y = 850.0 }, .size = .{ .x = 6.0, .y = 10.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1200.0, .y = 100.0 }, .size = .{ .x = 10.0, .y = 8.0 }, .type = .blocking },
+                .{ .position = .{ .x = 100.0, .y = 500.0 }, .size = .{ .x = 8.0, .y = 12.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1800.0, .y = 900.0 }, .size = .{ .x = 9.0, .y = 9.0 }, .type = .blocking },
+                .{ .position = .{ .x = 450.0, .y = 200.0 }, .size = .{ .x = 7.0, .y = 8.0 }, .type = .blocking },
                 // Overworld is now safe - no deadly hazards, only blocking obstacles for navigation challenge
             },
             .units = .{
@@ -69,17 +69,17 @@
             .portals = .{
                 // Portals to 6 dungeons arranged in regular hexagon (380px radius)
                 // Northwest
-                .{ .position = .{ .x = 770.0, .y = 211.0 }, .radius = 25.0, .destination = 4, .shape = "square" },
+                .{ .position = .{ .x = 770.0, .y = 211.0 }, .radius = 25.0, .destination = 4, .shape = .square },
                 // Northeast
-                .{ .position = .{ .x = 1150.0, .y = 211.0 }, .radius = 25.0, .destination = 5, .shape = "triangle" },
+                .{ .position = .{ .x = 1150.0, .y = 211.0 }, .radius = 25.0, .destination = 5, .shape = .triangle },
                 // East
-                .{ .position = .{ .x = 1340.0, .y = 540.0 }, .radius = 25.0, .destination = 6, .shape = "circle" },
+                .{ .position = .{ .x = 1340.0, .y = 540.0 }, .radius = 25.0, .destination = 6, .shape = .circle },
                 // Southeast
-                .{ .position = .{ .x = 1150.0, .y = 869.0 }, .radius = 25.0, .destination = 1, .shape = "square" },
+                .{ .position = .{ .x = 1150.0, .y = 869.0 }, .radius = 25.0, .destination = 1, .shape = .square },
                 // Southwest
-                .{ .position = .{ .x = 770.0, .y = 869.0 }, .radius = 25.0, .destination = 2, .shape = "triangle" },
+                .{ .position = .{ .x = 770.0, .y = 869.0 }, .radius = 25.0, .destination = 2, .shape = .triangle },
                 // West
-                .{ .position = .{ .x = 580.0, .y = 540.0 }, .radius = 25.0, .destination = 3, .shape = "circle" },
+                .{ .position = .{ .x = 580.0, .y = 540.0 }, .radius = 25.0, .destination = 3, .shape = .circle },
             },
             .lifestones = .{
                 // Central spawn lifestone (player starts here) - matches SCREEN_CENTER
@@ -117,15 +117,15 @@
         .{
             .name = "Southeast Dungeon",
             .background_color = .{ .r = 15, .g = 15, .b = 25 },
-            .camera_mode = "follow",
+            .camera_mode = .follow,
             //.camera_scale = 1.5, // Zoomed in for claustrophobic feel
             .obstacles = .{
                 // Circular chamber layout
-                .{ .position = .{ .x = 600.0, .y = 100.0 }, .size = .{ .x = 200.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 400.0, .y = 400.0 }, .size = .{ .x = 120.0, .y = 120.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1400.0, .y = 400.0 }, .size = .{ .x = 120.0, .y = 120.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 800.0, .y = 700.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
-                .{ .position = .{ .x = 1120.0, .y = 700.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
+                .{ .position = .{ .x = 600.0, .y = 100.0 }, .size = .{ .x = 200.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 400.0, .y = 400.0 }, .size = .{ .x = 120.0, .y = 120.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1400.0, .y = 400.0 }, .size = .{ .x = 120.0, .y = 120.0 }, .type = .blocking },
+                .{ .position = .{ .x = 800.0, .y = 700.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = .deadly },
+                .{ .position = .{ .x = 1120.0, .y = 700.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = .deadly },
             },
             .units = .{
                 // Southeast Dungeon: 1 boss unit (largest size) - positioned off-center for better flow
@@ -133,10 +133,10 @@
             },
             .portals = .{
                 // Back to overworld (Southeast dungeon - portal positioned UP-LEFT toward overworld)
-                .{ .position = .{ .x = 960.0, .y = 660.0 }, .radius = 30.0, .destination = 0, .shape = "circle" },
+                .{ .position = .{ .x = 960.0, .y = 660.0 }, .radius = 30.0, .destination = 0, .shape = .circle },
                 // To adjacent dungeons (clockwise)
-                .{ .position = .{ .x = 1700.0, .y = 540.0 }, .radius = 25.0, .destination = 2, .shape = "triangle" },
-                .{ .position = .{ .x = 220.0, .y = 540.0 }, .radius = 25.0, .destination = 6, .shape = "square" },
+                .{ .position = .{ .x = 1700.0, .y = 540.0 }, .radius = 25.0, .destination = 2, .shape = .triangle },
+                .{ .position = .{ .x = 220.0, .y = 540.0 }, .radius = 25.0, .destination = 6, .shape = .square },
             },
             .lifestones = .{
                 // 2 lifestones in Southeast Dungeon
@@ -149,14 +149,14 @@
         .{
             .name = "Southwest Dungeon",
             .background_color = .{ .r = 25, .g = 15, .b = 15 },
-            .camera_mode = "follow",
+            .camera_mode = .follow,
             .obstacles = .{
                 // Triangular chamber layout
-                .{ .position = .{ .x = 800.0, .y = 150.0 }, .size = .{ .x = 320.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 400.0, .y = 600.0 }, .size = .{ .x = 160.0, .y = 160.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1360.0, .y = 600.0 }, .size = .{ .x = 160.0, .y = 160.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1200.0, .y = 800.0 }, .size = .{ .x = 30.0, .y = 30.0 }, .type = "deadly" },
-                .{ .position = .{ .x = 700.0, .y = 400.0 }, .size = .{ .x = 35.0, .y = 35.0 }, .type = "deadly" },
+                .{ .position = .{ .x = 800.0, .y = 150.0 }, .size = .{ .x = 320.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 400.0, .y = 600.0 }, .size = .{ .x = 160.0, .y = 160.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1360.0, .y = 600.0 }, .size = .{ .x = 160.0, .y = 160.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1200.0, .y = 800.0 }, .size = .{ .x = 30.0, .y = 30.0 }, .type = .deadly },
+                .{ .position = .{ .x = 700.0, .y = 400.0 }, .size = .{ .x = 35.0, .y = 35.0 }, .type = .deadly },
             },
             .units = .{
                 // Southwest Dungeon: 2 units (second largest size)
@@ -165,10 +165,10 @@
             },
             .portals = .{
                 // Back to overworld (Southwest dungeon - portal positioned UP-RIGHT toward overworld)
-                .{ .position = .{ .x = 856.0, .y = 644.0 }, .radius = 30.0, .destination = 0, .shape = "circle" },
+                .{ .position = .{ .x = 856.0, .y = 644.0 }, .radius = 30.0, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 1650.0, .y = 800.0 }, .radius = 25.0, .destination = 3, .shape = "square" },
-                .{ .position = .{ .x = 220.0, .y = 200.0 }, .radius = 25.0, .destination = 1, .shape = "circle" },
+                .{ .position = .{ .x = 1650.0, .y = 800.0 }, .radius = 25.0, .destination = 3, .shape = .square },
+                .{ .position = .{ .x = 220.0, .y = 200.0 }, .radius = 25.0, .destination = 1, .shape = .circle },
             },
             .lifestones = .{
                 // 3 lifestones in Southwest Dungeon
@@ -182,15 +182,15 @@
         .{
             .name = "West Dungeon",
             .background_color = .{ .r = 15, .g = 25, .b = 15 },
-            .camera_mode = "follow",
+            .camera_mode = .follow,
             //.camera_scale = 2.0, // Very zoomed in for intense combat
             .obstacles = .{
                 // Square chamber layout
-                .{ .position = .{ .x = 300.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 200.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1520.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 200.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 700.0, .y = 150.0 }, .size = .{ .x = 520.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 700.0, .y = 820.0 }, .size = .{ .x = 520.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1120.0, .y = 500.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
+                .{ .position = .{ .x = 300.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 200.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1520.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 200.0 }, .type = .blocking },
+                .{ .position = .{ .x = 700.0, .y = 150.0 }, .size = .{ .x = 520.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 700.0, .y = 820.0 }, .size = .{ .x = 520.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1120.0, .y = 500.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = .deadly },
             },
             .units = .{
                 // West Dungeon: 3 units (medium size) - square chamber combat
@@ -200,10 +200,10 @@
             },
             .portals = .{
                 // Back to overworld (West dungeon - portal positioned RIGHT toward overworld)
-                .{ .position = .{ .x = 856.0, .y = 436.0 }, .radius = 30.0, .destination = 0, .shape = "circle" },
+                .{ .position = .{ .x = 856.0, .y = 436.0 }, .radius = 30.0, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 960.0, .y = 980.0 }, .radius = 25.0, .destination = 4, .shape = "circle" },
-                .{ .position = .{ .x = 200.0, .y = 400.0 }, .radius = 25.0, .destination = 2, .shape = "triangle" },
+                .{ .position = .{ .x = 960.0, .y = 980.0 }, .radius = 25.0, .destination = 4, .shape = .circle },
+                .{ .position = .{ .x = 200.0, .y = 400.0 }, .radius = 25.0, .destination = 2, .shape = .triangle },
             },
             .lifestones = .{
                 // 2 lifestones in Southeast Dungeon
@@ -216,14 +216,14 @@
         .{
             .name = "Northwest Dungeon",
             .background_color = .{ .r = 25, .g = 25, .b = 15 },
-            .camera_mode = "follow",
+            .camera_mode = .follow,
             .obstacles = .{
                 // Circular chamber layout (variant)
-                .{ .position = .{ .x = 600.0, .y = 980.0 }, .size = .{ .x = 200.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 350.0, .y = 680.0 }, .size = .{ .x = 120.0, .y = 120.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1450.0, .y = 680.0 }, .size = .{ .x = 120.0, .y = 120.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 700.0, .y = 300.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
-                .{ .position = .{ .x = 1220.0, .y = 300.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
+                .{ .position = .{ .x = 600.0, .y = 980.0 }, .size = .{ .x = 200.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 350.0, .y = 680.0 }, .size = .{ .x = 120.0, .y = 120.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1450.0, .y = 680.0 }, .size = .{ .x = 120.0, .y = 120.0 }, .type = .blocking },
+                .{ .position = .{ .x = 700.0, .y = 300.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = .deadly },
+                .{ .position = .{ .x = 1220.0, .y = 300.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = .deadly },
             },
             .units = .{
                 // Northwest Dungeon: 4 units (smaller size) - coordinated pack
@@ -234,10 +234,10 @@
             },
             .portals = .{
                 // Back to overworld (Northwest dungeon - portal positioned DOWN-RIGHT toward overworld)
-                .{ .position = .{ .x = 960.0, .y = 420.0 }, .radius = 30.0, .destination = 0, .shape = "circle" },
+                .{ .position = .{ .x = 960.0, .y = 420.0 }, .radius = 30.0, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 220.0, .y = 540.0 }, .radius = 25.0, .destination = 5, .shape = "triangle" },
-                .{ .position = .{ .x = 1700.0, .y = 540.0 }, .radius = 25.0, .destination = 3, .shape = "square" },
+                .{ .position = .{ .x = 220.0, .y = 540.0 }, .radius = 25.0, .destination = 5, .shape = .triangle },
+                .{ .position = .{ .x = 1700.0, .y = 540.0 }, .radius = 25.0, .destination = 3, .shape = .square },
             },
             .lifestones = .{
                 // 3 lifestones in South Dungeon
@@ -251,14 +251,14 @@
         .{
             .name = "Northeast Dungeon",
             .background_color = .{ .r = 25, .g = 15, .b = 25 },
-            .camera_mode = "follow",
+            .camera_mode = .follow,
             .obstacles = .{
                 // Triangular chamber layout (variant)
-                .{ .position = .{ .x = 800.0, .y = 850.0 }, .size = .{ .x = 320.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 350.0, .y = 320.0 }, .size = .{ .x = 160.0, .y = 160.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1410.0, .y = 320.0 }, .size = .{ .x = 160.0, .y = 160.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1200.0, .y = 150.0 }, .size = .{ .x = 30.0, .y = 30.0 }, .type = "deadly" },
-                .{ .position = .{ .x = 1220.0, .y = 600.0 }, .size = .{ .x = 35.0, .y = 35.0 }, .type = "deadly" },
+                .{ .position = .{ .x = 800.0, .y = 850.0 }, .size = .{ .x = 320.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 350.0, .y = 320.0 }, .size = .{ .x = 160.0, .y = 160.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1410.0, .y = 320.0 }, .size = .{ .x = 160.0, .y = 160.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1200.0, .y = 150.0 }, .size = .{ .x = 30.0, .y = 30.0 }, .type = .deadly },
+                .{ .position = .{ .x = 1220.0, .y = 600.0 }, .size = .{ .x = 35.0, .y = 35.0 }, .type = .deadly },
             },
             .units = .{
                 // Northeast Dungeon: 5 units (small size) - swarm tactics
@@ -270,10 +270,10 @@
             },
             .portals = .{
                 // Back to overworld (Northeast dungeon - portal positioned DOWN-LEFT toward overworld)
-                .{ .position = .{ .x = 1064.0, .y = 436.0 }, .radius = 30.0, .destination = 0, .shape = "circle" },
+                .{ .position = .{ .x = 1064.0, .y = 436.0 }, .radius = 30.0, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 400.0, .y = 150.0 }, .radius = 25.0, .destination = 6, .shape = "square" },
-                .{ .position = .{ .x = 1700.0, .y = 880.0 }, .radius = 25.0, .destination = 4, .shape = "circle" },
+                .{ .position = .{ .x = 400.0, .y = 150.0 }, .radius = 25.0, .destination = 6, .shape = .square },
+                .{ .position = .{ .x = 1700.0, .y = 880.0 }, .radius = 25.0, .destination = 4, .shape = .circle },
             },
             .lifestones = .{
                 // 2 lifestones in Northeast Dungeon
@@ -286,15 +286,15 @@
         .{
             .name = "East Dungeon",
             .background_color = .{ .r = 15, .g = 20, .b = 25 },
-            .camera_mode = "follow",
+            .camera_mode = .follow,
             .obstacles = .{
                 // Square chamber layout (variant)
-                .{ .position = .{ .x = 200.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 200.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 1620.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 200.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 600.0, .y = 850.0 }, .size = .{ .x = 720.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 600.0, .y = 150.0 }, .size = .{ .x = 720.0, .y = 80.0 }, .type = "blocking" },
-                .{ .position = .{ .x = 700.0, .y = 500.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
-                .{ .position = .{ .x = 1220.0, .y = 500.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = "deadly" },
+                .{ .position = .{ .x = 200.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 200.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1620.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 200.0 }, .type = .blocking },
+                .{ .position = .{ .x = 600.0, .y = 850.0 }, .size = .{ .x = 720.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 600.0, .y = 150.0 }, .size = .{ .x = 720.0, .y = 80.0 }, .type = .blocking },
+                .{ .position = .{ .x = 700.0, .y = 500.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = .deadly },
+                .{ .position = .{ .x = 1220.0, .y = 500.0 }, .size = .{ .x = 40.0, .y = 40.0 }, .type = .deadly },
             },
             .units = .{
                 // East Dungeon: 6 units (smallest size) - overwhelming numbers
@@ -307,10 +307,10 @@
             },
             .portals = .{
                 // Back to overworld (East dungeon - portal positioned DOWN-LEFT toward overworld)
-                .{ .position = .{ .x = 1064.0, .y = 744.0 }, .radius = 30.0, .destination = 0, .shape = "circle" },
+                .{ .position = .{ .x = 1064.0, .y = 744.0 }, .radius = 30.0, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 1700.0, .y = 200.0 }, .radius = 25.0, .destination = 1, .shape = "circle" },
-                .{ .position = .{ .x = 960.0, .y = 1050.0 }, .radius = 25.0, .destination = 5, .shape = "triangle" },
+                .{ .position = .{ .x = 1700.0, .y = 200.0 }, .radius = 25.0, .destination = 1, .shape = .circle },
+                .{ .position = .{ .x = 960.0, .y = 1050.0 }, .radius = 25.0, .destination = 5, .shape = .triangle },
             },
             .lifestones = .{
                 // 3 lifestones in Northwest Dungeon

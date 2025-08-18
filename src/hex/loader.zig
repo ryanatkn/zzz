@@ -85,11 +85,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
     };
 
     // Set camera mode for this zone
-    if (std.mem.eql(u8, data.camera_mode, "fixed")) {
-        zone.camera_mode = .fixed;
-    } else {
-        zone.camera_mode = .follow;
-    }
+    zone.camera_mode = data.camera_mode;
 
     // Set camera scale (default to 1.0 if not specified)
     zone.camera_scale = data.camera_scale orelse 1.0;
@@ -103,7 +99,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
     // Load obstacles
     if (data.obstacles) |obstacles| {
         for (obstacles) |obstacle_data| {
-            const is_deadly = std.mem.eql(u8, obstacle_data.type, "deadly");
+            const is_deadly = obstacle_data.type == .deadly;
 
             // Create obstacle entity
             const obstacle_id = game.createObstacle(
@@ -193,13 +189,13 @@ const GameData = struct {
 const ZoneData = struct {
     name: []const u8,
     background_color: struct { r: u8, g: u8, b: u8 },
-    camera_mode: []const u8,
+    camera_mode: constants.CameraMode,
     camera_scale: ?f32 = null, // Optional camera scale with default value
     spawn_pos: ?struct { x: f32, y: f32 } = null, // Optional spawn position, defaults to screen center
     obstacles: ?[]const struct {
         position: struct { x: f32, y: f32 },
         size: struct { x: f32, y: f32 },
-        type: []const u8,
+        type: constants.ObstacleType,
     },
     units: ?[]const struct {
         position: struct { x: f32, y: f32 },
@@ -210,7 +206,7 @@ const ZoneData = struct {
         position: struct { x: f32, y: f32 },
         radius: f32,
         destination: usize,
-        shape: []const u8,
+        shape: constants.PortalShape,
     },
     lifestones: ?[]const struct {
         position: struct { x: f32, y: f32 },
