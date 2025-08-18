@@ -6,8 +6,9 @@ const patrol_behavior = @import("patrol_behavior.zig");
 const guard_behavior = @import("guard_behavior.zig");
 const wander_behavior = @import("wander_behavior.zig");
 const return_home_behavior = @import("return_home_behavior.zig");
+const behavior_state_machine = @import("behavior_state_machine.zig");
 
-/// Behavior type enumeration
+/// Behavior type enumeration (kept for compatibility)
 pub const BehaviorType = enum {
     chase,
     flee,
@@ -16,6 +17,19 @@ pub const BehaviorType = enum {
     wander,
     return_home,
     idle,
+    
+    /// Convert from new BehaviorState to old BehaviorType for compatibility
+    pub fn fromBehaviorState(state: behavior_state_machine.BehaviorState) BehaviorType {
+        return switch (state) {
+            .chasing => .chase,
+            .fleeing => .flee,
+            .patrolling => .patrol,
+            .guarding => .guard,
+            .investigating => .wander, // Map investigating to wander for compatibility
+            .returning_home => .return_home,
+            .idle => .idle,
+        };
+    }
 };
 
 /// Behavior priority levels (higher number = higher priority)
@@ -145,14 +159,11 @@ pub const UnitBehaviorConfig = struct {
     }
 };
 
-/// Generic unit state for behavior management
+/// Generic unit state for behavior management (now using state machine)
 pub const UnitBehaviorState = struct {
-    /// Currently active behavior
-    active_behavior: BehaviorType = .idle,
-    /// Previous behavior (for transition tracking)
-    previous_behavior: BehaviorType = .idle,
-
-    /// Individual behavior states
+    /// State machine for behavior transitions
+    state_machine: behavior_state_machine.BehaviorStateMachine,
+    /// Individual behavior states (kept for compatibility with existing behaviors)
     chase: chase_behavior.ChaseState,
     flee: flee_behavior.FleeState,
     patrol: patrol_behavior.PatrolState,
@@ -162,6 +173,7 @@ pub const UnitBehaviorState = struct {
 
     pub fn init(home_pos: Vec2, patrol_waypoints: []const Vec2, random_seed: u64) UnitBehaviorState {
         return .{
+            .state_machine = behavior_state_machine.BehaviorStateMachine.init(.idle),
             .chase = chase_behavior.ChaseState.init(),
             .flee = flee_behavior.FleeState.init(),
             .patrol = patrol_behavior.PatrolState.init(patrol_waypoints),
@@ -172,8 +184,7 @@ pub const UnitBehaviorState = struct {
     }
 
     pub fn reset(self: *UnitBehaviorState, home_pos: Vec2) void {
-        self.active_behavior = .idle;
-        self.previous_behavior = .idle;
+        self.state_machine = behavior_state_machine.BehaviorStateMachine.init(.idle);
         self.chase.reset();
         self.flee.reset();
         self.patrol.reset();
@@ -182,12 +193,14 @@ pub const UnitBehaviorState = struct {
         self.return_home = return_home_behavior.PatrolState.init(&[_]Vec2{});
     }
 
-    /// Set behavior as active (used by behavior evaluation)
-    pub fn setBehavior(self: *UnitBehaviorState, behavior_type: BehaviorType) void {
-        if (self.active_behavior != behavior_type) {
-            self.previous_behavior = self.active_behavior;
-            self.active_behavior = behavior_type;
-        }
+    /// Get current behavior type for compatibility
+    pub fn getActiveBehavior(self: *const UnitBehaviorState) BehaviorType {
+        return BehaviorType.fromBehaviorState(self.state_machine.getCurrentState());
+    }
+    
+    /// Get previous behavior type for compatibility  
+    pub fn getPreviousBehavior(self: *const UnitBehaviorState) BehaviorType {
+        return BehaviorType.fromBehaviorState(self.state_machine.state_machine.getPreviousState());
     }
 };
 
@@ -225,169 +238,73 @@ pub const BehaviorContext = struct {
     dt: f32,
 };
 
-/// Update unit behavior with priority-based behavior switching
+/// Update unit behavior with state machine-based behavior switching
 pub fn updateUnitBehavior(
     context: BehaviorContext,
     state: *UnitBehaviorState,
     config: UnitBehaviorConfig,
 ) UnitBehaviorResult {
-    var result = UnitBehaviorResult{
-        .velocity = Vec2.ZERO,
-        .active_behavior = state.active_behavior,
-        .previous_behavior = null,
-        .behavior_changed = false,
-        .state_changed = false,
+    const old_behavior = state.getActiveBehavior();
+    
+    // Create behavior context for state machine
+    const behavior_context = behavior_state_machine.BehaviorContext.init(
+        context.unit_pos,
+        context.home_pos,
+        context.target_pos,
+        context.target_alive,
+        context.aggro_multiplier,
+        context.dt
+    );
+    
+    // Determine profile based on config priorities (simplified mapping)
+    const profile = determineProfileFromConfig(config);
+    const ranges = profile.getRanges(config.chase.detection_range);
+    
+    // Update state machine
+    const state_machine_result = behavior_state_machine.updateBehaviorStateMachine(
+        &state.state_machine,
+        behavior_context,
+        profile,
+        ranges
+    );
+    
+    const result = UnitBehaviorResult{
+        .velocity = state_machine_result.velocity,
+        .active_behavior = BehaviorType.fromBehaviorState(state_machine_result.active_behavior),
+        .previous_behavior = if (state_machine_result.behavior_changed) old_behavior else null,
+        .behavior_changed = state_machine_result.behavior_changed,
+        .state_changed = state_machine_result.state_changed,
+        .detected_target = state_machine_result.detected_target,
+        .lost_target = state_machine_result.lost_target,
+        .started_fleeing = state_machine_result.started_fleeing,
+        .stopped_fleeing = state_machine_result.stopped_fleeing,
     };
-
-    const old_behavior = state.active_behavior;
-
-    // Evaluate all behaviors and find highest priority active one
-    var best_behavior = BehaviorType.idle;
-    var best_priority = BehaviorPriority.lowest;
-    var best_velocity = Vec2.ZERO;
-
-    // Evaluate chase behavior
-    if (context.target_pos != null and context.target_alive) {
-        const chase_result = chase_behavior.evaluateChase(
-            context.unit_pos,
-            context.target_pos.?,
-            context.target_alive,
-            &state.chase,
-            config.chase,
-            context.aggro_multiplier,
-            context.dt,
-        );
-
-        if (chase_result.is_chasing) {
-            const priority = config.behavior_priorities.getPriority(.chase);
-            if (@intFromEnum(priority) > @intFromEnum(best_priority)) {
-                best_behavior = .chase;
-                best_priority = priority;
-                best_velocity = chase_result.velocity;
-                result.detected_target = chase_result.detected_target;
-                result.lost_target = chase_result.lost_target;
-                result.state_changed = chase_result.state_changed;
-            }
-        }
-    }
-
-    // Evaluate flee behavior
-    if (context.threat_pos != null and context.threat_active) {
-        const flee_result = flee_behavior.evaluateFlee(
-            context.unit_pos,
-            context.threat_pos.?,
-            context.threat_active,
-            &state.flee,
-            config.flee,
-            context.speed_multiplier,
-            context.dt,
-        );
-
-        if (flee_result.is_fleeing) {
-            const priority = config.behavior_priorities.getPriority(.flee);
-            if (@intFromEnum(priority) > @intFromEnum(best_priority)) {
-                best_behavior = .flee;
-                best_priority = priority;
-                best_velocity = flee_result.velocity;
-                result.started_fleeing = flee_result.started_fleeing;
-                result.stopped_fleeing = flee_result.stopped_fleeing;
-                result.state_changed = flee_result.state_changed;
-            }
-        }
-    }
-
-    // Evaluate guard behavior
-    const guard_result = guard_behavior.evaluateGuard(
-        context.unit_pos,
-        context.threat_pos orelse context.target_pos,
-        context.threat_active or context.target_alive,
-        &state.guard,
-        config.guard,
-        context.speed_multiplier,
-        context.dt,
-    );
-
-    if (guard_result.mode != .at_post or guard_result.velocity.lengthSquared() > 0) {
-        const priority = config.behavior_priorities.getPriority(.guard);
-        if (@intFromEnum(priority) > @intFromEnum(best_priority)) {
-            best_behavior = .guard;
-            best_priority = priority;
-            best_velocity = guard_result.velocity;
-            result.detected_target = guard_result.detected_threat;
-            result.lost_target = guard_result.lost_threat;
-            result.returned_to_post = guard_result.returned_to_post;
-            result.state_changed = guard_result.state_changed;
-        }
-    }
-
-    // Evaluate patrol behavior (if has waypoints)
-    if (state.patrol.waypoints.len > 0) {
-        const patrol_result = patrol_behavior.evaluatePatrol(
-            context.unit_pos,
-            &state.patrol,
-            config.patrol,
-            context.speed_multiplier,
-            context.dt,
-        );
-
-        if (patrol_result.velocity.lengthSquared() > 0 or patrol_result.paused_at_waypoint) {
-            const priority = config.behavior_priorities.getPriority(.patrol);
-            if (@intFromEnum(priority) > @intFromEnum(best_priority)) {
-                best_behavior = .patrol;
-                best_priority = priority;
-                best_velocity = patrol_result.velocity;
-                result.reached_waypoint = patrol_result.reached_waypoint;
-                result.state_changed = patrol_result.state_changed;
-            }
-        }
-    }
-
-    // Evaluate wander behavior (fallback for idle units)
-    const wander_result = wander_behavior.evaluateWander(
-        context.unit_pos,
-        &state.wander,
-        config.wander,
-        context.speed_multiplier,
-        context.dt,
-    );
-
-    if (wander_result.velocity.lengthSquared() > 0) {
-        const priority = config.behavior_priorities.getPriority(.wander);
-        if (@intFromEnum(priority) > @intFromEnum(best_priority)) {
-            best_behavior = .wander;
-            best_priority = priority;
-            best_velocity = wander_result.velocity;
-            result.state_changed = wander_result.state_changed;
-        }
-    }
-
-    // Fallback to return home if no other behavior is active
-    if (best_behavior == .idle) {
-        const return_result = return_home_behavior.calculateReturnHomeVelocity(
-            context.unit_pos,
-            context.home_pos,
-            config.return_home,
-        );
-
-        if (!return_result.at_home) {
-            best_behavior = .return_home;
-            best_velocity = return_result.velocity;
-        }
-    }
-
-    // Update behavior state
-    state.setBehavior(best_behavior);
-
-    // Set result values
-    result.velocity = best_velocity;
-    result.active_behavior = best_behavior;
-
-    if (old_behavior != best_behavior) {
-        result.previous_behavior = old_behavior;
-        result.behavior_changed = true;
-    }
-
+    
     return result;
+}
+
+/// Determine behavior profile from config priorities (compatibility layer)
+fn determineProfileFromConfig(config: UnitBehaviorConfig) behavior_state_machine.BehaviorProfile {
+    // Analyze priority configuration to guess the intended profile
+    const chase_priority = @intFromEnum(config.behavior_priorities.chase);
+    const flee_priority = @intFromEnum(config.behavior_priorities.flee);
+    const guard_priority = @intFromEnum(config.behavior_priorities.guard);
+    const patrol_priority = @intFromEnum(config.behavior_priorities.patrol);
+    
+    // Aggressive: high chase, low flee
+    if (chase_priority >= 3 and flee_priority <= 1) return .aggressive;
+    
+    // Defensive: high flee, high guard
+    if (flee_priority >= 3 and guard_priority >= 2) return .defensive;
+    
+    // Patrolling: high patrol
+    if (patrol_priority >= 3) return .patrolling;
+    
+    // Guardian: high guard, high chase
+    if (guard_priority >= 3 and chase_priority >= 2) return .guardian;
+    
+    // Default to wandering (balanced behavior)
+    return .wandering;
 }
 
 // Deprecated: Use updateUnitBehavior() directly with FrameContext.effectiveDelta()
