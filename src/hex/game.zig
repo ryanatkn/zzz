@@ -91,8 +91,7 @@ pub const GameState = struct {
     });
 
     pub fn init(allocator: std.mem.Allocator) !Self {
-        // Initialize behavior system with allocator
-        behaviors.initBehaviors(allocator);
+        // No behavior system initialization needed - using persistent state machines
 
         var game_state = Self{
             .hex_game = HexGame.init(allocator),
@@ -120,7 +119,7 @@ pub const GameState = struct {
     }
 
     pub fn deinit(self: *Self) void {
-        behaviors.deinitBehaviors();
+        // No behavior system cleanup needed - persistent state machines clean themselves
         self.hex_game.deinit();
         self.logger.deinit();
         if (self.ai_input) |ai| {
@@ -348,7 +347,7 @@ fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
                         // Update unit AI behavior using HexGame components with context
                         // For now using 1.0 aggro modifier (no spell effects)
                         const aggro_mod: f32 = 1.0;
-                        behaviors.updateUnitWithAggroMod(unit_id, unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, frame_ctx);
+                        behaviors.updateUnitWithAggroMod(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, frame_ctx);
                     }
 
                     // Check collision with obstacles

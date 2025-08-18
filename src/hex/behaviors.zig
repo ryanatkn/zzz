@@ -6,8 +6,7 @@ const frame = @import("../lib/core/frame.zig");
 const colors = @import("../lib/core/colors.zig");
 const behaviors_mod = @import("../lib/game/behaviors/mod.zig");
 
-// Import behavior types from the library  
-const unit_behavior = behaviors_mod.unit_behavior;
+// No additional imports needed - using behavior_state_machine directly
 
 const Vec2 = math.Vec2;
 const Unit = hex_game_mod.Unit;
@@ -38,14 +37,9 @@ fn getDetectionRange(profile: BehaviorProfile) f32 {
 // Patrol waypoints can be generated on-demand if needed
 // For now, simple patrol uses simplePatrol function
 
-/// Get behavior profile from unit component
-fn getBehaviorProfile(unit_comp: *const Unit) BehaviorProfile {
-    return unit_comp.behavior_profile;
-}
 
-/// Simplified hex-specific unit update using state machine directly
+/// Optimized hex-specific unit update using persistent state machine
 pub fn updateUnitWithAggroMod(
-    entity_id: u32,
     unit_comp: *Unit,
     transform: *Transform,
     visual: *Visual,
@@ -54,9 +48,8 @@ pub fn updateUnitWithAggroMod(
     aggro_multiplier: f32,
     frame_ctx: FrameContext,
 ) void {
-    _ = entity_id; // Not needed anymore
     const dt = frame_ctx.effectiveDelta();
-    const profile = getBehaviorProfile(unit_comp);
+    const profile = unit_comp.behavior_profile; // Inline profile access
     
     // Create context for state machine
     const behavior_context = behaviors_mod.behavior_state_machine.BehaviorContext.init(
@@ -70,12 +63,9 @@ pub fn updateUnitWithAggroMod(
     
     const ranges = profile.getRanges(getDetectionRange(profile));
     
-    // Create a temporary state machine based on current state
-    var state_machine = behaviors_mod.behavior_state_machine.BehaviorStateMachine.init(unit_comp.base.behavior_state);
-    
-    // Update state machine
+    // Use persistent state machine - major performance improvement!
     const result = behaviors_mod.behavior_state_machine.updateBehaviorStateMachine(
-        &state_machine,
+        &unit_comp.base.behavior_state_machine,
         behavior_context,
         profile,
         ranges
@@ -112,11 +102,4 @@ fn getBehaviorColor(behavior: behaviors_mod.behavior_state_machine.BehaviorState
     };
 }
 
-// Simplified initialization/cleanup functions
-pub fn initBehaviors(allocator: std.mem.Allocator) void {
-    _ = allocator; // No storage needed anymore
-}
-
-pub fn deinitBehaviors() void {
-    // No cleanup needed
-}
+// No initialization/cleanup needed - persistent state machines manage themselves

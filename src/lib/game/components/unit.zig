@@ -15,12 +15,14 @@ pub const Unit = struct {
 
     // Use unified BehaviorState from behavior_state_machine
     pub const BehaviorState = @import("../behaviors/behavior_state_machine.zig").BehaviorState;
+    const BehaviorStateMachine = @import("../behaviors/behavior_state_machine.zig").BehaviorStateMachine;
 
     unit_type: UnitType,
     aggro_range: f32,
     aggro_factor: f32,
     home_pos: Vec2,
     behavior_state: BehaviorState,
+    behavior_state_machine: BehaviorStateMachine,
     target: ?EntityId,
 
     pub fn init(unit_type: UnitType, home_pos: Vec2) Unit {
@@ -34,6 +36,7 @@ pub const Unit = struct {
             .aggro_factor = 1.0,
             .home_pos = home_pos,
             .behavior_state = .idle,
+            .behavior_state_machine = BehaviorStateMachine.init(.idle),
             .target = null,
         };
     }
