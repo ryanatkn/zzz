@@ -4,7 +4,7 @@ pub const Vec2 = math.Vec2;
 const EntityId = u32;
 
 /// Unit - core gameplay entity component
-/// Sparse storage - only actual units have this
+/// Generic unit with basic properties - games add behavior specifics
 pub const Unit = struct {
     pub const UnitType = enum {
         player,
@@ -13,31 +13,14 @@ pub const Unit = struct {
         neutral,
     };
 
-    // Behavior system imports
-    pub const BehaviorState = @import("../behaviors/behavior_state_machine.zig").BehaviorState;
-    const BehaviorStateMachine = @import("../behaviors/behavior_state_machine.zig").BehaviorStateMachine;
-    pub const BehaviorProfile = @import("../behaviors/behavior_state_machine.zig").BehaviorProfile;
-
     unit_type: UnitType,
-    aggro_range: f32,
-    aggro_factor: f32,
     home_pos: Vec2,
-    behavior_state_machine: BehaviorStateMachine,
-    behavior_profile: BehaviorProfile,
     target: ?EntityId,
 
-    pub fn init(unit_type: UnitType, home_pos: Vec2, behavior_profile: BehaviorProfile) Unit {
+    pub fn init(unit_type: UnitType, home_pos: Vec2) Unit {
         return .{
             .unit_type = unit_type,
-            .aggro_range = switch (unit_type) {
-                .enemy => 150.0,
-                .friendly => 100.0,
-                else => 0.0,
-            },
-            .aggro_factor = 1.0,
             .home_pos = home_pos,
-            .behavior_state_machine = BehaviorStateMachine.init(.idle),
-            .behavior_profile = behavior_profile,
             .target = null,
         };
     }

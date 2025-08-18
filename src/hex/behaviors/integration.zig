@@ -7,9 +7,9 @@ const frame = @import("../../lib/core/frame.zig");
 const hex_game_mod = @import("../hex_game.zig");
 
 const BehaviorComposer = @import("composer.zig").BehaviorComposer;
-const BehaviorProfile = hex_game_mod.BehaviorProfile;
+const BehaviorProfile = @import("../behavior_profile.zig").BehaviorProfile;
 const evaluators = @import("evaluators.zig");
-const entity_mapping = @import("entity_mapping.zig");
+const UnitUpdateContext = @import("context.zig").UnitUpdateContext;
 
 const Vec2 = math.Vec2;
 const Unit = hex_game_mod.Unit;
@@ -27,13 +27,11 @@ var composer_allocator: std.mem.Allocator = undefined;
 pub fn initBehaviorSystem(allocator: std.mem.Allocator) void {
     composer_allocator = allocator;
     composer_storage = ComposerHashMap.init(allocator);
-    entity_mapping.initEntityIDMapping(allocator);
 }
 
 /// Cleanup behavior composer system
 pub fn deinitBehaviorSystem() void {
     composer_storage.deinit();
-    entity_mapping.deinitEntityIDMapping();
 }
 
 /// Get or create behavior composer for an entity
@@ -63,7 +61,46 @@ pub fn removeComposer(entity_id: u32) void {
     _ = composer_storage.remove(entity_id);
 }
 
-/// New modular unit update function using composed behaviors
+/// Simplified unit update function using context struct - full update including visuals
+pub fn updateUnit(context: UnitUpdateContext) void {
+    const result = evaluateUnitBehavior(context);
+    applyBehaviorResult(context, result);
+}
+
+/// Evaluate unit behavior without applying any changes - pure function
+pub fn evaluateUnitBehavior(context: UnitUpdateContext) evaluators.ComposedBehaviorResult {
+    const profile = context.unit.behavior_profile;
+    
+    // Get behavior composer for this entity
+    const composer = getOrCreateComposer(context.unit.entity_id, profile, context.unit.homePos());
+    
+    // Create context for behavior evaluation
+    const behavior_context = evaluators.BehaviorContext.init(
+        context.transform.pos,
+        context.unit.homePos(),
+        if (context.player_alive) context.player_pos else null,
+        context.player_alive,
+        context.unit.aggro_factor,
+        context.frame_ctx.effectiveDelta(),
+    );
+    
+    // Evaluate composed behavior (pure function)
+    return evaluators.evaluateBehaviorForProfile(composer, behavior_context);
+}
+
+/// Apply behavior result to unit components - caller controls what gets updated
+pub fn applyBehaviorResult(context: UnitUpdateContext, result: evaluators.ComposedBehaviorResult) void {
+    const dt = context.frame_ctx.effectiveDelta();
+    
+    // Apply movement
+    context.transform.vel = result.velocity;
+    context.transform.pos = context.transform.pos.add(result.velocity.scale(dt));
+    
+    // Apply visual color (caller can override this by calling evaluateUnitBehavior directly)
+    context.visual.color = result.getColor(context.unit.behavior_profile);
+}
+
+/// Legacy function for backward compatibility - will be removed  
 pub fn updateUnitWithAggroMod(
     unit_comp: *Unit,
     transform: *Transform,
@@ -73,53 +110,13 @@ pub fn updateUnitWithAggroMod(
     aggro_multiplier: f32,
     frame_ctx: FrameContext,
 ) void {
-    const entity_id = entity_mapping.getEntityID(unit_comp);
-    updateUnitWithAggroModComposed(
-        entity_id,
-        unit_comp,
-        transform,
-        visual,
-        player_pos,
-        player_alive,
-        aggro_multiplier,
-        frame_ctx,
-    );
-}
-
-/// Internal function using composed behaviors
-fn updateUnitWithAggroModComposed(
-    entity_id: u32,
-    unit_comp: *Unit,
-    transform: *Transform,
-    visual: *Visual,
-    player_pos: Vec2,
-    player_alive: bool,
-    aggro_multiplier: f32,
-    frame_ctx: FrameContext,
-) void {
-    const dt = frame_ctx.effectiveDelta();
-    const profile = unit_comp.behavior_profile;
-    
-    // Get behavior composer for this entity
-    const composer = getOrCreateComposer(entity_id, profile, unit_comp.home_pos);
-    
-    // Create context for behavior evaluation
-    const context = evaluators.BehaviorContext.init(
-        transform.pos,
-        unit_comp.home_pos,
-        if (player_alive) player_pos else null,
-        player_alive,
-        aggro_multiplier,
-        dt,
-    );
-    
-    // Evaluate composed behavior
-    const result = evaluators.evaluateBehaviorForProfile(composer, context);
-    
-    // Apply hex-specific colors based on active behavior
-    visual.color = evaluators.getBehaviorColor(result.active_behavior, profile);
-    
-    // Apply movement
-    transform.vel = result.velocity;
-    transform.pos = transform.pos.add(result.velocity.scale(dt));
+    _ = aggro_multiplier; // Legacy parameter, now using unit's aggro_factor
+    updateUnit(UnitUpdateContext.init(
+        unit_comp, 
+        transform, 
+        visual, 
+        player_pos, 
+        player_alive, 
+        frame_ctx
+    ));
 }

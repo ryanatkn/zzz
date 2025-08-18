@@ -6,7 +6,7 @@ const Vec2 = @import("../../lib/math/mod.zig").Vec2;
 const BehaviorComposer = @import("composer.zig").BehaviorComposer;
 const BehaviorType = @import("composer.zig").BehaviorType;
 const ProfileConfigs = @import("profiles.zig").ProfileConfigs;
-const BehaviorProfile = @import("../hex_game.zig").BehaviorProfile;
+const BehaviorProfile = @import("../behavior_profile.zig").BehaviorProfile;
 const constants = @import("../constants.zig");
 const behaviors_mod = @import("../../lib/game/behaviors/mod.zig");
 
@@ -27,9 +27,14 @@ pub const ComposedBehaviorResult = struct {
     lost_target: bool = false,
     started_fleeing: bool = false,
     stopped_fleeing: bool = false,
+    
+    /// Get color for this behavior and profile (optional helper)
+    pub fn getColor(self: ComposedBehaviorResult, profile: BehaviorProfile) @import("../../lib/core/colors.zig").Color {
+        return getBehaviorColor(self.active_behavior, profile);
+    }
 };
 
-/// Context for behavior evaluation - similar to BehaviorContext but hex-specific
+/// Context for behavior evaluation - optimized for performance
 pub const BehaviorContext = struct {
     unit_pos: Vec2,
     home_pos: Vec2,
@@ -38,11 +43,12 @@ pub const BehaviorContext = struct {
     aggro_multiplier: f32,
     dt: f32,
     distance_to_player: f32,
-    distance_from_home: f32,
+    distance_from_home_sq: f32, // Squared for performance
     
     pub fn init(unit_pos: Vec2, home_pos: Vec2, player_pos: ?Vec2, player_alive: bool, aggro_multiplier: f32, dt: f32) BehaviorContext {
         const distance_to_player = if (player_pos) |pp| unit_pos.sub(pp).length() else std.math.inf(f32);
-        const distance_from_home = unit_pos.sub(home_pos).length();
+        const home_offset = unit_pos.sub(home_pos);
+        const distance_from_home_sq = home_offset.lengthSquared();
         
         return .{
             .unit_pos = unit_pos,
@@ -52,7 +58,7 @@ pub const BehaviorContext = struct {
             .aggro_multiplier = aggro_multiplier,
             .dt = dt,
             .distance_to_player = distance_to_player,
-            .distance_from_home = distance_from_home,
+            .distance_from_home_sq = distance_from_home_sq,
         };
     }
 };
@@ -169,9 +175,9 @@ fn evaluateNeutralBehavior(composer: *BehaviorComposer, context: BehaviorContext
         .active_behavior = composer.current_behavior,
     };
     
-    // Check if too far from home - return if needed
-    const home_tolerance = ProfileConfigs.neutral.return_home.home_tolerance_sq; // This field is actually the tolerance squared
-    if (context.distance_from_home * context.distance_from_home > home_tolerance) {
+    // Check if too far from home - return if needed  
+    const home_tolerance_sq = ProfileConfigs.neutral.return_home.home_tolerance_sq;
+    if (context.distance_from_home_sq > home_tolerance_sq) {
         const home_result = return_home_behavior.calculateReturnHomeVelocity(
             context.unit_pos,
             context.home_pos,
@@ -231,8 +237,8 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
     }
     
     // Check if too far from home - return if needed
-    const home_tolerance = ProfileConfigs.friendly.return_home.home_tolerance_sq; // This field is actually the tolerance squared
-    if (context.distance_from_home * context.distance_from_home > home_tolerance) {
+    const home_tolerance_sq = ProfileConfigs.friendly.return_home.home_tolerance_sq;
+    if (context.distance_from_home_sq > home_tolerance_sq) {
         const home_result = return_home_behavior.calculateReturnHomeVelocity(
             context.unit_pos,
             context.home_pos,

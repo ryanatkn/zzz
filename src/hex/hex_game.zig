@@ -51,10 +51,10 @@ pub const Statuses = components.Statuses;
 pub const Terrain = components.Terrain;
 pub const Interactable = components.Interactable;
 
-// Use Unit directly from lib components - no wrapper needed
-pub const Unit = components.Unit;
+// Use extended Unit with hex-specific fields
+pub const Unit = @import("unit_ext.zig").HexUnit;
 pub const UnitType = components.Unit.UnitType;
-pub const BehaviorProfile = components.Unit.BehaviorProfile;
+pub const BehaviorProfile = @import("behavior_profile.zig").BehaviorProfile;
 
 // Use PlayerInput from lib components
 pub const PlayerInput = components.PlayerInput;
@@ -395,7 +395,8 @@ pub const HexGame = struct {
         const transform = components.Transform.init(pos, radius);
         const health = components.Health.init(50);
         const visual = components.Visual.init(constants.COLOR_UNIT_DEFAULT);
-        const unit = Unit.init(.enemy, pos, behavior); // Direct Unit with behavior profile
+        const entity_id = self.entity_allocator.create();
+        const unit = Unit.init(.enemy, pos, behavior, entity_id);
 
         try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;

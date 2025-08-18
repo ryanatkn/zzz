@@ -1,23 +1,24 @@
 # Hex Behaviors System
 
-**Architecture**: Modular composition using lib/game behavior modules  
-**Performance**: 6-7ms frame times, zero allocations in update loop  
-**Design**: Engine provides modules, game composes behaviors via profiles
+**Architecture**: Clean modular composition with hex-specific profiles  
+**Performance**: 6-7ms frame times, optimized squared distance calculations  
+**Design**: Engine provides primitives, game composes behaviors, caller controls visuals
 
 ## Module Structure
 
 ```
 src/hex/behaviors/
 ├── mod.zig              # Public API - import from here
+├── context.zig          # UnitUpdateContext for clean parameter passing
 ├── composer.zig         # BehaviorComposer state container  
-├── profiles.zig         # 4 behavior profiles with configs
-├── evaluators.zig       # Profile evaluation logic
-├── entity_mapping.zig   # Stable entity ID system
-└── integration.zig      # Main update coordination
+├── profiles.zig         # 4 behavior profile configurations
+├── evaluators.zig       # Profile evaluation logic + visual helpers
+└── integration.zig      # Main update coordination and pure functions
 ```
 
 ## Usage
 
+### Modern API (Recommended)
 ```zig
 const behaviors = @import("behaviors/mod.zig");
 
@@ -25,12 +26,36 @@ const behaviors = @import("behaviors/mod.zig");
 behaviors.initBehaviorSystem(allocator);
 defer behaviors.deinitBehaviorSystem();
 
-// Update units
+// Create update context
+const context = behaviors.UnitUpdateContext.init(
+    unit, transform, visual, player_pos, player_alive, frame_ctx
+);
+
+// Option 1: Full update including visuals
+behaviors.updateUnit(context);
+
+// Option 2: Separate evaluation and application (for custom visuals)
+const result = behaviors.evaluateUnitBehavior(context);
+behaviors.applyBehaviorResult(context, result);
+// Custom visual handling here...
+```
+
+### Legacy API (Backward Compatible)
+```zig
 behaviors.updateUnitWithAggroMod(
     unit_comp, transform, visual,
     player_pos, player_alive, aggro_multiplier, frame_ctx
 );
 ```
+
+## Behavior Types
+
+Active behaviors tracked per unit:
+- `idle` - Stationary or returning home
+- `chasing` - Pursuing player (hostile/friendly)
+- `fleeing` - Escaping from player (fearful)
+- `wandering` - Exploring near home (neutral/friendly)
+- `returning_home` - Moving back to spawn point
 
 ## Behavior Profiles
 
@@ -39,12 +64,39 @@ behaviors.updateUnitWithAggroMod(
 - **Neutral** - Ignore player, wander near home (gray units)
 - **Friendly** - Follow player gently, explore (green units)
 
-## Architecture Benefits
+## Architecture Improvements
 
-- **Modular**: Each file has single responsibility
-- **Extensible**: New profiles just add to profiles.zig
-- **Testable**: Individual modules can be tested separately
-- **Performance**: Zero behavioral changes, same frame times
-- **Clean API**: Public interface unchanged from original
+### ✅ **Removed Circular Dependencies**
+- BehaviorProfile moved entirely to hex game (no more lib/game dependency)
+- Engine provides primitives, games define specific profiles
 
-The system demonstrates capability-based organization where the engine provides behavior primitives and the game composes them into meaningful AI profiles.
+### ✅ **Clean Interface**
+- UnitUpdateContext replaces 7-parameter functions
+- Pure evaluation functions for testing and custom logic
+- Caller controls visual updates vs automatic application
+
+### ✅ **Direct Entity IDs** 
+- Entity ID stored directly in unit (no complex pointer mapping)
+- Eliminated entity_mapping.zig entirely
+- Simpler, faster ID access
+
+### ✅ **Decoupled Visuals**
+- Behavior system returns state, doesn't force visual changes
+- `evaluateUnitBehavior()` for pure logic
+- `applyBehaviorResult()` for controlled application
+- Helper methods for color mapping when needed
+
+### ✅ **Performance Optimizations**
+- Squared distance calculations (avoid expensive sqrt)
+- Fixed home_tolerance_sq usage confusion
+- Direct field access vs complex mapping
+
+## Benefits
+
+- **Clean Separation**: Engine primitives vs game-specific profiles
+- **Flexible Updates**: Pure functions + controllable side effects
+- **Better Performance**: Direct IDs, squared distances, fewer allocations
+- **Extensible**: Easy to add new profiles, behaviors, or visual systems
+- **Testable**: Pure evaluation functions for unit testing
+
+The system now follows proper dependency flow: engine provides tools, game composes behaviors, caller controls presentation.

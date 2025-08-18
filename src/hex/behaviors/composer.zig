@@ -4,7 +4,7 @@
 const std = @import("std");
 const Vec2 = @import("../../lib/math/mod.zig").Vec2;
 const behaviors_mod = @import("../../lib/game/behaviors/mod.zig");
-const BehaviorProfile = @import("../hex_game.zig").BehaviorProfile;
+const BehaviorProfile = @import("../behavior_profile.zig").BehaviorProfile;
 
 // Import individual behavior modules
 const chase_behavior = behaviors_mod.chase_behavior;
