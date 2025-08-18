@@ -336,8 +336,7 @@ fn calculateVelocityForState(
         },
 
         .patrolling => {
-            // Use simple back-and-forth patrol for now
-            // TODO: Implement with actual waypoints when needed
+            // Simple back-and-forth patrol implementation
             return patrol_behavior.simplePatrol(context.unit_pos, context.home_pos, Vec2{ .x = context.home_pos.x + 100.0, .y = context.home_pos.y }, // Simple waypoint
                 getWalkSpeed(profile), context.aggro_multiplier, // speed_multiplier
                 10.0 // tolerance

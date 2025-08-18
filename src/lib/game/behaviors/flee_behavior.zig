@@ -75,7 +75,7 @@ pub const FleeState = struct {
         }
     }
 
-    // Deprecated: Use update() directly with deltaTime from FrameContext
+    // Timer management for flee duration
 };
 
 /// Result of flee behavior evaluation
@@ -164,7 +164,7 @@ pub fn evaluateFlee(
     return result;
 }
 
-// Deprecated: Use evaluateFlee() directly with deltaTime from FrameContext
+// Simplified stateless API - use evaluateFlee() for full state tracking
 
 /// Simplified flee behavior for basic AI (stateless)
 pub fn simpleFlee(
@@ -237,4 +237,30 @@ test "flee config variations" {
     const full_config = FleeConfig.init(100.0, 150.0, 200.0, 2.0);
     try std.testing.expect(full_config.use_flee_timer);
     try std.testing.expect(full_config.track_state_changes);
+}
+
+test "flee stops at safe distance" {
+    var state = FleeState.init();
+    const config = FleeConfig.init(100.0, 150.0, 200.0, 0.0); // No timer
+    
+    // Unit at origin, threat nearby - start fleeing
+    const unit_pos = Vec2{ .x = 0, .y = 0 };
+    const threat_pos = Vec2{ .x = 50, .y = 0 };
+    
+    var result = evaluateFlee(unit_pos, threat_pos, true, &state, config, 1.0, 0.1);
+    try std.testing.expect(result.started_fleeing);
+    try std.testing.expect(result.is_fleeing);
+    try std.testing.expect(result.velocity.x < 0); // Should flee away
+    
+    // Unit reaches safe distance (beyond 150 safe distance)
+    const safe_pos = Vec2{ .x = -160, .y = 0 };
+    result = evaluateFlee(safe_pos, threat_pos, true, &state, config, 1.0, 0.1);
+    
+    // Should stop fleeing when safe
+    try std.testing.expect(result.stopped_fleeing);
+    try std.testing.expect(!result.is_fleeing);
+    try std.testing.expect(result.velocity.x == 0.0 and result.velocity.y == 0.0);
+    
+    // Verify state was reset
+    try std.testing.expect(!state.is_fleeing);
 }

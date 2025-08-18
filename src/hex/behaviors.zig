@@ -8,7 +8,6 @@ const behaviors_mod = @import("../lib/game/behaviors/mod.zig");
 // Import individual behavior modules
 const chase_behavior = behaviors_mod.chase_behavior;
 const flee_behavior = behaviors_mod.flee_behavior;
-const patrol_behavior = behaviors_mod.patrol_behavior;
 const wander_behavior = behaviors_mod.wander_behavior;
 const return_home_behavior = behaviors_mod.return_home_behavior;
 
