@@ -19,6 +19,7 @@ const combat = @import("combat.zig");
 const player_controller = @import("player.zig");
 const portals = @import("portals.zig");
 const controls = @import("controls.zig");
+const behaviors = @import("behaviors.zig");
 
 // Reactive system imports
 const reactive_context = @import("../lib/reactive/context.zig");
@@ -115,6 +116,9 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     game_state = try global_allocator.create(GameState);
     errdefer global_allocator.destroy(game_state.?);
     game_state.?.* = try GameState.init(global_allocator);
+    
+    // Initialize behavior system for modular AI
+    behaviors.initBehaviorSystem(global_allocator);
 
     // Initialize HUD (heap allocated)
     game_hud = try global_allocator.create(Hud);
@@ -193,6 +197,9 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
         {
             game_state.?.deinitHud();
 
+            // Clean up behavior system
+            behaviors.deinitBehaviorSystem();
+            
             // CRITICAL: Clean up persistent text system BEFORE game_renderer.deinit()
             // This ensures GPU textures are released before the GPU device is destroyed
             persistent_text.deinitGlobalPersistentTextSystem(global_allocator);

@@ -146,9 +146,14 @@ pub fn evaluateFlee(
         if (dist_sq < safe_sq) {
             const direction = to_threat.normalize().scale(-1.0); // Flee away from threat
             result.velocity = direction.scale(config.flee_speed * speed_multiplier);
+            result.is_fleeing = true;
+        } else {
+            // Reached safe distance - stop fleeing
+            state.is_fleeing = false;
+            result.stopped_fleeing = true;
+            if (config.track_state_changes) result.state_changed = true;
+            result.is_fleeing = false;
         }
-
-        result.is_fleeing = true;
     }
 
     // Check if state changed
