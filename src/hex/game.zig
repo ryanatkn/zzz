@@ -161,6 +161,31 @@ pub const GameState = struct {
             self.logger.info("ai_toggle", "AI control: {} (ai_input is null)", .{self.ai_enabled});
         }
     }
+    
+    // Possession/Control methods (Phase 2)
+    pub fn cyclePossessionTarget(self: *Self) void {
+        if (self.hex_game.cyclePossession()) {
+            if (self.hex_game.getControlledEntity()) |entity_id| {
+                self.logger.info("possession", "Cycled to entity {}", .{entity_id});
+                
+                // Log faction perspective change
+                if (self.hex_game.getControlledEntityFactions()) |factions| {
+                    self.logger.info("faction_view", "Now viewing world through {} faction tags", .{factions.tags.count()});
+                }
+            }
+        } else {
+            self.logger.info("possession", "No controllable entities found to cycle to", .{});
+        }
+    }
+    
+    pub fn releaseControl(self: *Self) void {
+        if (self.hex_game.getControlledEntity()) |entity_id| {
+            self.hex_game.releaseControl();
+            self.logger.info("autonomous", "Released control of entity {} - entering autonomous simulation", .{entity_id});
+        } else {
+            self.logger.info("autonomous", "No entity was controlled - already in autonomous mode", .{});
+        }
+    }
 
     // Save/load functions can be implemented using generic persistence patterns from lib/game/persistence/
     // when needed - GameStatistics already uses StatisticsInterface
@@ -398,16 +423,23 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     // Update portal cooldown
     portals.updatePortalCooldown(world, frame_ctx);
 
-    if (world.getPlayerAlive()) {
-        // Update player controller
+    // Update controlled entity (new architecture) or player (legacy fallback)
+    if (world.getControlledEntity()) |controlled_entity| {
+        // Use new controlled entity system
+        const controlled_entity_mod = @import("controlled_entity.zig");
+        controlled_entity_mod.updateControlledEntity(world, controlled_entity, frame_ctx, input_state, cam);
+    } else if (world.getPlayerAlive()) {
+        // Legacy fallback for backward compatibility
         player_controller.updatePlayer(world, frame_ctx, input_state, cam);
+    }
 
-        // Handle continuous shooting on left-click hold (rhythm mode)
-        // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
-        if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and world.canFireBullet()) {
-            // Use context-aware bullet firing
-            _ = combat.fireBulletAtMouse(world, input_state.getMousePos(), &world.bullet_pool);
-        }
+    // Handle continuous shooting on left-click hold (rhythm mode)
+    // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
+    // Check if there's a controlled entity or fallback to player alive check
+    const can_shoot = (world.hasLiveControlledEntity() or world.getPlayerAlive()) and world.canFireBullet();
+    if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and can_shoot) {
+        // Use context-aware bullet firing
+        _ = combat.fireBulletAtMouse(world, input_state.getMousePos(), &world.bullet_pool);
     }
 
     // Update bullet entities using ECS

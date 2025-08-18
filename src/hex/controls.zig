@@ -103,6 +103,12 @@ pub fn handleSDLEvent(
                 .ToggleAI => {
                     game_state.toggleAIControl();
                 },
+                .CyclePossession => {
+                    game_state.cyclePossessionTarget();
+                },
+                .ReleaseControl => {
+                    game_state.releaseControl();
+                },
                 // Spell selection actions
                 .SelectSpell1, .SelectSpell2, .SelectSpell3, .SelectSpell4, .SelectSpell5, .SelectSpell6, .SelectSpell7, .SelectSpell8 => {
                     if (input_actions.getSpellSlotFromAction(action)) |slot| {

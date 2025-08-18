@@ -184,3 +184,11 @@ pub fn getFriendlyEntitiesNear(game: *const HexGame, center_entity: EntityId, _:
     
     return ally_count;
 }
+
+/// Check if an entity can be controlled (for possession mechanics)
+pub fn canEntityBeControlled(game: *const HexGame, entity_id: EntityId) bool {
+    if (getEntityCapabilities(game, entity_id)) |caps| {
+        return caps.can_be_controlled;
+    }
+    return false;
+}

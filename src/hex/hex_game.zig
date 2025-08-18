@@ -21,6 +21,7 @@ const constants = @import("constants.zig");
 const combat = @import("combat.zig");
 const faction_presets = @import("faction_presets.zig");
 const faction_integration = @import("faction_integration.zig");
+const controller_mod = @import("controller.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -168,10 +169,13 @@ pub const HexGame = struct {
     // Generic zone management from lib
     zone_manager: zones.ZoneManager(ZoneData, MAX_ZONES),
 
-    // Player tracking
+    // Player tracking (legacy - to be removed)
     player_entity: ?EntityId,
     player_zone: usize,
     player_start_pos: Vec2,
+
+    // Controller system (new architecture)
+    primary_controller: controller_mod.Controller,
 
     // Game systems
     bullet_pool: BulletPool,
@@ -272,6 +276,7 @@ pub const HexGame = struct {
             .player_entity = null,
             .player_zone = 0,
             .player_start_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y },
+            .primary_controller = controller_mod.createPlayerController(),
             .bullet_pool = BulletPool.init(),
             .entity_allocator = EntityAllocator{},
             .allocator = allocator,
@@ -472,8 +477,12 @@ pub const HexGame = struct {
         const player_capabilities = faction_presets.getPlayerCapabilities();
         self.logger.debug("player_factions", "Player created with {} faction tags and attack capability: {}", .{ player_factions.tags.count(), player_capabilities.can_attack });
 
+        // Legacy player tracking (maintain backward compatibility during transition)
         self.player_entity = entity;
         self.player_zone = self.zone_manager.getCurrentZoneIndex();
+
+        // New controller system: possess the created player entity
+        _ = self.primary_controller.possess(self, entity);
         self.player_start_pos = pos;
 
         return entity;
@@ -682,6 +691,41 @@ pub const HexGame = struct {
                 }
             }
         }
+    }
+
+    // Controller-based methods (new architecture)
+    
+    /// Get the currently controlled entity (replaces getPlayer)
+    pub fn getControlledEntity(self: *const HexGame) ?EntityId {
+        return self.primary_controller.getControlledEntity();
+    }
+    
+    /// Check if there's a controlled entity that's alive
+    pub fn hasLiveControlledEntity(self: *const HexGame) bool {
+        if (self.getControlledEntity()) |entity_id| {
+            const entity_queries = @import("entity_queries.zig");
+            return entity_queries.isEntityAlive(self, entity_id);
+        }
+        return false;
+    }
+    
+    /// Get faction perspective of controlled entity  
+    pub fn getControlledEntityFactions(self: *const HexGame) ?@import("factions.zig").EntityFactions {
+        return self.primary_controller.getWorldView();
+    }
+    
+    /// Cycle to next controllable entity (for Tab key possession)
+    pub fn cyclePossession(self: *HexGame) bool {
+        const next_entity = controller_mod.findNextControllableEntity(self, self.getControlledEntity());
+        if (next_entity) |entity_id| {
+            return self.primary_controller.possess(self, entity_id);
+        }
+        return false;
+    }
+    
+    /// Release control (enter autonomous mode)
+    pub fn releaseControl(self: *HexGame) void {
+        self.primary_controller.releaseAny(self);
     }
 
     pub fn canFireBullet(self: *const HexGame) bool {

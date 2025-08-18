@@ -8,6 +8,7 @@ const constants = @import("constants.zig");
 const components = @import("../lib/game/components/mod.zig");
 const faction_integration = @import("faction_integration.zig");
 const factions = @import("factions.zig");
+const entity_queries = @import("entity_queries.zig");
 
 /// Component-based approach to identify deadly terrain
 /// This centralizes the logic and makes it easier to extend with Hazard components later
@@ -17,8 +18,19 @@ fn isDeadlyTerrain(terrain: *const components.Terrain) bool {
     return terrain.terrain_type == .pit;
 }
 
-// Check if player can move to position (obstacle collision)
+// Check if entity can move to position (obstacle collision) - generic version
+pub fn canEntityMoveTo(game: *HexGame, entity_id: hex_game_mod.EntityId, new_pos: math.Vec2) bool {
+    const entity_radius = entity_queries.getEntityRadius(game, entity_id) orelse 20.0;
+    return canEntityMoveToWithRadius(game, new_pos, entity_radius);
+}
+
+// Check if player can move to position (obstacle collision) - legacy compatibility
 pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) bool {
+    return canEntityMoveToWithRadius(game, new_pos, player_radius);
+}
+
+// Internal helper for obstacle collision checking
+fn canEntityMoveToWithRadius(game: *HexGame, new_pos: math.Vec2, entity_radius: f32) bool {
     const zone = game.getCurrentZone();
 
     // Convert zone obstacles to query format
@@ -39,7 +51,7 @@ pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) b
     }
 
     const config = queries.ObstacleQueryConfig{ .check_solid_only = true };
-    const result = queries.PhysicsQueries.checkCircleObstacleCollision(new_pos, player_radius, obstacles[0..obstacle_count], config);
+    const result = queries.PhysicsQueries.checkCircleObstacleCollision(new_pos, entity_radius, obstacles[0..obstacle_count], config);
 
     return !result.found;
 }

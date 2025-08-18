@@ -19,11 +19,27 @@ pub const BulletPool = BulletPoolImpl;
 
 // Hex-specific interface implementations for generic combat system
 const HexCombatInterface = struct {
+    pub fn getShooterPos(game: *HexGame) ?Vec2 {
+        // Use controlled entity instead of hardcoded player
+        if (game.getControlledEntity()) |entity_id| {
+            const entity_queries = @import("entity_queries.zig");
+            return entity_queries.getEntityPos(game, entity_id);
+        }
+        return null;
+    }
+    
     pub fn getPlayerPos(game: *HexGame) Vec2 {
+        // Legacy method for backward compatibility
         return game.getPlayerPos();
     }
 
+    pub fn isShooterAlive(game: *HexGame) bool {
+        // Use controlled entity instead of hardcoded player
+        return game.hasLiveControlledEntity();
+    }
+
     pub fn isPlayerAlive(game: *HexGame) bool {
+        // Legacy method for backward compatibility
         return game.getPlayerAlive();
     }
 
@@ -33,9 +49,15 @@ const HexCombatInterface = struct {
 };
 
 pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool {
+    // Check if there's a controlled entity that can shoot
+    if (!HexCombatInterface.isShooterAlive(game)) return false;
+    
+    // Get shooter position (controlled entity)
+    const shooter_pos = HexCombatInterface.getShooterPos(game) orelse return false;
+
     // Use generic combat system
     const config = combat.CombatActions.ShootConfig.fromShooterToTarget(
-        HexCombatInterface.getPlayerPos(game),
+        shooter_pos,
         target_pos,
         constants.BULLET_SPEED,
         constants.BULLET_RADIUS,
@@ -56,7 +78,7 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
     // Consume from bullet pool
     pool.fire();
 
-    game.logger.info("bullet_fired", "Bullet fired! ID: {}, pos: {any}, target: {any}", .{ bullet_id, config.shooter_pos, target_pos });
+    game.logger.info("bullet_fired", "Bullet fired from controlled entity! ID: {}, pos: {any}, target: {any}", .{ bullet_id, config.shooter_pos, target_pos });
     return true;
 }
 
@@ -73,12 +95,16 @@ fn lifestoneToCheckpoint(lifestone_result: physics.LifestoneResult) game_systems
 
 /// Find best respawn checkpoint using generic patterns applied to hex lifestones
 fn findBestRespawnCheckpoint(game: *HexGame) ?game_systems.respawn.RespawnInterface.CheckpointResult {
-    const player_pos = game.getPlayerPos();
+    // Use controlled entity position, or fallback to player position for now
+    const entity_pos = if (game.getControlledEntity()) |entity_id| blk: {
+        const entity_queries = @import("entity_queries.zig");
+        break :blk entity_queries.getEntityPos(game, entity_id) orelse game.getPlayerPos();
+    } else game.getPlayerPos();
 
     // Use hex-specific lifestone search
     if (physics.findNearestAttunedLifestone(game)) |lifestone_result| {
         const checkpoint = lifestoneToCheckpoint(lifestone_result);
-        return game_systems.respawn.RespawnInterface.CheckpointResult.init(checkpoint, player_pos);
+        return game_systems.respawn.RespawnInterface.CheckpointResult.init(checkpoint, entity_pos);
     }
 
     return null;
