@@ -68,7 +68,7 @@ pub fn getUnitCapabilities(disposition: Disposition) Capabilities {
         .fearful => .{
             .can_move = true,
             .move_speed = constants.UNIT_SPEED * 1.2, // Faster when fleeing
-            .can_be_controlled = false,
+            .can_be_controlled = true,
             .can_attack = false,  // Too scared to attack
             .attack_damage = 0.0,
             .can_be_damaged = true,
@@ -132,7 +132,7 @@ pub fn getCreatureCapabilities(creature_type: CreatureType) Capabilities {
         .goblin_shaman => .{
             .can_move = true,
             .move_speed = 80.0,  // Slower but more dangerous
-            .can_be_controlled = false,
+            .can_be_controlled = true,
             .can_attack = true,
             .attack_damage = 20.0,  // Magic damage
             .can_be_damaged = true,
@@ -143,7 +143,7 @@ pub fn getCreatureCapabilities(creature_type: CreatureType) Capabilities {
         .forest_sprite => .{
             .can_move = true,
             .move_speed = 150.0,  // Very fast
-            .can_be_controlled = false,
+            .can_be_controlled = true,
             .can_attack = false,  // Peaceful guardian
             .attack_damage = 0.0,
             .can_be_damaged = true,
@@ -152,7 +152,7 @@ pub fn getCreatureCapabilities(creature_type: CreatureType) Capabilities {
         .stone_golem => .{
             .can_move = true,
             .move_speed = 60.0,   // Slow but powerful
-            .can_be_controlled = false,
+            .can_be_controlled = true,
             .can_attack = true,
             .attack_damage = 30.0,
             .can_be_damaged = true,

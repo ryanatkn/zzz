@@ -39,7 +39,7 @@ pub const Capabilities = struct {
         return .{
             .can_move = true,
             .move_speed = move_speed,
-            .can_be_controlled = false,
+            .can_be_controlled = true,
             .can_attack = true,
             .attack_damage = damage,
             .can_be_damaged = true,
@@ -52,7 +52,7 @@ pub const Capabilities = struct {
         return .{
             .can_move = true,
             .move_speed = move_speed,
-            .can_be_controlled = false,
+            .can_be_controlled = true,
             .can_attack = false,  // Friendly units don't attack
             .attack_damage = 0.0,
             .can_be_damaged = true,
@@ -65,7 +65,7 @@ pub const Capabilities = struct {
         return .{
             .can_move = true,
             .move_speed = move_speed,
-            .can_be_controlled = false,
+            .can_be_controlled = true,
             .can_attack = false,
             .attack_damage = 0.0,
             .can_be_damaged = true,

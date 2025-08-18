@@ -192,3 +192,34 @@ pub fn canEntityBeControlled(game: *const HexGame, entity_id: EntityId) bool {
     }
     return false;
 }
+
+/// Get color for entity based on faction relationship from viewer's perspective
+pub fn getRelationshipColor(game: *const HexGame, viewer_entity: ?EntityId, target_entity: EntityId) @import("../lib/core/colors.zig").Color {
+    const colors = @import("../lib/core/colors.zig");
+    const constants = @import("constants.zig");
+    
+    // Default colors if no faction relationship can be determined
+    const default_color = constants.COLOR_UNIT_DEFAULT;
+    
+    // Get viewer's factions (controlled entity or fallback)
+    const viewer_factions = if (viewer_entity) |viewer| 
+        getEntityFactions(game, viewer) 
+    else 
+        null;
+        
+    const target_factions = getEntityFactions(game, target_entity) orelse return default_color;
+    
+    if (viewer_factions) |v_factions| {
+        const relation = factions.calculateRelation(v_factions, target_factions);
+        return switch (relation) {
+            .allied => colors.GREEN_BRIGHT,      // Strong allies - bright green
+            .friendly => colors.CYAN,            // Friendly - cyan blue  
+            .neutral => colors.YELLOW_BRIGHT,    // Neutral - yellow
+            .suspicious => colors.ORANGE_BRIGHT, // Suspicious - orange
+            .hostile => colors.RED_BRIGHT,       // Hostile - red
+        };
+    }
+    
+    // No viewer faction - use traditional disposition colors
+    return default_color;
+}

@@ -11,6 +11,9 @@ const Color = colors.Color;
 // Global arena for ZON data that persists for game lifetime
 var game_data_arena: ?std.heap.ArenaAllocator = null;
 
+// Track current world path
+var current_world_path: []const u8 = DEFAULT_WORLD;
+
 // Clean up game data memory
 pub fn deinit() void {
     if (game_data_arena) |*arena| {
@@ -19,10 +22,78 @@ pub fn deinit() void {
     }
 }
 
-// Load game data from ZON file
+// Default world for development
+// Change this line to quickly switch default worlds:
+pub const DEFAULT_WORLD = "worlds/game_world.zon"; // or "worlds/test_world.zon"
+
+// Available worlds
+pub const AVAILABLE_WORLDS = [_][]const u8{
+    "worlds/test_world.zon",
+    "worlds/game_world.zon",
+};
+
+// World display names (for menu)
+pub const WORLD_NAMES = [_][]const u8{
+    "Test World (Dev)",
+    "Game World",
+};
+
+// Get embedded world file based on path
+fn getWorldFile(world_path: []const u8) []const u8 {
+    // TODO: Add environment variable and command line support
+    // For now, switch based on path string
+    if (std.mem.eql(u8, world_path, "worlds/test_world.zon")) {
+        return @embedFile("worlds/test_world.zon");
+    } else if (std.mem.eql(u8, world_path, "worlds/game_world.zon")) {
+        return @embedFile("worlds/game_world.zon");
+    } else {
+        // Default to test world
+        return @embedFile("worlds/test_world.zon");
+    }
+}
+
+// Get current world path
+pub fn getCurrentWorld() []const u8 {
+    return current_world_path;
+}
+
+// Get current world display name
+pub fn getCurrentWorldDisplayName() []const u8 {
+    return getWorldDisplayName(current_world_path);
+}
+
+// Load game data from world file
 pub fn loadGameData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame) !void {
-    // Load game data from ZON file
-    const gameDataFile = @embedFile("game_data.zon");
+    return loadWorldData(allocator, game, DEFAULT_WORLD);
+}
+
+// Get world name for display
+pub fn getWorldDisplayName(world_path: []const u8) []const u8 {
+    for (AVAILABLE_WORLDS, 0..) |available_path, i| {
+        if (std.mem.eql(u8, world_path, available_path)) {
+            return WORLD_NAMES[i];
+        }
+    }
+    return "Unknown World";
+}
+
+// Validate world path
+pub fn isValidWorldPath(world_path: []const u8) bool {
+    for (AVAILABLE_WORLDS) |available_path| {
+        if (std.mem.eql(u8, world_path, available_path)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Load specific world file
+pub fn loadWorldData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame, world_path: []const u8) !void {
+    // Update current world tracking
+    current_world_path = world_path;
+    
+    // Load world data from ZON file
+    const worldDataFile = getWorldFile(world_path);
 
     // Initialize arena if not already done
     if (game_data_arena == null) {
@@ -31,10 +102,10 @@ pub fn loadGameData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame) !
     const arena_allocator = game_data_arena.?.allocator();
 
     // Convert to null-terminated string for ZON parser
-    const gameDataNullTerm = try arena_allocator.dupeZ(u8, gameDataFile);
+    const worldDataNullTerm = try arena_allocator.dupeZ(u8, worldDataFile);
 
-    const game_data = std.zon.parse.fromSlice(GameData, arena_allocator, gameDataNullTerm, null, .{}) catch |err| {
-        loggers.getGameLog().err("zon_parse_error", "Failed to parse ZON file: {}. Check structure match with GameData struct", .{err});
+    const game_data = std.zon.parse.fromSlice(GameData, arena_allocator, worldDataNullTerm, null, .{}) catch |err| {
+        loggers.getGameLog().err("zon_parse_error", "Failed to parse world ZON file {s}: {}. Check structure match with GameData struct", .{ world_path, err });
         return err;
     };
 

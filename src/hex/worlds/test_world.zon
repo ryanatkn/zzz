@@ -1,0 +1,118 @@
+// Test World - Simple Testing Environment
+// Designed for development and testing of game mechanics
+
+.{
+    // Screen dimensions
+    .screen_width = 1920.0,
+    .screen_height = 1080.0,
+
+    // Player starting position (test hub center-left)
+    .player_start = .{
+        .zone = 0,
+        .position = .{ .x = 400.0, .y = 540.0 }, // Left side of screen
+        .radius = 20.0,
+    },
+
+    .zones = .{
+        // Zone 0: Test Hub - Portal cluster and faction test units
+        .{
+            .name = "Test Hub",
+            .background_color = .{ .r = 15, .g = 10, .b = 20 }, // Dark purple for test env
+            .camera_mode = .fixed,
+            .camera_scale = 1.0,
+            
+            // Minimal obstacles - just boundary markers
+            .obstacles = .{
+                // Screen boundaries (visual guides)
+                .{ .position = .{ .x = 50.0, .y = 50.0 }, .size = .{ .x = 20.0, .y = 20.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1870.0, .y = 50.0 }, .size = .{ .x = 20.0, .y = 20.0 }, .type = .blocking },
+                .{ .position = .{ .x = 50.0, .y = 1030.0 }, .size = .{ .x = 20.0, .y = 20.0 }, .type = .blocking },
+                .{ .position = .{ .x = 1870.0, .y = 1030.0 }, .size = .{ .x = 20.0, .y = 20.0 }, .type = .blocking },
+            },
+            
+            // Test units for possession mechanics (arranged near spawn)
+            .units = .{
+                // Hostile units (red when viewed from player perspective)
+                .{ .position = .{ .x = 300.0, .y = 400.0 }, .radius = 12.0, .disposition = .hostile },
+                .{ .position = .{ .x = 350.0, .y = 450.0 }, .radius = 10.0, .disposition = .hostile },
+                
+                // Friendly units (green when viewed from player perspective)  
+                .{ .position = .{ .x = 300.0, .y = 600.0 }, .radius = 12.0, .disposition = .friendly },
+                .{ .position = .{ .x = 350.0, .y = 650.0 }, .radius = 10.0, .disposition = .friendly },
+                
+                // Neutral units (yellow when viewed from player perspective)
+                .{ .position = .{ .x = 500.0, .y = 400.0 }, .radius = 12.0, .disposition = .neutral },
+                .{ .position = .{ .x = 500.0, .y = 600.0 }, .radius = 12.0, .disposition = .neutral },
+                
+                // Fearful units (orange when viewed from player perspective)
+                .{ .position = .{ .x = 650.0, .y = 500.0 }, .radius = 8.0, .disposition = .fearful },
+                .{ .position = .{ .x = 700.0, .y = 450.0 }, .radius = 8.0, .disposition = .fearful },
+            },
+            
+            // Test portal cluster (simplified - just 3 portals)
+            .portals = .{
+                .{ .position = .{ .x = 1200.0, .y = 400.0 }, .radius = 30.0, .destination = 1, .shape = .circle },
+                .{ .position = .{ .x = 1200.0, .y = 540.0 }, .radius = 30.0, .destination = 2, .shape = .square },
+                .{ .position = .{ .x = 1200.0, .y = 680.0 }, .radius = 30.0, .destination = 0, .shape = .triangle }, // Self-loop for testing
+            },
+            
+            // Lifestones for testing
+            .lifestones = .{
+                // Central test hub lifestone
+                .{ .position = .{ .x = 960.0, .y = 540.0 }, .radius = 15.0 },
+                // Near spawn point
+                .{ .position = .{ .x = 400.0, .y = 300.0 }, .radius = 12.0 },
+            },
+        },
+        
+        // Zone 1: Simple test zone
+        .{
+            .name = "Test Zone 1",
+            .background_color = .{ .r = 20, .g = 10, .b = 10 }, // Dark red
+            .camera_mode = .follow,
+            .camera_scale = 1.0,
+            
+            .obstacles = .{
+                .{ .position = .{ .x = 960.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 20.0 }, .type = .blocking },
+            },
+            
+            .units = .{
+                .{ .position = .{ .x = 800.0, .y = 400.0 }, .radius = 12.0, .disposition = .hostile },
+                .{ .position = .{ .x = 1120.0, .y = 400.0 }, .radius = 12.0, .disposition = .friendly },
+            },
+            
+            .portals = .{
+                .{ .position = .{ .x = 960.0, .y = 800.0 }, .radius = 25.0, .destination = 0, .shape = .circle },
+            },
+            
+            .lifestones = .{
+                .{ .position = .{ .x = 960.0, .y = 600.0 }, .radius = 15.0 },
+            },
+        },
+        
+        // Zone 2: Another test zone
+        .{
+            .name = "Test Zone 2",
+            .background_color = .{ .r = 10, .g = 20, .b = 10 }, // Dark green
+            .camera_mode = .follow,
+            .camera_scale = 1.0,
+            
+            .obstacles = .{
+                .{ .position = .{ .x = 960.0, .y = 700.0 }, .size = .{ .x = 200.0, .y = 20.0 }, .type = .blocking },
+            },
+            
+            .units = .{
+                .{ .position = .{ .x = 600.0, .y = 400.0 }, .radius = 12.0, .disposition = .neutral },
+                .{ .position = .{ .x = 1320.0, .y = 400.0 }, .radius = 12.0, .disposition = .fearful },
+            },
+            
+            .portals = .{
+                .{ .position = .{ .x = 960.0, .y = 200.0 }, .radius = 25.0, .destination = 0, .shape = .square },
+            },
+            
+            .lifestones = .{
+                .{ .position = .{ .x = 960.0, .y = 540.0 }, .radius = 15.0 },
+            },
+        },
+    },
+}

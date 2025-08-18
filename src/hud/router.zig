@@ -18,6 +18,14 @@ const ide_page = @import("../menu/ide/+page.zig");
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const Vec2 = math.Vec2;
 
+// Global reference to game state for world reloading (set from main)
+var global_game_state: ?*@import("../hex/game.zig").GameState = null;
+
+/// Set global game state reference for world reloading
+pub fn setGameStateReference(game_state: *@import("../hex/game.zig").GameState) void {
+    global_game_state = game_state;
+}
+
 pub const Router = struct {
     allocator: std.mem.Allocator,
     current_page: ?*page.Page,
@@ -66,8 +74,15 @@ pub const Router = struct {
                 // Same page, just handle the action without destroying/recreating
                 if (std.mem.indexOf(u8, path, "?")) |query_start| {
                     const query = path[query_start + 1 ..];
-                    log.info("Calling handleIDEAction with query: '{s}'", .{query});
-                    try self.handleIDEAction(query);
+                    
+                    // Check if it's a world loading query or IDE action
+                    if (std.mem.startsWith(u8, query, "load_world=")) {
+                        log.info("Calling handleWorldLoading with query: '{s}'", .{query});
+                        try self.handleWorldLoading(query);
+                    } else {
+                        log.info("Calling handleIDEAction with query: '{s}'", .{query});
+                        try self.handleIDEAction(query);
+                    }
                 }
                 return;
             }
@@ -77,7 +92,13 @@ pub const Router = struct {
         self.cleanupCurrent();
 
         // Route to new page based on path
-        if (std.mem.eql(u8, path, "/")) {
+        if (std.mem.eql(u8, path, "/") or std.mem.startsWith(u8, path, "/?")) {
+            // Handle world loading if query parameter present
+            if (std.mem.indexOf(u8, path, "?")) |query_start| {
+                const query = path[query_start + 1 ..];
+                try self.handleWorldLoading(query);
+            }
+            
             // Load root layout
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
@@ -323,6 +344,30 @@ pub const Router = struct {
                 self.collapseAllRecursive(child);
             }
         }
+    }
+
+    /// Handle world loading from query parameters
+    fn handleWorldLoading(self: *Router, query: []const u8) !void {
+        const log = std.log.scoped(.world_loading);
+        log.info("Processing world loading query: '{s}'", .{query});
+        
+        // Parse load_world parameter
+        if (std.mem.startsWith(u8, query, "load_world=")) {
+            const world_path = query[11..]; // Skip "load_world="
+            log.info("Loading world: '{s}'", .{world_path});
+            
+            if (global_game_state) |game_state| {
+                // Reload the game with the new world
+                game_state.reloadWithWorld(world_path) catch |err| {
+                    log.err("World reload failed: {}", .{err});
+                    return;
+                };
+                log.info("World successfully reloaded: '{s}'", .{world_path});
+            } else {
+                log.warn("No game state reference available for world reloading", .{});
+            }
+        }
+        _ = self; // unused for now
     }
 
     pub fn renderWithLayouts(self: *const Router, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {

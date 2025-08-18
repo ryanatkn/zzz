@@ -36,6 +36,7 @@ const constants = @import("constants.zig");
 const spells = @import("spells.zig");
 const save_data = @import("save_data.zig");
 const spellbar = @import("spellbar.zig");
+const faction_integration = @import("faction_integration.zig");
 
 // HUD modules
 const hud = @import("../hud/hud.zig");
@@ -67,6 +68,9 @@ pub const GameState = struct {
 
     // HUD system for system menu (reactive)
     hud_system: ?reactive_hud.ReactiveHud,
+    
+    // Renderer reference for HUD recreation during world reload
+    renderer: ?*game_renderer.GameRenderer,
 
     // Iris wipe effect for resurrection
     iris_wipe_active: bool,
@@ -104,6 +108,7 @@ pub const GameState = struct {
             .spellbar_ui = spellbar.Spellbar.init(),
             .allocator = allocator,
             .hud_system = null,
+            .renderer = null,
             .iris_wipe_active = false,
             .iris_wipe_start_time = time_utils.Time.now(),
             .game_stats = .{},
@@ -191,6 +196,7 @@ pub const GameState = struct {
     // when needed - GameStatistics already uses StatisticsInterface
 
     pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
+        self.renderer = renderer_ptr; // Store renderer reference
         self.hud_system = try reactive_hud.ReactiveHud.init(allocator, renderer_ptr);
     }
 
@@ -266,6 +272,71 @@ pub const GameState = struct {
         self.particle_system.clear();
 
         self.logger.info("full_reset", "Full game reset", .{});
+    }
+    
+    /// Reload the game with a different world
+    pub fn reloadWithWorld(self: *Self, world_path: []const u8) !void {
+        const loader = @import("loader.zig");
+        
+        self.logger.info("world_reload", "Reloading with world: {s}", .{world_path});
+        
+        // Clean up HUD before world reload to prevent reactive state corruption
+        self.deinitHud();
+        self.logger.info("world_reload_hud_cleanup", "HUD deinitialized", .{});
+        
+        // Clear current game state
+        self.hex_game.deinit();
+        self.particle_system.clear();
+        
+        // Clear zone manager state
+        self.hex_game = HexGame.init(self.allocator);
+        
+        // Load new world data with error handling
+        var world_loaded_successfully = false;
+        loader.loadWorldData(self.allocator, &self.hex_game, world_path) catch |err| {
+            self.logger.err("world_reload_failed", "Failed to load world {s}: {}", .{ world_path, err });
+            
+            // Try to recover by loading the default world
+            const fallback_world = @import("loader.zig").DEFAULT_WORLD;
+            self.logger.info("world_reload_fallback", "Attempting fallback to: {s}", .{fallback_world});
+            
+            loader.loadWorldData(self.allocator, &self.hex_game, fallback_world) catch |fallback_err| {
+                self.logger.err("world_reload_fallback_failed", "Fallback also failed: {}", .{fallback_err});
+                
+                // Try to recreate HUD even after failure to maintain some stability  
+                self.tryRecreateHud();
+                
+                return fallback_err;
+            };
+            
+            self.logger.info("world_reload_fallback_success", "Fallback successful", .{});
+            world_loaded_successfully = true;
+        };
+        
+        if (!world_loaded_successfully) {
+            world_loaded_successfully = true;
+        }
+        
+        // Recreate HUD after successful world loading
+        self.tryRecreateHud();
+        
+        // Reset game state for new world
+        self.game_paused = false;
+        self.iris_wipe_active = false;
+        
+        self.logger.info("world_reload_complete", "Successfully reloaded world: {s}", .{world_path});
+    }
+    
+    /// Helper function to recreate HUD, handling errors gracefully
+    fn tryRecreateHud(self: *Self) void {
+        if (self.renderer) |renderer_ptr| {
+            self.initHud(self.allocator, renderer_ptr) catch |hud_err| {
+                self.logger.err("hud_recreation_failed", "Failed to recreate HUD: {}", .{hud_err});
+            };
+            self.logger.info("hud_recreation_attempted", "HUD recreation attempted", .{});
+        } else {
+            self.logger.warn("hud_recreation_no_renderer", "No renderer reference available for HUD recreation", .{});
+        }
     }
 
     /// Check if all lifestones across all zones are attuned
@@ -368,11 +439,19 @@ fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
                 if (zone_storage.units.getComponentMut(unit_id, .unit)) |unit_comp| {
                     const old_pos = transform.pos;
 
+                    // Check if this unit is controlled - if so, skip AI behavior
+                    const is_controlled = world.getControlledEntity() == unit_id;
+
                     if (zone_storage.units.getComponentMut(unit_id, .visual)) |visual| {
-                        // Update unit AI behavior using HexGame components with context
-                        // For now using 1.0 aggro modifier (no spell effects)
-                        const aggro_mod: f32 = 1.0;
-                        behaviors.updateUnitWithAggroMod(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, frame_ctx);
+                        if (!is_controlled) {
+                            // Only apply AI behavior to uncontrolled units
+                            const aggro_mod: f32 = 1.0;
+                            behaviors.updateUnitWithAggroMod(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, frame_ctx);
+                        }
+                        
+                        // Apply faction-based colors from controlled entity's perspective
+                        const viewer_entity = world.getControlledEntity();
+                        visual.color = faction_integration.getRelationshipColor(world, viewer_entity, unit_id);
                     }
 
                     // Check collision with obstacles
