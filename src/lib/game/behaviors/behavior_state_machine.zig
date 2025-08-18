@@ -2,6 +2,14 @@ const std = @import("std");
 const Vec2 = @import("../../math/mod.zig").Vec2;
 const state_machine = @import("state_machine.zig");
 
+// Import individual behavior modules for delegation
+const chase_behavior = @import("chase_behavior.zig");
+const flee_behavior = @import("flee_behavior.zig");
+const patrol_behavior = @import("patrol_behavior.zig");
+const guard_behavior = @import("guard_behavior.zig");
+const wander_behavior = @import("wander_behavior.zig");
+const return_home_behavior = @import("return_home_behavior.zig");
+
 /// Specific behavior states for unit AI
 pub const BehaviorState = enum {
     idle,
@@ -295,43 +303,80 @@ fn calculateVelocityForState(
         .idle => Vec2.ZERO,
         
         .investigating => {
-            // Move toward player position slowly
+            // Move toward player position slowly  
             if (context.player_pos) |player_pos| {
-                const direction = player_pos.sub(context.unit_pos).normalize();
-                return direction.scale(getWalkSpeed(profile) * 0.7); // Slower investigation
+                return chase_behavior.simpleChase(
+                    context.unit_pos,
+                    player_pos,
+                    context.player_alive,
+                    200.0, // detection_range (investigating has longer range)
+                    10.0,  // min_distance
+                    getWalkSpeed(profile) * 0.7, // slower investigation speed
+                    context.aggro_multiplier
+                );
             }
             return Vec2.ZERO;
         },
         
         .chasing => {
             if (context.player_pos) |player_pos| {
-                const direction = player_pos.sub(context.unit_pos).normalize();
-                return direction.scale(getChaseSpeed(profile) * context.aggro_multiplier);
+                return chase_behavior.simpleChase(
+                    context.unit_pos,
+                    player_pos,
+                    context.player_alive,
+                    200.0, // detection_range 
+                    10.0,  // min_distance
+                    getChaseSpeed(profile),
+                    context.aggro_multiplier
+                );
             }
             return Vec2.ZERO;
         },
         
         .fleeing => {
             if (context.player_pos) |player_pos| {
-                const direction = context.unit_pos.sub(player_pos).normalize(); // Away from player
-                return direction.scale(getFleeSpeed(profile));
+                return flee_behavior.simpleFlee(
+                    context.unit_pos,
+                    player_pos,
+                    context.player_alive,
+                    150.0, // danger_range
+                    getFleeSpeed(profile),
+                    context.aggro_multiplier
+                );
             }
             return Vec2.ZERO;
         },
         
         .patrolling => {
-            // TODO: Implement patrol waypoint movement
-            return Vec2.ZERO;
+            // Use simple back-and-forth patrol for now
+            // TODO: Implement with actual waypoints when needed
+            return patrol_behavior.simplePatrol(
+                context.unit_pos,
+                context.home_pos,
+                Vec2{.x = context.home_pos.x + 100.0, .y = context.home_pos.y}, // Simple waypoint
+                getWalkSpeed(profile),
+                context.aggro_multiplier, // speed_multiplier
+                10.0 // tolerance
+            );
         },
         
         .guarding => {
-            // Guards stay mostly stationary, maybe small movements
-            return Vec2.ZERO;
+            // Guards stay mostly stationary, slight movement toward home
+            return return_home_behavior.simpleReturnHome(
+                context.unit_pos,
+                context.home_pos,
+                5.0, // small tolerance - stay very close
+                getWalkSpeed(profile) * 0.3 // very slow movement
+            );
         },
         
         .returning_home => {
-            const direction = context.home_pos.sub(context.unit_pos).normalize();
-            return direction.scale(getWalkSpeed(profile));
+            return return_home_behavior.simpleReturnHome(
+                context.unit_pos,
+                context.home_pos,
+                10.0, // home_tolerance
+                getWalkSpeed(profile)
+            );
         },
     };
 }

@@ -76,8 +76,8 @@ pub const HexUnit = struct {
     pub fn getState(self: HexUnit) UnitState {
         return switch (self.base.behavior_state) {
             .idle => .at_home,
-            .chasing, .attacking => .chasing,
-            .fleeing, .patrolling => .returning_home,
+            .chasing => .chasing,
+            .fleeing, .patrolling, .investigating, .guarding, .returning_home => .returning_home,
         };
     }
 };

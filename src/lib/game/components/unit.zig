@@ -13,13 +13,8 @@ pub const Unit = struct {
         neutral,
     };
 
-    pub const BehaviorState = enum {
-        idle,
-        chasing,
-        attacking,
-        fleeing,
-        patrolling,
-    };
+    // Use unified BehaviorState from behavior_state_machine
+    pub const BehaviorState = @import("../behaviors/behavior_state_machine.zig").BehaviorState;
 
     unit_type: UnitType,
     aggro_range: f32,
