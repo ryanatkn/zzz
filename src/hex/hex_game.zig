@@ -7,7 +7,7 @@ const frame = @import("../lib/core/frame.zig");
 const object_pools = @import("../lib/core/object_pools.zig");
 
 // Game system capabilities
-const components = @import("../lib/game/components.zig");
+const components = @import("../lib/game/components/mod.zig");
 const zones = @import("../lib/game/zones/mod.zig");
 const storage = @import("../lib/game/storage/mod.zig");
 const world = @import("../lib/game/world/mod.zig");
@@ -413,10 +413,12 @@ pub const HexGame = struct {
         // Create components directly
         const transform = components.Transform.init(pos, radius);
         const visual = components.Visual.init(color);
+        // Use floor terrain type - lifestones are identified by component composition, not terrain type
         const terrain = components.Terrain.init(.floor, Vec2.init(radius * 2, radius * 2));
+        // Lifestone is identified by having an Interactable component with attunement capability
         var interactable = components.Interactable.init(.deflectable);
-        interactable.state = .normal; // Use available state
-        interactable.attuned = attuned; // Set attuned field directly
+        interactable.state = .normal;
+        interactable.attuned = attuned; // This marks it as a lifestone checkpoint
 
         try zone.lifestones.addEntity(entity, transform, visual, terrain, interactable);
         zone.entity_count += 1;

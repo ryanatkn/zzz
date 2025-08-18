@@ -138,4 +138,4 @@ Built with (see [./deps](./deps)):
 - [Zig](https://ziglang.org/) - systems programming language
 - [SDL3](https://libsdl.org/) - cross-platform GPU API
 - [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross) - shader compilation
-- [Claude Code](https://claude.ai/code) - AI-powered development
+- [Claude Code](https://claude.ai/code) - AI-assisted development, thank you Anthropic people

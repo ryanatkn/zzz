@@ -1,5 +1,5 @@
 const std = @import("std");
-const components = @import("../components.zig");
+const components = @import("../components/mod.zig");
 
 /// Generic archetype storages for common entity patterns
 /// Games can instantiate these with their own component types and size limits

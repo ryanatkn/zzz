@@ -293,6 +293,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - **Physics modules** (`physics/`): collision, shapes
 - **Barrel imports**: Use `reactive.zig` and `ui.zig` for complete subsystems
 - **Apply DRY principles**: Prefer shared utilities over duplicate code
+- **Library isolation**: Modules in `src/lib/` must never import from outside `src/lib/` - they provide interfaces for games to implement
 - **Import examples**:
   ```zig
   const types = @import("../lib/core/types.zig");

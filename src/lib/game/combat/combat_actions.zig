@@ -1,6 +1,6 @@
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const components = @import("../components.zig");
+const components = @import("../components/mod.zig");
 
 const Vec2 = math.Vec2;
 

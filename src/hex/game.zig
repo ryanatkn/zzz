@@ -480,52 +480,48 @@ pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void 
 // Check lifestone collisions
 fn checkLifestoneCollisions(game_state: *GameState, player_pos: Vec2, player_radius: f32) void {
     const world = &game_state.hex_game;
-    const zone_storage = world.getZoneStorage();
-    var lifestone_iter = zone_storage.lifestones.entityIterator();
+    
+    // Use the same approach as physics.zig for consistency
+    const zone = world.getCurrentZone();
+    
+    // Check all lifestones in this zone using direct array access like physics.zig does
+    for (0..zone.lifestones.count) |i| {
+        const entity_id = zone.lifestones.entities[i];
+        if (entity_id == std.math.maxInt(u32)) continue;
+        
+        const transform = &zone.lifestones.transforms[i];
+        const interactable = &zone.lifestones.interactables[i];
+        
+        // Lifestones are identified by component composition (having both Transform and Interactable with attunement capability)
+        // This is more flexible than checking terrain type
+        
+        // Check collision first (allows re-attunement when overlapping)
+        if (collision.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
+            const was_attuned = interactable.attuned;
+            
+            // Attune the lifestone
+            interactable.attuned = true;
+            
+            // Update visual color for attunement
+            const visual = &zone.lifestones.visuals[i];
+            visual.color = constants.COLOR_LIFESTONE_ATTUNED;
 
-    while (lifestone_iter.next()) |entity_id| {
-        // Get components - lifestones have terrain, transform, visual, and interactable components
-        if (zone_storage.lifestones.getComponent(entity_id, .terrain)) |terrain| {
-            // Only check lifestones (altar terrain type)
-            if (terrain.terrain_type != .altar) continue;
+            // Only log and track stats for new attunements
+            if (!was_attuned) {
+                game_state.logger.info("lifestone_attuned", "Lifestone attuned!", .{});
 
-            if (zone_storage.lifestones.getComponent(entity_id, .interactable)) |interactable_const| {
-                // Get transform component
-                if (zone_storage.lifestones.getComponent(entity_id, .transform)) |transform| {
-                    // Check if lifestone is not yet attuned
-                    const is_attuned = interactable_const.attuned;
-                    if (is_attuned) continue; // Skip already attuned lifestones
+                // Track lifestone attunement for save system
+                game_state.game_stats.lifestones_attuned += 1;
 
-                    // Check collision
-                    if (collision.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
-                        // Attune the lifestone - need mutable access
-                        if (zone_storage.lifestones.getComponentMut(entity_id, .interactable)) |interactable| {
-                            interactable.attuned = true;
-                        }
-
-                        // Update visual color for attunement
-                        if (zone_storage.lifestones.getComponentMut(entity_id, .visual)) |visual| {
-                            visual.color = constants.COLOR_LIFESTONE_ATTUNED;
-                        }
-
-                        game_state.logger.info("lifestone_attuned", "Lifestone attuned!", .{});
-
-                        // Track lifestone attunement for save system
-                        game_state.game_stats.lifestones_attuned += 1;
-
-                        // Check if all lifestones are now attuned
-                        if (game_state.hasAttunedAllLifestones()) {
-                            game_state.logger.info("achievement", "All lifestones attuned!", .{});
-                            game_state.game_stats.all_lifestones_attuned = true;
-                        }
-
-                        // Add inner effect for newly attuned lifestone
-                        game_state.effect_system.addLifestoneInnerEffectOnly(transform.pos, transform.radius);
-
-                        return; // Only attune one lifestone per frame
-                    }
+                // Check if all lifestones are now attuned
+                if (game_state.hasAttunedAllLifestones()) {
+                    game_state.logger.info("achievement", "All lifestones attuned!", .{});
+                    game_state.game_stats.all_lifestones_attuned = true;
                 }
             }
+
+            // Add inner effect for newly attuned lifestone
+            game_state.effect_system.addLifestoneInnerEffectOnly(transform.pos, transform.radius);
         }
     }
 }

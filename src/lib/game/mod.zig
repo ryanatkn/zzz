@@ -2,7 +2,7 @@
 /// Engine provides interfaces, games provide implementations
 
 // Core simple helpers
-pub const components = @import("components.zig");
+pub const components = @import("components/mod.zig");
 pub const timer_patterns = @import("timer_patterns.zig");
 
 // Behaviors

@@ -1,5 +1,5 @@
 const std = @import("std");
-const components = @import("../components.zig");
+const components = @import("../components/mod.zig");
 
 /// Generic damage system for health modification
 /// Games implement these interfaces for their specific damage mechanics

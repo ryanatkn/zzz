@@ -5,6 +5,15 @@ const queries = @import("../lib/physics/queries.zig");
 const hex_game_mod = @import("hex_game.zig");
 const HexGame = hex_game_mod.HexGame;
 const constants = @import("constants.zig");
+const components = @import("../lib/game/components/mod.zig");
+
+/// Component-based approach to identify deadly terrain
+/// This centralizes the logic and makes it easier to extend with Hazard components later
+fn isDeadlyTerrain(terrain: *const components.Terrain) bool {
+    // For now, use terrain type as bridge to component-based approach
+    // Future: Check for presence of Hazard component with deadly=true
+    return terrain.terrain_type == .pit;
+}
 
 // Check if player can move to position (obstacle collision)
 pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) bool {
@@ -22,7 +31,7 @@ pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) b
             .position = transform.pos,
             .size = terrain.size,
             .is_solid = terrain.solid,
-            .is_deadly = terrain.terrain_type == .pit,
+            .is_deadly = isDeadlyTerrain(terrain),
         };
         obstacle_count += 1;
     }
@@ -75,8 +84,8 @@ pub fn checkUnitObstacleCollision(world: *hex_game_mod.HexGame, unit_id: hex_gam
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
 
                 if (collision.checkCollision(circle, rect)) {
-                    // Check if it's a deadly obstacle
-                    if (terrain.terrain_type == .pit) {
+                    // Check if it's a deadly obstacle using component-based approach
+                    if (isDeadlyTerrain(terrain)) {
                         unit_health.alive = false;
                         if (zone_storage.units.getComponentMut(unit_id, .visual)) |unit_visual| {
                             unit_visual.color = constants.COLOR_DEAD;
@@ -106,8 +115,8 @@ pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_game_
         const terrain = &zone.obstacles.terrains[i];
         const transform = &zone.obstacles.transforms[i];
 
-        // Only include deadly obstacles
-        if (terrain.terrain_type == .pit) {
+        // Only include deadly obstacles using component-based approach
+        if (isDeadlyTerrain(terrain)) {
             obstacles[obstacle_count] = queries.ObstacleData{
                 .position = transform.pos,
                 .size = terrain.size,
@@ -146,11 +155,10 @@ pub fn findNearestAttunedLifestone(game: *HexGame) ?LifestoneResult {
         // Check all lifestones in this zone
         for (0..zone.lifestones.count) |i| {
             const interactable = &zone.lifestones.interactables[i];
-            const terrain = &zone.lifestones.terrains[i];
             const transform = &zone.lifestones.transforms[i];
 
-            // Check if lifestone is attuned
-            if (terrain.terrain_type == .altar and interactable.attuned) {
+            // Check if lifestone is attuned (component-based identification)
+            if (interactable.attuned) {
                 lifestones[lifestone_count] = queries.EntityData{
                     .position = transform.pos,
                     .radius = transform.radius,
