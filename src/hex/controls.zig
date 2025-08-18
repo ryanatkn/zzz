@@ -14,7 +14,6 @@ const combat = @import("combat.zig");
 const game_input = @import("../lib/game/input/mod.zig");
 const input_actions = game_input.actions;
 const input_modifiers = game_input.modifiers;
-const dead_player_handler = game_input.dead_player_handler;
 
 const Vec2 = math.Vec2;
 const GameState = game_controller.GameState;
@@ -50,7 +49,7 @@ pub fn handleSDLEvent(
         if (handled) return c.sdl.SDL_APP_CONTINUE;
     }
 
-    // Legacy HUD doesn't block events - it's just a display overlay
+    // Legacy game HUD doesn't block events - it's just a display overlay
 
     switch (event.type) {
         c.sdl.SDL_EVENT_QUIT => {
@@ -136,17 +135,19 @@ pub fn handleSDLEvent(
             // Extract action from mouse button
             const action = extractGameAction(event);
 
-            // Handle dead player actions
+            // Handle dead player actions - simplified inline logic
             if (!game_state.hex_game.getPlayerAlive()) {
-                const dead_result = dead_player_handler.DeadPlayerHandler.handleDeadPlayerAction(action);
-                switch (dead_result) {
-                    .Respawn => {
+                switch (action) {
+                    // Respawn actions
+                    .PrimaryAttack, .Respawn => {
                         game_state.hex_game.logger.info("respawn_click", "Dead player action respawn triggered", .{});
                         game_controller.handleRespawn(game_state);
                         return c.sdl.SDL_APP_CONTINUE;
                     },
-                    .Block => return c.sdl.SDL_APP_CONTINUE,
-                    .Allow => {}, // Continue with normal processing for system actions
+                    // System actions always allowed
+                    .ToggleMenu, .TogglePause, .Quit => {}, // Continue with normal processing
+                    // Block all other actions when dead
+                    else => return c.sdl.SDL_APP_CONTINUE,
                 }
             }
 

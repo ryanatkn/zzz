@@ -93,8 +93,8 @@ pub const SimpleGPURenderer = struct {
     rect_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
 
     // Effect rendering
-    effect_vs: *c.sdl.SDL_GPUShader,
-    effect_ps: *c.sdl.SDL_GPUShader,
+    particle_vs: *c.sdl.SDL_GPUShader,
+    particle_ps: *c.sdl.SDL_GPUShader,
     particle_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
 
     // Text rendering
@@ -174,8 +174,8 @@ pub const SimpleGPURenderer = struct {
             .rect_vs = undefined,
             .rect_ps = undefined,
             .rect_pipeline = undefined,
-            .effect_vs = undefined,
-            .effect_ps = undefined,
+            .particle_vs = undefined,
+            .particle_ps = undefined,
             .particle_pipeline = undefined,
             .text_renderer = undefined,
             .screen_width = @import("../core/constants.zig").SCREEN.BASE_WIDTH,
@@ -222,8 +222,8 @@ pub const SimpleGPURenderer = struct {
         c.sdl.SDL_ReleaseGPUShader(self.device, self.circle_ps);
         c.sdl.SDL_ReleaseGPUShader(self.device, self.rect_vs);
         c.sdl.SDL_ReleaseGPUShader(self.device, self.rect_ps);
-        c.sdl.SDL_ReleaseGPUShader(self.device, self.effect_vs);
-        c.sdl.SDL_ReleaseGPUShader(self.device, self.effect_ps);
+        c.sdl.SDL_ReleaseGPUShader(self.device, self.particle_vs);
+        c.sdl.SDL_ReleaseGPUShader(self.device, self.particle_ps);
         c.sdl.SDL_DestroyGPUDevice(self.device);
     }
 
@@ -310,7 +310,7 @@ pub const SimpleGPURenderer = struct {
         const particle_vs_spv = @embedFile("../../shaders/compiled/vulkan/particle_vs.spv");
         const particle_ps_spv = @embedFile("../../shaders/compiled/vulkan/particle_ps.spv");
 
-        const effect_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
+        const particle_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
             .code_size = particle_vs_spv.len,
             .code = @ptrCast(particle_vs_spv.ptr),
             .entrypoint = "vs_main",
@@ -322,12 +322,12 @@ pub const SimpleGPURenderer = struct {
             .num_uniform_buffers = 1, // Effect shader uses uniforms
         };
 
-        self.effect_vs = c.sdl.SDL_CreateGPUShader(self.device, &effect_vs_info) orelse {
+        self.particle_vs = c.sdl.SDL_CreateGPUShader(self.device, &particle_vs_info) orelse {
             loggers.getRenderLog().err("particle_vs_fail", "Failed to create particle vertex shader", .{});
             return error.VertexShaderFailed;
         };
 
-        const effect_ps_info = c.sdl.SDL_GPUShaderCreateInfo{
+        const particle_ps_info = c.sdl.SDL_GPUShaderCreateInfo{
             .code_size = particle_ps_spv.len,
             .code = @ptrCast(particle_ps_spv.ptr),
             .entrypoint = "ps_main",
@@ -339,7 +339,7 @@ pub const SimpleGPURenderer = struct {
             .num_uniform_buffers = 0, // Fragment shader doesn't need uniforms
         };
 
-        self.effect_ps = c.sdl.SDL_CreateGPUShader(self.device, &effect_ps_info) orelse {
+        self.particle_ps = c.sdl.SDL_CreateGPUShader(self.device, &particle_ps_info) orelse {
             loggers.getRenderLog().err("particle_fs_fail", "Failed to create particle fragment shader", .{});
             return error.FragmentShaderFailed;
         };
@@ -458,24 +458,24 @@ pub const SimpleGPURenderer = struct {
         };
 
         // Create particle pipeline (needs alpha blending for visual particles)
-        const effect_target_info = c.sdl.SDL_GPUGraphicsPipelineTargetInfo{
+        const particle_target_info = c.sdl.SDL_GPUGraphicsPipelineTargetInfo{
             .color_target_descriptions = &alpha_blend_state,
             .num_color_targets = 1,
             .depth_stencil_format = c.sdl.SDL_GPU_TEXTUREFORMAT_INVALID,
             .has_depth_stencil_target = false,
         };
 
-        const effect_create_info = c.sdl.SDL_GPUGraphicsPipelineCreateInfo{
-            .vertex_shader = self.effect_vs,
-            .fragment_shader = self.effect_ps,
+        const particle_create_info = c.sdl.SDL_GPUGraphicsPipelineCreateInfo{
+            .vertex_shader = self.particle_vs,
+            .fragment_shader = self.particle_ps,
             .vertex_input_state = vertex_input_state,
             .primitive_type = c.sdl.SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
             .rasterizer_state = rasterizer_state,
             .multisample_state = multisample_state,
-            .target_info = effect_target_info,
+            .target_info = particle_target_info,
         };
 
-        self.particle_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &effect_create_info) orelse {
+        self.particle_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &particle_create_info) orelse {
             loggers.getRenderLog().err("particle_pipeline_fail", "Failed to create particle graphics pipeline", .{});
             loggers.getRenderLog().err("particle_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
             return error.PipelineCreationFailed;

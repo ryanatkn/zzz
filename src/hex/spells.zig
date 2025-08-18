@@ -8,6 +8,7 @@ const frame = @import("../lib/core/frame.zig");
 const game_abilities = @import("../lib/game/abilities/mod.zig");
 const effect_manager = game_abilities.effect_manager;
 const components = @import("../lib/game/components/mod.zig");
+const combat = @import("combat.zig");
 
 const Vec2 = math.Vec2;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
@@ -524,6 +525,10 @@ pub const SpellSystem = struct {
         const player_pos = game.getPlayerPos();
         const to_target = target_pos.sub(player_pos);
         const base_angle = std.math.atan2(to_target.y, to_target.x);
+        const target_distance = to_target.length();
+
+        // Need access to bullet pool - check if enough bullets available
+        var bullets_fired: u32 = 0;
 
         // Fire multiple bullets in a spread pattern
         for (0..constants.MULTISHOT_COUNT) |i| {
@@ -533,13 +538,30 @@ pub const SpellSystem = struct {
                 0.0;
 
             const angle = base_angle + offset_angle;
-            // TODO: In real implementation, spawn bullets with game.addBullet()
-            // Would calculate velocity as Vec2{@cos(angle) * speed, @sin(angle) * speed}
-            _ = angle;
+            
+            // Calculate target position for this bullet based on angle
+            const bullet_target = player_pos.add(Vec2{
+                .x = @cos(angle) * target_distance,
+                .y = @sin(angle) * target_distance,
+            });
+
+            // Use the hex_game's bullet pool for firing
+            if (game.canFireBullet()) {
+                const success = combat.fireBullet(game, bullet_target, &game.bullet_pool);
+                if (success) {
+                    bullets_fired += 1;
+                } else {
+                    // If we can't fire a bullet, stop trying (probably no pool space)
+                    break;
+                }
+            } else {
+                // No more bullets available in pool
+                break;
+            }
         }
 
-        loggers.getGameLog().info("multishot_cast", "Fired {} bullets in spread pattern", .{constants.MULTISHOT_COUNT});
-        return true;
+        loggers.getGameLog().info("multishot_cast", "Fired {}/{} bullets in spread pattern", .{ bullets_fired, constants.MULTISHOT_COUNT });
+        return bullets_fired > 0; // Success if we fired at least one bullet
     }
 
     /// Cast Dazzle spell - confuse/slow enemies in area
