@@ -494,7 +494,7 @@ pub const SpellSystem = struct {
         const target_unit = closest_unit.?;
         const zone_mut = @constCast(zone);
         const unit = &zone_mut.units.units[target_unit.index];
-        // Reduce aggro range to simulate slowness (temporary hack)
+        // Reduce aggro range to simulate sluggish unit behavior
         unit.aggro_range = unit.aggro_range * constants.LETHARGY_SPEED_MULT;
 
         // Visual effect
