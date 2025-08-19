@@ -15,6 +15,6 @@ node_modules/
 *.log
 
 .zz
-.test_output
+
 # TODO maybe rename to .zzz_commands?
 .ai_commands

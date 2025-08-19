@@ -125,19 +125,7 @@ pub const Edge = struct {
     }
 };
 
-/// Result of rasterizing a glyph
-pub const RasterizedGlyph = struct {
-    bitmap: []u8,
-    width: u32,
-    height: u32,
-    bearing_x: i32,
-    bearing_y: i32,
-    advance: i32,
-
-    pub fn deinit(self: *RasterizedGlyph, allocator: std.mem.Allocator) void {
-        allocator.free(self.bitmap);
-    }
-};
+/// Note: RasterizedGlyph is now defined in rasterizer_core.zig
 
 // ============================================================================
 // Font Configuration Types

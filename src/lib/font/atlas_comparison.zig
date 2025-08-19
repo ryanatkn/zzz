@@ -4,6 +4,10 @@ const ttf_parser = @import("ttf_parser.zig");
 const rasterizer_core = @import("rasterizer_core.zig");
 const font_atlas = @import("font_atlas.zig");
 const test_helpers = @import("test_helpers.zig");
+const test_main = @import("test.zig");
+
+// Output directory for test files
+const TEST_OUTPUT_DIR = ".zz/test-font";
 
 /// Compare our test rasterizer output with what the font atlas actually uses
 pub fn compareRasterizerWithAtlas() !void {
@@ -59,24 +63,25 @@ pub fn compareRasterizerWithAtlas() !void {
     // Save both regular and Y-flipped versions for comparison
     try saveBitmapComparison(allocator, &rasterized, test_char);
 
-    std.debug.print("\n✅ Bitmap comparison files saved:\n", .{});
-    std.debug.print("  .test_output/atlas_comparison_{}_normal.ppm\n", .{test_char});
-    std.debug.print("  .test_output/atlas_comparison_{}_flipped.ppm\n", .{test_char});
+    std.debug.print("\n✅ Character analysis files saved:\n", .{});
+    std.debug.print("  {s}/chars/char{}_orig.ppm\n", .{ TEST_OUTPUT_DIR, test_char });
+    std.debug.print("  {s}/chars/char{}_screen.ppm\n", .{ TEST_OUTPUT_DIR, test_char });
 }
 
 fn saveBitmapComparison(allocator: std.mem.Allocator, rasterized: *const rasterizer_core.RasterizedGlyph, char: u8) !void {
-    _ = allocator;
 
     const width = @as(u32, @intFromFloat(rasterized.width));
     const height = @as(u32, @intFromFloat(rasterized.height));
 
-    // Create output directory
-    std.fs.cwd().makeDir(".test_output") catch {};
+    // Create test directories
+    try test_main.ensureTestDirectories();
 
     // Save normal orientation
     {
-        var filename_buf: [256]u8 = undefined;
-        const filename = try std.fmt.bufPrint(filename_buf[0..], ".test_output/atlas_comparison_{}_normal.ppm", .{char});
+        var filename_buf: [64]u8 = undefined;
+        const base_filename = try std.fmt.bufPrint(filename_buf[0..], "char{}_orig.ppm", .{char});
+        const filename = try test_main.getTestOutputPath(allocator, "chars", base_filename);
+        defer allocator.free(filename);
 
         const file = try std.fs.cwd().createFile(filename, .{});
         defer file.close();
@@ -95,8 +100,10 @@ fn saveBitmapComparison(allocator: std.mem.Allocator, rasterized: *const rasteri
 
     // Save Y-flipped orientation (match GPU texture coordinates)
     {
-        var filename_buf: [256]u8 = undefined;
-        const filename = try std.fmt.bufPrint(filename_buf[0..], ".test_output/atlas_comparison_{}_flipped.ppm", .{char});
+        var filename_buf: [64]u8 = undefined;
+        const base_filename = try std.fmt.bufPrint(filename_buf[0..], "char{}_screen.ppm", .{char});
+        const filename = try test_main.getTestOutputPath(allocator, "chars", base_filename);
+        defer allocator.free(filename);
 
         const file = try std.fs.cwd().createFile(filename, .{});
         defer file.close();

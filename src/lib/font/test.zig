@@ -31,12 +31,46 @@ comptime {
     // _ = @import("test/font_rendering.zig"); // TODO: Fix missing dependencies
     _ = @import("test/font_debug.zig");
 
+    // Coordinate transformation tests (new)
+    _ = @import("test/coordinate_transform_test.zig");
+
     // Comparison tests
     _ = @import("atlas_comparison.zig");
 }
 
 // Optional flag for bitmap output - set to true to save test bitmaps
 const SAVE_BITMAPS = true;
+
+// Output directory for test files
+const TEST_OUTPUT_DIR = ".zz/test-font";
+
+/// Helper function to generate systematic test output paths
+/// Categories: "baseline", "chars", "coord", "debug", "full"
+pub fn getTestOutputPath(allocator: std.mem.Allocator, category: []const u8, filename: []const u8) ![]u8 {
+    return std.fmt.allocPrint(allocator, "{s}/{s}/{s}", .{ TEST_OUTPUT_DIR, category, filename });
+}
+
+/// Helper function to ensure test output directories exist
+pub fn ensureTestDirectories() !void {
+    const categories = [_][]const u8{ "baseline", "chars", "coord", "debug", "full" };
+    
+    // Create main test directory
+    std.fs.cwd().makePath(TEST_OUTPUT_DIR) catch |err| switch (err) {
+        error.PathAlreadyExists => {},
+        else => return err,
+    };
+    
+    // Create subdirectories
+    for (categories) |category| {
+        const dir_path = std.fmt.allocPrint(std.heap.page_allocator, "{s}/{s}", .{ TEST_OUTPUT_DIR, category }) catch return error.OutOfMemory;
+        defer std.heap.page_allocator.free(dir_path);
+        
+        std.fs.cwd().makePath(dir_path) catch |err| switch (err) {
+            error.PathAlreadyExists => {},
+            else => return err,
+        };
+    }
+}
 
 // Test metadata for summary
 pub const test_modules = [_][]const u8{
@@ -49,6 +83,7 @@ pub const test_modules = [_][]const u8{
     "test/bearing_analysis",
     "test/pixel_analysis",
     "test/font_debug",
+    "test/coordinate_transform_test", // New coordinate transformation tests
 };
 
 test "comprehensive character rendering - all alphabet" {
@@ -161,14 +196,21 @@ test "comprehensive character rendering - all alphabet" {
     std.debug.print("Success rate: {:.1}%\n", .{@as(f32, @floatFromInt(successful_renders)) * 100.0 / @as(f32, @floatFromInt(total_chars))});
 
     if (SAVE_BITMAPS) {
-        std.debug.print("\n💾 Bitmaps saved to ./.test_output/ (if writable)\n", .{});
+        std.debug.print("\n💾 Bitmaps saved to ./{s}/ (if writable)\n", .{TEST_OUTPUT_DIR});
 
-        // Create composite bitmap using new visualization module
+        // Create comprehensive coordinate composites using new visualization module
         var visualizer = test_visualization.FontTestVisualization.init(allocator);
-        const all_chars = lowercase ++ uppercase ++ numbers ++ special;
-        try visualizer.createCompositeBitmap(&rasterizer, all_chars, ".test_output/composite_all_chars.ppm");
+        
+        // Ensure test directories exist
+        try ensureTestDirectories();
+        
+        // Generate full alphabet composites in both coordinate spaces
+        const full_composite_path = try getTestOutputPath(allocator, "full", "alphabet.ppm");
+        defer allocator.free(full_composite_path);
+        try visualizer.createFullAlphabetComposite(&rasterizer, full_composite_path[0..full_composite_path.len-4], 1920.0, 1080.0);
 
-        // Detailed baseline analysis
+        // Detailed baseline analysis  
+        const all_chars = lowercase ++ uppercase ++ numbers ++ special;
         try visualizer.analyzeBaselineConsistency(&rasterizer, all_chars);
 
         // Individual character analysis for problematic chars
@@ -183,6 +225,65 @@ test "comprehensive character rendering - all alphabet" {
 
     // Require at least 90% success rate
     try testing.expect(successful_renders >= (total_chars * 9) / 10);
+}
+
+test "coordinate transformation - shader space bitmap generation" {
+    const allocator = testing.allocator;
+
+    // Initialize loggers for font system
+    try test_helpers.initTestLoggers(allocator);
+    defer test_helpers.deinitTestLoggers();
+
+    // Try to load DM Sans font
+    const font_path = "static/fonts/DM_Sans/static/DMSans-Regular.ttf";
+    const font_data = std.fs.cwd().readFileAlloc(allocator, font_path, 1024 * 1024) catch |err| switch (err) {
+        error.FileNotFound => {
+            std.debug.print("Font file not found: {s} - skipping coordinate transform test\n", .{font_path});
+            return;
+        },
+        else => return err,
+    };
+    defer allocator.free(font_data);
+
+    std.debug.print("\n🔄 COORDINATE TRANSFORMATION TEST\n", .{});
+    std.debug.print("=" ** 80 ++ "\n", .{});
+
+    // Parse the font
+    var parser = try ttf_parser.TTFParser.init(allocator, font_data);
+    defer parser.deinit();
+
+    // Create rasterizer
+    var rasterizer = rasterizer_core.RasterizerCore.init(allocator, &parser, 16.0, 96.0);
+
+    // Baseline test characters for coordinate transformation
+    const baseline_chars = "nopgy";
+
+    var visualizer = test_visualization.FontTestVisualization.init(allocator);
+
+    if (SAVE_BITMAPS) {
+        // Ensure test directories exist
+        try ensureTestDirectories();
+        
+        // Generate baseline character bitmaps in both coordinate spaces (for quick testing)
+        const baseline_path = try getTestOutputPath(allocator, "baseline", "nopgy.ppm");
+        defer allocator.free(baseline_path);
+        try visualizer.createCompositeBitmapWithCoordinateSpace(
+            &rasterizer, 
+            baseline_chars, // Core baseline test characters
+            baseline_path,
+            .both
+        );
+
+        // Generate comprehensive coordinate transformation test output  
+        const coordinate_transform_test = @import("test/coordinate_transform_test.zig");
+        try coordinate_transform_test.runAllTests(allocator);
+
+        std.debug.print("✅ Font test outputs generated in {s}/\n", .{TEST_OUTPUT_DIR});
+        std.debug.print("  📊 Full alphabet: full/alphabet_{{screen,ndc}}.ppm\n", .{});
+        std.debug.print("  🔬 Baseline chars: baseline/nopgy_{{screen,ndc}}.ppm\n", .{});
+    } else {
+        std.debug.print("💡 Set SAVE_BITMAPS = true to generate coordinate transformation output\n", .{});
+    }
 }
 
 // Note: Individual bitmap saving removed to eliminate garbled PBM files
@@ -277,8 +378,10 @@ fn createCompositeBitmap(allocator: std.mem.Allocator, rasterizer: *rasterizer_c
     }
 
     // Save composite bitmap as PPM (grayscale)
-    std.fs.cwd().makeDir(".test_output") catch {};
-    const file = std.fs.cwd().createFile(".test_output/composite_all_chars.ppm", .{}) catch |err| {
+    try ensureTestDirectories();
+    const composite_path = try getTestOutputPath(allocator, "full", "composite_legacy.ppm");
+    defer allocator.free(composite_path);
+    const file = std.fs.cwd().createFile(composite_path, .{}) catch |err| {
         std.debug.print("Could not create composite bitmap file: {}\n", .{err});
         return;
     };
@@ -297,7 +400,7 @@ fn createCompositeBitmap(allocator: std.mem.Allocator, rasterizer: *rasterizer_c
         try file.writer().print("\n", .{});
     }
 
-    std.debug.print("✅ Composite bitmap saved to .test_output/composite_all_chars.ppm\n", .{});
+    std.debug.print("✅ Legacy composite bitmap saved to {s}/full/composite_legacy.ppm\n", .{TEST_OUTPUT_DIR});
 }
 
 test "font module test summary" {

@@ -1,146 +1,242 @@
-# ✅ COMPLETED: Font System Debugging Guide
+# Font System Debugging Guide
 
-## Issue: Descender Character Cutoff/Misalignment
+## System Overview
 
-### Problem Description
-Descender characters (g, j, p, q, y) appear cut off at bottom or positioned below baseline compared to regular characters like (a, e, n, o).
+The font system is a pure Zig TTF renderer with SDL3 GPU integration. This guide covers debugging techniques, common issues, and solutions.
 
-### Root Cause Analysis (Completed)
+## Architecture Components
 
-**Pipeline Investigation Results:**
-1. **Font Metrics**: Line height calculation correct (27.78px for DM Sans 16pt)
-2. **Texture Height**: Not the primary issue - texture size adequate 
-3. **Positioning Formula**: Core issue identified in baseline alignment
+### Font Processing Pipeline
+1. **TTF Parsing** → 2. **Glyph Extraction** → 3. **Rasterization** → 4. **Texture Creation** → 5. **GPU Rendering**
 
-**Key Findings:**
-- Font: DM Sans, Scale: 0.021333, Ascender: 992 units, Descender: -310 units
-- Different characters have different `bearing_y` values based on their individual heights
-- Original formula: `glyph_y = cursor_y + baseline_offset - bearing_y`
-- Issue: Individual `bearing_y` values cause different baseline positions
+### Coordinate Systems
+- **TTF Space**: Y=0 at baseline, positive up (font units)
+- **Bitmap Space**: Y=0 at top, positive down (pixels)
+- **GPU/NDC Space**: X,Y in [-1,1], requires Y-flip
 
-### Applied Fixes
+## Debugging Infrastructure
 
-**Primary Fix (layout.zig:129):**
-```zig
-// OLD: Individual glyph bearing_y creates inconsistent baselines
-const glyph_y = cursor_y + self.rasterizer.metrics.getBaselineOffset() - bearing_y;
-
-// NEW: Font ascender as consistent baseline reference
-const font_ascender_px = @as(f32, @floatFromInt(self.rasterizer.metrics.ascender)) * self.rasterizer.metrics.scale;
-const glyph_y = cursor_y + (font_ascender_px - @as(f32, @floatFromInt(glyph_info.bearing_y)));
+### Test Output Organization
+```
+.zz/test-font/
+├── baseline/    # Baseline alignment tests
+│   ├── nopgy_orig.ppm      # Original bitmap coordinates
+│   ├── nopgy_screen.ppm    # Screen space rendering
+│   ├── nopgy_ndc.ppm       # NDC/shader space
+│   └── nopgy_comparison.txt # Coordinate analysis
+├── chars/       # Individual character analysis
+│   ├── char{N}_orig.ppm    # Character bitmaps
+│   └── char{N}_screen.ppm  # Screen space versions
+├── coord/       # Coordinate transformation
+│   ├── accuracy.txt        # Round-trip accuracy
+│   └── pattern_analysis.txt # Test pattern analysis
+├── debug/       # Debug outputs (mostly stdout)
+└── full/        # Full alphabet composites
+    ├── alphabet_orig.ppm
+    ├── alphabet_screen.ppm
+    ├── alphabet_ndc.ppm
+    └── alphabet_comparison.txt
 ```
 
-**Supporting Fix (layout.zig:161):**
-```zig
-// Added rasterizer padding to texture height calculation
-const rasterizer_padding: f32 = 2.0;
-const total_height = line_height + rasterizer_padding;
-```
-
-### Debugging Tools Created
-
-**Test Infrastructure:**
-- `src/lib/font/test/` - Comprehensive test directory
-- `src/lib/font/simple_font_test.zig` - Basic font metrics analysis
-- `src/lib/font/test_pipeline_debug.zig` - Full pipeline tracing
-- `src/lib/font/test_bearing_analysis.zig` - Baseline positioning analysis
-
-**Key Test Commands:**
+### Test Commands
 ```bash
-zig build test -Dtest-filter="simple font metrics"  # Basic metrics
-zig build test -Dtest-filter="pipeline debug"       # Full analysis  
-zig build test -Dtest-filter="bearing"              # Baseline theory
+# Run all font tests with detailed output
+zig build test -Dtest-filter="font"
+
+# Specific test categories
+zig build test -Dtest-filter="baseline"      # Baseline alignment
+zig build test -Dtest-filter="pixel"         # Pixel-level analysis
+zig build test -Dtest-filter="coordinate"    # Coordinate transforms
+zig build test -Dtest-filter="bearing"       # Bearing calculations
+zig build test -Dtest-filter="character"     # Character analysis
+
+# Visual verification
+zig build run  # Navigate to font test pages
 ```
 
-### Technical Details
+## Common Issues and Solutions
 
-**Font Coordinates:**
-- TrueType: Y=0 at baseline, positive Y up, negative Y down
-- Screen: Y=0 at top, positive Y down
-- Conversion handled by rasterizer Y-flip logic
+### Issue: Descender Character Cutoff
 
-**Critical Components:**
-- `rasterizer_core.zig:161` - bearing_y calculation from bounds.y_max
-- `layout.zig:129` - Glyph positioning formula (FIXED)
-- `font_metrics.zig:49` - getBaselineOffset() = ascender * scale
+**Symptoms:**
+- Characters with descenders (g, j, p, q, y) cut off at bottom
+- Inconsistent baseline alignment between character types
 
-### Issue Status: 🎯 MAJOR PROGRESS (August 19, 2025) - SUBSTANTIAL IMPROVEMENT
+**Root Cause:**
+- Bitmap coordinate system created inconsistent baseline positioning
+- Different characters had different `bearing_y` values
 
-**Root Cause Identified:** Bitmap coordinate system created inconsistent baseline positioning for descenders
-**Complete Solution Applied:** Normalized bitmap generation with consistent baseline positioning
-**Current Verification:** Core descender characters (n, o, p, g, y, j) now have identical baseline alignment
-**Remaining Work:** Capital letters and fine-tuning for complete alphabet consistency
-
-### Complete Solution Applied
-
-**1. Normalized Bitmap Height (`rasterizer_core.zig:108-118`)**
+**Solution Applied:**
 ```zig
-// NEW: Height based on font metrics, not just glyph bounds
-const font_ascender = @as(f32, @floatFromInt(self.metrics.ascender)) * self.scale;
-const font_descender = @as(f32, @floatFromInt(-self.metrics.descender)) * self.scale;
+// Normalized bitmap height (rasterizer_core.zig)
+const font_ascender = metrics.ascender * scale;
+const font_descender = -metrics.descender * scale;
 const total_font_height = font_ascender + font_descender;
 const height_f = @max(bounds.height() + 2.0, total_font_height + 2.0);
-```
 
-**2. Consistent Baseline Positioning (`rasterizer_core.zig:142-155`)**
-```zig
-// NEW: Baseline at fixed position from bottom for ALL characters
+// Consistent baseline positioning
 const baseline_from_bottom = font_descender + 1.0;
-const bitmap_y_from_bottom = @as(f32, @floatFromInt(height)) - 1.0 - @as(f32, @floatFromInt(y));
+const bitmap_y_from_bottom = height - 1.0 - y;
 const pixel_y = bitmap_y_from_bottom - baseline_from_bottom;
+
+// Updated bearing_y calculation
+bearing_y = baseline_from_bottom + bounds.y_max;
 ```
 
-**3. Updated bearing_y Calculation (`rasterizer_core.zig:175`)**
+### Issue: Coordinate Transformation Illegibility
+
+**Symptoms:**
+- Test output bitmaps were microscopic and illegible
+- Characters stretched across entire screen width
+
+**Root Cause:**
+- Incorrect scaling treated small glyphs as full-screen elements
+- Disconnected from working font rasterization system
+
+**Solution Applied:**
 ```zig
-// NEW: Reflects consistent baseline position
-.bearing_y = baseline_from_bottom + bounds.y_max,
+// Font-aware scaling (coordinate_transform.zig)
+const font_display_scale: f32 = 4.0;  // 4x for visibility
+const base_screen_x: f32 = target_screen_width * 0.25;
+const base_screen_y: f32 = target_screen_height * 0.4;
+
+const screen_x = base_screen_x + (bitmap_x * font_display_scale);
+const screen_y = base_screen_y + (bitmap_y * font_display_scale);
 ```
 
-**4. Comprehensive Testing (`test_descender_analysis.zig`)**
-- Tests n, o, p, g, y, j characters for alignment
-- Verifies consistent empty rows at top (11 for all)  
-- Confirms identical baseline position (22.4 for all)
-- Validates same distance to first ink (11.4 pixels for all)
+### Issue: Text Cutoff at Top/Bottom
 
-**Current Verification Results:**
-- **Tested characters (n, o, p, g, y, j)**: baseline at row 22.4, first ink at row 11  
-- **Perfect uniformity**: 11 empty rows at top for all tested characters
-- ✅ **MAJOR IMPROVEMENT** - descenders (p, g, y, j) now align closely with regular characters
-- 🔄 **REMAINING**: Capital letters still need alignment fixes, minor inconsistencies with full alphabet
+**Symptoms:**
+- Tall characters (capitals, b, d, f, h) cut off at top
+- Descenders cut off at bottom of texture
 
-### Outstanding Issues to Address
+**Root Cause:**
+- Texture height calculation didn't account for full glyph height
+- GPU textures were too small to contain characters
 
-**Capital Letter Positioning:**
-- Capital letters (A, B, C, etc.) reported to still have alignment issues
-- May require separate handling due to different baseline relationships
+**Solution Applied:**
+```zig
+// Texture padding (layout.zig)
+const ascender_padding = line_height * 0.5;
+const descender_padding = line_height * 0.3;
+const total_height = cursor_y + line_height + ascender_padding + descender_padding;
 
-**Minor Alignment Inconsistencies:**
-- Small discrepancies reported between a/z/y characters
-- Fine-tuning needed for pixel-perfect alignment across all character types
-
-**Next Steps:**
-1. Extend test suite to include capital letters (A-Z)
-2. Analyze capital letter baseline positioning requirements
-3. Fine-tune coordinate system for remaining inconsistencies
-4. Test complete alphabet for comprehensive alignment verification
-
-### Validation Commands
-
-```bash
-# Test the fix
-zig build test -Dtest-filter="pixel-level"
-
-# Visual confirmation (if GPU available)
-zig build run
-
-# Full font test suite 
-zig build test -Dtest-filter="font" --summary all
+// Baseline positioning
+const glyph_y = cursor_y + rasterizer.metrics.getBaselineOffset() - bearing_y;
 ```
 
-### Key Files Modified
+## Debugging Techniques
 
-- `src/lib/font/rasterizer_core.zig` - Fixed Y-coordinate transformation and bearing_y (lines 144, 164)
-- `src/lib/font/test_pixel_analysis.zig` - Added memory cleanup (line 31)
-- `TODO_FONT_SYSTEM_DEBUGGING.md` - Updated with complete solution
+### 1. Pixel-Level Analysis
+Use `test/pixel_analysis.zig` to examine bitmap structure:
+```
+- First/last ink rows
+- Empty space distribution
+- Baseline position verification
+- Bearing calculations
+```
 
-**Status:** ✅ **COMPLETE** - Descender characters now properly aligned with baseline.
+### 2. Character Type Comparison
+Test different character categories:
+- **Regular**: a, e, n, o (x-height characters)
+- **Descenders**: g, j, p, q, y (extend below baseline)
+- **Capitals**: A, B, C, etc. (cap height)
+- **Tall**: b, d, f, h, k, l (ascender height)
+
+### 3. Coordinate Verification
+```zig
+// Test round-trip accuracy
+const ndc = screenToNDC(screen_x, screen_y, width, height);
+const back = ndcToScreen(ndc.x, ndc.y, width, height);
+const error = @sqrt((back.x - screen_x)² + (back.y - screen_y)²);
+// Error should be < 0.001
+```
+
+### 4. Visual Debugging
+- Generate PPM files for visual inspection
+- Use ASCII art representation in terminal
+- Compare original vs transformed coordinates
+- Check alignment across character types
+
+## Key Metrics to Monitor
+
+### Font Metrics
+```
+Scale factor: 0.021333 (for 16pt at 96 DPI)
+Ascender: 992 units (21.2 px)
+Descender: -310 units (-6.6 px)
+Line height: 27.78 px
+Baseline offset: 21.16 px
+```
+
+### Bitmap Metrics
+- **Consistent empty rows**: All chars should have ~11 empty rows at top
+- **Baseline position**: Should be at row ~22.4 for all characters
+- **First ink distance**: ~11.4 pixels from top for aligned characters
+
+### Performance Metrics
+- **Cache hit rate**: Should be >95% for UI text
+- **Rasterization time**: First render slow, cached fast
+- **Memory usage**: Scales with unique text strings
+
+## Critical Code Locations
+
+### Baseline Alignment
+- `rasterizer_core.zig:108-118` - Normalized bitmap height
+- `rasterizer_core.zig:142-155` - Baseline positioning
+- `rasterizer_core.zig:175` - bearing_y calculation
+
+### Texture Management
+- `layout.zig:79` - Cursor starting position
+- `layout.zig:129` - Glyph Y positioning
+- `layout.zig:157-161` - Texture height calculation
+
+### Coordinate Systems
+- `coordinate_transform.zig:42-53` - Font-aware scaling
+- `coordinate_transform.zig:13-23` - Core coordinate integration
+
+## Validation Checklist
+
+### For New Changes
+- [ ] Run full font test suite
+- [ ] Check baseline alignment across character types
+- [ ] Verify no clipping at texture boundaries
+- [ ] Test coordinate transformations
+- [ ] Examine pixel-level bitmap structure
+- [ ] Generate visual output for inspection
+
+### For Debugging Issues
+1. **Identify character type** causing the issue
+2. **Extract metrics** (bearing_y, bounds, bitmap size)
+3. **Trace positioning** through the pipeline
+4. **Compare** with working characters
+5. **Verify** coordinate transformations
+6. **Check** texture boundaries
+
+## Understanding Test Output
+
+### PPM Files
+- **_orig.ppm**: Original bitmap coordinates (GPU input)
+- **_screen.ppm**: Screen space coordinates
+- **_ndc.ppm**: NDC/shader space (what GPU sees)
+
+### Text Analysis Files
+- **accuracy.txt**: Coordinate round-trip verification
+- **comparison.txt**: Side-by-side coordinate analysis
+- **pattern_analysis.txt**: Test pattern transformations
+
+### Debug Output (stdout)
+- Character metrics and bounds
+- Pixel content analysis
+- Baseline positioning calculations
+- Coordinate transformation details
+
+## Future Debugging Improvements
+
+1. **Automated validation** - Script to verify alignment
+2. **Visual diff tools** - Compare bitmaps between runs
+3. **Performance profiling** - Identify bottlenecks
+4. **Memory tracking** - Detect leaks and excessive allocation
+5. **Regression testing** - Catch breaking changes
+
+This debugging guide provides comprehensive tools and techniques for maintaining and improving the font rendering system.
