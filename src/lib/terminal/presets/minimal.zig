@@ -25,18 +25,11 @@ pub const MinimalTerminal = struct {
     pub fn init(allocator: std.mem.Allocator) !Self {
         var registry = kernel.createRegistry(allocator);
         
-        // Allocate capabilities on heap
-        const keyboard = try allocator.create(KeyboardInput);
-        keyboard.* = KeyboardInput{};
-        
-        const writer = try allocator.create(BasicWriter);
-        writer.* = BasicWriter.init(allocator);
-        
-        const line_buffer = try allocator.create(LineBuffer);
-        line_buffer.* = LineBuffer.init(allocator);
-        
-        const cursor = try allocator.create(Cursor);
-        cursor.* = Cursor.init();
+        // Create capabilities using factory methods
+        const keyboard = try KeyboardInput.create(allocator);
+        const writer = try BasicWriter.create(allocator);
+        const line_buffer = try LineBuffer.create(allocator);
+        const cursor = try Cursor.create(allocator);
         
         // Create capability interfaces and register them
         const keyboard_cap = kernel.createCapability(keyboard);
@@ -68,7 +61,7 @@ pub const MinimalTerminal = struct {
         // Registry deinit will call capability deinit methods
         self.registry.deinit();
         
-        // Free allocated memory for capabilities
+        // Just free the memory, don't call deinit again (registry already did)
         self.allocator.destroy(self.keyboard);
         self.allocator.destroy(self.writer);
         self.allocator.destroy(self.line_buffer);

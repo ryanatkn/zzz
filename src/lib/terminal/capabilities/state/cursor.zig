@@ -3,9 +3,9 @@ const kernel = @import("../../kernel/mod.zig");
 
 /// Cursor capability - manages cursor position, visibility, and blinking
 pub const Cursor = struct {
-    name: []const u8 = "cursor",
-    capability_type: []const u8 = "state",
-    dependencies: []const []const u8 = &[_][]const u8{},
+    pub const name = "cursor";
+    pub const capability_type = "state";
+    pub const dependencies = &[_][]const u8{};
     
     active: bool = false,
     initialized: bool = false,
@@ -29,25 +29,41 @@ pub const Cursor = struct {
     pub fn init() Self {
         return Self{};
     }
+    
+    /// Create a new cursor capability
+    pub fn create(allocator: std.mem.Allocator) !*Self {
+        const self = try allocator.create(Self);
+        self.* = Self.init();
+        return self;
+    }
+    
+    /// Destroy cursor capability
+    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+        self.deinit();
+        allocator.destroy(self);
+    }
 
     /// Get capability name
     pub fn getName(self: *Self) []const u8 {
-        return self.name;
+        _ = self;
+        return name;
     }
 
     /// Get capability type
     pub fn getType(self: *Self) []const u8 {
-        return self.capability_type;
+        _ = self;
+        return capability_type;
     }
 
     /// Get required dependencies
     pub fn getDependencies(self: *Self) []const []const u8 {
-        return self.dependencies;
+        _ = self;
+        return dependencies;
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
-        _ = dependencies; // No dependencies for cursor
+    pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+        _ = deps; // No dependencies for cursor
         
         self.event_bus = event_bus;
         
@@ -87,7 +103,7 @@ pub const Cursor = struct {
         if (self.blink_timer >= self.blink_rate) {
             self.blink_timer = 0.0;
             self.visible = !self.visible;
-            try self.emitStateChange("blink_toggled");
+            try self.emitStateChange(.blink_toggled);
         }
     }
 
@@ -97,7 +113,7 @@ pub const Cursor = struct {
         
         self.visible = true;
         self.blink_timer = 0.0;
-        try self.emitStateChange("shown");
+        try self.emitStateChange(.shown);
     }
 
     /// Hide cursor
@@ -105,7 +121,7 @@ pub const Cursor = struct {
         if (!self.active) return;
         
         self.visible = false;
-        try self.emitStateChange("hidden");
+        try self.emitStateChange(.hidden);
     }
 
     /// Set cursor position
@@ -115,7 +131,7 @@ pub const Cursor = struct {
         self.x = @min(x, self.max_columns - 1);
         self.y = @min(y, self.max_rows - 1);
         try self.show(); // Reset blink on position change
-        try self.emitStateChange("position_changed");
+        try self.emitStateChange(.position_changed);
     }
 
     /// Move cursor by relative amount
@@ -142,7 +158,7 @@ pub const Cursor = struct {
         if (self.x >= columns) self.x = columns - 1;
         if (self.y >= rows) self.y = rows - 1;
         
-        try self.emitStateChange("dimensions_changed");
+        try self.emitStateChange(.dimensions_changed);
     }
 
     /// Get cursor position
@@ -156,13 +172,12 @@ pub const Cursor = struct {
     }
 
     /// Emit state change event
-    fn emitStateChange(self: *Self, change_type: []const u8) !void {
+    fn emitStateChange(self: *Self, state: kernel.events.CursorState) !void {
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, kernel.EventData{
                 .state_change = kernel.events.StateChangeData{
-                    .component = "cursor",
-                    .old_state = null,
-                    .new_state = change_type,
+                    .component = .cursor,
+                    .state = .{ .cursor = state },
                 },
             });
             try bus.emit(event);
@@ -177,17 +192,20 @@ fn stateChangeCallback(event: kernel.Event, context: ?*anyopaque) !void {
     switch (event.data) {
         .state_change => |state_data| {
             // React to line buffer changes that might affect cursor position
-            if (std.mem.eql(u8, state_data.component, "line_buffer")) {
-                if (std.mem.eql(u8, state_data.new_state, "char_inserted")) {
-                    // Cursor position is managed by line buffer, just reset blink
-                    try self.show();
-                } else if (std.mem.eql(u8, state_data.new_state, "char_deleted")) {
-                    try self.show();
-                } else if (std.mem.eql(u8, state_data.new_state, "line_executed")) {
-                    // Move to new line
-                    try self.setPosition(0, self.y + 1);
-                } else if (std.mem.eql(u8, state_data.new_state, "line_cleared")) {
-                    try self.setPosition(0, self.y);
+            if (state_data.component == .line_buffer) {
+                switch (state_data.state.line_buffer) {
+                    .char_inserted, .char_deleted => {
+                        // Cursor position is managed by line buffer, just reset blink
+                        try self.show();
+                    },
+                    .line_executed => {
+                        // Move to new line
+                        try self.setPosition(0, self.y + 1);
+                    },
+                    .line_cleared => {
+                        try self.setPosition(0, self.y);
+                    },
+                    else => {}, // Ignore other line buffer states
                 }
             }
         },
@@ -201,14 +219,17 @@ fn inputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
     
     switch (event.data) {
         .input => |input_data| {
-            const key_name = input_data.data;
-            // Handle cursor movement keys that aren't handled by line buffer
-            if (std.mem.eql(u8, key_name, "PAGE_UP")) {
-                try self.moveRelative(0, -10); // Move up 10 lines
-            } else if (std.mem.eql(u8, key_name, "PAGE_DOWN")) {
-                try self.moveRelative(0, 10); // Move down 10 lines
+            switch (input_data.key) {
+                .special => |special_key| {
+                    // Handle cursor movement keys that aren't handled by line buffer
+                    switch (special_key) {
+                        .page_up => try self.moveRelative(0, -10), // Move up 10 lines
+                        .page_down => try self.moveRelative(0, 10), // Move down 10 lines
+                        else => {}, // Other cursor movement is handled by line buffer
+                    }
+                },
+                else => {}, // Ignore character and text input
             }
-            // Other cursor movement is handled by line buffer
         },
         else => {}, // Ignore other event types
     }

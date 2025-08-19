@@ -26,6 +26,34 @@ pub const Event = struct {
     }
 };
 
+/// Special key enum for type-safe keyboard input
+pub const SpecialKey = enum {
+    enter,
+    backspace,
+    delete,
+    tab,
+    escape,
+    up_arrow,
+    down_arrow,
+    left_arrow,
+    right_arrow,
+    home,
+    end,
+    page_up,
+    page_down,
+    ctrl_c,
+    ctrl_l,
+    ctrl_d,
+    ctrl_z,
+};
+
+/// Key input tagged union for zero-allocation input handling
+pub const KeyInput = union(enum) {
+    char: u8,
+    special: SpecialKey,
+    text: []const u8, // For pasted text or multi-byte input
+};
+
 /// Event data union for different event types
 pub const EventData = union(EventType) {
     input: InputEventData,
@@ -39,7 +67,7 @@ pub const EventData = union(EventType) {
 
 pub const InputEventData = struct {
     input_type: InputType,
-    data: []const u8,
+    key: KeyInput,
 };
 
 pub const OutputEventData = struct {
@@ -47,10 +75,50 @@ pub const OutputEventData = struct {
     target: ?[]const u8 = null, // Optional output target
 };
 
+/// Component types that can emit state changes
+pub const ComponentType = enum {
+    line_buffer,
+    cursor,
+    basic_writer,
+    keyboard_input,
+};
+
+/// Line buffer state changes
+pub const LineBufferState = enum {
+    char_inserted,
+    char_deleted,
+    cursor_moved,
+    history_loaded,
+    line_executed,
+    line_cleared,
+};
+
+/// Cursor state changes  
+pub const CursorState = enum {
+    blink_toggled,
+    shown,
+    hidden,
+    position_changed,
+    dimensions_changed,
+};
+
+/// Basic writer state changes
+pub const WriterState = enum {
+    text_written,
+    cleared,
+};
+
+/// State change types union
+pub const StateChangeType = union(ComponentType) {
+    line_buffer: LineBufferState,
+    cursor: CursorState,
+    basic_writer: WriterState,
+    keyboard_input: void, // No state changes for keyboard
+};
+
 pub const StateChangeData = struct {
-    component: []const u8,
-    old_state: ?[]const u8,
-    new_state: []const u8,
+    component: ComponentType,
+    state: StateChangeType,
 };
 
 pub const CommandExecuteData = struct {
@@ -82,26 +150,40 @@ pub const EventCallback = *const fn (event: Event, context: ?*anyopaque) anyerro
 
 /// Event subscription entry
 const Subscription = struct {
-    event_type: EventType,
     callback: EventCallback,
     context: ?*anyopaque,
     active: bool,
 };
 
-/// Zero-allocation event bus with fixed capacity
+/// Subscription list for a specific event type
+const SubscriptionList = struct {
+    items: [MAX_SUBSCRIPTIONS_PER_TYPE]Subscription,
+    count: usize = 0,
+    
+    const MAX_SUBSCRIPTIONS_PER_TYPE = 16;
+};
+
+/// Zero-allocation event bus with type-indexed subscriptions for O(1) lookup
 pub const EventBus = struct {
-    subscriptions: [MAX_SUBSCRIPTIONS]Subscription,
-    subscription_count: usize,
+    // Group subscriptions by event type for faster dispatch
+    subscriptions_by_type: [std.meta.fields(EventType).len]SubscriptionList,
     allocator: std.mem.Allocator,
 
     const MAX_SUBSCRIPTIONS = 64;
 
     pub fn init(allocator: std.mem.Allocator) EventBus {
-        return EventBus{
-            .subscriptions = undefined,
-            .subscription_count = 0,
+        var bus = EventBus{
+            .subscriptions_by_type = undefined,
             .allocator = allocator,
         };
+        // Initialize all subscription lists
+        for (&bus.subscriptions_by_type) |*list| {
+            list.* = SubscriptionList{
+                .items = undefined,
+                .count = 0,
+            };
+        }
+        return bus;
     }
 
     /// Subscribe to event type with callback
@@ -111,17 +193,19 @@ pub const EventBus = struct {
         callback: EventCallback,
         context: ?*anyopaque,
     ) !void {
-        if (self.subscription_count >= MAX_SUBSCRIPTIONS) {
+        const type_index = @intFromEnum(event_type);
+        const list = &self.subscriptions_by_type[type_index];
+        
+        if (list.count >= SubscriptionList.MAX_SUBSCRIPTIONS_PER_TYPE) {
             return error.TooManySubscriptions;
         }
 
-        self.subscriptions[self.subscription_count] = Subscription{
-            .event_type = event_type,
+        list.items[list.count] = Subscription{
             .callback = callback,
             .context = context,
             .active = true,
         };
-        self.subscription_count += 1;
+        list.count += 1;
     }
 
     /// Unsubscribe from events (mark as inactive)
@@ -131,18 +215,25 @@ pub const EventBus = struct {
         callback: EventCallback,
         context: ?*anyopaque,
     ) void {
-        for (self.subscriptions[0..self.subscription_count]) |*sub| {
-            if (sub.event_type == event_type and sub.callback == callback and sub.context == context) {
+        const type_index = @intFromEnum(event_type);
+        const list = &self.subscriptions_by_type[type_index];
+        
+        for (list.items[0..list.count]) |*sub| {
+            if (sub.callback == callback and sub.context == context) {
                 sub.active = false;
                 break;
             }
         }
     }
 
-    /// Emit event to all subscribers
+    /// Emit event to all subscribers (O(1) lookup to relevant subscriptions)
     pub fn emit(self: *EventBus, event: Event) !void {
-        for (self.subscriptions[0..self.subscription_count]) |*sub| {
-            if (sub.active and sub.event_type == event.type) {
+        const type_index = @intFromEnum(event.type);
+        const list = &self.subscriptions_by_type[type_index];
+        
+        // Only iterate relevant subscriptions for this event type
+        for (list.items[0..list.count]) |sub| {
+            if (sub.active) {
                 try sub.callback(event, sub.context);
             }
         }
@@ -150,22 +241,35 @@ pub const EventBus = struct {
 
     /// Clean up inactive subscriptions (periodic maintenance)
     pub fn cleanup(self: *EventBus) void {
-        var write_index: usize = 0;
-        for (self.subscriptions[0..self.subscription_count]) |sub| {
-            if (sub.active) {
-                self.subscriptions[write_index] = sub;
-                write_index += 1;
+        for (&self.subscriptions_by_type) |*list| {
+            var write_index: usize = 0;
+            for (list.items[0..list.count]) |sub| {
+                if (sub.active) {
+                    list.items[write_index] = sub;
+                    write_index += 1;
+                }
             }
+            list.count = write_index;
         }
-        self.subscription_count = write_index;
     }
 
-    /// Get count of active subscriptions
+    /// Get total count of all subscriptions (including inactive)
     pub fn getSubscriptionCount(self: *const EventBus) usize {
-        var count: usize = 0;
-        for (self.subscriptions[0..self.subscription_count]) |sub| {
-            if (sub.active) count += 1;
+        var total_count: usize = 0;
+        for (&self.subscriptions_by_type) |*list| {
+            total_count += list.count;
         }
-        return count;
+        return total_count;
+    }
+    
+    /// Get count of active subscriptions only
+    pub fn getActiveSubscriptionCount(self: *const EventBus) usize {
+        var total_count: usize = 0;
+        for (&self.subscriptions_by_type) |*list| {
+            for (list.items[0..list.count]) |sub| {
+                if (sub.active) total_count += 1;
+            }
+        }
+        return total_count;
     }
 };

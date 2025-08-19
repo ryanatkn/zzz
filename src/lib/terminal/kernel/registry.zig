@@ -160,10 +160,27 @@ pub const CapabilityRegistry = struct {
         }
         return null;
     }
+    
+    /// Get capability with type safety (compile-time type checking where possible)
+    pub fn getCapabilityTyped(self: *const CapabilityRegistry, comptime T: type) ?*T {
+        const cap = self.getCapability(T.name) orelse return null;
+        
+        // In debug builds, verify type matches
+        if (std.debug.runtime_safety) {
+            std.debug.assert(std.mem.eql(u8, cap.getType(), T.capability_type));
+        }
+        
+        return @ptrCast(@alignCast(cap.ptr));
+    }
 
     /// Check if capability exists
     pub fn hasCapability(self: *const CapabilityRegistry, name: []const u8) bool {
         return self.getCapability(name) != null;
+    }
+    
+    /// Check if capability exists with type
+    pub fn hasCapabilityTyped(self: *const CapabilityRegistry, comptime T: type) bool {
+        return self.getCapabilityTyped(T) != null;
     }
 
     /// Resolve dependencies and initialize all capabilities

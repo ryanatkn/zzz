@@ -3,9 +3,9 @@ const kernel = @import("../../kernel/mod.zig");
 
 /// Line buffer capability - manages current input line editing
 pub const LineBuffer = struct {
-    name: []const u8 = "line_buffer",
-    capability_type: []const u8 = "state",
-    dependencies: []const []const u8 = &[_][]const u8{ "keyboard_input", "basic_writer" },
+    pub const name = "line_buffer";
+    pub const capability_type = "state";
+    pub const dependencies = &[_][]const u8{ "keyboard_input", "basic_writer" };
     
     active: bool = false,
     initialized: bool = false,
@@ -26,30 +26,51 @@ pub const LineBuffer = struct {
 
     pub fn init(allocator: std.mem.Allocator) Self {
         return Self{
+            .active = false,
+            .initialized = false,
+            .event_bus = null,
             .allocator = allocator,
             .current_line = std.ArrayList(u8).init(allocator),
+            .cursor_x = 0,
             .command_history = std.ArrayList([]u8).init(allocator),
+            .history_index = null,
         };
+    }
+
+    /// Create a new line buffer capability
+    pub fn create(allocator: std.mem.Allocator) !*Self {
+        const self = try allocator.create(Self);
+        self.* = Self.init(allocator);
+        return self;
+    }
+    
+    /// Destroy line buffer capability
+    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+        self.deinit();
+        allocator.destroy(self);
     }
 
     /// Get capability name
     pub fn getName(self: *Self) []const u8 {
-        return self.name;
+        _ = self;
+        return name;
     }
 
     /// Get capability type
     pub fn getType(self: *Self) []const u8 {
-        return self.capability_type;
+        _ = self;
+        return capability_type;
     }
 
     /// Get required dependencies
     pub fn getDependencies(self: *Self) []const []const u8 {
-        return self.dependencies;
+        _ = self;
+        return dependencies;
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
-        _ = dependencies; // Dependencies verified by registry
+    pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+        _ = deps; // Dependencies verified by registry
         
         self.event_bus = event_bus;
         
@@ -88,7 +109,7 @@ pub const LineBuffer = struct {
     fn insertChar(self: *Self, ch: u8) !void {
         try self.current_line.insert(self.cursor_x, ch);
         self.cursor_x += 1;
-        try self.emitStateChange("char_inserted");
+        try self.emitStateChange(.char_inserted);
     }
 
     /// Handle backspace - delete character before cursor
@@ -96,7 +117,7 @@ pub const LineBuffer = struct {
         if (self.cursor_x > 0 and self.current_line.items.len > 0) {
             _ = self.current_line.orderedRemove(self.cursor_x - 1);
             self.cursor_x -= 1;
-            try self.emitStateChange("char_deleted");
+            try self.emitStateChange(.char_deleted);
         }
     }
 
@@ -104,37 +125,43 @@ pub const LineBuffer = struct {
     fn handleDelete(self: *Self) !void {
         if (self.cursor_x < self.current_line.items.len) {
             _ = self.current_line.orderedRemove(self.cursor_x);
-            try self.emitStateChange("char_deleted");
+            try self.emitStateChange(.char_deleted);
         }
     }
 
     /// Handle arrow key navigation
-    fn handleArrowKey(self: *Self, direction: []const u8) !void {
-        if (std.mem.eql(u8, direction, "LEFT_ARROW")) {
-            if (self.cursor_x > 0) {
-                self.cursor_x -= 1;
-                try self.emitStateChange("cursor_moved");
-            }
-        } else if (std.mem.eql(u8, direction, "RIGHT_ARROW")) {
-            if (self.cursor_x < self.current_line.items.len) {
-                self.cursor_x += 1;
-                try self.emitStateChange("cursor_moved");
-            }
-        } else if (std.mem.eql(u8, direction, "UP_ARROW")) {
-            self.navigateHistory(-1);
-        } else if (std.mem.eql(u8, direction, "DOWN_ARROW")) {
-            self.navigateHistory(1);
+    fn handleArrowKey(self: *Self, direction: kernel.events.SpecialKey) !void {
+        switch (direction) {
+            .left_arrow => {
+                if (self.cursor_x > 0) {
+                    self.cursor_x -= 1;
+                    try self.emitStateChange(.cursor_moved);
+                }
+            },
+            .right_arrow => {
+                if (self.cursor_x < self.current_line.items.len) {
+                    self.cursor_x += 1;
+                    try self.emitStateChange(.cursor_moved);
+                }
+            },
+            .up_arrow => self.navigateHistory(-1),
+            .down_arrow => self.navigateHistory(1),
+            else => {},
         }
     }
 
     /// Handle home/end keys
-    fn handlePositioning(self: *Self, key: []const u8) !void {
-        if (std.mem.eql(u8, key, "HOME")) {
-            self.cursor_x = 0;
-            try self.emitStateChange("cursor_moved");
-        } else if (std.mem.eql(u8, key, "END")) {
-            self.cursor_x = self.current_line.items.len;
-            try self.emitStateChange("cursor_moved");
+    fn handlePositioning(self: *Self, key: kernel.events.SpecialKey) !void {
+        switch (key) {
+            .home => {
+                self.cursor_x = 0;
+                try self.emitStateChange(.cursor_moved);
+            },
+            .end => {
+                self.cursor_x = self.current_line.items.len;
+                try self.emitStateChange(.cursor_moved);
+            },
+            else => {},
         }
     }
 
@@ -167,7 +194,7 @@ pub const LineBuffer = struct {
             self.current_line.clearRetainingCapacity();
             self.current_line.appendSlice(cmd) catch return;
             self.cursor_x = cmd.len;
-            self.emitStateChange("history_loaded") catch {};
+            self.emitStateChange(.history_loaded) catch {};
         }
     }
 
@@ -195,24 +222,23 @@ pub const LineBuffer = struct {
         // Clear current line
         self.current_line.clearRetainingCapacity();
         self.cursor_x = 0;
-        try self.emitStateChange("line_executed");
+        try self.emitStateChange(.line_executed);
     }
 
     /// Clear current line
     fn clearLine(self: *Self) !void {
         self.current_line.clearRetainingCapacity();
         self.cursor_x = 0;
-        try self.emitStateChange("line_cleared");
+        try self.emitStateChange(.line_cleared);
     }
 
     /// Emit state change event
-    fn emitStateChange(self: *Self, change_type: []const u8) !void {
+    fn emitStateChange(self: *Self, state: kernel.events.LineBufferState) !void {
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, kernel.EventData{
                 .state_change = kernel.events.StateChangeData{
-                    .component = "line_buffer",
-                    .old_state = null,
-                    .new_state = change_type,
+                    .component = .line_buffer,
+                    .state = .{ .line_buffer = state },
                 },
             });
             try bus.emit(event);
@@ -236,26 +262,34 @@ fn inputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
     
     switch (event.data) {
         .input => |input_data| {
-            if (input_data.data.len == 1) {
-                // Single character input
-                try self.insertChar(input_data.data[0]);
-            } else {
-                // Special key handling
-                const key_name = input_data.data;
-                if (std.mem.eql(u8, key_name, "BACKSPACE")) {
-                    try self.handleBackspace();
-                } else if (std.mem.eql(u8, key_name, "DELETE")) {
-                    try self.handleDelete();
-                } else if (std.mem.endsWith(u8, key_name, "_ARROW")) {
-                    try self.handleArrowKey(key_name);
-                } else if (std.mem.eql(u8, key_name, "HOME") or std.mem.eql(u8, key_name, "END")) {
-                    try self.handlePositioning(key_name);
-                } else if (std.mem.eql(u8, key_name, "ENTER")) {
-                    try self.executeCurrentLine();
-                } else if (std.mem.eql(u8, key_name, "CTRL_C")) {
-                    try self.clearLine();
-                }
-                // TAB, CTRL_L, etc. are handled by other capabilities
+            switch (input_data.key) {
+                .char => |ch| {
+                    // Single character input
+                    try self.insertChar(ch);
+                },
+                .special => |special_key| {
+                    // Handle special keys with enum matching
+                    switch (special_key) {
+                        .backspace => try self.handleBackspace(),
+                        .delete => try self.handleDelete(),
+                        .enter => try self.executeCurrentLine(),
+                        .ctrl_c => try self.clearLine(),
+                        .left_arrow, .right_arrow, .up_arrow, .down_arrow => {
+                            try self.handleArrowKey(special_key);
+                        },
+                        .home, .end => {
+                            try self.handlePositioning(special_key);
+                        },
+                        // TAB, CTRL_L, etc. are handled by other capabilities
+                        else => {},
+                    }
+                },
+                .text => |text| {
+                    // Handle pasted text - insert each character
+                    for (text) |ch| {
+                        try self.insertChar(ch);
+                    }
+                },
             }
         },
         else => {}, // Ignore other event types

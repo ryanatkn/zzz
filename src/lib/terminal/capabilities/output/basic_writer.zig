@@ -5,9 +5,9 @@ const colors = @import("../../../core/colors.zig");
 
 /// Basic writer capability - handles text output to terminal scrollback
 pub const BasicWriter = struct {
-    name: []const u8 = "basic_writer",
-    capability_type: []const u8 = "output",
-    dependencies: []const []const u8 = &[_][]const u8{},
+    pub const name = "basic_writer";
+    pub const capability_type = "output";
+    pub const dependencies = &[_][]const u8{};
     
     active: bool = false,
     initialized: bool = false,
@@ -28,30 +28,51 @@ pub const BasicWriter = struct {
 
     pub fn init(allocator: std.mem.Allocator) Self {
         return Self{
+            .active = false,
+            .initialized = false,
+            .event_bus = null,
             .allocator = allocator,
-            .arena = std.heap.ArenaAllocator.init(allocator),
             .scrollback = core.RingBuffer(core.Line, 1000).init(),
+            .current_color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+            .current_bold = false,
+            .arena = std.heap.ArenaAllocator.init(allocator),
         };
+    }
+    
+    /// Create a new basic writer capability
+    pub fn create(allocator: std.mem.Allocator) !*Self {
+        const self = try allocator.create(Self);
+        self.* = Self.init(allocator);
+        return self;
+    }
+    
+    /// Destroy basic writer capability
+    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+        self.deinit();
+        allocator.destroy(self);
     }
 
     /// Get capability name
     pub fn getName(self: *Self) []const u8 {
-        return self.name;
+        _ = self;
+        return name;
     }
 
     /// Get capability type
     pub fn getType(self: *Self) []const u8 {
-        return self.capability_type;
+        _ = self;
+        return capability_type;
     }
 
     /// Get required dependencies
     pub fn getDependencies(self: *Self) []const []const u8 {
-        return self.dependencies;
+        _ = self;
+        return dependencies;
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
-        _ = dependencies; // No dependencies for basic writer
+    pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+        _ = deps; // No dependencies for basic writer
         
         self.event_bus = event_bus;
         
@@ -94,9 +115,8 @@ pub const BasicWriter = struct {
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, kernel.EventData{
                 .state_change = kernel.events.StateChangeData{
-                    .component = "basic_writer",
-                    .old_state = null,
-                    .new_state = "text_written",
+                    .component = .basic_writer,
+                    .state = .{ .basic_writer = .text_written },
                 },
             });
             try bus.emit(event);
@@ -156,9 +176,8 @@ pub const BasicWriter = struct {
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, kernel.EventData{
                 .state_change = kernel.events.StateChangeData{
-                    .component = "basic_writer",
-                    .old_state = null,
-                    .new_state = "cleared",
+                    .component = .basic_writer,
+                    .state = .{ .basic_writer = .cleared },
                 },
             });
             try bus.emit(event);

@@ -3,9 +3,9 @@ const kernel = @import("../../kernel/mod.zig");
 
 /// Keyboard input capability - handles raw keyboard events and emits structured input events
 pub const KeyboardInput = struct {
-    name: []const u8 = "keyboard_input",
-    capability_type: []const u8 = "input",
-    dependencies: []const []const u8 = &[_][]const u8{},
+    pub const name = "keyboard_input";
+    pub const capability_type = "input";
+    pub const dependencies = &[_][]const u8{};
     
     active: bool = false,
     initialized: bool = false,
@@ -15,24 +15,40 @@ pub const KeyboardInput = struct {
 
     const Self = @This();
 
+    /// Create a new keyboard input capability
+    pub fn create(allocator: std.mem.Allocator) !*Self {
+        const self = try allocator.create(Self);
+        self.* = Self{};
+        return self;
+    }
+    
+    /// Destroy keyboard input capability
+    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+        self.deinit();
+        allocator.destroy(self);
+    }
+
     /// Get capability name
     pub fn getName(self: *Self) []const u8 {
-        return self.name;
+        _ = self;
+        return name;
     }
 
     /// Get capability type
     pub fn getType(self: *Self) []const u8 {
-        return self.capability_type;
+        _ = self;
+        return capability_type;
     }
 
     /// Get required dependencies
     pub fn getDependencies(self: *Self) []const []const u8 {
-        return self.dependencies;
+        _ = self;
+        return dependencies;
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
-        _ = dependencies; // No dependencies for keyboard input
+    pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+        _ = deps; // No dependencies for keyboard input
         
         self.event_bus = event_bus;
         self.initialized = true;
@@ -55,153 +71,35 @@ pub const KeyboardInput = struct {
     pub fn handleKey(self: *Self, key: kernel.Key) !void {
         if (!self.active or self.event_bus == null) return;
 
-        switch (key) {
-            .char => |ch| {
-                // Emit character input event
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = &[_]u8{ch},
-                    },
-                });
-                try self.event_bus.?.emit(event);
+        // Convert kernel.Key to our KeyInput enum
+        const key_input: kernel.events.KeyInput = switch (key) {
+            .char => |ch| .{ .char = ch },
+            .backspace => .{ .special = .backspace },
+            .delete => .{ .special = .delete },
+            .enter => .{ .special = .enter },
+            .tab => .{ .special = .tab },
+            .escape => .{ .special = .escape },
+            .up_arrow => .{ .special = .up_arrow },
+            .down_arrow => .{ .special = .down_arrow },
+            .left_arrow => .{ .special = .left_arrow },
+            .right_arrow => .{ .special = .right_arrow },
+            .home => .{ .special = .home },
+            .end => .{ .special = .end },
+            .page_up => .{ .special = .page_up },
+            .page_down => .{ .special = .page_down },
+            .ctrl_c => .{ .special = .ctrl_c },
+            .ctrl_l => .{ .special = .ctrl_l },
+            .ctrl_d => .{ .special = .ctrl_d },
+            .ctrl_z => .{ .special = .ctrl_z },
+        };
+        
+        // Emit structured input event with enum-based key
+        const event = kernel.Event.init(.input, kernel.EventData{
+            .input = kernel.events.InputEventData{
+                .input_type = .keyboard,
+                .key = key_input,
             },
-            .backspace => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "BACKSPACE",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .delete => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "DELETE",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .enter => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "ENTER",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .tab => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "TAB",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .up_arrow => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "UP_ARROW",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .down_arrow => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "DOWN_ARROW",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .left_arrow => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "LEFT_ARROW",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .right_arrow => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "RIGHT_ARROW",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .home => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "HOME",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .end => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "END",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .page_up => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "PAGE_UP",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .page_down => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "PAGE_DOWN",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .ctrl_c => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "CTRL_C",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            .ctrl_l => {
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "CTRL_L",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-            else => {
-                // Unknown key - emit generic input event
-                const event = kernel.Event.init(.input, kernel.EventData{
-                    .input = kernel.events.InputEventData{
-                        .input_type = .keyboard,
-                        .data = "UNKNOWN",
-                    },
-                });
-                try self.event_bus.?.emit(event);
-            },
-        }
+        });
+        try self.event_bus.?.emit(event);
     }
 };

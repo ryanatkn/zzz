@@ -49,7 +49,7 @@ const MockTerminal = struct {
         const event = kernel.Event.init(.input, kernel.EventData{
             .input = kernel.events.InputEventData{
                 .input_type = .keyboard,
-                .data = "test",
+                .key = .{ .text = "test" },
             },
         });
         try self.event_bus.emit(event);
@@ -148,7 +148,7 @@ test "EventBus - subscribe and emit" {
     const event = kernel.Event.init(.input, kernel.EventData{
         .input = kernel.events.InputEventData{
             .input_type = .keyboard,
-            .data = "test_key",
+            .key = .{ .text = "test_key" },
         },
     });
     try event_bus.emit(event);
@@ -196,7 +196,7 @@ test "EventBus - cleanup inactive subscriptions" {
     event_bus.unsubscribe(.input, testEventCallback, null);
 
     // Count should still be 2 (inactive subscription still present)
-    try testing.expectEqual(@as(usize, 2), event_bus.subscription_count);
+    try testing.expectEqual(@as(usize, 2), event_bus.getSubscriptionCount());
 
     // Cleanup should reduce count to 1
     event_bus.cleanup();

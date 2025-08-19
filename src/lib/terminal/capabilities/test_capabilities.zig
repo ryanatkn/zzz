@@ -19,7 +19,17 @@ fn testEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
     
     switch (event.data) {
         .input => |input_data| {
-            test_event_data = input_data.data;
+            switch (input_data.key) {
+                .char => |ch| {
+                    test_event_data = &[_]u8{ch};
+                },
+                .special => |special| {
+                    test_event_data = @tagName(special);
+                },
+                .text => |text| {
+                    test_event_data = text;
+                },
+            }
         },
         .command_execute => |cmd_data| {
             test_event_data = cmd_data.command;
@@ -51,7 +61,7 @@ test "KeyboardInput - emit character events" {
     // Verify event was emitted
     try testing.expect(test_event_received);
     try testing.expectEqual(kernel.EventType.input, test_event_type);
-    try testing.expectEqualStrings("a", test_event_data);
+    try testing.expectEqual(@as(u8, 'a'), test_event_data[0]);
 }
 
 test "KeyboardInput - emit enter input event" {
@@ -75,7 +85,7 @@ test "KeyboardInput - emit enter input event" {
     // Verify input event was emitted
     try testing.expect(test_event_received);
     try testing.expectEqual(kernel.EventType.input, test_event_type);
-    try testing.expectEqualStrings("ENTER", test_event_data);
+    try testing.expectEqualStrings("enter", test_event_data);
 }
 
 test "BasicWriter - write text to scrollback" {
@@ -130,7 +140,7 @@ test "LineBuffer - character insertion and deletion" {
     const char_event = kernel.Event.init(.input, kernel.EventData{
         .input = kernel.events.InputEventData{
             .input_type = .keyboard,
-            .data = "a",
+            .key = .{ .char = 'a' },
         },
     });
     try event_bus.emit(char_event);
@@ -143,7 +153,7 @@ test "LineBuffer - character insertion and deletion" {
     const backspace_event = kernel.Event.init(.input, kernel.EventData{
         .input = kernel.events.InputEventData{
             .input_type = .keyboard,
-            .data = "BACKSPACE",
+            .key = .{ .special = .backspace },
         },
     });
     try event_bus.emit(backspace_event);
@@ -172,7 +182,7 @@ test "LineBuffer - command execution" {
     const char_event1 = kernel.Event.init(.input, kernel.EventData{
         .input = kernel.events.InputEventData{
             .input_type = .keyboard,
-            .data = "l",
+            .key = .{ .char = 'l' },
         },
     });
     try event_bus.emit(char_event1);
@@ -180,7 +190,7 @@ test "LineBuffer - command execution" {
     const char_event2 = kernel.Event.init(.input, kernel.EventData{
         .input = kernel.events.InputEventData{
             .input_type = .keyboard,
-            .data = "s",
+            .key = .{ .char = 's' },
         },
     });
     try event_bus.emit(char_event2);
@@ -189,7 +199,7 @@ test "LineBuffer - command execution" {
     const enter_event = kernel.Event.init(.input, kernel.EventData{
         .input = kernel.events.InputEventData{
             .input_type = .keyboard,
-            .data = "ENTER",
+            .key = .{ .special = .enter },
         },
     });
     try event_bus.emit(enter_event);
