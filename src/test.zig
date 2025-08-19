@@ -194,14 +194,9 @@ test {
     std.testing.refAllDeclsRecursive(@import("lib/ui/geometric_text.zig"));
 }
 
-// Terminal kernel tests (micro-kernel architecture)
+// Terminal tests (all phases: kernel, capabilities, state management, presets)
 test {
-    std.testing.refAllDeclsRecursive(@import("lib/terminal/kernel/test_kernel.zig"));
-}
-
-// Terminal capabilities tests (Phase 2 implementation)
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/terminal/capabilities/test_capabilities.zig"));
+    std.testing.refAllDeclsRecursive(@import("lib/terminal/test.zig"));
 }
 
 // EXCLUDED: Imports text/renderer.zig which depends on SDL

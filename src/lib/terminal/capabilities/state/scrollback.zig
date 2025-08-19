@@ -89,6 +89,11 @@ pub const Scrollback = struct {
         return dependencies;
     }
     
+    /// Check if capability is active
+    pub fn isActive(self: *Self) bool {
+        return self.active;
+    }
+    
     /// Initialize capability with event bus
     pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // No dependencies

@@ -24,7 +24,7 @@ pub const Persistence = struct {
     max_history_lines: usize = 1000,
     
     // Cached references to capabilities
-    history_capability: ?*kernel.ICapability = null,
+    history_capability: ?*const kernel.ICapability = null,
     
     const Self = @This();
     
@@ -78,12 +78,17 @@ pub const Persistence = struct {
         return dependencies;
     }
     
+    /// Check if capability is active
+    pub fn isActive(self: *Self) bool {
+        return self.active;
+    }
+    
     /// Initialize capability with dependencies
     pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
         self.event_bus = event_bus;
         
         // Find history capability in dependencies
-        for (deps) |dep| {
+        for (deps) |*dep| {
             if (std.mem.eql(u8, dep.getName(), "history")) {
                 self.history_capability = dep;
                 break;
