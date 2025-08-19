@@ -20,6 +20,7 @@ pub const Executor = struct {
     pub const capability_type = "commands";
 
     allocator: std.mem.Allocator,
+    arena: *std.heap.ArenaAllocator,
     current_process: ?std.process.Child = null,
     working_directory: std.ArrayList(u8),
     environment: std.process.EnvMap,
@@ -33,9 +34,15 @@ pub const Executor = struct {
 
     /// Factory method for creating executor capability
     pub fn create(allocator: std.mem.Allocator) !*Self {
-        var env = std.process.EnvMap.init(allocator);
+        // Create arena allocator for this capability - allocate it separately so it doesn't move
+        const arena = try allocator.create(std.heap.ArenaAllocator);
+        arena.* = std.heap.ArenaAllocator.init(allocator);
+        const arena_allocator = arena.allocator();
+        
+        // Initialize environment with arena allocator
+        var env = std.process.EnvMap.init(arena_allocator);
 
-        // Copy current environment - EnvMap.put() will handle string copying
+        // Copy current environment - all strings will be allocated in arena
         var env_map = try std.process.getEnvMap(allocator);
         defer env_map.deinit();
         var env_iter = env_map.iterator();
@@ -43,18 +50,18 @@ pub const Executor = struct {
             try env.put(entry.key_ptr.*, entry.value_ptr.*);
         }
 
-        // Get initial working directory
-        var working_dir = std.ArrayList(u8).init(allocator);
-        const cwd = std.fs.cwd().realpathAlloc(allocator, ".") catch |err| switch (err) {
-            error.AccessDenied => try allocator.dupe(u8, "/"),
-            else => try allocator.dupe(u8, "."),
+        // Get initial working directory using arena allocator
+        var working_dir = std.ArrayList(u8).init(arena_allocator);
+        const cwd = std.fs.cwd().realpathAlloc(arena_allocator, ".") catch |err| switch (err) {
+            error.AccessDenied => try arena_allocator.dupe(u8, "/"),
+            else => try arena_allocator.dupe(u8, "."),
         };
         try working_dir.appendSlice(cwd);
-        allocator.free(cwd);
 
         const executor = try allocator.create(Self);
         executor.* = Self{
             .allocator = allocator,
+            .arena = arena,
             .current_process = null,
             .working_directory = working_dir,
             .environment = env,
@@ -64,7 +71,9 @@ pub const Executor = struct {
 
     /// Factory method for destroying executor capability
     pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
-        // Resources are cleaned up by deinit(), just free the memory
+        // Clean up resources first
+        self.deinit();
+        // Then free the memory
         allocator.destroy(self);
     }
 
@@ -95,9 +104,9 @@ pub const Executor = struct {
             _ = process.kill() catch {};
         }
         
-        // EnvMap.deinit() will handle freeing the copied strings
-        self.environment.deinit();
-        self.working_directory.deinit();
+        // Arena deinit frees all environment variables and working directory memory
+        self.arena.deinit();
+        self.allocator.destroy(self.arena);
         self.event_bus = null;
     }
 
@@ -185,12 +194,13 @@ pub const Executor = struct {
 
     /// Change working directory
     pub fn changeDirectory(self: *Self, path: []const u8) !void {
-        // Resolve path
+        const arena_allocator = self.arena.allocator();
+        
+        // Resolve path using arena allocator
         const resolved_path = if (std.fs.path.isAbsolute(path))
-            try self.allocator.dupe(u8, path)
+            try arena_allocator.dupe(u8, path)
         else
-            try std.fs.path.resolve(self.allocator, &[_][]const u8{ self.working_directory.items, path });
-        defer self.allocator.free(resolved_path);
+            try std.fs.path.resolve(arena_allocator, &[_][]const u8{ self.working_directory.items, path });
 
         // Validate directory exists
         var dir = std.fs.cwd().openDir(resolved_path, .{}) catch |err| switch (err) {
@@ -301,6 +311,11 @@ test "Executor environment variables" {
     var executor = try Executor.create(allocator);
     defer executor.destroy(allocator);
 
+    // First check if we can access existing environment variables
+    const path_var = executor.getEnvironmentVariable("PATH");
+    try std.testing.expect(path_var != null);
+    
+    // Try setting a new environment variable
     try executor.setEnvironmentVariable("TEST_VAR", "test_value");
     
     const value = executor.getEnvironmentVariable("TEST_VAR");
