@@ -76,8 +76,13 @@ pub const BitmapTransform = struct {
         return .{ .allocator = allocator };
     }
 
-    /// Create transformed bitmap that matches shader coordinate space
-    /// Returns new bitmap data that represents how the font would appear after shader transformation
+    /// Create transformed bitmap that shows post-shader coordinate space (NDC with Y-flip)
+    /// 
+    /// IMPORTANT: This does NOT show what's sent to the GPU. The GPU receives normal readable 
+    /// bitmap textures. The Y-flip transformation happens IN THE VERTEX SHADER during NDC conversion.
+    /// 
+    /// This visualization shows what the coordinate space looks like AFTER shader transformation,
+    /// which is useful for debugging coordinate-related rendering issues.
     pub fn createTransformedBitmap(
         self: *BitmapTransform,
         original_bitmap: []const u8,
@@ -88,30 +93,28 @@ pub const BitmapTransform = struct {
         output_width: u32,
         output_height: u32,
     ) ![]u8 {
+        _ = target_screen_width;
+        _ = target_screen_height;
+        
         const transformed_bitmap = try self.allocator.alloc(u8, output_width * output_height);
         @memset(transformed_bitmap, 0);
 
-        // For each pixel in the output bitmap, find corresponding source pixel
+        // Apply Y-flip transformation to visualize post-shader NDC coordinate space
+        // The Y-flip happens in the vertex shader, not in the input texture data
         for (0..output_height) |y| {
             for (0..output_width) |x| {
-                // Convert output coordinates to NDC space
-                const output_screen_x = (@as(f32, @floatFromInt(x)) / @as(f32, @floatFromInt(output_width))) * target_screen_width;
-                const output_screen_y = (@as(f32, @floatFromInt(y)) / @as(f32, @floatFromInt(output_height))) * target_screen_height;
+                // Map output coordinates to source bitmap coordinates
+                const src_x = (x * original_width) / output_width;
+                const src_y_flipped = ((output_height - 1 - y) * original_height) / output_height; // Y-flip
 
-                const ndc = screenToNDC(output_screen_x, output_screen_y, target_screen_width, target_screen_height);
+                // Bounds check
+                if (src_x < original_width and src_y_flipped < original_height) {
+                    const src_idx = src_y_flipped * original_width + src_x;
+                    const dst_idx = y * output_width + x;
 
-                // Convert back to source bitmap coordinates
-                const back_to_screen = ndcToScreen(ndc.x, ndc.y, @as(f32, @floatFromInt(original_width)), @as(f32, @floatFromInt(original_height)));
-
-                const src_x = @as(u32, @intFromFloat(@max(0, @min(@as(f32, @floatFromInt(original_width - 1)), back_to_screen.x))));
-                const src_y = @as(u32, @intFromFloat(@max(0, @min(@as(f32, @floatFromInt(original_height - 1)), back_to_screen.y))));
-
-                // Copy pixel value
-                const src_idx = src_y * original_width + src_x;
-                const dst_idx = y * output_width + x;
-
-                if (src_idx < original_bitmap.len) {
-                    transformed_bitmap[dst_idx] = original_bitmap[src_idx];
+                    if (src_idx < original_bitmap.len and dst_idx < transformed_bitmap.len) {
+                        transformed_bitmap[dst_idx] = original_bitmap[src_idx];
+                    }
                 }
             }
         }

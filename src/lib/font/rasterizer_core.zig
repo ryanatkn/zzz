@@ -340,7 +340,7 @@ pub const RasterizerCore = struct {
             .bitmap_width = width,    // The actual allocated dimensions
             .bitmap_height = height,
             .bearing_x = bounds.x_min - 1.0, // X offset from cursor to glyph left edge (already in pixels)
-            .bearing_y = baseline_from_bottom + bounds.y_max, // Distance from baseline to top of bitmap
+            .bearing_y = height_f - baseline_from_bottom, // Distance from baseline to top of bitmap
             .advance = outline.metrics.advance_width,
         };
     }

@@ -9,234 +9,193 @@ The font system is a pure Zig TTF renderer with SDL3 GPU integration. This guide
 ### Font Processing Pipeline
 1. **TTF Parsing** → 2. **Glyph Extraction** → 3. **Rasterization** → 4. **Texture Creation** → 5. **GPU Rendering**
 
+### Core Components
+- **RasterizedGlyph Structure**: Contains both logical dimensions (f32) and bitmap dimensions (u32)
+- **Coordinate Transform**: Provides NDC transformations for shader compatibility
+- **Test Visualization**: Generates debug output in multiple coordinate spaces
+
 ### Coordinate Systems
 - **TTF Space**: Y=0 at baseline, positive up (font units)
 - **Bitmap Space**: Y=0 at top, positive down (pixels)
-- **GPU/NDC Space**: X,Y in [-1,1], requires Y-flip
+- **Screen Space**: Direct pixel positioning (Y=0 at top)
+- **NDC Space**: Normalized Device Coordinates [-1,1], Y-flipped for GPU
 
-## Debugging Infrastructure
+## Test Output Organization
 
-### Test Output Organization
 ```
 .zz/test-font/
 ├── baseline/    # Baseline alignment tests
 │   ├── nopgy_orig.ppm      # Original bitmap coordinates
-│   ├── nopgy_screen.ppm    # Screen space rendering
-│   ├── nopgy_ndc.ppm       # NDC/shader space
+│   ├── nopgy_screen.ppm    # Screen space rendering (readable)
+│   ├── nopgy_ndc.ppm       # NDC/shader space (Y-flipped)
 │   └── nopgy_comparison.txt # Coordinate analysis
 ├── chars/       # Individual character analysis
 │   ├── char{N}_orig.ppm    # Character bitmaps
-│   └── char{N}_screen.ppm  # Screen space versions
-├── coord/       # Coordinate transformation
-│   ├── accuracy.txt        # Round-trip accuracy
-│   └── pattern_analysis.txt # Test pattern analysis
-├── debug/       # Debug outputs (mostly stdout)
+│   ├── char{N}_screen.ppm  # Screen space versions
+│   └── char{N}_analysis.txt # Pixel analysis
+├── coord/       # Coordinate transformation validation
+│   ├── accuracy.txt        # Round-trip accuracy (<0.001 error)
+│   └── pattern_analysis.txt # Test pattern transformations
+├── debug/       # Debug outputs (console logs)
 └── full/        # Full alphabet composites
-    ├── alphabet_orig.ppm
-    ├── alphabet_screen.ppm
-    ├── alphabet_ndc.ppm
-    └── alphabet_comparison.txt
+    ├── alphabet_orig.ppm    # Original bitmaps
+    ├── alphabet_screen.ppm  # Normal readable text
+    ├── alphabet_ndc.ppm     # Y-flipped (GPU input view)
+    └── alphabet_comparison.txt # Coordinate space comparison
 ```
 
-### Test Commands
+## Critical Architecture Fix: Bitmap Dimensions
+
+### Problem Solved
+Previous garbled output was caused by mismatch between bitmap allocation dimensions and indexing dimensions.
+
+### RasterizedGlyph Structure
+```zig
+pub const RasterizedGlyph = struct {
+    bitmap: []u8,
+    width: f32,          // Logical dimensions for positioning
+    height: f32,
+    bitmap_width: u32,   // Actual bitmap dimensions for indexing
+    bitmap_height: u32,
+    bearing_x: f32,
+    bearing_y: f32,
+    advance: f32,
+};
+```
+
+### Key Benefits
+- **Eliminates indexing bugs**: Bitmap access uses correct dimensions
+- **Clear separation**: Logical vs physical dimensions
+- **Type safety**: u32 for array access, f32 for positioning
+- **Future-proof**: Ready for subpixel rendering
+
+## Test Commands
+
 ```bash
 # Run all font tests with detailed output
 zig build test -Dtest-filter="font"
 
 # Specific test categories
 zig build test -Dtest-filter="baseline"      # Baseline alignment
-zig build test -Dtest-filter="pixel"         # Pixel-level analysis
 zig build test -Dtest-filter="coordinate"    # Coordinate transforms
-zig build test -Dtest-filter="bearing"       # Bearing calculations
 zig build test -Dtest-filter="character"     # Character analysis
 
 # Visual verification
 zig build run  # Navigate to font test pages
 ```
 
+## Understanding Test Output
+
+### PPM File Types
+- **_orig.ppm**: Original bitmap coordinates (direct rasterization)
+- **_screen.ppm**: Screen space coordinates (readable, normal orientation)
+- **_ndc.ppm**: Post-shader coordinate space (Y-flipped visualization)
+
+### Expected Differences
+- **Screen PPM**: Normal readable text (matches GPU texture input)
+- **NDC PPM**: Upside-down text (visualizes post-shader coordinate space)
+- **Coordinate Accuracy**: <0.001 pixel error in round-trip transformations
+
+### What Each Output Represents
+- **GPU Input**: Normal readable bitmap textures (shown in _screen.ppm)
+- **Shader Processing**: Y-flip happens in vertex shader during NDC conversion
+- **NDC Visualization**: Shows coordinate space after shader transformation (_ndc.ppm)
+- **Purpose**: Debug coordinate transformation issues in shaders
+
+### Text Analysis Files
+- **accuracy.txt**: Coordinate transformation precision verification
+- **comparison.txt**: Side-by-side coordinate space analysis
+- **pattern_analysis.txt**: Bitmap transformation validation
+
 ## Common Issues and Solutions
 
-### Issue: Descender Character Cutoff
+### Issue: Garbled Font Output ✅ SOLVED
+**Symptoms**: Characters appear as random pixels, unreadable output
+**Root Cause**: Bitmap allocated with ceiling dimensions but indexed with float dimensions
+**Solution**: Added explicit bitmap_width/bitmap_height fields to RasterizedGlyph
 
-**Symptoms:**
-- Characters with descenders (g, j, p, q, y) cut off at bottom
-- Inconsistent baseline alignment between character types
+### Issue: NDC Output Identical to Screen
+**Symptoms**: alphabet_ndc.ppm looks the same as alphabet_screen.ppm
+**Root Cause**: Round-trip transformation cancels out Y-flip
+**Solution**: Direct Y-flip transformation shows actual GPU input
 
-**Root Cause:**
-- Bitmap coordinate system created inconsistent baseline positioning
-- Different characters had different `bearing_y` values
+### Issue: Character Alignment Problems
+**Symptoms**: Inconsistent baseline between characters
+**Solution**: Use consistent baseline positioning with bearing_y calculations
 
-**Solution Applied:**
-```zig
-// Normalized bitmap height (rasterizer_core.zig)
-const font_ascender = metrics.ascender * scale;
-const font_descender = -metrics.descender * scale;
-const total_font_height = font_ascender + font_descender;
-const height_f = @max(bounds.height() + 2.0, total_font_height + 2.0);
-
-// Consistent baseline positioning
-const baseline_from_bottom = font_descender + 1.0;
-const bitmap_y_from_bottom = height - 1.0 - y;
-const pixel_y = bitmap_y_from_bottom - baseline_from_bottom;
-
-// Updated bearing_y calculation
-bearing_y = baseline_from_bottom + bounds.y_max;
-```
-
-### Issue: Coordinate Transformation Illegibility
-
-**Symptoms:**
-- Test output bitmaps were microscopic and illegible
-- Characters stretched across entire screen width
-
-**Root Cause:**
-- Incorrect scaling treated small glyphs as full-screen elements
-- Disconnected from working font rasterization system
-
-**Solution Applied:**
-```zig
-// Font-aware scaling (coordinate_transform.zig)
-const font_display_scale: f32 = 4.0;  // 4x for visibility
-const base_screen_x: f32 = target_screen_width * 0.25;
-const base_screen_y: f32 = target_screen_height * 0.4;
-
-const screen_x = base_screen_x + (bitmap_x * font_display_scale);
-const screen_y = base_screen_y + (bitmap_y * font_display_scale);
-```
-
-### Issue: Text Cutoff at Top/Bottom
-
-**Symptoms:**
-- Tall characters (capitals, b, d, f, h) cut off at top
-- Descenders cut off at bottom of texture
-
-**Root Cause:**
-- Texture height calculation didn't account for full glyph height
-- GPU textures were too small to contain characters
-
-**Solution Applied:**
-```zig
-// Texture padding (layout.zig)
-const ascender_padding = line_height * 0.5;
-const descender_padding = line_height * 0.3;
-const total_height = cursor_y + line_height + ascender_padding + descender_padding;
-
-// Baseline positioning
-const glyph_y = cursor_y + rasterizer.metrics.getBaselineOffset() - bearing_y;
-```
+### Issue: Coordinate Precision Errors
+**Symptoms**: Characters drift or misalign after transformation
+**Verification**: Check accuracy.txt for errors >0.001
 
 ## Debugging Techniques
 
-### 1. Pixel-Level Analysis
-Use `test/pixel_analysis.zig` to examine bitmap structure:
-```
-- First/last ink rows
-- Empty space distribution
-- Baseline position verification
-- Bearing calculations
+### 1. Visual Inspection
+- Compare screen vs NDC PPM files
+- Screen should be readable, NDC should be Y-flipped
+- Look for pixel-perfect alignment in similar characters
+
+### 2. Coordinate Verification
+```bash
+# Check transformation accuracy
+grep "Error" .zz/test-font/coord/accuracy.txt | sort -nk8
+# All errors should be <0.001
 ```
 
-### 2. Character Type Comparison
+### 3. Character Type Testing
 Test different character categories:
-- **Regular**: a, e, n, o (x-height characters)
-- **Descenders**: g, j, p, q, y (extend below baseline)
-- **Capitals**: A, B, C, etc. (cap height)
+- **Regular**: a, e, n, o (baseline characters)
+- **Descenders**: g, j, p, q, y (below baseline)
+- **Capitals**: A, B, C (cap height)
 - **Tall**: b, d, f, h, k, l (ascender height)
 
-### 3. Coordinate Verification
+### 4. Bitmap Dimension Validation
 ```zig
-// Test round-trip accuracy
-const ndc = screenToNDC(screen_x, screen_y, width, height);
-const back = ndcToScreen(ndc.x, ndc.y, width, height);
-const error = @sqrt((back.x - screen_x)² + (back.y - screen_y)²);
-// Error should be < 0.001
+// In tests, verify dimensions match
+assert(glyph.bitmap.len == glyph.bitmap_width * glyph.bitmap_height);
 ```
 
-### 4. Visual Debugging
-- Generate PPM files for visual inspection
-- Use ASCII art representation in terminal
-- Compare original vs transformed coordinates
-- Check alignment across character types
+## Performance Monitoring
 
-## Key Metrics to Monitor
+### Key Metrics
+- **Cache hit rate**: >95% for UI text rendering
+- **Bitmap allocation**: No dimension mismatches
+- **Coordinate accuracy**: <0.001 pixel error
+- **Memory usage**: Scales with unique character set
 
-### Font Metrics
-```
-Scale factor: 0.021333 (for 16pt at 96 DPI)
-Ascender: 992 units (21.2 px)
-Descender: -310 units (-6.6 px)
-Line height: 27.78 px
-Baseline offset: 21.16 px
-```
-
-### Bitmap Metrics
-- **Consistent empty rows**: All chars should have ~11 empty rows at top
-- **Baseline position**: Should be at row ~22.4 for all characters
-- **First ink distance**: ~11.4 pixels from top for aligned characters
-
-### Performance Metrics
-- **Cache hit rate**: Should be >95% for UI text
-- **Rasterization time**: First render slow, cached fast
-- **Memory usage**: Scales with unique text strings
-
-## Critical Code Locations
-
-### Baseline Alignment
-- `rasterizer_core.zig:108-118` - Normalized bitmap height
-- `rasterizer_core.zig:142-155` - Baseline positioning
-- `rasterizer_core.zig:175` - bearing_y calculation
-
-### Texture Management
-- `layout.zig:79` - Cursor starting position
-- `layout.zig:129` - Glyph Y positioning
-- `layout.zig:157-161` - Texture height calculation
-
-### Coordinate Systems
-- `coordinate_transform.zig:42-53` - Font-aware scaling
-- `coordinate_transform.zig:13-23` - Core coordinate integration
+### Critical Code Locations
+- `rasterizer_core.zig:186-196` - RasterizedGlyph definition
+- `coordinate_transform.zig:97-118` - NDC Y-flip transformation
+- `test_visualization.zig:162-163` - Bitmap dimension usage
 
 ## Validation Checklist
 
 ### For New Changes
-- [ ] Run full font test suite
-- [ ] Check baseline alignment across character types
-- [ ] Verify no clipping at texture boundaries
-- [ ] Test coordinate transformations
-- [ ] Examine pixel-level bitmap structure
-- [ ] Generate visual output for inspection
+- [ ] Run `zig build test -Dtest-filter="font"`
+- [ ] Check alphabet_screen.ppm is readable
+- [ ] Verify alphabet_ndc.ppm is Y-flipped
+- [ ] Confirm coordinate accuracy <0.001
+- [ ] Test multiple character types
+- [ ] Validate bitmap dimension consistency
 
-### For Debugging Issues
-1. **Identify character type** causing the issue
-2. **Extract metrics** (bearing_y, bounds, bitmap size)
-3. **Trace positioning** through the pipeline
-4. **Compare** with working characters
-5. **Verify** coordinate transformations
-6. **Check** texture boundaries
+### For Debugging New Issues
+1. **Reproduce** the issue with specific characters
+2. **Check** PPM output files for visual clues
+3. **Examine** coordinate accuracy in accuracy.txt
+4. **Verify** bitmap dimensions match allocation
+5. **Compare** with working characters
+6. **Test** both screen and NDC coordinate spaces
 
-## Understanding Test Output
+## Architecture Notes
 
-### PPM Files
-- **_orig.ppm**: Original bitmap coordinates (GPU input)
-- **_screen.ppm**: Screen space coordinates
-- **_ndc.ppm**: NDC/shader space (what GPU sees)
+### Separation of Concerns
+- **Engine (lib/)**: Provides coordinate transformation interfaces
+- **Font System**: Implements TTF parsing and rasterization
+- **Test System**: Validates output across coordinate spaces
 
-### Text Analysis Files
-- **accuracy.txt**: Coordinate round-trip verification
-- **comparison.txt**: Side-by-side coordinate analysis
-- **pattern_analysis.txt**: Test pattern transformations
+### Design Principles
+- **Type Safety**: Separate logical and physical dimensions
+- **Visual Debugging**: Multiple coordinate space outputs
+- **Precision Verification**: Automated accuracy testing
+- **Performance Focus**: Efficient bitmap handling
 
-### Debug Output (stdout)
-- Character metrics and bounds
-- Pixel content analysis
-- Baseline positioning calculations
-- Coordinate transformation details
-
-## Future Debugging Improvements
-
-1. **Automated validation** - Script to verify alignment
-2. **Visual diff tools** - Compare bitmaps between runs
-3. **Performance profiling** - Identify bottlenecks
-4. **Memory tracking** - Detect leaks and excessive allocation
-5. **Regression testing** - Catch breaking changes
-
-This debugging guide provides comprehensive tools and techniques for maintaining and improving the font rendering system.
+This guide provides comprehensive debugging tools for the font system's coordinate transformations and bitmap handling.
