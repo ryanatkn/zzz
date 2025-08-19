@@ -9,7 +9,7 @@
 const std = @import("std");
 
 // ============================================================================
-// WORKING TESTS (29 modules, 134 individual tests, all passing)
+// WORKING TESTS (30 modules, 164 individual tests, all passing)
 // ============================================================================
 
 // Hex game tests
@@ -192,6 +192,11 @@ test {
 
 test {
     std.testing.refAllDeclsRecursive(@import("lib/ui/geometric_text.zig"));
+}
+
+// Terminal kernel tests (micro-kernel architecture)
+test {
+    std.testing.refAllDeclsRecursive(@import("lib/terminal/kernel/test_kernel.zig"));
 }
 
 // EXCLUDED: Imports text/renderer.zig which depends on SDL
