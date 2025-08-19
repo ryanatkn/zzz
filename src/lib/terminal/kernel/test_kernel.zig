@@ -72,7 +72,7 @@ const MockTerminal = struct {
     }
 };
 
-const MockCapability = struct {
+pub const MockCapability = struct {
     name: []const u8,
     capability_type: []const u8,
     dependencies: []const []const u8,
@@ -205,7 +205,7 @@ test "EventBus - cleanup inactive subscriptions" {
 
 test "CapabilityRegistry - register and retrieve capabilities" {
     const allocator = testing.allocator;
-    var registry = kernel.CapabilityRegistry.init(allocator);
+    var registry = kernel.TypeSafeCapabilityRegistry.init(allocator);
     defer registry.deinit();
 
     // Create mock capabilities
@@ -232,7 +232,7 @@ test "CapabilityRegistry - register and retrieve capabilities" {
 
 test "CapabilityRegistry - dependency resolution" {
     const allocator = testing.allocator;
-    var registry = kernel.CapabilityRegistry.init(allocator);
+    var registry = kernel.TypeSafeCapabilityRegistry.init(allocator);
     defer registry.deinit();
 
     // Create capabilities with dependencies
@@ -255,7 +255,7 @@ test "CapabilityRegistry - dependency resolution" {
 
 test "CapabilityRegistry - circular dependency detection" {
     const allocator = testing.allocator;
-    var registry = kernel.CapabilityRegistry.init(allocator);
+    var registry = kernel.TypeSafeCapabilityRegistry.init(allocator);
     defer registry.deinit();
 
     // Create capabilities with circular dependencies

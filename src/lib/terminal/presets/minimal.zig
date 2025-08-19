@@ -8,7 +8,7 @@ const Cursor = @import("../capabilities/state/cursor.zig").Cursor;
 /// Minimal terminal preset - basic input/output with line editing
 pub const MinimalTerminal = struct {
     allocator: std.mem.Allocator,
-    registry: kernel.CapabilityRegistry,
+    registry: kernel.TypeSafeCapabilityRegistry,
     
     // Capabilities stored as pointers to heap-allocated instances
     keyboard: *KeyboardInput,
@@ -31,7 +31,7 @@ pub const MinimalTerminal = struct {
         const line_buffer = try LineBuffer.create(allocator);
         const cursor = try Cursor.create(allocator);
         
-        // Create capability interfaces and register them
+        // Create type-safe capability interfaces and register them
         const keyboard_cap = kernel.createCapability(keyboard);
         const writer_cap = kernel.createCapability(writer);
         const line_buffer_cap = kernel.createCapability(line_buffer);

@@ -13,7 +13,7 @@ const AnsiWriter = @import("../capabilities/output/ansi_writer.zig").AnsiWriter;
 /// Command terminal preset - extends StandardTerminal with full command execution capabilities
 pub const CommandTerminal = struct {
     allocator: std.mem.Allocator,
-    registry: kernel.CapabilityRegistry,
+    registry: kernel.TypeSafeCapabilityRegistry,
     
     // Base terminal
     standard: StandardTerminal,

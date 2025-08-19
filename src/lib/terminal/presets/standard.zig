@@ -9,7 +9,7 @@ const Persistence = @import("../capabilities/state/persistence.zig").Persistence
 /// Standard terminal preset - full-featured terminal with all state management capabilities
 pub const StandardTerminal = struct {
     allocator: std.mem.Allocator,
-    registry: kernel.CapabilityRegistry,
+    registry: kernel.TypeSafeCapabilityRegistry,
     
     // Core capabilities from minimal terminal
     minimal: MinimalTerminal,

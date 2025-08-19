@@ -15,18 +15,19 @@ const std = @import("std");
 // Core kernel components
 pub const terminal_trait = @import("terminal_trait.zig");
 pub const events = @import("events.zig");
-pub const registry = @import("registry.zig");
 pub const typesafe = @import("typesafe_capabilities.zig");
 
 // Primary interfaces
 pub const ITerminal = terminal_trait.ITerminal;
-pub const ICapability = registry.ICapability;
 
-// Type-safe capability system
+// Type-safe capability system (now the primary system)
 pub const TypeSafeCapability = typesafe.TypeSafeCapability;
 pub const CapabilityData = typesafe.CapabilityData;
 pub const TypeSafeCapabilityRegistry = typesafe.TypeSafeCapabilityRegistry;
-pub const createTypeSafeCapability = typesafe.createCapability;
+pub const createCapability = typesafe.createCapability;
+
+// Legacy compatibility
+pub const CapabilityRegistry = TypeSafeCapabilityRegistry;
 
 // Event system
 pub const Event = events.Event;
@@ -54,8 +55,6 @@ pub const KeyModifiers = terminal_trait.KeyModifiers;
 pub const MouseButton = terminal_trait.MouseButton;
 pub const MouseAction = terminal_trait.MouseAction;
 
-// Registry
-pub const CapabilityRegistry = registry.CapabilityRegistry;
 
 // Utilities
 pub const RingBuffer = @import("../core.zig").RingBuffer;
@@ -68,8 +67,8 @@ pub const VERSION = std.SemanticVersion{
 };
 
 /// Initialize a new capability registry
-pub fn createRegistry(allocator: std.mem.Allocator) CapabilityRegistry {
-    return CapabilityRegistry.init(allocator);
+pub fn createRegistry(allocator: std.mem.Allocator) TypeSafeCapabilityRegistry {
+    return TypeSafeCapabilityRegistry.init(allocator);
 }
 
 /// Create event bus for capability communication
@@ -159,56 +158,3 @@ pub fn createTerminal(implementation: anytype) ITerminal {
     };
 }
 
-/// Utility function to create a capability interface from implementation
-pub fn createCapability(implementation: anytype) ICapability {
-    const T = @TypeOf(implementation.*);
-    
-    const vtable = &ICapability.VTable{
-        .getName = struct {
-            fn getName(ptr: *anyopaque) []const u8 {
-                const self: *T = @ptrCast(@alignCast(ptr));
-                return self.getName();
-            }
-        }.getName,
-        
-        .getType = struct {
-            fn getType(ptr: *anyopaque) []const u8 {
-                const self: *T = @ptrCast(@alignCast(ptr));
-                return self.getType();
-            }
-        }.getType,
-        
-        .getDependencies = struct {
-            fn getDependencies(ptr: *anyopaque) []const []const u8 {
-                const self: *T = @ptrCast(@alignCast(ptr));
-                return self.getDependencies();
-            }
-        }.getDependencies,
-        
-        .init = struct {
-            fn init(ptr: *anyopaque, dependencies: []const ICapability, event_bus: *events.EventBus) !void {
-                const self: *T = @ptrCast(@alignCast(ptr));
-                return self.initialize(dependencies, event_bus);
-            }
-        }.init,
-        
-        .deinit = struct {
-            fn deinit(ptr: *anyopaque) void {
-                const self: *T = @ptrCast(@alignCast(ptr));
-                self.deinit();
-            }
-        }.deinit,
-        
-        .isActive = struct {
-            fn isActive(ptr: *anyopaque) bool {
-                const self: *T = @ptrCast(@alignCast(ptr));
-                return self.isActive();
-            }
-        }.isActive,
-    };
-
-    return ICapability{
-        .ptr = implementation,
-        .vtable = vtable,
-    };
-}
