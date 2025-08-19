@@ -39,8 +39,8 @@ const spellbar = @import("spellbar.zig");
 const faction_integration = @import("faction_integration.zig");
 
 // HUD modules
-const hud = @import("../hud/hud.zig");
-const reactive_hud = @import("../hud/reactive_hud.zig");
+const hud = @import("hud/hud.zig");
+const reactive_hud = @import("hud/reactive_hud.zig");
 
 const Vec2 = math.Vec2;
 const HexGame = hex_game_mod.HexGame;

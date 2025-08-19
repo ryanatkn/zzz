@@ -28,7 +28,7 @@ Dependencies: SDL3 (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation), 
   - Uses generic systems from `lib/game` for reusable functionality
   - Implements all hex-specific behavior (zones, spells, units, portals)
 - `src/hud/` - HUD overlay system with SvelteKit-style routing
-- `src/menu/` - Menu pages and settings
+- `src/roots/` - Base directories for separate UI document structures (SvelteKit-style routing)
 - `src/shaders/` - HLSL shaders and compilation
 - `docs/` - Technical documentation
 

@@ -49,7 +49,7 @@
 
 ### ✅ Completed Components
 
-**IDE Page Focus Management (`src/menu/ide/+page.zig`):**
+**IDE Page Focus Management (`src/roots/menu/ide/+page.zig`):**
 - Added `FocusedPanel` enum (FileTree, Content, Terminal)
 - Added `focused_panel` state tracking
 - Implemented `handleTerminalClick()` with proper bounds calculation
@@ -100,7 +100,7 @@
 **Files modified**:
 - ✅ `/src/hud/reactive_hud.zig` - Added terminal focus detection
 - ✅ `/src/hud/hud.zig` - Route input events to terminal
-- ✅ `/src/menu/ide/+page.zig` - Handle terminal input in IDE update loop
+- ✅ `/src/roots/menu/ide/+page.zig` - Handle terminal input in IDE update loop
 - ✅ `/src/lib/ui/terminal.zig` - Added SDL keyboard event processing
 - ✅ `/src/hud/renderer.zig` - Added focus indication rendering
 

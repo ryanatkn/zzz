@@ -39,7 +39,7 @@ comptime {
 }
 
 // Optional flag for bitmap output - set to true to save test bitmaps
-const SAVE_BITMAPS = true;
+const SAVE_BITMAPS = false;
 
 // Output directory for test files
 const TEST_OUTPUT_DIR = ".zz/test-font";
@@ -53,18 +53,18 @@ pub fn getTestOutputPath(allocator: std.mem.Allocator, category: []const u8, fil
 /// Helper function to ensure test output directories exist
 pub fn ensureTestDirectories() !void {
     const categories = [_][]const u8{ "baseline", "chars", "coord", "debug", "full" };
-    
+
     // Create main test directory
     std.fs.cwd().makePath(TEST_OUTPUT_DIR) catch |err| switch (err) {
         error.PathAlreadyExists => {},
         else => return err,
     };
-    
+
     // Create subdirectories
     for (categories) |category| {
         const dir_path = std.fmt.allocPrint(std.heap.page_allocator, "{s}/{s}", .{ TEST_OUTPUT_DIR, category }) catch return error.OutOfMemory;
         defer std.heap.page_allocator.free(dir_path);
-        
+
         std.fs.cwd().makePath(dir_path) catch |err| switch (err) {
             error.PathAlreadyExists => {},
             else => return err,
@@ -200,16 +200,16 @@ test "comprehensive character rendering - all alphabet" {
 
         // Create comprehensive coordinate composites using new visualization module
         var visualizer = test_visualization.FontTestVisualization.init(allocator);
-        
+
         // Ensure test directories exist
         try ensureTestDirectories();
-        
+
         // Generate full alphabet composites in both coordinate spaces
         const full_composite_path = try getTestOutputPath(allocator, "full", "alphabet.ppm");
         defer allocator.free(full_composite_path);
-        try visualizer.createFullAlphabetComposite(&rasterizer, full_composite_path[0..full_composite_path.len-4], 1920.0, 1080.0);
+        try visualizer.createFullAlphabetComposite(&rasterizer, full_composite_path[0 .. full_composite_path.len - 4], 1920.0, 1080.0);
 
-        // Detailed baseline analysis  
+        // Detailed baseline analysis
         const all_chars = lowercase ++ uppercase ++ numbers ++ special;
         try visualizer.analyzeBaselineConsistency(&rasterizer, all_chars);
 
@@ -263,18 +263,14 @@ test "coordinate transformation - shader space bitmap generation" {
     if (SAVE_BITMAPS) {
         // Ensure test directories exist
         try ensureTestDirectories();
-        
+
         // Generate baseline character bitmaps in both coordinate spaces (for quick testing)
         const baseline_path = try getTestOutputPath(allocator, "baseline", "nopgy.ppm");
         defer allocator.free(baseline_path);
-        try visualizer.createCompositeBitmapWithCoordinateSpace(
-            &rasterizer, 
-            baseline_chars, // Core baseline test characters
-            baseline_path,
-            .both
-        );
+        try visualizer.createCompositeBitmapWithCoordinateSpace(&rasterizer, baseline_chars, // Core baseline test characters
+            baseline_path, .both);
 
-        // Generate comprehensive coordinate transformation test output  
+        // Generate comprehensive coordinate transformation test output
         const coordinate_transform_test = @import("test/coordinate_transform_test.zig");
         try coordinate_transform_test.runAllTests(allocator);
 

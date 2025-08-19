@@ -149,7 +149,8 @@ preferred to reference one or more issues and discussions.
 ## Credits
 
 Built with (see [./deps](./deps)):
-- [Zig](https://ziglang.org/) - systems programming language
+- [Zig](https://ziglang.org/), "a general-purpose programming language
+  and toolchain for maintaining robust, optimal and reusable software"
 - [SDL3](https://libsdl.org/) - cross-platform GPU API
 - [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross) - shader compilation
 - [Claude Code](https://claude.ai/code) - AI-assisted development, thank you Anthropic people

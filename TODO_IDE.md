@@ -17,7 +17,7 @@
 ### 2. Syntax Highlighting Freeze (Fixed)
 **Problem:** `main.zig` content causing infinite loop/hang in syntax highlighting system
 **Solution:** Temporarily disabled syntax highlighting (`ENABLE_HIGHLIGHTING = false`)  
-**Files Modified:** `src/menu/ide/constants.zig` - can be re-enabled with proper safeguards later
+**Files Modified:** `src/roots/menu/ide/constants.zig` - can be re-enabled with proper safeguards later
 
 ### 3. Empty Text Texture Failures (Fixed)
 **Problem:** Empty lines causing `EmptyText` texture creation errors and visual flashing
@@ -38,7 +38,7 @@
 - `src/hud/reactive_hud.zig` - added arena support to reactive system
 - `src/hud/page.zig` - updated render interface to accept allocator
 - `src/hud/router.zig` - pass arena to page rendering
-- `src/menu/ide/+page.zig` - use arena for dynamic link paths
+- `src/roots/menu/ide/+page.zig` - use arena for dynamic link paths
 - All page files - updated render signatures to match new interface
 
 ## Testing Results

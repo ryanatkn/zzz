@@ -117,7 +117,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     game_state.?.* = try GameState.init(global_allocator);
 
     // Set global reference for world reloading in HUD
-    const router = @import("../hud/router.zig");
+    const router = @import("hud/router.zig");
     router.setGameStateReference(game_state.?);
 
     // Initialize behavior system for modular AI
