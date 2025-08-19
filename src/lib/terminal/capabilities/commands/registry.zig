@@ -48,7 +48,9 @@ pub const Registry = struct {
 
     /// Factory method for destroying registry capability
     pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
-        // Commands HashMap is cleaned up in deinit(), just free the memory
+        // Clean up resources first
+        self.deinit();
+        // Then free the memory
         allocator.destroy(self);
     }
 
