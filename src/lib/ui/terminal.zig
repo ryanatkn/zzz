@@ -148,8 +148,9 @@ pub const TerminalComponent = struct {
         
         var y_offset: f32 = bounds_rect.position.y + 4; // Small margin
         
-        // Render scrollback lines
-        for (content.lines) |line| {
+        // Render scrollback lines using iterator
+        var lines_iter = content.lines;
+        while (lines_iter.next()) |line| {
             if (y_offset > bounds_rect.position.y + bounds_rect.size.y) break;
             
             try self.renderLine(renderer, line.getText(), bounds_rect.position.x + 4, y_offset, text_color);
@@ -311,6 +312,9 @@ pub const TerminalComponent = struct {
     
     /// Set focus state
     pub fn setFocus(self: *Self, focused: bool) void {
+        const log = std.log.scoped(.terminal_focus);
+        const old_focus = self.is_focused.get();
+        log.info("Focus change: {} -> {}", .{ old_focus, focused });
         self.is_focused.set(focused);
     }
     
@@ -343,9 +347,10 @@ pub const TerminalComponent = struct {
     
     /// Handle SDL keyboard event directly (called from HUD)
     pub fn handleKeyPress(self: *Self, key_event: @import("../platform/sdl.zig").sdl.SDL_KeyboardEvent) bool {
-        if (!self.is_focused.get()) return false;
+        if (!self.is_focused.get()) {
+            return false;
+        }
         
-        const log = std.log.scoped(.terminal_input);
         const sdl = @import("../platform/sdl.zig");
         
         // Convert SDL key event to terminal key
@@ -353,7 +358,6 @@ pub const TerminalComponent = struct {
         
         switch (key_event.scancode) {
             sdl.sdl.SDL_SCANCODE_RETURN => {
-                log.info("ENTER key pressed - executing command", .{});
                 self.terminal_engine.handleKey(.enter) catch {};
                 handled = true;
             },
@@ -388,6 +392,7 @@ pub const TerminalComponent = struct {
             else => {
                 // Check for printable characters
                 const shift_held = (key_event.mod & sdl.sdl.SDL_KMOD_SHIFT) != 0;
+                
                 if (self.scancodeToChar(key_event.scancode, shift_held)) |ch| {
                     self.terminal_engine.handleKey(Key{ .char = ch }) catch {};
                     handled = true;

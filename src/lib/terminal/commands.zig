@@ -1,5 +1,6 @@
 const std = @import("std");
 const process = @import("process.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const ProcessExecutor = process.ProcessExecutor;
 
@@ -58,9 +59,6 @@ pub const CommandRegistry = struct {
     
     /// Execute a command
     pub fn execute(self: *Self, context: *CommandContext, command_line: []const u8) !bool {
-        const log = std.log.scoped(.command_registry);
-        log.info("Registry execute: '{s}'", .{command_line});
-        
         // Parse command and arguments
         var args = std.ArrayList([]const u8).init(context.allocator);
         defer {
@@ -73,23 +71,18 @@ pub const CommandRegistry = struct {
         try self.parseArgs(command_line, &args, context.allocator);
         
         if (args.items.len == 0) {
-            log.info("No arguments parsed, returning false", .{});
             return false;
         }
         
         const command_name = args.items[0];
         const command_args = if (args.items.len > 1) args.items[1..] else &[_][]const u8{};
-        log.info("Parsed command: '{s}' with {d} args", .{ command_name, command_args.len });
         
         // Check if it's a built-in command
         if (self.commands.get(command_name)) |command| {
-            log.info("Found built-in command: '{s}' - {s}", .{ command.name, command.description });
             try command.func(context, command_args);
-            log.info("Built-in command completed successfully", .{});
             return true;
         }
         
-        log.info("No built-in command found for: '{s}'", .{command_name});
         return false; // Not a built-in command
     }
     

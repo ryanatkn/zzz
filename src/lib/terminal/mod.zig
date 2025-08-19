@@ -4,6 +4,9 @@
 // The terminal engine handles command execution, process management, ANSI parsing, and state management,
 // while UI components (like src/lib/ui/terminal.zig) handle the actual rendering and user interaction.
 
+const std = @import("std");
+const loggers = @import("../debug/loggers.zig");
+
 pub const core = @import("core.zig");
 pub const process = @import("process.zig");
 pub const commands = @import("commands.zig");
@@ -35,6 +38,7 @@ pub const Cursor = core.Cursor;
 pub const Key = core.Key;
 pub const RingBuffer = core.RingBuffer;
 pub const CommandExecutorFn = core.CommandExecutorFn;
+pub const VisibleLinesIterator = core.VisibleLinesIterator;
 
 /// Integrated terminal engine that combines all components
 pub const TerminalEngine = struct {
@@ -82,11 +86,8 @@ pub const TerminalEngine = struct {
     
     /// Execute a command line
     pub fn executeCommand(self: *Self, command_line: []const u8) !void {
-        const log = std.log.scoped(.terminal_execute);
         const trimmed = std.mem.trim(u8, command_line, " \t\n");
-        log.info("Command received: '{s}' (length: {d})", .{ trimmed, trimmed.len });
         if (trimmed.len == 0) {
-            log.info("Empty command, returning", .{});
             return;
         }
         
@@ -100,34 +101,86 @@ pub const TerminalEngine = struct {
         };
         
         // Try built-in commands first
-        log.info("Checking built-in commands...", .{});
         const handled_builtin = self.command_registry.execute(&context, trimmed) catch |err| {
-            log.err("Built-in command execution failed: {}", .{err});
-            try self.terminal.write("Error executing command: ");
-            try self.terminal.write(@errorName(err));
-            try self.terminal.write("\n");
+            const error_msg = std.fmt.allocPrint(self.allocator, "Error: Failed to execute command '{s}' - {s}\n", .{ trimmed, @errorName(err) }) catch {
+                try self.terminal.write("Error: Command execution failed\n");
+                return;
+            };
+            defer self.allocator.free(error_msg);
+            try self.terminal.write(error_msg);
             return;
         };
         
         if (handled_builtin) {
-            log.info("Built-in command executed successfully", .{});
+            // Add a blank line after built-in command output
+            try self.terminal.write("\n");
             return; // Built-in command was executed
         }
         
         // Execute as external process
-        log.info("No built-in command found, trying external process...", .{});
         self.executeExternalCommand(trimmed) catch |err| {
-            log.err("External command execution failed: {}", .{err});
-            try self.terminal.write("Error executing external command: ");
-            try self.terminal.write(@errorName(err));
-            try self.terminal.write("\n");
+            const error_msg = std.fmt.allocPrint(self.allocator, "Error: Failed to execute external command '{s}' - {s}\n", .{ trimmed, @errorName(err) }) catch {
+                try self.terminal.write("Error: External command execution failed\n");
+                return;
+            };
+            defer self.allocator.free(error_msg);
+            try self.terminal.write(error_msg);
         };
     }
     
     /// Execute external command via process executor
     fn executeExternalCommand(self: *Self, command_line: []const u8) !void {
+        
+        // Try with absolute paths first for common commands
+        var modified_command_line: ?[]u8 = null;
+        defer if (modified_command_line) |cmd| self.allocator.free(cmd);
+        
+        var args = std.ArrayList([]const u8).init(self.allocator);
+        defer {
+            for (args.items) |arg| {
+                self.allocator.free(arg);
+            }
+            args.deinit();
+        }
+        
+        // Parse to get the command name
+        try self.process_executor.parseCommandLine(command_line, &args);
+        if (args.items.len > 0) {
+            const command_name = args.items[0];
+            
+            // Try common absolute paths for basic commands
+            const common_commands = [_]struct { name: []const u8, path: []const u8 }{
+                .{ .name = "ls", .path = "/bin/ls" },
+                .{ .name = "echo", .path = "/bin/echo" },
+                .{ .name = "pwd", .path = "/bin/pwd" },
+                .{ .name = "cat", .path = "/bin/cat" },
+                .{ .name = "grep", .path = "/bin/grep" },
+                .{ .name = "find", .path = "/bin/find" },
+                .{ .name = "which", .path = "/bin/which" },
+            };
+            
+            for (common_commands) |cmd| {
+                if (std.mem.eql(u8, command_name, cmd.name)) {
+                    // Check if absolute path exists
+                    std.fs.cwd().access(cmd.path, .{}) catch {
+                        break;
+                    };
+                    
+                    // Replace command with absolute path
+                    modified_command_line = try std.fmt.allocPrint(
+                        self.allocator, 
+                        "{s}{s}", 
+                        .{ cmd.path, command_line[command_name.len..] }
+                    );
+                    break;
+                }
+            }
+        }
+        
+        const final_command = modified_command_line orelse command_line;
+        
         // Use streaming execution for better responsiveness
-        const result = self.process_executor.executeWithStreaming(command_line) catch |err| {
+        const result = self.process_executor.executeWithStreaming(final_command) catch |err| {
             const error_msg = switch (err) {
                 error.FileNotFound => "Command not found",
                 error.AccessDenied => "Permission denied",
@@ -147,10 +200,13 @@ pub const TerminalEngine = struct {
         
         // Show exit code if non-zero
         if (result.exit_code != 0) {
-            const exit_msg = std.fmt.allocPrint(self.allocator, "Command exited with code {d}\n", .{result.exit_code}) catch return;
+            const exit_msg = std.fmt.allocPrint(self.allocator, "[Exit code: {d}]\n", .{result.exit_code}) catch return;
             defer self.allocator.free(exit_msg);
             try self.terminal.write(exit_msg);
         }
+        
+        // Add a blank line after command output for readability
+        try self.terminal.write("\n");
     }
     
     /// Write text to terminal with ANSI parsing
@@ -179,6 +235,28 @@ pub const TerminalEngine = struct {
     pub fn handleKey(self: *Self, key: Key) !void {
         const log = std.log.scoped(.terminal_engine_key);
         
+        // Log all key inputs received by the engine
+        switch (key) {
+            .char => |ch| log.info("Engine received character: '{c}' (ASCII {d})", .{ ch, ch }),
+            .enter => log.info("Engine received: ENTER", .{}),
+            .backspace => log.info("Engine received: BACKSPACE", .{}),
+            .delete => log.info("Engine received: DELETE", .{}),
+            .tab => log.info("Engine received: TAB", .{}),
+            .up_arrow => log.info("Engine received: UP_ARROW", .{}),
+            .down_arrow => log.info("Engine received: DOWN_ARROW", .{}),
+            .left_arrow => log.info("Engine received: LEFT_ARROW", .{}),
+            .right_arrow => log.info("Engine received: RIGHT_ARROW", .{}),
+            .home => log.info("Engine received: HOME", .{}),
+            .end => log.info("Engine received: END", .{}),
+            .page_up => log.info("Engine received: PAGE_UP", .{}),
+            .page_down => log.info("Engine received: PAGE_DOWN", .{}),
+            .ctrl_c => log.info("Engine received: CTRL_C", .{}),
+            .ctrl_d => log.info("Engine received: CTRL_D", .{}),
+            .ctrl_l => log.info("Engine received: CTRL_L", .{}),
+            .ctrl_z => log.info("Engine received: CTRL_Z", .{}),
+            else => log.info("Engine received: {}", .{key}),
+        }
+        
         // Handle signal keys first (Ctrl+C, etc.)
         if (self.signal_handler.handleKeyInput(key)) {
             log.info("Signal key handled: {}", .{key});
@@ -190,17 +268,10 @@ pub const TerminalEngine = struct {
             return;
         }
         
-        // Log regular keys (but not every single character to avoid spam)
-        switch (key) {
-            .enter => log.info("Processing ENTER key in engine", .{}),
-            .backspace => log.info("Processing BACKSPACE key", .{}),
-            .up_arrow => log.info("Processing UP ARROW key", .{}),
-            .down_arrow => log.info("Processing DOWN ARROW key", .{}),
-            else => {}, // Don't log every character
-        }
-        
-        // Regular key handling
+        // Forward to terminal core for processing
+        log.info("Forwarding key to terminal core", .{});
         try self.terminal.handleKey(key);
+        log.info("Terminal core processing complete", .{});
     }
     
     /// Update terminal state
@@ -209,7 +280,7 @@ pub const TerminalEngine = struct {
     }
     
     /// Get visible lines for rendering
-    pub fn getVisibleContent(self: *const Self) struct { lines: []const Line, current: []const u8, cursor: Cursor } {
+    pub fn getVisibleContent(self: *const Self) struct { lines: VisibleLinesIterator, current: []const u8, cursor: Cursor } {
         const visible = self.terminal.getVisibleLines();
         return .{
             .lines = visible.lines,
@@ -260,4 +331,3 @@ fn streamOutputCallback(context: *anyopaque, data: []const u8) !void {
     try engine.writeWithAnsiParsing(data);
 }
 
-const std = @import("std");

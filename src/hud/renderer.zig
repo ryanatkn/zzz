@@ -462,9 +462,10 @@ pub const BrowserRenderer = struct {
         const max_lines = @as(usize, @intFromFloat(@max(0, (panel_rect.size.y - 40) / line_height)));
         const max_chars_per_line = @as(usize, @intFromFloat(@max(0, (panel_rect.size.x - 20) / char_width)));
         
-        // Render scrollback lines with safety checks
+        // Render scrollback lines with safety checks using iterator
         var lines_rendered: usize = 0;
-        for (content.lines) |line| {
+        var lines_iter = content.lines;
+        while (lines_iter.next()) |line| {
             if (lines_rendered >= max_lines) break;
             if (current_y > panel_rect.position.y + panel_rect.size.y - line_height) break;
             

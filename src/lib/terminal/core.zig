@@ -1,5 +1,6 @@
 const std = @import("std");
 const colors = @import("../core/colors.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const Color = colors.Color;
 
@@ -7,6 +8,7 @@ const Color = colors.Color;
 pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
     return struct {
         items: [capacity]T = undefined,
+        initialized: [capacity]bool = [_]bool{false} ** capacity,
         start: usize = 0,
         len: usize = 0,
         
@@ -19,9 +21,18 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
         pub fn push(self: *Self, item: T) void {
             if (self.len < capacity) {
                 self.items[self.len] = item;
+                self.initialized[self.len] = true;
                 self.len += 1;
             } else {
+                // Clean up old item before overwriting (only if T has deinit method)
+                if (self.initialized[self.start]) {
+                    const type_info = @typeInfo(T);
+                    if (type_info == .@"struct" and @hasDecl(T, "deinit")) {
+                        self.items[self.start].deinit();
+                    }
+                }
                 self.items[self.start] = item;
+                self.initialized[self.start] = true;
                 self.start = (self.start + 1) % capacity;
             }
         }
@@ -32,7 +43,22 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
             return self.items[real_index];
         }
         
+        pub fn getMutable(self: *Self, index: usize) ?*T {
+            if (index >= self.len) return null;
+            const real_index = (self.start + index) % capacity;
+            return &self.items[real_index];
+        }
+        
         pub fn clear(self: *Self) void {
+            // Clean up all initialized items (only if T has deinit method)
+            for (self.initialized, 0..) |is_init, i| {
+                if (is_init) {
+                    if (@hasDecl(T, "deinit")) {
+                        self.items[i].deinit();
+                    }
+                    self.initialized[i] = false;
+                }
+            }
             self.start = 0;
             self.len = 0;
         }
@@ -75,6 +101,7 @@ pub const Key = union(enum) {
 
 /// Terminal line with styling information
 pub const Line = struct {
+    allocator: std.mem.Allocator,
     text: std.ArrayList(u8),
     colors: std.ArrayList(Color),
     bold: std.ArrayList(bool),
@@ -83,6 +110,7 @@ pub const Line = struct {
     
     pub fn init(allocator: std.mem.Allocator) Self {
         return Self{
+            .allocator = allocator,
             .text = std.ArrayList(u8).init(allocator),
             .colors = std.ArrayList(Color).init(allocator),
             .bold = std.ArrayList(bool).init(allocator),
@@ -151,6 +179,40 @@ pub const Cursor = struct {
 /// Command execution callback function type
 pub const CommandExecutorFn = *const fn (context: *anyopaque, command: []const u8) anyerror!void;
 
+/// Iterator for visible lines that avoids memory allocation
+pub const VisibleLinesIterator = struct {
+    scrollback: *const RingBuffer(Line, 1000),
+    start_index: usize,
+    count: usize,
+    current: usize = 0,
+    
+    pub fn init(scrollback: *const RingBuffer(Line, 1000), max_rows: usize) VisibleLinesIterator {
+        const total_lines = scrollback.count();
+        const visible_count = @min(max_rows, total_lines);
+        const start_index = if (total_lines > max_rows) total_lines - max_rows else 0;
+        
+        return VisibleLinesIterator{
+            .scrollback = scrollback,
+            .start_index = start_index,
+            .count = visible_count,
+        };
+    }
+    
+    pub fn next(self: *VisibleLinesIterator) ?Line {
+        if (self.current >= self.count) return null;
+        
+        const line_index = self.start_index + self.current;
+        const line = self.scrollback.get(line_index) orelse return null;
+        self.current += 1;
+        
+        return line;
+    }
+    
+    pub fn reset(self: *VisibleLinesIterator) void {
+        self.current = 0;
+    }
+};
+
 /// Terminal state and configuration
 pub const Terminal = struct {
     allocator: std.mem.Allocator,
@@ -194,13 +256,13 @@ pub const Terminal = struct {
     }
     
     pub fn deinit(self: *Self) void {
-        // Clean up scrollback - lines are owned by scrollback, just clear it
+        // Clean up scrollback using the RingBuffer's clear method
         self.scrollback.clear();
         
         // Clean up history
-        var i: usize = 0;
-        while (i < self.command_history.count()) : (i += 1) {
-            if (self.command_history.get(i)) |cmd| {
+        var history_i: usize = 0;
+        while (history_i < self.command_history.count()) : (history_i += 1) {
+            if (self.command_history.get(history_i)) |cmd| {
                 self.allocator.free(cmd);
             }
         }
@@ -211,6 +273,9 @@ pub const Terminal = struct {
     
     /// Write text to the terminal
     pub fn write(self: *Self, text: []const u8) !void {
+        if (loggers.game_log) |*log| {
+            log.info("terminal_write", "write() called with text: '{s}'", .{text});
+        }
         for (text) |ch| {
             try self.writeChar(ch);
         }
@@ -319,45 +384,62 @@ pub const Terminal = struct {
         }
     }
     
+    /// Get prompt text for command echoing
+    fn getPromptText(self: *const Self) ![]u8 {
+        const cwd = self.working_directory.items;
+        
+        // Extract directory name from full path
+        const dir_name = if (std.fs.path.basename(cwd).len > 0)
+            std.fs.path.basename(cwd)
+        else
+            cwd;
+        
+        return std.fmt.allocPrint(self.allocator, "{s}$ ", .{dir_name});
+    }
+    
     /// Execute the current command line
     fn executeCurrentLine(self: *Self) !void {
-        const log = std.log.scoped(.terminal_core);
         const command = try self.allocator.dupe(u8, self.current_line.items);
         defer self.allocator.free(command);
         
-        log.info("Terminal core executing: '{s}'", .{command});
-        
-        // Add to history if not empty
+        // Echo the command with prompt to scrollback
         if (command.len > 0) {
+            // Add command to history
             const command_copy = try self.allocator.dupe(u8, command);
             self.command_history.push(command_copy);
             self.history_index = null;
-            log.info("Added to history (total: {d})", .{self.command_history.count()});
+            
+            // Create prompt + command line for display
+            const prompt_text = try self.getPromptText();
+            defer self.allocator.free(prompt_text);
+            
+            var echo_line = Line.init(self.allocator);
+            try echo_line.appendText(prompt_text, self.current_color, false);
+            try echo_line.appendText(command, self.current_color, false);
+            
+            // Add echoed command to scrollback
+            self.scrollback.push(echo_line);
         }
         
-        // Move to new line before executing command
-        try self.newline();
-        log.info("Moved to new line, calling executor...", .{});
+        // Clear current line and move cursor
+        self.current_line.clearRetainingCapacity();
+        self.cursor.x = 0;
+        self.cursor.y += 1;
         
         // Execute command via callback if available
         if (self.command_executor) |executor| {
             if (self.command_executor_context) |context| {
-                log.info("Calling command executor callback", .{});
                 executor(context, command) catch |err| {
-                    log.err("Command executor callback failed: {}", .{err});
                     try self.write("Error executing command: ");
                     try self.write(@errorName(err));
                     try self.write("\n");
                 };
             }
         } else {
-            // Fallback if no executor is set
-            log.warn("No command executor available!", .{});
             try self.write("No command executor available\n");
         }
         
         self.clearCurrentLine();
-        log.info("Command execution complete, line cleared", .{});
     }
     
     /// Navigate command history
@@ -421,29 +503,15 @@ pub const Terminal = struct {
         }
     }
     
-    /// Get visible lines for rendering
-    pub fn getVisibleLines(self: *const Self) struct { lines: []const Line, current: []const u8 } {
-        const total_lines = self.scrollback.count();
-        
-        if (total_lines == 0 or self.viewport_offset >= total_lines) {
-            return .{ .lines = &[_]Line{}, .current = self.current_line.items };
-        }
-        
-        // Calculate visible range
-        const start = if (self.viewport_offset > 0) total_lines - self.viewport_offset else 0;
-        const visible_count = @min(self.rows, total_lines - start);
-        
-        // Create slice of visible lines
-        var visible_lines = self.allocator.alloc(Line, visible_count) catch return .{ .lines = &[_]Line{}, .current = self.current_line.items };
-        
-        var i: usize = 0;
-        while (i < visible_count) : (i += 1) {
-            if (self.scrollback.get(start + i)) |line| {
-                visible_lines[i] = line;
-            }
-        }
-        
-        return .{ .lines = visible_lines, .current = self.current_line.items };
+    /// Get visible lines for rendering (iterator-based version)
+    pub fn getVisibleLines(self: *const Self) struct { 
+        lines: VisibleLinesIterator, 
+        current: []const u8 
+    } {
+        return .{ 
+            .lines = VisibleLinesIterator.init(&self.scrollback, self.rows),
+            .current = self.current_line.items 
+        };
     }
     
     /// Resize terminal

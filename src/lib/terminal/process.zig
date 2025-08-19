@@ -1,4 +1,5 @@
 const std = @import("std");
+const loggers = @import("../debug/loggers.zig");
 
 /// Process execution result
 pub const ProcessResult = struct {
@@ -240,7 +241,7 @@ pub const ProcessExecutor = struct {
     }
     
     /// Parse command line into arguments (simple shell-like parsing)
-    fn parseCommandLine(self: *Self, command_line: []const u8, args: *std.ArrayList([]const u8)) !void {
+    pub fn parseCommandLine(self: *Self, command_line: []const u8, args: *std.ArrayList([]const u8)) !void {
         var i: usize = 0;
         var in_quotes = false;
         var quote_char: u8 = 0;
@@ -295,23 +296,33 @@ pub const ProcessExecutor = struct {
     
     /// Check if a command exists in PATH
     pub fn commandExists(self: *Self, command: []const u8) bool {
-        _ = self;
-        
         // Check if it's an absolute or relative path
         if (std.mem.indexOf(u8, command, "/") != null) {
-            std.fs.cwd().access(command, .{}) catch return false;
+            std.fs.cwd().access(command, .{}) catch {
+                return false;
+            };
             return true;
         }
         
         // Search in PATH
-        const path_env = std.posix.getenv("PATH") orelse return false;
-        var path_iter = std.mem.split(u8, path_env, ":");
+        const path_env = self.environment.get("PATH") orelse std.posix.getenv("PATH") orelse {
+            return false;
+        };
+        
+        var path_iter = std.mem.splitScalar(u8, path_env, ':');
         
         while (path_iter.next()) |path_dir| {
-            var path_buffer: [std.fs.MAX_PATH_BYTES]u8 = undefined;
-            const full_path = std.fmt.bufPrint(&path_buffer, "{s}/{s}", .{ path_dir, command }) catch continue;
+            if (path_dir.len == 0) continue;
             
-            std.fs.cwd().access(full_path, .{}) catch continue;
+            var path_buffer: [std.fs.max_path_bytes]u8 = undefined;
+            const full_path = std.fmt.bufPrint(&path_buffer, "{s}/{s}", .{ path_dir, command }) catch {
+                continue;
+            };
+            
+            std.fs.cwd().access(full_path, .{}) catch {
+                continue;
+            };
+            
             return true;
         }
         
@@ -353,8 +364,34 @@ pub const ProcessExecutor = struct {
         process.stderr_behavior = .Pipe;
         process.stdin_behavior = .Close;
         
-        // Spawn process
-        try process.spawn();
+        // Spawn process with comprehensive error handling
+        process.spawn() catch |err| {
+            // Only log errors using game logger
+            const error_msg = switch (err) {
+                error.FileNotFound => blk: {
+                    if (self.commandExists(args.items[0])) {
+                        break :blk "Command found in PATH but spawn failed - permission issue?";
+                    } else {
+                        break :blk "Command not found in PATH";
+                    }
+                },
+                error.AccessDenied => "Permission denied - cannot execute command",
+                error.SystemResources => "System resources exhausted",
+                error.InvalidExe => "Invalid executable format",
+                else => "Unknown spawn error",
+            };
+            
+            if (loggers.game_log) |*log| {
+                log.warn("terminal_spawn", "Process spawn failed: {s} for command: {s}", .{ error_msg, args.items[0] });
+            }
+            
+            // Return error result instead of crashing
+            return ProcessResult{
+                .stdout = try self.allocator.dupe(u8, ""),
+                .stderr = try self.allocator.dupe(u8, error_msg),
+                .exit_code = 127, // Standard "command not found" exit code
+            };
+        };
         self.current_process = process;
         
         // Read output with streaming if callback is set
