@@ -206,7 +206,7 @@ test "config validation" {
     try testing.expectEqual(@as(u32, 256), renderer.config.max_glyph_size);
 }
 
-// Visual test - run with: zig test src/lib/font/test_font_rendering.zig --test-filter "visual"
+// Visual test - run with: zig build test -Dtest-filter="visual"
 test "visual inspection - all renderers" {
     if (!(std.process.hasEnvVar(testing.allocator, "VISUAL_TEST") catch false)) {
         return error.SkipZigTest; // Skip unless VISUAL_TEST env var is set
@@ -254,4 +254,4 @@ test "visual inspection - all renderers" {
     }
 }
 
-// Run all tests with: zig test src/lib/font/test_font_rendering.zig
+// Run all tests with: zig build test -Dtest-filter="font"

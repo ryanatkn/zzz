@@ -210,4 +210,4 @@ test "save to PGM file" {
     std.debug.print("View with: display test_gradient.pgm\n", .{});
 }
 
-// Run with: zig test src/lib/font/test_basic_rendering.zig
+// Run with: zig build test -Dtest-filter="basic rendering"

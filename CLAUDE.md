@@ -56,6 +56,11 @@ For detailed architecture, see [docs/architecture.md](docs/architecture.md)
 $ zig build              # Build (includes automatic shader compilation)
 $ zig build run          # Build and run
 
+# Testing
+$ zig build test                          # Run all tests
+$ zig build test -Dtest-filter="pattern"  # Run tests matching pattern
+$ zig build test --summary all            # Show detailed test results
+
 # Dependency management
 $ zig build update-deps  # Update vendored SDL dependencies  
 $ zig build check-deps   # Check dependency status (CI-friendly)

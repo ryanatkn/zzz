@@ -101,16 +101,35 @@ pub fn build(b: *std.Build) void {
 
     run_step.dependOn(&run.step);
 
-    // Test step
+    // Test step with filtering support
+    const test_filter = b.option([]const u8, "test-filter", "Run only tests matching this pattern");
+
     const exe_unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/main.zig"),
+        .root_source_file = b.path("src/test.zig"),
         .target = target,
         .optimize = optimize,
+        .filters = if (test_filter) |filter| &.{filter} else &.{},
     });
 
-    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
+    // Link minimal dependencies for tests (avoiding SDL linking issues)
+    exe_unit_tests.linkLibC();
+
     const test_step = b.step("test", "Run unit tests");
-    test_step.dependOn(&run_exe_unit_tests.step);
+
+    // Run tests with filtering feedback
+    if (test_filter) |filter| {
+        // Show filter being applied
+        const filter_info_cmd = b.addSystemCommand(&.{ "echo", b.fmt("Running tests matching filter: '{s}'", .{filter}) });
+        test_step.dependOn(&filter_info_cmd.step);
+        
+        const run_test = b.addRunArtifact(exe_unit_tests);
+        run_test.step.dependOn(&filter_info_cmd.step);
+        test_step.dependOn(&run_test.step);
+    } else {
+        // Normal test run without filter
+        const run_test = b.addRunArtifact(exe_unit_tests);
+        test_step.dependOn(&run_test.step);
+    }
 }
 
 // System library detection helpers

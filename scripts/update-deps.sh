@@ -925,6 +925,7 @@ EOF
         echo "  1. Review changes:  git diff deps/"
         echo "  2. Test build:      zig build"
         echo "  3. Run tests:       zig build test"
+        echo "                      zig build test -Dtest-filter=\"pattern\""
         echo "  4. Commit changes:  git add deps/ && git commit -m 'Update vendored SDL dependencies'"
     fi
     

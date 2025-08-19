@@ -169,9 +169,15 @@ const sdl = @import("../platform/sdl.zig");
 ## Testing
 
 ```bash
-# Run library tests
-zig test src/lib/reactive/test_expected_behavior.zig
-zig test src/lib/font/test_font_rendering.zig
+# Run all tests (includes lib tests)
+zig build test
+
+# Run specific test patterns
+zig build test -Dtest-filter="reactive"  # Reactive system tests
+zig build test -Dtest-filter="font"      # Font rendering tests
+
+# Show detailed test summary  
+zig build test --summary all
 
 # Visual tests
 zig build run  # Navigate to test pages

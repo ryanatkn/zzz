@@ -15,6 +15,15 @@ zig version  # Requires 0.14.1+
 
 # Build and run the Hex demo (shaders compile automatically)
 zig build run
+
+# Run all tests
+zig build test
+
+# Run specific tests (filtering by pattern)  
+zig build test -Dtest-filter="faction"
+
+# Show detailed test summary
+zig build test --summary all
 ```
 
 ## What it does

@@ -70,12 +70,22 @@ const ui = @import("../lib/ui.zig");
 # Run all tests
 zig build test
 
-# Run specific test
-zig test src/lib/reactive/test_expected_behavior.zig
+# Run tests matching pattern
+zig build test -Dtest-filter="pattern"
+
+# Show detailed test summary (useful for debugging)
+zig build test --summary all
 
 # Visual debugging
 zig build run  # Then navigate to test pages
 ```
+
+### Test Organization
+- **Test Discovery**: All tests are manually included in `src/test.zig` using `refAllDeclsRecursive()` 
+- **~72 test files** across the codebase - systematic inclusion strategy documented in test.zig
+- **Finding Tests**: Use `rg "^test " --type=zig -l` to list all files with test blocks
+- **Filtering**: Use `-Dtest-filter="pattern"` to run specific test subsets
+- **Compilation Issues**: Some modules deferred due to SDL dependencies or compilation errors
 
 ### Test Coverage Areas
 - Reactive system: 20+ comprehensive tests
@@ -181,7 +191,8 @@ const MyComponent = ReactiveComponent {
 ```bash
 zig build              # Debug build
 zig build run          # Run immediately
-zig build test         # Run tests
+zig build test         # Run all tests
+zig build test -Dtest-filter="pattern"  # Run specific tests
 ```
 
 ### Release Builds
