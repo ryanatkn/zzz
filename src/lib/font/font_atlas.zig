@@ -13,14 +13,14 @@ pub const RenderMode = enum {
 };
 
 pub const GlyphInfo = struct {
-    texture_x: u32,
-    texture_y: u32,
-    width: u32,
-    height: u32,
-    bearing_x: i32,
-    bearing_y: i32,
+    texture_x: f32,
+    texture_y: f32,
+    width: f32,
+    height: f32,
+    bearing_x: f32,
+    bearing_y: f32,
     advance: f32,
-    atlas_index: u32,
+    atlas_index: u32, // Keep as int - it's an index
     bitmap: ?[]u8, // Store the actual bitmap data for reuse
     render_mode: RenderMode, // How this glyph was rendered
 };
@@ -177,8 +177,8 @@ pub const FontAtlas = struct {
         else
             try self.createNewAtlas();
 
-        const padded_width = rasterized.width + self.padding * 2;
-        const padded_height = rasterized.height + self.padding * 2;
+        const padded_width = @as(u32, @intFromFloat(@ceil(rasterized.width))) + self.padding * 2;
+        const padded_height = @as(u32, @intFromFloat(@ceil(rasterized.height))) + self.padding * 2;
 
         if (atlas.current_x + padded_width > atlas.width) {
             atlas.current_x = self.padding;
@@ -193,14 +193,14 @@ pub const FontAtlas = struct {
         const texture_x = atlas.current_x + self.padding;
         const texture_y = atlas.current_y + self.padding;
 
-        try self.uploadGlyphToAtlas(atlas.texture, final_bitmap, rasterized.width, rasterized.height, texture_x, texture_y);
+        try self.uploadGlyphToAtlas(atlas.texture, final_bitmap, @as(u32, @intFromFloat(@ceil(rasterized.width))), @as(u32, @intFromFloat(@ceil(rasterized.height))), texture_x, texture_y);
 
         atlas.current_x += padded_width;
         atlas.row_height = @max(atlas.row_height, padded_height);
 
         const info = GlyphInfo{
-            .texture_x = texture_x,
-            .texture_y = texture_y,
+            .texture_x = @floatFromInt(texture_x),
+            .texture_y = @floatFromInt(texture_y),
             .width = rasterized.width,
             .height = rasterized.height,
             .bearing_x = rasterized.bearing_x,

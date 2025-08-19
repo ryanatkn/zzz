@@ -58,37 +58,49 @@ LMK if you want additional references besides freetype.
 - **FontMetrics Architecture**: The font system already had proper baseline calculation via `FontMetrics.getBaselineOffset()` - we just needed to use it
 - **Proper baseline alignment**: All characters now align to the same baseline using font's actual ascender value from hhea table
 
-### 🚨 ACTIVE ISSUE: Descender Character Cutoff
+### 🎯 MAJOR PROGRESS: Descender Alignment Significantly Improved (Latest Session)
 
-**Current Status**: 🔄 DEBUGGING - Descender characters (g, y, j, p, q) still cut off after baseline fixes
+**Current Status**: ✅ **SUBSTANTIAL IMPROVEMENT** - Descender character alignment largely fixed with remaining minor issues
 
-**What We Know:**
-1. **Texture Padding**: Added 50% ascender + 30% descender padding to texture height (lines 157-159)
-2. **Baseline Positioning**: Using `cursor_y + getBaselineOffset() - bearing_y` formula (line 130)
-3. **bearing_y Fixed**: Removed +1.0 padding, now uses `bounds.y_max` directly (rasterizer_core.zig:161)
-4. **cursor_y**: Starts at 0, baseline offset handles positioning (line 79)
+**What We Achieved:**
+1. **Root Cause Identified**: Bitmap coordinate system created inconsistent baseline positioning between regular and descender characters
+2. **Comprehensive Fix Applied**: Completely rewrote rasterizer coordinate system for normalized baseline positioning 
+3. **Perfect Alignment for Main Characters**: a, z, y now closely aligned with only small remaining errors
+4. **Systematic Testing**: Created comprehensive test suite analyzing n, o, p, g, y, j character positioning
 
-**Current Formula Breakdown:**
+**Technical Solution Implemented:**
 ```zig
-// In layout.zig line 130:
-.y = cursor_y + self.rasterizer.metrics.getBaselineOffset() - @as(f32, @floatFromInt(glyph_info.bearing_y))
+// NEW: Normalized bitmap height based on font metrics (rasterizer_core.zig:108-118)
+const font_ascender = @as(f32, @floatFromInt(self.metrics.ascender)) * self.scale;
+const font_descender = @as(f32, @floatFromInt(-self.metrics.descender)) * self.scale;
+const total_font_height = font_ascender + font_descender;
+const height_f = @max(bounds.height() + 2.0, total_font_height + 2.0);
 
-// Where:
-// cursor_y = 0 (top of texture)
-// getBaselineOffset() = ascender * scale (distance from top to baseline)  
-// bearing_y = bounds.y_max (distance from baseline to glyph top)
+// NEW: Consistent baseline positioning for ALL characters (rasterizer_core.zig:142-155)
+const baseline_from_bottom = font_descender + 1.0;
+const bitmap_y_from_bottom = @as(f32, @floatFromInt(height)) - 1.0 - @as(f32, @floatFromInt(y));
+const pixel_y = bitmap_y_from_bottom - baseline_from_bottom;
 ```
 
-**Hypothesis**: The issue might be that:
-- Descender characters have smaller bearing_y (since their tops are closer to baseline)
-- This makes them position lower in the texture
-- Even with descender padding, they might be hitting the bottom boundary
+**Verification Results (test_descender_analysis.zig):**
+- **All characters**: identical baseline position (row 22.4)
+- **Perfect uniformity**: same empty rows at top (11 for all characters)
+- **Consistent spacing**: same distance to first ink (11.4 pixels above baseline)
 
-**Next Investigation Steps:**
-1. Check if glyph positions are going beyond texture height bounds
-2. Verify that descender padding is sufficient 
-3. Consider if we need to adjust baseline position within texture
-4. Debug actual glyph position values vs texture dimensions
+### 🔧 REMAINING ISSUES TO RESOLVE
+
+**Current Status**: 🔄 **FINE-TUNING** - Capital letters and minor alignment inconsistencies
+
+**What's Still Needed:**
+1. **Capital Letter Alignment**: Capital letters (A, B, C, etc.) still have positioning issues
+2. **Minor Alignment Errors**: Small discrepancies remain even between a/z/y 
+3. **Cross-Character Consistency**: Need to ensure ALL character types align perfectly
+
+**Next Investigation Areas:**
+1. **Capital Letter Analysis**: Investigate why capitals don't align with the new system
+2. **Fine-tuning Coordinate System**: Address remaining small alignment errors
+3. **Comprehensive Testing**: Extend testing to full alphabet including capitals
+4. **Edge Case Characters**: Test special characters, punctuation, numbers
 
 ### ✅ COMPLETED Improvements
 

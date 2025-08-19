@@ -41,10 +41,10 @@ fn isPointInsideGlyph(test_x: f32, test_y: f32, contours: []const glyph_extracto
 /// Result of rasterizing a glyph
 pub const RasterizedGlyph = struct {
     bitmap: []u8,
-    width: u32,
-    height: u32,
-    bearing_x: i32,
-    bearing_y: i32,
+    width: f32,
+    height: f32,
+    bearing_x: f32,
+    bearing_y: f32,
     advance: f32,
 };
 
@@ -103,19 +103,28 @@ pub const RasterizerCore = struct {
             log.debug("Rasterizing outline with bounds {}", .{outline.bounds});
         }
 
-        // Calculate bitmap dimensions
+        // Calculate bitmap dimensions with normalized baseline positioning
         const bounds = outline.bounds;
-        const width = @as(u32, @intFromFloat(@ceil(bounds.width()))) + 2;
-        const height = @as(u32, @intFromFloat(@ceil(bounds.height()))) + 2;
+        const width_f = bounds.width() + 2.0; // Add padding
+        
+        // For consistent baseline positioning, calculate height based on font metrics
+        const font_ascender = @as(f32, @floatFromInt(self.metrics.ascender)) * self.scale;
+        const font_descender = @as(f32, @floatFromInt(-self.metrics.descender)) * self.scale; // Make positive
+        const total_font_height = font_ascender + font_descender;
+        
+        // Use the larger of glyph bounds or font metrics to ensure consistent baseline
+        const height_f = @max(bounds.height() + 2.0, total_font_height + 2.0);
+        const width = @as(u32, @intFromFloat(@ceil(width_f)));
+        const height = @as(u32, @intFromFloat(@ceil(height_f)));
 
         // Handle empty glyphs (like space)
         if (width <= 2 or height <= 2 or outline.contours.len == 0) {
             return RasterizedGlyph{
                 .bitmap = &[_]u8{}, // Empty slice
-                .width = 0,
-                .height = 0,
-                .bearing_x = 0,
-                .bearing_y = 0,
+                .width = 0.0,
+                .height = 0.0,
+                .bearing_x = 0.0,
+                .bearing_y = 0.0,
                 .advance = outline.metrics.advance_width,
             };
         }
@@ -131,14 +140,18 @@ pub const RasterizerCore = struct {
 
         // Calculate transform from bitmap coordinates to TTF coordinates
         const offset_x = bounds.x_min - 1.0;
-        const offset_y = bounds.y_min - 1.0;
-
+        
+        // For consistent baseline positioning, place baseline at a fixed position from bottom
+        const baseline_from_bottom = font_descender + 1.0; // Padding from bottom
+        
         // Rasterize each pixel
         for (0..height) |y| {
             for (0..width) |x| {
                 const pixel_x = @as(f32, @floatFromInt(x)) + offset_x;
-                // Flip Y coordinate: TTF uses bottom-up, screen uses top-down
-                const pixel_y = bounds.y_max - (@as(f32, @floatFromInt(y)) + offset_y);
+                
+                // Calculate TTF Y coordinate: baseline is at consistent position from bitmap bottom
+                const bitmap_y_from_bottom = @as(f32, @floatFromInt(height)) - 1.0 - @as(f32, @floatFromInt(y));
+                const pixel_y = bitmap_y_from_bottom - baseline_from_bottom; // TTF coordinate (baseline = 0)
 
                 // Test if point is inside glyph using simple winding number
                 const inside = isPointInsideGlyph(pixel_x, pixel_y, outline.contours);
@@ -155,10 +168,10 @@ pub const RasterizerCore = struct {
 
         return RasterizedGlyph{
             .bitmap = bitmap,
-            .width = width,
-            .height = height,
-            .bearing_x = @intFromFloat(@round(bounds.x_min - 1.0)),
-            .bearing_y = @intFromFloat(@round(bounds.y_max)), // Distance from baseline to top of glyph
+            .width = width_f,
+            .height = height_f,
+            .bearing_x = bounds.x_min - 1.0, // X offset from cursor to glyph left edge (already in pixels)
+            .bearing_y = baseline_from_bottom + bounds.y_max, // Distance from baseline to top of bitmap
             .advance = outline.metrics.advance_width,
         };
     }

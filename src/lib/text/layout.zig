@@ -118,22 +118,25 @@ pub const TextLayoutEngine = struct {
 
             if (glyph_info.width > 0 and glyph_info.height > 0) {
                 const atlas_texture = self.atlas.atlases.items[glyph_info.atlas_index];
-                const tex_u0 = @as(f32, @floatFromInt(glyph_info.texture_x)) / @as(f32, @floatFromInt(atlas_texture.width));
-                const tex_v0 = @as(f32, @floatFromInt(glyph_info.texture_y)) / @as(f32, @floatFromInt(atlas_texture.height));
-                const tex_u1 = @as(f32, @floatFromInt(glyph_info.texture_x + glyph_info.width)) / @as(f32, @floatFromInt(atlas_texture.width));
-                const tex_v1 = @as(f32, @floatFromInt(glyph_info.texture_y + glyph_info.height)) / @as(f32, @floatFromInt(atlas_texture.height));
+                const tex_u0 = glyph_info.texture_x / @as(f32, @floatFromInt(atlas_texture.width));
+                const tex_v0 = glyph_info.texture_y / @as(f32, @floatFromInt(atlas_texture.height));
+                const tex_u1 = (glyph_info.texture_x + glyph_info.width) / @as(f32, @floatFromInt(atlas_texture.width));
+                const tex_v1 = (glyph_info.texture_y + glyph_info.height) / @as(f32, @floatFromInt(atlas_texture.height));
 
-                const glyph_y = cursor_y + self.rasterizer.metrics.getBaselineOffset() - @as(f32, @floatFromInt(glyph_info.bearing_y));
+                // Position glyph using standard baseline approach
+                // All glyphs should have their baseline at the same Y position
+                const baseline_offset = self.rasterizer.metrics.getBaselineOffset();
+                const glyph_y = cursor_y + baseline_offset - glyph_info.bearing_y;
                 
                 const layouted_glyph = LayoutedGlyph{
                     .codepoint = codepoint,
                     .position = Vec2{
-                        .x = cursor_x + @as(f32, @floatFromInt(glyph_info.bearing_x)),
+                        .x = cursor_x + glyph_info.bearing_x,
                         .y = glyph_y, // Baseline alignment: baseline_pos - distance_from_baseline_to_top
                     },
                     .size = Vec2{
-                        .x = @floatFromInt(glyph_info.width),
-                        .y = @floatFromInt(glyph_info.height),
+                        .x = glyph_info.width,
+                        .y = glyph_info.height,
                     },
                     .tex_coords = .{
                         .u0 = tex_u0,
@@ -155,12 +158,18 @@ pub const TextLayoutEngine = struct {
             try self.finalizeLine(&lines, &current_line_glyphs, cursor_x, cursor_y, line_height, options.alignment);
         }
 
-        // Calculate total height using actual font metrics
-        // line_height already includes ascender + |descender| + line_gap
+        // Calculate total height based on our positioning scheme
+        // We position glyphs using: glyph_y = cursor_y + (font_ascender_px - bearing_y)
+        // This means the texture needs to accommodate the actual glyph positions, not just line_height
+        const font_ascender_px = @as(f32, @floatFromInt(self.rasterizer.metrics.ascender)) * self.rasterizer.metrics.scale;
+        const font_descender_px = @as(f32, @floatFromInt(-self.rasterizer.metrics.descender)) * self.rasterizer.metrics.scale; // Make positive
+        const rasterizer_padding: f32 = 6.0; // Account for: bitmap padding (2px) + positioning safety margin (4px)
+        
+        // Total height needs: font ascender + font descender + padding
         const total_height = if (lines.items.len <= 1)
-            line_height  // Single line: just need line height
+            font_ascender_px + font_descender_px + rasterizer_padding  // Single line: full font metrics + padding
         else
-            cursor_y + line_height; // Multiple lines: cursor_y + final line height
+            cursor_y + font_ascender_px + font_descender_px + rasterizer_padding; // Multiple lines: cursor_y + full font metrics + padding
 
         const owned_lines = try self.allocator.alloc(LayoutedLine, lines.items.len);
         for (lines.items, 0..) |line, idx| {

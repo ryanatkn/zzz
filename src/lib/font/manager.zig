@@ -236,15 +236,17 @@ pub const FontManager = struct {
                     defer rasterizer.allocator.free(rasterized.bitmap);
 
                     // Still use the rasterized data but log this shouldn't happen
+                    const height_u32 = @as(u32, @intFromFloat(@ceil(glyph_info.height)));
+                    const width_u32 = @as(u32, @intFromFloat(@ceil(glyph_info.width)));
                     var py: u32 = 0;
-                    while (py < glyph_info.height) : (py += 1) {
+                    while (py < height_u32) : (py += 1) {
                         var px: u32 = 0;
-                        while (px < glyph_info.width) : (px += 1) {
+                        while (px < width_u32) : (px += 1) {
                             const dst_x = glyph_x + @as(i32, @intCast(px));
                             const dst_y = glyph_y + @as(i32, @intCast(py));
 
                             if (dst_x >= 0 and dst_x < width and dst_y >= 0 and dst_y < height) {
-                                const src_idx = py * glyph_info.width + px;
+                                const src_idx = py * width_u32 + px;
                                 const dst_idx = (@as(usize, @intCast(dst_y)) * width + @as(usize, @intCast(dst_x))) * 4;
 
                                 if (src_idx < rasterized.bitmap.len) {
@@ -261,15 +263,17 @@ pub const FontManager = struct {
                 };
 
                 // Use the cached bitmap directly
+                const height_u32_cached = @as(u32, @intFromFloat(@ceil(glyph_info.height)));
+                const width_u32_cached = @as(u32, @intFromFloat(@ceil(glyph_info.width)));
                 var py: u32 = 0;
-                while (py < glyph_info.height) : (py += 1) {
+                while (py < height_u32_cached) : (py += 1) {
                     var px: u32 = 0;
-                    while (px < glyph_info.width) : (px += 1) {
+                    while (px < width_u32_cached) : (px += 1) {
                         const dst_x = glyph_x + @as(i32, @intCast(px));
                         const dst_y = glyph_y + @as(i32, @intCast(py));
 
                         if (dst_x >= 0 and dst_x < width and dst_y >= 0 and dst_y < height) {
-                            const src_idx = py * glyph_info.width + px;
+                            const src_idx = py * width_u32_cached + px;
                             const dst_idx = (@as(usize, @intCast(dst_y)) * width + @as(usize, @intCast(dst_x))) * 4;
 
                             if (src_idx < cached_bitmap.len) {

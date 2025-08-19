@@ -9,7 +9,7 @@ test "debug font metrics and descenders" {
     const allocator = testing.allocator;
     
     std.debug.print("\n\n🔍 FONT DEBUG SESSION STARTING\n", .{});
-    std.debug.print("=" ** 50 ++ "\n", .{});
+    std.debug.print("{s}\n", .{"=" ** 50});
     
     // Try to load DM Sans font
     const font_path = "static/fonts/DM_Sans/static/DMSans-Regular.ttf";
@@ -71,7 +71,7 @@ test "debug font metrics and descenders" {
             .{rasterized.width, rasterized.height, rasterized.bearing_x, rasterized.bearing_y, rasterized.advance});
         
         // Analyze relationship to baseline
-        std.debug.print("Relationship to baseline (y=0):\n");
+        std.debug.print("Relationship to baseline (y=0):\n", .{});
         std.debug.print("  Top: {:.1} font units ({:.2} px above baseline)\n", 
             .{outline.bounds.y_max, outline.bounds.y_max});
         std.debug.print("  Bottom: {:.1} font units ({:.2} px {} baseline)\n", 
@@ -87,7 +87,7 @@ test "debug font metrics and descenders" {
         const glyph_y = cursor_y + baseline_offset - @as(f32, @floatFromInt(rasterized.bearing_y));
         const glyph_bottom = glyph_y + @as(f32, @floatFromInt(rasterized.height));
         
-        std.debug.print("Layout positioning simulation:\n");
+        std.debug.print("Layout positioning simulation:\n", .{});
         std.debug.print("  cursor_y: {:.2}, baseline_offset: {:.2}, bearing_y: {}\n", 
             .{cursor_y, baseline_offset, rasterized.bearing_y});
         std.debug.print("  Final glyph_y: {:.2}, glyph_bottom: {:.2}\n", .{glyph_y, glyph_bottom});
@@ -112,5 +112,5 @@ test "debug font metrics and descenders" {
     }
     
     std.debug.print("\n🔍 FONT DEBUG SESSION COMPLETE\n", .{});
-    std.debug.print("=" ** 50 ++ "\n", .{});
+    std.debug.print("{s}\n", .{"=" ** 50});
 }
