@@ -14,6 +14,7 @@ const stats_page = @import("../../roots/menu/stats/+page.zig");
 const font_grid_test_page = @import("../../roots/menu/font_grid_test/+page.zig");
 const vector_test_page = @import("../../roots/menu/vector_test/+page.zig");
 const ide_page = @import("../../roots/menu/ide/+page.zig");
+const reactive_test_page = @import("../../roots/menu/reactive_test/+page.zig");
 
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const Vec2 = math.Vec2;
@@ -75,10 +76,13 @@ pub const Router = struct {
                 if (std.mem.indexOf(u8, path, "?")) |query_start| {
                     const query = path[query_start + 1 ..];
 
-                    // Check if it's a world loading query or IDE action
+                    // Check if it's a world loading query, reactive test action, or IDE action
                     if (std.mem.startsWith(u8, query, "load_world=")) {
                         log.info("Calling handleWorldLoading with query: '{s}'", .{query});
                         try self.handleWorldLoading(query);
+                    } else if (std.mem.eql(u8, current_base_path, "/reactive-test")) {
+                        log.info("Calling handleReactiveTestAction with query: '{s}'", .{query});
+                        try self.handleReactiveTestAction(query);
                     } else {
                         log.info("Calling handleIDEAction with query: '{s}'", .{query});
                         try self.handleIDEAction(query);
@@ -190,6 +194,15 @@ pub const Router = struct {
                 const query = path[query_start + 1 ..];
                 try self.handleIDEAction(query);
             }
+        } else if (std.mem.eql(u8, path, "/reactive-test") or std.mem.startsWith(u8, path, "/reactive-test?")) {
+            // Handle reactive test page
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Load reactive test page
+            self.current_page = try reactive_test_page.create(self.allocator);
         } else {
             // Default to index for unknown paths
             // Load root layout
@@ -237,6 +250,30 @@ pub const Router = struct {
                     try self.handleExpandAll(ide_page_impl);
                 } else if (std.mem.eql(u8, query, "collapse_all=true")) {
                     try self.handleCollapseAll(ide_page_impl);
+                }
+            }
+        }
+    }
+
+    /// Handle reactive test actions from query parameters
+    fn handleReactiveTestAction(self: *Router, query: []const u8) !void {
+        const log = std.log.scoped(.reactive_test_action);
+        log.info("Handling reactive test action: '{s}'", .{query});
+        
+        if (self.current_page) |current_page| {
+            if (std.mem.eql(u8, current_page.path, "/reactive-test")) {
+                const reactive_page_impl: *reactive_test_page.ReactiveTestPage = @fieldParentPtr("base", current_page);
+                
+                if (std.mem.eql(u8, query, "current_increment")) {
+                    log.info("Incrementing current system counter", .{});
+                    // Increment current system counter
+                    reactive_page_impl.current_count.set(reactive_page_impl.current_count.get() + 1);
+                } else if (std.mem.eql(u8, query, "gannaway_increment")) {
+                    log.info("Incrementing Gannaway system counter", .{});
+                    // Increment Gannaway counter with explicit notification
+                    reactive_page_impl.gannaway_count.update(reactive_page_impl.gannaway_count.get() + 1);
+                } else {
+                    log.info("Unknown reactive test action: '{s}'", .{query});
                 }
             }
         }
