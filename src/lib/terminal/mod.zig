@@ -19,6 +19,22 @@ pub const kernel = @import("kernel/mod.zig");
 pub const presets = struct {
     pub const MinimalTerminal = @import("presets/minimal.zig").MinimalTerminal;
     pub const StandardTerminal = @import("presets/standard.zig").StandardTerminal;
+    pub const CommandTerminal = @import("presets/command.zig").CommandTerminal;
+};
+
+// Export command capabilities
+pub const capabilities = struct {
+    pub const commands = struct {
+        pub const Parser = @import("capabilities/commands/parser.zig").Parser;
+        pub const Registry = @import("capabilities/commands/registry.zig").Registry;
+        pub const Executor = @import("capabilities/commands/executor.zig").Executor;
+        pub const Builtin = @import("capabilities/commands/builtin.zig").Builtin;
+        pub const Pipeline = @import("capabilities/commands/pipeline.zig").Pipeline;
+    };
+    
+    pub const output = struct {
+        pub const AnsiWriter = @import("capabilities/output/ansi_writer.zig").AnsiWriter;
+    };
 };
 
 // Re-export main types for convenience

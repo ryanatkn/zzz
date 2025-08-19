@@ -81,6 +81,9 @@ pub const ComponentType = enum {
     cursor,
     basic_writer,
     keyboard_input,
+    registry,
+    executor,
+    writer,
 };
 
 /// Line buffer state changes
@@ -109,11 +112,24 @@ pub const WriterState = enum {
 };
 
 /// State change types union
+/// Registry state for command registrations
+pub const RegistryState = struct {
+    command_count: usize,
+};
+
+/// Executor state for process execution
+pub const ExecutorState = struct {
+    exit_code: u8,
+};
+
 pub const StateChangeType = union(ComponentType) {
     line_buffer: LineBufferState,
     cursor: CursorState,
     basic_writer: WriterState,
     keyboard_input: void, // No state changes for keyboard
+    registry: RegistryState,
+    executor: ExecutorState,
+    writer: WriterState,
 };
 
 pub const StateChangeData = struct {

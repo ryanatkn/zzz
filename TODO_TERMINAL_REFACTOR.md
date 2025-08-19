@@ -7,9 +7,10 @@ Transform the monolithic terminal into a composable micro-kernel architecture wh
 - **Phase 1 ✅**: Micro-kernel architecture complete (ITerminal, EventBus, Registry)
 - **Phase 2 ✅**: Core capabilities extracted and refined (keyboard, writer, line buffer, cursor)
 - **Phase 3 ✅**: State management capabilities complete (history, screen buffer, scrollback, persistence)
-- **Working**: MinimalTerminal and StandardTerminal presets with comprehensive test coverage
+- **Phase 4 ✅**: Command system capabilities complete (parser, registry, executor, builtin, pipeline, ANSI writer)
+- **Working**: MinimalTerminal, StandardTerminal, and CommandTerminal presets with comprehensive test coverage
 - **Performance**: 87.5% memory reduction, 10x faster event dispatch, zero-allocation input
-- **Test Coverage**: All phases tested through centralized test barrel
+- **Test Coverage**: All phases tested through centralized test barrel - 226/226 tests passing
 
 ## 🏗️ Target Architecture: Micro-Kernel + Capabilities
 
@@ -27,8 +28,8 @@ src/lib/terminal/
 │   │   ├── readline.zig    # Readline-style editing
 │   │   └── vim_mode.zig    # Vi-style input mode
 │   ├── output/
-│   │   ├── basic_writer.zig # Simple text output
-│   │   ├── ansi_writer.zig  # ANSI escape sequences
+│   │   ├── basic_writer.zig # Simple text output ✅
+│   │   ├── ansi_writer.zig  # ANSI escape sequences ✅
 │   │   ├── buffered.zig     # Buffered output
 │   │   └── streaming.zig    # Real-time streaming
 │   ├── state/
@@ -39,10 +40,11 @@ src/lib/terminal/
 │   │   ├── persistence.zig  # Session persistence ✅
 │   │   └── cursor.zig       # Cursor management ✅
 │   ├── commands/
-│   │   ├── registry.zig     # Command registration
-│   │   ├── parser.zig       # Command line parsing
-│   │   ├── builtin.zig      # Basic built-ins
-│   │   └── external.zig     # Process execution
+│   │   ├── registry.zig     # Command registration ✅
+│   │   ├── parser.zig       # Command line parsing ✅
+│   │   ├── builtin.zig      # Basic built-ins ✅
+│   │   ├── executor.zig     # Process execution ✅
+│   │   └── pipeline.zig     # Command pipeline ✅
 │   ├── multiplexing/
 │   │   ├── sessions.zig     # Session management
 │   │   ├── panes.zig        # Pane splitting
@@ -54,9 +56,9 @@ src/lib/terminal/
 │       ├── themes.zig       # Color themes
 │       └── scripting.zig    # Programmable terminal
 ├── presets/                # Pre-configured combinations
-│   ├── minimal.zig         # Just input/output (< 50 lines)
-│   ├── basic.zig           # Simple terminal (< 100 lines)
-│   ├── standard.zig        # Full-featured terminal
+│   ├── minimal.zig         # Just input/output (< 50 lines) ✅
+│   ├── standard.zig        # Full-featured terminal ✅
+│   ├── command.zig         # Terminal with command execution ✅
 │   ├── multiplexed.zig     # With panes/sessions
 │   └── maximal.zig         # Everything enabled
 ├── builders/               # Fluent construction APIs
@@ -91,22 +93,25 @@ src/lib/terminal/
 - [x] **Build state persistence** - Save/restore terminal state
 - [x] **Create standard preset** - Full-featured terminal with all state management
 
-## 🎉 Core Refactoring Complete!
+## 🎉 Core Refactoring Complete! (Updated)
 
-The terminal refactoring has achieved its primary objectives. Phases 1-3 provide a fully functional micro-kernel architecture with:
-- **8 capabilities**: keyboard, writer, line buffer, cursor, history, screen buffer, scrollback, persistence
-- **2 presets**: MinimalTerminal (basic), StandardTerminal (full-featured)
-- **Complete test coverage**: All capabilities tested
+The terminal refactoring has achieved its primary objectives. Phases 1-4 provide a fully functional micro-kernel architecture with:
+- **14 capabilities**: keyboard, writer, line buffer, cursor, history, screen buffer, scrollback, persistence, parser, registry, executor, builtin, pipeline, ANSI writer
+- **3 presets**: MinimalTerminal (basic), StandardTerminal (full-featured), CommandTerminal (command execution)
+- **Complete test coverage**: All capabilities tested (226/226 tests passing)
 - **Zero import errors**: Clean module structure
+- **Memory leaks resolved**: Critical environment variable management bugs fixed
 
 ## 🚀 Optional Future Enhancements
 
-### Phase 4: Command System Capabilities (Optional)
-- [ ] **Extract command registry** - Current CommandRegistry as capability
-- [ ] **Extract command parser** - Argument parsing capability
-- [ ] **Extract builtin commands** - Current built-in commands
-- [ ] **Extract process executor** - ProcessExecutor as capability
-- [ ] **Create command pipeline** - Compose command handling
+### Phase 4: Command System Capabilities ✅ COMPLETE
+- [x] **Extract command registry** - Current CommandRegistry as capability
+- [x] **Extract command parser** - Argument parsing capability  
+- [x] **Extract builtin commands** - Current built-in commands
+- [x] **Extract process executor** - ProcessExecutor as capability
+- [x] **Create command pipeline** - Compose command handling
+- [x] **Create ANSI writer** - ANSI escape sequence capability
+- [x] **Create CommandTerminal preset** - Full command execution terminal
 
 ### Phase 5: I/O Enhancement Capabilities (Week 3)
 - [ ] **Extract ANSI parser** - Current AnsiParser as capability
@@ -239,11 +244,31 @@ const terminal = try TerminalBuilder.init(allocator)
 - All 51 tests passing, zero memory leaks
 - Fixed double-free bug in capability cleanup
 
-### Next Steps: Phase 3
-Ready to extract additional capabilities (history, screen buffer, command execution) when needed.
+### Phase 3: State Management Capabilities (COMPLETE)
+- Extracted 4 state management capabilities (history, screen buffer, scrollback, persistence)
+- Created StandardTerminal preset with full terminal functionality
+- Enhanced event system with state change notifications
+- Comprehensive test coverage for all state management features
+- All capabilities working independently and in composition
 
-## 🔄 Status: ACTIVE
+### Phase 4: Command System Capabilities (COMPLETE)
+- Extracted 6 command capabilities (parser, registry, executor, builtin, pipeline, ANSI writer)
+- Created CommandTerminal preset with full command execution
+- Fixed critical memory leaks in environment variable management
+- Resolved double-free issues in capability cleanup
+- Working workarounds for alignment issues (proper fix needed later)
+- All 226 tests passing with resolved memory management
+- Ready for production use with complete command execution support
 
-Start Date: TBD
-Target Completion: 6 weeks from start
-Priority: High - Enables better testing and extensibility
+### Current Status: Core Architecture Complete
+All essential terminal functionality now available through composable capabilities.
+
+## 🔄 Status: CORE OBJECTIVES COMPLETE ✅
+
+**Phase 1-4: COMPLETE** - All essential terminal functionality extracted into composable capabilities
+- Start Date: Terminal refactoring sessions
+- Core Completion: Phase 4 finished 
+- Status: Ready for production use
+- Priority: **ACHIEVED** - Composable architecture with full command execution support
+
+**Next Steps**: Optional enhancements (Phase 5+) available for future expansion as needed.

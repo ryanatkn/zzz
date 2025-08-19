@@ -31,7 +31,37 @@ test {
     _ = @import("capabilities/state/persistence.zig");
 }
 
+// Command capability tests (Phase 4)
+test {
+    _ = @import("capabilities/commands/parser.zig");
+}
+
+test {
+    _ = @import("capabilities/commands/registry.zig");
+}
+
+test {
+    _ = @import("capabilities/commands/executor.zig");
+}
+
+test {
+    _ = @import("capabilities/commands/builtin.zig");
+}
+
+test {
+    _ = @import("capabilities/commands/pipeline.zig");
+}
+
+// Output capability tests (Phase 4)
+test {
+    _ = @import("capabilities/output/ansi_writer.zig");
+}
+
 // Preset tests
 test {
     _ = @import("presets/standard.zig");
+}
+
+test {
+    _ = @import("presets/command.zig");
 }
