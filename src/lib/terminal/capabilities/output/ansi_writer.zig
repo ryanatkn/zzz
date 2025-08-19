@@ -1,5 +1,6 @@
 const std = @import("std");
 const kernel = @import("../../kernel/mod.zig");
+const BasicWriter = @import("basic_writer.zig").BasicWriter;
 const colors = @import("../../../core/colors.zig");
 
 const Color = colors.Color;
@@ -75,7 +76,7 @@ pub const AnsiWriter = struct {
     pub const capability_type = "output";
 
     allocator: std.mem.Allocator,
-    basic_writer_capability: ?*const kernel.ICapability = null,
+    basic_writer_capability: ?*BasicWriter = null,
     event_bus: ?*kernel.EventBus = null,
     current_style: Style = Style{},
 
@@ -111,13 +112,14 @@ pub const AnsiWriter = struct {
         return &[_][]const u8{"basic_writer"};
     }
 
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         self.event_bus = event_bus;
 
-        // Find basic writer dependency
+        // Find basic writer dependency using type-safe casting
         for (dependencies) |dep| {
-            if (std.mem.eql(u8, dep.vtable.getName(dep.ptr), "basic_writer")) {
-                self.basic_writer_capability = &dep;
+            const dep_name = dep.getName();
+            if (std.mem.eql(u8, dep_name, "basic_writer")) {
+                self.basic_writer_capability = dep.cast(BasicWriter) orelse return error.InvalidCapabilityType;
                 break;
             }
         }

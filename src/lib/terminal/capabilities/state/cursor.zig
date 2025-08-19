@@ -62,7 +62,7 @@ pub const Cursor = struct {
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // No dependencies for cursor
         
         self.event_bus = event_bus;

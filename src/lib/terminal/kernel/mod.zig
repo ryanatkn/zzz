@@ -16,10 +16,17 @@ const std = @import("std");
 pub const terminal_trait = @import("terminal_trait.zig");
 pub const events = @import("events.zig");
 pub const registry = @import("registry.zig");
+pub const typesafe = @import("typesafe_capabilities.zig");
 
 // Primary interfaces
 pub const ITerminal = terminal_trait.ITerminal;
 pub const ICapability = registry.ICapability;
+
+// Type-safe capability system
+pub const TypeSafeCapability = typesafe.TypeSafeCapability;
+pub const CapabilityData = typesafe.CapabilityData;
+pub const TypeSafeCapabilityRegistry = typesafe.TypeSafeCapabilityRegistry;
+pub const createTypeSafeCapability = typesafe.createCapability;
 
 // Event system
 pub const Event = events.Event;

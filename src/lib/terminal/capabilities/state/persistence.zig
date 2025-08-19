@@ -1,5 +1,6 @@
 const std = @import("std");
 const kernel = @import("../../kernel/mod.zig");
+const History = @import("history.zig").History;
 
 /// Persistence capability - saves and restores terminal state across sessions
 pub const Persistence = struct {
@@ -24,7 +25,7 @@ pub const Persistence = struct {
     max_history_lines: usize = 1000,
     
     // Cached references to capabilities
-    history_capability: ?*const kernel.ICapability = null,
+    history_capability: ?*History = null,
     
     const Self = @This();
     
@@ -84,13 +85,14 @@ pub const Persistence = struct {
     }
     
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         self.event_bus = event_bus;
         
-        // Find history capability in dependencies
-        for (deps) |*dep| {
-            if (std.mem.eql(u8, dep.getName(), "history")) {
-                self.history_capability = dep;
+        // Find history capability in dependencies using type-safe casting
+        for (deps) |dep| {
+            const dep_name = dep.getName();
+            if (std.mem.eql(u8, dep_name, "history")) {
+                self.history_capability = dep.cast(History) orelse return error.InvalidCapabilityType;
                 break;
             }
         }

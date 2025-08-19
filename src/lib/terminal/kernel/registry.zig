@@ -9,19 +9,19 @@ pub const ICapability = struct {
     pub const VTable = struct {
         /// Get capability name
         getName: *const fn (ptr: *anyopaque) []const u8,
-        
+
         /// Get capability type
         getType: *const fn (ptr: *anyopaque) []const u8,
-        
+
         /// Get required dependencies
         getDependencies: *const fn (ptr: *anyopaque) []const []const u8,
-        
+
         /// Initialize capability with dependencies
         init: *const fn (ptr: *anyopaque, dependencies: []const ICapability, event_bus: *events.EventBus) anyerror!void,
-        
+
         /// Cleanup capability resources
         deinit: *const fn (ptr: *anyopaque) void,
-        
+
         /// Check if capability is active
         isActive: *const fn (ptr: *anyopaque) bool,
     };
@@ -141,8 +141,8 @@ pub const CapabilityRegistry = struct {
                 if (remaining > 0) {
                     std.mem.copy(
                         CapabilityEntry,
-                        self.entries[i..i + remaining],
-                        self.entries[i + 1..self.entry_count],
+                        self.entries[i .. i + remaining],
+                        self.entries[i + 1 .. self.entry_count],
                     );
                 }
                 self.entry_count -= 1;
@@ -160,16 +160,16 @@ pub const CapabilityRegistry = struct {
         }
         return null;
     }
-    
+
     /// Get capability with type safety (compile-time type checking where possible)
     pub fn getCapabilityTyped(self: *const CapabilityRegistry, comptime T: type) ?*T {
         const cap = self.getCapability(T.name) orelse return null;
-        
+
         // In debug builds, verify type matches
         if (std.debug.runtime_safety) {
             std.debug.assert(std.mem.eql(u8, cap.getType(), T.capability_type));
         }
-        
+
         return @ptrCast(@alignCast(cap.ptr));
     }
 
@@ -177,7 +177,7 @@ pub const CapabilityRegistry = struct {
     pub fn hasCapability(self: *const CapabilityRegistry, name: []const u8) bool {
         return self.getCapability(name) != null;
     }
-    
+
     /// Check if capability exists with type
     pub fn hasCapabilityTyped(self: *const CapabilityRegistry, comptime T: type) bool {
         return self.getCapabilityTyped(T) != null;
@@ -191,7 +191,7 @@ pub const CapabilityRegistry = struct {
             initialized_any = false;
             // Re-resolve dependencies each iteration since they depend on what's initialized
             try self.resolveDependencies();
-            
+
             for (self.entries[0..self.entry_count]) |*entry| {
                 if (!entry.initialized and entry.dependencies_resolved) {
                     try self.initializeCapability(entry);

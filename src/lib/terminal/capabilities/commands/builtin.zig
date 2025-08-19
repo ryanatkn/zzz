@@ -12,7 +12,7 @@ pub const Builtin = struct {
     pub const capability_type = "commands";
 
     allocator: std.mem.Allocator,
-    registry_capability: ?*const kernel.ICapability = null,
+    registry_capability: ?*Registry = null,
     event_bus: ?*kernel.EventBus = null,
 
     const Self = @This();
@@ -47,13 +47,14 @@ pub const Builtin = struct {
         return &[_][]const u8{"command_registry"};
     }
 
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         self.event_bus = event_bus;
 
-        // Find registry dependency
+        // Find registry dependency using type-safe casting
         for (dependencies) |dep| {
-            if (std.mem.eql(u8, dep.vtable.getName(dep.ptr), "command_registry")) {
-                self.registry_capability = &dep;
+            const dep_name = dep.getName();
+            if (std.mem.eql(u8, dep_name, "command_registry")) {
+                self.registry_capability = dep.cast(Registry) orelse return error.InvalidCapabilityType;
                 break;
             }
         }
@@ -77,7 +78,7 @@ pub const Builtin = struct {
 
     /// Register all built-in commands with the registry
     fn registerBuiltinCommands(self: *Self) !void {
-        const registry_impl = @as(*Registry, @ptrCast(@alignCast(self.registry_capability.?.ptr)));
+        const registry_impl = self.registry_capability.?;
 
         const builtins = [_]Command{
             .{ .name = "help", .description = "Show available commands", .usage = "help [command]", .func = cmdHelp },

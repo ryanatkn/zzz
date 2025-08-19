@@ -107,7 +107,7 @@ const MockCapability = struct {
         return self.dependencies;
     }
 
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = dependencies;
         _ = event_bus;
         self.initialized = true;

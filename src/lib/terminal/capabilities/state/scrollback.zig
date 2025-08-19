@@ -95,7 +95,7 @@ pub const Scrollback = struct {
     }
     
     /// Initialize capability with event bus
-    pub fn initialize(self: *Self, deps: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // No dependencies
         
         self.event_bus = event_bus;

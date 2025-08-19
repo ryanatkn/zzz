@@ -15,9 +15,9 @@ pub const Pipeline = struct {
     pub const capability_type = "commands";
 
     allocator: std.mem.Allocator,
-    parser_capability: ?*const kernel.ICapability = null,
-    registry_capability: ?*const kernel.ICapability = null,
-    executor_capability: ?*const kernel.ICapability = null,
+    parser_capability: ?*Parser = null,
+    registry_capability: ?*Registry = null,
+    executor_capability: ?*Executor = null,
     event_bus: ?*kernel.EventBus = null,
 
     // Output callback for command results
@@ -56,18 +56,18 @@ pub const Pipeline = struct {
         return &[_][]const u8{ "command_parser", "command_registry", "process_executor" };
     }
 
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         self.event_bus = event_bus;
 
-        // Find all dependencies
+        // Find all dependencies using type-safe casting
         for (dependencies) |dep| {
-            const dep_name = dep.vtable.getName(dep.ptr);
+            const dep_name = dep.getName();
             if (std.mem.eql(u8, dep_name, "command_parser")) {
-                self.parser_capability = &dep;
+                self.parser_capability = dep.cast(Parser) orelse return error.InvalidCapabilityType;
             } else if (std.mem.eql(u8, dep_name, "command_registry")) {
-                self.registry_capability = &dep;
+                self.registry_capability = dep.cast(Registry) orelse return error.InvalidCapabilityType;
             } else if (std.mem.eql(u8, dep_name, "process_executor")) {
-                self.executor_capability = &dep;
+                self.executor_capability = dep.cast(Executor) orelse return error.InvalidCapabilityType;
             }
         }
 
@@ -110,10 +110,10 @@ pub const Pipeline = struct {
             return;
         }
 
-        // Get capability implementations
-        const parser_impl = @as(*Parser, @ptrCast(@alignCast(self.parser_capability.?.ptr)));
-        const registry_impl = @as(*Registry, @ptrCast(@alignCast(self.registry_capability.?.ptr)));
-        const executor_impl = @as(*Executor, @ptrCast(@alignCast(self.executor_capability.?.ptr)));
+        // Get capability implementations - type-safe direct access
+        const parser_impl = self.parser_capability.?;
+        const registry_impl = self.registry_capability.?;
+        const executor_impl = self.executor_capability.?;
 
         // Parse command line
         var parse_result = parser_impl.parse(trimmed) catch |err| {
@@ -192,7 +192,7 @@ pub const Pipeline = struct {
 
     /// Internal write output function used by command context
     fn pipelineWriteOutput(context: *anyopaque, text: []const u8) !void {
-        const self = @as(*Pipeline, @ptrCast(@alignCast(context)));
+        const self: *Pipeline = @ptrCast(@alignCast(context));
         try self.writeOutput(text);
     }
 
@@ -213,31 +213,16 @@ pub const Pipeline = struct {
             return error.NotInitialized;
         }
 
-        // For now, just do basic validation rather than risk alignment issues
-        // TODO: Fix capability pointer alignment issue
-        _ = self.parser_capability; // Acknowledge we have the capability
+        // Use the parser capability to validate the command line
+        const parser_impl = self.parser_capability.?;
         
-        // Basic validation: check for unclosed quotes
-        var in_quotes = false;
-        var quote_char: u8 = 0;
-        for (command_line) |ch| {
-            switch (ch) {
-                '"', '\'' => {
-                    if (in_quotes and ch == quote_char) {
-                        in_quotes = false;
-                        quote_char = 0;
-                    } else if (!in_quotes) {
-                        in_quotes = true;
-                        quote_char = ch;
-                    }
-                },
-                else => {},
-            }
-        }
+        // Parse to validate syntax - this will catch quote errors
+        var parse_result = parser_impl.parse(command_line) catch |err| {
+            return err; // Return the parsing error directly
+        };
+        defer parse_result.deinit();
         
-        if (in_quotes) {
-            return error.UnclosedQuote;
-        }
+        // If parsing succeeds, the command line is valid
     }
 
     /// Get list of available commands
@@ -246,7 +231,7 @@ pub const Pipeline = struct {
             return error.NotInitialized;
         }
 
-        const registry_impl = @as(*Registry, @ptrCast(@alignCast(self.registry_capability.?.ptr)));
+        const registry_impl = self.registry_capability.?;
         return registry_impl.getCommandNames(self.allocator);
     }
 
@@ -256,18 +241,9 @@ pub const Pipeline = struct {
             return false;
         }
 
-        // For now, just check if we have basic commands available
-        // TODO: Fix capability pointer alignment issue
-        _ = self.registry_capability; // Acknowledge we have the capability
-        
-        // Basic built-in commands that should be available
-        const builtin_commands = [_][]const u8{ "help", "clear", "cd", "pwd", "ls", "cat", "echo", "env", "export", "history", "exit" };
-        for (builtin_commands) |cmd| {
-            if (std.mem.eql(u8, command_name, cmd)) {
-                return true;
-            }
-        }
-        return false;
+        // Use the registry capability to check if command exists
+        const registry_impl = self.registry_capability.?;
+        return registry_impl.hasCommand(command_name);
     }
 
     /// Get current working directory from executor
@@ -276,7 +252,7 @@ pub const Pipeline = struct {
             return null;
         }
 
-        const executor_impl = @as(*Executor, @ptrCast(@alignCast(self.executor_capability.?.ptr)));
+        const executor_impl = self.executor_capability.?;
         return executor_impl.getCurrentDirectory();
     }
 
@@ -286,7 +262,7 @@ pub const Pipeline = struct {
             return error.NotInitialized;
         }
 
-        const executor_impl = @as(*Executor, @ptrCast(@alignCast(self.executor_capability.?.ptr)));
+        const executor_impl = self.executor_capability.?;
         try executor_impl.changeDirectory(path);
     }
 };
@@ -311,7 +287,7 @@ test "Pipeline dependency validation" {
     var event_bus = kernel.EventBus.init(allocator);
 
     // Test with empty dependencies (should fail)
-    try std.testing.expectError(error.MissingDependency, pipeline.initialize(&[_]kernel.ICapability{}, &event_bus));
+    try std.testing.expectError(error.MissingDependency, pipeline.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus));
 }
 
 test "Pipeline command validation" {

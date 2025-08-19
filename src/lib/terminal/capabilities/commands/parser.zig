@@ -57,7 +57,7 @@ pub const Parser = struct {
         return &[_][]const u8{}; // No dependencies
     }
 
-    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = dependencies;
         self.event_bus = event_bus;
     }

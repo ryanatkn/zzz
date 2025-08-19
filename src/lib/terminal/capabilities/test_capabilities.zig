@@ -52,7 +52,7 @@ test "KeyboardInput - emit character events" {
     try event_bus.subscribe(.input, testEventCallback, null);
     
     // Initialize keyboard capability
-    try keyboard.initialize(&[_]kernel.ICapability{}, &event_bus);
+    try keyboard.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
     defer keyboard.deinit();
     
     // Handle character input
@@ -76,7 +76,7 @@ test "KeyboardInput - emit enter input event" {
     try event_bus.subscribe(.input, testEventCallback, null);
     
     // Initialize keyboard capability
-    try keyboard.initialize(&[_]kernel.ICapability{}, &event_bus);
+    try keyboard.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
     defer keyboard.deinit();
     
     // Handle enter key
@@ -94,7 +94,7 @@ test "BasicWriter - write text to scrollback" {
     var event_bus = kernel.createEventBus(allocator);
     
     // Initialize writer capability
-    try writer.initialize(&[_]kernel.ICapability{}, &event_bus);
+    try writer.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
     defer writer.deinit();
     
     // Write text
@@ -111,7 +111,7 @@ test "BasicWriter - clear scrollback" {
     var event_bus = kernel.createEventBus(allocator);
     
     // Initialize writer capability
-    try writer.initialize(&[_]kernel.ICapability{}, &event_bus);
+    try writer.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
     defer writer.deinit();
     
     // Write some text
@@ -133,7 +133,7 @@ test "LineBuffer - character insertion and deletion" {
     var event_bus = kernel.createEventBus(allocator);
     
     // Initialize line buffer capability
-    try line_buffer.initialize(&[_]kernel.ICapability{}, &event_bus);
+    try line_buffer.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
     defer line_buffer.deinit();
     
     // Simulate character input events
@@ -175,7 +175,7 @@ test "LineBuffer - command execution" {
     try event_bus.subscribe(.command_execute, testEventCallback, null);
     
     // Initialize line buffer capability
-    try line_buffer.initialize(&[_]kernel.ICapability{}, &event_bus);
+    try line_buffer.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
     defer line_buffer.deinit();
     
     // Add some text
@@ -219,7 +219,7 @@ test "Cursor - position and visibility" {
     var event_bus = kernel.createEventBus(allocator);
     
     // Initialize cursor capability
-    try cursor.initialize(&[_]kernel.ICapability{}, &event_bus);
+    try cursor.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
     defer cursor.deinit();
     
     // Test initial position
@@ -249,7 +249,7 @@ test "Cursor - dimension bounds checking" {
     var event_bus = kernel.createEventBus(allocator);
     
     // Initialize cursor capability
-    try cursor.initialize(&[_]kernel.ICapability{}, &event_bus);
+    try cursor.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
     defer cursor.deinit();
     
     // Set smaller dimensions
