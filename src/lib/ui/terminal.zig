@@ -146,40 +146,100 @@ pub const TerminalComponent = struct {
         const char_width = self.char_width.get();
         const text_color = self.text_color.get();
         
-        var y_offset: f32 = bounds_rect.position.y + 4; // Small margin
+        // Improved spacing and margins
+        const bottom_margin: f32 = 12; // More bottom margin
+        const top_margin: f32 = 8;
+        const side_margin: f32 = 8;
+        const line_spacing: f32 = line_height * 1.2; // 20% more spacing between lines
+        const input_padding: f32 = 4; // Padding inside input area
         
-        // Render scrollback lines using iterator
-        var lines_iter = content.lines;
-        while (lines_iter.next()) |line| {
-            if (y_offset > bounds_rect.position.y + bounds_rect.size.y) break;
+        // Start from bottom of the terminal, leaving space for proper margins
+        const bottom_y = bounds_rect.position.y + bounds_rect.size.y - bottom_margin;
+        const input_height = line_height + (input_padding * 2); // Input with padding
+        var current_y = bottom_y - input_height;
+        
+        // First render the input background with styling
+        const input_y = current_y;
+        const input_bg_rect = Rectangle{
+            .position = Vec2{ .x = bounds_rect.position.x + side_margin, .y = input_y },
+            .size = Vec2{ .x = bounds_rect.size.x - (side_margin * 2), .y = input_height },
+        };
+        
+        // Draw input background - slightly different color when focused
+        const input_bg_color = if (self.is_focused.get()) 
+            Color{ .r = 30, .g = 35, .b = 40, .a = 255 }  // Slightly lighter when focused
+        else
+            Color{ .r = 15, .g = 20, .b = 25, .a = 255 }; // Darker when not focused
             
-            try self.renderLine(renderer, line.getText(), bounds_rect.position.x + 4, y_offset, text_color);
-            y_offset += line_height;
+        if (@hasDecl(@TypeOf(renderer), "drawRect")) {
+            try renderer.drawRect(input_bg_rect, input_bg_color);
         }
         
-        // Render current input line
-        if (y_offset <= bounds_rect.position.y + bounds_rect.size.y) {
-            // Show prompt
-            const prompt = try self.getPrompt();
-            defer self.allocator.free(prompt);
+        // Render input border when focused
+        if (self.is_focused.get()) {
+            const border_color = Color{ .r = 70, .g = 130, .b = 180, .a = 255 }; // Blue border
+            const border_width: f32 = 1;
             
-            try self.renderLine(renderer, prompt, bounds_rect.position.x + 4, y_offset, text_color);
-            const prompt_width = @as(f32, @floatFromInt(prompt.len)) * char_width;
-            
-            try self.renderLine(renderer, content.current, bounds_rect.position.x + 4 + prompt_width, y_offset, text_color);
-            
-            // Render cursor
-            if (self.is_focused.get() and content.cursor.visible) {
-                const cursor_x = bounds_rect.position.x + 4 + prompt_width + @as(f32, @floatFromInt(content.cursor.x)) * char_width;
-                const cursor_rect = Rectangle{
-                    .position = Vec2{ .x = cursor_x, .y = y_offset },
-                    .size = Vec2{ .x = char_width, .y = line_height },
-                };
-                
-                if (@hasDecl(@TypeOf(renderer), "drawRect")) {
-                    try renderer.drawRect(cursor_rect, self.cursor_color.get());
-                }
+            if (@hasDecl(@TypeOf(renderer), "drawRect")) {
+                // Top border
+                try renderer.drawRect(Rectangle{
+                    .position = input_bg_rect.position,
+                    .size = Vec2{ .x = input_bg_rect.size.x, .y = border_width },
+                }, border_color);
+                // Bottom border
+                try renderer.drawRect(Rectangle{
+                    .position = Vec2{ .x = input_bg_rect.position.x, .y = input_bg_rect.position.y + input_bg_rect.size.y - border_width },
+                    .size = Vec2{ .x = input_bg_rect.size.x, .y = border_width },
+                }, border_color);
+                // Left border
+                try renderer.drawRect(Rectangle{
+                    .position = input_bg_rect.position,
+                    .size = Vec2{ .x = border_width, .y = input_bg_rect.size.y },
+                }, border_color);
+                // Right border
+                try renderer.drawRect(Rectangle{
+                    .position = Vec2{ .x = input_bg_rect.position.x + input_bg_rect.size.x - border_width, .y = input_bg_rect.position.y },
+                    .size = Vec2{ .x = border_width, .y = input_bg_rect.size.y },
+                }, border_color);
             }
+        }
+        
+        // Render input text with padding
+        const text_y = input_y + input_padding;
+        const text_x = bounds_rect.position.x + side_margin + input_padding;
+        
+        // Show prompt
+        const prompt = try self.getPrompt();
+        defer self.allocator.free(prompt);
+        
+        try self.renderLine(renderer, prompt, text_x, text_y, text_color);
+        const prompt_width = @as(f32, @floatFromInt(prompt.len)) * char_width;
+        
+        try self.renderLine(renderer, content.current, text_x + prompt_width, text_y, text_color);
+        
+        // Render cursor for input line
+        if (self.is_focused.get() and content.cursor.visible) {
+            const cursor_x = text_x + prompt_width + @as(f32, @floatFromInt(content.cursor.x)) * char_width;
+            const cursor_rect = Rectangle{
+                .position = Vec2{ .x = cursor_x, .y = text_y },
+                .size = Vec2{ .x = char_width, .y = line_height },
+            };
+            
+            if (@hasDecl(@TypeOf(renderer), "drawRect")) {
+                try renderer.drawRect(cursor_rect, self.cursor_color.get());
+            }
+        }
+        
+        // Now render scrollback lines going upward from the input line with better spacing
+        var lines_iter = content.lines;
+        while (lines_iter.next()) |line| {
+            // Move up with proper line spacing
+            current_y -= line_spacing;
+            
+            // Stop if we've reached the top of the terminal bounds
+            if (current_y < bounds_rect.position.y + top_margin) break;
+            
+            try self.renderLine(renderer, line.getText(), bounds_rect.position.x + side_margin, current_y, text_color);
         }
     }
     

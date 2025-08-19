@@ -124,6 +124,9 @@ pub const GameState = struct {
     }
 
     pub fn deinit(self: *Self) void {
+        // Clean up HUD system
+        self.deinitHud();
+        
         // No behavior system cleanup needed - persistent state machines clean themselves
         self.hex_game.deinit();
         self.logger.deinit();

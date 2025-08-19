@@ -131,35 +131,91 @@ pub const TerminalRenderer = struct {
         const viewport = self.viewport.get();
         const line_height = self.text_renderer.config.get().line_height;
         
-        var current_y = text_area.position.y;
-        const max_y = text_area.position.y + text_area.size.y - line_height;
+        // Improved spacing and margins
+        const bottom_margin: f32 = 12;
+        const side_margin: f32 = 8;
+        const line_spacing: f32 = line_height * 1.2; // 20% more spacing between lines
+        const input_padding: f32 = 4;
         
-        // Render scrollback lines
+        // Start from bottom of text area with proper margins
+        const bottom_y = text_area.position.y + text_area.size.y - bottom_margin;
+        const input_height = line_height + (input_padding * 2);
+        var current_y = bottom_y - input_height;
+        
+        // Render input background with styling
+        const input_y = current_y;
+        const input_bg_rect = Rectangle{
+            .position = Vec2{ .x = text_area.position.x + side_margin, .y = input_y },
+            .size = Vec2{ .x = text_area.size.x - (side_margin * 2), .y = input_height },
+        };
+        
+        // Draw input background - different color based on focus (we'll assume focused for now in this renderer)
+        const input_bg_color = Color{ .r = 30, .g = 35, .b = 40, .a = 255 };
+        if (@hasDecl(@TypeOf(renderer), "drawRect")) {
+            try renderer.drawRect(input_bg_rect.position, input_bg_rect.size, input_bg_color);
+        }
+        
+        // Draw input border
+        const border_color = Color{ .r = 70, .g = 130, .b = 180, .a = 255 };
+        const border_width: f32 = 1;
+        
+        if (@hasDecl(@TypeOf(renderer), "drawRect")) {
+            // Top border
+            try renderer.drawRect(
+                input_bg_rect.position,
+                Vec2{ .x = input_bg_rect.size.x, .y = border_width },
+                border_color
+            );
+            // Bottom border
+            try renderer.drawRect(
+                Vec2{ .x = input_bg_rect.position.x, .y = input_bg_rect.position.y + input_bg_rect.size.y - border_width },
+                Vec2{ .x = input_bg_rect.size.x, .y = border_width },
+                border_color
+            );
+            // Left border
+            try renderer.drawRect(
+                input_bg_rect.position,
+                Vec2{ .x = border_width, .y = input_bg_rect.size.y },
+                border_color
+            );
+            // Right border
+            try renderer.drawRect(
+                Vec2{ .x = input_bg_rect.position.x + input_bg_rect.size.x - border_width, .y = input_bg_rect.position.y },
+                Vec2{ .x = border_width, .y = input_bg_rect.size.y },
+                border_color
+            );
+        }
+        
+        // Render input text with padding
+        const input_position = Vec2{ 
+            .x = text_area.position.x + side_margin + input_padding, 
+            .y = input_y + input_padding 
+        };
+        try self.text_renderer.renderInputLine(
+            renderer, 
+            content.prompt, 
+            content.current_input, 
+            content.cursor, 
+            input_position, 
+            text_area.size.x - (side_margin * 2) - (input_padding * 2)
+        );
+        
+        // Now render scrollback lines going upward from input line with better spacing
         const start_line = viewport.scroll_offset;
         const max_lines = @min(viewport.visible_lines, content.lines.len);
         
         var lines_rendered: usize = 0;
         for (content.lines[start_line..]) |*line| {
-            if (lines_rendered >= max_lines or current_y > max_y) break;
+            // Move up with proper line spacing
+            current_y -= line_spacing;
             
-            const line_position = Vec2{ .x = text_area.position.x, .y = current_y };
-            try self.text_renderer.renderLine(renderer, line, line_position, text_area.size.x);
+            // Stop if we've reached the top of the text area
+            if (current_y < text_area.position.y or lines_rendered >= max_lines) break;
             
-            current_y += line_height;
+            const line_position = Vec2{ .x = text_area.position.x + side_margin, .y = current_y };
+            try self.text_renderer.renderLine(renderer, line, line_position, text_area.size.x - (side_margin * 2));
+            
             lines_rendered += 1;
-        }
-        
-        // Render current input line with prompt and cursor
-        if (current_y <= max_y) {
-            const input_position = Vec2{ .x = text_area.position.x, .y = current_y };
-            try self.text_renderer.renderInputLine(
-                renderer, 
-                content.prompt, 
-                content.current_input, 
-                content.cursor, 
-                input_position, 
-                text_area.size.x
-            );
         }
     }
 

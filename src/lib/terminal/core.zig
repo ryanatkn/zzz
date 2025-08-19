@@ -8,7 +8,6 @@ const Color = colors.Color;
 pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
     return struct {
         items: [capacity]T = undefined,
-        initialized: [capacity]bool = [_]bool{false} ** capacity,
         start: usize = 0,
         len: usize = 0,
         
@@ -21,18 +20,9 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
         pub fn push(self: *Self, item: T) void {
             if (self.len < capacity) {
                 self.items[self.len] = item;
-                self.initialized[self.len] = true;
                 self.len += 1;
             } else {
-                // Clean up old item before overwriting (only if T has deinit method)
-                if (self.initialized[self.start]) {
-                    const type_info = @typeInfo(T);
-                    if (type_info == .@"struct" and @hasDecl(T, "deinit")) {
-                        self.items[self.start].deinit();
-                    }
-                }
                 self.items[self.start] = item;
-                self.initialized[self.start] = true;
                 self.start = (self.start + 1) % capacity;
             }
         }
@@ -50,15 +40,6 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
         }
         
         pub fn clear(self: *Self) void {
-            // Clean up all initialized items (only if T has deinit method)
-            for (self.initialized, 0..) |is_init, i| {
-                if (is_init) {
-                    if (@hasDecl(T, "deinit")) {
-                        self.items[i].deinit();
-                    }
-                    self.initialized[i] = false;
-                }
-            }
             self.start = 0;
             self.len = 0;
         }
@@ -117,11 +98,6 @@ pub const Line = struct {
         };
     }
     
-    pub fn deinit(self: *Self) void {
-        self.text.deinit();
-        self.colors.deinit();
-        self.bold.deinit();
-    }
     
     pub fn appendChar(self: *Self, ch: u8, color: Color, is_bold: bool) !void {
         try self.text.append(ch);
@@ -216,6 +192,7 @@ pub const VisibleLinesIterator = struct {
 /// Terminal state and configuration
 pub const Terminal = struct {
     allocator: std.mem.Allocator,
+    arena: std.heap.ArenaAllocator,
     
     // Dimensions
     columns: usize = 80,
@@ -246,29 +223,22 @@ pub const Terminal = struct {
     const Self = @This();
     
     pub fn init(allocator: std.mem.Allocator) Self {
+        var arena = std.heap.ArenaAllocator.init(allocator);
+        const arena_allocator = arena.allocator();
+        
         return Self{
             .allocator = allocator,
+            .arena = arena,
             .scrollback = RingBuffer(Line, 1000).init(),
-            .current_line = std.ArrayList(u8).init(allocator),
+            .current_line = std.ArrayList(u8).init(arena_allocator),
             .command_history = RingBuffer([]const u8, 100).init(),
-            .working_directory = std.ArrayList(u8).init(allocator),
+            .working_directory = std.ArrayList(u8).init(arena_allocator),
         };
     }
     
     pub fn deinit(self: *Self) void {
-        // Clean up scrollback using the RingBuffer's clear method
-        self.scrollback.clear();
-        
-        // Clean up history
-        var history_i: usize = 0;
-        while (history_i < self.command_history.count()) : (history_i += 1) {
-            if (self.command_history.get(history_i)) |cmd| {
-                self.allocator.free(cmd);
-            }
-        }
-        
-        self.current_line.deinit();
-        self.working_directory.deinit();
+        // Arena allocator cleanup handles all terminal allocations automatically
+        self.arena.deinit();
     }
     
     /// Write text to the terminal
@@ -309,7 +279,7 @@ pub const Terminal = struct {
     /// Move to new line
     fn newline(self: *Self) !void {
         // Create a new line from current buffer
-        var line = Line.init(self.allocator);
+        var line = Line.init(self.arena.allocator());
         try line.appendText(self.current_line.items, self.current_color, self.current_bold);
         
         // Add to scrollback
@@ -385,7 +355,7 @@ pub const Terminal = struct {
     }
     
     /// Get prompt text for command echoing
-    fn getPromptText(self: *const Self) ![]u8 {
+    fn getPromptText(self: *Self) ![]u8 {
         const cwd = self.working_directory.items;
         
         // Extract directory name from full path
@@ -394,26 +364,24 @@ pub const Terminal = struct {
         else
             cwd;
         
-        return std.fmt.allocPrint(self.allocator, "{s}$ ", .{dir_name});
+        return std.fmt.allocPrint(self.arena.allocator(), "{s}$ ", .{dir_name});
     }
     
     /// Execute the current command line
     fn executeCurrentLine(self: *Self) !void {
-        const command = try self.allocator.dupe(u8, self.current_line.items);
-        defer self.allocator.free(command);
+        const command = try self.arena.allocator().dupe(u8, self.current_line.items);
         
         // Echo the command with prompt to scrollback
         if (command.len > 0) {
             // Add command to history
-            const command_copy = try self.allocator.dupe(u8, command);
+            const command_copy = try self.arena.allocator().dupe(u8, command);
             self.command_history.push(command_copy);
             self.history_index = null;
             
             // Create prompt + command line for display
             const prompt_text = try self.getPromptText();
-            defer self.allocator.free(prompt_text);
             
-            var echo_line = Line.init(self.allocator);
+            var echo_line = Line.init(self.arena.allocator());
             try echo_line.appendText(prompt_text, self.current_color, false);
             try echo_line.appendText(command, self.current_color, false);
             
