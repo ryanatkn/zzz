@@ -1,0 +1,179 @@
+const std = @import("std");
+const kernel = @import("../../kernel/mod.zig");
+const core = @import("../../core.zig");
+const colors = @import("../../../core/colors.zig");
+
+/// Basic writer capability - handles text output to terminal scrollback
+pub const BasicWriter = struct {
+    name: []const u8 = "basic_writer",
+    capability_type: []const u8 = "output",
+    dependencies: []const []const u8 = &[_][]const u8{},
+    
+    active: bool = false,
+    initialized: bool = false,
+    
+    // Event bus for emitting events and subscribing to output events
+    event_bus: ?*kernel.EventBus = null,
+    allocator: std.mem.Allocator,
+    
+    // Terminal state
+    scrollback: core.RingBuffer(core.Line, 1000),
+    current_color: colors.Color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+    current_bold: bool = false,
+    
+    // Arena allocator for line management
+    arena: std.heap.ArenaAllocator,
+
+    const Self = @This();
+
+    pub fn init(allocator: std.mem.Allocator) Self {
+        return Self{
+            .allocator = allocator,
+            .arena = std.heap.ArenaAllocator.init(allocator),
+            .scrollback = core.RingBuffer(core.Line, 1000).init(),
+        };
+    }
+
+    /// Get capability name
+    pub fn getName(self: *Self) []const u8 {
+        return self.name;
+    }
+
+    /// Get capability type
+    pub fn getType(self: *Self) []const u8 {
+        return self.capability_type;
+    }
+
+    /// Get required dependencies
+    pub fn getDependencies(self: *Self) []const []const u8 {
+        return self.dependencies;
+    }
+
+    /// Initialize capability with dependencies
+    pub fn initialize(self: *Self, dependencies: []const kernel.ICapability, event_bus: *kernel.EventBus) !void {
+        _ = dependencies; // No dependencies for basic writer
+        
+        self.event_bus = event_bus;
+        
+        // Subscribe to output events
+        try event_bus.subscribe(.output, outputEventCallback, self);
+        
+        self.initialized = true;
+        self.active = true;
+    }
+
+    /// Cleanup capability resources
+    pub fn deinit(self: *Self) void {
+        // Unsubscribe from events
+        if (self.event_bus) |bus| {
+            bus.unsubscribe(.output, outputEventCallback, self);
+        }
+        
+        // Clean up arena
+        self.arena.deinit();
+        
+        self.active = false;
+        self.initialized = false;
+        self.event_bus = null;
+    }
+
+    /// Check if capability is active
+    pub fn isActive(self: *Self) bool {
+        return self.active;
+    }
+
+    /// Write text to the terminal scrollback
+    pub fn write(self: *Self, text: []const u8) !void {
+        if (!self.active) return;
+        
+        for (text) |ch| {
+            try self.writeChar(ch);
+        }
+        
+        // Emit state change event
+        if (self.event_bus) |bus| {
+            const event = kernel.Event.init(.state_change, kernel.EventData{
+                .state_change = kernel.events.StateChangeData{
+                    .component = "basic_writer",
+                    .old_state = null,
+                    .new_state = "text_written",
+                },
+            });
+            try bus.emit(event);
+        }
+    }
+
+    /// Write a single character to the terminal
+    fn writeChar(self: *Self, ch: u8) !void {
+        switch (ch) {
+            '\n' => try self.newline(),
+            '\r' => {}, // Ignore carriage return for now
+            '\t' => {
+                // Convert tab to spaces
+                const spaces = 4;
+                var i: usize = 0;
+                while (i < spaces) : (i += 1) {
+                    try self.writeChar(' ');
+                }
+            },
+            else => {
+                // Just add the character - we don't manage cursor position here
+                // That's handled by the line buffer capability
+                // For now, we create a simple line with the character
+                try self.addCharToCurrentOutput(ch);
+            },
+        }
+    }
+
+    /// Add character to current output (simplified for basic writer)
+    fn addCharToCurrentOutput(self: *Self, ch: u8) !void {
+        // For basic writer, we immediately create a line with the character
+        // In a more sophisticated setup, this would interact with line buffer
+        var line = core.Line.init(self.arena.allocator());
+        try line.appendChar(ch, self.current_color, self.current_bold);
+        self.scrollback.push(line);
+    }
+
+    /// Move to new line
+    fn newline(self: *Self) !void {
+        // Add empty line to scrollback to represent newline
+        const line = core.Line.init(self.arena.allocator());
+        self.scrollback.push(line);
+    }
+
+    /// Get scrollback for rendering
+    pub fn getScrollback(self: *const Self) *const core.RingBuffer(core.Line, 1000) {
+        return &self.scrollback;
+    }
+
+    /// Clear all output
+    pub fn clear(self: *Self) !void {
+        if (!self.active) return;
+        
+        self.scrollback.clear();
+        
+        // Emit state change event
+        if (self.event_bus) |bus| {
+            const event = kernel.Event.init(.state_change, kernel.EventData{
+                .state_change = kernel.events.StateChangeData{
+                    .component = "basic_writer",
+                    .old_state = null,
+                    .new_state = "cleared",
+                },
+            });
+            try bus.emit(event);
+        }
+    }
+};
+
+/// Event callback for handling output events
+fn outputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
+    const self: *BasicWriter = @ptrCast(@alignCast(context.?));
+    
+    switch (event.data) {
+        .output => |output_data| {
+            try self.write(output_data.text);
+        },
+        else => {}, // Ignore other event types
+    }
+}

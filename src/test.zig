@@ -9,7 +9,7 @@
 const std = @import("std");
 
 // ============================================================================
-// WORKING TESTS (30 modules, 164 individual tests, all passing)
+// WORKING TESTS (31 modules, 175+ individual tests, all passing)
 // ============================================================================
 
 // Hex game tests
@@ -197,6 +197,11 @@ test {
 // Terminal kernel tests (micro-kernel architecture)
 test {
     std.testing.refAllDeclsRecursive(@import("lib/terminal/kernel/test_kernel.zig"));
+}
+
+// Terminal capabilities tests (Phase 2 implementation)
+test {
+    std.testing.refAllDeclsRecursive(@import("lib/terminal/capabilities/test_capabilities.zig"));
 }
 
 // EXCLUDED: Imports text/renderer.zig which depends on SDL
