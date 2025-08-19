@@ -28,9 +28,11 @@ pub const FontGridTestPage = struct {
         "Oversampling 2x",
         "Oversampling 4x",
         "ASCII Debug",
-        "The quick brown fox jumps over lazy dog",
+        "gjpqy - descender test", // Test specific descender characters
+        "Typography with gjpqy", // Mixed text with descenders
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
         "abcdefghijklmnopqrstuvwxyz",
+        "The quick brown fox jumps over lazy dog",
         "0123456789!@#$%^&*()",
     };
 

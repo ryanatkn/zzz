@@ -75,8 +75,8 @@ pub const TextLayoutEngine = struct {
         defer current_line_glyphs.deinit();
 
         var cursor_x: f32 = 0;
-        const line_height: f32 = @floatFromInt(font_size);
-        var cursor_y: f32 = 0; // Start at top, baseline offset handles positioning
+        const line_height = self.rasterizer.metrics.getLineHeight();
+        var cursor_y: f32 = 0; // Start at top of texture
         var max_width: f32 = 0;
 
         const space_glyph = try self.atlas.getOrRasterizeGlyph(self.rasterizer, ' ', font_id, font_size);
@@ -123,11 +123,13 @@ pub const TextLayoutEngine = struct {
                 const tex_u1 = @as(f32, @floatFromInt(glyph_info.texture_x + glyph_info.width)) / @as(f32, @floatFromInt(atlas_texture.width));
                 const tex_v1 = @as(f32, @floatFromInt(glyph_info.texture_y + glyph_info.height)) / @as(f32, @floatFromInt(atlas_texture.height));
 
+                const glyph_y = cursor_y + self.rasterizer.metrics.getBaselineOffset() - @as(f32, @floatFromInt(glyph_info.bearing_y));
+                
                 const layouted_glyph = LayoutedGlyph{
                     .codepoint = codepoint,
                     .position = Vec2{
                         .x = cursor_x + @as(f32, @floatFromInt(glyph_info.bearing_x)),
-                        .y = cursor_y + self.rasterizer.metrics.getBaselineOffset() - @as(f32, @floatFromInt(glyph_info.bearing_y)), // Baseline alignment: baseline_pos - distance_from_baseline_to_top
+                        .y = glyph_y, // Baseline alignment: baseline_pos - distance_from_baseline_to_top
                     },
                     .size = Vec2{
                         .x = @floatFromInt(glyph_info.width),
@@ -153,10 +155,12 @@ pub const TextLayoutEngine = struct {
             try self.finalizeLine(&lines, &current_line_glyphs, cursor_x, cursor_y, line_height, options.alignment);
         }
 
-        // Add padding for ascenders and descenders that extend above/below the baseline
-        const ascender_padding = line_height * 0.5; // 50% padding for tall ascenders (like capitals, 'b', 'd', etc.)
-        const descender_padding = line_height * 0.3; // 30% padding for descenders (like 'g', 'j', 'y', 'p', 'q')
-        const total_height = cursor_y + line_height + ascender_padding + descender_padding;
+        // Calculate total height using actual font metrics
+        // line_height already includes ascender + |descender| + line_gap
+        const total_height = if (lines.items.len <= 1)
+            line_height  // Single line: just need line height
+        else
+            cursor_y + line_height; // Multiple lines: cursor_y + final line height
 
         const owned_lines = try self.allocator.alloc(LayoutedLine, lines.items.len);
         for (lines.items, 0..) |line, idx| {
