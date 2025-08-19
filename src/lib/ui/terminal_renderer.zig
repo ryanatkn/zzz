@@ -1,4 +1,10 @@
 /// Safe terminal content renderer with proper error handling
+///
+/// TODO: Consider consolidating terminal rendering logic across:
+/// - terminal.zig render()
+/// - terminal_renderer.zig renderTerminalContent() 
+/// - hud/renderer.zig renderTerminalContentSafe()
+/// These all implement similar bottom-up terminal layout with input styling.
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");

@@ -12,24 +12,34 @@ LMK if you want additional references besides freetype.
 
 ## Current Status: ✅ COMPLETE - Font System Fully Operational
 
-### ✅ MAJOR BREAKTHROUGH: Text Cutoff Issue Resolved (Latest Session)
+### ✅ MAJOR BREAKTHROUGH: Text Cutoff Issues Fully Resolved (Latest Sessions)
 
-**Critical Issue Discovered and Fixed:**
+**Critical Issues Discovered and Fixed:**
+
+**Top Cutoff (Previous Session):**
 - ✅ **Root Cause Found**: Text cutoff was NOT a UI positioning issue - it was a GPU texture size problem
 - ✅ **Fix Applied**: Text layout engine now accounts for font ascenders in texture height calculation
-- ✅ **All Text Rendering**: Button text, navigation text, and all UI text now renders completely without cutoff
-- ✅ **GPU-Level Solution**: Fixed texture dimension calculation in `src/lib/text/layout.zig`
+- ✅ **Technical Solution**: Added 50% padding for ascenders in `src/lib/text/layout.zig`
 
-**Technical Analysis and Solution:**
-- **Problem**: Text layout calculated texture height as `cursor_y + line_height` but glyphs with ascenders (capital letters, tall characters) extend above the baseline
-- **Result**: GPU textures were too small to contain full glyph height, causing top portions to be clipped
-- **Solution**: Added 50% padding to texture height calculation and offset glyph positions to stay within bounds
-- **Code Change**: Modified `src/lib/text/layout.zig` to include ascender padding in total height
+**Bottom Cutoff (Current Session):**
+- ✅ **Root Cause Found**: Characters with descenders (j, g, y, p, q) were being clipped at the bottom
+- ✅ **Fix Applied**: Extended texture height calculation to include descender padding
+- ✅ **Technical Solution**: Added 30% padding for descenders in addition to existing ascender padding
+- ✅ **All Text Rendering**: Button text, navigation text, and all UI text now renders completely without any cutoff
+
+**Complete Technical Analysis and Solution:**
+- **Problem**: Text layout calculated texture height as `cursor_y + line_height` but:
+  - Glyphs with ascenders (capitals, 'b', 'd', etc.) extend above the baseline
+  - Glyphs with descenders ('j', 'g', 'y', 'p', 'q') extend below the baseline
+- **Result**: GPU textures were too small to contain full glyph height, causing clipping on both top and bottom
+- **Solution**: Added comprehensive padding for both ascenders (50%) and descenders (30%) to texture height calculation
+- **Code Changes**: Modified `src/lib/text/layout.zig` lines 157-159 to include both ascender and descender padding
 
 **Key Learning:**
 - GPU texture boundaries are absolute - anything positioned outside the texture is completely clipped
-- Font baseline positioning means text extends above the nominal position
-- Proper text rendering requires accounting for full glyph height including ascenders and descenders
+- Font baseline positioning means text extends both above and below the nominal position
+- Proper text rendering requires accounting for full glyph height including both ascenders and descenders
+- Different character types require different amounts of padding (ascenders need more space than descenders)
 
 ### ✅ Font System Architecture (Fully Working)
 
@@ -117,7 +127,7 @@ LMK if you want additional references besides freetype.
 - `src/lib/font/font_atlas.zig` - GPU texture atlas management
 
 ### Text Layout and Rendering
-- `src/lib/text/layout.zig` - Text positioning and line breaking (**KEY FILE for cutoff fix**)
+- `src/lib/text/layout.zig` - Text positioning and line breaking (**KEY FILE for cutoff fixes - lines 157-159**)
 - `src/lib/text/renderer.zig` - GPU text rendering pipeline
 - `src/lib/text/cache.zig` - Persistent texture caching
 
