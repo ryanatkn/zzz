@@ -1,22 +1,14 @@
 const std = @import("std");
 const testing = std.testing;
-const bitmap_utils = @import("../image/bitmap.zig");
-const font_types = @import("font_types.zig");
-const bitmap_simple = @import("renderers/bitmap_simple.zig");
-const debug_ascii = @import("renderers/debug_ascii.zig");
-const oversampling = @import("renderers/oversampling.zig");
+const font_types = @import("../font_types.zig");
+const bitmap_simple = @import("../renderers/bitmap_simple.zig");
+const debug_ascii = @import("../renderers/debug_ascii.zig");
+const oversampling = @import("../renderers/oversampling.zig");
 
-const BitmapVisualizer = bitmap_utils.Visualizer;
-const Assertions = bitmap_utils.Assertions;
-const font_helpers = @import("../test_utils/font_helpers.zig");
+const test_helpers = @import("../test_helpers.zig");
 
-/// Test data generators for font testing (using shared utilities)
-const TestData = struct {
-    // Delegate to shared implementations
-    const createRectangleOutline = font_helpers.createRectangleOutline;
-    const createTriangleOutline = font_helpers.createTriangleOutline;
-    const freeOutline = font_helpers.freeOutline;
-};
+// NOTE: Temporarily disabled due to missing dependencies
+// TODO: Re-enable when multi_strategy and Benchmark utilities are available
 
 test "simple bitmap renderer - rectangle" {
     const allocator = testing.allocator;

@@ -174,9 +174,9 @@ test {
     std.testing.refAllDeclsRecursive(@import("lib/cache/glyph_cache.zig"));
 }
 
-// Font system tests (barrel import)
+// Font system tests (consolidated)
 test {
-    std.testing.refAllDeclsRecursive(@import("lib/font/tests.zig"));
+    std.testing.refAllDeclsRecursive(@import("lib/font/test.zig"));
 }
 
 // Working UI component tests

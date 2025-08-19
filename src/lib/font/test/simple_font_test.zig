@@ -1,8 +1,8 @@
 const std = @import("std");
 const testing = std.testing;
-const ttf_parser = @import("ttf_parser.zig");
-const rasterizer_core = @import("rasterizer_core.zig");
-const test_helpers = @import("test_helpers.zig");
+const ttf_parser = @import("../ttf_parser.zig");
+const rasterizer_core = @import("../rasterizer_core.zig");
+const test_helpers = @import("../test_helpers.zig");
 
 // Simple test to examine font data for the descender issue
 test "simple font metrics examination" {
@@ -28,6 +28,7 @@ test "simple font metrics examination" {
     
     // Parse the font
     var parser = try ttf_parser.TTFParser.init(allocator, font_data);
+    defer parser.deinit();
     std.debug.print("Font parsed successfully\n", .{});
     
     // Create rasterizer

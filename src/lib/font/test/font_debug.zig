@@ -1,12 +1,17 @@
 const std = @import("std");
 const testing = std.testing;
-const ttf_parser = @import("ttf_parser.zig");
-const rasterizer_core = @import("rasterizer_core.zig");
-const glyph_extractor = @import("glyph_extractor.zig");
+const ttf_parser = @import("../ttf_parser.zig");
+const rasterizer_core = @import("../rasterizer_core.zig");
+const glyph_extractor = @import("../glyph_extractor.zig");
+const test_helpers = @import("../test_helpers.zig");
 
 // Simple debug test to understand our font data
 test "debug font metrics and descenders" {
     const allocator = testing.allocator;
+    
+    // Initialize loggers for font system
+    try test_helpers.initTestLoggers(allocator);
+    defer test_helpers.deinitTestLoggers();
     
     std.debug.print("\n\n🔍 FONT DEBUG SESSION STARTING\n", .{});
     std.debug.print("{s}\n", .{"=" ** 50});
@@ -27,6 +32,7 @@ test "debug font metrics and descenders" {
     
     // Parse the font
     var parser = try ttf_parser.TTFParser.init(allocator, font_data);
+    defer parser.deinit();
     
     std.debug.print("✅ Font parsed successfully\n", .{});
     
@@ -74,7 +80,7 @@ test "debug font metrics and descenders" {
         std.debug.print("Relationship to baseline (y=0):\n", .{});
         std.debug.print("  Top: {:.1} font units ({:.2} px above baseline)\n", 
             .{outline.bounds.y_max, outline.bounds.y_max});
-        std.debug.print("  Bottom: {:.1} font units ({:.2} px {} baseline)\n", 
+        std.debug.print("  Bottom: {:.1} font units ({:.2} px {s} baseline)\n", 
             .{outline.bounds.y_min, @abs(outline.bounds.y_min), if (outline.bounds.y_min < 0) "below" else "above"});
         
         if (outline.bounds.y_min < 0) {
@@ -84,8 +90,8 @@ test "debug font metrics and descenders" {
         // Simulate layout positioning
         const cursor_y: f32 = 0;
         const baseline_offset = metrics.getBaselineOffset();
-        const glyph_y = cursor_y + baseline_offset - @as(f32, @floatFromInt(rasterized.bearing_y));
-        const glyph_bottom = glyph_y + @as(f32, @floatFromInt(rasterized.height));
+        const glyph_y = cursor_y + baseline_offset - rasterized.bearing_y;
+        const glyph_bottom = glyph_y + rasterized.height;
         
         std.debug.print("Layout positioning simulation:\n", .{});
         std.debug.print("  cursor_y: {:.2}, baseline_offset: {:.2}, bearing_y: {}\n", 

@@ -1,8 +1,8 @@
 const std = @import("std");
 const testing = std.testing;
-const ttf_parser = @import("ttf_parser.zig");
-const rasterizer_core = @import("rasterizer_core.zig");
-const test_helpers = @import("test_helpers.zig");
+const ttf_parser = @import("../ttf_parser.zig");
+const rasterizer_core = @import("../rasterizer_core.zig");
+const test_helpers = @import("../test_helpers.zig");
 
 // Test to examine actual pixel data in rasterized bitmaps
 test "pixel-level bitmap analysis" {

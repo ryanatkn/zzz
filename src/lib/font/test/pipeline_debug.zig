@@ -1,7 +1,7 @@
 const std = @import("std");
 const testing = std.testing;
-const ttf_parser = @import("ttf_parser.zig");
-const rasterizer_core = @import("rasterizer_core.zig");
+const ttf_parser = @import("../ttf_parser.zig");
+const rasterizer_core = @import("../rasterizer_core.zig");
 
 // Comprehensive pipeline test to trace descender cutoff issue
 test "pipeline debug - trace descender 'g' through all stages" {
@@ -24,6 +24,7 @@ test "pipeline debug - trace descender 'g' through all stages" {
     
     // Parse the font
     var parser = try ttf_parser.TTFParser.init(allocator, font_data);
+    defer parser.deinit();
     const rasterizer = rasterizer_core.RasterizerCore.init(allocator, &parser, 16.0, 96.0);
     
     const char: u8 = 'g'; // Focus on 'g' as our test descender character

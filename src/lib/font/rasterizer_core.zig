@@ -7,28 +7,38 @@ const bitmap_utils = @import("../image/bitmap.zig");
 
 const log = std.log.scoped(.rasterizer_core);
 
-/// Simple point-in-polygon test using winding number algorithm
-fn isPointInsideGlyph(test_x: f32, test_y: f32, contours: []const glyph_extractor.Contour) bool {
+/// Improved point-in-glyph test with curve tessellation support
+fn isPointInsideGlyph(test_x: f32, test_y: f32, contours: []const glyph_extractor.Contour, allocator: std.mem.Allocator) !bool {
     var winding_number: i32 = 0;
 
     for (contours) |contour| {
-        if (contour.points.len < 3) continue; // Need at least 3 points for a polygon
+        if (contour.points.len < 2) continue;
+        
+        // Tessellate curves into line segments for more accurate rendering
+        const tessellated_points = try tessellateContour(allocator, contour);
+        defer allocator.free(tessellated_points);
 
-        for (contour.points, 0..) |_, i| {
-            const next_i = (i + 1) % contour.points.len;
-            const p1 = contour.points[i];
-            const p2 = contour.points[next_i];
+        if (tessellated_points.len < 3) continue;
 
-            // Ray casting algorithm - check if ray from test point crosses edge
+        // Use improved winding number algorithm on tessellated contour
+        for (tessellated_points, 0..) |_, i| {
+            const next_i = (i + 1) % tessellated_points.len;
+            const p1 = tessellated_points[i];
+            const p2 = tessellated_points[next_i];
+
+            // Ray casting with better precision
             if ((p1.y <= test_y and test_y < p2.y) or (p2.y <= test_y and test_y < p1.y)) {
-                const t = (test_y - p1.y) / (p2.y - p1.y);
-                const intersection_x = p1.x + t * (p2.x - p1.x);
+                const dy = p2.y - p1.y;
+                if (@abs(dy) > 0.0001) { // Avoid division by very small numbers
+                    const t = (test_y - p1.y) / dy;
+                    const intersection_x = p1.x + t * (p2.x - p1.x);
 
-                if (intersection_x > test_x) {
-                    if (p1.y < p2.y) {
-                        winding_number += 1;
-                    } else {
-                        winding_number -= 1;
+                    if (intersection_x > test_x) {
+                        if (p1.y < p2.y) {
+                            winding_number += 1;
+                        } else {
+                            winding_number -= 1;
+                        }
                     }
                 }
             }
@@ -36,6 +46,141 @@ fn isPointInsideGlyph(test_x: f32, test_y: f32, contours: []const glyph_extracto
     }
 
     return winding_number != 0;
+}
+
+/// Fast point-in-glyph test using pre-tessellated contours
+fn isPointInsideGlyphFast(test_x: f32, test_y: f32, tessellated_contours: []const []glyph_extractor.Point) bool {
+    var winding_number: i32 = 0;
+
+    for (tessellated_contours) |contour_points| {
+        if (contour_points.len < 3) continue;
+
+        // Use improved winding number algorithm on tessellated contour
+        for (contour_points, 0..) |_, i| {
+            const next_i = (i + 1) % contour_points.len;
+            const p1 = contour_points[i];
+            const p2 = contour_points[next_i];
+
+            // Ray casting with better precision
+            if ((p1.y <= test_y and test_y < p2.y) or (p2.y <= test_y and test_y < p1.y)) {
+                const dy = p2.y - p1.y;
+                if (@abs(dy) > 0.0001) { // Avoid division by very small numbers
+                    const t = (test_y - p1.y) / dy;
+                    const intersection_x = p1.x + t * (p2.x - p1.x);
+
+                    if (intersection_x > test_x) {
+                        if (p1.y < p2.y) {
+                            winding_number += 1;
+                        } else {
+                            winding_number -= 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return winding_number != 0;
+}
+
+/// Tessellate a contour by converting curves to line segments
+fn tessellateContour(allocator: std.mem.Allocator, contour: glyph_extractor.Contour) ![]glyph_extractor.Point {
+    var tessellated = std.ArrayList(glyph_extractor.Point).init(allocator);
+    defer tessellated.deinit();
+
+    if (contour.points.len < 2) {
+        return tessellated.toOwnedSlice();
+    }
+
+    var i: usize = 0;
+    while (i < contour.points.len) {
+        const current = contour.points[i];
+        const next_i = (i + 1) % contour.points.len;
+        const next = contour.points[next_i];
+
+        try tessellated.append(current);
+
+        // If current point is on-curve and next is off-curve, we have a curve segment
+        if (current.on_curve and !next.on_curve) {
+            // Look for the end point of the curve
+            const end_i = (i + 2) % contour.points.len;
+            var end_point = contour.points[end_i];
+            
+            // If end point is also off-curve, create implied on-curve point
+            if (!end_point.on_curve and i + 2 < contour.points.len) {
+                const next_next = contour.points[end_i];
+                end_point = glyph_extractor.Point{
+                    .x = (next.x + next_next.x) / 2.0,
+                    .y = (next.y + next_next.y) / 2.0,
+                    .on_curve = true,
+                };
+            } else if (!end_point.on_curve) {
+                // Wrap around - use first point
+                end_point = contour.points[0];
+            }
+
+            // Tessellate quadratic bezier curve
+            const steps = 8; // Number of line segments to approximate curve
+            var step: u32 = 1;
+            while (step <= steps) : (step += 1) {
+                const t = @as(f32, @floatFromInt(step)) / @as(f32, @floatFromInt(steps));
+                const point = quadraticBezier(current, next, end_point, t);
+                try tessellated.append(point);
+            }
+
+            // Skip the control point and move to end point
+            i = end_i;
+        } else {
+            i += 1;
+        }
+    }
+
+    return tessellated.toOwnedSlice();
+}
+
+/// Evaluate quadratic bezier curve at parameter t
+fn quadraticBezier(p0: glyph_extractor.Point, p1: glyph_extractor.Point, p2: glyph_extractor.Point, t: f32) glyph_extractor.Point {
+    const one_minus_t = 1.0 - t;
+    const a = one_minus_t * one_minus_t;
+    const b = 2.0 * one_minus_t * t;
+    const c = t * t;
+    
+    return glyph_extractor.Point{
+        .x = a * p0.x + b * p1.x + c * p2.x,
+        .y = a * p0.y + b * p1.y + c * p2.y,
+        .on_curve = true,
+    };
+}
+
+/// Calculate pixel coverage with basic edge anti-aliasing
+fn calculatePixelCoverage(center_x: f32, center_y: f32, contours: []const glyph_extractor.Contour, allocator: std.mem.Allocator) !f32 {
+    // First check center point
+    const center_inside = isPointInsideGlyph(center_x, center_y, contours, allocator) catch false;
+    
+    // For performance, use simple 4-point sampling only near edges
+    const edge_samples = [_]struct { x: f32, y: f32 }{
+        .{ .x = center_x - 0.25, .y = center_y },
+        .{ .x = center_x + 0.25, .y = center_y },
+        .{ .x = center_x, .y = center_y - 0.25 },
+        .{ .x = center_x, .y = center_y + 0.25 },
+    };
+    
+    var inside_count: u32 = if (center_inside) 1 else 0;
+    var edge_detected = false;
+    
+    for (edge_samples) |sample| {
+        const inside = isPointInsideGlyph(sample.x, sample.y, contours, allocator) catch false;
+        if (inside) inside_count += 1;
+        if (inside != center_inside) edge_detected = true;
+    }
+    
+    // If we're not near an edge, return solid fill or empty
+    if (!edge_detected) {
+        return if (center_inside) 1.0 else 0.0;
+    }
+    
+    // Near edge: return proportional coverage
+    return @as(f32, @floatFromInt(inside_count)) / 5.0; // 5 samples total
 }
 
 /// Result of rasterizing a glyph
@@ -134,6 +279,24 @@ pub const RasterizerCore = struct {
         errdefer self.allocator.free(bitmap);
         @memset(bitmap, 0);
 
+        // Pre-tessellate all contours once to avoid repeated tessellation
+        var tessellated_contours = std.ArrayList([]glyph_extractor.Point).init(self.allocator);
+        defer {
+            for (tessellated_contours.items) |tessellated_points| {
+                self.allocator.free(tessellated_points);
+            }
+            tessellated_contours.deinit();
+        }
+
+        // Tessellate all contours once
+        for (outline.contours) |contour| {
+            const tessellated_points = tessellateContour(self.allocator, contour) catch continue;
+            tessellated_contours.append(tessellated_points) catch {
+                self.allocator.free(tessellated_points);
+                continue;
+            };
+        }
+
         // Simple bitmap rasterization using point-in-polygon test
         _ = subpixel_x;
         _ = subpixel_y;
@@ -153,11 +316,11 @@ pub const RasterizerCore = struct {
                 const bitmap_y_from_bottom = @as(f32, @floatFromInt(height)) - 1.0 - @as(f32, @floatFromInt(y));
                 const pixel_y = bitmap_y_from_bottom - baseline_from_bottom; // TTF coordinate (baseline = 0)
 
-                // Test if point is inside glyph using simple winding number
-                const inside = isPointInsideGlyph(pixel_x, pixel_y, outline.contours);
+                // Test if point is inside glyph using pre-tessellated contours
+                const inside = isPointInsideGlyphFast(pixel_x, pixel_y, tessellated_contours.items);
 
                 const bitmap_idx = y * width + x;
-                bitmap[bitmap_idx] = if (inside) 255 else 0; // Pure black/white
+                bitmap[bitmap_idx] = if (inside) 255 else 0;
             }
         }
 
