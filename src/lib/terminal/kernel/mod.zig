@@ -28,6 +28,15 @@ pub const EventData = events.EventData;
 pub const EventBus = events.EventBus;
 pub const EventCallback = events.EventCallback;
 
+// Event data types
+pub const SpecialKey = events.SpecialKey;
+pub const KeyInput = events.KeyInput;
+pub const ComponentType = events.ComponentType;
+pub const LineBufferState = events.LineBufferState;
+pub const CursorState = events.CursorState;
+pub const WriterState = events.WriterState;
+pub const StateChangeType = events.StateChangeType;
+
 // Input/output types
 pub const InputEvent = terminal_trait.InputEvent;
 pub const KeyEvent = terminal_trait.KeyEvent;
@@ -40,6 +49,9 @@ pub const MouseAction = terminal_trait.MouseAction;
 
 // Registry
 pub const CapabilityRegistry = registry.CapabilityRegistry;
+
+// Utilities
+pub const RingBuffer = @import("../core.zig").RingBuffer;
 
 // Kernel version information
 pub const VERSION = std.SemanticVersion{

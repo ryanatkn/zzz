@@ -14,6 +14,13 @@ pub const ansi = @import("ansi.zig");
 pub const output_capture = @import("output_capture.zig");
 pub const process_control = @import("process_control.zig");
 
+// Export kernel and presets for micro-kernel terminal
+pub const kernel = @import("kernel/mod.zig");
+pub const presets = struct {
+    pub const MinimalTerminal = @import("presets/minimal.zig").MinimalTerminal;
+    pub const StandardTerminal = @import("presets/standard.zig").StandardTerminal;
+};
+
 // Re-export main types for convenience
 pub const Terminal = core.Terminal;
 pub const ProcessExecutor = process.ProcessExecutor;
