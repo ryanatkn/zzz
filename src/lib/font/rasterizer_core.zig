@@ -158,7 +158,7 @@ pub const RasterizerCore = struct {
             .width = width,
             .height = height,
             .bearing_x = @intFromFloat(@round(bounds.x_min - 1.0)),
-            .bearing_y = @intFromFloat(@round(bounds.y_max + 1.0)),
+            .bearing_y = @intFromFloat(@round(bounds.y_max)), // Distance from baseline to top of glyph
             .advance = outline.metrics.advance_width,
         };
     }

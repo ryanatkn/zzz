@@ -21,25 +21,98 @@ LMK if you want additional references besides freetype.
 - ✅ **Fix Applied**: Text layout engine now accounts for font ascenders in texture height calculation
 - ✅ **Technical Solution**: Added 50% padding for ascenders in `src/lib/text/layout.zig`
 
-**Bottom Cutoff (Current Session):**
+**Bottom Cutoff & Positioning (Current Session):**
 - ✅ **Root Cause Found**: Characters with descenders (j, g, y, p, q) were being clipped at the bottom
 - ✅ **Fix Applied**: Extended texture height calculation to include descender padding
 - ✅ **Technical Solution**: Added 30% padding for descenders in addition to existing ascender padding
-- ✅ **All Text Rendering**: Button text, navigation text, and all UI text now renders completely without any cutoff
+- ✅ **Secondary Issue**: Descender characters appeared too low due to blanket Y-offset
+- ✅ **Positioning Fix**: Removed blanket ascender offset from Y positioning (line 130)
+- ✅ **Tertiary Issue**: Removing offset caused top cutoff again as tall characters exceeded texture bounds
+- ✅ **Comprehensive Fix**: Start cursor_y with ascender padding instead of applying offset after positioning
+- ✅ **TTF Coordinate Issue**: Discovered bearing_y calculation was using wrong metrics (glyph bounds vs baseline)
+- ✅ **Simple Baseline Fix Attempt**: Tried using cursor_y directly but caused uneven text alignment
+- ✅ **Proper Baseline Fix**: Implemented correct baseline positioning using FontMetrics.getBaselineOffset()
+- ✅ **bearing_y Padding Issue**: Found extra +1.0 padding in rasterizer_core.zig line 161 disrupting baseline alignment
+- ✅ **bearing_y Fix**: Removed +1.0 padding, now uses `bounds.y_max` directly as baseline-to-top distance
+- 🚨 **CURRENT ISSUE**: Descender characters (g, y, j, p, q) are still being cut off, possibly worse after bearing_y fix
 
 **Complete Technical Analysis and Solution:**
 - **Problem**: Text layout calculated texture height as `cursor_y + line_height` but:
   - Glyphs with ascenders (capitals, 'b', 'd', etc.) extend above the baseline
   - Glyphs with descenders ('j', 'g', 'y', 'p', 'q') extend below the baseline
 - **Result**: GPU textures were too small to contain full glyph height, causing clipping on both top and bottom
-- **Solution**: Added comprehensive padding for both ascenders (50%) and descenders (30%) to texture height calculation
-- **Code Changes**: Modified `src/lib/text/layout.zig` lines 157-159 to include both ascender and descender padding
+- **Solution**: Added comprehensive padding for both ascenders (50%) and descenders (30%) to texture height calculation, and implemented proper baseline positioning using font metrics
+- **Code Changes**: 
+  - Modified `src/lib/text/layout.zig` lines 157-159 to include both ascender and descender padding
+  - Fixed Y positioning in line 130 to use `self.rasterizer.metrics.getBaselineOffset()` for proper baseline alignment
+  - Reset cursor_y starting position (line 79) to 0 since baseline offset handles positioning
 
 **Key Learning:**
 - GPU texture boundaries are absolute - anything positioned outside the texture is completely clipped
 - Font baseline positioning means text extends both above and below the nominal position
 - Proper text rendering requires accounting for full glyph height including both ascenders and descenders
 - Different character types require different amounts of padding (ascenders need more space than descenders)
+- Texture padding and glyph positioning must work together - both texture size AND cursor starting position must account for ascender space
+- Starting cursor position determines where the baseline sits within the texture, affecting all character positioning
+- **TTF Coordinate System**: TTF uses baseline-relative coordinates (Y=0 at baseline), properly handled by using font's ascender metric
+- **FontMetrics Architecture**: The font system already had proper baseline calculation via `FontMetrics.getBaselineOffset()` - we just needed to use it
+- **Proper baseline alignment**: All characters now align to the same baseline using font's actual ascender value from hhea table
+
+### 🚨 ACTIVE ISSUE: Descender Character Cutoff
+
+**Current Status**: 🔄 DEBUGGING - Descender characters (g, y, j, p, q) still cut off after baseline fixes
+
+**What We Know:**
+1. **Texture Padding**: Added 50% ascender + 30% descender padding to texture height (lines 157-159)
+2. **Baseline Positioning**: Using `cursor_y + getBaselineOffset() - bearing_y` formula (line 130)
+3. **bearing_y Fixed**: Removed +1.0 padding, now uses `bounds.y_max` directly (rasterizer_core.zig:161)
+4. **cursor_y**: Starts at 0, baseline offset handles positioning (line 79)
+
+**Current Formula Breakdown:**
+```zig
+// In layout.zig line 130:
+.y = cursor_y + self.rasterizer.metrics.getBaselineOffset() - @as(f32, @floatFromInt(glyph_info.bearing_y))
+
+// Where:
+// cursor_y = 0 (top of texture)
+// getBaselineOffset() = ascender * scale (distance from top to baseline)  
+// bearing_y = bounds.y_max (distance from baseline to glyph top)
+```
+
+**Hypothesis**: The issue might be that:
+- Descender characters have smaller bearing_y (since their tops are closer to baseline)
+- This makes them position lower in the texture
+- Even with descender padding, they might be hitting the bottom boundary
+
+**Next Investigation Steps:**
+1. Check if glyph positions are going beyond texture height bounds
+2. Verify that descender padding is sufficient 
+3. Consider if we need to adjust baseline position within texture
+4. Debug actual glyph position values vs texture dimensions
+
+### ✅ COMPLETED Improvements
+
+**✅ Baseline Architecture:**
+- **Font Metrics Integration**: Using FontMetrics.getBaselineOffset() with font ascender/descender from hhea table
+- **bearing_y Calculation**: Fixed to use bounds.y_max without extra padding
+- **Positioning Formula**: Implemented proper baseline alignment calculation
+
+**TODO - Active Debugging:**
+- **Descender Cutoff Resolution**: Fix remaining cutoff issue for descender characters
+- **Position Bounds Checking**: Ensure glyph positions stay within texture bounds
+- **Padding Calculation Review**: Verify descender padding is calculated correctly
+
+**Current Code State (as of latest session):**
+- `src/lib/text/layout.zig:79` - cursor_y starts at 0
+- `src/lib/text/layout.zig:130` - Y position uses baseline formula with FontMetrics
+- `src/lib/text/layout.zig:157-159` - Texture height includes both ascender and descender padding
+- `src/lib/font/rasterizer_core.zig:161` - bearing_y uses bounds.y_max (no +1.0 padding)
+
+**Key Technical Details for Next Session:**
+- The positioning formula places glyph bitmap top-left corner in texture
+- Glyph bitmap contains the full glyph shape including descender parts
+- Texture height = cursor_y + line_height + ascender_padding + descender_padding
+- Issue likely: descender glyphs extend beyond calculated texture bounds despite padding
 
 ### ✅ Font System Architecture (Fully Working)
 
@@ -127,7 +200,7 @@ LMK if you want additional references besides freetype.
 - `src/lib/font/font_atlas.zig` - GPU texture atlas management
 
 ### Text Layout and Rendering
-- `src/lib/text/layout.zig` - Text positioning and line breaking (**KEY FILE for cutoff fixes - lines 157-159**)
+- `src/lib/text/layout.zig` - Text positioning and line breaking (**KEY FILE for cutoff fixes - lines 79, 130, 157-159**)
 - `src/lib/text/renderer.zig` - GPU text rendering pipeline
 - `src/lib/text/cache.zig` - Persistent texture caching
 

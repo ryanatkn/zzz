@@ -75,8 +75,8 @@ pub const TextLayoutEngine = struct {
         defer current_line_glyphs.deinit();
 
         var cursor_x: f32 = 0;
-        var cursor_y: f32 = 0;
         const line_height: f32 = @floatFromInt(font_size);
+        var cursor_y: f32 = 0; // Start at top, baseline offset handles positioning
         var max_width: f32 = 0;
 
         const space_glyph = try self.atlas.getOrRasterizeGlyph(self.rasterizer, ' ', font_id, font_size);
@@ -127,7 +127,7 @@ pub const TextLayoutEngine = struct {
                     .codepoint = codepoint,
                     .position = Vec2{
                         .x = cursor_x + @as(f32, @floatFromInt(glyph_info.bearing_x)),
-                        .y = cursor_y + line_height - @as(f32, @floatFromInt(glyph_info.bearing_y)) + (line_height * 0.5), // Add ascender padding offset (descenders handled by total texture height)
+                        .y = cursor_y + self.rasterizer.metrics.getBaselineOffset() - @as(f32, @floatFromInt(glyph_info.bearing_y)), // Baseline alignment: baseline_pos - distance_from_baseline_to_top
                     },
                     .size = Vec2{
                         .x = @floatFromInt(glyph_info.width),
