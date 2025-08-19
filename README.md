@@ -1,6 +1,6 @@
 # Zzz
 
-> ⚠️ AI slop code and docs, is unstable and full of lies
+> ⚠️ AI slop code and docs, is unstable, insecure, and full of lies
 
 Zzz is a GUI in Zig written by Claude Code and designed by people.
 For the companion CLI see [zz](https://github.com/ryanatkn/zz).
