@@ -19,13 +19,7 @@ const WALK_SPEED_MULT = constants.WALK_SPEED_MULTIPLIER; // Walking speed is 1/4
 
 /// Update any controlled entity with frame context and direct parameters
 /// This replaces the old updatePlayer function and works with any controllable entity
-pub fn updateControlledEntity(
-    game: *HexGame, 
-    entity_id: EntityId,
-    frame_ctx: FrameContext, 
-    input_state: *const InputState, 
-    cam: *const camera.Camera
-) void {
+pub fn updateControlledEntity(game: *HexGame, entity_id: EntityId, frame_ctx: FrameContext, input_state: *const InputState, cam: *const camera.Camera) void {
     const deltaTime = frame_ctx.effectiveDelta();
 
     // Check if entity is alive
@@ -36,13 +30,7 @@ pub fn updateControlledEntity(
     if (!capabilities.can_move) return;
 
     // Calculate velocity from input
-    const velocity = calculateVelocityFromInput(
-        game,
-        entity_id,
-        input_state,
-        cam,
-        capabilities.move_speed
-    );
+    const velocity = calculateVelocityFromInput(game, entity_id, input_state, cam, capabilities.move_speed);
 
     // Get current position
     const current_pos = entity_queries.getEntityPos(game, entity_id) orelse return;
@@ -62,18 +50,12 @@ pub fn updateControlledEntity(
         entity_queries.setEntityPos(game, entity_id, new_pos);
     }
     // If collision detected, don't move (entity stays at current position)
-    
+
     entity_queries.setEntityVelocity(game, entity_id, velocity);
 }
 
 /// Calculate velocity from input for any entity
-fn calculateVelocityFromInput(
-    game: *HexGame,
-    entity_id: EntityId,
-    input_state: *const InputState,
-    cam: *const camera.Camera,
-    base_speed: f32
-) Vec2 {
+fn calculateVelocityFromInput(game: *HexGame, entity_id: EntityId, input_state: *const InputState, cam: *const camera.Camera, base_speed: f32) Vec2 {
     var keyboard_velocity = Vec2.ZERO;
     var mouse_velocity = Vec2.ZERO;
 
@@ -133,4 +115,3 @@ pub fn getEntitySpeed(game: *const HexGame, entity_id: EntityId) f32 {
     }
     return constants.PLAYER_SPEED; // Default fallback
 }
-

@@ -49,7 +49,7 @@ pub const FontTestVisualization = struct {
         for (glyphs.items) |glyph| {
             max_bearing_y = @max(max_bearing_y, glyph.bearing_y);
         }
-        
+
         const composite_height = max_height + padding * 2;
         const baseline_y = padding + @as(u32, @intFromFloat(max_bearing_y));
 
@@ -66,18 +66,18 @@ pub const FontTestVisualization = struct {
             _ = test_chars[i]; // Character ID for debugging
             const glyph_width = @as(u32, @intFromFloat(glyph.width));
             const glyph_height = @as(u32, @intFromFloat(glyph.height));
-            
+
             // Calculate glyph position (baseline-aligned)
             const bearing_y_u32 = @as(u32, @intFromFloat(glyph.bearing_y));
             const glyph_y = if (baseline_y >= bearing_y_u32) baseline_y - bearing_y_u32 else 0;
-            
+
             // Copy glyph bitmap to composite
             for (0..glyph_height) |y| {
                 for (0..glyph_width) |x| {
                     const src_idx = y * glyph_width + x;
                     const dst_x = current_x + x;
                     const dst_y = glyph_y + y;
-                    
+
                     if (dst_x < total_width and dst_y < composite_height and src_idx < glyph.bitmap.len) {
                         const dst_idx = dst_y * total_width + dst_x;
                         if (dst_idx < composite_bitmap.len) {
@@ -131,9 +131,9 @@ pub const FontTestVisualization = struct {
 
             // Categorize character
             const category: u8 = if (char >= 'A' and char <= 'Z') 'U' // Uppercase
-            else if (char >= 'a' and char <= 'z') 'l' // Lowercase
-            else if (char >= '0' and char <= '9') 'n' // Numbers
-            else 's'; // Special
+                else if (char >= 'a' and char <= 'z') 'l' // Lowercase
+                else if (char >= '0' and char <= '9') 'n' // Numbers
+                else 's'; // Special
 
             var entry = character_types.getOrPut(category) catch continue;
             if (!entry.found_existing) {
@@ -178,7 +178,7 @@ pub const FontTestVisualization = struct {
 
             const type_name = switch (category) {
                 'U' => "Uppercase",
-                'l' => "Lowercase", 
+                'l' => "Lowercase",
                 'n' => "Numbers",
                 's' => "Special",
                 else => "Other",
@@ -211,7 +211,7 @@ pub const FontTestVisualization = struct {
         filename: []const u8,
     ) !void {
         _ = self;
-        
+
         // Create output directory
         const dirname = std.fs.path.dirname(filename) orelse ".";
         std.fs.cwd().makePath(dirname) catch {};
@@ -260,11 +260,11 @@ pub const FontTestVisualization = struct {
 
         // Print glyph metrics
         std.debug.print("Outline bounds: x[{:.1}, {:.1}] y[{:.1}, {:.1}]\n", .{
-            outline.bounds.x_min, outline.bounds.x_max, 
+            outline.bounds.x_min, outline.bounds.x_max,
             outline.bounds.y_min, outline.bounds.y_max,
         });
         std.debug.print("Rasterized: {:.1}x{:.1} px, bearing_x:{:.1}, bearing_y:{:.1}\n", .{
-            rasterized.width, rasterized.height, 
+            rasterized.width,     rasterized.height,
             rasterized.bearing_x, rasterized.bearing_y,
         });
         std.debug.print("Advance width: {:.1} px\n", .{rasterized.advance});

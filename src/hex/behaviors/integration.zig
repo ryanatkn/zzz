@@ -41,7 +41,7 @@ fn getOrCreateComposer(entity_id: u32, profile: Disposition, home_pos: Vec2) *Be
         var default_composer = BehaviorComposer.init(profile, home_pos);
         return &default_composer;
     };
-    
+
     if (!result.found_existing) {
         // Create new composer for this entity
         result.value_ptr.* = BehaviorComposer.init(profile, home_pos);
@@ -52,7 +52,7 @@ fn getOrCreateComposer(entity_id: u32, profile: Disposition, home_pos: Vec2) *Be
             result.value_ptr.reset(home_pos);
         }
     }
-    
+
     return result.value_ptr;
 }
 
@@ -70,10 +70,10 @@ pub fn updateUnit(context: UnitUpdateContext) void {
 /// Evaluate unit behavior without applying any changes - pure function
 pub fn evaluateUnitBehavior(context: UnitUpdateContext) evaluators.ComposedBehaviorResult {
     const profile = context.unit.disposition;
-    
+
     // Get behavior composer for this entity
     const composer = getOrCreateComposer(context.unit.entity_id, profile, context.unit.homePos());
-    
+
     // Create context for behavior evaluation
     const behavior_context = evaluators.BehaviorContext.init(
         context.transform.pos,
@@ -83,7 +83,7 @@ pub fn evaluateUnitBehavior(context: UnitUpdateContext) evaluators.ComposedBehav
         context.unit.aggro_factor,
         context.frame_ctx.effectiveDelta(),
     );
-    
+
     // Evaluate composed behavior (pure function)
     return evaluators.evaluateBehaviorForProfile(composer, behavior_context);
 }
@@ -91,16 +91,16 @@ pub fn evaluateUnitBehavior(context: UnitUpdateContext) evaluators.ComposedBehav
 /// Apply behavior result to unit components - caller controls what gets updated
 pub fn applyBehaviorResult(context: UnitUpdateContext, result: evaluators.ComposedBehaviorResult) void {
     const dt = context.frame_ctx.effectiveDelta();
-    
+
     // Apply movement
     context.transform.vel = result.velocity;
     context.transform.pos = context.transform.pos.add(result.velocity.scale(dt));
-    
+
     // Apply visual color (caller can override this by calling evaluateUnitBehavior directly)
     context.visual.color = result.getColor(context.unit.disposition);
 }
 
-/// Legacy function for backward compatibility - will be removed  
+/// Legacy function for backward compatibility - will be removed
 pub fn updateUnitWithAggroMod(
     unit_comp: *Unit,
     transform: *Transform,
@@ -111,12 +111,5 @@ pub fn updateUnitWithAggroMod(
     frame_ctx: FrameContext,
 ) void {
     _ = aggro_multiplier; // Legacy parameter, now using unit's aggro_factor
-    updateUnit(UnitUpdateContext.init(
-        unit_comp, 
-        transform, 
-        visual, 
-        player_pos, 
-        player_alive, 
-        frame_ctx
-    ));
+    updateUnit(UnitUpdateContext.init(unit_comp, transform, visual, player_pos, player_alive, frame_ctx));
 }

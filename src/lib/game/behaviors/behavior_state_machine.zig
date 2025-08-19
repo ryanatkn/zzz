@@ -13,7 +13,6 @@ pub const BehaviorState = enum {
     patrolling,
     guarding,
     returning_home,
-
 };
 
 /// Behavior state machine using the generic infrastructure
@@ -97,7 +96,7 @@ pub const BehaviorRanges = struct {
 pub const BehaviorResult = struct {
     velocity: Vec2,
     active_behavior: BehaviorState,
-    new_state: BehaviorState,  // The state that should be transitioned to (may equal active_behavior)
+    new_state: BehaviorState, // The state that should be transitioned to (may equal active_behavior)
     behavior_changed: bool,
 
     // Events
@@ -109,7 +108,7 @@ pub const BehaviorResult = struct {
 };
 
 /// Pure function to evaluate behavior state and calculate results (no side effects)
-/// 
+///
 /// This function determines the desired behavior state based on current context
 /// and calculates the appropriate velocity and events. It has no side effects
 /// and is easily testable. Use this for testing or when you need to evaluate
@@ -170,7 +169,7 @@ pub fn evaluateBehavior(
 }
 
 /// Update behavior state machine and return result (applies state changes)
-/// 
+///
 /// This is the main interface for updating unit behavior. It uses the pure
 /// evaluateBehavior() function internally and applies any state transitions
 /// to the provided state machine.
@@ -184,7 +183,7 @@ pub fn updateBehaviorStateMachine(
     ranges: BehaviorRanges,
 ) BehaviorResult {
     const current_state = state_machine_ref.getCurrentState();
-    
+
     // Update state machine timer (side effect)
     state_machine_ref.update(context.dt);
 
@@ -236,10 +235,10 @@ fn evaluateDesiredState(context: BehaviorContext, profile: BehaviorProfile, rang
 }
 
 /// Explicit state transition validation with clear, documented rules
-/// 
+///
 /// This function defines the complete transition matrix for the behavior system.
 /// Each transition is explicitly allowed or denied with a documented reason.
-/// 
+///
 /// This replaced the previous priority-based system that could create conflicts.
 /// Now transitions are deterministic and easily debuggable.
 pub fn isValidTransition(from_state: BehaviorState, to_state: BehaviorState) bool {
@@ -272,10 +271,9 @@ pub fn isValidTransition(from_state: BehaviorState, to_state: BehaviorState) boo
 /// Legacy function for backward compatibility - delegates to explicit rule-based validation
 fn canTransitionToState(current: BehaviorState, target: BehaviorState, context: BehaviorContext, ranges: BehaviorRanges) bool {
     _ = context; // Context no longer needed after priority system removal
-    _ = ranges;  // Ranges no longer needed after priority system removal
+    _ = ranges; // Ranges no longer needed after priority system removal
     return isValidTransition(current, target);
 }
-
 
 /// Calculate velocity vector for a given behavior state
 fn calculateVelocityForState(
@@ -440,18 +438,18 @@ test "hostile units never flee" {
 
 test "explicit state transition rules" {
     // Test all valid transitions using the pure isValidTransition function
-    
+
     // Idle can transition to main behavioral states
     try std.testing.expect(isValidTransition(.idle, .chasing));
     try std.testing.expect(isValidTransition(.idle, .fleeing));
     try std.testing.expect(!isValidTransition(.idle, .idle)); // Same state not allowed
-    
+
     // Chasing can lose target or be interrupted
     try std.testing.expect(isValidTransition(.chasing, .idle));
     try std.testing.expect(isValidTransition(.chasing, .fleeing));
     try std.testing.expect(!isValidTransition(.chasing, .patrolling)); // Not allowed
     try std.testing.expect(!isValidTransition(.chasing, .guarding)); // Not allowed
-    
+
     // Fleeing can only return to idle (safety)
     try std.testing.expect(isValidTransition(.fleeing, .idle));
     try std.testing.expect(!isValidTransition(.fleeing, .chasing)); // Fleeing units don't chase
@@ -460,27 +458,26 @@ test "explicit state transition rules" {
 
 test "pure behavior evaluation function" {
     const ranges = BehaviorProfile.hostile.getRanges(100.0);
-    
+
     // Test that pure function produces same results as stateful version
-    const context = BehaviorContext.init(
-        Vec2{ .x = 0, .y = 0 }, // unit_pos
-        Vec2{ .x = 0, .y = 0 }, // home_pos  
+    const context = BehaviorContext.init(Vec2{ .x = 0, .y = 0 }, // unit_pos
+        Vec2{ .x = 0, .y = 0 }, // home_pos
         Vec2{ .x = 50, .y = 0 }, // player_pos (within detection range)
         true, // player_alive
         1.0, // aggro_multiplier
         0.1 // dt
     );
-    
+
     // Test pure function
     const pure_result = evaluateBehavior(.idle, context, .hostile, ranges);
-    
+
     // Should want to transition to chasing
     try std.testing.expect(pure_result.new_state == .chasing);
     try std.testing.expect(pure_result.state_changed == true);
     try std.testing.expect(pure_result.detected_target == true);
     try std.testing.expect(pure_result.velocity.lengthSquared() > 0); // Should have movement
-    
-    // Test that it correctly identifies no change when appropriate  
+
+    // Test that it correctly identifies no change when appropriate
     const no_change_result = evaluateBehavior(.chasing, context, .hostile, ranges);
     try std.testing.expect(no_change_result.new_state == .chasing); // Stay in chasing
     try std.testing.expect(no_change_result.state_changed == false); // No change
@@ -488,21 +485,21 @@ test "pure behavior evaluation function" {
 
 test "state transition comprehensive matrix" {
     const all_states = [_]BehaviorState{ .idle, .chasing, .fleeing, .returning_home, .patrolling, .guarding };
-    
+
     // Test every possible state transition
     for (all_states) |from_state| {
         for (all_states) |to_state| {
             const can_transition = isValidTransition(from_state, to_state);
-            
+
             // Verify specific rules
             if (from_state == to_state) {
                 // Same state should never be allowed
                 try std.testing.expect(!can_transition);
             } else if (from_state == .idle) {
                 // Idle can transition to main behavioral states
-                const expected = (to_state == .chasing or to_state == .fleeing or 
-                                to_state == .patrolling or to_state == .guarding or 
-                                to_state == .returning_home);
+                const expected = (to_state == .chasing or to_state == .fleeing or
+                    to_state == .patrolling or to_state == .guarding or
+                    to_state == .returning_home);
                 try std.testing.expectEqual(expected, can_transition);
             } else if (from_state == .fleeing and to_state != .idle) {
                 // Fleeing units can only go to idle (safety)

@@ -127,7 +127,7 @@ pub const TextLayoutEngine = struct {
                 // All glyphs should have their baseline at the same Y position
                 const baseline_offset = self.rasterizer.metrics.getBaselineOffset();
                 const glyph_y = cursor_y + baseline_offset - glyph_info.bearing_y;
-                
+
                 const layouted_glyph = LayoutedGlyph{
                     .codepoint = codepoint,
                     .position = Vec2{
@@ -164,10 +164,10 @@ pub const TextLayoutEngine = struct {
         const font_ascender_px = @as(f32, @floatFromInt(self.rasterizer.metrics.ascender)) * self.rasterizer.metrics.scale;
         const font_descender_px = @as(f32, @floatFromInt(-self.rasterizer.metrics.descender)) * self.rasterizer.metrics.scale; // Make positive
         const rasterizer_padding: f32 = 6.0; // Account for: bitmap padding (2px) + positioning safety margin (4px)
-        
+
         // Total height needs: font ascender + font descender + padding
         const total_height = if (lines.items.len <= 1)
-            font_ascender_px + font_descender_px + rasterizer_padding  // Single line: full font metrics + padding
+            font_ascender_px + font_descender_px + rasterizer_padding // Single line: full font metrics + padding
         else
             cursor_y + font_ascender_px + font_descender_px + rasterizer_padding; // Multiple lines: cursor_y + full font metrics + padding
 

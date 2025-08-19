@@ -1,4 +1,4 @@
-// Behavior Evaluators - Disposition-specific behavior logic  
+// Behavior Evaluators - Disposition-specific behavior logic
 // Contains 4 evaluator functions (hostile, fearful, neutral, friendly)
 
 const std = @import("std");
@@ -21,13 +21,13 @@ pub const ComposedBehaviorResult = struct {
     velocity: Vec2,
     active_behavior: BehaviorType,
     behavior_changed: bool = false,
-    
+
     // Events for hex-specific handling
     detected_target: bool = false,
     lost_target: bool = false,
     started_fleeing: bool = false,
     stopped_fleeing: bool = false,
-    
+
     /// Get color for this behavior and profile (optional helper)
     pub fn getColor(self: ComposedBehaviorResult, profile: Disposition) @import("../../lib/core/colors.zig").Color {
         return getBehaviorColor(self.active_behavior, profile);
@@ -44,12 +44,12 @@ pub const BehaviorContext = struct {
     dt: f32,
     distance_to_player: f32,
     distance_from_home_sq: f32, // Squared for performance
-    
+
     pub fn init(unit_pos: Vec2, home_pos: Vec2, player_pos: ?Vec2, player_alive: bool, aggro_multiplier: f32, dt: f32) BehaviorContext {
         const distance_to_player = if (player_pos) |pp| unit_pos.sub(pp).length() else std.math.inf(f32);
         const home_offset = unit_pos.sub(home_pos);
         const distance_from_home_sq = home_offset.lengthSquared();
-        
+
         return .{
             .unit_pos = unit_pos,
             .home_pos = home_pos,
@@ -79,7 +79,7 @@ fn evaluateHostileBehavior(composer: *BehaviorComposer, context: BehaviorContext
         .velocity = Vec2.ZERO,
         .active_behavior = composer.current_behavior,
     };
-    
+
     // Try chase behavior first
     if (context.player_alive and context.player_pos != null) {
         const chase_result = chase_behavior.evaluateChase(
@@ -91,7 +91,7 @@ fn evaluateHostileBehavior(composer: *BehaviorComposer, context: BehaviorContext
             context.aggro_multiplier,
             context.dt,
         );
-        
+
         if (chase_result.is_chasing) {
             result.velocity = chase_result.velocity;
             result.active_behavior = .chasing;
@@ -101,25 +101,25 @@ fn evaluateHostileBehavior(composer: *BehaviorComposer, context: BehaviorContext
             composer.current_behavior = .chasing;
             return result;
         }
-        
+
         // Track lost target event
         if (chase_result.lost_target) {
             result.lost_target = true;
         }
     }
-    
+
     // Fall back to return home behavior
     const home_result = return_home_behavior.calculateReturnHomeVelocity(
         context.unit_pos,
         context.home_pos,
         ProfileConfigs.hostile.return_home,
     );
-    
+
     result.velocity = home_result.velocity;
     result.active_behavior = if (home_result.at_home) .idle else .returning_home;
     result.behavior_changed = composer.current_behavior != result.active_behavior;
     composer.current_behavior = result.active_behavior;
-    
+
     return result;
 }
 
@@ -129,7 +129,7 @@ fn evaluateFearfulBehavior(composer: *BehaviorComposer, context: BehaviorContext
         .velocity = Vec2.ZERO,
         .active_behavior = composer.current_behavior,
     };
-    
+
     // Try flee behavior first
     if (context.player_alive and context.player_pos != null) {
         const flee_result = flee_behavior.evaluateFlee(
@@ -141,7 +141,7 @@ fn evaluateFearfulBehavior(composer: *BehaviorComposer, context: BehaviorContext
             context.aggro_multiplier,
             context.dt,
         );
-        
+
         if (flee_result.is_fleeing) {
             result.velocity = flee_result.velocity;
             result.active_behavior = .fleeing;
@@ -152,19 +152,19 @@ fn evaluateFearfulBehavior(composer: *BehaviorComposer, context: BehaviorContext
             return result;
         }
     }
-    
+
     // Fall back to return home behavior
     const home_result = return_home_behavior.calculateReturnHomeVelocity(
         context.unit_pos,
         context.home_pos,
         ProfileConfigs.fearful.return_home,
     );
-    
+
     result.velocity = home_result.velocity;
     result.active_behavior = if (home_result.at_home) .idle else .returning_home;
     result.behavior_changed = composer.current_behavior != result.active_behavior;
     composer.current_behavior = result.active_behavior;
-    
+
     return result;
 }
 
@@ -174,8 +174,8 @@ fn evaluateNeutralBehavior(composer: *BehaviorComposer, context: BehaviorContext
         .velocity = Vec2.ZERO,
         .active_behavior = composer.current_behavior,
     };
-    
-    // Check if too far from home - return if needed  
+
+    // Check if too far from home - return if needed
     const home_tolerance_sq = ProfileConfigs.neutral.return_home.home_tolerance_sq;
     if (context.distance_from_home_sq > home_tolerance_sq) {
         const home_result = return_home_behavior.calculateReturnHomeVelocity(
@@ -183,14 +183,14 @@ fn evaluateNeutralBehavior(composer: *BehaviorComposer, context: BehaviorContext
             context.home_pos,
             ProfileConfigs.neutral.return_home,
         );
-        
+
         result.velocity = home_result.velocity;
         result.active_behavior = .returning_home;
         result.behavior_changed = composer.current_behavior != .returning_home;
         composer.current_behavior = .returning_home;
         return result;
     }
-    
+
     // Use wander behavior for exploration
     const wander_result = wander_behavior.evaluateWander(
         context.unit_pos,
@@ -199,12 +199,12 @@ fn evaluateNeutralBehavior(composer: *BehaviorComposer, context: BehaviorContext
         1.0, // speed_multiplier
         context.dt,
     );
-    
+
     result.velocity = wander_result.velocity;
     result.active_behavior = if (wander_result.velocity.lengthSquared() > 0.1) .wandering else .idle;
     result.behavior_changed = composer.current_behavior != result.active_behavior;
     composer.current_behavior = result.active_behavior;
-    
+
     return result;
 }
 
@@ -214,7 +214,7 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
         .velocity = Vec2.ZERO,
         .active_behavior = composer.current_behavior,
     };
-    
+
     // Try gentle following behavior
     if (context.player_alive and context.player_pos != null) {
         const chase_result = chase_behavior.evaluateChase(
@@ -226,7 +226,7 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
             context.aggro_multiplier,
             context.dt,
         );
-        
+
         if (chase_result.is_chasing) {
             result.velocity = chase_result.velocity;
             result.active_behavior = .chasing;
@@ -235,7 +235,7 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
             return result;
         }
     }
-    
+
     // Check if too far from home - return if needed
     const home_tolerance_sq = ProfileConfigs.friendly.return_home.home_tolerance_sq;
     if (context.distance_from_home_sq > home_tolerance_sq) {
@@ -244,14 +244,14 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
             context.home_pos,
             ProfileConfigs.friendly.return_home,
         );
-        
+
         result.velocity = home_result.velocity;
         result.active_behavior = .returning_home;
         result.behavior_changed = composer.current_behavior != .returning_home;
         composer.current_behavior = .returning_home;
         return result;
     }
-    
+
     // Use wander behavior for exploration
     const wander_result = wander_behavior.evaluateWander(
         context.unit_pos,
@@ -260,12 +260,12 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
         1.0, // speed_multiplier
         context.dt,
     );
-    
+
     result.velocity = wander_result.velocity;
     result.active_behavior = if (wander_result.velocity.lengthSquared() > 0.1) .wandering else .idle;
     result.behavior_changed = composer.current_behavior != result.active_behavior;
     composer.current_behavior = result.active_behavior;
-    
+
     return result;
 }
 
@@ -279,6 +279,6 @@ pub fn getBehaviorColor(behavior: BehaviorType, profile: Disposition) @import(".
         .wandering => behaviors_mod.behavior_state_machine.BehaviorState.idle,
         .returning_home => behaviors_mod.behavior_state_machine.BehaviorState.returning_home,
     };
-    
+
     return constants.getDispositionColor(legacy_behavior, profile);
 }

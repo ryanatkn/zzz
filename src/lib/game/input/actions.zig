@@ -39,10 +39,10 @@ pub const GameAction = enum {
     // Debug/Special actions
     ToggleAI,
     ToggleHUD,
-    
+
     // Possession/Control actions (Phase 2)
     CyclePossession, // Tab key - cycle through controllable entities
-    ReleaseControl,  // Tilde key - enter autonomous simulation mode
+    ReleaseControl, // Tilde key - enter autonomous simulation mode
 
     None,
 };
@@ -139,7 +139,7 @@ pub fn mapScancodeToAction(scancode: u32) GameAction {
         c.sdl.SDL_SCANCODE_T => .ResetZone,
         c.sdl.SDL_SCANCODE_Y => .ResetGame,
         c.sdl.SDL_SCANCODE_G => .ToggleAI,
-        
+
         // Possession/Control (Phase 2)
         c.sdl.SDL_SCANCODE_TAB => .CyclePossession,
         c.sdl.SDL_SCANCODE_APOSTROPHE => .ReleaseControl, // Single quote key

@@ -7,7 +7,7 @@ pub fn initTestLoggers(allocator: std.mem.Allocator) !void {
     try loggers.initGlobalLoggers(allocator);
 }
 
-/// Test helper to clean up global loggers 
+/// Test helper to clean up global loggers
 /// Call this at the end of font tests (use defer)
 pub fn deinitTestLoggers() void {
     loggers.deinitGlobalLoggers();
@@ -18,7 +18,7 @@ pub fn deinitTestLoggers() void {
 /// test "my font test" {
 ///     try withTestLoggers(testing.allocator, testFontFunction);
 /// }
-pub fn withTestLoggers(allocator: std.mem.Allocator, testFn: fn() anyerror!void) !void {
+pub fn withTestLoggers(allocator: std.mem.Allocator, testFn: fn () anyerror!void) !void {
     try initTestLoggers(allocator);
     defer deinitTestLoggers();
     try testFn();

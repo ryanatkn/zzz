@@ -13,11 +13,11 @@ pub const UnitUpdateContext = struct {
     unit: *Unit,
     transform: *Transform,
     visual: *Visual,
-    
+
     // World context
     player_pos: Vec2,
     player_alive: bool,
-    
+
     // Timing
     frame_ctx: FrameContext,
 

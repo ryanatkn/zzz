@@ -68,7 +68,7 @@ pub const GameState = struct {
 
     // HUD system for system menu (reactive)
     hud_system: ?reactive_hud.ReactiveHud,
-    
+
     // Renderer reference for HUD recreation during world reload
     renderer: ?*game_renderer.GameRenderer,
 
@@ -126,7 +126,7 @@ pub const GameState = struct {
     pub fn deinit(self: *Self) void {
         // Clean up HUD system
         self.deinitHud();
-        
+
         // No behavior system cleanup needed - persistent state machines clean themselves
         self.hex_game.deinit();
         self.logger.deinit();
@@ -169,13 +169,13 @@ pub const GameState = struct {
             self.logger.info("ai_toggle", "AI control: {} (ai_input is null)", .{self.ai_enabled});
         }
     }
-    
+
     // Possession/Control methods (Phase 2)
     pub fn cyclePossessionTarget(self: *Self) void {
         if (self.hex_game.cyclePossession()) {
             if (self.hex_game.getControlledEntity()) |entity_id| {
                 self.logger.info("possession", "Cycled to entity {}", .{entity_id});
-                
+
                 // Log faction perspective change
                 if (self.hex_game.getControlledEntityFactions()) |factions| {
                     self.logger.info("faction_view", "Now viewing world through {} faction tags", .{factions.tags.count()});
@@ -185,7 +185,7 @@ pub const GameState = struct {
             self.logger.info("possession", "No controllable entities found to cycle to", .{});
         }
     }
-    
+
     pub fn releaseControl(self: *Self) void {
         if (self.hex_game.getControlledEntity()) |entity_id| {
             self.hex_game.releaseControl();
@@ -276,60 +276,60 @@ pub const GameState = struct {
 
         self.logger.info("full_reset", "Full game reset", .{});
     }
-    
+
     /// Reload the game with a different world
     pub fn reloadWithWorld(self: *Self, world_path: []const u8) !void {
         const loader = @import("loader.zig");
-        
+
         self.logger.info("world_reload", "Reloading with world: {s}", .{world_path});
-        
+
         // Clean up HUD before world reload to prevent reactive state corruption
         self.deinitHud();
         self.logger.info("world_reload_hud_cleanup", "HUD deinitialized", .{});
-        
+
         // Clear current game state
         self.hex_game.deinit();
         self.particle_system.clear();
-        
+
         // Clear zone manager state
         self.hex_game = HexGame.init(self.allocator);
-        
+
         // Load new world data with error handling
         var world_loaded_successfully = false;
         loader.loadWorldData(self.allocator, &self.hex_game, world_path) catch |err| {
             self.logger.err("world_reload_failed", "Failed to load world {s}: {}", .{ world_path, err });
-            
+
             // Try to recover by loading the default world
             const fallback_world = @import("loader.zig").DEFAULT_WORLD;
             self.logger.info("world_reload_fallback", "Attempting fallback to: {s}", .{fallback_world});
-            
+
             loader.loadWorldData(self.allocator, &self.hex_game, fallback_world) catch |fallback_err| {
                 self.logger.err("world_reload_fallback_failed", "Fallback also failed: {}", .{fallback_err});
-                
-                // Try to recreate HUD even after failure to maintain some stability  
+
+                // Try to recreate HUD even after failure to maintain some stability
                 self.tryRecreateHud();
-                
+
                 return fallback_err;
             };
-            
+
             self.logger.info("world_reload_fallback_success", "Fallback successful", .{});
             world_loaded_successfully = true;
         };
-        
+
         if (!world_loaded_successfully) {
             world_loaded_successfully = true;
         }
-        
+
         // Recreate HUD after successful world loading
         self.tryRecreateHud();
-        
+
         // Reset game state for new world
         self.game_paused = false;
         self.iris_wipe_active = false;
-        
+
         self.logger.info("world_reload_complete", "Successfully reloaded world: {s}", .{world_path});
     }
-    
+
     /// Helper function to recreate HUD, handling errors gracefully
     fn tryRecreateHud(self: *Self) void {
         if (self.renderer) |renderer_ptr| {
@@ -451,7 +451,7 @@ fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
                             const aggro_mod: f32 = 1.0;
                             behaviors.updateUnitWithAggroMod(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, frame_ctx);
                         }
-                        
+
                         // Apply faction-based colors from controlled entity's perspective
                         const viewer_entity = world.getControlledEntity();
                         visual.color = faction_integration.getRelationshipColor(world, viewer_entity, unit_id);

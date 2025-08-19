@@ -13,9 +13,9 @@ pub const Capabilities = components.Capabilities;
 /// Get default faction tags for the player entity
 pub fn getPlayerFactions() EntityFactions {
     return EntityFactions.initWithTags(&.{
-        .halfling,        // Default player race
-        .living,          // Player is a living being
-        .kingdom_guard,   // Starting allegiance
+        .halfling, // Default player race
+        .living, // Player is a living being
+        .kingdom_guard, // Starting allegiance
     });
 }
 
@@ -29,32 +29,32 @@ pub fn getPlayerCapabilities() Capabilities {
 pub fn getUnitFactions(disposition: Disposition, unit_type: UnitType) EntityFactions {
     return switch (disposition) {
         .friendly => EntityFactions.initWithTags(&.{
-            .halfling,        // Assume friendly units are same race as player
+            .halfling, // Assume friendly units are same race as player
             .living,
-            .kingdom_guard,   // Friendly units serve the kingdom
+            .kingdom_guard, // Friendly units serve the kingdom
         }),
         .hostile => switch (unit_type) {
             .enemy => EntityFactions.initWithTags(&.{
-                .goblin,          // Default hostile race
+                .goblin, // Default hostile race
                 .living,
-                .bandit,          // Hostile allegiance
-                .territorial,     // Aggressive behavior
+                .bandit, // Hostile allegiance
+                .territorial, // Aggressive behavior
             }),
             else => EntityFactions.initWithTags(&.{
-                .beast,           // Non-enemy hostiles are beasts
+                .beast, // Non-enemy hostiles are beasts
                 .living,
-                .territorial,     // Defensive of their territory
+                .territorial, // Defensive of their territory
             }),
         },
         .fearful => EntityFactions.initWithTags(&.{
-            .beast,           // Fearful creatures are usually animals
+            .beast, // Fearful creatures are usually animals
             .living,
-            .fleeing,         // Currently in flight mode
+            .fleeing, // Currently in flight mode
         }),
         .neutral => EntityFactions.initWithTags(&.{
-            .beast,           // Neutral creatures are typically wildlife
+            .beast, // Neutral creatures are typically wildlife
             .living,
-            .solitary,        // Keeps to themselves
+            .solitary, // Keeps to themselves
         }),
     };
 }
@@ -69,7 +69,7 @@ pub fn getUnitCapabilities(disposition: Disposition) Capabilities {
             .can_move = true,
             .move_speed = constants.UNIT_SPEED * 1.2, // Faster when fleeing
             .can_be_controlled = true,
-            .can_attack = false,  // Too scared to attack
+            .can_attack = false, // Too scared to attack
             .attack_damage = 0.0,
             .can_be_damaged = true,
             .can_interact = false, // Too scared to interact
@@ -82,33 +82,15 @@ pub fn getUnitCapabilities(disposition: Disposition) Capabilities {
 /// This allows for more detailed faction combinations
 pub fn getCreatureFactions(creature_type: CreatureType) EntityFactions {
     return switch (creature_type) {
-        .goblin_warrior => EntityFactions.initWithTags(&.{
-            .goblin, .living, .bandit, .pack_hunter, .territorial
-        }),
-        .goblin_shaman => EntityFactions.initWithTags(&.{
-            .goblin, .living, .necromancer_cult, .territorial
-        }),
-        .forest_wolf => EntityFactions.initWithTags(&.{
-            .beast, .living, .pack_hunter, .territorial
-        }),
-        .dire_bear => EntityFactions.initWithTags(&.{
-            .beast, .living, .solitary, .territorial
-        }),
-        .forest_sprite => EntityFactions.initWithTags(&.{
-            .fey, .living, .forest_warden, .guardian
-        }),
-        .stone_golem => EntityFactions.initWithTags(&.{
-            .golem, .construct, .guardian, .territorial
-        }),
-        .undead_warrior => EntityFactions.initWithTags(&.{
-            .halfling, .undead, .necromancer_cult
-        }),
-        .merchant_guard => EntityFactions.initWithTags(&.{
-            .halfling, .living, .merchant_guild, .guardian
-        }),
-        .kingdom_patrol => EntityFactions.initWithTags(&.{
-            .halfling, .living, .kingdom_guard, .guardian
-        }),
+        .goblin_warrior => EntityFactions.initWithTags(&.{ .goblin, .living, .bandit, .pack_hunter, .territorial }),
+        .goblin_shaman => EntityFactions.initWithTags(&.{ .goblin, .living, .necromancer_cult, .territorial }),
+        .forest_wolf => EntityFactions.initWithTags(&.{ .beast, .living, .pack_hunter, .territorial }),
+        .dire_bear => EntityFactions.initWithTags(&.{ .beast, .living, .solitary, .territorial }),
+        .forest_sprite => EntityFactions.initWithTags(&.{ .fey, .living, .forest_warden, .guardian }),
+        .stone_golem => EntityFactions.initWithTags(&.{ .golem, .construct, .guardian, .territorial }),
+        .undead_warrior => EntityFactions.initWithTags(&.{ .halfling, .undead, .necromancer_cult }),
+        .merchant_guard => EntityFactions.initWithTags(&.{ .halfling, .living, .merchant_guild, .guardian }),
+        .kingdom_patrol => EntityFactions.initWithTags(&.{ .halfling, .living, .kingdom_guard, .guardian }),
     };
 }
 
@@ -131,10 +113,10 @@ pub fn getCreatureCapabilities(creature_type: CreatureType) Capabilities {
         .goblin_warrior => Capabilities.initHostileUnit(100.0, 15.0),
         .goblin_shaman => .{
             .can_move = true,
-            .move_speed = 80.0,  // Slower but more dangerous
+            .move_speed = 80.0, // Slower but more dangerous
             .can_be_controlled = true,
             .can_attack = true,
-            .attack_damage = 20.0,  // Magic damage
+            .attack_damage = 20.0, // Magic damage
             .can_be_damaged = true,
             .can_interact = false,
         },
@@ -142,16 +124,16 @@ pub fn getCreatureCapabilities(creature_type: CreatureType) Capabilities {
         .dire_bear => Capabilities.initHostileUnit(90.0, 25.0),
         .forest_sprite => .{
             .can_move = true,
-            .move_speed = 150.0,  // Very fast
+            .move_speed = 150.0, // Very fast
             .can_be_controlled = true,
-            .can_attack = false,  // Peaceful guardian
+            .can_attack = false, // Peaceful guardian
             .attack_damage = 0.0,
             .can_be_damaged = true,
             .can_interact = true,
         },
         .stone_golem => .{
             .can_move = true,
-            .move_speed = 60.0,   // Slow but powerful
+            .move_speed = 60.0, // Slow but powerful
             .can_be_controlled = true,
             .can_attack = true,
             .attack_damage = 30.0,

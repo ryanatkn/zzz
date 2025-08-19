@@ -74,7 +74,7 @@ pub const Router = struct {
                 // Same page, just handle the action without destroying/recreating
                 if (std.mem.indexOf(u8, path, "?")) |query_start| {
                     const query = path[query_start + 1 ..];
-                    
+
                     // Check if it's a world loading query or IDE action
                     if (std.mem.startsWith(u8, query, "load_world=")) {
                         log.info("Calling handleWorldLoading with query: '{s}'", .{query});
@@ -98,7 +98,7 @@ pub const Router = struct {
                 const query = path[query_start + 1 ..];
                 try self.handleWorldLoading(query);
             }
-            
+
             // Load root layout
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
@@ -350,12 +350,12 @@ pub const Router = struct {
     fn handleWorldLoading(self: *Router, query: []const u8) !void {
         const log = std.log.scoped(.world_loading);
         log.info("Processing world loading query: '{s}'", .{query});
-        
+
         // Parse load_world parameter
         if (std.mem.startsWith(u8, query, "load_world=")) {
             const world_path = query[11..]; // Skip "load_world="
             log.info("Loading world: '{s}'", .{world_path});
-            
+
             if (global_game_state) |game_state| {
                 // Reload the game with the new world
                 game_state.reloadWithWorld(world_path) catch |err| {

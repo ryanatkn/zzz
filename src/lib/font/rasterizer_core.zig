@@ -13,7 +13,7 @@ fn isPointInsideGlyph(test_x: f32, test_y: f32, contours: []const glyph_extracto
 
     for (contours) |contour| {
         if (contour.points.len < 2) continue;
-        
+
         // Tessellate curves into line segments for more accurate rendering
         const tessellated_points = try tessellateContour(allocator, contour);
         defer allocator.free(tessellated_points);
@@ -105,7 +105,7 @@ fn tessellateContour(allocator: std.mem.Allocator, contour: glyph_extractor.Cont
             // Look for the end point of the curve
             const end_i = (i + 2) % contour.points.len;
             var end_point = contour.points[end_i];
-            
+
             // If end point is also off-curve, create implied on-curve point
             if (!end_point.on_curve and i + 2 < contour.points.len) {
                 const next_next = contour.points[end_i];
@@ -144,7 +144,7 @@ fn quadraticBezier(p0: glyph_extractor.Point, p1: glyph_extractor.Point, p2: gly
     const a = one_minus_t * one_minus_t;
     const b = 2.0 * one_minus_t * t;
     const c = t * t;
-    
+
     return glyph_extractor.Point{
         .x = a * p0.x + b * p1.x + c * p2.x,
         .y = a * p0.y + b * p1.y + c * p2.y,
@@ -156,7 +156,7 @@ fn quadraticBezier(p0: glyph_extractor.Point, p1: glyph_extractor.Point, p2: gly
 fn calculatePixelCoverage(center_x: f32, center_y: f32, contours: []const glyph_extractor.Contour, allocator: std.mem.Allocator) !f32 {
     // First check center point
     const center_inside = isPointInsideGlyph(center_x, center_y, contours, allocator) catch false;
-    
+
     // For performance, use simple 4-point sampling only near edges
     const edge_samples = [_]struct { x: f32, y: f32 }{
         .{ .x = center_x - 0.25, .y = center_y },
@@ -164,21 +164,21 @@ fn calculatePixelCoverage(center_x: f32, center_y: f32, contours: []const glyph_
         .{ .x = center_x, .y = center_y - 0.25 },
         .{ .x = center_x, .y = center_y + 0.25 },
     };
-    
+
     var inside_count: u32 = if (center_inside) 1 else 0;
     var edge_detected = false;
-    
+
     for (edge_samples) |sample| {
         const inside = isPointInsideGlyph(sample.x, sample.y, contours, allocator) catch false;
         if (inside) inside_count += 1;
         if (inside != center_inside) edge_detected = true;
     }
-    
+
     // If we're not near an edge, return solid fill or empty
     if (!edge_detected) {
         return if (center_inside) 1.0 else 0.0;
     }
-    
+
     // Near edge: return proportional coverage
     return @as(f32, @floatFromInt(inside_count)) / 5.0; // 5 samples total
 }
@@ -251,12 +251,12 @@ pub const RasterizerCore = struct {
         // Calculate bitmap dimensions with normalized baseline positioning
         const bounds = outline.bounds;
         const width_f = bounds.width() + 2.0; // Add padding
-        
+
         // For consistent baseline positioning, calculate height based on font metrics
         const font_ascender = @as(f32, @floatFromInt(self.metrics.ascender)) * self.scale;
         const font_descender = @as(f32, @floatFromInt(-self.metrics.descender)) * self.scale; // Make positive
         const total_font_height = font_ascender + font_descender;
-        
+
         // Use the larger of glyph bounds or font metrics to ensure consistent baseline
         const height_f = @max(bounds.height() + 2.0, total_font_height + 2.0);
         const width = @as(u32, @intFromFloat(@ceil(width_f)));
@@ -303,15 +303,15 @@ pub const RasterizerCore = struct {
 
         // Calculate transform from bitmap coordinates to TTF coordinates
         const offset_x = bounds.x_min - 1.0;
-        
+
         // For consistent baseline positioning, place baseline at a fixed position from bottom
         const baseline_from_bottom = font_descender + 1.0; // Padding from bottom
-        
+
         // Rasterize each pixel
         for (0..height) |y| {
             for (0..width) |x| {
                 const pixel_x = @as(f32, @floatFromInt(x)) + offset_x;
-                
+
                 // Calculate TTF Y coordinate: baseline is at consistent position from bitmap bottom
                 const bitmap_y_from_bottom = @as(f32, @floatFromInt(height)) - 1.0 - @as(f32, @floatFromInt(y));
                 const pixel_y = bitmap_y_from_bottom - baseline_from_bottom; // TTF coordinate (baseline = 0)

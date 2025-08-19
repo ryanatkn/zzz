@@ -5,26 +5,26 @@ pub const OutputCapture = struct {
     allocator: std.mem.Allocator,
     buffer: std.ArrayList(u8),
     max_buffer_size: usize = 1024 * 1024, // 1MB default limit
-    
+
     const Self = @This();
-    
+
     pub fn init(allocator: std.mem.Allocator) Self {
         return Self{
             .allocator = allocator,
             .buffer = std.ArrayList(u8).init(allocator),
         };
     }
-    
+
     pub fn deinit(self: *Self) void {
         self.buffer.deinit();
     }
-    
+
     /// Capture output from a stream with real-time processing
     pub fn captureStream(self: *Self, stream: std.fs.File, callback: *const fn (data: []const u8) void) ![]u8 {
         self.buffer.clearRetainingCapacity();
-        
+
         var read_buffer: [4096]u8 = undefined;
-        
+
         while (true) {
             const bytes_read = stream.read(&read_buffer) catch |err| switch (err) {
                 error.WouldBlock => {
@@ -34,17 +34,17 @@ pub const OutputCapture = struct {
                 },
                 else => return err,
             };
-            
+
             if (bytes_read == 0) break; // EOF
-            
+
             const data = read_buffer[0..bytes_read];
-            
+
             // Call callback for real-time processing
             callback(data);
-            
+
             // Add to buffer for final result
             try self.buffer.appendSlice(data);
-            
+
             // Prevent buffer overflow
             if (self.buffer.items.len > self.max_buffer_size) {
                 // Truncate older data, keep newer data
@@ -54,16 +54,16 @@ pub const OutputCapture = struct {
                 self.buffer.shrinkRetainingCapacity(keep_size);
             }
         }
-        
+
         return try self.allocator.dupe(u8, self.buffer.items);
     }
-    
+
     /// Simple capture without streaming (for compatibility)
     pub fn captureAll(self: *Self, stream: std.fs.File) ![]u8 {
         self.buffer.clearRetainingCapacity();
         return stream.readToEndAlloc(self.allocator, self.max_buffer_size);
     }
-    
+
     /// Set maximum buffer size
     pub fn setMaxBufferSize(self: *Self, size: usize) void {
         self.max_buffer_size = size;
@@ -75,9 +75,9 @@ pub const ProgressiveOutput = struct {
     allocator: std.mem.Allocator,
     write_callback: *const fn (context: *anyopaque, data: []const u8) anyerror!void,
     write_context: *anyopaque,
-    
+
     const Self = @This();
-    
+
     pub fn init(
         allocator: std.mem.Allocator,
         write_callback: *const fn (context: *anyopaque, data: []const u8) anyerror!void,
@@ -89,14 +89,14 @@ pub const ProgressiveOutput = struct {
             .write_context = write_context,
         };
     }
-    
+
     /// Handle incoming data chunk
     pub fn handleData(self: *Self, data: []const u8) void {
         self.write_callback(self.write_context, data) catch |err| {
             std.log.err("Failed to write progressive output: {}", .{err});
         };
     }
-    
+
     /// Create callback function for OutputCapture
     pub fn createCallback(self: *Self) *const fn (data: []const u8) void {
         _ = self;
@@ -115,28 +115,28 @@ pub const StreamReader = struct {
     allocator: std.mem.Allocator,
     stream: std.fs.File,
     buffer: [4096]u8 = undefined,
-    
+
     const Self = @This();
-    
+
     pub fn init(allocator: std.mem.Allocator, stream: std.fs.File) Self {
         return Self{
             .allocator = allocator,
             .stream = stream,
         };
     }
-    
+
     /// Try to read available data (non-blocking)
     pub fn readAvailable(self: *Self) !?[]u8 {
         const bytes_read = self.stream.read(&self.buffer) catch |err| switch (err) {
             error.WouldBlock => return null, // No data available
             else => return err,
         };
-        
+
         if (bytes_read == 0) return null; // EOF or no data
-        
+
         return try self.allocator.dupe(u8, self.buffer[0..bytes_read]);
     }
-    
+
     /// Check if stream has data available
     pub fn hasData(self: *Self) bool {
         // This is a simplified check - in a real implementation,

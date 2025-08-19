@@ -11,7 +11,7 @@ pub const CommandContext = struct {
     command_registry: *CommandRegistry,
     allocator: std.mem.Allocator,
     output_writer: *const fn (context: *anyopaque, text: []const u8) anyerror!void,
-    
+
     /// Write output to terminal
     pub fn writeOutput(self: *CommandContext, text: []const u8) !void {
         try self.output_writer(self.terminal, text);
@@ -33,30 +33,30 @@ pub const Command = struct {
 pub const CommandRegistry = struct {
     commands: std.StringHashMap(Command),
     allocator: std.mem.Allocator,
-    
+
     const Self = @This();
-    
+
     pub fn init(allocator: std.mem.Allocator) Self {
         var registry = Self{
             .commands = std.StringHashMap(Command).init(allocator),
             .allocator = allocator,
         };
-        
+
         // Register built-in commands
         registry.registerBuiltins();
-        
+
         return registry;
     }
-    
+
     pub fn deinit(self: *Self) void {
         self.commands.deinit();
     }
-    
+
     /// Register a command
     pub fn register(self: *Self, command: Command) !void {
         try self.commands.put(command.name, command);
     }
-    
+
     /// Execute a command
     pub fn execute(self: *Self, context: *CommandContext, command_line: []const u8) !bool {
         // Parse command and arguments
@@ -67,35 +67,35 @@ pub const CommandRegistry = struct {
             }
             args.deinit();
         }
-        
+
         try self.parseArgs(command_line, &args, context.allocator);
-        
+
         if (args.items.len == 0) {
             return false;
         }
-        
+
         const command_name = args.items[0];
         const command_args = if (args.items.len > 1) args.items[1..] else &[_][]const u8{};
-        
+
         // Check if it's a built-in command
         if (self.commands.get(command_name)) |command| {
             try command.func(context, command_args);
             return true;
         }
-        
+
         return false; // Not a built-in command
     }
-    
+
     /// Get command by name
     pub fn getCommand(self: *const Self, name: []const u8) ?Command {
         return self.commands.get(name);
     }
-    
+
     /// List all commands
     pub fn listCommands(self: *const Self) std.StringHashMap(Command).Iterator {
         return self.commands.iterator();
     }
-    
+
     /// Register built-in commands
     fn registerBuiltins(self: *Self) void {
         const builtins = [_]Command{
@@ -111,24 +111,24 @@ pub const CommandRegistry = struct {
             .{ .name = "history", .description = "Show command history", .usage = "history", .func = cmdHistory },
             .{ .name = "exit", .description = "Exit the terminal", .usage = "exit", .func = cmdExit },
         };
-        
+
         for (builtins) |command| {
             self.commands.put(command.name, command) catch {};
         }
     }
-    
+
     /// Parse command line into arguments
     fn parseArgs(self: *Self, command_line: []const u8, args: *std.ArrayList([]const u8), allocator: std.mem.Allocator) !void {
         _ = self;
-        
+
         var i: usize = 0;
         var in_quotes = false;
         var quote_char: u8 = 0;
         var current_arg = std.ArrayList(u8).init(allocator);
-        
+
         while (i < command_line.len) {
             const ch = command_line[i];
-            
+
             switch (ch) {
                 ' ', '\t' => {
                     if (in_quotes) {
@@ -161,10 +161,10 @@ pub const CommandRegistry = struct {
                     try current_arg.append(ch);
                 },
             }
-            
+
             i += 1;
         }
-        
+
         // Add final argument if any
         if (current_arg.items.len > 0) {
             try args.append(try current_arg.toOwnedSlice());
@@ -179,13 +179,13 @@ pub const CommandRegistry = struct {
 fn cmdHelp(context: *CommandContext, args: []const []const u8) !void {
     if (args.len == 0) {
         try context.writeOutput("Available commands:\n\n");
-        
+
         var iter = context.command_registry.listCommands();
         while (iter.next()) |entry| {
             const command = entry.value_ptr;
             try context.writeOutput(std.fmt.allocPrint(context.allocator, "  {s:<12} - {s}\n", .{ command.name, command.description }) catch "");
         }
-        
+
         try context.writeOutput("\nType 'help <command>' for detailed usage.\n");
     } else {
         const command_name = args[0];
@@ -206,7 +206,7 @@ fn cmdClear(context: *CommandContext, args: []const []const u8) !void {
 
 fn cmdCd(context: *CommandContext, args: []const []const u8) !void {
     const target_dir = if (args.len > 0) args[0] else (std.posix.getenv("HOME") orelse "/");
-    
+
     context.process_executor.changeDirectory(target_dir) catch |err| {
         const error_msg = switch (err) {
             error.DirectoryNotFound => "Directory not found",
@@ -227,7 +227,7 @@ fn cmdPwd(context: *CommandContext, args: []const []const u8) !void {
 
 fn cmdLs(context: *CommandContext, args: []const []const u8) !void {
     const target_dir = if (args.len > 0) args[0] else ".";
-    
+
     var dir = std.fs.cwd().openDir(target_dir, .{ .iterate = true }) catch |err| {
         const error_msg = switch (err) {
             error.FileNotFound => "Directory not found",
@@ -239,17 +239,17 @@ fn cmdLs(context: *CommandContext, args: []const []const u8) !void {
         return;
     };
     defer dir.close();
-    
+
     var iterator = dir.iterate();
-    
+
     // Collect entries and sort them
     var entries = std.ArrayList(std.fs.Dir.Entry).init(context.allocator);
     defer entries.deinit();
-    
+
     while (iterator.next() catch null) |entry| {
         try entries.append(entry);
     }
-    
+
     // Sort entries alphabetically
     std.sort.block(std.fs.Dir.Entry, entries.items, {}, struct {
         fn lessThan(ctx: void, a: std.fs.Dir.Entry, b: std.fs.Dir.Entry) bool {
@@ -257,7 +257,7 @@ fn cmdLs(context: *CommandContext, args: []const []const u8) !void {
             return std.mem.order(u8, a.name, b.name) == .lt;
         }
     }.lessThan);
-    
+
     // Display entries
     for (entries.items) |entry| {
         const prefix = switch (entry.kind) {
@@ -266,7 +266,7 @@ fn cmdLs(context: *CommandContext, args: []const []const u8) !void {
             .sym_link => "l",
             else => "?",
         };
-        
+
         try context.writeOutput(std.fmt.allocPrint(context.allocator, "{s} {s}\n", .{ prefix, entry.name }) catch "");
     }
 }
@@ -276,7 +276,7 @@ fn cmdCat(context: *CommandContext, args: []const []const u8) !void {
         try context.writeOutput("cat: missing file argument\nUsage: cat <file>\n");
         return;
     }
-    
+
     const filename = args[0];
     const file = std.fs.cwd().openFile(filename, .{}) catch |err| {
         const error_msg = switch (err) {
@@ -289,7 +289,7 @@ fn cmdCat(context: *CommandContext, args: []const []const u8) !void {
         return;
     };
     defer file.close();
-    
+
     const contents = file.readToEndAlloc(context.allocator, 1024 * 1024) catch |err| {
         const error_msg = switch (err) {
             error.OutOfMemory => "File too large",
@@ -299,7 +299,7 @@ fn cmdCat(context: *CommandContext, args: []const []const u8) !void {
         return;
     };
     defer context.allocator.free(contents);
-    
+
     try context.writeOutput(contents);
 }
 
@@ -308,7 +308,7 @@ fn cmdEcho(context: *CommandContext, args: []const []const u8) !void {
         try context.writeOutput("\n");
         return;
     }
-    
+
     for (args, 0..) |arg, i| {
         if (i > 0) try context.writeOutput(" ");
         try context.writeOutput(arg);
@@ -318,27 +318,27 @@ fn cmdEcho(context: *CommandContext, args: []const []const u8) !void {
 
 fn cmdEnv(context: *CommandContext, args: []const []const u8) !void {
     _ = args;
-    
+
     // Get all environment variables
     var env_map = try std.process.getEnvMap(context.allocator);
     defer env_map.deinit();
     var env_iter = env_map.iterator();
-    
+
     // Collect and sort environment variables
     var env_vars = std.ArrayList(struct { key: []const u8, value: []const u8 }).init(context.allocator);
     defer env_vars.deinit();
-    
+
     while (env_iter.next()) |entry| {
         try env_vars.append(.{ .key = entry.key_ptr.*, .value = entry.value_ptr.* });
     }
-    
+
     std.sort.block(@TypeOf(env_vars.items[0]), env_vars.items, {}, struct {
         fn lessThan(ctx: void, a: @TypeOf(env_vars.items[0]), b: @TypeOf(env_vars.items[0])) bool {
             _ = ctx;
             return std.mem.order(u8, a.key, b.key) == .lt;
         }
     }.lessThan);
-    
+
     for (env_vars.items) |env_var| {
         try context.writeOutput(std.fmt.allocPrint(context.allocator, "{s}={s}\n", .{ env_var.key, env_var.value }) catch "");
     }
@@ -349,12 +349,12 @@ fn cmdExport(context: *CommandContext, args: []const []const u8) !void {
         try context.writeOutput("export: missing variable assignment\nUsage: export VAR=value\n");
         return;
     }
-    
+
     const assignment = args[0];
     if (std.mem.indexOf(u8, assignment, "=")) |eq_pos| {
         const var_name = assignment[0..eq_pos];
         const var_value = assignment[eq_pos + 1 ..];
-        
+
         try context.process_executor.setEnv(var_name, var_value);
         try context.writeOutput(std.fmt.allocPrint(context.allocator, "Exported {s}={s}\n", .{ var_name, var_value }) catch "");
     } else {

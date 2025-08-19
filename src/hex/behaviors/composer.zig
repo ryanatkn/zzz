@@ -27,11 +27,11 @@ pub const BehaviorComposer = struct {
     chase_state: chase_behavior.ChaseState,
     flee_state: flee_behavior.FleeState,
     wander_state: wander_behavior.WanderState,
-    
+
     // Unit disposition (temperament that influences behavior selection)
     profile: Disposition,
     current_behavior: BehaviorType,
-    
+
     pub fn init(profile: Disposition, home_pos: Vec2) BehaviorComposer {
         return .{
             .chase_state = chase_behavior.ChaseState.init(),
@@ -41,7 +41,7 @@ pub const BehaviorComposer = struct {
             .current_behavior = .idle,
         };
     }
-    
+
     pub fn reset(self: *BehaviorComposer, home_pos: Vec2) void {
         self.chase_state.reset();
         self.flee_state.reset();

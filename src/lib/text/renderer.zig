@@ -173,7 +173,6 @@ pub const TextRenderer = struct {
         self.screen_height = height;
     }
 
-
     // Queue a texture-based text for drawing (IMMEDIATE MODE)
     // Texture will be released after this frame
     pub fn queueTextTexture(self: *Self, texture: *c.sdl.SDL_GPUTexture, position: Vec2, width: u32, height: u32, color: Color) void {
@@ -205,7 +204,6 @@ pub const TextRenderer = struct {
     // Queue persistent text for drawing (PERSISTENT MODE)
     // Uses persistent texture system to avoid recreating textures every frame
     pub fn queuePersistentText(self: *Self, text: []const u8, position: Vec2, font_manager: anytype, font_category: anytype, font_size: f32, color: Color) !void {
-
         if (persistent_text.getGlobalPersistentTextSystem()) |persistent_system| {
             if (try persistent_system.getOrCreateTexture(text, font_manager, font_category, font_size, color)) |handle| {
                 // Queue the persistent texture for rendering (but don't release it)

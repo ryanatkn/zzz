@@ -10,7 +10,6 @@ const EntityFactions = factions.EntityFactions;
 const FactionRelation = factions.FactionRelation;
 
 /// Helper functions to integrate faction system with existing hex game code
-
 /// Get entity factions from player storage
 pub fn getPlayerFactions(game: *const HexGame, entity_id: EntityId) ?EntityFactions {
     const zone = game.getCurrentZoneConst();
@@ -61,12 +60,12 @@ pub fn getEntityFactions(game: *const HexGame, entity_id: EntityId) ?EntityFacti
     if (getPlayerFactions(game, entity_id)) |player_factions| {
         return player_factions;
     }
-    
+
     // Try unit storage
     if (getUnitFactions(game, entity_id)) |unit_factions| {
         return unit_factions;
     }
-    
+
     return null;
 }
 
@@ -76,12 +75,12 @@ pub fn getEntityCapabilities(game: *const HexGame, entity_id: EntityId) ?compone
     if (getPlayerCapabilities(game, entity_id)) |player_caps| {
         return player_caps;
     }
-    
+
     // Try unit storage
     if (getUnitCapabilities(game, entity_id)) |unit_caps| {
         return unit_caps;
     }
-    
+
     return null;
 }
 
@@ -89,7 +88,7 @@ pub fn getEntityCapabilities(game: *const HexGame, entity_id: EntityId) ?compone
 pub fn getEntityRelation(game: *const HexGame, from_entity: EntityId, to_entity: EntityId) ?FactionRelation {
     const from_factions = getEntityFactions(game, from_entity) orelse return null;
     const to_factions = getEntityFactions(game, to_entity) orelse return null;
-    
+
     return factions.calculateRelation(from_factions, to_factions);
 }
 
@@ -122,13 +121,13 @@ pub fn logFactionRelation(game: *const HexGame, from_entity: EntityId, to_entity
     // Cast away const to access logger (logging is considered safe side effect)
     const mutable_game = @constCast(game);
     const logger = &mutable_game.logger;
-    
+
     const from_factions = getEntityFactions(game, from_entity);
     const to_factions = getEntityFactions(game, to_entity);
-    
+
     if (from_factions != null and to_factions != null) {
         logger.debug("faction_relation", "Entity {} -> Entity {}: {s}", .{ from_entity, to_entity, @tagName(relation) });
-        
+
         // Log faction tags for debugging
         if (from_factions) |f| {
             logger.debug("from_factions", "Entity {} factions: {}", .{ from_entity, f.tags.count() });
@@ -143,18 +142,16 @@ pub fn logFactionRelation(game: *const HexGame, from_entity: EntityId, to_entity
 pub fn shareAllegiance(game: *const HexGame, entity_a: EntityId, entity_b: EntityId) bool {
     const factions_a = getEntityFactions(game, entity_a) orelse return false;
     const factions_b = getEntityFactions(game, entity_b) orelse return false;
-    
+
     // Check for common allegiance tags
-    const allegiances = [_]factions.FactionTag{
-        .kingdom_guard, .bandit, .merchant_guild, .forest_warden, .necromancer_cult
-    };
-    
+    const allegiances = [_]factions.FactionTag{ .kingdom_guard, .bandit, .merchant_guild, .forest_warden, .necromancer_cult };
+
     for (allegiances) |allegiance| {
         if (factions_a.hasTag(allegiance) and factions_b.hasTag(allegiance)) {
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -162,18 +159,18 @@ pub fn shareAllegiance(game: *const HexGame, entity_a: EntityId, entity_b: Entit
 pub fn getFriendlyEntitiesNear(game: *const HexGame, center_entity: EntityId, _: f32, allies: []EntityId) usize {
     const zone = game.getCurrentZoneConst();
     const center_factions = getEntityFactions(game, center_entity) orelse return 0;
-    
+
     var ally_count: usize = 0;
-    
+
     // Check units in current zone
     var unit_iter = zone.units.entityIterator();
     while (unit_iter.next()) |unit_id| {
         if (unit_id == center_entity) continue; // Skip self
         if (ally_count >= allies.len) break;
-        
+
         const unit_factions = getUnitFactions(game, unit_id) orelse continue;
         const relation = factions.calculateRelation(center_factions, unit_factions);
-        
+
         // Only consider friendly or allied entities
         if (relation == .friendly or relation == .allied) {
             // TODO: Add distance check when we have position data
@@ -181,7 +178,7 @@ pub fn getFriendlyEntitiesNear(game: *const HexGame, center_entity: EntityId, _:
             ally_count += 1;
         }
     }
-    
+
     return ally_count;
 }
 
@@ -197,29 +194,29 @@ pub fn canEntityBeControlled(game: *const HexGame, entity_id: EntityId) bool {
 pub fn getRelationshipColor(game: *const HexGame, viewer_entity: ?EntityId, target_entity: EntityId) @import("../lib/core/colors.zig").Color {
     const colors = @import("../lib/core/colors.zig");
     const constants = @import("constants.zig");
-    
+
     // Default colors if no faction relationship can be determined
     const default_color = constants.COLOR_UNIT_DEFAULT;
-    
+
     // Get viewer's factions (controlled entity or fallback)
-    const viewer_factions = if (viewer_entity) |viewer| 
-        getEntityFactions(game, viewer) 
-    else 
+    const viewer_factions = if (viewer_entity) |viewer|
+        getEntityFactions(game, viewer)
+    else
         null;
-        
+
     const target_factions = getEntityFactions(game, target_entity) orelse return default_color;
-    
+
     if (viewer_factions) |v_factions| {
         const relation = factions.calculateRelation(v_factions, target_factions);
         return switch (relation) {
-            .allied => colors.GREEN_BRIGHT,      // Strong allies - bright green
-            .friendly => colors.CYAN,            // Friendly - cyan blue  
-            .neutral => colors.YELLOW_BRIGHT,    // Neutral - yellow
+            .allied => colors.GREEN_BRIGHT, // Strong allies - bright green
+            .friendly => colors.CYAN, // Friendly - cyan blue
+            .neutral => colors.YELLOW_BRIGHT, // Neutral - yellow
             .suspicious => colors.ORANGE_BRIGHT, // Suspicious - orange
-            .hostile => colors.RED_BRIGHT,       // Hostile - red
+            .hostile => colors.RED_BRIGHT, // Hostile - red
         };
     }
-    
+
     // No viewer faction - use traditional disposition colors
     return default_color;
 }

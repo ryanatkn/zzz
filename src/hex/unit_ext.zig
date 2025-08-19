@@ -9,7 +9,7 @@ const Vec2 = @import("../lib/math/mod.zig").Vec2;
 pub const HexUnit = struct {
     // Base unit component
     base: Unit,
-    
+
     // Hex-specific disposition fields (temperament/personality)
     disposition: Disposition,
     aggro_range: f32,

@@ -91,7 +91,7 @@ pub fn isValidWorldPath(world_path: []const u8) bool {
 pub fn loadWorldData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame, world_path: []const u8) !void {
     // Update current world tracking
     current_world_path = world_path;
-    
+
     // Load world data from ZON file
     const worldDataFile = getWorldFile(world_path);
 

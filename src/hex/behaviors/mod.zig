@@ -4,7 +4,7 @@
 // Other hex modules should import from this file to access behavior functionality.
 //
 // The behavior system uses a modular architecture where:
-// - Engine (lib/game) provides behavior modules  
+// - Engine (lib/game) provides behavior modules
 // - Game (hex) composes behaviors using profiles
 // - Each unit owns a BehaviorComposer that manages individual behavior states
 

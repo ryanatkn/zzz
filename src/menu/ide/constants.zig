@@ -93,16 +93,16 @@ pub const SYNTAX = struct {
 pub const TERMINAL = struct {
     /// Terminal line spacing multiplier (1.2 = 20% more space)
     pub const LINE_SPACING_MULTIPLIER: f32 = 1.3;
-    
+
     /// Bottom margin for terminal content
     pub const BOTTOM_MARGIN: f32 = 15;
-    
+
     /// Side margin for terminal content
     pub const SIDE_MARGIN: f32 = 10;
-    
+
     /// Input padding inside the input field
     pub const INPUT_PADDING: f32 = 6;
-    
+
     /// Input field colors
     pub const INPUT_BG_NORMAL = @import("../../lib/core/colors.zig").Color{ .r = 35, .g = 40, .b = 50, .a = 255 };
     pub const INPUT_BG_FOCUSED = @import("../../lib/core/colors.zig").Color{ .r = 55, .g = 60, .b = 70, .a = 150 };

@@ -199,7 +199,7 @@ pub const Hud = struct {
             },
             c.sdl.SDL_EVENT_KEY_DOWN => {
                 const key_event = event.key;
-                
+
                 // Handle system keys first
                 if (key_event.scancode == c.sdl.SDL_SCANCODE_GRAVE) { // Backtick
                     self.toggle();
@@ -208,7 +208,7 @@ pub const Hud = struct {
                     self.is_open = false;
                     return true;
                 }
-                
+
                 // Route to current page for input handling
                 if (self.router.getCurrentPage()) |current_page| {
                     if (std.mem.eql(u8, current_page.path, "/ide")) {

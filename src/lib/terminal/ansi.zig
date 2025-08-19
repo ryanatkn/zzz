@@ -21,7 +21,7 @@ pub const AnsiColor = enum(u8) {
     bright_magenta = 13,
     bright_cyan = 14,
     bright_white = 15,
-    
+
     pub fn toColor(self: AnsiColor) Color {
         return switch (self) {
             .black => Color{ .r = 0, .g = 0, .b = 0, .a = 255 },
@@ -60,7 +60,7 @@ pub const Style = struct {
     foreground: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
     background: Color = Color{ .r = 0, .g = 0, .b = 0, .a = 255 },
     attributes: TextAttributes = TextAttributes{},
-    
+
     pub fn reset(self: *Style) void {
         self.foreground = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
         self.background = Color{ .r = 0, .g = 0, .b = 0, .a = 255 };
@@ -74,20 +74,20 @@ pub const AnsiParser = struct {
     params: [16]u32 = [_]u32{0} ** 16,
     param_count: usize = 0,
     current_param: u32 = 0,
-    
+
     const State = enum {
         normal,
         escape,
         csi, // Control Sequence Introducer
         osc, // Operating System Command
     };
-    
+
     const Self = @This();
-    
+
     pub fn init() Self {
         return Self{};
     }
-    
+
     /// Parse ANSI sequences from input text and apply styling
     pub fn parse(self: *Self, input: []const u8, style: *Style, output: *std.ArrayList(u8), output_colors: *std.ArrayList(Color), output_attributes: *std.ArrayList(TextAttributes)) !void {
         for (input) |ch| {
@@ -145,14 +145,14 @@ pub const AnsiParser = struct {
             }
         }
     }
-    
+
     /// Reset parameter parsing state
     fn resetParams(self: *Self) void {
         self.params = [_]u32{0} ** 16;
         self.param_count = 0;
         self.current_param = 0;
     }
-    
+
     /// Add current parameter to list
     fn addParam(self: *Self) void {
         if (self.param_count < self.params.len) {
@@ -161,7 +161,7 @@ pub const AnsiParser = struct {
         }
         self.current_param = 0;
     }
-    
+
     /// Process CSI command
     fn processCsiCommand(self: *Self, command: u8, style: *Style) !void {
         switch (command) {
@@ -194,7 +194,7 @@ pub const AnsiParser = struct {
             },
         }
     }
-    
+
     /// Process SGR (Select Graphic Rendition) parameters
     fn processSgr(self: *Self, style: *Style) !void {
         if (self.param_count == 0) {
@@ -202,11 +202,11 @@ pub const AnsiParser = struct {
             style.reset();
             return;
         }
-        
+
         var i: usize = 0;
         while (i < self.param_count) : (i += 1) {
             const param = self.params[i];
-            
+
             switch (param) {
                 0 => style.reset(), // Reset all attributes
                 1 => style.attributes.bold = true, // Bold
@@ -223,7 +223,7 @@ pub const AnsiParser = struct {
                 25 => style.attributes.blink = false, // Blink off
                 27 => style.attributes.reverse = false, // Reverse off
                 29 => style.attributes.strikethrough = false, // Strikethrough off
-                
+
                 // Foreground colors (30-37)
                 30...37 => {
                     const color = @as(AnsiColor, @enumFromInt(param - 30));
@@ -244,7 +244,7 @@ pub const AnsiParser = struct {
                     const color = @as(AnsiColor, @enumFromInt(param - 100 + 8));
                     style.background = color.toColor();
                 },
-                
+
                 // 256-color and RGB color modes
                 38 => {
                     if (i + 1 < self.param_count and self.params[i + 1] == 5) {
@@ -286,7 +286,7 @@ pub const AnsiParser = struct {
                         }
                     }
                 },
-                
+
                 39 => {
                     // Default foreground color
                     style.foreground = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
@@ -295,18 +295,18 @@ pub const AnsiParser = struct {
                     // Default background color
                     style.background = Color{ .r = 0, .g = 0, .b = 0, .a = 255 };
                 },
-                
+
                 else => {
                     // Unknown parameter - ignore
                 },
             }
         }
     }
-    
+
     /// Convert 256-color index to RGB color
     fn color256ToRgb(self: *Self, index: u32) Color {
         _ = self;
-        
+
         if (index < 16) {
             // Standard 16 colors
             const color_index: u8 = @intCast(index);
@@ -317,7 +317,7 @@ pub const AnsiParser = struct {
             const r = (n / 36) * 51;
             const g = ((n % 36) / 6) * 51;
             const b = (n % 6) * 51;
-            
+
             return Color{
                 .r = @intCast(r),
                 .g = @intCast(g),
@@ -346,13 +346,13 @@ pub fn parseAnsiText(allocator: std.mem.Allocator, input: []const u8) !struct {
 } {
     var parser = AnsiParser.init();
     var style = Style{};
-    
+
     var output = std.ArrayList(u8).init(allocator);
     var output_colors = std.ArrayList(Color).init(allocator);
     var output_attributes = std.ArrayList(TextAttributes).init(allocator);
-    
+
     try parser.parse(input, &style, &output, &output_colors, &output_attributes);
-    
+
     return .{
         .text = try output.toOwnedSlice(),
         .colors = try output_colors.toOwnedSlice(),

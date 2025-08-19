@@ -388,7 +388,7 @@ pub const ReactiveHud = struct {
             },
             c.sdl.SDL_EVENT_KEY_DOWN => {
                 const key_event = event.key;
-                
+
                 // Handle system keys first
                 if (key_event.scancode == c.sdl.SDL_SCANCODE_GRAVE) { // Backtick
                     self.toggle();
@@ -397,7 +397,7 @@ pub const ReactiveHud = struct {
                     hud_data.is_open.set(false);
                     return true;
                 }
-                
+
                 // Route to current page for input handling
                 if (hud_data.router.getCurrentPage()) |current_page| {
                     if (std.mem.eql(u8, current_page.path, "/ide")) {

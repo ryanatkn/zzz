@@ -78,35 +78,19 @@ pub const FocusableBorder = struct {
     /// Render border as separate rectangles (top, bottom, left, right)
     fn renderBorderRects(self: *const Component, renderer: anytype, bounds: Rectangle, width: f32, color: Color) !void {
         _ = self;
-        
+
         if (@hasDecl(@TypeOf(renderer), "drawRect")) {
             // Top border
-            try renderer.drawRect(
-                Vec2{ .x = bounds.position.x - width, .y = bounds.position.y - width },
-                Vec2{ .x = bounds.size.x + 2 * width, .y = width },
-                color
-            );
-            
+            try renderer.drawRect(Vec2{ .x = bounds.position.x - width, .y = bounds.position.y - width }, Vec2{ .x = bounds.size.x + 2 * width, .y = width }, color);
+
             // Bottom border
-            try renderer.drawRect(
-                Vec2{ .x = bounds.position.x - width, .y = bounds.position.y + bounds.size.y },
-                Vec2{ .x = bounds.size.x + 2 * width, .y = width },
-                color
-            );
-            
+            try renderer.drawRect(Vec2{ .x = bounds.position.x - width, .y = bounds.position.y + bounds.size.y }, Vec2{ .x = bounds.size.x + 2 * width, .y = width }, color);
+
             // Left border
-            try renderer.drawRect(
-                Vec2{ .x = bounds.position.x - width, .y = bounds.position.y },
-                Vec2{ .x = width, .y = bounds.size.y },
-                color
-            );
-            
+            try renderer.drawRect(Vec2{ .x = bounds.position.x - width, .y = bounds.position.y }, Vec2{ .x = width, .y = bounds.size.y }, color);
+
             // Right border
-            try renderer.drawRect(
-                Vec2{ .x = bounds.position.x + bounds.size.x, .y = bounds.position.y },
-                Vec2{ .x = width, .y = bounds.size.y },
-                color
-            );
+            try renderer.drawRect(Vec2{ .x = bounds.position.x + bounds.size.x, .y = bounds.position.y }, Vec2{ .x = width, .y = bounds.size.y }, color);
         }
     }
 
@@ -150,13 +134,13 @@ pub const FocusableBorder = struct {
 /// Create a focusable border component
 pub fn createFocusableBorder(allocator: std.mem.Allocator, bounds: Rectangle) !*FocusableBorder {
     const border = try allocator.create(FocusableBorder);
-    
+
     const props = ComponentProps{
         .bounds = try reactive.signal(allocator, Rectangle, bounds),
         .visible = try reactive.signal(allocator, bool, true),
         .background_color = try reactive.signal(allocator, Color, Color{ .r = 0, .g = 0, .b = 0, .a = 0 }), // Transparent
     };
-    
+
     border.* = FocusableBorder{
         .base = Component{
             .props = props,
@@ -175,7 +159,7 @@ pub fn createFocusableBorder(allocator: std.mem.Allocator, bounds: Rectangle) !*
         .normal_color = undefined,
         .border_style = undefined,
     };
-    
+
     try border.base.vtable.init(&border.base, allocator, props);
     return border;
 }

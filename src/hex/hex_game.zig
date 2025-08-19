@@ -407,7 +407,7 @@ pub const HexGame = struct {
 
         try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;
-        
+
         // Log faction system initialization for debugging
         const unit_factions = faction_presets.getUnitFactions(disposition, .enemy);
         const unit_capabilities = faction_presets.getUnitCapabilities(disposition);
@@ -471,7 +471,7 @@ pub const HexGame = struct {
 
         try zone.players.addEntity(entity, transform, health, player_input, visual, movement);
         zone.entity_count += 1;
-        
+
         // Log faction system initialization for debugging
         const player_factions = faction_presets.getPlayerFactions();
         const player_capabilities = faction_presets.getPlayerCapabilities();
@@ -694,12 +694,12 @@ pub const HexGame = struct {
     }
 
     // Controller-based methods (new architecture)
-    
+
     /// Get the currently controlled entity (replaces getPlayer)
     pub fn getControlledEntity(self: *const HexGame) ?EntityId {
         return self.primary_controller.getControlledEntity();
     }
-    
+
     /// Check if there's a controlled entity that's alive
     pub fn hasLiveControlledEntity(self: *const HexGame) bool {
         if (self.getControlledEntity()) |entity_id| {
@@ -708,12 +708,12 @@ pub const HexGame = struct {
         }
         return false;
     }
-    
-    /// Get faction perspective of controlled entity  
+
+    /// Get faction perspective of controlled entity
     pub fn getControlledEntityFactions(self: *const HexGame) ?@import("factions.zig").EntityFactions {
         return self.primary_controller.getWorldView();
     }
-    
+
     /// Cycle to next controllable entity (for Tab key possession)
     pub fn cyclePossession(self: *HexGame) bool {
         const next_entity = controller_mod.findNextControllableEntity(self, self.getControlledEntity());
@@ -722,7 +722,7 @@ pub const HexGame = struct {
         }
         return false;
     }
-    
+
     /// Release control (enter autonomous mode)
     pub fn releaseControl(self: *HexGame) void {
         self.primary_controller.releaseAny(self);

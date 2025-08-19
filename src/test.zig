@@ -3,7 +3,7 @@
 //
 // Usage:
 //   zig build test                          # Run all tests
-//   zig build test -Dtest-filter="pattern" # Filter tests by pattern  
+//   zig build test -Dtest-filter="pattern" # Filter tests by pattern
 //   zig build test --summary all           # Show detailed results
 
 const std = @import("std");
@@ -103,7 +103,7 @@ test {
     std.testing.refAllDeclsRecursive(@import("lib/reactive/utils.zig"));
 }
 
-// Physics tests (compilation verified)  
+// Physics tests (compilation verified)
 // EXCLUDED: Runtime failure - test logic errors (collision detection, area queries)
 // test {
 //     std.testing.refAllDeclsRecursive(@import("lib/physics/queries.zig"));
@@ -207,7 +207,7 @@ test {
 //
 // SDL Dependencies:
 // - lib/core/animation.zig
-// - lib/core/time.zig  
+// - lib/core/time.zig
 // - lib/game/control/direct_input.zig
 // - All font test files (test_font_rendering.zig, test_basic_rendering.zig, etc.)
 // - lib/ui.zig and many UI components

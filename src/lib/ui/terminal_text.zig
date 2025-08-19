@@ -32,7 +32,7 @@ pub const TerminalText = struct {
     config: reactive.Signal(TerminalTextConfig),
     cursor_visible: reactive.Signal(bool),
     blink_timer: f32 = 0.0,
-    
+
     allocator: std.mem.Allocator,
 
     const Self = @This();
@@ -54,7 +54,7 @@ pub const TerminalText = struct {
     pub fn update(self: *Self, dt: f32) void {
         self.blink_timer += dt;
         const config = self.config.get();
-        
+
         // Update cursor visibility based on blink rate
         const blink_period = 1.0 / config.cursor_blink_rate;
         const should_show = @mod(self.blink_timer, blink_period) < (blink_period / 2.0);
@@ -65,18 +65,18 @@ pub const TerminalText = struct {
     pub fn renderLine(self: *const Self, renderer: anytype, line: *const Line, position: Vec2, max_width: f32) !void {
         const config = self.config.get();
         const text = line.getText();
-        
+
         // Safety: Check for valid text
         if (text.len == 0) return;
-        
+
         // Calculate maximum characters that fit
         const max_chars = @min(text.len, @as(usize, @intFromFloat(max_width / config.char_width)));
         const safe_text = text[0..max_chars];
-        
+
         // Validate text is printable ASCII for safety
         const display_text = try self.sanitizeText(safe_text);
         defer self.allocator.free(display_text);
-        
+
         if (display_text.len > 0) {
             try self.renderText(renderer, display_text, position, config.text_color);
         }
@@ -85,30 +85,30 @@ pub const TerminalText = struct {
     /// Render current input line with prompt and cursor
     pub fn renderInputLine(self: *const Self, renderer: anytype, prompt: []const u8, input: []const u8, cursor: Cursor, position: Vec2, max_width: f32) !void {
         const config = self.config.get();
-        
+
         // Calculate available space for prompt + input
         const prompt_width = @as(f32, @floatFromInt(prompt.len)) * config.char_width;
         const available_input_width = max_width - prompt_width;
-        
+
         // Render prompt
         if (prompt.len > 0) {
             try self.renderText(renderer, prompt, position, config.text_color);
         }
-        
+
         // Calculate input display area
         const input_position = Vec2{ .x = position.x + prompt_width, .y = position.y };
         const max_input_chars = @max(0, @as(usize, @intFromFloat(available_input_width / config.char_width)));
-        
+
         // Handle input text scrolling for long input
         const display_input = self.getVisibleInput(input, cursor.x, max_input_chars);
-        
+
         // Render input text
         if (display_input.len > 0) {
             const sanitized_input = try self.sanitizeText(display_input);
             defer self.allocator.free(sanitized_input);
             try self.renderText(renderer, sanitized_input, input_position, config.text_color);
         }
-        
+
         // Render cursor
         if (cursor.visible and self.cursor_visible.get()) {
             const cursor_x = input_position.x + @as(f32, @floatFromInt(@min(cursor.x, max_input_chars))) * config.char_width;
@@ -120,7 +120,7 @@ pub const TerminalText = struct {
     /// Render text at specified position with color
     fn renderText(self: *const Self, renderer: anytype, text: []const u8, position: Vec2, color: Color) !void {
         const config = self.config.get();
-        
+
         if (@hasDecl(@TypeOf(renderer), "drawText")) {
             try renderer.drawText(text, position.x, position.y, config.font_size, color);
         } else if (@hasDecl(@TypeOf(renderer), "drawSimpleText")) {
@@ -131,41 +131,41 @@ pub const TerminalText = struct {
     /// Render cursor based on style
     fn renderCursor(self: *const Self, renderer: anytype, position: Vec2) !void {
         const config = self.config.get();
-        
+
         if (!@hasDecl(@TypeOf(renderer), "drawRect")) return;
-        
+
         const cursor_size = switch (config.cursor_style) {
             .block => Vec2{ .x = config.char_width, .y = config.line_height },
             .underline => Vec2{ .x = config.char_width, .y = 2.0 },
             .vertical_bar => Vec2{ .x = 2.0, .y = config.line_height },
         };
-        
+
         const cursor_position = switch (config.cursor_style) {
             .block => position,
             .underline => Vec2{ .x = position.x, .y = position.y + config.line_height - 2.0 },
             .vertical_bar => position,
         };
-        
+
         try renderer.drawRect(cursor_position, cursor_size, config.cursor_color);
     }
 
     /// Get visible portion of input text based on cursor position
     fn getVisibleInput(self: *const Self, input: []const u8, cursor_pos: usize, max_chars: usize) []const u8 {
         _ = self;
-        
+
         if (input.len <= max_chars) return input;
-        
+
         // If cursor is near the end, show the end of the string
         if (cursor_pos >= input.len - max_chars / 2) {
             const start = input.len - max_chars;
             return input[start..];
         }
-        
+
         // If cursor is near the beginning, show the beginning
         if (cursor_pos < max_chars / 2) {
             return input[0..max_chars];
         }
-        
+
         // Center the cursor in the visible area
         const start = cursor_pos - max_chars / 2;
         const end = @min(start + max_chars, input.len);
@@ -176,10 +176,10 @@ pub const TerminalText = struct {
     fn sanitizeText(self: *const Self, text: []const u8) ![]u8 {
         const config = self.config.get();
         const max_len = @min(text.len, config.max_line_length);
-        
+
         var result = try self.allocator.alloc(u8, max_len);
         var result_len: usize = 0;
-        
+
         for (text[0..max_len]) |ch| {
             // Only include printable ASCII characters and common whitespace
             if ((ch >= 32 and ch <= 126) or ch == '\t' or ch == ' ') {
@@ -191,7 +191,7 @@ pub const TerminalText = struct {
                 result_len += 1;
             }
         }
-        
+
         // Resize to actual length
         result = try self.allocator.realloc(result, result_len);
         return result;

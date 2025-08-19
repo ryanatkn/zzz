@@ -27,7 +27,7 @@ pub const ProfileConfigs = struct {
             100.0, // return_speed
         );
     };
-    
+
     // Fearful profile: flees early and fast
     pub const fearful = struct {
         pub const flee = flee_behavior.FleeConfig.init(
@@ -41,7 +41,7 @@ pub const ProfileConfigs = struct {
             120.0, // return_speed - quick return
         );
     };
-    
+
     // Neutral profile: ignores player, wanders near home
     pub const neutral = struct {
         pub const wander = wander_behavior.WanderConfig.init(
@@ -54,7 +54,7 @@ pub const ProfileConfigs = struct {
             100.0, // return_speed
         );
     };
-    
+
     // Friendly profile: follows player gently
     pub const friendly = struct {
         pub const chase = chase_behavior.ChaseConfig.init(

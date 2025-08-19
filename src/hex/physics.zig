@@ -61,7 +61,7 @@ pub fn checkPlayerUnitCollision(world: *hex_game_mod.HexGame) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
     const zone_storage = world.getZoneStorage();
-    
+
     // Get player entity ID for faction checking
     const player_entity = world.getPlayer() orelse return false;
 

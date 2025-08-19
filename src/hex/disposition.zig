@@ -3,8 +3,8 @@
 
 /// Hex-specific unit dispositions (temperament/personality)
 pub const Disposition = enum {
-    hostile,  // Always aggressive, never flees (red)
-    fearful,  // Always flees from player (orange/yellow)  
-    neutral,  // Ignores player, returns home when far (gray)
+    hostile, // Always aggressive, never flees (red)
+    fearful, // Always flees from player (orange/yellow)
+    neutral, // Ignores player, returns home when far (gray)
     friendly, // Never attacks, may follow player (green)
 };

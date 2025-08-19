@@ -27,7 +27,7 @@ const HexCombatInterface = struct {
         }
         return null;
     }
-    
+
     pub fn isShooterAlive(game: *HexGame) bool {
         // Use controlled entity instead of hardcoded player
         return game.hasLiveControlledEntity();
@@ -41,7 +41,7 @@ const HexCombatInterface = struct {
 pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool {
     // Check if there's a controlled entity that can shoot
     if (!HexCombatInterface.isShooterAlive(game)) return false;
-    
+
     // Get shooter position (controlled entity)
     const shooter_pos = HexCombatInterface.getShooterPos(game) orelse return false;
 

@@ -395,7 +395,7 @@ pub const SpellSystem = struct {
             loggers.getGameLog().info("blink_no_controlled_entity", "No controlled entity found", .{});
             return false;
         };
-        
+
         const entity_queries = @import("entity_queries.zig");
         const player_pos = entity_queries.getEntityPos(game, controlled_entity) orelse {
             loggers.getGameLog().info("blink_no_position", "Could not get controlled entity position", .{});
@@ -437,7 +437,7 @@ pub const SpellSystem = struct {
             loggers.getGameLog().info("phase_no_controlled_entity", "No controlled entity found", .{});
             return false;
         };
-        
+
         const entity_queries = @import("entity_queries.zig");
         const player_pos = entity_queries.getEntityPos(game, controlled_entity) orelse {
             loggers.getGameLog().info("phase_no_position", "Could not get controlled entity position", .{});
@@ -549,7 +549,7 @@ pub const SpellSystem = struct {
                 0.0;
 
             const angle = base_angle + offset_angle;
-            
+
             // Calculate target position for this bullet based on angle
             const bullet_target = player_pos.add(Vec2{
                 .x = @cos(angle) * target_distance,

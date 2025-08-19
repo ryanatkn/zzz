@@ -183,7 +183,7 @@ pub fn getDispositionColor(_: anytype, disposition: anytype) @TypeOf(COLOR_UNIT_
     };
 
     // Note: We could add behavior-specific shading in the future:
-    // - Slightly brighter when actively chasing/fleeing  
+    // - Slightly brighter when actively chasing/fleeing
     // - Slightly dimmer when idle
     // - Different shade when returning home
     // But for now, consistent disposition-based colors provide clear visual feedback

@@ -30,20 +30,20 @@ const IndexPage = struct {
 
         // World selection section at top
         const loader = @import("../hex/loader.zig");
-        
+
         // World selection header
         try links.append(page.createLink("WORLD SELECTION", "", 100, 100, 300, 40));
-        
+
         // Current world display
         const current_world_name = loader.getCurrentWorldDisplayName();
         const current_text = try std.fmt.allocPrint(arena, "Current: {s}", .{current_world_name});
         try links.append(page.createLink(current_text, "", 100, 140, 400, 30));
-        
+
         // World selection buttons
         const world_button_width = 150.0;
         const world_button_height = 40.0;
         const world_button_y = 180.0;
-        
+
         try links.append(page.createLink("Test World", "/?load_world=worlds/test_world.zon", 100, world_button_y, world_button_width, world_button_height));
         try links.append(page.createLink("Game World", "/?load_world=worlds/game_world.zon", 270, world_button_y, world_button_width, world_button_height));
 
