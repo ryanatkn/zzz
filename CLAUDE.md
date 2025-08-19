@@ -352,6 +352,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - [Game Design](docs/game-design.md) - Zone system, combat, spells
 - [Development Workflow](docs/development-workflow.md) - TODO management, patterns
 - [Logging Guidelines](docs/logging-guidelines.md) - Logging system configuration
+- [Font System](docs/font-system.md) - Pure Zig TTF rendering with baseline alignment
 
 ### Hex Game Documentation
 - [Entity System](docs/hex/ecs.mdz) - Module architecture
