@@ -23,6 +23,8 @@ pub const BasicWriter = struct {
 
     // Arena allocator for line management
     arena: std.heap.ArenaAllocator,
+    // Current line being built (accumulates characters until newline)
+    current_line: ?core.Line = null,
 
     const Self = @This();
 
@@ -36,6 +38,7 @@ pub const BasicWriter = struct {
             .current_color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
             .current_bold = false,
             .arena = std.heap.ArenaAllocator.init(allocator),
+            .current_line = null,
         };
     }
 
@@ -145,20 +148,37 @@ pub const BasicWriter = struct {
         }
     }
 
-    /// Add character to current output (simplified for basic writer)
+    /// Add character to current output
     fn addCharToCurrentOutput(self: *Self, ch: u8) !void {
-        // For basic writer, we immediately create a line with the character
-        // In a more sophisticated setup, this would interact with line buffer
-        var line = core.Line.init(self.arena.allocator());
-        try line.appendChar(ch, self.current_color, self.current_bold);
-        self.scrollback.push(line);
+        // Initialize current line if it doesn't exist (start of new line)
+        if (self.current_line == null) {
+            self.current_line = core.Line.init(self.arena.allocator());
+            // This is a new line, so push it to scrollback
+            self.scrollback.push(self.current_line.?);
+        }
+
+        // Add character to current line
+        try self.current_line.?.appendChar(ch, self.current_color, self.current_bold);
+
+        // Update the last line in scrollback with our updated current line
+        // (since current_line is the same object we pushed, we can replace it)
+        _ = self.scrollback.replaceLast(self.current_line.?);
     }
 
     /// Move to new line
     fn newline(self: *Self) !void {
-        // Add empty line to scrollback to represent newline
-        const line = core.Line.init(self.arena.allocator());
-        self.scrollback.push(line);
+        // Finalize current line if it exists
+        if (self.current_line != null) {
+            // Current line should already be in scrollback, just reset our reference
+            self.current_line = null;
+        } else {
+            // No current line, add empty line to scrollback
+            const empty_line = core.Line.init(self.arena.allocator());
+            self.scrollback.push(empty_line);
+        }
+
+        // Next character will start a new line
+        self.current_line = null;
     }
 
     /// Get scrollback for rendering
@@ -171,6 +191,7 @@ pub const BasicWriter = struct {
         if (!self.active) return;
 
         self.scrollback.clear();
+        self.current_line = null;
 
         // Emit state change event
         if (self.event_bus) |bus| {

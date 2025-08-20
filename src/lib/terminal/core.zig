@@ -55,6 +55,31 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
         pub fn count(self: *const Self) usize {
             return self.len;
         }
+
+        /// Get the last item in the buffer (most recently added)
+        pub fn getLast(self: *const Self) ?T {
+            if (self.len == 0) return null;
+            // Last item is at index len - 1
+            return self.get(self.len - 1);
+        }
+
+        /// Get mutable reference to the last item in the buffer
+        pub fn getLastMutable(self: *Self) ?*T {
+            if (self.len == 0) return null;
+            // Last item is at index len - 1
+            return self.getMutable(self.len - 1);
+        }
+
+        /// Replace the last item in the buffer
+        pub fn replaceLast(self: *Self, item: T) bool {
+            if (self.len == 0) return false;
+            const last_real_index = if (self.len < capacity)
+                self.len - 1
+            else
+                (self.start + self.len - 1) % capacity;
+            self.items[last_real_index] = item;
+            return true;
+        }
     };
 }
 
@@ -333,8 +358,9 @@ pub const Terminal = struct {
                     // Simple completion: find matching history entries
                     const prefix = self.current_line.items;
                     for (self.command_history.items) |hist_entry| {
-                        if (hist_entry.len >= prefix.len and 
-                            std.mem.startsWith(u8, hist_entry, prefix)) {
+                        if (hist_entry.len >= prefix.len and
+                            std.mem.startsWith(u8, hist_entry, prefix))
+                        {
                             // Clear current line and replace with completion
                             self.current_line.clearRetainingCapacity();
                             try self.current_line.appendSlice(hist_entry);

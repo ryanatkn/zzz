@@ -76,7 +76,7 @@ pub const StandardTerminal = struct {
     pub fn deinit(self: *Self) void {
         // Delegate cleanup to the minimal terminal, which will handle the registry
         self.minimal.deinit();
-        
+
         // Just free our additional capabilities
         self.allocator.destroy(self.history);
         self.allocator.destroy(self.screen_buffer);

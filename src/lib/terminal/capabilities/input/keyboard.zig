@@ -102,7 +102,7 @@ pub const KeyboardInput = struct {
                 .key = key_input,
             },
         });
-        
+
         try self.event_bus.?.emit(event);
     }
 };

@@ -206,7 +206,7 @@ pub const TypeSafeCapabilityRegistry = struct {
             .allocator = allocator,
             .event_bus = events.EventBus.init(allocator),
         };
-        
+
         return registry;
     }
 

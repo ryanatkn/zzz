@@ -246,7 +246,7 @@ fn cmdCat(context: *CommandContext, args: []const []const u8) !void {
 
 fn cmdEcho(context: *CommandContext, args: []const []const u8) !void {
     // Debug logging removed to avoid logger initialization requirement in tests
-    
+
     if (args.len == 0) {
         try context.writeOutput("\n");
         return;

@@ -79,7 +79,7 @@ pub const Pipeline = struct {
         {
             return error.MissingDependency;
         }
-        
+
         // Subscribe to command_execute events to handle user input
         try event_bus.subscribe(.command_execute, handleCommandExecuteEvent, self);
     }
@@ -89,7 +89,7 @@ pub const Pipeline = struct {
         if (self.event_bus) |bus| {
             bus.unsubscribe(.command_execute, handleCommandExecuteEvent, self);
         }
-        
+
         self.event_bus = null;
         self.parser_capability = null;
         self.registry_capability = null;
@@ -276,9 +276,9 @@ pub const Pipeline = struct {
 /// Event handler for command_execute events from LineBuffer
 fn handleCommandExecuteEvent(event: kernel.Event, context: ?*anyopaque) !void {
     if (context == null) return;
-    
+
     const pipeline = @as(*Pipeline, @ptrCast(@alignCast(context.?)));
-    
+
     switch (event.data) {
         .command_execute => |cmd_data| {
             // Execute the command through the pipeline

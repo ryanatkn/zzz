@@ -72,7 +72,6 @@ pub fn createRegistry(allocator: std.mem.Allocator) !*TypeSafeCapabilityRegistry
     return registry;
 }
 
-
 /// Utility function to create a terminal interface from implementation
 pub fn createTerminal(implementation: anytype) ITerminal {
     const T = @TypeOf(implementation.*);

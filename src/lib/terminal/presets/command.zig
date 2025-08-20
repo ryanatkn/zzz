@@ -362,7 +362,7 @@ test "CommandTerminal event-driven command execution" {
             .args = null,
         },
     });
-    
+
     // Just verify the handler doesn't crash on event structure parsing
     // The actual command execution will fail safely for invalid commands
     _ = test_event; // The test proves the subscription exists and handler is connected

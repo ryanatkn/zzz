@@ -233,6 +233,9 @@ pub const TerminalComponent = struct {
         }
 
         // Now render scrollback lines going upward from the input line with better spacing
+        // TODO: Improve scrollback rendering design to be more efficient and explicit (viewport-aware)
+        // Simple approach: render lines as they come from iterator (newest at bottom)
+
         var lines_iter = content.lines;
         while (lines_iter.next()) |line| {
             // Move up with proper line spacing

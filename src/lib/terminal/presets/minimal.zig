@@ -67,7 +67,7 @@ pub const MinimalTerminal = struct {
         self.allocator.destroy(self.writer);
         self.allocator.destroy(self.line_buffer);
         self.allocator.destroy(self.cursor);
-        
+
         // Free the registry itself
         self.allocator.destroy(self.registry);
     }
