@@ -22,34 +22,33 @@ pub const Cursor = struct {
     max_columns: usize = 80,
     max_rows: usize = 24,
 
-    const Self = @This();
 
-    pub fn init() Self {
-        return Self{};
+    pub fn init() Cursor {
+        return Cursor{};
     }
 
     /// Create a new cursor capability
-    pub fn create(allocator: std.mem.Allocator) !*Self {
-        const self = try allocator.create(Self);
-        self.* = Self.init();
+    pub fn create(allocator: std.mem.Allocator) !*Cursor {
+        const self = try allocator.create(Cursor);
+        self.* = Cursor.init();
         return self;
     }
 
     /// Destroy cursor capability
-    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+    pub fn destroy(self: *Cursor, allocator: std.mem.Allocator) void {
         self.deinit();
         allocator.destroy(self);
     }
 
 
     /// Get required dependencies
-    pub fn getDependencies(self: *Self) []const []const u8 {
+    pub fn getDependencies(self: *Cursor) []const []const u8 {
         _ = self;
         return dependencies;
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Cursor, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // No dependencies for cursor
 
         self.event_bus = event_bus;
@@ -64,7 +63,7 @@ pub const Cursor = struct {
     }
 
     /// Cleanup capability resources
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *Cursor) void {
         // Unsubscribe from events
         if (self.event_bus) |bus| {
             bus.unsubscribe(.state_change, stateChangeCallback, self);
@@ -78,12 +77,12 @@ pub const Cursor = struct {
     }
 
     /// Check if capability is active
-    pub fn isActive(self: *Self) bool {
+    pub fn isActive(self: *Cursor) bool {
         return self.active;
     }
 
     /// Update cursor blinking animation
-    pub fn update(self: *Self, dt: f32) !void {
+    pub fn update(self: *Cursor, dt: f32) !void {
         if (!self.active) return;
 
         self.blink_timer += dt;
@@ -95,7 +94,7 @@ pub const Cursor = struct {
     }
 
     /// Show cursor and reset blink timer
-    pub fn show(self: *Self) !void {
+    pub fn show(self: *Cursor) !void {
         if (!self.active) return;
 
         self.visible = true;
@@ -104,7 +103,7 @@ pub const Cursor = struct {
     }
 
     /// Hide cursor
-    pub fn hide(self: *Self) !void {
+    pub fn hide(self: *Cursor) !void {
         if (!self.active) return;
 
         self.visible = false;
@@ -112,7 +111,7 @@ pub const Cursor = struct {
     }
 
     /// Set cursor position
-    pub fn setPosition(self: *Self, x: usize, y: usize) !void {
+    pub fn setPosition(self: *Cursor, x: usize, y: usize) !void {
         if (!self.active) return;
 
         self.x = @min(x, self.max_columns - 1);
@@ -122,7 +121,7 @@ pub const Cursor = struct {
     }
 
     /// Move cursor by relative amount
-    pub fn moveRelative(self: *Self, dx: i32, dy: i32) !void {
+    pub fn moveRelative(self: *Cursor, dx: i32, dy: i32) !void {
         if (!self.active) return;
 
         const new_x: i32 = @as(i32, @intCast(self.x)) + dx;
@@ -135,7 +134,7 @@ pub const Cursor = struct {
     }
 
     /// Set terminal dimensions for bounds checking
-    pub fn setDimensions(self: *Self, columns: usize, rows: usize) !void {
+    pub fn setDimensions(self: *Cursor, columns: usize, rows: usize) !void {
         if (!self.active) return;
 
         self.max_columns = columns;
@@ -149,17 +148,17 @@ pub const Cursor = struct {
     }
 
     /// Get cursor position
-    pub fn getPosition(self: *const Self) struct { x: usize, y: usize } {
+    pub fn getPosition(self: *const Cursor) struct { x: usize, y: usize } {
         return .{ .x = self.x, .y = self.y };
     }
 
     /// Check if cursor is visible
-    pub fn isVisible(self: *const Self) bool {
+    pub fn isVisible(self: *const Cursor) bool {
         return self.visible;
     }
 
     /// Emit state change event
-    fn emitStateChange(self: *Self, state: kernel.events.CursorState) !void {
+    fn emitStateChange(self: *Cursor, state: kernel.events.CursorState) !void {
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, kernel.EventData{
                 .state_change = kernel.events.StateChangeData{

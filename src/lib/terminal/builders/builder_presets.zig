@@ -1,8 +1,10 @@
 const std = @import("std");
 const terminal_builder = @import("terminal_builder.zig");
+const validation = @import("validation.zig");
 const TerminalBuilder = terminal_builder.TerminalBuilder;
 const BuiltTerminal = terminal_builder.BuiltTerminal;
 const PresetType = terminal_builder.PresetType;
+const CapabilityType = terminal_builder.CapabilityType;
 
 /// Builder-based preset constructors for common terminal configurations
 pub const BuilderPresets = struct {
@@ -81,18 +83,48 @@ pub const BuilderPresets = struct {
     
     /// Create terminal with validation
     pub fn createValidated(allocator: std.mem.Allocator, preset: PresetType) !struct { terminal: BuiltTerminal, warnings: []const []const u8 } {
-        // TODO: Implement validation integration
+        // Build terminal first
         var builder = TerminalBuilder.init(allocator);
         defer builder.deinit();
         
         const terminal = try builder
             .withPreset(preset)
             .build();
-            
-        // For now, return empty warnings
-        const warnings: []const []const u8 = &[_][]const u8{};
         
+        // Get capabilities from the terminal for validation
+        const capabilities = getPresetCapabilities(preset);
+        
+        // Run validation
+        var validator = validation.ValidationSystem.init(allocator);
+        defer validator.deinit();
+        
+        var validation_result = validator.validateCapabilities(capabilities) catch |err| {
+            std.log.warn("Validation failed: {}", .{err});
+            const warnings: []const []const u8 = &[_][]const u8{};
+            return .{ .terminal = terminal, .warnings = warnings };
+        };
+        defer validation_result.deinit();
+        
+        // Convert validation warnings to string array
+        var warning_list = std.ArrayList([]const u8).init(allocator);
+        defer warning_list.deinit();
+        
+        for (validation_result.warnings.items) |warning| {
+            const warning_msg = try std.fmt.allocPrint(allocator, "Warning: {} capability: {s}", .{ @tagName(warning.warning_type), warning.message });
+            try warning_list.append(warning_msg);
+        }
+        
+        const warnings = try warning_list.toOwnedSlice();
         return .{ .terminal = terminal, .warnings = warnings };
+    }
+    
+    /// Get capabilities for a preset type (helper for validation)
+    fn getPresetCapabilities(preset: PresetType) []const CapabilityType {
+        return switch (preset) {
+            .minimal => &[_]CapabilityType{ .keyboard_input, .basic_writer, .line_buffer, .cursor },
+            .standard => &[_]CapabilityType{ .keyboard_input, .basic_writer, .line_buffer, .cursor, .history, .screen_buffer, .scrollback, .persistence },
+            .command => &[_]CapabilityType{ .keyboard_input, .basic_writer, .ansi_writer, .line_buffer, .cursor, .history, .screen_buffer, .scrollback, .persistence, .parser, .registry, .executor, .builtin, .pipeline },
+        };
     }
 };
 

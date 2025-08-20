@@ -28,10 +28,8 @@ pub const StandardTerminal = struct {
     // Terminal interface
     event_bus: *kernel.EventBus,
 
-    const Self = @This();
-
     /// Initialize standard terminal with all capabilities
-    pub fn init(allocator: std.mem.Allocator) !Self {
+    pub fn init(allocator: std.mem.Allocator) !StandardTerminal {
         // Create registry and register all standard capabilities 
         var registry = try kernel.createRegistry(allocator);
         errdefer allocator.destroy(registry);
@@ -49,7 +47,7 @@ pub const StandardTerminal = struct {
         // Initialize all capabilities
         try registry.initializeAll();
 
-        return Self{
+        return StandardTerminal{
             .allocator = allocator,
             .registry = registry,
             .minimal = MinimalTerminal{
@@ -70,7 +68,7 @@ pub const StandardTerminal = struct {
     }
 
     /// Cleanup standard terminal
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *StandardTerminal) void {
         // Registry deinit will handle all capability cleanup (deinit + destroy)
         self.registry.deinit();
 
@@ -81,147 +79,147 @@ pub const StandardTerminal = struct {
     // ===== Core Terminal Functions (delegated to minimal) =====
 
     /// Handle keyboard input
-    pub fn handleKey(self: *Self, key: kernel.Key) !void {
+    pub fn handleKey(self: *StandardTerminal, key: kernel.Key) !void {
         try self.minimal.handleKey(key);
     }
 
     /// Write text to terminal output
-    pub fn write(self: *Self, text: []const u8) !void {
+    pub fn write(self: *StandardTerminal, text: []const u8) !void {
         try self.minimal.write(text);
     }
 
     /// Update terminal state (cursor blink, etc.)
-    pub fn update(self: *Self, dt: f32) !void {
+    pub fn update(self: *StandardTerminal, dt: f32) !void {
         try self.minimal.update(dt);
     }
 
     /// Get current input line content
-    pub fn getCurrentLine(self: *const Self) []const u8 {
+    pub fn getCurrentLine(self: *const StandardTerminal) []const u8 {
         return self.minimal.getCurrentLine();
     }
 
     /// Get cursor position
-    pub fn getCursorPosition(self: *const Self) struct { x: usize, y: usize } {
+    pub fn getCursorPosition(self: *const StandardTerminal) struct { x: usize, y: usize } {
         return self.minimal.getCursorPosition();
     }
 
     /// Check if cursor is visible
-    pub fn isCursorVisible(self: *const Self) bool {
+    pub fn isCursorVisible(self: *const StandardTerminal) bool {
         return self.minimal.isCursorVisible();
     }
 
     // ===== History Functions =====
 
     /// Get command history count
-    pub fn getHistoryCount(self: *const Self) usize {
+    pub fn getHistoryCount(self: *const StandardTerminal) usize {
         return self.history.getCount();
     }
 
     /// Clear command history
-    pub fn clearHistory(self: *Self) void {
+    pub fn clearHistory(self: *StandardTerminal) void {
         self.history.clear();
     }
 
     /// Navigate history (for external control)
-    pub fn navigateHistory(self: *Self, direction: i32) ?[]const u8 {
+    pub fn navigateHistory(self: *StandardTerminal, direction: i32) ?[]const u8 {
         return self.history.navigate(direction);
     }
 
     // ===== Screen Buffer Functions =====
 
     /// Switch to alternate screen (for full-screen apps)
-    pub fn switchToAlternateScreen(self: *Self) void {
+    pub fn switchToAlternateScreen(self: *StandardTerminal) void {
         self.screen_buffer.switchToAlternate();
     }
 
     /// Switch back to primary screen
-    pub fn switchToPrimaryScreen(self: *Self) void {
+    pub fn switchToPrimaryScreen(self: *StandardTerminal) void {
         self.screen_buffer.switchToPrimary();
     }
 
     /// Check if using alternate screen
-    pub fn isUsingAlternateScreen(self: *const Self) bool {
+    pub fn isUsingAlternateScreen(self: *const StandardTerminal) bool {
         return self.screen_buffer.using_alternate;
     }
 
     /// Clear screen
-    pub fn clearScreen(self: *Self) void {
+    pub fn clearScreen(self: *StandardTerminal) void {
         self.screen_buffer.clearScreen();
     }
 
     // ===== Scrollback Functions =====
 
     /// Scroll up by specified lines
-    pub fn scrollUp(self: *Self, lines: usize) void {
+    pub fn scrollUp(self: *StandardTerminal, lines: usize) void {
         self.scrollback.scrollUp(lines);
     }
 
     /// Scroll down by specified lines
-    pub fn scrollDown(self: *Self, lines: usize) void {
+    pub fn scrollDown(self: *StandardTerminal, lines: usize) void {
         self.scrollback.scrollDown(lines);
     }
 
     /// Scroll to top of buffer
-    pub fn scrollToTop(self: *Self) void {
+    pub fn scrollToTop(self: *StandardTerminal) void {
         self.scrollback.scrollToTop();
     }
 
     /// Scroll to bottom of buffer
-    pub fn scrollToBottom(self: *Self) void {
+    pub fn scrollToBottom(self: *StandardTerminal) void {
         self.scrollback.scrollToBottom();
     }
 
     /// Check if at bottom of scrollback
-    pub fn isAtBottom(self: *const Self) bool {
+    pub fn isAtBottom(self: *const StandardTerminal) bool {
         return self.scrollback.isAtBottom();
     }
 
     /// Get scrollback line count
-    pub fn getScrollbackLineCount(self: *const Self) usize {
+    pub fn getScrollbackLineCount(self: *const StandardTerminal) usize {
         return self.scrollback.getLineCount();
     }
 
     /// Get visible lines for rendering
-    pub fn getVisibleLines(self: *const Self, max_rows: usize) Scrollback.VisibleLinesIterator {
+    pub fn getVisibleLines(self: *const StandardTerminal, max_rows: usize) Scrollback.VisibleLinesIterator {
         return self.scrollback.getVisibleLines(max_rows);
     }
 
     /// Clear scrollback buffer
-    pub fn clearScrollback(self: *Self) void {
+    pub fn clearScrollback(self: *StandardTerminal) void {
         self.scrollback.clear();
     }
 
     // ===== Persistence Functions =====
 
     /// Save current session
-    pub fn saveSession(self: *Self, name: ?[]const u8) !void {
+    pub fn saveSession(self: *StandardTerminal, name: ?[]const u8) !void {
         try self.persistence.saveSession(name);
         try self.persistence.saveHistory();
     }
 
     /// Load session
-    pub fn loadSession(self: *Self, name: ?[]const u8) !void {
+    pub fn loadSession(self: *StandardTerminal, name: ?[]const u8) !void {
         try self.persistence.loadSession(name);
         try self.persistence.loadHistory();
     }
 
     /// List available sessions
-    pub fn listSessions(self: *Self) ![][]u8 {
+    pub fn listSessions(self: *StandardTerminal) ![][]u8 {
         return try self.persistence.listSessions(self.allocator);
     }
 
     /// Delete a session
-    pub fn deleteSession(self: *Self, name: []const u8) !void {
+    pub fn deleteSession(self: *StandardTerminal, name: []const u8) !void {
         try self.persistence.deleteSession(name);
     }
 
     /// Save history manually
-    pub fn saveHistory(self: *Self) !void {
+    pub fn saveHistory(self: *StandardTerminal) !void {
         try self.persistence.saveHistory();
     }
 
     /// Load history manually
-    pub fn loadHistory(self: *Self) !void {
+    pub fn loadHistory(self: *StandardTerminal) !void {
         try self.persistence.loadHistory();
     }
 
@@ -229,7 +227,7 @@ pub const StandardTerminal = struct {
 
 
     /// Resize terminal
-    pub fn resize(self: *Self, columns: usize, rows: usize) !void {
+    pub fn resize(self: *StandardTerminal, columns: usize, rows: usize) !void {
         // Emit resize event for all capabilities to handle
         const resize_event = kernel.Event.init(.resize, .{
             .resize = .{

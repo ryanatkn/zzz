@@ -10,28 +10,26 @@ pub const BuiltinRegistry = descriptors.BuiltinRegistry;
 pub const CapabilityLoader = struct {
     allocator: std.mem.Allocator,
     
-    const Self = @This();
-    
     /// Initialize capability loader - no longer needs to build metadata maps
-    pub fn init(allocator: std.mem.Allocator) !Self {
-        return Self{
+    pub fn init(allocator: std.mem.Allocator) !CapabilityLoader {
+        return CapabilityLoader{
             .allocator = allocator,
         };
     }
     
     /// Clean up loader resources - nothing to clean with new system
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *CapabilityLoader) void {
         _ = self;
     }
     
     /// Get metadata for a capability type - O(1) with new system
-    pub fn getMetadata(self: *Self, cap_type: CapabilityType) ?CapabilityMetadata {
+    pub fn getMetadata(self: *CapabilityLoader, cap_type: CapabilityType) ?CapabilityMetadata {
         _ = self;
         return BuiltinRegistry.getMetadata(cap_type);
     }
     
     /// Get all capabilities in a category
-    pub fn getCapabilitiesByCategory(self: *Self, category: descriptors.CapabilityCategory, result: *std.ArrayList(CapabilityType)) !void {
+    pub fn getCapabilitiesByCategory(self: *CapabilityLoader, category: descriptors.CapabilityCategory, result: *std.ArrayList(CapabilityType)) !void {
         _ = self;
         
         // Iterate through all builtin descriptors
@@ -43,7 +41,7 @@ pub const CapabilityLoader = struct {
     }
     
     /// Resolve dependencies for a set of capabilities using precomputed graph
-    pub fn resolveDependencies(self: *Self, requested: []const CapabilityType, resolved: *std.ArrayList(CapabilityType)) !void {
+    pub fn resolveDependencies(self: *CapabilityLoader, requested: []const CapabilityType, resolved: *std.ArrayList(CapabilityType)) !void {
         
         // Use precomputed dependency graph for efficient resolution
         const dependency_graph = BuiltinRegistry.dependency_graph;
@@ -66,7 +64,7 @@ pub const CapabilityLoader = struct {
     }
     
     /// Check if capability is a dependency of any requested capabilities
-    fn isDependencyOfRequested(self: *Self, cap_type: CapabilityType, requested: []const CapabilityType) bool {
+    fn isDependencyOfRequested(self: *CapabilityLoader, cap_type: CapabilityType, requested: []const CapabilityType) bool {
         
         for (requested) |req_type| {
             const metadata = BuiltinRegistry.getMetadata(req_type);
@@ -84,7 +82,7 @@ pub const CapabilityLoader = struct {
     }
     
     /// Validate that a set of capabilities is compatible using descriptor data
-    pub fn validateCompatibility(self: *Self, capabilities: []const CapabilityType) !void {
+    pub fn validateCompatibility(self: *CapabilityLoader, capabilities: []const CapabilityType) !void {
         _ = self;
         
         // Check for conflicts using descriptor metadata
@@ -126,14 +124,14 @@ pub const CapabilityLoader = struct {
     }
     
     /// Load capability from external plugin (future extension point)
-    pub fn loadPlugin(self: *Self, plugin_path: []const u8) !void {
+    pub fn loadPlugin(self: *CapabilityLoader, plugin_path: []const u8) !void {
         _ = self;
         _ = plugin_path;
         std.log.warn("Plugin loading not yet implemented", .{});
     }
     
     /// Get recommended capabilities for a use case
-    pub fn getRecommendedCapabilities(self: *Self, use_case: UseCase, recommended: *std.ArrayList(CapabilityType)) !void {
+    pub fn getRecommendedCapabilities(self: *CapabilityLoader, use_case: UseCase, recommended: *std.ArrayList(CapabilityType)) !void {
         _ = self;
         
         const caps = switch (use_case) {

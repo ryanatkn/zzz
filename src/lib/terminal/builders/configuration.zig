@@ -3,11 +3,11 @@ const terminal_builder = @import("terminal_builder.zig");
 const CapabilityType = terminal_builder.CapabilityType;
 const PresetType = terminal_builder.PresetType;
 
+// TODO probably just support Zon for now
 /// Configuration formats supported by the system
 pub const ConfigFormat = enum {
     json,
-    // TODO: Add TOML, ZON support when parsers available
-    // toml,
+    // TODO: Add ZON support when parsers available
     // zon,
 };
 
@@ -17,17 +17,15 @@ pub const TerminalConfig = struct {
     capabilities: []CapabilityType = &[_]CapabilityType{},
     capability_configs: std.HashMap(CapabilityType, CapabilitySpecificConfig, std.hash_map.AutoContext(CapabilityType), std.hash_map.default_max_load_percentage),
     
-    const Self = @This();
-    
     /// Initialize empty configuration
-    pub fn init(allocator: std.mem.Allocator) Self {
-        return Self{
+    pub fn init(allocator: std.mem.Allocator) TerminalConfig {
+        return TerminalConfig{
             .capability_configs = std.HashMap(CapabilityType, CapabilitySpecificConfig, std.hash_map.AutoContext(CapabilityType), std.hash_map.default_max_load_percentage).init(allocator),
         };
     }
     
     /// Clean up configuration resources
-    pub fn deinit(self: *Self, allocator: std.mem.Allocator) void {
+    pub fn deinit(self: *TerminalConfig, allocator: std.mem.Allocator) void {
         if (self.capabilities.len > 0) {
             allocator.free(self.capabilities);
         }
@@ -41,15 +39,13 @@ pub const CapabilitySpecificConfig = struct {
     // For now, using a generic key-value store
     options: std.HashMap([]const u8, []const u8, std.hash_map.StringContext, std.hash_map.default_max_load_percentage),
     
-    const Self = @This();
-    
-    pub fn init(allocator: std.mem.Allocator) Self {
-        return Self{
+    pub fn init(allocator: std.mem.Allocator) CapabilitySpecificConfig {
+        return CapabilitySpecificConfig{
             .options = std.HashMap([]const u8, []const u8, std.hash_map.StringContext, std.hash_map.default_max_load_percentage).init(allocator),
         };
     }
     
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *CapabilitySpecificConfig) void {
         self.options.deinit();
     }
 };
@@ -58,17 +54,15 @@ pub const CapabilitySpecificConfig = struct {
 pub const ConfigurationSystem = struct {
     allocator: std.mem.Allocator,
     
-    const Self = @This();
-    
     /// Initialize configuration system
-    pub fn init(allocator: std.mem.Allocator) Self {
-        return Self{
+    pub fn init(allocator: std.mem.Allocator) ConfigurationSystem {
+        return ConfigurationSystem{
             .allocator = allocator,
         };
     }
     
     /// Load configuration from file
-    pub fn loadFromFile(self: *Self, file_path: []const u8) !TerminalConfig {
+    pub fn loadFromFile(self: *ConfigurationSystem, file_path: []const u8) !TerminalConfig {
         const file_extension = std.fs.path.extension(file_path);
         const format = if (std.mem.eql(u8, file_extension, ".json"))
             ConfigFormat.json
@@ -84,7 +78,7 @@ pub const ConfigurationSystem = struct {
     }
     
     /// Load configuration from environment variables
-    pub fn loadFromEnvironment(self: *Self) !TerminalConfig {
+    pub fn loadFromEnvironment(self: *ConfigurationSystem) !TerminalConfig {
         var config = TerminalConfig.init(self.allocator);
         
         // Check for preset environment variable
@@ -108,14 +102,14 @@ pub const ConfigurationSystem = struct {
     }
     
     /// Create default configuration
-    pub fn defaultConfig(self: *Self) TerminalConfig {
+    pub fn defaultConfig(self: *ConfigurationSystem) TerminalConfig {
         var config = TerminalConfig.init(self.allocator);
         config.preset = .standard; // Default to standard terminal
         return config;
     }
     
     /// Merge multiple configurations (later configs override earlier ones)
-    pub fn mergeConfigs(self: *Self, configs: []const TerminalConfig) !TerminalConfig {
+    pub fn mergeConfigs(self: *ConfigurationSystem, configs: []const TerminalConfig) !TerminalConfig {
         var merged = TerminalConfig.init(self.allocator);
         
         for (configs) |config| {
@@ -142,7 +136,7 @@ pub const ConfigurationSystem = struct {
     }
     
     /// Validate configuration for consistency
-    pub fn validateConfig(self: *Self, config: *const TerminalConfig) !void {
+    pub fn validateConfig(self: *ConfigurationSystem, config: *const TerminalConfig) !void {
         _ = self;
         _ = config;
         // TODO: Implement configuration validation
@@ -153,7 +147,7 @@ pub const ConfigurationSystem = struct {
     }
     
     /// Apply configuration to a terminal builder
-    pub fn applyToBuilder(self: *Self, config: *const TerminalConfig, builder: *terminal_builder.TerminalBuilder) !void {
+    pub fn applyToBuilder(self: *ConfigurationSystem, config: *const TerminalConfig, builder: *terminal_builder.TerminalBuilder) !void {
         _ = self;
         
         // Apply preset first if specified
@@ -170,7 +164,7 @@ pub const ConfigurationSystem = struct {
     }
     
     /// Read file contents
-    fn readFile(self: *Self, file_path: []const u8) ![]u8 {
+    fn readFile(self: *ConfigurationSystem, file_path: []const u8) ![]u8 {
         const file = try std.fs.cwd().openFile(file_path, .{});
         defer file.close();
         
@@ -182,13 +176,61 @@ pub const ConfigurationSystem = struct {
     }
     
     /// Parse JSON configuration
-    fn parseJson(self: *Self, json_content: []const u8) !TerminalConfig {
-        const config = TerminalConfig.init(self.allocator);
+    fn parseJson(self: *ConfigurationSystem, json_content: []const u8) !TerminalConfig {
+        var config = TerminalConfig.init(self.allocator);
         
-        // TODO: Implement JSON parsing when std.json is available
-        // For now, just return default config with a warning
-        _ = json_content;
-        std.log.warn("JSON parsing not yet implemented, using default config", .{});
+        // Simple JSON parsing using std.json.parseFromSlice
+        var json_parser = std.json.parseFromSlice(std.json.Value, self.allocator, json_content, .{}) catch |err| {
+            std.log.warn("JSON parsing failed: {}, using default config", .{err});
+            return config;
+        };
+        defer json_parser.deinit();
+        
+        const root = json_parser.value;
+        if (root != .object) {
+            std.log.warn("Config root is not JSON object, using default config", .{});
+            return config;
+        }
+        
+        const obj = root.object;
+        
+        // Parse preset
+        if (obj.get("preset")) |preset_value| {
+            if (preset_value == .string) {
+                const preset_str = preset_value.string;
+                if (std.mem.eql(u8, preset_str, "minimal")) {
+                    config.preset = .minimal;
+                } else if (std.mem.eql(u8, preset_str, "standard")) {
+                    config.preset = .standard;
+                } else if (std.mem.eql(u8, preset_str, "command")) {
+                    config.preset = .command;
+                }
+            }
+        }
+        
+        // Parse capabilities array
+        if (obj.get("capabilities")) |caps_value| {
+            if (caps_value == .array) {
+                var caps_list = std.ArrayList(CapabilityType).init(self.allocator);
+                defer caps_list.deinit();
+                
+                for (caps_value.array.items) |cap_value| {
+                    if (cap_value == .string) {
+                        const cap_str = cap_value.string;
+                        if (std.mem.eql(u8, cap_str, "keyboard_input")) {
+                            try caps_list.append(.keyboard_input);
+                        } else if (std.mem.eql(u8, cap_str, "basic_writer")) {
+                            try caps_list.append(.basic_writer);
+                        } else if (std.mem.eql(u8, cap_str, "ansi_writer")) {
+                            try caps_list.append(.ansi_writer);
+                        }
+                        // Add more capability parsing as needed
+                    }
+                }
+                
+                config.capabilities = try caps_list.toOwnedSlice();
+            }
+        }
         
         return config;
     }

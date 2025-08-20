@@ -28,10 +28,9 @@ pub const BasicWriter = struct {
     // Current line being built (accumulates characters until newline)
     current_line: ?core.Line = null,
 
-    const Self = @This();
 
-    pub fn init(allocator: std.mem.Allocator) Self {
-        return Self{
+    pub fn init(allocator: std.mem.Allocator) BasicWriter {
+        return BasicWriter{
             .active = false,
             .initialized = false,
             .event_bus = null,
@@ -47,27 +46,27 @@ pub const BasicWriter = struct {
     }
 
     /// Create a new basic writer capability
-    pub fn create(allocator: std.mem.Allocator) !*Self {
-        const self = try allocator.create(Self);
-        self.* = Self.init(allocator);
+    pub fn create(allocator: std.mem.Allocator) !*BasicWriter {
+        const self = try allocator.create(BasicWriter);
+        self.* = BasicWriter.init(allocator);
         return self;
     }
 
     /// Destroy basic writer capability
-    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+    pub fn destroy(self: *BasicWriter, allocator: std.mem.Allocator) void {
         self.deinit();
         allocator.destroy(self);
     }
 
 
     /// Get required dependencies
-    pub fn getDependencies(self: *Self) []const []const u8 {
+    pub fn getDependencies(self: *BasicWriter) []const []const u8 {
         _ = self;
         return dependencies;
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *BasicWriter, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // No dependencies for basic writer
 
         self.event_bus = event_bus;
@@ -81,7 +80,7 @@ pub const BasicWriter = struct {
     }
 
     /// Cleanup capability resources
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *BasicWriter) void {
         // Unsubscribe from events
         if (self.event_bus) |bus| {
             bus.unsubscribe(.output, outputEventCallback, self);
@@ -97,12 +96,12 @@ pub const BasicWriter = struct {
     }
 
     /// Check if capability is active
-    pub fn isActive(self: *Self) bool {
+    pub fn isActive(self: *BasicWriter) bool {
         return self.active;
     }
 
     /// Write text to the terminal scrollback
-    pub fn write(self: *Self, text: []const u8) !void {
+    pub fn write(self: *BasicWriter, text: []const u8) !void {
         if (!self.active) return;
 
         for (text) |ch| {
@@ -122,7 +121,7 @@ pub const BasicWriter = struct {
     }
 
     /// Write a single character to the terminal
-    fn writeChar(self: *Self, ch: u8) !void {
+    fn writeChar(self: *BasicWriter, ch: u8) !void {
         switch (ch) {
             '\n' => try self.newline(),
             '\r' => {}, // Ignore carriage return for now
@@ -144,7 +143,7 @@ pub const BasicWriter = struct {
     }
 
     /// Add character to current output
-    fn addCharToCurrentOutput(self: *Self, ch: u8) !void {
+    fn addCharToCurrentOutput(self: *BasicWriter, ch: u8) !void {
         // Initialize current line if it doesn't exist (start of new line)
         if (self.current_line == null) {
             self.current_line = core.Line.init(self.arena.allocator());
@@ -174,7 +173,7 @@ pub const BasicWriter = struct {
     }
 
     /// Move to new line
-    fn newline(self: *Self) !void {
+    fn newline(self: *BasicWriter) !void {
         // Finalize current line if it exists
         if (self.current_line != null) {
             // Current line should already be in scrollback, just reset our reference
@@ -190,19 +189,19 @@ pub const BasicWriter = struct {
     }
 
     /// Force a new line without adding empty line to scrollback (for wrapping)
-    fn forceNewline(self: *Self) !void {
+    fn forceNewline(self: *BasicWriter) !void {
         // Simply finalize current line and reset reference
         // The current line is already in scrollback, no need to add empty line
         self.current_line = null;
     }
 
     /// Get scrollback for rendering
-    pub fn getScrollback(self: *const Self) *const core.RingBuffer(core.Line, 1000) {
+    pub fn getScrollback(self: *const BasicWriter) *const core.RingBuffer(core.Line, 1000) {
         return &self.scrollback;
     }
 
     /// Clear all output
-    pub fn clear(self: *Self) !void {
+    pub fn clear(self: *BasicWriter) !void {
         if (!self.active) return;
 
         self.scrollback.clear();
@@ -221,17 +220,17 @@ pub const BasicWriter = struct {
     }
 
     /// Configure line wrapping behavior
-    pub fn setLineWrapping(self: *Self, enabled: bool) void {
+    pub fn setLineWrapping(self: *BasicWriter, enabled: bool) void {
         self.wrap_lines = enabled;
     }
 
     /// Get current line wrapping setting
-    pub fn isLineWrappingEnabled(self: *const Self) bool {
+    pub fn isLineWrappingEnabled(self: *const BasicWriter) bool {
         return self.wrap_lines;
     }
 
     /// Get current terminal width setting
-    pub fn getTerminalWidth(self: *const Self) usize {
+    pub fn getTerminalWidth(self: *const BasicWriter) usize {
         return self.terminal_width;
     }
 };

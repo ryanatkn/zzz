@@ -8,8 +8,6 @@ const std = @import("std");
 const loggers = @import("../debug/loggers.zig");
 
 pub const core = @import("core.zig");
-pub const process = @import("process.zig");
-pub const commands = @import("commands.zig");
 pub const ansi = @import("ansi.zig");
 pub const output_capture = @import("output_capture.zig");
 pub const process_control = @import("process_control.zig");
@@ -42,12 +40,13 @@ pub const capabilities = struct {
 
 // Re-export main types for convenience
 pub const Terminal = core.Terminal;
-pub const ProcessExecutor = process.ProcessExecutor;
-pub const ProcessResult = process.ProcessResult;
-pub const CommandRegistry = commands.CommandRegistry;
-pub const CommandContext = commands.CommandContext;
-pub const CommandFn = commands.CommandFn;
-pub const Command = commands.Command;
+// Legacy compatibility exports (use capabilities.commands directly for new code)
+pub const ProcessExecutor = capabilities.commands.Executor;
+pub const ProcessResult = @import("capabilities/commands/executor.zig").ProcessResult;
+pub const CommandRegistry = capabilities.commands.Registry;
+pub const CommandContext = @import("capabilities/commands/registry.zig").CommandContext;
+pub const CommandFn = @import("capabilities/commands/registry.zig").CommandFn;
+pub const Command = @import("capabilities/commands/registry.zig").Command;
 pub const AnsiParser = ansi.AnsiParser;
 pub const AnsiColor = ansi.AnsiColor;
 pub const TextAttributes = ansi.TextAttributes;

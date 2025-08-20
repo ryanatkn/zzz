@@ -9,18 +9,38 @@ const ScrollbackCapability = scrollback_cap.Scrollback;
 
 /// Terminal viewport manager for efficient visible line rendering
 pub const TerminalViewport = struct {
-    /// Get lines in rendering order (oldest first, newest last)
+    /// Maximum visible lines in a terminal viewport (reasonable upper limit)
+    pub const MAX_VISIBLE_LINES = 256;
+    
+    /// Get lines in rendering order using bounded array for better performance
     /// This ensures when rendered top-to-bottom, newest lines appear at bottom
+    /// Returns owned slice that must be freed by caller
     pub fn getVisibleLinesArray(allocator: std.mem.Allocator, scrollback: *const RingBuffer(Line, 1000), max_rows: usize) ![]Line {
-        var lines_list = std.ArrayList(Line).init(allocator);
-        defer lines_list.deinit();
-
-        var iterator = VisibleLinesIterator.init(scrollback, max_rows);
+        var lines_buffer = std.BoundedArray(Line, MAX_VISIBLE_LINES){};
+        
+        var iterator = VisibleLinesIterator.init(scrollback, @min(max_rows, MAX_VISIBLE_LINES));
         while (iterator.next()) |line| {
-            try lines_list.append(line);
+            lines_buffer.append(line) catch break; // Stop if buffer full
         }
 
-        return lines_list.toOwnedSlice();
+        // Create owned slice for compatibility with existing API
+        const result = try allocator.dupe(Line, lines_buffer.slice());
+        return result;
+    }
+    
+    /// Get visible lines without allocation using caller-provided buffer
+    /// More efficient version for performance-critical code
+    pub fn getVisibleLinesIntoBuffer(scrollback: *const RingBuffer(Line, 1000), max_rows: usize, buffer: []Line) usize {
+        var count: usize = 0;
+        var iterator = VisibleLinesIterator.init(scrollback, @min(max_rows, buffer.len));
+        
+        while (iterator.next()) |line| {
+            if (count >= buffer.len) break;
+            buffer[count] = line;
+            count += 1;
+        }
+        
+        return count;
     }
 
     /// Check if viewport should show scrollback indicator

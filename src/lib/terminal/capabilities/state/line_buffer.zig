@@ -22,10 +22,8 @@ pub const LineBuffer = struct {
     command_history: std.ArrayList([]u8),
     history_index: ?usize = null,
 
-    const Self = @This();
-
-    pub fn init(allocator: std.mem.Allocator) Self {
-        return Self{
+    pub fn init(allocator: std.mem.Allocator) LineBuffer {
+        return LineBuffer{
             .active = false,
             .initialized = false,
             .event_bus = null,
@@ -38,38 +36,38 @@ pub const LineBuffer = struct {
     }
 
     /// Create a new line buffer capability
-    pub fn create(allocator: std.mem.Allocator) !*Self {
-        const self = try allocator.create(Self);
-        self.* = Self.init(allocator);
+    pub fn create(allocator: std.mem.Allocator) !*LineBuffer {
+        const self = try allocator.create(LineBuffer);
+        self.* = LineBuffer.init(allocator);
         return self;
     }
 
     /// Destroy line buffer capability
-    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+    pub fn destroy(self: *LineBuffer, allocator: std.mem.Allocator) void {
         self.deinit();
         allocator.destroy(self);
     }
 
     /// Get capability name
-    pub fn getName(self: *Self) []const u8 {
+    pub fn getName(self: *LineBuffer) []const u8 {
         _ = self;
         return name;
     }
 
     /// Get capability type
-    pub fn getType(self: *Self) []const u8 {
+    pub fn getType(self: *LineBuffer) []const u8 {
         _ = self;
         return capability_type;
     }
 
     /// Get required dependencies
-    pub fn getDependencies(self: *Self) []const []const u8 {
+    pub fn getDependencies(self: *LineBuffer) []const []const u8 {
         _ = self;
         return dependencies;
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *LineBuffer, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // Dependencies verified by registry
 
         self.event_bus = event_bus;
@@ -82,7 +80,7 @@ pub const LineBuffer = struct {
     }
 
     /// Cleanup capability resources
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *LineBuffer) void {
         // Unsubscribe from events
         if (self.event_bus) |bus| {
             bus.unsubscribe(.input, inputEventCallback, self);
@@ -101,19 +99,19 @@ pub const LineBuffer = struct {
     }
 
     /// Check if capability is active
-    pub fn isActive(self: *Self) bool {
+    pub fn isActive(self: *LineBuffer) bool {
         return self.active;
     }
 
     /// Insert character at cursor position
-    fn insertChar(self: *Self, ch: u8) !void {
+    fn insertChar(self: *LineBuffer, ch: u8) !void {
         try self.current_line.insert(self.cursor_x, ch);
         self.cursor_x += 1;
         try self.emitStateChange(.char_inserted);
     }
 
     /// Handle backspace - delete character before cursor
-    fn handleBackspace(self: *Self) !void {
+    fn handleBackspace(self: *LineBuffer) !void {
         if (self.cursor_x > 0 and self.current_line.items.len > 0) {
             _ = self.current_line.orderedRemove(self.cursor_x - 1);
             self.cursor_x -= 1;
@@ -122,7 +120,7 @@ pub const LineBuffer = struct {
     }
 
     /// Handle delete - delete character at cursor
-    fn handleDelete(self: *Self) !void {
+    fn handleDelete(self: *LineBuffer) !void {
         if (self.cursor_x < self.current_line.items.len) {
             _ = self.current_line.orderedRemove(self.cursor_x);
             try self.emitStateChange(.char_deleted);
@@ -130,7 +128,7 @@ pub const LineBuffer = struct {
     }
 
     /// Handle arrow key navigation
-    fn handleArrowKey(self: *Self, direction: kernel.events.SpecialKey) !void {
+    fn handleArrowKey(self: *LineBuffer, direction: kernel.events.SpecialKey) !void {
         switch (direction) {
             .left_arrow => {
                 if (self.cursor_x > 0) {
@@ -151,7 +149,7 @@ pub const LineBuffer = struct {
     }
 
     /// Handle home/end keys
-    fn handlePositioning(self: *Self, key: kernel.events.SpecialKey) !void {
+    fn handlePositioning(self: *LineBuffer, key: kernel.events.SpecialKey) !void {
         switch (key) {
             .home => {
                 self.cursor_x = 0;
@@ -166,7 +164,7 @@ pub const LineBuffer = struct {
     }
 
     /// Navigate command history
-    fn navigateHistory(self: *Self, direction: i32) void {
+    fn navigateHistory(self: *LineBuffer, direction: i32) void {
         const history_len = self.command_history.items.len;
         if (history_len == 0) return;
 
@@ -199,7 +197,7 @@ pub const LineBuffer = struct {
     }
 
     /// Execute current line - add to history and clear buffer
-    fn executeCurrentLine(self: *Self) !void {
+    fn executeCurrentLine(self: *LineBuffer) !void {
         const command = try self.allocator.dupe(u8, self.current_line.items);
 
         // Add to history if not empty
@@ -226,14 +224,14 @@ pub const LineBuffer = struct {
     }
 
     /// Clear current line
-    fn clearLine(self: *Self) !void {
+    fn clearLine(self: *LineBuffer) !void {
         self.current_line.clearRetainingCapacity();
         self.cursor_x = 0;
         try self.emitStateChange(.line_cleared);
     }
 
     /// Emit state change event
-    fn emitStateChange(self: *Self, state: kernel.events.LineBufferState) !void {
+    fn emitStateChange(self: *LineBuffer, state: kernel.events.LineBufferState) !void {
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, kernel.EventData{
                 .state_change = kernel.events.StateChangeData{
@@ -246,22 +244,22 @@ pub const LineBuffer = struct {
     }
 
     /// Get current line content
-    pub fn getCurrentLine(self: *const Self) []const u8 {
+    pub fn getCurrentLine(self: *const LineBuffer) []const u8 {
         return self.current_line.items;
     }
 
     /// Get cursor position
-    pub fn getCursorPosition(self: *const Self) usize {
+    pub fn getCursorPosition(self: *const LineBuffer) usize {
         return self.cursor_x;
     }
 
     /// Set cursor position
-    pub fn setCursorPosition(self: *Self, pos: usize) void {
+    pub fn setCursorPosition(self: *LineBuffer, pos: usize) void {
         self.cursor_x = @min(pos, self.current_line.items.len);
     }
 
     /// Set the current line content
-    pub fn setCurrentLine(self: *Self, text: []const u8) !void {
+    pub fn setCurrentLine(self: *LineBuffer, text: []const u8) !void {
         self.current_line.clearRetainingCapacity();
         try self.current_line.appendSlice(text);
         self.cursor_x = @min(self.cursor_x, text.len);
@@ -269,7 +267,7 @@ pub const LineBuffer = struct {
     }
 
     /// Insert text at specific position
-    pub fn insertTextAt(self: *Self, pos: usize, text: []const u8) !void {
+    pub fn insertTextAt(self: *LineBuffer, pos: usize, text: []const u8) !void {
         const insert_pos = @min(pos, self.current_line.items.len);
 
         // Use ArrayList's insertSlice method directly - no temporary allocation needed
@@ -284,7 +282,7 @@ pub const LineBuffer = struct {
     }
 
     /// Delete range of characters
-    pub fn deleteRange(self: *Self, start: usize, end: usize) !void {
+    pub fn deleteRange(self: *LineBuffer, start: usize, end: usize) !void {
         if (start >= end or start >= self.current_line.items.len) return;
 
         const actual_end = @min(end, self.current_line.items.len);
@@ -306,18 +304,18 @@ pub const LineBuffer = struct {
     }
 
     /// Get history count
-    pub fn getHistoryCount(self: *const Self) usize {
+    pub fn getHistoryCount(self: *const LineBuffer) usize {
         return self.command_history.items.len;
     }
 
     /// Get history item at index
-    pub fn getHistoryItem(self: *const Self, index: usize) ?[]const u8 {
+    pub fn getHistoryItem(self: *const LineBuffer, index: usize) ?[]const u8 {
         if (index >= self.command_history.items.len) return null;
         return self.command_history.items[index];
     }
 
     /// Public wrapper for inserting a character
-    pub fn insertCharAt(self: *Self, pos: usize, ch: u8) !void {
+    pub fn insertCharAt(self: *LineBuffer, pos: usize, ch: u8) !void {
         const old_cursor = self.cursor_x;
         self.cursor_x = pos;
         try self.insertChar(ch);
@@ -325,7 +323,7 @@ pub const LineBuffer = struct {
     }
 
     /// Public wrapper for handling special keys
-    pub fn handleSpecialKey(self: *Self, key: kernel.events.SpecialKey) !void {
+    pub fn handleSpecialKey(self: *LineBuffer, key: kernel.events.SpecialKey) !void {
         switch (key) {
             .backspace => try self.handleBackspace(),
             .delete => try self.handleDelete(),

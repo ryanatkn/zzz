@@ -31,10 +31,8 @@ pub const Executor = struct {
     output_callback: ?*const fn (context: *anyopaque, data: []const u8) anyerror!void = null,
     output_context: ?*anyopaque = null,
 
-    const Self = @This();
-
     /// Factory method for creating executor capability
-    pub fn create(allocator: std.mem.Allocator) !*Self {
+    pub fn create(allocator: std.mem.Allocator) !*Executor {
         // Create arena allocator for this capability - allocate it separately so it doesn't move
         const arena = try allocator.create(std.heap.ArenaAllocator);
         arena.* = std.heap.ArenaAllocator.init(allocator);
@@ -59,8 +57,8 @@ pub const Executor = struct {
         };
         try working_dir.appendSlice(cwd);
 
-        const executor = try allocator.create(Self);
-        executor.* = Self{
+        const executor = try allocator.create(Executor);
+        executor.* = Executor{
             .allocator = allocator,
             .arena = arena,
             .current_process = null,
@@ -71,7 +69,7 @@ pub const Executor = struct {
     }
 
     /// Factory method for destroying executor capability
-    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+    pub fn destroy(self: *Executor, allocator: std.mem.Allocator) void {
         // Clean up resources first
         self.deinit();
         // Then free the memory
@@ -79,27 +77,27 @@ pub const Executor = struct {
     }
 
     /// ICapability interface implementation
-    pub fn getName(self: *const Self) []const u8 {
+    pub fn getName(self: *const Executor) []const u8 {
         _ = self;
         return name;
     }
 
-    pub fn getType(self: *const Self) []const u8 {
+    pub fn getType(self: *const Executor) []const u8 {
         _ = self;
         return capability_type;
     }
 
-    pub fn getDependencies(self: *const Self) []const []const u8 {
+    pub fn getDependencies(self: *const Executor) []const []const u8 {
         _ = self;
         return &[_][]const u8{}; // No dependencies
     }
 
-    pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Executor, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = dependencies;
         self.event_bus = event_bus;
     }
 
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *Executor) void {
         // Clean up resources when called by registry
         if (self.current_process) |*process| {
             const ui_log = loggers.getUILog();
@@ -119,18 +117,18 @@ pub const Executor = struct {
         self.event_bus = null;
     }
 
-    pub fn isActive(self: *const Self) bool {
+    pub fn isActive(self: *const Executor) bool {
         return self.event_bus != null;
     }
 
     /// Set output streaming callback
-    pub fn setOutputCallback(self: *Self, callback: *const fn (context: *anyopaque, data: []const u8) anyerror!void, context: *anyopaque) void {
+    pub fn setOutputCallback(self: *Executor, callback: *const fn (context: *anyopaque, data: []const u8) anyerror!void, context: *anyopaque) void {
         self.output_callback = callback;
         self.output_context = context;
     }
 
     /// Execute a command and return result
-    pub fn execute(self: *Self, command: []const u8, args: []const []const u8) !ProcessResult {
+    pub fn execute(self: *Executor, command: []const u8, args: []const []const u8) !ProcessResult {
         // Build full argument list (command + args)
         var argv = std.ArrayList([]const u8).init(self.allocator);
         defer argv.deinit();
@@ -195,14 +193,14 @@ pub const Executor = struct {
     }
 
     /// Execute command with shell (for more complex commands)
-    pub fn executeShell(self: *Self, command_line: []const u8) !ProcessResult {
+    pub fn executeShell(self: *Executor, command_line: []const u8) !ProcessResult {
         const shell_cmd = "/bin/sh";
         const shell_args = [_][]const u8{ "-c", command_line };
         return self.execute(shell_cmd, &shell_args);
     }
 
     /// Change working directory
-    pub fn changeDirectory(self: *Self, path: []const u8) !void {
+    pub fn changeDirectory(self: *Executor, path: []const u8) !void {
         const arena_allocator = self.arena.allocator();
 
         // Resolve path using arena allocator
@@ -237,28 +235,28 @@ pub const Executor = struct {
     }
 
     /// Get current working directory
-    pub fn getCurrentDirectory(self: *const Self) []const u8 {
+    pub fn getCurrentDirectory(self: *const Executor) []const u8 {
         return self.working_directory.items;
     }
 
     /// Set environment variable
-    pub fn setEnvironmentVariable(self: *Self, var_name: []const u8, value: []const u8) !void {
+    pub fn setEnvironmentVariable(self: *Executor, var_name: []const u8, value: []const u8) !void {
         // EnvMap.put() handles memory management for us
         try self.environment.put(var_name, value);
     }
 
     /// Get environment variable
-    pub fn getEnvironmentVariable(self: *const Self, var_name: []const u8) ?[]const u8 {
+    pub fn getEnvironmentVariable(self: *const Executor, var_name: []const u8) ?[]const u8 {
         return self.environment.get(var_name);
     }
 
     /// Get all environment variables
-    pub fn getEnvironmentVariables(self: *const Self) std.process.EnvMap.Iterator {
+    pub fn getEnvironmentVariables(self: *const Executor) std.process.EnvMap.Iterator {
         return self.environment.iterator();
     }
 
     /// Kill current running process
-    pub fn killCurrentProcess(self: *Self) !void {
+    pub fn killCurrentProcess(self: *Executor) !void {
         if (self.current_process) |*process| {
             try process.kill();
             self.current_process = null;
@@ -266,7 +264,7 @@ pub const Executor = struct {
     }
 
     /// Check if a process is currently running
-    pub fn isProcessRunning(self: *const Self) bool {
+    pub fn isProcessRunning(self: *const Executor) bool {
         return self.current_process != null;
     }
 };

@@ -78,29 +78,27 @@ pub const AnsiWriter = struct {
     event_bus: ?*kernel.EventBus = null,
     current_style: Style = Style{},
 
-    const Self = @This();
-
     /// Factory method for creating ANSI writer capability
-    pub fn create(allocator: std.mem.Allocator) !*Self {
-        const writer = try allocator.create(Self);
-        writer.* = Self{
+    pub fn create(allocator: std.mem.Allocator) !*AnsiWriter {
+        const writer = try allocator.create(AnsiWriter);
+        writer.* = AnsiWriter{
             .allocator = allocator,
         };
         return writer;
     }
 
     /// Factory method for destroying ANSI writer capability
-    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+    pub fn destroy(self: *AnsiWriter, allocator: std.mem.Allocator) void {
         allocator.destroy(self);
     }
 
 
-    pub fn getDependencies(self: *const Self) []const []const u8 {
+    pub fn getDependencies(self: *const AnsiWriter) []const []const u8 {
         _ = self;
         return &[_][]const u8{"basic_writer"};
     }
 
-    pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *AnsiWriter, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         self.event_bus = event_bus;
 
         // Find basic writer dependency using type-safe casting
@@ -116,17 +114,17 @@ pub const AnsiWriter = struct {
         }
     }
 
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *AnsiWriter) void {
         self.event_bus = null;
         self.basic_writer_capability = null;
     }
 
-    pub fn isActive(self: *const Self) bool {
+    pub fn isActive(self: *const AnsiWriter) bool {
         return self.event_bus != null and self.basic_writer_capability != null;
     }
 
     /// Write text with current ANSI styling
-    pub fn write(self: *Self, text: []const u8) !void {
+    pub fn write(self: *AnsiWriter, text: []const u8) !void {
         if (!self.isActive()) {
             return error.NotInitialized;
         }
@@ -148,42 +146,42 @@ pub const AnsiWriter = struct {
     }
 
     /// Write text with specific foreground color
-    pub fn writeColored(self: *Self, text: []const u8, color: AnsiColor) !void {
+    pub fn writeColored(self: *AnsiWriter, text: []const u8, color: AnsiColor) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[3{d}m{s}\x1b[0m", .{ @intFromEnum(color), text });
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
     }
 
     /// Write text with specific foreground and background colors
-    pub fn writeColoredBg(self: *Self, text: []const u8, fg_color: AnsiColor, bg_color: AnsiColor) !void {
+    pub fn writeColoredBg(self: *AnsiWriter, text: []const u8, fg_color: AnsiColor, bg_color: AnsiColor) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[3{d};4{d}m{s}\x1b[0m", .{ @intFromEnum(fg_color), @intFromEnum(bg_color), text });
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
     }
 
     /// Write bold text
-    pub fn writeBold(self: *Self, text: []const u8) !void {
+    pub fn writeBold(self: *AnsiWriter, text: []const u8) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[1m{s}\x1b[0m", .{text});
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
     }
 
     /// Write underlined text
-    pub fn writeUnderlined(self: *Self, text: []const u8) !void {
+    pub fn writeUnderlined(self: *AnsiWriter, text: []const u8) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[4m{s}\x1b[0m", .{text});
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
     }
 
     /// Write italic text
-    pub fn writeItalic(self: *Self, text: []const u8) !void {
+    pub fn writeItalic(self: *AnsiWriter, text: []const u8) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[3m{s}\x1b[0m", .{text});
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
     }
 
     /// Set foreground color
-    pub fn setForegroundColor(self: *Self, color: AnsiColor) !void {
+    pub fn setForegroundColor(self: *AnsiWriter, color: AnsiColor) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[3{d}m", .{@intFromEnum(color)});
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
@@ -191,7 +189,7 @@ pub const AnsiWriter = struct {
     }
 
     /// Set background color
-    pub fn setBackgroundColor(self: *Self, color: AnsiColor) !void {
+    pub fn setBackgroundColor(self: *AnsiWriter, color: AnsiColor) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[4{d}m", .{@intFromEnum(color)});
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
@@ -199,70 +197,70 @@ pub const AnsiWriter = struct {
     }
 
     /// Enable bold
-    pub fn setBold(self: *Self, enable: bool) !void {
+    pub fn setBold(self: *AnsiWriter, enable: bool) !void {
         const ansi_seq = if (enable) "\x1b[1m" else "\x1b[22m";
         try self.write(ansi_seq);
         self.current_style.attributes.bold = enable;
     }
 
     /// Enable underline
-    pub fn setUnderline(self: *Self, enable: bool) !void {
+    pub fn setUnderline(self: *AnsiWriter, enable: bool) !void {
         const ansi_seq = if (enable) "\x1b[4m" else "\x1b[24m";
         try self.write(ansi_seq);
         self.current_style.attributes.underline = enable;
     }
 
     /// Enable italic
-    pub fn setItalic(self: *Self, enable: bool) !void {
+    pub fn setItalic(self: *AnsiWriter, enable: bool) !void {
         const ansi_seq = if (enable) "\x1b[3m" else "\x1b[23m";
         try self.write(ansi_seq);
         self.current_style.attributes.italic = enable;
     }
 
     /// Reset all styling to defaults
-    pub fn resetStyle(self: *Self) !void {
+    pub fn resetStyle(self: *AnsiWriter) !void {
         try self.write("\x1b[0m");
         self.current_style.reset();
     }
 
     /// Clear screen
-    pub fn clearScreen(self: *Self) !void {
+    pub fn clearScreen(self: *AnsiWriter) !void {
         try self.write("\x1b[2J\x1b[H");
     }
 
     /// Move cursor to position (1-based)
-    pub fn moveCursor(self: *Self, row: usize, col: usize) !void {
+    pub fn moveCursor(self: *AnsiWriter, row: usize, col: usize) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[{d};{d}H", .{ row, col });
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
     }
 
     /// Move cursor up by lines
-    pub fn moveCursorUp(self: *Self, lines: usize) !void {
+    pub fn moveCursorUp(self: *AnsiWriter, lines: usize) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[{d}A", .{lines});
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
     }
 
     /// Move cursor down by lines
-    pub fn moveCursorDown(self: *Self, lines: usize) !void {
+    pub fn moveCursorDown(self: *AnsiWriter, lines: usize) !void {
         const ansi_seq = try std.fmt.allocPrint(self.allocator, "\x1b[{d}B", .{lines});
         defer self.allocator.free(ansi_seq);
         try self.write(ansi_seq);
     }
 
     /// Hide cursor
-    pub fn hideCursor(self: *Self) !void {
+    pub fn hideCursor(self: *AnsiWriter) !void {
         try self.write("\x1b[?25l");
     }
 
     /// Show cursor
-    pub fn showCursor(self: *Self) !void {
+    pub fn showCursor(self: *AnsiWriter) !void {
         try self.write("\x1b[?25h");
     }
 
     /// Get current style
-    pub fn getCurrentStyle(self: *const Self) Style {
+    pub fn getCurrentStyle(self: *const AnsiWriter) Style {
         return self.current_style;
     }
 };

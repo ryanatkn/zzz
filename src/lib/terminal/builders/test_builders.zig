@@ -6,6 +6,8 @@ const capability_loader = @import("capability_loader.zig");
 const configuration = @import("configuration.zig");
 const validation = @import("validation.zig");
 const builder_presets = @import("builder_presets.zig");
+const KeyboardInput = @import("../capabilities/input/keyboard.zig").KeyboardInput;
+const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
 
 const TerminalBuilder = terminal_builder.TerminalBuilder;
 const CapabilityType = terminal_builder.CapabilityType;
@@ -92,8 +94,8 @@ test "TerminalBuilder: Build minimal terminal" {
     try testing.expect(terminal.capability_count == 4);
     
     // Test that we can get capabilities
-    const keyboard = terminal.getCapability(@import("../capabilities/input/keyboard.zig").KeyboardInput);
-    const writer = terminal.getCapability(@import("../capabilities/output/basic_writer.zig").BasicWriter);
+    const keyboard = terminal.getCapability(KeyboardInput);
+    const writer = terminal.getCapability(BasicWriter);
     
     try testing.expect(keyboard != null);
     try testing.expect(writer != null);
@@ -220,7 +222,7 @@ test "ValidationSystem: Validate valid configuration" {
     defer result.deinit();
     
     try testing.expect(result.is_valid);
-    try testing.expect(result.errors.items.len == 0);
+    try testing.expect(result.errors.len == 0);
 }
 
 test "ValidationSystem: Detect missing dependencies" {
@@ -233,11 +235,11 @@ test "ValidationSystem: Detect missing dependencies" {
     defer result.deinit();
     
     try testing.expect(!result.is_valid);
-    try testing.expect(result.errors.items.len > 0);
+    try testing.expect(result.errors.len > 0);
     
     // Should have missing dependency errors
     var found_missing_dep = false;
-    for (result.errors.items) |error_info| {
+    for (result.errors.slice()) |error_info| {
         if (error_info.error_type == .missing_dependency) {
             found_missing_dep = true;
             break;

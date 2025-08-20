@@ -11,42 +11,40 @@ const MockTerminal = struct {
     capabilities: std.StringHashMap(*anyopaque),
     event_bus: kernel.EventBus,
 
-    const Self = @This();
-
-    pub fn init(allocator: std.mem.Allocator) Self {
-        return Self{
+    pub fn init(allocator: std.mem.Allocator) MockTerminal {
+        return MockTerminal{
             .output = std.ArrayList(u8).init(allocator),
             .capabilities = std.StringHashMap(*anyopaque).init(allocator),
             .event_bus = kernel.EventBus.init(allocator),
         };
     }
 
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *MockTerminal) void {
         self.output.deinit();
         self.capabilities.deinit();
     }
 
-    pub fn write(self: *Self, text: []const u8) !void {
+    pub fn write(self: *MockTerminal, text: []const u8) !void {
         try self.output.appendSlice(text);
     }
 
-    pub fn read(self: *Self, buffer: []u8) !usize {
+    pub fn read(self: *MockTerminal, buffer: []u8) !usize {
         _ = self;
         _ = buffer;
         return 0;
     }
 
-    pub fn clear(self: *Self) void {
+    pub fn clear(self: *MockTerminal) void {
         self.output.clearRetainingCapacity();
     }
 
-    pub fn resize(self: *Self, columns: usize, rows: usize) void {
+    pub fn resize(self: *MockTerminal, columns: usize, rows: usize) void {
         _ = self;
         _ = columns;
         _ = rows;
     }
 
-    pub fn handleInput(self: *Self, input: kernel.InputEvent) !void {
+    pub fn handleInput(self: *MockTerminal, input: kernel.InputEvent) !void {
         _ = input;
         const event = kernel.Event.init(.input, kernel.EventData{
             .input = kernel.events.InputEventData{
@@ -57,19 +55,19 @@ const MockTerminal = struct {
         try self.event_bus.emit(event);
     }
 
-    pub fn hasCapability(self: *Self, capability: []const u8) bool {
+    pub fn hasCapability(self: *MockTerminal, capability: []const u8) bool {
         return self.capabilities.contains(capability);
     }
 
-    pub fn getCapability(self: *Self, capability: []const u8) ?*anyopaque {
+    pub fn getCapability(self: *MockTerminal, capability: []const u8) ?*anyopaque {
         return self.capabilities.get(capability);
     }
 
-    pub fn emit(self: *Self, event: kernel.Event) !void {
+    pub fn emit(self: *MockTerminal, event: kernel.Event) !void {
         return self.event_bus.emit(event);
     }
 
-    pub fn subscribe(self: *Self, event_type: kernel.EventType, callback: kernel.EventCallback) !void {
+    pub fn subscribe(self: *MockTerminal, event_type: kernel.EventType, callback: kernel.EventCallback) !void {
         return self.event_bus.subscribe(event_type, callback, null);
     }
 };

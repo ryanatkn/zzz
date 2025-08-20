@@ -46,10 +46,8 @@ pub const CommandTerminal = struct {
     // Terminal interface
     event_bus: *kernel.EventBus,
 
-    const Self = @This();
-
     /// Initialize command terminal with all capabilities
-    pub fn init(allocator: std.mem.Allocator) !Self {
+    pub fn init(allocator: std.mem.Allocator) !CommandTerminal {
         // Create registry and register all command terminal capabilities
         var registry = try kernel.createRegistry(allocator);
         errdefer allocator.destroy(registry);
@@ -73,7 +71,7 @@ pub const CommandTerminal = struct {
         // Initialize all capabilities
         try registry.initializeAll();
 
-        return Self{
+        return CommandTerminal{
             .allocator = allocator,
             .registry = registry,
             .standard = StandardTerminal{
@@ -105,7 +103,7 @@ pub const CommandTerminal = struct {
     }
 
     /// Cleanup command terminal
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *CommandTerminal) void {
         // Registry deinit will handle all capability cleanup (deinit + destroy)
         self.registry.deinit();
 
@@ -116,166 +114,166 @@ pub const CommandTerminal = struct {
     // ===== Core Terminal Functions (delegated to standard) =====
 
     /// Handle keyboard input
-    pub fn handleKey(self: *Self, key: kernel.Key) !void {
+    pub fn handleKey(self: *CommandTerminal, key: kernel.Key) !void {
         try self.standard.handleKey(key);
     }
 
     /// Write text to terminal output
-    pub fn write(self: *Self, text: []const u8) !void {
+    pub fn write(self: *CommandTerminal, text: []const u8) !void {
         try self.standard.write(text);
     }
 
     /// Update terminal state (cursor blink, etc.)
-    pub fn update(self: *Self, dt: f32) !void {
+    pub fn update(self: *CommandTerminal, dt: f32) !void {
         try self.standard.update(dt);
     }
 
     /// Get current input line content
-    pub fn getCurrentLine(self: *const Self) []const u8 {
+    pub fn getCurrentLine(self: *const CommandTerminal) []const u8 {
         return self.standard.getCurrentLine();
     }
 
     /// Get cursor position
-    pub fn getCursorPosition(self: *const Self) struct { x: usize, y: usize } {
+    pub fn getCursorPosition(self: *const CommandTerminal) struct { x: usize, y: usize } {
         return self.standard.getCursorPosition();
     }
 
     /// Check if cursor is visible
-    pub fn isCursorVisible(self: *const Self) bool {
+    pub fn isCursorVisible(self: *const CommandTerminal) bool {
         return self.standard.isCursorVisible();
     }
 
     // ===== Command Execution Functions =====
 
     /// Execute a command line through the pipeline
-    pub fn executeCommand(self: *Self, command_line: []const u8) !void {
+    pub fn executeCommand(self: *CommandTerminal, command_line: []const u8) !void {
         try self.pipeline.executeCommand(command_line);
     }
 
     /// Validate command syntax
-    pub fn validateCommand(self: *Self, command_line: []const u8) !void {
+    pub fn validateCommand(self: *CommandTerminal, command_line: []const u8) !void {
         try self.pipeline.validateCommand(command_line);
     }
 
     /// Get list of available commands
-    pub fn getAvailableCommands(self: *Self) ![][]const u8 {
+    pub fn getAvailableCommands(self: *CommandTerminal) ![][]const u8 {
         return self.pipeline.getAvailableCommands();
     }
 
     /// Check if a command exists
-    pub fn hasCommand(self: *Self, command_name: []const u8) bool {
+    pub fn hasCommand(self: *CommandTerminal, command_name: []const u8) bool {
         return self.pipeline.hasCommand(command_name);
     }
 
     // ===== Directory Operations =====
 
     /// Get current working directory
-    pub fn getCurrentDirectory(self: *Self) ?[]const u8 {
+    pub fn getCurrentDirectory(self: *CommandTerminal) ?[]const u8 {
         return self.pipeline.getCurrentDirectory();
     }
 
     /// Change working directory
-    pub fn changeDirectory(self: *Self, path: []const u8) !void {
+    pub fn changeDirectory(self: *CommandTerminal, path: []const u8) !void {
         try self.pipeline.changeDirectory(path);
     }
 
     // ===== ANSI Output Functions =====
 
     /// Write colored text
-    pub fn writeColored(self: *Self, text: []const u8, color: AnsiWriter.AnsiColor) !void {
+    pub fn writeColored(self: *CommandTerminal, text: []const u8, color: AnsiWriter.AnsiColor) !void {
         try self.ansi_writer.writeColored(text, color);
     }
 
     /// Write bold text
-    pub fn writeBold(self: *Self, text: []const u8) !void {
+    pub fn writeBold(self: *CommandTerminal, text: []const u8) !void {
         try self.ansi_writer.writeBold(text);
     }
 
     /// Write underlined text
-    pub fn writeUnderlined(self: *Self, text: []const u8) !void {
+    pub fn writeUnderlined(self: *CommandTerminal, text: []const u8) !void {
         try self.ansi_writer.writeUnderlined(text);
     }
 
     /// Clear screen with ANSI
-    pub fn clearScreen(self: *Self) !void {
+    pub fn clearScreen(self: *CommandTerminal) !void {
         try self.ansi_writer.clearScreen();
     }
 
     /// Move cursor to position
-    pub fn moveCursor(self: *Self, row: usize, col: usize) !void {
+    pub fn moveCursor(self: *CommandTerminal, row: usize, col: usize) !void {
         try self.ansi_writer.moveCursor(row, col);
     }
 
     /// Reset ANSI styling
-    pub fn resetStyle(self: *Self) !void {
+    pub fn resetStyle(self: *CommandTerminal) !void {
         try self.ansi_writer.resetStyle();
     }
 
     // ===== Inherited Functions from StandardTerminal =====
 
     /// Get command history count
-    pub fn getHistoryCount(self: *const Self) usize {
+    pub fn getHistoryCount(self: *const CommandTerminal) usize {
         return self.standard.getHistoryCount();
     }
 
     /// Clear command history
-    pub fn clearHistory(self: *Self) void {
+    pub fn clearHistory(self: *CommandTerminal) void {
         self.standard.clearHistory();
     }
 
     /// Navigate history
-    pub fn navigateHistory(self: *Self, direction: i32) ?[]const u8 {
+    pub fn navigateHistory(self: *CommandTerminal, direction: i32) ?[]const u8 {
         return self.standard.navigateHistory(direction);
     }
 
     /// Switch to alternate screen
-    pub fn switchToAlternateScreen(self: *Self) void {
+    pub fn switchToAlternateScreen(self: *CommandTerminal) void {
         self.standard.switchToAlternateScreen();
     }
 
     /// Switch to primary screen
-    pub fn switchToPrimaryScreen(self: *Self) void {
+    pub fn switchToPrimaryScreen(self: *CommandTerminal) void {
         self.standard.switchToPrimaryScreen();
     }
 
     /// Check if using alternate screen
-    pub fn isUsingAlternateScreen(self: *const Self) bool {
+    pub fn isUsingAlternateScreen(self: *const CommandTerminal) bool {
         return self.standard.isUsingAlternateScreen();
     }
 
     /// Scroll up in scrollback
-    pub fn scrollUp(self: *Self, lines: usize) void {
+    pub fn scrollUp(self: *CommandTerminal, lines: usize) void {
         self.standard.scrollUp(lines);
     }
 
     /// Scroll down in scrollback
-    pub fn scrollDown(self: *Self, lines: usize) void {
+    pub fn scrollDown(self: *CommandTerminal, lines: usize) void {
         self.standard.scrollDown(lines);
     }
 
     /// Check if at bottom of scrollback
-    pub fn isAtBottom(self: *const Self) bool {
+    pub fn isAtBottom(self: *const CommandTerminal) bool {
         return self.standard.isAtBottom();
     }
 
     /// Save session
-    pub fn saveSession(self: *Self, name: ?[]const u8) !void {
+    pub fn saveSession(self: *CommandTerminal, name: ?[]const u8) !void {
         try self.standard.saveSession(name);
     }
 
     /// Load session
-    pub fn loadSession(self: *Self, name: ?[]const u8) !void {
+    pub fn loadSession(self: *CommandTerminal, name: ?[]const u8) !void {
         try self.standard.loadSession(name);
     }
 
 
     /// Resize terminal
-    pub fn resize(self: *Self, columns: usize, rows: usize) !void {
+    pub fn resize(self: *CommandTerminal, columns: usize, rows: usize) !void {
         try self.standard.resize(columns, rows);
     }
 
     /// Get visible content for rendering (unified method)  
-    pub fn getVisibleContent(self: *const Self) struct { lines: VisibleLinesIterator, current: []const u8, cursor: Cursor } {
+    pub fn getVisibleContent(self: *const CommandTerminal) struct { lines: VisibleLinesIterator, current: []const u8, cursor: Cursor } {
         const ui_log = loggers.getUILog();
 
         // Get capabilities using proper enum-based API

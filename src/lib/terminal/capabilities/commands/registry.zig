@@ -1,7 +1,7 @@
 const std = @import("std");
 const kernel = @import("../../kernel/mod.zig");
 
-/// Command function signature for registered commands
+/// Command function signature for registered commands  
 pub const CommandFn = *const fn (context: *CommandContext, args: []const []const u8) anyerror!void;
 
 /// Command execution context provided to command functions
@@ -32,12 +32,10 @@ pub const Registry = struct {
     commands: std.StringHashMap(Command),
     event_bus: ?*kernel.EventBus = null,
 
-    const Self = @This();
-
     /// Factory method for creating registry capability
-    pub fn create(allocator: std.mem.Allocator) !*Self {
-        const registry = try allocator.create(Self);
-        registry.* = Self{
+    pub fn create(allocator: std.mem.Allocator) !*Registry {
+        const registry = try allocator.create(Registry);
+        registry.* = Registry{
             .allocator = allocator,
             .commands = std.StringHashMap(Command).init(allocator),
         };
@@ -45,7 +43,7 @@ pub const Registry = struct {
     }
 
     /// Factory method for destroying registry capability
-    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+    pub fn destroy(self: *Registry, allocator: std.mem.Allocator) void {
         // Clean up resources first
         self.deinit();
         // Then free the memory
@@ -53,28 +51,28 @@ pub const Registry = struct {
     }
 
 
-    pub fn getDependencies(self: *const Self) []const []const u8 {
+    pub fn getDependencies(self: *const Registry) []const []const u8 {
         _ = self;
         return &[_][]const u8{}; // No dependencies
     }
 
-    pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *Registry, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = dependencies;
         self.event_bus = event_bus;
     }
 
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *Registry) void {
         // Free the commands HashMap when called by registry
         self.commands.deinit();
         self.event_bus = null;
     }
 
-    pub fn isActive(self: *const Self) bool {
+    pub fn isActive(self: *const Registry) bool {
         return self.event_bus != null;
     }
 
     /// Register a command
-    pub fn register(self: *Self, command: Command) !void {
+    pub fn register(self: *Registry, command: Command) !void {
         try self.commands.put(command.name, command);
 
         // Emit command registration event
@@ -90,7 +88,7 @@ pub const Registry = struct {
     }
 
     /// Unregister a command
-    pub fn unregister(self: *Self, command_name: []const u8) bool {
+    pub fn unregister(self: *Registry, command_name: []const u8) bool {
         const removed = self.commands.remove(command_name);
 
         // Emit command removal event
@@ -108,17 +106,17 @@ pub const Registry = struct {
     }
 
     /// Get a command by name
-    pub fn getCommand(self: *const Self, command_name: []const u8) ?Command {
+    pub fn getCommand(self: *const Registry, command_name: []const u8) ?Command {
         return self.commands.get(command_name);
     }
 
     /// Check if a command exists
-    pub fn hasCommand(self: *const Self, command_name: []const u8) bool {
+    pub fn hasCommand(self: *const Registry, command_name: []const u8) bool {
         return self.commands.contains(command_name);
     }
 
     /// Get all registered command names
-    pub fn getCommandNames(self: *const Self, allocator: std.mem.Allocator) ![][]const u8 {
+    pub fn getCommandNames(self: *const Registry, allocator: std.mem.Allocator) ![][]const u8 {
         var names = std.ArrayList([]const u8).init(allocator);
         errdefer names.deinit();
 
@@ -131,17 +129,17 @@ pub const Registry = struct {
     }
 
     /// Get iterator over all commands
-    pub fn commandIterator(self: *const Self) std.StringHashMap(Command).Iterator {
+    pub fn commandIterator(self: *const Registry) std.StringHashMap(Command).Iterator {
         return self.commands.iterator();
     }
 
     /// Get command count
-    pub fn getCommandCount(self: *const Self) usize {
+    pub fn getCommandCount(self: *const Registry) usize {
         return self.commands.count();
     }
 
     /// Execute a command if it exists in the registry
-    pub fn execute(self: *Self, context: *CommandContext, command_name: []const u8, args: []const []const u8) !bool {
+    pub fn execute(self: *Registry, context: *CommandContext, command_name: []const u8, args: []const []const u8) !bool {
         if (self.getCommand(command_name)) |command| {
             try command.func(context, args);
 
@@ -162,7 +160,7 @@ pub const Registry = struct {
     }
 
     /// Clear all registered commands
-    pub fn clear(self: *Self) void {
+    pub fn clear(self: *Registry) void {
         self.commands.clearRetainingCapacity();
 
         // Emit clear event

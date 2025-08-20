@@ -1,6 +1,10 @@
 const std = @import("std");
 const kernel = @import("../kernel/mod.zig");
 const descriptors = @import("../kernel/capability_descriptors.zig");
+const configuration = @import("configuration.zig");
+const core = @import("../core.zig");
+const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
+const AnsiWriter = @import("../capabilities/output/ansi_writer.zig").AnsiWriter;
 
 // Use new data-oriented types
 pub const CapabilityType = descriptors.CapabilityType;
@@ -25,13 +29,23 @@ pub const TerminalBuilder = struct {
     allocator: std.mem.Allocator,
     capabilities: std.BoundedArray(CapabilityType, 32), // Fixed size, no allocation failures
     config: ?CapabilityConfig,
-    error_state: ?anyerror, // Track first error encountered
+    error_state: ?BuildError, // Track first error encountered
     
-    const Self = @This();
+    /// Specific error set for terminal building operations
+    const BuildError = error{
+        OutOfMemory,
+        TooManyCapabilities,
+        Overflow,
+        ConfigLoadFailed,
+        ConfigApplicationFailed,
+        ValidationFailed,
+        NoCapabilities,
+        NoWriterCapability,
+    };
     
     /// Initialize a new terminal builder
-    pub fn init(allocator: std.mem.Allocator) Self {
-        return Self{
+    pub fn init(allocator: std.mem.Allocator) TerminalBuilder {
+        return TerminalBuilder{
             .allocator = allocator,
             .capabilities = std.BoundedArray(CapabilityType, 32){},
             .config = null,
@@ -40,22 +54,22 @@ pub const TerminalBuilder = struct {
     }
     
     /// Clean up builder resources (nothing to clean with BoundedArray)
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *TerminalBuilder) void {
         _ = self; // No cleanup needed
     }
     
     /// Add a capability to the terminal
-    pub fn withCapability(self: *Self, capability_type: CapabilityType) *Self {
+    pub fn withCapability(self: *TerminalBuilder, capability_type: CapabilityType) *TerminalBuilder {
         if (self.error_state != null) return self; // Skip if already errored
         
-        self.capabilities.append(capability_type) catch |err| {
-            self.error_state = err;
+        self.capabilities.append(capability_type) catch {
+            self.error_state = BuildError.Overflow;
         };
         return self;
     }
     
     /// Add multiple capabilities at once
-    pub fn withCapabilities(self: *Self, capability_types: []const CapabilityType) *Self {
+    pub fn withCapabilities(self: *TerminalBuilder, capability_types: []const CapabilityType) *TerminalBuilder {
         if (self.error_state != null) return self; // Skip if already errored
         
         for (capability_types) |cap_type| {
@@ -68,7 +82,7 @@ pub const TerminalBuilder = struct {
     }
     
     /// Use a preset configuration
-    pub fn withPreset(self: *Self, preset: PresetType) *Self {
+    pub fn withPreset(self: *TerminalBuilder, preset: PresetType) *TerminalBuilder {
         if (self.error_state != null) return self; // Skip if already errored
         
         const preset_capabilities = switch (preset) {
@@ -110,24 +124,58 @@ pub const TerminalBuilder = struct {
     }
     
     /// Set configuration options
-    pub fn withConfig(self: *Self, config: CapabilityConfig) *Self {
+    pub fn withConfig(self: *TerminalBuilder, config: CapabilityConfig) *TerminalBuilder {
         if (self.error_state != null) return self; // Skip if already errored
         self.config = config;
         return self;
     }
     
     /// Load configuration from file
-    pub fn withConfigFile(self: *Self, path: []const u8) *Self {
+    pub fn withConfigFile(self: *TerminalBuilder, path: []const u8) *TerminalBuilder {
         if (self.error_state != null) return self; // Skip if already errored
         
-        // TODO: Implement config file loading
-        _ = path;
-        std.log.warn("Config file loading not yet implemented", .{});
+        // Load configuration from file
+        const config_system = configuration.ConfigurationSystem.init(self.allocator);
+        defer config_system.deinit();
+        
+        const terminal_config = config_system.loadFromFile(path) catch {
+            self.error_state = BuildError.ConfigLoadFailed;
+            std.log.err("Failed to load config file '{s}'", .{path});
+            return self;
+        };
+        
+        // Apply config to builder
+        self.applyConfig(terminal_config) catch {
+            self.error_state = BuildError.ConfigApplicationFailed;
+            std.log.err("Failed to apply config");
+            return self;
+        };
+        
         return self;
     }
     
+    /// Apply configuration to the terminal builder
+    fn applyConfig(self: *TerminalBuilder, config: configuration.TerminalConfig) BuildError!void {
+        // Apply preset if specified
+        if (config.preset) |preset| {
+            switch (preset) {
+                .minimal => _ = self.withPreset(.minimal),
+                .standard => _ = self.withPreset(.standard),
+                .command => _ = self.withPreset(.command),
+            }
+        }
+        
+        // Add individual capabilities
+        for (config.capabilities) |cap| {
+            _ = self.withCapability(cap);
+        }
+        
+        // Apply capability-specific configurations
+        // TODO: Implement capability-specific config application
+    }
+    
     /// Build the terminal with all configured capabilities
-    pub fn build(self: *Self) !BuiltTerminal {
+    pub fn build(self: *TerminalBuilder) !BuiltTerminal {
         // Check for accumulated errors first
         if (self.error_state) |err| {
             return err;
@@ -161,15 +209,13 @@ pub const BuiltTerminal = struct {
     registry: *TypeSafeCapabilityRegistry,
     capability_count: usize,
     
-    const Self = @This();
-    
     /// Get a capability of the specified type
-    pub fn getCapability(self: *Self, comptime T: type) ?*T {
+    pub fn getCapability(self: *BuiltTerminal, comptime T: type) ?*T {
         return self.registry.getCapabilityTyped(T);
     }
     
     /// Execute a command (if command capabilities are present)
-    pub fn executeCommand(self: *Self, command: []const u8) !void {
+    pub fn executeCommand(self: *BuiltTerminal, command: []const u8) !void {
         // TODO: Implement command execution through pipeline
         _ = self;
         _ = command;
@@ -177,9 +223,7 @@ pub const BuiltTerminal = struct {
     }
     
     /// Write text to the terminal (if writer capabilities are present)
-    pub fn write(self: *Self, text: []const u8) !void {
-        const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
-        const AnsiWriter = @import("../capabilities/output/ansi_writer.zig").AnsiWriter;
+    pub fn write(self: *BuiltTerminal, text: []const u8) !void {
         
         if (self.getCapability(BasicWriter)) |writer| {
             try writer.write(text);
@@ -191,7 +235,7 @@ pub const BuiltTerminal = struct {
     }
     
     /// Clean up all terminal resources - simplified with new data-oriented system
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *BuiltTerminal) void {
         // Registry cleanup is now handled by the registry itself
         self.registry.deinit();
         self.allocator.destroy(self.registry);

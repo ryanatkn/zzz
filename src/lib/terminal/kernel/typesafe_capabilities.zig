@@ -1,6 +1,7 @@
 const std = @import("std");
 const events = @import("events.zig");
 const descriptors = @import("capability_descriptors.zig");
+const KeyboardInput = @import("../capabilities/input/keyboard.zig").KeyboardInput;
 
 // Re-export the new data-oriented types
 pub const CapabilityType = descriptors.CapabilityType;
@@ -267,7 +268,7 @@ test "TypeSafeCapabilityRegistry operations" {
     try testing.expect(registry.getInitializedCount() == 4);
     
     // Test typed access
-    const typed_keyboard = registry.getCapabilityTyped(@import("../capabilities/input/keyboard.zig").KeyboardInput);
+    const typed_keyboard = registry.getCapabilityTyped(KeyboardInput);
     try testing.expect(typed_keyboard != null);
 }
 

@@ -13,41 +13,40 @@ pub const KeyboardInput = struct {
     // Event bus for emitting events
     event_bus: ?*kernel.EventBus = null,
 
-    const Self = @This();
 
     /// Create a new keyboard input capability
-    pub fn create(allocator: std.mem.Allocator) !*Self {
-        const self = try allocator.create(Self);
-        self.* = Self{};
+    pub fn create(allocator: std.mem.Allocator) !*KeyboardInput {
+        const self = try allocator.create(KeyboardInput);
+        self.* = KeyboardInput{};
         return self;
     }
 
     /// Destroy keyboard input capability
-    pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
+    pub fn destroy(self: *KeyboardInput, allocator: std.mem.Allocator) void {
         self.deinit();
         allocator.destroy(self);
     }
 
     /// Get capability name
-    pub fn getName(self: *Self) []const u8 {
+    pub fn getName(self: *KeyboardInput) []const u8 {
         _ = self;
         return name;
     }
 
     /// Get capability type
-    pub fn getType(self: *Self) []const u8 {
+    pub fn getType(self: *KeyboardInput) []const u8 {
         _ = self;
         return capability_type;
     }
 
     /// Get required dependencies
-    pub fn getDependencies(self: *Self) []const []const u8 {
+    pub fn getDependencies(self: *KeyboardInput) []const []const u8 {
         _ = self;
         return dependencies;
     }
 
     /// Initialize capability with dependencies
-    pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
+    pub fn initialize(self: *KeyboardInput, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // No dependencies for keyboard input
 
         self.event_bus = event_bus;
@@ -56,19 +55,19 @@ pub const KeyboardInput = struct {
     }
 
     /// Cleanup capability resources
-    pub fn deinit(self: *Self) void {
+    pub fn deinit(self: *KeyboardInput) void {
         self.active = false;
         self.initialized = false;
         self.event_bus = null;
     }
 
     /// Check if capability is active
-    pub fn isActive(self: *Self) bool {
+    pub fn isActive(self: *KeyboardInput) bool {
         return self.active;
     }
 
     /// Handle a keyboard key press and emit appropriate events
-    pub fn handleKey(self: *Self, key: kernel.Key) !void {
+    pub fn handleKey(self: *KeyboardInput, key: kernel.Key) !void {
         if (!self.active or self.event_bus == null) {
             return;
         }
