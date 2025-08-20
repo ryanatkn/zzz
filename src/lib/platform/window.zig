@@ -1,5 +1,6 @@
 const std = @import("std");
 const c = @import("sdl.zig");
+const loggers = @import("../debug/loggers.zig");
 
 /// Window creation and management utilities
 /// This is platform-level functionality that doesn't depend on rendering
@@ -21,8 +22,8 @@ pub const WindowConfig = struct {
 /// Create a window with the specified configuration
 pub fn createWindow(config: WindowConfig) WindowError!*c.sdl.SDL_Window {
     return c.sdl.SDL_CreateWindow(config.title, config.width, config.height, config.flags) orelse {
-        const log = std.log.scoped(.window);
-        log.err("Failed to create window: {s} {}x{}", .{ config.title, config.width, config.height });
+        const game_log = loggers.getGameLog();
+        game_log.err("window", "Failed to create window: {s} {}x{}", .{ config.title, config.width, config.height });
         return WindowError.WindowCreationFailed;
     };
 }
@@ -32,8 +33,8 @@ pub fn createGPUDevice() WindowError!*c.sdl.SDL_GPUDevice {
     return c.sdl.SDL_CreateGPUDevice(c.sdl.SDL_GPU_SHADERFORMAT_SPIRV, true, // debug mode
         null // preferred backend (let SDL choose)
     ) orelse {
-        const log = std.log.scoped(.window);
-        log.err("Failed to create GPU device", .{});
+        const game_log = loggers.getGameLog();
+        game_log.err("window", "Failed to create GPU device", .{});
         return WindowError.DeviceCreationFailed;
     };
 }
@@ -41,8 +42,8 @@ pub fn createGPUDevice() WindowError!*c.sdl.SDL_GPUDevice {
 /// Claim a window for GPU rendering
 pub fn claimWindowForGPU(device: *c.sdl.SDL_GPUDevice, window: *c.sdl.SDL_Window) WindowError!void {
     if (!c.sdl.SDL_ClaimWindowForGPUDevice(device, window)) {
-        const log = std.log.scoped(.window);
-        log.err("Failed to claim window for GPU device", .{});
+        const game_log = loggers.getGameLog();
+        game_log.err("window", "Failed to claim window for GPU device", .{});
         return WindowError.DeviceCreationFailed;
     }
 }

@@ -6,6 +6,8 @@ const persistent_text = @import("../text/cache.zig");
 const rendering_modes = @import("../rendering/modes.zig");
 const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../reactive/component.zig").createComponent;
+const getComponentData = @import("../reactive/component.zig").getComponentData;
+const castComponentState = @import("../reactive/component.zig").castComponentState;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
 const effect = @import("../reactive/effect.zig");
@@ -334,18 +336,18 @@ pub const ReactiveLabelData = struct {
     }
 
     fn onRender(state: *anyopaque) !void {
-        const self = @as(*ReactiveLabelData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(ReactiveLabelData, state);
 
         loggers.getUILog().debug("reactive_render", "Reactive label render triggered - visible: {}, needs update: {}", .{ self.is_visible.peek(), self.needs_update.peek() });
     }
 
     fn shouldRender(state: *anyopaque) bool {
-        const self = @as(*ReactiveLabelData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(ReactiveLabelData, state);
         return self.is_visible.peek() and self.needs_update.peek();
     }
 
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
-        const self = @as(*ReactiveLabelData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(ReactiveLabelData, state);
         self.deinit();
         allocator.destroy(self);
     }
@@ -384,7 +386,7 @@ pub const ReactiveLabel = struct {
     }
 
     pub fn getLabelData(self: *Self) *ReactiveLabelData {
-        return @as(*ReactiveLabelData, @ptrCast(@alignCast(self.component.state)));
+        return getComponentData(ReactiveLabelData, self.component);
     }
 
     // Convenience methods

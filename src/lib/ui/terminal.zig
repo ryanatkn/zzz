@@ -2,6 +2,7 @@ const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
+const loggers = @import("../debug/loggers.zig");
 const input = @import("../platform/input.zig");
 const sdl = @import("../platform/sdl.zig");
 const terminal_mod = @import("../terminal/mod.zig");
@@ -372,9 +373,9 @@ pub const TerminalComponent = struct {
 
     /// Set focus state
     pub fn setFocus(self: *Self, focused: bool) void {
-        const log = std.log.scoped(.terminal_focus);
+        const ui_log = loggers.getUILog();
         const old_focus = self.is_focused.get();
-        log.info("Focus change: {} -> {}", .{ old_focus, focused });
+        ui_log.info("terminal_focus", "Focus change: {} -> {}", .{ old_focus, focused });
         self.is_focused.set(focused);
     }
 
@@ -407,12 +408,12 @@ pub const TerminalComponent = struct {
 
     /// Handle SDL keyboard event directly (called from HUD)
     pub fn handleKeyPress(self: *Self, key_event: sdl.sdl.SDL_KeyboardEvent) bool {
-        const log = std.log.scoped(.terminal_input);
+        const ui_log = loggers.getUILog();
 
-        log.info("Terminal handleKeyPress called - scancode: {d}, focused: {}", .{ key_event.scancode, self.is_focused.get() });
+        ui_log.info("terminal_input", "Terminal handleKeyPress called - scancode: {d}, focused: {}", .{ key_event.scancode, self.is_focused.get() });
 
         if (!self.is_focused.get()) {
-            log.warn("Terminal not focused, ignoring key input", .{});
+            ui_log.warn("terminal_input", "Terminal not focused, ignoring key input", .{});
             return false;
         }
 
@@ -457,11 +458,11 @@ pub const TerminalComponent = struct {
                 const shift_held = (key_event.mod & sdl.sdl.SDL_KMOD_SHIFT) != 0;
 
                 if (self.scancodeToChar(key_event.scancode, shift_held)) |ch| {
-                    log.info("Character input: '{c}' (ASCII {d})", .{ ch, ch });
+                    ui_log.info("terminal_input", "Character input: '{c}' (ASCII {d})", .{ ch, ch });
                     self.terminal.handleKey(Key{ .char = ch }) catch {};
                     handled = true;
                 } else {
-                    log.warn("Unknown scancode: {d} (shift: {})", .{ key_event.scancode, shift_held });
+                    ui_log.warn("terminal_input", "Unknown scancode: {d} (shift: {})", .{ key_event.scancode, shift_held });
                 }
             },
         }

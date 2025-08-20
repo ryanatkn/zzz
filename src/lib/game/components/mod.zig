@@ -30,5 +30,6 @@ pub const Teleportable = @import("teleportable.zig").Teleportable;
 pub const MagicTarget = @import("magic_target.zig").MagicTarget;
 
 // Entity ID type definition
+const std = @import("std");
 pub const EntityId = u32;
-pub const INVALID_ENTITY: EntityId = @import("std").math.maxInt(u32);
+pub const INVALID_ENTITY: EntityId = std.math.maxInt(u32);

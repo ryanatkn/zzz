@@ -15,9 +15,9 @@ pub const ReadlineInput = struct {
     initialized: bool = false,
 
     // Dependencies
-    line_buffer: ?*@import("../state/line_buffer.zig").LineBuffer = null,
-    cursor: ?*@import("../state/cursor.zig").Cursor = null,
-    keyboard_input: ?*@import("keyboard.zig").KeyboardInput = null,
+    line_buffer: ?*LineBuffer = null,
+    cursor: ?*Cursor = null,
+    keyboard_input: ?*KeyboardInput = null,
 
     // Event bus
     event_bus: ?*kernel.EventBus = null,

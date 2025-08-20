@@ -8,6 +8,7 @@ const browser_renderer = @import("renderer.zig");
 const page = @import("../../lib/browser/page.zig");
 const math = @import("../../lib/math/mod.zig");
 const ide_page = @import("../../roots/menu/ide/+page.zig");
+const loggers = @import("../../lib/debug/loggers.zig");
 
 pub const Hud = struct {
     is_open: bool,
@@ -32,10 +33,10 @@ pub const Hud = struct {
         };
 
         // Initialize font system
-        const log = std.log.scoped(.hud);
-        log.info("Initializing HUD font system...", .{});
+        const ui_log = loggers.getUILog();
+        ui_log.info("hud_init", "Initializing HUD font system...", .{});
         try hud_sys.renderer.initFonts(allocator);
-        log.info("HUD font system initialized", .{});
+        ui_log.info("hud_init", "HUD font system initialized", .{});
 
         // Initialize with home page
         try hud_sys.router.navigate("/");
@@ -56,7 +57,8 @@ pub const Hud = struct {
             // Reset to home when opening
             self.history = history.SimpleHistory.init();
             self.router.navigate("/") catch |err| {
-                std.log.err("Failed to navigate to home page: {}", .{err});
+                const ui_log = loggers.getUILog();
+                ui_log.err("hud_toggle", "Failed to navigate to home page: {}", .{err});
                 // If navigation fails, keep HUD closed to prevent broken state
                 self.is_open = false;
             };
@@ -68,8 +70,8 @@ pub const Hud = struct {
 
         // Debug: Log all mouse clicks when HUD is open
         if (event.type == c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN) {
-            const log = std.log.scoped(.hud_click);
-            log.info("HUD click detected at ({},{})", .{ event.button.x, event.button.y });
+            const ui_log = loggers.getUILog();
+            ui_log.info("hud_click", "HUD click detected at ({},{})", .{ event.button.x, event.button.y });
         }
 
         switch (event.type) {
@@ -95,17 +97,17 @@ pub const Hud = struct {
 
                         // Check IDE page-specific interactions first
                         if (self.router.getCurrentPage()) |current_page| {
-                            const log = std.log.scoped(.hud_routing);
-                            log.info("Current page: '{s}'", .{current_page.path});
+                            const ui_log = loggers.getUILog();
+                            ui_log.info("hud_routing", "Current page: '{s}'", .{current_page.path});
 
                             if (std.mem.eql(u8, current_page.path, "/ide")) {
-                                log.info("On IDE page, handling IDE interactions", .{});
+                                ui_log.info("hud_routing", "On IDE page, handling IDE interactions", .{});
                                 const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
                                 const point = math.Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
 
                                 // Try terminal click first
                                 if (ide_page_impl.handleTerminalClick(point)) {
-                                    log.info("Terminal panel clicked, focus set", .{});
+                                    ui_log.info("hud_routing", "Terminal panel clicked, focus set", .{});
                                     return true;
                                 }
 
@@ -120,8 +122,9 @@ pub const Hud = struct {
 
                         // Check if clicking a link
                         if (self.hovered_link) |link_index| {
+                            const ui_log = loggers.getUILog();
                             if (link_index >= self.links.items.len) {
-                                std.log.err("Invalid hovered link index: {} >= {}", .{ link_index, self.links.items.len });
+                                ui_log.err("hud_click", "Invalid hovered link index: {} >= {}", .{ link_index, self.links.items.len });
                                 self.hovered_link = null;
                                 return true;
                             }
@@ -129,7 +132,7 @@ pub const Hud = struct {
                             // Copy path to stack buffer to avoid use-after-free from arena reset
                             var path_buffer: [512]u8 = undefined;
                             const path_copy = std.fmt.bufPrint(&path_buffer, "{s}", .{link.path}) catch {
-                                std.log.err("Link path too long: '{s}'", .{link.path});
+                                ui_log.err("hud_click", "Link path too long: '{s}'", .{link.path});
                                 return true;
                             };
                             try self.navigateTo(path_copy);

@@ -4,6 +4,7 @@ const derived = @import("derived.zig");
 const effect = @import("effect.zig");
 const context = @import("context.zig");
 const batch = @import("batch.zig");
+const loggers = @import("../debug/loggers.zig");
 
 /// Base reactive component for UI elements
 /// Provides automatic re-rendering when reactive dependencies change
@@ -80,7 +81,8 @@ pub const ReactiveComponent = struct {
 
                 if (is_mounted) {
                     comp.component_vtable.onMount(comp.component_state) catch |err| {
-                        std.debug.print("Component onMount error: {}\n", .{err});
+                        const ui_log = loggers.getUILog();
+                        ui_log.err("reactive_component", "Component onMount error: {}", .{err});
                     };
                 }
             }
@@ -102,7 +104,8 @@ pub const ReactiveComponent = struct {
 
                     if (should_render) {
                         comp.component_vtable.onRender(comp.component_state) catch |err| {
-                            std.debug.print("Component onRender error: {}\n", .{err});
+                            const ui_log = loggers.getUILog();
+                            ui_log.err("reactive_component", "Component onRender error: {}", .{err});
                         };
 
                         // Update render time
@@ -194,6 +197,11 @@ pub fn getComponentData(comptime T: type, reactive_component: *ReactiveComponent
     return @as(*T, @ptrCast(@alignCast(reactive_component.component_state)));
 }
 
+/// Helper to cast anyopaque state pointer to typed component data (for vtable functions)
+pub fn castComponentState(comptime T: type, state: *anyopaque) *T {
+    return @as(*T, @ptrCast(@alignCast(state)));
+}
+
 // Example usage and testing
 const TestComponent = struct {
     name: []const u8,
@@ -201,18 +209,21 @@ const TestComponent = struct {
 
     fn onMount(state: *anyopaque) !void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
-        std.debug.print("TestComponent '{}' mounted\n", .{self.name});
+        const ui_log = loggers.getUILog();
+        ui_log.debug("test_component", "TestComponent '{}' mounted", .{self.name});
     }
 
     fn onUnmount(state: *anyopaque) void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
-        std.debug.print("TestComponent '{}' unmounted\n", .{self.name});
+        const ui_log = loggers.getUILog();
+        ui_log.debug("test_component", "TestComponent '{}' unmounted", .{self.name});
     }
 
     fn onRender(state: *anyopaque) !void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
         self.render_count += 1;
-        std.debug.print("TestComponent '{}' rendered (count: {})\n", .{ self.name, self.render_count });
+        const ui_log = loggers.getUILog();
+        ui_log.debug("test_component", "TestComponent '{}' rendered (count: {})", .{ self.name, self.render_count });
     }
 
     fn shouldRender(state: *anyopaque) bool {
@@ -223,7 +234,8 @@ const TestComponent = struct {
 
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
-        std.debug.print("TestComponent '{}' destroyed\n", .{self.name});
+        const ui_log = loggers.getUILog();
+        ui_log.debug("test_component", "TestComponent '{}' destroyed", .{self.name});
         allocator.destroy(self);
     }
 

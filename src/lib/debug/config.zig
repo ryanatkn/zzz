@@ -64,7 +64,8 @@ pub fn loadOverrides(allocator: std.mem.Allocator) !OverrideConfig {
 
     // Parse ZON configuration
     const parsed = std.zon.parse.fromSlice(OverrideConfig, allocator, zon_data, null, .{}) catch |err| {
-        std.log.warn("Failed to parse log config: {}", .{err});
+        const log = loggers.getGameLog();
+        log.warn("debug_config", "Failed to parse log config: {}", .{err});
         return OverrideConfig{};
     };
 

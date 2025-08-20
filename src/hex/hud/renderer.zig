@@ -3,6 +3,7 @@ const c = @import("../../lib/platform/sdl.zig");
 const math = @import("../../lib/math/mod.zig");
 const colors = @import("../../lib/core/colors.zig");
 const constants = @import("../../lib/core/constants.zig");
+const loggers = @import("../../lib/debug/loggers.zig");
 const lib_renderer = @import("../../lib/rendering/interface.zig");
 const game_renderer = @import("../game_renderer.zig");
 const page = @import("../../lib/browser/page.zig");
@@ -10,6 +11,7 @@ const font_config = @import("../../lib/font/config.zig");
 const text_renderer = @import("../../lib/text/renderer.zig");
 const menu_text = @import("../../lib/ui/menu_text.zig");
 const drawing = @import("../../lib/rendering/drawing.zig");
+const TerminalComponent = @import("../../lib/ui/terminal.zig").TerminalComponent;
 const font_grid_test_page = @import("../../roots/menu/font_grid_test/+page.zig");
 const ide_page = @import("../../roots/menu/ide/+page.zig");
 const ide_constants = @import("../../roots/menu/ide/constants.zig");
@@ -17,6 +19,7 @@ const directory_scanner = @import("../../lib/platform/directory_scanner.zig");
 const syntax_highlighter = @import("../../roots/menu/ide/syntax_highlighter.zig");
 const bitmap_simple = @import("../../lib/font/renderers/bitmap_simple.zig");
 const text_alignment = @import("../../lib/text/alignment.zig");
+const file_tree_mod = @import("../../lib/ui/file_tree.zig");
 
 // Throttled logging to prevent spam
 const Logger = @import("../../lib/debug/logger.zig").Logger;
@@ -25,6 +28,7 @@ const filters = @import("../../lib/debug/filters.zig");
 
 const Color = colors.Color;
 const Vec2 = math.Vec2;
+const FileIcon = file_tree_mod.FileIcon;
 
 // Configure throttled logger for rendering (compile-time)
 const ThrottledLogger = Logger(.{
@@ -81,8 +85,8 @@ pub const BrowserRenderer = struct {
     pub fn initFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) !void {
         _ = self;
         _ = allocator;
-        const log = std.log.scoped(.browser_renderer);
-        log.info("HUD using main game's FontManager and TextRenderer - no separate initialization needed", .{});
+        const ui_log = loggers.getUILog();
+        ui_log.info("browser_renderer", "HUD using main game's FontManager and TextRenderer - no separate initialization needed", .{});
     }
 
     pub fn deinitFonts(_: *BrowserRenderer, _: std.mem.Allocator) void {
@@ -437,7 +441,7 @@ pub const BrowserRenderer = struct {
     }
 
     /// Render terminal content with improved safety checks
-    fn renderTerminalContentSafe(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, terminal: *const @import("../../lib/ui/terminal.zig").TerminalComponent, panel_rect: math.Rectangle, is_focused: bool) !void {
+    fn renderTerminalContentSafe(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, terminal: *const TerminalComponent, panel_rect: math.Rectangle, is_focused: bool) !void {
         // Get terminal content safely with error handling
         const content = terminal.terminal.getVisibleContent();
 
@@ -593,7 +597,7 @@ pub const BrowserRenderer = struct {
     }
 
     /// Draw file type icon
-    fn drawFileIcon(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, icon: @import("../../lib/ui/file_tree.zig").FileIcon, position: Vec2) !void {
+    fn drawFileIcon(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, icon: FileIcon, position: Vec2) !void {
         const icon_color = icon.getColor();
         const icon_size = ide_constants.FILE_TREE.ICON_SIZE;
 
@@ -756,8 +760,8 @@ pub const BrowserRenderer = struct {
 
         // Use the exact same approach as working navigation text
         self.base_renderer.gpu.text_renderer.queuePersistentText(text, aligned_position, self.base_renderer.font_manager, .sans, font_size, text_color) catch |err| {
-            const log = std.log.scoped(.ide_text);
-            log.err("Failed to queue IDE text '{s}': {}", .{ text, err });
+            const ui_log = loggers.getUILog();
+            ui_log.err("ide_text", "Failed to queue IDE text '{s}': {}", .{ text, err });
         };
     }
 };

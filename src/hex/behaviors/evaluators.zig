@@ -271,7 +271,7 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
 }
 
 /// Get behavior color for visualization (hex-specific)
-pub fn getBehaviorColor(behavior: BehaviorType, profile: Disposition) @import("../../lib/core/colors.zig").Color {
+pub fn getBehaviorColor(behavior: BehaviorType, profile: Disposition) Color {
     // Map BehaviorType to legacy BehaviorState for color compatibility
     const legacy_behavior = switch (behavior) {
         .idle => behaviors_mod.behavior_state_machine.BehaviorState.idle,

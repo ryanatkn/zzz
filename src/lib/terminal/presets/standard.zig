@@ -1,5 +1,6 @@
 const std = @import("std");
 const kernel = @import("../kernel/mod.zig");
+const loggers = @import("../../debug/loggers.zig");
 const MinimalTerminal = @import("minimal.zig").MinimalTerminal;
 const History = @import("../capabilities/state/history.zig").History;
 const ScreenBuffer = @import("../capabilities/state/screen_buffer.zig").ScreenBuffer;
@@ -91,8 +92,8 @@ pub const StandardTerminal = struct {
 
     /// Handle keyboard input
     pub fn handleKey(self: *Self, key: kernel.Key) !void {
-        const log = std.log.scoped(.standard_terminal);
-        log.info("StandardTerminal handleKey: {}", .{key});
+        const ui_log = loggers.getUILog();
+        ui_log.info("standard_terminal", "StandardTerminal handleKey: {}", .{key});
         try self.minimal.handleKey(key);
     }
 

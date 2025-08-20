@@ -12,7 +12,7 @@ pub const MouseInput = struct {
     initialized: bool = false,
 
     // Dependencies
-    ansi_writer: ?*@import("../output/ansi_writer.zig").AnsiWriter = null,
+    ansi_writer: ?*AnsiWriter = null,
 
     // Event bus
     event_bus: ?*kernel.EventBus = null,

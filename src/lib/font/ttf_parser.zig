@@ -1,5 +1,5 @@
 const std = @import("std");
-const log = std.log.scoped(.ttf_parser);
+const loggers = @import("../debug/loggers.zig");
 
 pub const GlyphID = u16;
 

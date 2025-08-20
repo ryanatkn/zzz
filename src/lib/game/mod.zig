@@ -27,8 +27,9 @@ pub const storage = @import("storage/mod.zig");
 pub const world = @import("world/mod.zig");
 
 // Simple entity ID type - games can define their own if needed
+const std = @import("std");
 pub const EntityId = u32;
-pub const INVALID_ENTITY: EntityId = @import("std").math.maxInt(u32);
+pub const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
 
 // Backwards compatibility
 pub const bullet_pool = projectiles;

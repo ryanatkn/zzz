@@ -252,47 +252,48 @@ pub const TerminalEngine = struct {
 
     /// Handle keyboard input
     pub fn handleKey(self: *Self, key: Key) !void {
-        const log = std.log.scoped(.terminal_engine_key);
+        const ui_log = loggers.getUILog();
 
         // Log all key inputs received by the engine
         switch (key) {
-            .char => |ch| log.info("Engine received character: '{c}' (ASCII {d})", .{ ch, ch }),
-            .enter => log.info("Engine received: ENTER", .{}),
-            .backspace => log.info("Engine received: BACKSPACE", .{}),
-            .delete => log.info("Engine received: DELETE", .{}),
-            .tab => log.info("Engine received: TAB", .{}),
-            .up_arrow => log.info("Engine received: UP_ARROW", .{}),
-            .down_arrow => log.info("Engine received: DOWN_ARROW", .{}),
-            .left_arrow => log.info("Engine received: LEFT_ARROW", .{}),
-            .right_arrow => log.info("Engine received: RIGHT_ARROW", .{}),
-            .home => log.info("Engine received: HOME", .{}),
-            .end => log.info("Engine received: END", .{}),
-            .page_up => log.info("Engine received: PAGE_UP", .{}),
-            .page_down => log.info("Engine received: PAGE_DOWN", .{}),
-            .ctrl_c => log.info("Engine received: CTRL_C", .{}),
-            .ctrl_d => log.info("Engine received: CTRL_D", .{}),
-            .ctrl_l => log.info("Engine received: CTRL_L", .{}),
-            .ctrl_z => log.info("Engine received: CTRL_Z", .{}),
-            else => log.info("Engine received: {}", .{key}),
+            .char => |ch| ui_log.info("terminal_engine_key", "Engine received character: '{c}' (ASCII {d})", .{ ch, ch }),
+            .enter => ui_log.info("terminal_engine_key", "Engine received: ENTER", .{}),
+            .backspace => ui_log.info("terminal_engine_key", "Engine received: BACKSPACE", .{}),
+            .delete => ui_log.info("terminal_engine_key", "Engine received: DELETE", .{}),
+            .tab => ui_log.info("terminal_engine_key", "Engine received: TAB", .{}),
+            .up_arrow => ui_log.info("terminal_engine_key", "Engine received: UP_ARROW", .{}),
+            .down_arrow => ui_log.info("terminal_engine_key", "Engine received: DOWN_ARROW", .{}),
+            .left_arrow => ui_log.info("terminal_engine_key", "Engine received: LEFT_ARROW", .{}),
+            .right_arrow => ui_log.info("terminal_engine_key", "Engine received: RIGHT_ARROW", .{}),
+            .home => ui_log.info("terminal_engine_key", "Engine received: HOME", .{}),
+            .end => ui_log.info("terminal_engine_key", "Engine received: END", .{}),
+            .page_up => ui_log.info("terminal_engine_key", "Engine received: PAGE_UP", .{}),
+            .page_down => ui_log.info("terminal_engine_key", "Engine received: PAGE_DOWN", .{}),
+            .ctrl_c => ui_log.info("terminal_engine_key", "Engine received: CTRL_C", .{}),
+            .ctrl_d => ui_log.info("terminal_engine_key", "Engine received: CTRL_D", .{}),
+            .ctrl_l => ui_log.info("terminal_engine_key", "Engine received: CTRL_L", .{}),
+            .ctrl_z => ui_log.info("terminal_engine_key", "Engine received: CTRL_Z", .{}),
+            else => ui_log.info("terminal_engine_key", "Engine received: {}", .{key}),
         }
 
         // Handle signal keys first (Ctrl+C, etc.)
         if (self.signal_handler.handleKeyInput(key)) {
-            log.info("Signal key handled: {}", .{key});
+            ui_log.info("terminal_engine_key", "Signal key handled: {}", .{key});
             // Process any pending signals
             _ = self.signal_handler.processSignals(if (self.process_executor.isProcessRunning())
                 &self.process_executor.current_process.?
             else
                 null) catch |err| {
-                std.log.err("Failed to process signal: {}", .{err});
+                const signal_log = loggers.getUILog();
+                signal_log.err("terminal_signal", "Failed to process signal: {}", .{err});
             };
             return;
         }
 
         // Forward to terminal core for processing
-        log.info("Forwarding key to terminal core", .{});
+        ui_log.info("terminal_engine_key", "Forwarding key to terminal core", .{});
         try self.terminal.handleKey(key);
-        log.info("Terminal core processing complete", .{});
+        ui_log.info("terminal_engine_key", "Terminal core processing complete", .{});
     }
 
     /// Update terminal state
@@ -339,11 +340,11 @@ fn writeToTerminal(terminal_ptr: *anyopaque, text: []const u8) !void {
 
 /// Command execution callback for terminal core
 fn executeCommandCallback(context: *anyopaque, command: []const u8) !void {
-    const log = std.log.scoped(.terminal_callback);
-    log.info("Callback triggered for command: '{s}'", .{command});
+    const ui_log = loggers.getUILog();
+    ui_log.info("terminal_callback", "Callback triggered for command: '{s}'", .{command});
     const engine: *TerminalEngine = @ptrCast(@alignCast(context));
     try engine.executeCommand(command);
-    log.info("Callback completed", .{});
+    ui_log.info("terminal_callback", "Callback completed", .{});
 }
 
 /// Output streaming callback for real-time display

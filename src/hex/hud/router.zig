@@ -2,6 +2,8 @@ const std = @import("std");
 const page = @import("../../lib/browser/page.zig");
 const directory_scanner = @import("../../lib/platform/directory_scanner.zig");
 const math = @import("../../lib/math/mod.zig");
+const game_mod = @import("../game.zig");
+const loggers = @import("../../lib/debug/loggers.zig");
 
 const root_page = @import("../../roots/menu/+page.zig");
 const root_layout = @import("../../roots/menu/+layout.zig");
@@ -18,12 +20,13 @@ const reactive_test_page = @import("../../roots/menu/reactive_test/+page.zig");
 
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const Vec2 = math.Vec2;
+const GameState = game_mod.GameState;
 
 // Global reference to game state for world reloading (set from main)
-var global_game_state: ?*@import("../game.zig").GameState = null;
+var global_game_state: ?*GameState = null;
 
 /// Set global game state reference for world reloading
-pub fn setGameStateReference(game_state: *@import("../game.zig").GameState) void {
+pub fn setGameStateReference(game_state: *GameState) void {
     global_game_state = game_state;
 }
 
@@ -60,31 +63,31 @@ pub const Router = struct {
     }
 
     pub fn navigate(self: *Router, path: []const u8) !void {
-        const log = std.log.scoped(.router_navigate);
-        log.info("Router navigate called with path: '{s}'", .{path});
+        const ui_log = loggers.getUILog();
+        ui_log.info("router_navigate", "Router navigate called with path: '{s}'", .{path});
 
         // Check if we're navigating within the same page (only query parameters changed)
         if (self.current_page) |current_page| {
             const current_base_path = self.extractBasePath(current_page.path);
             const new_base_path = self.extractBasePath(path);
 
-            log.info("Current page: '{s}', base: '{s}', new base: '{s}'", .{ current_page.path, current_base_path, new_base_path });
+            ui_log.info("router_navigate", "Current page: '{s}', base: '{s}', new base: '{s}'", .{ current_page.path, current_base_path, new_base_path });
 
             if (std.mem.eql(u8, current_base_path, new_base_path)) {
-                log.info("Same page navigation - handling action without page recreation", .{});
+                ui_log.info("router_navigate", "Same page navigation - handling action without page recreation", .{});
                 // Same page, just handle the action without destroying/recreating
                 if (std.mem.indexOf(u8, path, "?")) |query_start| {
                     const query = path[query_start + 1 ..];
 
                     // Check if it's a world loading query, reactive test action, or IDE action
                     if (std.mem.startsWith(u8, query, "load_world=")) {
-                        log.info("Calling handleWorldLoading with query: '{s}'", .{query});
+                        ui_log.info("router_navigate", "Calling handleWorldLoading with query: '{s}'", .{query});
                         try self.handleWorldLoading(query);
                     } else if (std.mem.eql(u8, current_base_path, "/reactive-test")) {
-                        log.info("Calling handleReactiveTestAction with query: '{s}'", .{query});
+                        ui_log.info("router_navigate", "Calling handleReactiveTestAction with query: '{s}'", .{query});
                         try self.handleReactiveTestAction(query);
                     } else {
-                        log.info("Calling handleIDEAction with query: '{s}'", .{query});
+                        ui_log.info("router_navigate", "Calling handleIDEAction with query: '{s}'", .{query});
                         try self.handleIDEAction(query);
                     }
                 }
@@ -257,23 +260,23 @@ pub const Router = struct {
 
     /// Handle reactive test actions from query parameters
     fn handleReactiveTestAction(self: *Router, query: []const u8) !void {
-        const log = std.log.scoped(.reactive_test_action);
-        log.info("Handling reactive test action: '{s}'", .{query});
+        const ui_log = loggers.getUILog();
+        ui_log.info("reactive_test_action", "Handling reactive test action: '{s}'", .{query});
 
         if (self.current_page) |current_page| {
             if (std.mem.eql(u8, current_page.path, "/reactive-test")) {
                 const reactive_page_impl: *reactive_test_page.ReactiveTestPage = @fieldParentPtr("base", current_page);
 
                 if (std.mem.eql(u8, query, "current_increment")) {
-                    log.info("Incrementing current system counter", .{});
+                    ui_log.info("reactive_test_action", "Incrementing current system counter", .{});
                     // Increment current system counter
                     reactive_page_impl.current_count.set(reactive_page_impl.current_count.get() + 1);
                 } else if (std.mem.eql(u8, query, "gannaway_increment")) {
-                    log.info("Incrementing Gannaway system counter", .{});
+                    ui_log.info("reactive_test_action", "Incrementing Gannaway system counter", .{});
                     // Increment Gannaway counter with explicit notification
                     reactive_page_impl.gannaway_count.update(reactive_page_impl.gannaway_count.get() + 1);
                 } else {
-                    log.info("Unknown reactive test action: '{s}'", .{query});
+                    ui_log.info("reactive_test_action", "Unknown reactive test action: '{s}'", .{query});
                 }
             }
         }
@@ -282,8 +285,8 @@ pub const Router = struct {
     /// Handle folder expand/collapse
     fn handleFolderToggle(self: *Router, ide_impl: *ide_page.IDEPage, folder_name: []const u8) !void {
         _ = self;
-        const log = std.log.scoped(.ide_action);
-        log.info("Toggle folder: '{s}'", .{folder_name});
+        const ui_log = loggers.getUILog();
+        ui_log.info("ide_action", "Toggle folder: '{s}'", .{folder_name});
 
         // Find and toggle the folder in the file tree
         const tree_items = ide_impl.file_tree_component.getVisibleItems();
@@ -295,10 +298,10 @@ pub const Router = struct {
 
                     // Rebuild the tree
                     if (ide_impl.root_directory) |root| {
-                        try ide_impl.file_tree_component.renderer.buildRenderList(root, @import("../../lib/math/mod.zig").Vec2{ .x = 0.0, .y = 0.0 });
+                        try ide_impl.file_tree_component.renderer.buildRenderList(root, Vec2{ .x = 0.0, .y = 0.0 });
                     }
 
-                    log.info("Toggled folder '{s}' to {}", .{ folder_name, item.entry.expanded });
+                    ui_log.info("ide_action", "Toggled folder '{s}' to {}", .{ folder_name, item.entry.expanded });
                     break;
                 }
             }
@@ -308,41 +311,41 @@ pub const Router = struct {
     /// Handle file loading
     fn handleFileLoad(self: *Router, ide_impl: *ide_page.IDEPage, file_name: []const u8) !void {
         _ = self;
-        const log = std.log.scoped(.ide_action);
-        log.info("Load file: '{s}'", .{file_name});
+        const ui_log = loggers.getUILog();
+        ui_log.info("ide_action", "Load file: '{s}'", .{file_name});
 
-        log.info("File tree has {} visible items", .{ide_impl.file_tree_component.getVisibleItems().len});
+        ui_log.info("ide_action", "File tree has {} visible items", .{ide_impl.file_tree_component.getVisibleItems().len});
 
         // Find and select the file in the file tree
         const tree_items = ide_impl.file_tree_component.getVisibleItems();
         var found = false;
         for (tree_items) |item| {
-            log.info("Checking tree item: '{s}' (is_dir: {}) vs looking for: '{s}'", .{ item.entry.metadata.name, item.entry.metadata.is_directory, file_name });
+            ui_log.info("ide_action", "Checking tree item: '{s}' (is_dir: {}) vs looking for: '{s}'", .{ item.entry.metadata.name, item.entry.metadata.is_directory, file_name });
             if (std.mem.eql(u8, item.entry.metadata.name, file_name)) {
-                log.info("Found matching item: '{s}', full_path: '{s}'", .{ item.entry.metadata.name, item.entry.metadata.full_path });
+                ui_log.info("ide_action", "Found matching item: '{s}', full_path: '{s}'", .{ item.entry.metadata.name, item.entry.metadata.full_path });
                 if (!item.entry.metadata.is_directory) {
                     // Select the file
                     ide_impl.file_tree_component.state.selectEntry(item.entry);
 
-                    log.info("About to load file content for: '{s}'", .{item.entry.metadata.full_path});
+                    ui_log.info("ide_action", "About to load file content for: '{s}'", .{item.entry.metadata.full_path});
                     // Load the file content
                     try ide_impl.loadFileContent(item.entry);
 
-                    log.info("Successfully loaded file '{s}'", .{file_name});
+                    ui_log.info("ide_action", "Successfully loaded file '{s}'", .{file_name});
                     found = true;
                     break;
                 }
             }
         }
         if (!found) {
-            log.warn("File '{s}' not found in tree with {} items", .{ file_name, tree_items.len });
+            ui_log.warn("ide_action", "File '{s}' not found in tree with {} items", .{ file_name, tree_items.len });
         }
     }
 
     /// Handle expand all action
     fn handleExpandAll(self: *Router, ide_impl: *ide_page.IDEPage) !void {
-        const log = std.log.scoped(.ide_action);
-        log.info("Expand all folders", .{});
+        const ui_log = loggers.getUILog();
+        ui_log.info("ide_action", "Expand all folders", .{});
 
         if (ide_impl.root_directory) |root| {
             self.expandAllRecursive(root);
@@ -353,8 +356,8 @@ pub const Router = struct {
 
     /// Handle collapse all action
     fn handleCollapseAll(self: *Router, ide_impl: *ide_page.IDEPage) !void {
-        const log = std.log.scoped(.ide_action);
-        log.info("Collapse all folders", .{});
+        const ui_log = loggers.getUILog();
+        ui_log.info("ide_action", "Collapse all folders", .{});
 
         if (ide_impl.root_directory) |root| {
             self.collapseAllRecursive(root);
@@ -385,23 +388,23 @@ pub const Router = struct {
 
     /// Handle world loading from query parameters
     fn handleWorldLoading(self: *Router, query: []const u8) !void {
-        const log = std.log.scoped(.world_loading);
-        log.info("Processing world loading query: '{s}'", .{query});
+        const ui_log = loggers.getUILog();
+        ui_log.info("world_loading", "Processing world loading query: '{s}'", .{query});
 
         // Parse load_world parameter
         if (std.mem.startsWith(u8, query, "load_world=")) {
             const world_path = query[11..]; // Skip "load_world="
-            log.info("Loading world: '{s}'", .{world_path});
+            ui_log.info("world_loading", "Loading world: '{s}'", .{world_path});
 
             if (global_game_state) |game_state| {
                 // Reload the game with the new world
                 game_state.reloadWithWorld(world_path) catch |err| {
-                    log.err("World reload failed: {}", .{err});
+                    ui_log.err("world_loading", "World reload failed: {}", .{err});
                     return;
                 };
-                log.info("World successfully reloaded: '{s}'", .{world_path});
+                ui_log.info("world_loading", "World successfully reloaded: '{s}'", .{world_path});
             } else {
-                log.warn("No game state reference available for world reloading", .{});
+                ui_log.warn("world_loading", "No game state reference available for world reloading", .{});
             }
         }
         _ = self; // unused for now

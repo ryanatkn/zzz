@@ -2,6 +2,7 @@ const std = @import("std");
 const c = @import("sdl.zig");
 const window_mod = @import("window.zig");
 const font_manager = @import("../font/manager.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const WindowGPU = window_mod.WindowGPU;
 const FontManager = font_manager.FontManager;
@@ -32,8 +33,8 @@ pub const SharedFontManager = struct {
         };
 
         fm.* = FontManager.init(allocator, device) catch |err| {
-            const log = std.log.scoped(.resource_manager);
-            log.err("Failed to initialize shared FontManager: {}", .{err});
+            const platform_log = loggers.getPlatformLog();
+            platform_log.err("resource_manager", "Failed to initialize shared FontManager: {}", .{err});
             allocator.destroy(fm);
             allocator.destroy(shared);
             return ResourceError.FontManagerInitFailed;
@@ -69,23 +70,23 @@ pub const SharedFontManager = struct {
 /// Error handling utilities for resource initialization
 pub const ResourceErrorHandler = struct {
     pub fn logAndHandleError(err: anyerror, context: []const u8) ResourceError {
-        const log = std.log.scoped(.resource_manager);
+        const platform_log = loggers.getPlatformLog();
 
         switch (err) {
             error.OutOfMemory => {
-                log.err("Out of memory during {s}", .{context});
+                platform_log.err("resource_manager", "Out of memory during {s}", .{context});
                 return ResourceError.OutOfMemory;
             },
             error.DeviceCreationFailed => {
-                log.err("GPU device creation failed during {s}", .{context});
+                platform_log.err("resource_manager", "GPU device creation failed during {s}", .{context});
                 return ResourceError.DeviceCreationFailed;
             },
             error.WindowCreationFailed => {
-                log.err("Window creation failed during {s}", .{context});
+                platform_log.err("resource_manager", "Window creation failed during {s}", .{context});
                 return ResourceError.WindowCreationFailed;
             },
             else => {
-                log.err("Unexpected error during {s}: {}", .{ context, err });
+                platform_log.err("resource_manager", "Unexpected error during {s}: {}", .{ context, err });
                 return ResourceError.RendererInitFailed;
             },
         }
@@ -116,8 +117,8 @@ pub const PlatformResources = struct {
         };
 
         fm.* = FontManager.init(allocator, window_gpu.device) catch |err| {
-            const log = std.log.scoped(.resource_manager);
-            log.err("Failed to initialize FontManager: {}", .{err});
+            const platform_log = loggers.getPlatformLog();
+            platform_log.err("resource_manager", "Failed to initialize FontManager: {}", .{err});
             allocator.destroy(fm);
             return ResourceError.FontManagerInitFailed;
         };

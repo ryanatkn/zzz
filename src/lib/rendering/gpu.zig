@@ -3,6 +3,7 @@ const loggers = @import("../debug/loggers.zig");
 const performance = @import("performance.zig");
 
 const c = @import("../platform/sdl.zig");
+const constants = @import("../core/constants.zig");
 
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
@@ -178,8 +179,8 @@ pub const SimpleGPURenderer = struct {
             .particle_ps = undefined,
             .particle_pipeline = undefined,
             .text_renderer = undefined,
-            .screen_width = @import("../core/constants.zig").SCREEN.BASE_WIDTH,
-            .screen_height = @import("../core/constants.zig").SCREEN.BASE_HEIGHT,
+            .screen_width = constants.SCREEN.BASE_WIDTH,
+            .screen_height = constants.SCREEN.BASE_HEIGHT,
             .circle_instances = std.ArrayList(CircleInstance).init(allocator),
             .rect_instances = std.ArrayList(RectInstance).init(allocator),
             .particle_instances = std.ArrayList(CircleInstance).init(allocator),

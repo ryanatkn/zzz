@@ -1,4 +1,7 @@
 const std = @import("std");
+const core = @import("core.zig");
+
+const Key = core.Key;
 
 /// Process control for signal handling and job management
 pub const ProcessControl = struct {
@@ -70,7 +73,7 @@ pub const SignalHandler = struct {
     }
 
     /// Handle keyboard input for signal generation
-    pub fn handleKeyInput(self: *Self, key: @import("core.zig").Key) bool {
+    pub fn handleKeyInput(self: *Self, key: Key) bool {
         switch (key) {
             .ctrl_c => {
                 self.process_control.handleCtrlC();

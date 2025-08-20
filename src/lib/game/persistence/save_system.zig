@@ -211,6 +211,7 @@ pub fn ZoneSaveData(comptime EntityId: type, comptime max_entities: usize) type 
 
         pub fn init() @This() {
             return .{
+                // Safe: initializing with 0 elements when capacity is max_entities
                 .entities = std.BoundedArray(EntitySaveData(EntityId), max_entities).init(0) catch unreachable,
             };
         }

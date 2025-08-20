@@ -6,11 +6,13 @@ const game_renderer = @import("../game_renderer.zig");
 const browser_renderer = @import("renderer.zig");
 const page = @import("../../lib/browser/page.zig");
 const math = @import("../../lib/math/mod.zig");
+const loggers = @import("../../lib/debug/loggers.zig");
 
 // Reactive system imports
 const ReactiveComponent = @import("../../lib/reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../../lib/reactive/component.zig").createComponent;
 const getComponentData = @import("../../lib/reactive/component.zig").getComponentData;
+const castComponentState = @import("../../lib/reactive/component.zig").castComponentState;
 const signal = @import("../../lib/reactive/signal.zig");
 const derived = @import("../../lib/reactive/derived.zig");
 const effect = @import("../../lib/reactive/effect.zig");
@@ -81,10 +83,10 @@ pub const ReactiveHudData = struct {
         self.can_go_forward = try self.createCanGoForwardDerived();
 
         // Initialize font system
-        const log = std.log.scoped(.reactive_hud);
-        log.info("Initializing reactive HUD font system...", .{});
+        const ui_log = loggers.getUILog();
+        ui_log.info("reactive_hud", "Initializing reactive HUD font system...", .{});
         try self.renderer.initFonts(allocator);
-        log.info("Reactive HUD font system initialized", .{});
+        ui_log.info("reactive_hud", "Reactive HUD font system initialized", .{});
 
         // Initialize with home page
         try self.router.navigate("/");
@@ -131,7 +133,8 @@ pub const ReactiveHudData = struct {
             // Reset to home when opening
             self.history = history.SimpleHistory.init();
             self.router.navigate("/") catch |err| {
-                std.log.err("Failed to navigate to home page in reactive HUD: {}", .{err});
+                const ui_log = loggers.getUILog();
+                ui_log.err("reactive_hud", "Failed to navigate to home page in reactive HUD: {}", .{err});
                 // Don't open HUD if navigation fails
                 return;
             };
@@ -206,29 +209,29 @@ pub const ReactiveHudData = struct {
     // Component vtable implementation
     fn onMount(state: *anyopaque) !void {
         _ = state;
-        const log = std.log.scoped(.reactive_hud);
-        log.info("Reactive HUD component mounted", .{});
+        const ui_log = loggers.getUILog();
+        ui_log.info("reactive_hud", "Reactive HUD component mounted", .{});
     }
 
     fn onUnmount(state: *anyopaque) void {
         _ = state;
-        const log = std.log.scoped(.reactive_hud);
-        log.info("Reactive HUD component unmounted", .{});
+        const ui_log = loggers.getUILog();
+        ui_log.info("reactive_hud", "Reactive HUD component unmounted", .{});
     }
 
     fn onRender(state: *anyopaque) !void {
-        const self = @as(*ReactiveHudData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(ReactiveHudData, state);
 
         // This is called automatically when reactive dependencies change
         // Mark that we need to re-render
         self.needs_rerender.set(true);
 
-        const log = std.log.scoped(.reactive_hud);
-        log.debug("Reactive HUD render triggered - path: {s}, open: {}", .{ self.current_path.peek(), self.is_open.peek() });
+        const ui_log = loggers.getUILog();
+        ui_log.debug("reactive_hud", "Reactive HUD render triggered - path: {s}, open: {}", .{ self.current_path.peek(), self.is_open.peek() });
     }
 
     fn shouldRender(state: *anyopaque) bool {
-        const self = @as(*ReactiveHudData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(ReactiveHudData, state);
 
         // Only render if HUD is open and something has changed
         const should_render = self.is_open.peek() and self.needs_rerender.peek();
@@ -244,7 +247,7 @@ pub const ReactiveHudData = struct {
     }
 
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
-        const self = @as(*ReactiveHudData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(ReactiveHudData, state);
         self.deinit();
         allocator.destroy(self);
     }

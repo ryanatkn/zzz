@@ -56,11 +56,12 @@ pub const ProcessExecutor = struct {
 
     pub fn deinit(self: *Self) void {
         if (self.current_process) |*process| {
+            const ui_log = loggers.getUILog();
             const term = process.kill() catch |err| {
-                std.log.err("Failed to kill process during deinit: {}", .{err});
+                ui_log.err("terminal_process", "Failed to kill process during deinit: {}", .{err});
                 return;
             };
-            std.log.debug("Process killed with term: {}", .{term});
+            ui_log.debug("terminal_process", "Process killed with term: {}", .{term});
         }
         self.working_directory.deinit();
         self.environment.deinit();
@@ -123,13 +124,15 @@ pub const ProcessExecutor = struct {
 
     /// Execute a command asynchronously (for interactive commands)
     pub fn executeAsync(self: *Self, command_line: []const u8) !void {
+        const ui_log = loggers.getUILog();
+
         // Kill existing process if running
         if (self.current_process) |*process| {
             const term = process.kill() catch |err| {
-                std.log.err("Failed to kill existing process: {}", .{err});
+                ui_log.err("terminal_process", "Failed to kill existing process: {}", .{err});
                 return;
             };
-            std.log.debug("Process killed with term: {}", .{term});
+            ui_log.debug("terminal_process", "Process killed with term: {}", .{term});
         }
 
         // Parse command line

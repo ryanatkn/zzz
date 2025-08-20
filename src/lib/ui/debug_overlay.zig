@@ -6,6 +6,8 @@ const persistent_text = @import("../text/cache.zig");
 const rendering_modes = @import("../rendering/modes.zig");
 const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../reactive/component.zig").createComponent;
+const getComponentData = @import("../reactive/component.zig").getComponentData;
+const castComponentState = @import("../reactive/component.zig").castComponentState;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
 const loggers = @import("../debug/loggers.zig");
@@ -248,18 +250,18 @@ pub const DebugOverlayData = struct {
     }
 
     fn onRender(state: *anyopaque) !void {
-        const self = @as(*DebugOverlayData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(DebugOverlayData, state);
 
         loggers.getUILog().debug("reactive_render", "Debug overlay render triggered - {} values, visible: {}", .{ self.values.items.len, self.is_visible.peek() });
     }
 
     fn shouldRender(state: *anyopaque) bool {
-        const self = @as(*DebugOverlayData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(DebugOverlayData, state);
         return self.is_visible.peek() and self.values_changed.peek();
     }
 
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
-        const self = @as(*DebugOverlayData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(DebugOverlayData, state);
         self.deinit();
         allocator.destroy(self);
     }
@@ -305,7 +307,7 @@ pub const DebugOverlay = struct {
     }
 
     pub fn getOverlayData(self: *Self) *DebugOverlayData {
-        return @as(*DebugOverlayData, @ptrCast(@alignCast(self.component.state)));
+        return getComponentData(DebugOverlayData, self.component);
     }
 
     // Convenience methods

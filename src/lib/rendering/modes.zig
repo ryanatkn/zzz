@@ -1,6 +1,9 @@
 const std = @import("std");
 const persistent_text = @import("../text/cache.zig");
 const text_renderer = @import("../text/renderer.zig");
+const Vec2 = @import("../math/vec2.zig").Vec2;
+const Color = @import("../core/colors.zig").Color;
+const loggers = @import("../debug/loggers.zig");
 
 /// Rendering Mode Guidelines for the Zzz Game Engine
 ///
@@ -163,7 +166,7 @@ pub const UseCases = struct {
 /// Helper functions for common rendering patterns
 /// Render text using the recommended mode based on change frequency
 /// FontManager and FontCategory types are constrained to have the required methods
-pub fn renderTextWithAutoMode(comptime FontManager: type, comptime FontCategory: type, renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("../math/vec2.zig").Vec2, font_manager: *FontManager, font_category: FontCategory, font_size: f32, color: @import("../core/colors.zig").Color, changes_per_second: f32) !void {
+pub fn renderTextWithAutoMode(comptime FontManager: type, comptime FontCategory: type, renderer: *text_renderer.TextRenderer, text: []const u8, position: Vec2, font_manager: *FontManager, font_category: FontCategory, font_size: f32, color: Color, changes_per_second: f32) !void {
     const profile = recommendModeByRate(changes_per_second);
 
     switch (profile.recommended_mode) {
@@ -181,7 +184,7 @@ pub fn renderTextWithAutoMode(comptime FontManager: type, comptime FontCategory:
 
 /// Render text with explicit mode choice
 /// FontManager and FontCategory types are constrained to have the required methods
-pub fn renderTextExplicitMode(comptime FontManager: type, comptime FontCategory: type, renderer: *text_renderer.TextRenderer, text: []const u8, position: @import("../math/vec2.zig").Vec2, font_manager: *FontManager, font_category: FontCategory, font_size: f32, color: @import("../core/colors.zig").Color, mode: RenderingMode) !void {
+pub fn renderTextExplicitMode(comptime FontManager: type, comptime FontCategory: type, renderer: *text_renderer.TextRenderer, text: []const u8, position: Vec2, font_manager: *FontManager, font_category: FontCategory, font_size: f32, color: Color, mode: RenderingMode) !void {
     switch (mode) {
         .immediate => {
             const text_result = try font_manager.renderTextToTexture(text, font_category, font_size, color, renderer.device);
@@ -211,14 +214,14 @@ pub fn getPerformanceAdvice(content_type: []const u8) ?PerformanceProfile {
 /// Development helper - log recommendations for debugging
 pub fn logModeRecommendation(content_type: []const u8, changes_per_second: f32) void {
     const profile = recommendModeByRate(changes_per_second);
-    const log = std.log.scoped(.rendering_modes);
+    const render_log = loggers.getRenderLog();
 
-    log.info("Rendering recommendation for '{s}':", .{content_type});
-    log.info("  Changes per second: {d:.2}", .{changes_per_second});
-    log.info("  Recommended mode: {s}", .{@tagName(profile.recommended_mode)});
-    log.info("  Memory impact: {s}", .{@tagName(profile.memory_impact)});
-    log.info("  CPU overhead: {s}", .{@tagName(profile.cpu_overhead)});
-    log.info("  Reasoning: {s}", .{profile.reasoning});
+    render_log.info("rendering_modes", "Rendering recommendation for '{s}':", .{content_type});
+    render_log.info("rendering_modes", "  Changes per second: {d:.2}", .{changes_per_second});
+    render_log.info("rendering_modes", "  Recommended mode: {s}", .{@tagName(profile.recommended_mode)});
+    render_log.info("rendering_modes", "  Memory impact: {s}", .{@tagName(profile.memory_impact)});
+    render_log.info("rendering_modes", "  CPU overhead: {s}", .{@tagName(profile.cpu_overhead)});
+    render_log.info("rendering_modes", "  Reasoning: {s}", .{profile.reasoning});
 }
 
 /// Quick reference for developers

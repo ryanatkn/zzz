@@ -1,5 +1,6 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
@@ -308,8 +309,10 @@ pub const ParticleSystem = struct {
     }
 
     pub fn addParticle(self: *Self, pos: Vec2, radius: f32, particle_type: ParticleType, duration: f32) void {
+        const game_log = loggers.getGameLog();
+
         if (self.count >= MAX_PARTICLES) {
-            std.debug.print("WARNING: Particle pool full! ({} particles)\n", .{MAX_PARTICLES});
+            game_log.warn("particles", "Particle pool full! ({} particles)", .{MAX_PARTICLES});
             return;
         }
 
@@ -318,7 +321,7 @@ pub const ParticleSystem = struct {
 
         // Debug warning when approaching limit
         if (self.count > MAX_PARTICLES * 3 / 4) {
-            std.debug.print("Particle pool usage high: {}/{}\n", .{ self.count, MAX_PARTICLES });
+            game_log.warn("particles", "Particle pool usage high: {}/{}", .{ self.count, MAX_PARTICLES });
         }
     }
 

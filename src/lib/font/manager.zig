@@ -6,8 +6,7 @@ const rasterizer_core = @import("rasterizer_core.zig");
 const font_atlas = @import("font_atlas.zig");
 const text_layout = @import("../text/layout.zig");
 const font_config = @import("config.zig");
-
-const log = std.log.scoped(.pure_font_manager);
+const loggers = @import("../debug/loggers.zig");
 
 pub const LoadedFont = struct {
     id: u32,
@@ -84,7 +83,8 @@ pub const FontManager = struct {
         }
 
         if (font_family == null) {
-            log.err("Font family not found: {s}", .{family_name});
+            const font_log = loggers.getFontLog();
+            font_log.err("pure_font_manager", "Font family not found: {s}", .{family_name});
             return error.FontFamilyNotFound;
         }
 
@@ -124,7 +124,8 @@ pub const FontManager = struct {
         }
 
         const file = std.fs.cwd().openFile(best_variant.?.path, .{}) catch |err| {
-            log.err("Failed to open font file {s}: {}", .{ best_variant.?.path, err });
+            const font_log = loggers.getFontLog();
+            font_log.err("pure_font_manager", "Failed to open font file {s}: {}", .{ best_variant.?.path, err });
             return error.FontLoadFailed;
         };
         defer file.close();
@@ -161,7 +162,8 @@ pub const FontManager = struct {
             self.layout_engine = text_layout.TextLayoutEngine.init(self.allocator, &self.atlas, actual_rasterizer);
         }
 
-        log.info("Loaded font: {s} (id: {}, size: {d})", .{ best_variant.?.path, font_id, size });
+        const font_log = loggers.getFontLog();
+        font_log.info("pure_font_manager", "Loaded font: {s} (id: {}, size: {d})", .{ best_variant.?.path, font_id, size });
 
         return font_id;
     }
@@ -231,7 +233,8 @@ pub const FontManager = struct {
                 // Get the bitmap from the atlas cache instead of re-rasterizing
                 const cached_bitmap = self.atlas.getCachedBitmap(glyph_info) orelse {
                     // Fallback: only rasterize if not in cache (shouldn't happen)
-                    log.warn("Glyph not in cache, falling back to rasterization for codepoint {}", .{glyph.codepoint});
+                    const font_log = loggers.getFontLog();
+                    font_log.warn("pure_font_manager", "Glyph not in cache, falling back to rasterization for codepoint {}", .{glyph.codepoint});
                     const rasterized = try rasterizer.rasterizeGlyph(glyph.codepoint, 0, 0);
                     defer rasterizer.allocator.free(rasterized.bitmap);
 

@@ -1,8 +1,11 @@
 const std = @import("std");
 const kernel = @import("../kernel/mod.zig");
+const loggers = @import("../../debug/loggers.zig");
 const StandardTerminal = @import("standard.zig").StandardTerminal;
 const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
 const core = @import("../core.zig");
+const VisibleLinesIterator = core.VisibleLinesIterator;
+const Cursor = core.Cursor;
 
 // Command capabilities
 const Parser = @import("../capabilities/commands/parser.zig").Parser;
@@ -284,8 +287,8 @@ pub const CommandTerminal = struct {
     }
 
     /// Get visible content for rendering (compatibility method)
-    pub fn getVisibleContent(self: *const Self) struct { lines: @import("../core.zig").VisibleLinesIterator, current: []const u8, cursor: @import("../core.zig").Cursor } {
-        const log = std.log.scoped(.terminal_content);
+    pub fn getVisibleContent(self: *const Self) struct { lines: VisibleLinesIterator, current: []const u8, cursor: Cursor } {
+        const ui_log = loggers.getUILog();
 
         // Cast away const to access mutable getCapability method
         const mutable_self: *Self = @constCast(self);
@@ -295,7 +298,7 @@ pub const CommandTerminal = struct {
             const scrollback = writer.getScrollback();
 
             const current_line = self.getCurrentLine();
-            log.info("BasicWriter scrollback found - size: {d}, current_line: '{s}'", .{ scrollback.count(), current_line });
+            ui_log.info("terminal_content", "BasicWriter scrollback found - size: {d}, current_line: '{s}'", .{ scrollback.count(), current_line });
 
             return .{
                 .lines = core.VisibleLinesIterator.init(scrollback, 25), // Show 25 lines
@@ -303,7 +306,7 @@ pub const CommandTerminal = struct {
                 .cursor = core.Cursor{}, // Default cursor for now
             };
         } else {
-            log.warn("BasicWriter capability not found", .{});
+            ui_log.warn("terminal_content", "BasicWriter capability not found", .{});
         }
 
         // Fallback: return empty content

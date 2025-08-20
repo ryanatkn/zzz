@@ -1,6 +1,7 @@
 const std = @import("std");
 const kernel = @import("../../kernel/mod.zig");
 const History = @import("history.zig").History;
+const loggers = @import("../../../debug/loggers.zig");
 
 /// Persistence capability - saves and restores terminal state across sessions
 pub const Persistence = struct {
@@ -104,7 +105,8 @@ pub const Persistence = struct {
         if (self.auto_load) {
             self.loadHistory() catch |err| {
                 // Log error but don't fail initialization
-                std.log.warn("Failed to load history: {}", .{err});
+                const ui_log = loggers.getUILog();
+                ui_log.warn("terminal_persistence", "Failed to load history: {}", .{err});
             };
         }
 
@@ -117,7 +119,8 @@ pub const Persistence = struct {
         // Auto-save on shutdown if enabled
         if (self.auto_save and self.active) {
             self.saveHistory() catch |err| {
-                std.log.warn("Failed to save history: {}", .{err});
+                const ui_log = loggers.getUILog();
+                ui_log.warn("terminal_persistence", "Failed to save history: {}", .{err});
             };
         }
 
@@ -220,6 +223,7 @@ pub const Persistence = struct {
 
     /// Load session state
     pub fn loadSession(self: *Self, session_name: ?[]const u8) !void {
+        const ui_log = loggers.getUILog();
         const session = session_name orelse "default";
 
         const session_file = if (std.mem.eql(u8, session, "default"))
@@ -251,7 +255,7 @@ pub const Persistence = struct {
                 if (std.mem.eql(u8, key, "working_directory")) {
                     // Change to saved directory
                     std.process.changeCurDir(value) catch |err| {
-                        std.log.warn("Failed to restore working directory: {}", .{err});
+                        ui_log.warn("terminal_persistence", "Failed to restore working directory: {}", .{err});
                     };
                 }
                 // Handle other keys as needed
@@ -342,6 +346,12 @@ test "Persistence capability initialization" {
 
 test "Persistence session management" {
     const allocator = std.testing.allocator;
+
+    // Initialize global loggers for test environment
+    // Required because persistence tests use components that log
+    try loggers.initGlobalLoggers(allocator);
+    defer loggers.deinitGlobalLoggers();
+
     var persistence = try Persistence.init(allocator);
     defer persistence.deinit();
 

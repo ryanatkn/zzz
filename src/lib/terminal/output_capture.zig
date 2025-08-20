@@ -1,4 +1,5 @@
 const std = @import("std");
+const loggers = @import("../debug/loggers.zig");
 
 /// Output capture for real-time command output streaming
 pub const OutputCapture = struct {
@@ -93,7 +94,8 @@ pub const ProgressiveOutput = struct {
     /// Handle incoming data chunk
     pub fn handleData(self: *Self, data: []const u8) void {
         self.write_callback(self.write_context, data) catch |err| {
-            std.log.err("Failed to write progressive output: {}", .{err});
+            const ui_log = loggers.getUILog();
+            ui_log.err("terminal_output", "Failed to write progressive output: {}", .{err});
         };
     }
 

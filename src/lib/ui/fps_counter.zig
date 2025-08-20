@@ -7,6 +7,8 @@ const rendering_modes = @import("../rendering/modes.zig");
 const reactive_time = @import("../reactive/time.zig");
 const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../reactive/component.zig").createComponent;
+const getComponentData = @import("../reactive/component.zig").getComponentData;
+const castComponentState = @import("../reactive/component.zig").castComponentState;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
 const loggers = @import("../debug/loggers.zig");
@@ -182,21 +184,21 @@ pub const FPSCounterData = struct {
     }
 
     fn onRender(state: *anyopaque) !void {
-        const self = @as(*FPSCounterData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(FPSCounterData, state);
 
         // This is called when reactive dependencies change
         loggers.getUILog().debug("reactive_render", "FPS counter render triggered - FPS: {}, visible: {}", .{ self.current_fps.peek(), self.is_visible.peek() });
     }
 
     fn shouldRender(state: *anyopaque) bool {
-        const self = @as(*FPSCounterData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(FPSCounterData, state);
 
         // Only render if visible and something has changed
         return self.is_visible.peek() and self.should_update.peek();
     }
 
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
-        const self = @as(*FPSCounterData, @ptrCast(@alignCast(state)));
+        const self = castComponentState(FPSCounterData, state);
         self.deinit();
         allocator.destroy(self);
     }
@@ -236,7 +238,7 @@ pub const FPSCounter = struct {
     }
 
     pub fn getCounterData(self: *Self) *FPSCounterData {
-        return @as(*FPSCounterData, @ptrCast(@alignCast(self.component.state)));
+        return getComponentData(FPSCounterData, self.component);
     }
 
     // Convenience methods

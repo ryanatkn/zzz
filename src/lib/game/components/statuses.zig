@@ -36,7 +36,7 @@ pub const Statuses = struct {
 
     pub fn init() Statuses {
         return .{
-            // BoundedArray.init(0) should never fail for valid capacity
+            // Safe: initializing with 0 elements when capacity is 16
             .modifiers = BoundedArray(Modifier, 16).init(0) catch unreachable,
         };
     }

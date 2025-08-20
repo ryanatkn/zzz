@@ -1,5 +1,6 @@
 const std = @import("std");
 const kernel = @import("../../kernel/mod.zig");
+const loggers = @import("../../../debug/loggers.zig");
 
 /// Process execution result
 pub const ProcessResult = struct {
@@ -101,11 +102,12 @@ pub const Executor = struct {
     pub fn deinit(self: *Self) void {
         // Clean up resources when called by registry
         if (self.current_process) |*process| {
+            const ui_log = loggers.getUILog();
             const term = process.kill() catch |err| {
-                std.log.err("Failed to kill process during executor deinit: {}", .{err});
+                ui_log.err("terminal_executor", "Failed to kill process during executor deinit: {}", .{err});
                 return;
             };
-            std.log.debug("Process killed with term: {}", .{term});
+            ui_log.debug("terminal_executor", "Process killed with term: {}", .{term});
         }
 
         // Clean up working directory (uses regular allocator now)

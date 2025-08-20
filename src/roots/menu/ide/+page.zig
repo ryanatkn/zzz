@@ -6,6 +6,7 @@ const file_tree = @import("../../../lib/ui/file_tree.zig");
 const ide_constants = @import("constants.zig");
 const syntax_highlighter = @import("syntax_highlighter.zig");
 const terminal_ui = @import("../../../lib/ui/terminal.zig");
+const sdl = @import("../../../lib/platform/sdl.zig");
 
 const Vec2 = math.Vec2;
 const DirectoryScanner = directory_scanner.DirectoryScanner;
@@ -13,6 +14,7 @@ const DirectoryEntry = directory_scanner.DirectoryEntry;
 const FileTreeComponent = file_tree.FileTreeComponent;
 const ZigHighlighter = syntax_highlighter.ZigHighlighter;
 const TerminalComponent = terminal_ui.TerminalComponent;
+const KeyboardEvent = sdl.sdl.SDL_KeyboardEvent;
 
 /// Which panel currently has focus for input handling
 pub const FocusedPanel = enum {
@@ -168,7 +170,7 @@ pub const IDEPage = struct {
     }
 
     /// Handle keyboard input for focused panel
-    pub fn handleKeyboardInput(self: *IDEPage, key_event: @import("../../../lib/platform/sdl.zig").sdl.SDL_KeyboardEvent) bool {
+    pub fn handleKeyboardInput(self: *IDEPage, key_event: KeyboardEvent) bool {
         const log = std.log.scoped(.ide_input);
         log.info("IDE handleKeyboardInput - focused_panel: {}, scancode: {d}", .{ self.focused_panel, key_event.scancode });
 

@@ -163,7 +163,8 @@ pub const TextRenderer = struct {
         const size = Vec2{ .x = 100.0, .y = 100.0 };
         const color = colors.Color{ .r = 255, .g = 0, .b = 0, .a = 255 }; // Red tint
 
-        std.debug.print("DEBUG: Testing texture pipeline with checkerboard at ({}, {}) size {}x{}\n", .{ position.x, position.y, size.x, size.y });
+        const render_log = loggers.getRenderLog();
+        render_log.debug("texture_debug", "Testing texture pipeline with checkerboard at ({}, {}) size {}x{}", .{ position.x, position.y, size.x, size.y });
 
         self.drawTexturedQuad(cmd_buffer, render_pass, debug_texture.texture, sampler, position, size, color);
     }
@@ -313,7 +314,8 @@ pub const TextRenderer = struct {
 
         self.text_vs = c.sdl.SDL_CreateGPUShader(self.device, &text_vs_info);
         if (self.text_vs == null) {
-            std.debug.print("Failed to create text vertex shader: {s}\n", .{c.sdl.SDL_GetError()});
+            const render_log = loggers.getRenderLog();
+            render_log.err("shader_loading", "Failed to create text vertex shader: {s}", .{c.sdl.SDL_GetError()});
             return error.TextVertexShaderFailed;
         }
 
@@ -332,7 +334,8 @@ pub const TextRenderer = struct {
         if (self.text_vs != null) {
             self.text_ps = c.sdl.SDL_CreateGPUShader(self.device, &text_ps_info);
             if (self.text_ps == null) {
-                std.debug.print("Failed to create text fragment shader: {s}\n", .{c.sdl.SDL_GetError()});
+                const render_log = loggers.getRenderLog();
+                render_log.err("shader_loading", "Failed to create text fragment shader: {s}", .{c.sdl.SDL_GetError()});
                 return error.TextFragmentShaderFailed;
             }
         } else {
@@ -359,7 +362,8 @@ pub const TextRenderer = struct {
 
         self.text_sdf_vs = c.sdl.SDL_CreateGPUShader(self.device, &text_sdf_vs_info);
         if (self.text_sdf_vs == null) {
-            std.debug.print("Failed to create SDF text vertex shader: {s}\n", .{c.sdl.SDL_GetError()});
+            const render_log = loggers.getRenderLog();
+            render_log.err("shader_loading", "Failed to create SDF text vertex shader: {s}", .{c.sdl.SDL_GetError()});
             return error.SDFTextVertexShaderFailed;
         }
 
@@ -378,20 +382,23 @@ pub const TextRenderer = struct {
         if (self.text_sdf_vs != null) {
             self.text_sdf_ps = c.sdl.SDL_CreateGPUShader(self.device, &text_sdf_ps_info);
             if (self.text_sdf_ps == null) {
-                std.debug.print("Failed to create SDF text fragment shader: {s}\n", .{c.sdl.SDL_GetError()});
+                const render_log = loggers.getRenderLog();
+                render_log.err("shader_loading", "Failed to create SDF text fragment shader: {s}", .{c.sdl.SDL_GetError()});
                 return error.SDFTextFragmentShaderFailed;
             }
         } else {
             self.text_sdf_ps = null;
         }
 
-        std.debug.print("✓ SDF text shaders loaded successfully\n", .{});
+        const render_log = loggers.getRenderLog();
+        render_log.info("shader_loading", "SDF text shaders loaded successfully", .{});
     }
 
     // Create text rendering pipeline
     fn createTextPipeline(self: *Self) !void {
         if (self.text_vs == null or self.text_ps == null) {
-            std.debug.print("Text shaders not loaded, skipping pipeline creation\n", .{});
+            const render_log = loggers.getRenderLog();
+            render_log.warn("pipeline_creation", "Text shaders not loaded, skipping pipeline creation", .{});
             return error.TextShadersNotLoaded;
         }
 
@@ -442,17 +449,20 @@ pub const TextRenderer = struct {
 
         self.text_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &text_create_info);
         if (self.text_pipeline == null) {
-            std.debug.print("Failed to create text graphics pipeline: {s}\n", .{c.sdl.SDL_GetError()});
+            const render_log = loggers.getRenderLog();
+            render_log.err("pipeline_creation", "Failed to create text graphics pipeline: {s}", .{c.sdl.SDL_GetError()});
             return error.TextPipelineCreationFailed;
         }
 
-        std.debug.print("✓ Text pipeline created successfully\n", .{});
+        const render_log = loggers.getRenderLog();
+        render_log.info("pipeline_creation", "Text pipeline created successfully", .{});
     }
 
     // Create SDF text rendering pipeline
     fn createSDFTextPipeline(self: *Self) !void {
         if (self.text_sdf_vs == null or self.text_sdf_ps == null) {
-            std.debug.print("SDF text shaders not loaded, skipping SDF pipeline creation\n", .{});
+            const render_log = loggers.getRenderLog();
+            render_log.warn("pipeline_creation", "SDF text shaders not loaded, skipping SDF pipeline creation", .{});
             // This is not an error - SDF support is optional
             return;
         }
@@ -504,11 +514,13 @@ pub const TextRenderer = struct {
 
         self.text_sdf_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(self.device, &sdf_text_create_info);
         if (self.text_sdf_pipeline == null) {
-            std.debug.print("Failed to create SDF text graphics pipeline: {s}\n", .{c.sdl.SDL_GetError()});
+            const render_log = loggers.getRenderLog();
+            render_log.err("pipeline_creation", "Failed to create SDF text graphics pipeline: {s}", .{c.sdl.SDL_GetError()});
             return error.SDFTextPipelineCreationFailed;
         }
 
-        std.debug.print("✓ SDF text pipeline created successfully\n", .{});
+        const render_log = loggers.getRenderLog();
+        render_log.info("pipeline_creation", "SDF text pipeline created successfully", .{});
     }
 
     // Create sampler for text textures
@@ -531,11 +543,13 @@ pub const TextRenderer = struct {
 
         self.text_sampler = c.sdl.SDL_CreateGPUSampler(self.device, &sampler_info);
         if (self.text_sampler == null) {
-            std.debug.print("Failed to create text sampler: {s}\n", .{c.sdl.SDL_GetError()});
+            const render_log = loggers.getRenderLog();
+            render_log.err("sampler_creation", "Failed to create text sampler: {s}", .{c.sdl.SDL_GetError()});
             return error.SamplerCreationFailed;
         }
 
-        std.debug.print("✓ Text sampler created successfully\n", .{});
+        const render_log = loggers.getRenderLog();
+        render_log.info("sampler_creation", "Text sampler created successfully", .{});
     }
 
     // Draw a textured quad for text rendering

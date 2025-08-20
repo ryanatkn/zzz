@@ -12,7 +12,7 @@ pub const BufferedOutput = struct {
     initialized: bool = false,
 
     // Dependencies
-    basic_writer: ?*@import("basic_writer.zig").BasicWriter = null,
+    basic_writer: ?*BasicWriter = null,
 
     // Event bus
     event_bus: ?*kernel.EventBus = null,

@@ -189,7 +189,7 @@ const FilterConfig = union(enum) {
     pub fn deinit(self: *FilterConfig) void {
         switch (self.*) {
             .passthrough => {},
-            .throttle => {}, // TODO: implement throttle deinit when needed
+            .throttle => {}, // No cleanup needed for throttle config
         }
     }
 
@@ -197,10 +197,10 @@ const FilterConfig = union(enum) {
         return switch (self.*) {
             .passthrough => true,
             .throttle => {
-                // TODO: implement throttling logic
+                // Throttling logic not yet implemented - use filters.Throttle for actual throttling
                 _ = key;
                 _ = message;
-                return true; // For now, allow all
+                return true; // Allow all until throttling is implemented
             },
         };
     }

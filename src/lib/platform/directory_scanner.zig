@@ -1,5 +1,6 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
+const loggers = @import("../debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 
@@ -163,13 +164,15 @@ pub const DirectoryScanner = struct {
 
     /// Scan directory starting from given path
     pub fn scanDirectory(self: *Self, path: []const u8) !*DirectoryEntry {
+        const game_log = loggers.getGameLog();
+
         var dir = std.fs.cwd().openDir(path, .{ .iterate = true }) catch |err| switch (err) {
             error.FileNotFound => {
-                std.log.err("Directory not found: {s}", .{path});
+                game_log.err("directory_scan", "Directory not found: {s}", .{path});
                 return err;
             },
             error.AccessDenied => {
-                std.log.err("Access denied to directory: {s}", .{path});
+                game_log.err("directory_scan", "Access denied to directory: {s}", .{path});
                 return err;
             },
             else => return err,
@@ -191,10 +194,12 @@ pub const DirectoryScanner = struct {
 
     /// Recursively scan directory contents
     fn scanDirectoryRecursive(self: *Self, dir: std.fs.Dir, parent_entry: *DirectoryEntry, current_path: []const u8, depth: u32) !void {
+        const game_log = loggers.getGameLog();
+
         // Prevent infinite recursion
         const MAX_DEPTH = 10;
         if (depth > MAX_DEPTH) {
-            std.log.warn("Maximum directory depth exceeded for path: {s}", .{current_path});
+            game_log.warn("directory_scan", "Maximum directory depth exceeded for path: {s}", .{current_path});
             return;
         }
 
@@ -212,14 +217,14 @@ pub const DirectoryScanner = struct {
             const file_stat = blk: {
                 if (entry.kind == .directory) {
                     var sub_dir = dir.openDir(entry.name, .{}) catch |err| {
-                        std.log.warn("Failed to open subdirectory {s}: {}", .{ entry.name, err });
+                        game_log.warn("directory_scan", "Failed to open subdirectory {s}: {}", .{ entry.name, err });
                         continue;
                     };
                     defer sub_dir.close();
                     break :blk try sub_dir.stat();
                 } else {
                     var file = dir.openFile(entry.name, .{}) catch |err| {
-                        std.log.warn("Failed to open file {s}: {}", .{ entry.name, err });
+                        game_log.warn("directory_scan", "Failed to open file {s}: {}", .{ entry.name, err });
                         continue;
                     };
                     defer file.close();
@@ -237,7 +242,7 @@ pub const DirectoryScanner = struct {
             // Recursively scan subdirectories
             if (entry.kind == .directory) {
                 var sub_dir = dir.openDir(entry.name, .{ .iterate = true }) catch |err| {
-                    std.log.warn("Failed to iterate subdirectory {s}: {}", .{ entry.name, err });
+                    game_log.warn("directory_scan", "Failed to iterate subdirectory {s}: {}", .{ entry.name, err });
                     continue;
                 };
                 defer sub_dir.close();
