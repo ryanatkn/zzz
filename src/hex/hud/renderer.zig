@@ -448,7 +448,7 @@ pub const BrowserRenderer = struct {
     /// Render terminal panel with improved safety and error handling
     fn renderPreviewPanel(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ide_page_impl: *const ide_page.IDEPage, panel_rect: math.Rectangle) !void {
         const focused_panel = ide_page_impl.getFocusedPanel();
-        const is_terminal_focused = focused_panel == .Terminal;
+        const is_terminal_focused = focused_panel == .terminal;
 
         // Draw focus border if terminal is focused
         if (is_terminal_focused) {

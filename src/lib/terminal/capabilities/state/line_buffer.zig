@@ -206,6 +206,22 @@ pub const LineBuffer = struct {
             self.history_index = null;
         }
 
+        // For empty commands, emit an output event with newline for visual line break
+        if (command.len == 0) {
+            if (self.event_bus) |bus| {
+                const newline_event = kernel.Event.init(.output, kernel.EventData{
+                    .output = kernel.events.OutputEventData{
+                        .text = "\n",
+                    },
+                });
+                // Handle emission error gracefully - empty line processing should continue
+                bus.emit(newline_event) catch |err| {
+                    // Log error but don't fail - visual feedback is nice-to-have
+                    std.log.warn("Failed to emit newline event for empty command: {}", .{err});
+                };
+            }
+        }
+
         // Emit the command execution event with actual command
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.command_execute, kernel.EventData{

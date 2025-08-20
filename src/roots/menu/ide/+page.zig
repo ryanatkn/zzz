@@ -6,6 +6,7 @@ const file_tree = @import("../../../lib/ui/file_tree.zig");
 const ide_constants = @import("constants.zig");
 const syntax_highlighter = @import("syntax_highlighter.zig");
 const terminal_ui = @import("../../../lib/ui/terminal.zig");
+const focus_manager = @import("../../../lib/ui/focus_manager.zig");
 const sdl = @import("../../../lib/platform/sdl.zig");
 
 const Vec2 = math.Vec2;
@@ -16,11 +17,11 @@ const ZigHighlighter = syntax_highlighter.ZigHighlighter;
 const TerminalComponent = terminal_ui.TerminalComponent;
 const KeyboardEvent = sdl.sdl.SDL_KeyboardEvent;
 
-/// Which panel currently has focus for input handling
+/// Which panel currently has focus for input handling  
 pub const FocusedPanel = enum {
-    FileTree,
-    Content,
-    Terminal,
+    file_tree,
+    content_editor,
+    terminal,
 };
 
 pub const IDEPage = struct {
@@ -47,8 +48,8 @@ pub const IDEPage = struct {
     // Terminal component (replaces info panel)
     terminal_component: ?TerminalComponent = null,
 
-    // Focus management
-    focused_panel: FocusedPanel = .Terminal,
+    // Focus management using the new focus manager
+    focus_manager: focus_manager.FocusManager(FocusedPanel),
 
     /// Get currently selected file entry
     pub fn getSelectedEntry(self: *const IDEPage) ?*DirectoryEntry {
@@ -66,7 +67,7 @@ pub const IDEPage = struct {
         // If a file was selected, try to load its content
         if (clicked) {
             // Set focus to file tree
-            self.focused_panel = .FileTree;
+            self.focus_manager.setFocus(.file_tree);
 
             if (self.getSelectedEntry()) |selected| {
                 if (!selected.metadata.is_directory) {
@@ -103,23 +104,15 @@ pub const IDEPage = struct {
         return &self.syntax_highlighter;
     }
 
-    /// Get terminal component (initialize if needed)
+    /// Get terminal component (now always initialized)
     pub fn getTerminal(self: *IDEPage) !*TerminalComponent {
-        if (self.terminal_component == null) {
-            // Initialize terminal with simple bounds
-            const bounds = math.Rectangle{
-                .position = Vec2{ .x = 0, .y = 0 },
-                .size = Vec2{ .x = 400, .y = 300 },
-            };
-
-            // Simple initialization without complex operations
-            self.terminal_component = TerminalComponent.init(self.allocator, bounds) catch |err| {
-                self.error_message = "Failed to initialize terminal";
-                return err;
-            };
+        if (self.terminal_component) |*terminal| {
+            return terminal;
+        } else {
+            // This should not happen now that we initialize in init()
+            self.error_message = "Terminal component not initialized";
+            return error.TerminalNotInitialized;
         }
-
-        return &self.terminal_component.?;
     }
 
     /// Clear terminal
@@ -155,7 +148,7 @@ pub const IDEPage = struct {
             point.y >= terminal_bounds.position.y and
             point.y <= terminal_bounds.position.y + terminal_bounds.size.y)
         {
-            self.focused_panel = .Terminal;
+            self.focus_manager.setFocus(.terminal);
 
             // Ensure terminal is initialized and focused
             if (self.getTerminal()) |terminal| {
@@ -172,10 +165,10 @@ pub const IDEPage = struct {
     /// Handle keyboard input for focused panel
     pub fn handleKeyboardInput(self: *IDEPage, key_event: KeyboardEvent) bool {
         const log = std.log.scoped(.ide_input);
-        log.info("IDE handleKeyboardInput - focused_panel: {}, scancode: {d}", .{ self.focused_panel, key_event.scancode });
+        log.info("IDE handleKeyboardInput - focused_panel: {}, scancode: {d}", .{ self.focus_manager.getFocus(), key_event.scancode });
 
-        if (self.focused_panel != .Terminal) {
-            log.info("Not terminal focused, panel: {}", .{self.focused_panel});
+        if (!self.focus_manager.hasFocus(.terminal)) {
+            log.info("Not terminal focused, panel: {}", .{self.focus_manager.getFocus()});
             return false;
         }
 
@@ -193,12 +186,12 @@ pub const IDEPage = struct {
 
     /// Get focused panel
     pub fn getFocusedPanel(self: *const IDEPage) FocusedPanel {
-        return self.focused_panel;
+        return self.focus_manager.getFocus();
     }
 
     /// Set focused panel
     pub fn setFocusedPanel(self: *IDEPage, panel: FocusedPanel) void {
-        self.focused_panel = panel;
+        self.focus_manager.setFocus(panel);
     }
 
     /// Load file content safely with size and error handling
@@ -260,6 +253,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
         .directory_scanner = DirectoryScanner.init(allocator),
         .file_tree_component = FileTreeComponent.init(allocator),
         .syntax_highlighter = ZigHighlighter.init(allocator),
+        .focus_manager = try focus_manager.FocusManager(FocusedPanel).init(allocator, .terminal),
     };
     return &ide_page.base;
 }
@@ -270,6 +264,17 @@ fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
 
     // Load directory structure
     try loadDirectory(ide);
+
+    // Initialize terminal component immediately
+    const bounds = math.Rectangle{
+        .position = Vec2{ .x = 0, .y = 0 },
+        .size = Vec2{ .x = 400, .y = 300 },
+    };
+
+    ide.terminal_component = TerminalComponent.init(ide.allocator, bounds) catch |err| {
+        ide.error_message = "Failed to initialize terminal";
+        return err;
+    };
 
     ide.initialized = true;
 }
@@ -287,6 +292,9 @@ fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
     if (ide.terminal_component) |*terminal| {
         terminal.deinit();
     }
+
+    // Clean up focus manager
+    ide.focus_manager.deinit();
 
     // Clean up file tree
     ide.file_tree_component.deinit();
