@@ -346,11 +346,9 @@ fn inputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
         .input => |input_data| {
             switch (input_data.key) {
                 .char => |ch| {
-                    // Single character input
                     try self.insertChar(ch);
                 },
                 .special => |special_key| {
-                    // Handle special keys with enum matching
                     switch (special_key) {
                         .backspace => try self.handleBackspace(),
                         .delete => try self.handleDelete(),
@@ -367,7 +365,6 @@ fn inputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
                     }
                 },
                 .text => |text| {
-                    // Handle pasted text - insert each character
                     for (text) |ch| {
                         try self.insertChar(ch);
                     }

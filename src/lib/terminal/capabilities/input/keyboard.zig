@@ -69,7 +69,9 @@ pub const KeyboardInput = struct {
 
     /// Handle a keyboard key press and emit appropriate events
     pub fn handleKey(self: *Self, key: kernel.Key) !void {
-        if (!self.active or self.event_bus == null) return;
+        if (!self.active or self.event_bus == null) {
+            return;
+        }
 
         // Convert kernel.Key to our KeyInput enum
         const key_input: kernel.events.KeyInput = switch (key) {
@@ -100,6 +102,7 @@ pub const KeyboardInput = struct {
                 .key = key_input,
             },
         });
+        
         try self.event_bus.?.emit(event);
     }
 };

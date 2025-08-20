@@ -241,11 +241,14 @@ test "Kernel utility functions" {
     const allocator = testing.allocator;
 
     // Test registry creation
-    var registry = kernel.createRegistry(allocator);
-    defer registry.deinit();
-    try testing.expectEqual(@as(usize, 0), registry.getCapabilityCount());
+    const registry = try kernel.createRegistry(allocator);
+    defer {
+        registry.*.deinit();
+        allocator.destroy(registry);
+    }
+    try testing.expectEqual(@as(usize, 0), registry.*.getCapabilityCount());
 
     // Test event bus creation
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
     try testing.expectEqual(@as(usize, 0), event_bus.getSubscriptionCount());
 }

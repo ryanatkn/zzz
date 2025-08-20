@@ -66,14 +66,12 @@ pub const VERSION = std.SemanticVersion{
 };
 
 /// Initialize a new capability registry
-pub fn createRegistry(allocator: std.mem.Allocator) TypeSafeCapabilityRegistry {
-    return TypeSafeCapabilityRegistry.init(allocator);
+pub fn createRegistry(allocator: std.mem.Allocator) !*TypeSafeCapabilityRegistry {
+    const registry = try allocator.create(TypeSafeCapabilityRegistry);
+    registry.* = TypeSafeCapabilityRegistry.init(allocator);
+    return registry;
 }
 
-/// Create event bus for capability communication
-pub fn createEventBus(allocator: std.mem.Allocator) events.EventBus {
-    return events.EventBus.init(allocator);
-}
 
 /// Utility function to create a terminal interface from implementation
 pub fn createTerminal(implementation: anytype) ITerminal {

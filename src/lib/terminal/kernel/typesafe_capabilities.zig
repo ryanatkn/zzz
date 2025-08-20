@@ -200,12 +200,14 @@ pub const TypeSafeCapabilityRegistry = struct {
     };
 
     pub fn init(allocator: std.mem.Allocator) TypeSafeCapabilityRegistry {
-        return TypeSafeCapabilityRegistry{
+        const registry = TypeSafeCapabilityRegistry{
             .entries = undefined,
             .entry_count = 0,
             .allocator = allocator,
             .event_bus = events.EventBus.init(allocator),
         };
+        
+        return registry;
     }
 
     pub fn deinit(self: *TypeSafeCapabilityRegistry) void {

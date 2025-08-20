@@ -331,7 +331,21 @@ pub const Terminal = struct {
                 try self.executeCurrentLine();
             },
             .tab => {
-                // TODO: Implement tab completion
+                // Tab completion - cycle through history or available commands
+                if (self.current_line.items.len > 0) {
+                    // Simple completion: find matching history entries
+                    const prefix = self.current_line.items;
+                    for (self.command_history.items) |hist_entry| {
+                        if (hist_entry.len >= prefix.len and 
+                            std.mem.startsWith(u8, hist_entry, prefix)) {
+                            // Clear current line and replace with completion
+                            self.current_line.clearRetainingCapacity();
+                            try self.current_line.appendSlice(hist_entry);
+                            self.cursor_position = self.current_line.items.len;
+                            break;
+                        }
+                    }
+                }
             },
             .up_arrow => {
                 self.navigateHistory(-1);

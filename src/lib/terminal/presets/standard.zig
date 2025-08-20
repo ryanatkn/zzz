@@ -10,7 +10,7 @@ const Persistence = @import("../capabilities/state/persistence.zig").Persistence
 /// Standard terminal preset - full-featured terminal with all state management capabilities
 pub const StandardTerminal = struct {
     allocator: std.mem.Allocator,
-    registry: kernel.TypeSafeCapabilityRegistry,
+    registry: *kernel.TypeSafeCapabilityRegistry,
 
     // Core capabilities from minimal terminal
     minimal: MinimalTerminal,
@@ -74,14 +74,10 @@ pub const StandardTerminal = struct {
 
     /// Cleanup standard terminal
     pub fn deinit(self: *Self) void {
-        // Registry deinit will call capability deinit methods
-        self.registry.deinit();
-
-        // Just free the memory, don't call deinit again (registry already did)
-        self.allocator.destroy(self.minimal.keyboard);
-        self.allocator.destroy(self.minimal.writer);
-        self.allocator.destroy(self.minimal.line_buffer);
-        self.allocator.destroy(self.minimal.cursor);
+        // Delegate cleanup to the minimal terminal, which will handle the registry
+        self.minimal.deinit();
+        
+        // Just free our additional capabilities
         self.allocator.destroy(self.history);
         self.allocator.destroy(self.screen_buffer);
         self.allocator.destroy(self.scrollback);
@@ -92,8 +88,6 @@ pub const StandardTerminal = struct {
 
     /// Handle keyboard input
     pub fn handleKey(self: *Self, key: kernel.Key) !void {
-        const ui_log = loggers.getUILog();
-        ui_log.info("standard_terminal", "StandardTerminal handleKey: {}", .{key});
         try self.minimal.handleKey(key);
     }
 

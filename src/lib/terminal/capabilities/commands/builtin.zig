@@ -1,7 +1,6 @@
 const std = @import("std");
 const kernel = @import("../../kernel/mod.zig");
 const registry = @import("registry.zig");
-const loggers = @import("../../../debug/loggers.zig");
 
 const Registry = registry.Registry;
 const Command = registry.Command;
@@ -246,28 +245,19 @@ fn cmdCat(context: *CommandContext, args: []const []const u8) !void {
 }
 
 fn cmdEcho(context: *CommandContext, args: []const []const u8) !void {
-    const ui_log = loggers.getUILog();
-    ui_log.debug("terminal_echo", "cmdEcho called with {d} args", .{args.len});
-    for (args, 0..) |arg, i| {
-        ui_log.debug("terminal_echo", "arg[{d}] = '{s}'", .{ i, arg });
-    }
-
+    // Debug logging removed to avoid logger initialization requirement in tests
+    
     if (args.len == 0) {
-        ui_log.debug("terminal_echo", "No args, calling writeOutput('\\n')", .{});
         try context.writeOutput("\n");
         return;
     }
 
-    ui_log.debug("terminal_echo", "Processing {d} args", .{args.len});
     for (args, 0..) |arg, i| {
         if (i > 0) {
-            ui_log.debug("terminal_echo", "Writing space", .{});
             try context.writeOutput(" ");
         }
-        ui_log.debug("terminal_echo", "Writing arg '{s}'", .{arg});
         try context.writeOutput(arg);
     }
-    ui_log.debug("terminal_echo", "Writing final newline", .{});
     try context.writeOutput("\n");
 }
 

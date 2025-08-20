@@ -9,7 +9,7 @@ const core = @import("../core.zig");
 /// Minimal terminal preset - basic input/output with line editing
 pub const MinimalTerminal = struct {
     allocator: std.mem.Allocator,
-    registry: kernel.TypeSafeCapabilityRegistry,
+    registry: *kernel.TypeSafeCapabilityRegistry,
 
     // Capabilities stored as pointers to heap-allocated instances
     keyboard: *KeyboardInput,
@@ -24,7 +24,7 @@ pub const MinimalTerminal = struct {
 
     /// Initialize minimal terminal with all capabilities
     pub fn init(allocator: std.mem.Allocator) !Self {
-        var registry = kernel.createRegistry(allocator);
+        var registry = try kernel.createRegistry(allocator);
 
         // Create capabilities using factory methods
         const keyboard = try KeyboardInput.create(allocator);
@@ -67,6 +67,9 @@ pub const MinimalTerminal = struct {
         self.allocator.destroy(self.writer);
         self.allocator.destroy(self.line_buffer);
         self.allocator.destroy(self.cursor);
+        
+        // Free the registry itself
+        self.allocator.destroy(self.registry);
     }
 
     /// Handle keyboard input - main entry point for terminal interaction

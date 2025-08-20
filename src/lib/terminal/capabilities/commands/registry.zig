@@ -1,6 +1,5 @@
 const std = @import("std");
 const kernel = @import("../../kernel/mod.zig");
-const loggers = @import("../../../debug/loggers.zig");
 
 /// Command function signature for registered commands
 pub const CommandFn = *const fn (context: *CommandContext, args: []const []const u8) anyerror!void;
@@ -14,10 +13,7 @@ pub const CommandContext = struct {
 
     /// Write output to terminal
     pub fn writeOutput(self: *CommandContext, text: []const u8) !void {
-        const ui_log = loggers.getUILog();
-        ui_log.debug("terminal_context", "CommandContext.writeOutput called with: '{s}'", .{text});
         try self.write_fn(self.write_context, text);
-        ui_log.debug("terminal_context", "CommandContext.writeOutput completed", .{});
     }
 };
 

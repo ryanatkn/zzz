@@ -140,19 +140,13 @@ pub const AnsiWriter = struct {
 
     /// Write text with current ANSI styling
     pub fn write(self: *Self, text: []const u8) !void {
-        _ = text; // TODO: Implement proper write
         if (!self.isActive()) {
             return error.NotInitialized;
         }
 
-        // Simply delegate to basic writer for now
-        // In a full implementation, this would apply ANSI styling
+        // Delegate to basic writer - ANSI styling would be applied here in full implementation
         const basic_writer = self.basic_writer_capability.?;
-
-        // Call the basic writer's write method through its vtable
-        // Note: This is a simplified approach - in a real implementation we'd need
-        // to properly define the basic writer interface
-        _ = basic_writer;
+        try basic_writer.write(text);
 
         // For now, just emit a write event
         if (self.event_bus) |bus| {

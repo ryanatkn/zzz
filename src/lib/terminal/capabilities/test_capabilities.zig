@@ -43,7 +43,7 @@ fn testEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
 test "KeyboardInput - emit character events" {
     const allocator = testing.allocator;
     var keyboard = KeyboardInput{};
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
 
     // Reset test globals
     test_event_received = false;
@@ -67,7 +67,7 @@ test "KeyboardInput - emit character events" {
 test "KeyboardInput - emit enter input event" {
     const allocator = testing.allocator;
     var keyboard = KeyboardInput{};
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
 
     // Reset test globals
     test_event_received = false;
@@ -91,7 +91,7 @@ test "KeyboardInput - emit enter input event" {
 test "BasicWriter - write text to scrollback" {
     const allocator = testing.allocator;
     var writer = BasicWriter.init(allocator);
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
 
     // Initialize writer capability
     try writer.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
@@ -108,7 +108,7 @@ test "BasicWriter - write text to scrollback" {
 test "BasicWriter - clear scrollback" {
     const allocator = testing.allocator;
     var writer = BasicWriter.init(allocator);
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
 
     // Initialize writer capability
     try writer.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
@@ -130,7 +130,7 @@ test "BasicWriter - clear scrollback" {
 test "LineBuffer - character insertion and deletion" {
     const allocator = testing.allocator;
     var line_buffer = LineBuffer.init(allocator);
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
 
     // Initialize line buffer capability
     try line_buffer.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
@@ -166,7 +166,7 @@ test "LineBuffer - character insertion and deletion" {
 test "LineBuffer - command execution" {
     const allocator = testing.allocator;
     var line_buffer = LineBuffer.init(allocator);
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
 
     // Reset test globals
     test_event_received = false;
@@ -216,7 +216,7 @@ test "LineBuffer - command execution" {
 test "Cursor - position and visibility" {
     const allocator = testing.allocator;
     var cursor = Cursor.init();
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
 
     // Initialize cursor capability
     try cursor.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
@@ -246,7 +246,7 @@ test "Cursor - position and visibility" {
 test "Cursor - dimension bounds checking" {
     const allocator = testing.allocator;
     var cursor = Cursor.init();
-    var event_bus = kernel.createEventBus(allocator);
+    var event_bus = kernel.events.EventBus.init(allocator);
 
     // Initialize cursor capability
     try cursor.initialize(&[_]kernel.TypeSafeCapability{}, &event_bus);
@@ -320,8 +320,11 @@ test "MinimalTerminal - basic I/O operations" {
 
 test "Capability Integration - event flow" {
     const allocator = testing.allocator;
-    var registry = kernel.createRegistry(allocator);
-    defer registry.deinit();
+    const registry = try kernel.createRegistry(allocator);
+    defer {
+        registry.*.deinit();
+        allocator.destroy(registry);
+    }
 
     // Create all capabilities
     var keyboard = KeyboardInput{};
@@ -335,16 +338,16 @@ test "Capability Integration - event flow" {
     const line_buffer_cap = kernel.createCapability(&line_buffer);
     const cursor_cap = kernel.createCapability(&cursor);
 
-    try registry.register("keyboard_input", keyboard_cap);
-    try registry.register("basic_writer", writer_cap);
-    try registry.register("line_buffer", line_buffer_cap);
-    try registry.register("cursor", cursor_cap);
+    try registry.*.register("keyboard_input", keyboard_cap);
+    try registry.*.register("basic_writer", writer_cap);
+    try registry.*.register("line_buffer", line_buffer_cap);
+    try registry.*.register("cursor", cursor_cap);
 
     // Initialize all capabilities
-    try registry.initializeAll();
+    try registry.*.initializeAll();
 
     // Verify all capabilities are initialized
-    try testing.expectEqual(@as(usize, 4), registry.getInitializedCount());
+    try testing.expectEqual(@as(usize, 4), registry.*.getInitializedCount());
     try testing.expect(keyboard.isActive());
     try testing.expect(writer.isActive());
     try testing.expect(line_buffer.isActive());

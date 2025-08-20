@@ -18,7 +18,7 @@ const AnsiWriter = @import("../capabilities/output/ansi_writer.zig").AnsiWriter;
 /// Command terminal preset - extends StandardTerminal with full command execution capabilities
 pub const CommandTerminal = struct {
     allocator: std.mem.Allocator,
-    registry: kernel.TypeSafeCapabilityRegistry,
+    registry: *kernel.TypeSafeCapabilityRegistry,
 
     // Base terminal
     standard: StandardTerminal,
@@ -99,26 +99,16 @@ pub const CommandTerminal = struct {
 
     /// Cleanup command terminal
     pub fn deinit(self: *Self) void {
-        // Registry deinit will call capability deinit methods for proper cleanup
-        self.registry.deinit();
+        // Delegate cleanup to standard terminal, which will handle registry and base capabilities
+        self.standard.deinit();
 
-        // Just free the memory, don't call deinit again (registry already did)
+        // Just free our command capabilities
         self.allocator.destroy(self.parser);
         self.allocator.destroy(self.command_registry);
         self.allocator.destroy(self.executor);
         self.allocator.destroy(self.builtin);
         self.allocator.destroy(self.pipeline);
         self.allocator.destroy(self.ansi_writer);
-
-        // Standard terminal capabilities
-        self.allocator.destroy(self.standard.minimal.keyboard);
-        self.allocator.destroy(self.standard.minimal.writer);
-        self.allocator.destroy(self.standard.minimal.line_buffer);
-        self.allocator.destroy(self.standard.minimal.cursor);
-        self.allocator.destroy(self.standard.history);
-        self.allocator.destroy(self.standard.screen_buffer);
-        self.allocator.destroy(self.standard.scrollback);
-        self.allocator.destroy(self.standard.persistence);
     }
 
     // ===== Core Terminal Functions (delegated to standard) =====
