@@ -32,8 +32,7 @@ pub const CheckpointProvider = struct {
 };
 
 /// Find the nearest active checkpoint to a given position
-pub fn findNearestCheckpoint(provider: CheckpointProvider, position: Vec2, max_checkpoints: usize) ?CheckpointSearchResult {
-    const allocator = std.heap.page_allocator; // Use a temporary allocator
+pub fn findNearestCheckpoint(allocator: std.mem.Allocator, provider: CheckpointProvider, position: Vec2, max_checkpoints: usize) ?CheckpointSearchResult {
     const checkpoints = allocator.alloc(CheckpointData, max_checkpoints) catch return null;
     defer allocator.free(checkpoints);
 
@@ -65,8 +64,7 @@ pub fn findNearestCheckpoint(provider: CheckpointProvider, position: Vec2, max_c
 }
 
 /// Zone-specific checkpoint search
-pub fn findNearestCheckpointInZone(provider: CheckpointProvider, position: Vec2, zone_index: u32, max_checkpoints: usize) ?CheckpointSearchResult {
-    const allocator = std.heap.page_allocator;
+pub fn findNearestCheckpointInZone(allocator: std.mem.Allocator, provider: CheckpointProvider, position: Vec2, zone_index: u32, max_checkpoints: usize) ?CheckpointSearchResult {
     const checkpoints = allocator.alloc(CheckpointData, max_checkpoints) catch return null;
     defer allocator.free(checkpoints);
 

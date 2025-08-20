@@ -101,7 +101,11 @@ pub const Executor = struct {
     pub fn deinit(self: *Self) void {
         // Clean up resources when called by registry
         if (self.current_process) |*process| {
-            _ = process.kill() catch {};
+            const term = process.kill() catch |err| {
+                std.log.err("Failed to kill process during executor deinit: {}", .{err});
+                return;
+            };
+            std.log.debug("Process killed with term: {}", .{term});
         }
 
         // Clean up working directory (uses regular allocator now)

@@ -36,10 +36,8 @@ pub const Statuses = struct {
 
     pub fn init() Statuses {
         return .{
-            .modifiers = BoundedArray(Modifier, 16).init(0) catch |err| {
-                std.log.err("Failed to initialize Statuses modifiers array: {}", .{err});
-                @panic("Statuses component initialization failed");
-            },
+            // BoundedArray.init(0) should never fail for valid capacity
+            .modifiers = BoundedArray(Modifier, 16).init(0) catch unreachable,
         };
     }
 

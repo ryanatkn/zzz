@@ -194,7 +194,11 @@ fn sdlAppEvent(appstate: ?*anyopaque, event: *c.sdl.SDL_Event) !c.sdl.SDL_AppRes
 
 fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void {
     _ = appstate;
-    _ = result catch {};
+    const app_result = result catch |err| {
+        loggers.getGameLog().err("sdl_quit", "SDL app quit with error: {}", .{err});
+        return;
+    };
+    loggers.getGameLog().info("sdl_quit", "SDL app quit with result: {}", .{app_result});
 
     if (fully_initialized) {
         {
