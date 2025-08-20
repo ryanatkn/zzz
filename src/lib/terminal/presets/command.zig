@@ -4,6 +4,8 @@ const loggers = @import("../../debug/loggers.zig");
 const StandardTerminal = @import("standard.zig").StandardTerminal;
 const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
 const core = @import("../core.zig");
+const viewport = @import("../viewport.zig");
+const ScrollbackCapability = @import("../capabilities/state/scrollback.zig").Scrollback;
 const VisibleLinesIterator = core.VisibleLinesIterator;
 const Cursor = core.Cursor;
 
@@ -273,32 +275,58 @@ pub const CommandTerminal = struct {
         try self.standard.resize(columns, rows);
     }
 
-    /// Get visible content for rendering (compatibility method)
+    /// Get visible content for rendering (unified method)  
     pub fn getVisibleContent(self: *const Self) struct { lines: VisibleLinesIterator, current: []const u8, cursor: Cursor } {
         const ui_log = loggers.getUILog();
 
         // Cast away const to access mutable getCapability method
         const mutable_self: *Self = @constCast(self);
 
-        // For now, try to access through the basic writer capability
+        // Try to get both BasicWriter and Scrollback capability
+        var basic_writer_scrollback: ?*const core.RingBuffer(core.Line, 1000) = null;
+        var scrollback_capability: ?*ScrollbackCapability = null;
+
         if (mutable_self.getCapability(BasicWriter, "basic_writer")) |writer| {
-            const scrollback = writer.getScrollback();
-
-            const current_line = self.getCurrentLine();
-
-            return .{
-                .lines = core.VisibleLinesIterator.init(scrollback, 25), // Show 25 lines
-                .current = current_line,
-                .cursor = core.Cursor{}, // Default cursor for now
-            };
-        } else {
-            ui_log.warn("terminal_content", "BasicWriter capability not found", .{});
+            basic_writer_scrollback = writer.getScrollback();
         }
 
-        // Fallback: return empty content
+        if (mutable_self.getCapability(ScrollbackCapability, "scrollback")) |scrollback_cap| {
+            scrollback_capability = scrollback_cap;
+        }
+
+        // If we have at least one scrollback source, try to merge them
+        if (basic_writer_scrollback != null or scrollback_capability != null) {
+            const current_line = self.getCurrentLine();
+            
+            // Use chronological iterator for oldest-first ordering (natural terminal behavior)
+            if (basic_writer_scrollback) |scrollback| {
+                return .{
+                    .lines = VisibleLinesIterator.init(scrollback, 25), // Show 25 lines, oldest first
+                    .current = current_line,
+                    .cursor = core.Cursor{}, // Default cursor for now
+                };
+            } else if (scrollback_capability) |scrollback_cap| {
+                // Use the scrollback capability's own visible lines iterator
+                ui_log.info("terminal_content", "Using Scrollback capability with {} lines", .{scrollback_cap.getLineCount()});
+                _ = scrollback_cap.getVisibleLines(25); // Unused for now
+                
+                // For now, we need to create a compatible iterator
+                // This is a bridging solution until we can fully merge the systems
+                var temp_scrollback = core.RingBuffer(core.Line, 1000).init();
+                return .{
+                    .lines = VisibleLinesIterator.init(&temp_scrollback, 0), // Empty for now with chronological iterator
+                    .current = current_line,
+                    .cursor = core.Cursor{},
+                };
+            }
+        }
+
+        ui_log.warn("terminal_content", "No scrollback sources found", .{});
+
+        // Fallback: return empty content with chronological iterator
         var empty_scrollback = core.RingBuffer(core.Line, 1000).init();
         return .{
-            .lines = core.VisibleLinesIterator.init(&empty_scrollback, 0),
+            .lines = VisibleLinesIterator.init(&empty_scrollback, 0),
             .current = "",
             .cursor = core.Cursor{},
         };

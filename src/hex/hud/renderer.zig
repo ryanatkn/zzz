@@ -462,7 +462,7 @@ pub const BrowserRenderer = struct {
         // Start from bottom of panel with proper margins
         const bottom_y = panel_rect.position.y + panel_rect.size.y - bottom_margin;
         const input_height = line_height + (input_padding * 2);
-        var current_y = bottom_y - input_height;
+        const current_y = bottom_y - input_height;
 
         // Render input background with styling
         const input_y = current_y;
@@ -534,39 +534,34 @@ pub const BrowserRenderer = struct {
             }
         }
 
-        // Now render scrollback lines going upward from input line with better spacing
-        var lines_rendered: usize = 0;
+        // Calculate available space for scrollback lines
+        const available_height = current_y - (panel_rect.position.y + 30); // Above header
+        const max_scrollback_lines = @min(max_lines, @as(usize, @intFromFloat(@max(0, available_height / line_spacing))));
+        
+        // Single-pass direct rendering with chronological iterator (oldest first, top to bottom)
         var lines_iter = content.lines;
-
+        var render_index: usize = 0;
+        var render_y = panel_rect.position.y + 30; // Start below header
+        
         while (lines_iter.next()) |line| {
-            if (lines_rendered >= max_lines) break;
-
-            // Move up with proper line spacing
-            current_y -= line_spacing;
-
-            // Stop if we've reached the top of the panel (below header)
-            if (current_y < panel_rect.position.y + 30) break; // Header space
-
+            if (render_index >= max_scrollback_lines) break;
+            if (render_y >= current_y) break; // Don't overlap with current line
+            
             const text = line.getText();
-
-            // Safety checks for text content
-            if (text.len == 0) {
-                lines_rendered += 1;
-                continue;
-            }
-
+            if (text.len == 0) continue;
+            
             // Safely truncate text if too long
             const line_display_text = if (text.len > max_chars_per_line and max_chars_per_line > 0)
                 text[0..max_chars_per_line]
             else
                 text;
-
-            // Additional safety: ensure text contains only printable characters
+                
+            // Only render safe, printable text
             if (self.isTextSafe(line_display_text)) {
-                self.drawSimpleText(cmd_buffer, render_pass, line_display_text, Vec2{ .x = panel_rect.position.x + side_margin, .y = current_y });
+                self.drawSimpleText(cmd_buffer, render_pass, line_display_text, Vec2{ .x = panel_rect.position.x + side_margin, .y = render_y });
+                render_y += line_spacing;
+                render_index += 1;
             }
-
-            lines_rendered += 1;
         }
 
         // Show input instructions at the top if there's space

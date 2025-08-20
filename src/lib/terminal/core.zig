@@ -195,6 +195,7 @@ pub const VisibleLinesIterator = struct {
     pub fn init(scrollback: *const RingBuffer(Line, 1000), max_rows: usize) VisibleLinesIterator {
         const total_lines = scrollback.count();
         const visible_count = @min(max_rows, total_lines);
+        // Show the most recent lines: if we have 10 lines and want 3, start at index 7
         const start_index = if (total_lines > max_rows) total_lines - max_rows else 0;
 
         return VisibleLinesIterator{
@@ -207,6 +208,7 @@ pub const VisibleLinesIterator = struct {
     pub fn next(self: *VisibleLinesIterator) ?Line {
         if (self.current >= self.count) return null;
 
+        // Return lines in chronological order (oldest first)
         const line_index = self.start_index + self.current;
         const line = self.scrollback.get(line_index) orelse return null;
         self.current += 1;
@@ -218,6 +220,7 @@ pub const VisibleLinesIterator = struct {
         self.current = 0;
     }
 };
+
 
 /// Terminal state and configuration
 pub const Terminal = struct {

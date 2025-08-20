@@ -158,7 +158,7 @@ pub const TerminalComponent = struct {
         // Start from bottom of the terminal, leaving space for proper margins
         const bottom_y = bounds_rect.position.y + bounds_rect.size.y - bottom_margin;
         const input_height = line_height + (input_padding * 2); // Input with padding
-        var current_y = bottom_y - input_height;
+        const current_y = bottom_y - input_height;
 
         // First render the input background with styling
         const input_y = current_y;
@@ -232,19 +232,25 @@ pub const TerminalComponent = struct {
             }
         }
 
-        // Now render scrollback lines going upward from the input line with better spacing
-        // TODO: Improve scrollback rendering design to be more efficient and explicit (viewport-aware)
-        // Simple approach: render lines as they come from iterator (newest at bottom)
-
+        // Calculate how many lines we can display above the input
+        const available_height = current_y - (bounds_rect.position.y + top_margin);
+        const max_display_lines = @as(usize, @intFromFloat(@max(0, available_height / line_spacing)));
+        
+        // Single-pass direct rendering with chronological iterator (oldest first, top to bottom)
         var lines_iter = content.lines;
+        var render_index: usize = 0;
+        var render_y = bounds_rect.position.y + top_margin; // Start at top of terminal area
+        
         while (lines_iter.next()) |line| {
-            // Move up with proper line spacing
-            current_y -= line_spacing;
-
-            // Stop if we've reached the top of the terminal bounds
-            if (current_y < bounds_rect.position.y + top_margin) break;
-
-            try self.renderLine(renderer, line.getText(), bounds_rect.position.x + side_margin, current_y, text_color);
+            if (render_index >= max_display_lines) break;
+            if (render_y >= current_y) break; // Don't overlap with current line
+            
+            const line_text = line.getText();
+            if (line_text.len == 0) continue;
+            
+            try self.renderLine(renderer, line_text, bounds_rect.position.x + side_margin, render_y, text_color);
+            render_y += line_spacing;
+            render_index += 1;
         }
     }
 
