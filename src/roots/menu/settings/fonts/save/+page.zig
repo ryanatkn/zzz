@@ -2,6 +2,7 @@ const std = @import("std");
 const page = @import("../../../../../lib/browser/page.zig");
 const font_config = @import("../../../../../lib/font/config.zig");
 const save_mod = @import("../save.zig");
+const constants = @import("../../../../../lib/browser/constants.zig");
 
 const SavePage = struct {
     base: page.Page,
@@ -37,7 +38,6 @@ const SavePage = struct {
 
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {
         _ = arena;
-        const constants = @import("../../../../../lib/browser/constants.zig");
         const screen_width = constants.SCREEN.BASE_WIDTH;
         const screen_height = constants.SCREEN.BASE_HEIGHT;
         const save_page: *const SavePage = @fieldParentPtr("base", self);

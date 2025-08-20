@@ -1,5 +1,6 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
+const bitmap_utils = @import("bitmap.zig");
 
 /// GPU texture creation and management utilities
 /// Centralizes texture creation patterns used throughout the font and text systems
@@ -21,7 +22,6 @@ pub fn createFromBitmap(device: *c.sdl.SDL_GPUDevice, allocator: std.mem.Allocat
     }
 
     // Convert grayscale bitmap to RGBA for GPU texture
-    const bitmap_utils = @import("bitmap.zig");
     const rgba_data = try bitmap_utils.Convert.grayscaleToRGBA(allocator, bitmap, width, height);
     defer allocator.free(rgba_data);
 

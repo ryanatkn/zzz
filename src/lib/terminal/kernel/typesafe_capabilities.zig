@@ -20,19 +20,18 @@ const Executor = @import("../capabilities/commands/executor.zig").Executor;
 const Builtin = @import("../capabilities/commands/builtin.zig").Builtin;
 const Pipeline = @import("../capabilities/commands/pipeline.zig").Pipeline;
 
-
 /// Type-safe capability storage using tagged union
 pub const CapabilityData = union(enum) {
     // Input capabilities
     keyboard_input: *KeyboardInput,
     readline_input: *ReadlineInput,
     mouse_input: *MouseInput,
-    
+
     // Output capabilities
     basic_writer: *BasicWriter,
     ansi_writer: *AnsiWriter,
     buffered_output: *BufferedOutput,
-    
+
     // State capabilities
     cursor: *Cursor,
     line_buffer: *LineBuffer,
@@ -40,15 +39,14 @@ pub const CapabilityData = union(enum) {
     screen_buffer: *ScreenBuffer,
     scrollback: *Scrollback,
     persistence: *Persistence,
-    
+
     // Command capabilities
     parser: *Parser,
     registry: *Registry,
     executor: *Executor,
     builtin: *Builtin,
     pipeline: *Pipeline,
-    
-    
+
     /// Type-safe casting with compile-time validation
     pub fn cast(self: CapabilityData, comptime T: type) ?*T {
         return switch (self) {
@@ -61,49 +59,49 @@ pub const CapabilityData = union(enum) {
             },
         };
     }
-    
+
     /// Get the concrete pointer type for vtable operations
     pub fn getPtr(self: CapabilityData) *anyopaque {
         return switch (self) {
             inline else => |capability| @as(*anyopaque, @ptrCast(capability)),
         };
     }
-    
+
     /// Get capability name via dispatch to concrete type
     pub fn getName(self: CapabilityData) []const u8 {
         return switch (self) {
             inline else => |capability| capability.getName(),
         };
     }
-    
+
     /// Get capability type via dispatch to concrete type
     pub fn getType(self: CapabilityData) []const u8 {
         return switch (self) {
             inline else => |capability| capability.getType(),
         };
     }
-    
+
     /// Get dependencies via dispatch to concrete type
     pub fn getDependencies(self: CapabilityData) []const []const u8 {
         return switch (self) {
             inline else => |capability| capability.getDependencies(),
         };
     }
-    
+
     /// Initialize via dispatch to concrete type
     pub fn initialize(self: CapabilityData, dependencies: []const TypeSafeCapability, event_bus: *events.EventBus) !void {
         return switch (self) {
             inline else => |capability| capability.initialize(dependencies, event_bus),
         };
     }
-    
+
     /// Deinitialize via dispatch to concrete type
     pub fn deinit(self: CapabilityData) void {
         switch (self) {
             inline else => |capability| capability.deinit(),
         }
     }
-    
+
     /// Check if active via dispatch to concrete type
     pub fn isActive(self: CapabilityData) bool {
         return switch (self) {
@@ -116,38 +114,38 @@ pub const CapabilityData = union(enum) {
 pub const TypeSafeCapability = struct {
     data: CapabilityData,
     name: []const u8,
-    
+
     /// Type-safe casting with compile-time validation
     pub fn cast(self: TypeSafeCapability, comptime T: type) ?*T {
         return self.data.cast(T);
     }
-    
+
     /// Require a specific capability type (panics if wrong type)
     pub fn require(self: TypeSafeCapability, comptime T: type) *T {
         return self.cast(T) orelse std.debug.panic("Expected capability of type {s}, got {s}", .{ @typeName(T), self.data.getName() });
     }
-    
+
     // Delegate interface methods to the data union
     pub fn getName(self: TypeSafeCapability) []const u8 {
         return self.data.getName();
     }
-    
+
     pub fn getType(self: TypeSafeCapability) []const u8 {
         return self.data.getType();
     }
-    
+
     pub fn getDependencies(self: TypeSafeCapability) []const []const u8 {
         return self.data.getDependencies();
     }
-    
+
     pub fn initialize(self: TypeSafeCapability, dependencies: []const TypeSafeCapability, event_bus: *events.EventBus) !void {
         return self.data.initialize(dependencies, event_bus);
     }
-    
+
     pub fn deinit(self: TypeSafeCapability) void {
         self.data.deinit();
     }
-    
+
     pub fn isActive(self: TypeSafeCapability) bool {
         return self.data.isActive();
     }
@@ -157,7 +155,7 @@ pub const TypeSafeCapability = struct {
 pub fn createCapability(implementation: anytype) TypeSafeCapability {
     const T = @TypeOf(implementation.*);
     const name = implementation.getName();
-    
+
     const data = switch (T) {
         KeyboardInput => CapabilityData{ .keyboard_input = implementation },
         ReadlineInput => CapabilityData{ .readline_input = implementation },
@@ -178,7 +176,7 @@ pub fn createCapability(implementation: anytype) TypeSafeCapability {
         Pipeline => CapabilityData{ .pipeline = implementation },
         else => @compileError("Unsupported capability type: " ++ @typeName(T)),
     };
-    
+
     return TypeSafeCapability{
         .data = data,
         .name = name,
@@ -193,7 +191,7 @@ pub const TypeSafeCapabilityRegistry = struct {
     event_bus: events.EventBus,
 
     const MAX_CAPABILITIES = 32;
-    
+
     const CapabilityEntry = struct {
         name: []const u8,
         capability: TypeSafeCapability,
@@ -242,7 +240,7 @@ pub const TypeSafeCapabilityRegistry = struct {
         };
         self.entry_count += 1;
     }
-    
+
     /// Get capability by name
     pub fn getCapability(self: *const TypeSafeCapabilityRegistry, name: []const u8) ?TypeSafeCapability {
         for (self.entries[0..self.entry_count]) |entry| {
@@ -252,14 +250,14 @@ pub const TypeSafeCapabilityRegistry = struct {
         }
         return null;
     }
-    
+
     /// Get capability with compile-time type checking
     pub fn getCapabilityTyped(self: *const TypeSafeCapabilityRegistry, comptime T: type) ?*T {
         const capability_name = T.name;
         const capability = self.getCapability(capability_name) orelse return null;
         return capability.cast(T);
     }
-    
+
     /// Require a capability (panics if not found)
     pub fn requireCapability(self: *const TypeSafeCapabilityRegistry, comptime T: type) *T {
         return self.getCapabilityTyped(T) orelse std.debug.panic("Required capability not found: {s}", .{T.name});
@@ -269,7 +267,7 @@ pub const TypeSafeCapabilityRegistry = struct {
     pub fn hasCapability(self: *const TypeSafeCapabilityRegistry, name: []const u8) bool {
         return self.getCapability(name) != null;
     }
-    
+
     /// Initialize all capabilities with dependency resolution
     pub fn initializeAll(self: *TypeSafeCapabilityRegistry) !void {
         // Initialize in dependency order
@@ -278,7 +276,7 @@ pub const TypeSafeCapabilityRegistry = struct {
             initialized_any = false;
             // Re-resolve dependencies each iteration since they depend on what's initialized
             try self.resolveDependencies();
-            
+
             for (self.entries[0..self.entry_count]) |*entry| {
                 if (!entry.initialized and entry.dependencies_resolved) {
                     try self.initializeCapability(entry);
@@ -294,7 +292,7 @@ pub const TypeSafeCapabilityRegistry = struct {
             }
         }
     }
-    
+
     /// Resolve dependencies for all capabilities
     fn resolveDependencies(self: *TypeSafeCapabilityRegistry) !void {
         for (self.entries[0..self.entry_count]) |*entry| {
@@ -365,11 +363,11 @@ pub const TypeSafeCapabilityRegistry = struct {
 test "TypeSafeCapability creation and casting" {
     // Test would require actual capability instances - this is a placeholder
     // showing the expected API usage
-    
+
     // const allocator = std.testing.allocator;
     // const keyboard = try KeyboardInput.create(allocator);
     // defer keyboard.destroy(allocator);
-    // 
+    //
     // const capability = createCapability(keyboard);
     // try std.testing.expect(capability.cast(KeyboardInput) != null);
     // try std.testing.expect(capability.cast(BasicWriter) == null);
@@ -377,11 +375,10 @@ test "TypeSafeCapability creation and casting" {
 
 test "TypeSafeCapabilityRegistry operations" {
     const allocator = std.testing.allocator;
-    
+
     var registry = TypeSafeCapabilityRegistry.init(allocator);
     defer registry.deinit();
-    
+
     try std.testing.expect(registry.getCapabilityCount() == 0);
     try std.testing.expect(!registry.hasCapability("test"));
 }
-

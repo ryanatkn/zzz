@@ -72,9 +72,10 @@ pub const Pipeline = struct {
         }
 
         // Verify all dependencies are available
-        if (self.parser_capability == null or 
-            self.registry_capability == null or 
-            self.executor_capability == null) {
+        if (self.parser_capability == null or
+            self.registry_capability == null or
+            self.executor_capability == null)
+        {
             return error.MissingDependency;
         }
     }
@@ -87,10 +88,10 @@ pub const Pipeline = struct {
     }
 
     pub fn isActive(self: *const Self) bool {
-        return self.event_bus != null and 
-               self.parser_capability != null and 
-               self.registry_capability != null and 
-               self.executor_capability != null;
+        return self.event_bus != null and
+            self.parser_capability != null and
+            self.registry_capability != null and
+            self.executor_capability != null;
     }
 
     /// Set output callback for command results
@@ -117,13 +118,9 @@ pub const Pipeline = struct {
 
         // Parse command line
         var parse_result = parser_impl.parse(trimmed) catch |err| {
-            const error_msg = switch (err) {
-                error.EmptyCommand => "Empty command",
-                error.UnclosedQuote => "Unclosed quote in command",
-                error.TrailingEscape => "Trailing escape character",
-                else => "Failed to parse command",
-            };
-            try self.writeOutput(std.fmt.allocPrint(self.allocator, "Parse error: {s}\n", .{error_msg}) catch "Error formatting parse error\n");
+            const error_msg = std.fmt.allocPrint(self.allocator, "Parse error: {s}\n", .{@errorName(err)}) catch "Parse error\n";
+            defer if (std.mem.startsWith(u8, error_msg, "Parse error:")) self.allocator.free(error_msg);
+            try self.writeOutput(error_msg);
             return;
         };
         defer parse_result.deinit();
@@ -215,13 +212,13 @@ pub const Pipeline = struct {
 
         // Use the parser capability to validate the command line
         const parser_impl = self.parser_capability.?;
-        
+
         // Parse to validate syntax - this will catch quote errors
         var parse_result = parser_impl.parse(command_line) catch |err| {
             return err; // Return the parsing error directly
         };
         defer parse_result.deinit();
-        
+
         // If parsing succeeds, the command line is valid
     }
 

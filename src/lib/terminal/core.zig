@@ -121,6 +121,10 @@ pub const Line = struct {
     }
 
     pub fn getText(self: *const Self) []const u8 {
+        // DEBUG: Log what getText returns
+        if (loggers.game_log) |*log| {
+            log.info("line_gettext", "Line.getText() returning: '{s}' (length: {d})", .{ self.text.items, self.text.items.len });
+        }
         return self.text.items;
     }
 };
@@ -179,6 +183,11 @@ pub const VisibleLinesIterator = struct {
         const line_index = self.start_index + self.current;
         const line = self.scrollback.get(line_index) orelse return null;
         self.current += 1;
+
+        // DEBUG: Log what the iterator returns
+        if (loggers.game_log) |*log| {
+            log.info("lines_iterator", "Iterator returning line {d}/{d}: '{s}'", .{ self.current, self.count, line.getText() });
+        }
 
         return line;
     }
@@ -240,7 +249,7 @@ pub const Terminal = struct {
         // Clean up ArrayLists that use regular allocator
         self.current_line.deinit();
         self.working_directory.deinit();
-        
+
         // Arena allocator cleanup handles Line allocations in scrollback
         self.arena.deinit();
     }
@@ -288,6 +297,11 @@ pub const Terminal = struct {
 
         // Add to scrollback
         self.scrollback.push(line);
+
+        // DEBUG: Log scrollback update
+        if (loggers.game_log) |*log| {
+            log.info("terminal_scrollback", "Added line to scrollback: '{s}' (total lines: {d})", .{ self.current_line.items, self.scrollback.count() });
+        }
 
         // Clear current line
         self.current_line.clearRetainingCapacity();

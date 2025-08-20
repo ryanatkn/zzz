@@ -94,7 +94,7 @@ pub const Parser = struct {
 
         // Transfer ownership to result - duplicate the command string
         const owned_command = try self.allocator.dupe(u8, command);
-        
+
         // Duplicate each argument string
         var owned_args = try self.allocator.alloc([]const u8, command_args.len);
         for (command_args, 0..) |arg, i| {
@@ -183,7 +183,7 @@ pub const Parser = struct {
     /// Validate command line syntax (check for unclosed quotes, etc.)
     pub fn validate(self: *Self, command_line: []const u8) !void {
         _ = self;
-        
+
         var in_quotes = false;
         var quote_char: u8 = 0;
         var escape_next = false;
@@ -287,7 +287,7 @@ test "Parser validation errors" {
 
     try std.testing.expectError(error.UnclosedQuote, parser.validate("echo \"unclosed"));
     try std.testing.expectError(error.TrailingEscape, parser.validate("echo trailing\\"));
-    
+
     // Valid cases should not error
     try parser.validate("echo \"valid\" command");
     try parser.validate("echo 'valid' command");

@@ -6,10 +6,10 @@ pub const KeyboardInput = struct {
     pub const name = "keyboard_input";
     pub const capability_type = "input";
     pub const dependencies = &[_][]const u8{};
-    
+
     active: bool = false,
     initialized: bool = false,
-    
+
     // Event bus for emitting events
     event_bus: ?*kernel.EventBus = null,
 
@@ -21,7 +21,7 @@ pub const KeyboardInput = struct {
         self.* = Self{};
         return self;
     }
-    
+
     /// Destroy keyboard input capability
     pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
         self.deinit();
@@ -49,7 +49,7 @@ pub const KeyboardInput = struct {
     /// Initialize capability with dependencies
     pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // No dependencies for keyboard input
-        
+
         self.event_bus = event_bus;
         self.initialized = true;
         self.active = true;
@@ -92,7 +92,7 @@ pub const KeyboardInput = struct {
             .ctrl_d => .{ .special = .ctrl_d },
             .ctrl_z => .{ .special = .ctrl_z },
         };
-        
+
         // Emit structured input event with enum-based key
         const event = kernel.Event.init(.input, kernel.EventData{
             .input = kernel.events.InputEventData{

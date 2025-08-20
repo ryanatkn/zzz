@@ -3,6 +3,7 @@ const signal_mod = @import("signal.zig");
 const context = @import("context.zig");
 const observer = @import("observer.zig");
 const utils = @import("utils.zig");
+const effect_mod = @import("effect.zig");
 
 /// Reactive Array - fixed-size array with reactive element access and modification
 /// This provides reactive semantics for array operations in an idiomatic Zig way
@@ -377,8 +378,6 @@ test "reactive array dependency tracking" {
     defer arr.deinit();
 
     var effect_runs: u32 = 0;
-
-    const effect_mod = @import("effect.zig");
     const TestData = struct {
         var arr_ref: *ReactiveArray(i32, 2) = undefined;
         var runs: *u32 = undefined;

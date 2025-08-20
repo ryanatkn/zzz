@@ -22,6 +22,10 @@ const combat = @import("combat.zig");
 const faction_presets = @import("faction_presets.zig");
 const faction_integration = @import("faction_integration.zig");
 const controller_mod = @import("controller.zig");
+const unit_ext = @import("unit_ext.zig");
+const disposition = @import("disposition.zig");
+const entity_queries = @import("entity_queries.zig");
+const factions = @import("factions.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -55,9 +59,9 @@ pub const Terrain = components.Terrain;
 pub const Interactable = components.Interactable;
 
 // Use extended Unit with hex-specific fields
-pub const Unit = @import("unit_ext.zig").HexUnit;
+pub const Unit = unit_ext.HexUnit;
 pub const UnitType = components.Unit.UnitType;
-pub const Disposition = @import("disposition.zig").Disposition;
+pub const Disposition = disposition.Disposition;
 
 // Use PlayerInput from lib components
 pub const PlayerInput = components.PlayerInput;
@@ -392,7 +396,7 @@ pub const HexGame = struct {
         return entity;
     }
 
-    pub fn createUnit(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, disposition: Disposition) !EntityId {
+    pub fn createUnit(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, unit_disposition: Disposition) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
         const zone = self.zone_manager.getZone(zone_index);
@@ -403,15 +407,15 @@ pub const HexGame = struct {
         const health = components.Health.init(50);
         const visual = components.Visual.init(constants.COLOR_UNIT_DEFAULT);
         const entity_id = self.entity_allocator.create();
-        const unit = Unit.init(.enemy, pos, disposition, entity_id);
+        const unit = Unit.init(.enemy, pos, unit_disposition, entity_id);
 
         try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;
 
         // Log faction system initialization for debugging
-        const unit_factions = faction_presets.getUnitFactions(disposition, .enemy);
-        const unit_capabilities = faction_presets.getUnitCapabilities(disposition);
-        self.logger.debug("unit_factions", "Unit created with disposition {s}, {} faction tags, attack capability: {}", .{ @tagName(disposition), unit_factions.tags.count(), unit_capabilities.can_attack });
+        const unit_factions = faction_presets.getUnitFactions(unit_disposition, .enemy);
+        const unit_capabilities = faction_presets.getUnitCapabilities(unit_disposition);
+        self.logger.debug("unit_factions", "Unit created with disposition {s}, {} faction tags, attack capability: {}", .{ @tagName(unit_disposition), unit_factions.tags.count(), unit_capabilities.can_attack });
 
         return entity;
     }
@@ -703,14 +707,13 @@ pub const HexGame = struct {
     /// Check if there's a controlled entity that's alive
     pub fn hasLiveControlledEntity(self: *const HexGame) bool {
         if (self.getControlledEntity()) |entity_id| {
-            const entity_queries = @import("entity_queries.zig");
             return entity_queries.isEntityAlive(self, entity_id);
         }
         return false;
     }
 
     /// Get faction perspective of controlled entity
-    pub fn getControlledEntityFactions(self: *const HexGame) ?@import("factions.zig").EntityFactions {
+    pub fn getControlledEntityFactions(self: *const HexGame) ?factions.EntityFactions {
         return self.primary_controller.getWorldView();
     }
 

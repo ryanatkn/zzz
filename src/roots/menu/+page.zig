@@ -1,5 +1,7 @@
 const std = @import("std");
 const page = @import("../../lib/browser/page.zig");
+const constants = @import("../../lib/browser/constants.zig");
+const loader = @import("../../hex/loader.zig");
 
 const IndexPage = struct {
     base: page.Page,
@@ -22,14 +24,12 @@ const IndexPage = struct {
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {
         _ = self;
 
-        const constants = @import("../../lib/browser/constants.zig");
         const screen_width = constants.SCREEN.BASE_WIDTH;
         const screen_height = constants.SCREEN.BASE_HEIGHT;
 
         // Wide character layout - use full screen width
 
         // World selection section at top
-        const loader = @import("../../hex/loader.zig");
 
         // World selection header
         try links.append(page.createLink("WORLD SELECTION", "", 100, 100, 300, 40));

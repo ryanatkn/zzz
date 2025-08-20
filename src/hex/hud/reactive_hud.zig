@@ -5,6 +5,7 @@ const router_mod = @import("router.zig");
 const game_renderer = @import("../game_renderer.zig");
 const browser_renderer = @import("renderer.zig");
 const page = @import("../../lib/browser/page.zig");
+const math = @import("../../lib/math/mod.zig");
 
 // Reactive system imports
 const ReactiveComponent = @import("../../lib/reactive/component.zig").ReactiveComponent;
@@ -14,6 +15,7 @@ const signal = @import("../../lib/reactive/signal.zig");
 const derived = @import("../../lib/reactive/derived.zig");
 const effect = @import("../../lib/reactive/effect.zig");
 const batch = @import("../../lib/reactive/batch.zig");
+const ide_page = @import("../../roots/menu/ide/+page.zig");
 
 /// Reactive HUD component data
 pub const ReactiveHudData = struct {
@@ -319,8 +321,8 @@ pub const ReactiveHud = struct {
                         // Check IDE page-specific interactions first
                         if (hud_data.router.getCurrentPage()) |current_page| {
                             if (std.mem.eql(u8, current_page.path, "/ide")) {
-                                const ide_page_impl: *@import("../../roots/menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
-                                const point = @import("../../lib/math/mod.zig").Vec2{ .x = mouse_x, .y = mouse_y };
+                                const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
+                                const point = math.Vec2{ .x = mouse_x, .y = mouse_y };
 
                                 // Try terminal click first
                                 if (ide_page_impl.handleTerminalClick(point)) {
@@ -401,7 +403,7 @@ pub const ReactiveHud = struct {
                 // Route to current page for input handling
                 if (hud_data.router.getCurrentPage()) |current_page| {
                     if (std.mem.eql(u8, current_page.path, "/ide")) {
-                        const ide_page_impl: *@import("../../roots/menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
+                        const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
                         if (ide_page_impl.handleKeyboardInput(key_event)) {
                             return true; // IDE page handled the key
                         }

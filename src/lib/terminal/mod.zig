@@ -31,7 +31,7 @@ pub const capabilities = struct {
         pub const Builtin = @import("capabilities/commands/builtin.zig").Builtin;
         pub const Pipeline = @import("capabilities/commands/pipeline.zig").Pipeline;
     };
-    
+
     pub const output = struct {
         pub const AnsiWriter = @import("capabilities/output/ansi_writer.zig").AnsiWriter;
     };

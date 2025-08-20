@@ -38,7 +38,7 @@ pub const Executor = struct {
         const arena = try allocator.create(std.heap.ArenaAllocator);
         arena.* = std.heap.ArenaAllocator.init(allocator);
         const arena_allocator = arena.allocator();
-        
+
         // Initialize environment with arena allocator
         var env = std.process.EnvMap.init(arena_allocator);
 
@@ -103,10 +103,10 @@ pub const Executor = struct {
         if (self.current_process) |*process| {
             _ = process.kill() catch {};
         }
-        
+
         // Clean up working directory (uses regular allocator now)
         self.working_directory.deinit();
-        
+
         // Arena deinit frees all environment variables
         self.arena.deinit();
         self.allocator.destroy(self.arena);
@@ -128,7 +128,7 @@ pub const Executor = struct {
         // Build full argument list (command + args)
         var argv = std.ArrayList([]const u8).init(self.allocator);
         defer argv.deinit();
-        
+
         try argv.append(command);
         try argv.appendSlice(args);
 
@@ -198,7 +198,7 @@ pub const Executor = struct {
     /// Change working directory
     pub fn changeDirectory(self: *Self, path: []const u8) !void {
         const arena_allocator = self.arena.allocator();
-        
+
         // Resolve path using arena allocator
         const resolved_path = if (std.fs.path.isAbsolute(path))
             try arena_allocator.dupe(u8, path)
@@ -317,10 +317,10 @@ test "Executor environment variables" {
     // First check if we can access existing environment variables
     const path_var = executor.getEnvironmentVariable("PATH");
     try std.testing.expect(path_var != null);
-    
+
     // Try setting a new environment variable
     try executor.setEnvironmentVariable("TEST_VAR", "test_value");
-    
+
     const value = executor.getEnvironmentVariable("TEST_VAR");
     try std.testing.expect(value != null);
     try std.testing.expectEqualStrings("test_value", value.?);

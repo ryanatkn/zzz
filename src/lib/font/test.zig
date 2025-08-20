@@ -42,7 +42,6 @@ const debug_config = @import("../debug/config.zig");
 const ENABLE_DEBUG_OUTPUT = debug_config.font_test_debug.enable_file_output;
 const TEST_OUTPUT_DIR = debug_config.font_test_debug.output_dir;
 
-
 /// Helper function to generate systematic test output paths
 /// Categories: "baseline", "chars", "coord", "debug", "full"
 pub fn getTestOutputPath(allocator: std.mem.Allocator, category: []const u8, filename: []const u8) ![]u8 {
@@ -52,7 +51,7 @@ pub fn getTestOutputPath(allocator: std.mem.Allocator, category: []const u8, fil
 /// Helper function to ensure test output directories exist
 pub fn ensureTestDirectories() !void {
     if (!ENABLE_DEBUG_OUTPUT) return; // Skip directory creation when debug output is disabled
-    
+
     const categories = [_][]const u8{ "baseline", "chars", "coord", "debug", "full" };
 
     // Create main test directory

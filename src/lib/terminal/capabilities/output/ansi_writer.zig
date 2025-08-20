@@ -148,12 +148,12 @@ pub const AnsiWriter = struct {
         // Simply delegate to basic writer for now
         // In a full implementation, this would apply ANSI styling
         const basic_writer = self.basic_writer_capability.?;
-        
+
         // Call the basic writer's write method through its vtable
         // Note: This is a simplified approach - in a real implementation we'd need
         // to properly define the basic writer interface
         _ = basic_writer;
-        
+
         // For now, just emit a write event
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, .{

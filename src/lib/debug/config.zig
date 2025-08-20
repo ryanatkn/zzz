@@ -1,4 +1,5 @@
 const std = @import("std");
+const loggers = @import("loggers.zig");
 
 // Centralized logging configuration
 // These values are used at compile-time to configure logger instances
@@ -80,7 +81,6 @@ pub const OverrideConfig = struct {
     pub fn apply(self: OverrideConfig) void {
         // This will be called after loggers are initialized
         // to update their mutable settings
-        const loggers = @import("loggers.zig");
 
         if (self.game_throttle_ms) |ms| {
             if (loggers.game_log) |*log| {

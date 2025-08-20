@@ -1,5 +1,7 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
+const c = @import("../../platform/sdl.zig");
+const Color = @import("../core/colors.zig").Color;
 
 /// Time utilities for animation systems
 pub const Time = struct {
@@ -15,7 +17,6 @@ pub const Time = struct {
 
     /// Get current time in seconds using SDL_GetTicks
     pub fn getCurrentSeconds() f32 {
-        const c = @import("../../platform/sdl.zig");
         return millisecondsToSeconds(c.sdl.SDL_GetTicks());
     }
 };
@@ -151,8 +152,6 @@ pub const Sequence = struct {
 
 /// Color animation helpers
 pub const ColorAnimation = struct {
-    const Color = @import("../core/colors.zig").Color;
-
     /// Interpolate between two colors with given factor (0.0-1.0)
     pub fn lerp(color1: Color, color2: Color, factor: f32) Color {
         const t = math.clamp(factor, 0.0, 1.0);

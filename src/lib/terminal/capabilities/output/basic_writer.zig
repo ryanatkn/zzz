@@ -8,19 +8,19 @@ pub const BasicWriter = struct {
     pub const name = "basic_writer";
     pub const capability_type = "output";
     pub const dependencies = &[_][]const u8{};
-    
+
     active: bool = false,
     initialized: bool = false,
-    
+
     // Event bus for emitting events and subscribing to output events
     event_bus: ?*kernel.EventBus = null,
     allocator: std.mem.Allocator,
-    
+
     // Terminal state
     scrollback: core.RingBuffer(core.Line, 1000),
     current_color: colors.Color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
     current_bold: bool = false,
-    
+
     // Arena allocator for line management
     arena: std.heap.ArenaAllocator,
 
@@ -38,14 +38,14 @@ pub const BasicWriter = struct {
             .arena = std.heap.ArenaAllocator.init(allocator),
         };
     }
-    
+
     /// Create a new basic writer capability
     pub fn create(allocator: std.mem.Allocator) !*Self {
         const self = try allocator.create(Self);
         self.* = Self.init(allocator);
         return self;
     }
-    
+
     /// Destroy basic writer capability
     pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
         self.deinit();
@@ -73,12 +73,12 @@ pub const BasicWriter = struct {
     /// Initialize capability with dependencies
     pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // No dependencies for basic writer
-        
+
         self.event_bus = event_bus;
-        
+
         // Subscribe to output events
         try event_bus.subscribe(.output, outputEventCallback, self);
-        
+
         self.initialized = true;
         self.active = true;
     }
@@ -89,10 +89,10 @@ pub const BasicWriter = struct {
         if (self.event_bus) |bus| {
             bus.unsubscribe(.output, outputEventCallback, self);
         }
-        
+
         // Clean up arena
         self.arena.deinit();
-        
+
         self.active = false;
         self.initialized = false;
         self.event_bus = null;
@@ -106,11 +106,11 @@ pub const BasicWriter = struct {
     /// Write text to the terminal scrollback
     pub fn write(self: *Self, text: []const u8) !void {
         if (!self.active) return;
-        
+
         for (text) |ch| {
             try self.writeChar(ch);
         }
-        
+
         // Emit state change event
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, kernel.EventData{
@@ -169,9 +169,9 @@ pub const BasicWriter = struct {
     /// Clear all output
     pub fn clear(self: *Self) !void {
         if (!self.active) return;
-        
+
         self.scrollback.clear();
-        
+
         // Emit state change event
         if (self.event_bus) |bus| {
             const event = kernel.Event.init(.state_change, kernel.EventData{
@@ -188,7 +188,7 @@ pub const BasicWriter = struct {
 /// Event callback for handling output events
 fn outputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
     const self: *BasicWriter = @ptrCast(@alignCast(context.?));
-    
+
     switch (event.data) {
         .output => |output_data| {
             try self.write(output_data.text);

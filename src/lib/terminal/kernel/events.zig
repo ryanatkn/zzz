@@ -96,7 +96,7 @@ pub const LineBufferState = enum {
     line_cleared,
 };
 
-/// Cursor state changes  
+/// Cursor state changes
 pub const CursorState = enum {
     blink_toggled,
     shown,
@@ -175,7 +175,7 @@ const Subscription = struct {
 const SubscriptionList = struct {
     items: [MAX_SUBSCRIPTIONS_PER_TYPE]Subscription,
     count: usize = 0,
-    
+
     const MAX_SUBSCRIPTIONS_PER_TYPE = 16;
 };
 
@@ -211,7 +211,7 @@ pub const EventBus = struct {
     ) !void {
         const type_index = @intFromEnum(event_type);
         const list = &self.subscriptions_by_type[type_index];
-        
+
         if (list.count >= SubscriptionList.MAX_SUBSCRIPTIONS_PER_TYPE) {
             return error.TooManySubscriptions;
         }
@@ -233,7 +233,7 @@ pub const EventBus = struct {
     ) void {
         const type_index = @intFromEnum(event_type);
         const list = &self.subscriptions_by_type[type_index];
-        
+
         for (list.items[0..list.count]) |*sub| {
             if (sub.callback == callback and sub.context == context) {
                 sub.active = false;
@@ -246,7 +246,7 @@ pub const EventBus = struct {
     pub fn emit(self: *EventBus, event: Event) !void {
         const type_index = @intFromEnum(event.type);
         const list = &self.subscriptions_by_type[type_index];
-        
+
         // Only iterate relevant subscriptions for this event type
         for (list.items[0..list.count]) |sub| {
             if (sub.active) {
@@ -277,7 +277,7 @@ pub const EventBus = struct {
         }
         return total_count;
     }
-    
+
     /// Get count of active subscriptions only
     pub fn getActiveSubscriptionCount(self: *const EventBus) usize {
         var total_count: usize = 0;

@@ -4,6 +4,8 @@ const testing = std.testing;
 const rasterizer_core = @import("../src/lib/rasterizer_core.zig");
 const ttf_parser = @import("../src/lib/ttf_parser.zig");
 const bitmap_utils = @import("../src/lib/image/bitmap.zig");
+const font_debug = @import("../src/lib/font_debug.zig");
+const font_types = @import("../src/lib/font_types.zig");
 
 test "font rasterizer integration test" {
     // Test basic functionality with a simple mock
@@ -60,7 +62,6 @@ test "quality metrics analysis" {
 }
 
 test "font types basic operations" {
-    const font_types = @import("../src/lib/font_types.zig");
     
     // Test Point operations
     const p1 = font_types.Point.init(10, 20);

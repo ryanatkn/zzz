@@ -186,9 +186,9 @@ fn calculatePixelCoverage(center_x: f32, center_y: f32, contours: []const glyph_
 /// Result of rasterizing a glyph
 pub const RasterizedGlyph = struct {
     bitmap: []u8,
-    width: f32,          // Logical dimensions for positioning
+    width: f32, // Logical dimensions for positioning
     height: f32,
-    bitmap_width: u32,   // Actual bitmap dimensions for indexing
+    bitmap_width: u32, // Actual bitmap dimensions for indexing
     bitmap_height: u32,
     bearing_x: f32,
     bearing_y: f32,
@@ -337,7 +337,7 @@ pub const RasterizerCore = struct {
             .bitmap = bitmap,
             .width = width_f,
             .height = height_f,
-            .bitmap_width = width,    // The actual allocated dimensions
+            .bitmap_width = width, // The actual allocated dimensions
             .bitmap_height = height,
             .bearing_x = bounds.x_min - 1.0, // X offset from cursor to glyph left edge (already in pixels)
             .bearing_y = height_f - baseline_from_bottom, // Distance from baseline to top of bitmap

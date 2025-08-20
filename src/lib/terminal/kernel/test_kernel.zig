@@ -1,6 +1,8 @@
 const std = @import("std");
 const testing = std.testing;
 const kernel = @import("mod.zig");
+const cursor_mod = @import("../capabilities/state/cursor.zig");
+const line_buffer_mod = @import("../capabilities/state/line_buffer.zig");
 
 // Mock implementations for testing
 
@@ -71,7 +73,6 @@ const MockTerminal = struct {
         return self.event_bus.subscribe(event_type, callback, null);
     }
 };
-
 
 // Test callback for event testing
 var test_event_received: bool = false;
@@ -158,12 +159,10 @@ test "CapabilityRegistry - basic registration" {
     defer registry.deinit();
 
     // Create simple capabilities for testing
-    const cursor_mod = @import("../capabilities/state/cursor.zig");
-    const line_buffer_mod = @import("../capabilities/state/line_buffer.zig");
-    
+
     const cursor = try cursor_mod.Cursor.create(allocator);
     defer cursor_mod.Cursor.destroy(cursor, allocator);
-    
+
     const line_buffer = try line_buffer_mod.LineBuffer.create(allocator);
     defer line_buffer_mod.LineBuffer.destroy(line_buffer, allocator);
 

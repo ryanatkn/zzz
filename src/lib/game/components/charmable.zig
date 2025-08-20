@@ -1,10 +1,11 @@
+const std = @import("std");
 const EntityId = u32;
 
 /// Charmable - can be controlled by charm/command spells
 /// Sparse storage - only entities that can be charmed have this
 pub const Charmable = struct {
     charmed: bool = false,
-    original_controller: EntityId = @import("std").math.maxInt(EntityId), // Store original controller
+    original_controller: EntityId = std.math.maxInt(EntityId), // Store original controller
     charm_duration: f32 = 0,
     charm_strength: f32 = 1.0, // Resistance factor (0.5 = half duration, 2.0 = double duration)
     max_charm_duration: f32 = 10.0,
@@ -13,7 +14,7 @@ pub const Charmable = struct {
     pub fn init(max_duration: f32, resistance: f32) Charmable {
         return .{
             .charmed = false,
-            .original_controller = @import("std").math.maxInt(EntityId),
+            .original_controller = std.math.maxInt(EntityId),
             .charm_duration = 0,
             .charm_strength = resistance,
             .max_charm_duration = max_duration,
@@ -33,7 +34,7 @@ pub const Charmable = struct {
 
     pub fn endCharm(self: *Charmable) void {
         self.charmed = false;
-        self.original_controller = @import("std").math.maxInt(EntityId);
+        self.original_controller = std.math.maxInt(EntityId);
         self.charm_duration = 0;
     }
 
@@ -54,6 +55,6 @@ pub const Charmable = struct {
 
     pub fn getController(self: Charmable) EntityId {
         if (self.charmed) return self.original_controller;
-        return @import("std").math.maxInt(EntityId); // Invalid controller when not charmed
+        return std.math.maxInt(EntityId); // Invalid controller when not charmed
     }
 };

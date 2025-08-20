@@ -55,7 +55,6 @@ pub const KeyModifiers = terminal_trait.KeyModifiers;
 pub const MouseButton = terminal_trait.MouseButton;
 pub const MouseAction = terminal_trait.MouseAction;
 
-
 // Utilities
 pub const RingBuffer = @import("../core.zig").RingBuffer;
 
@@ -79,7 +78,7 @@ pub fn createEventBus(allocator: std.mem.Allocator) events.EventBus {
 /// Utility function to create a terminal interface from implementation
 pub fn createTerminal(implementation: anytype) ITerminal {
     const T = @TypeOf(implementation.*);
-    
+
     const vtable = &ITerminal.VTable{
         .write = struct {
             fn write(ptr: *anyopaque, text: []const u8) !void {
@@ -87,63 +86,63 @@ pub fn createTerminal(implementation: anytype) ITerminal {
                 return self.write(text);
             }
         }.write,
-        
+
         .read = struct {
             fn read(ptr: *anyopaque, buffer: []u8) !usize {
                 const self: *T = @ptrCast(@alignCast(ptr));
                 return self.read(buffer);
             }
         }.read,
-        
+
         .clear = struct {
             fn clear(ptr: *anyopaque) void {
                 const self: *T = @ptrCast(@alignCast(ptr));
                 self.clear();
             }
         }.clear,
-        
+
         .resize = struct {
             fn resize(ptr: *anyopaque, columns: usize, rows: usize) void {
                 const self: *T = @ptrCast(@alignCast(ptr));
                 self.resize(columns, rows);
             }
         }.resize,
-        
+
         .handleInput = struct {
             fn handleInput(ptr: *anyopaque, input: InputEvent) !void {
                 const self: *T = @ptrCast(@alignCast(ptr));
                 return self.handleInput(input);
             }
         }.handleInput,
-        
+
         .hasCapability = struct {
             fn hasCapability(ptr: *anyopaque, capability: []const u8) bool {
                 const self: *T = @ptrCast(@alignCast(ptr));
                 return self.hasCapability(capability);
             }
         }.hasCapability,
-        
+
         .getCapability = struct {
             fn getCapability(ptr: *anyopaque, capability: []const u8) ?*anyopaque {
                 const self: *T = @ptrCast(@alignCast(ptr));
                 return self.getCapability(capability);
             }
         }.getCapability,
-        
+
         .emit = struct {
             fn emit(ptr: *anyopaque, event: Event) !void {
                 const self: *T = @ptrCast(@alignCast(ptr));
                 return self.emit(event);
             }
         }.emit,
-        
+
         .subscribe = struct {
             fn subscribe(ptr: *anyopaque, event_type: EventType, callback: EventCallback) !void {
                 const self: *T = @ptrCast(@alignCast(ptr));
                 return self.subscribe(event_type, callback);
             }
         }.subscribe,
-        
+
         .deinit = struct {
             fn deinit(ptr: *anyopaque) void {
                 const self: *T = @ptrCast(@alignCast(ptr));
@@ -157,4 +156,3 @@ pub fn createTerminal(implementation: anytype) ITerminal {
         .vtable = vtable,
     };
 }
-

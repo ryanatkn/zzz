@@ -6,18 +6,18 @@ pub const LineBuffer = struct {
     pub const name = "line_buffer";
     pub const capability_type = "state";
     pub const dependencies = &[_][]const u8{ "keyboard_input", "basic_writer" };
-    
+
     active: bool = false,
     initialized: bool = false,
-    
+
     // Event bus for emitting events and subscribing to input events
     event_bus: ?*kernel.EventBus = null,
     allocator: std.mem.Allocator,
-    
+
     // Line buffer state
     current_line: std.ArrayList(u8),
     cursor_x: usize = 0,
-    
+
     // Command history
     command_history: std.ArrayList([]u8),
     history_index: ?usize = null,
@@ -43,7 +43,7 @@ pub const LineBuffer = struct {
         self.* = Self.init(allocator);
         return self;
     }
-    
+
     /// Destroy line buffer capability
     pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
         self.deinit();
@@ -71,12 +71,12 @@ pub const LineBuffer = struct {
     /// Initialize capability with dependencies
     pub fn initialize(self: *Self, deps: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
         _ = deps; // Dependencies verified by registry
-        
+
         self.event_bus = event_bus;
-        
+
         // Subscribe to input events from keyboard
         try event_bus.subscribe(.input, inputEventCallback, self);
-        
+
         self.initialized = true;
         self.active = true;
     }
@@ -87,14 +87,14 @@ pub const LineBuffer = struct {
         if (self.event_bus) |bus| {
             bus.unsubscribe(.input, inputEventCallback, self);
         }
-        
+
         // Clean up history
         for (self.command_history.items) |cmd| {
             self.allocator.free(cmd);
         }
         self.command_history.deinit();
         self.current_line.deinit();
-        
+
         self.active = false;
         self.initialized = false;
         self.event_bus = null;
@@ -201,7 +201,7 @@ pub const LineBuffer = struct {
     /// Execute current line - add to history and clear buffer
     fn executeCurrentLine(self: *Self) !void {
         const command = try self.allocator.dupe(u8, self.current_line.items);
-        
+
         // Add to history if not empty
         if (command.len > 0) {
             try self.command_history.append(command);
@@ -254,12 +254,12 @@ pub const LineBuffer = struct {
     pub fn getCursorPosition(self: *const Self) usize {
         return self.cursor_x;
     }
-    
+
     /// Set cursor position
     pub fn setCursorPosition(self: *Self, pos: usize) void {
         self.cursor_x = @min(pos, self.current_line.items.len);
     }
-    
+
     /// Set the current line content
     pub fn setCurrentLine(self: *Self, text: []const u8) !void {
         self.current_line.clearRetainingCapacity();
@@ -267,32 +267,32 @@ pub const LineBuffer = struct {
         self.cursor_x = @min(self.cursor_x, text.len);
         try self.emitStateChange(.char_inserted);
     }
-    
+
     /// Insert text at specific position
     pub fn insertTextAt(self: *Self, pos: usize, text: []const u8) !void {
         const insert_pos = @min(pos, self.current_line.items.len);
-        
+
         // Use ArrayList's insertSlice method directly - no temporary allocation needed
         try self.current_line.insertSlice(insert_pos, text);
-        
+
         // Update cursor if at or after insertion point
         if (self.cursor_x >= insert_pos) {
             self.cursor_x += text.len;
         }
-        
+
         try self.emitStateChange(.char_inserted);
     }
-    
+
     /// Delete range of characters
     pub fn deleteRange(self: *Self, start: usize, end: usize) !void {
         if (start >= end or start >= self.current_line.items.len) return;
-        
+
         const actual_end = @min(end, self.current_line.items.len);
         const delete_count = actual_end - start;
-        
+
         // Use ArrayList's replaceRange method to delete - replace with empty slice
         try self.current_line.replaceRange(start, delete_count, &[_]u8{});
-        
+
         // Update cursor if in or after deleted range
         if (self.cursor_x > start) {
             if (self.cursor_x >= actual_end) {
@@ -301,21 +301,21 @@ pub const LineBuffer = struct {
                 self.cursor_x = start;
             }
         }
-        
+
         try self.emitStateChange(.char_deleted);
     }
-    
+
     /// Get history count
     pub fn getHistoryCount(self: *const Self) usize {
         return self.command_history.items.len;
     }
-    
+
     /// Get history item at index
     pub fn getHistoryItem(self: *const Self, index: usize) ?[]const u8 {
         if (index >= self.command_history.items.len) return null;
         return self.command_history.items[index];
     }
-    
+
     /// Public wrapper for inserting a character
     pub fn insertCharAt(self: *Self, pos: usize, ch: u8) !void {
         const old_cursor = self.cursor_x;
@@ -323,7 +323,7 @@ pub const LineBuffer = struct {
         try self.insertChar(ch);
         self.cursor_x = old_cursor + 1;
     }
-    
+
     /// Public wrapper for handling special keys
     pub fn handleSpecialKey(self: *Self, key: kernel.events.SpecialKey) !void {
         switch (key) {
@@ -341,7 +341,7 @@ pub const LineBuffer = struct {
 /// Event callback for handling input events from keyboard
 fn inputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
     const self: *LineBuffer = @ptrCast(@alignCast(context.?));
-    
+
     switch (event.data) {
         .input => |input_data| {
             switch (input_data.key) {
@@ -377,4 +377,3 @@ fn inputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
         else => {}, // Ignore other event types
     }
 }
-

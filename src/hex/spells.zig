@@ -9,6 +9,7 @@ const game_abilities = @import("../lib/game/abilities/mod.zig");
 const effect_manager = game_abilities.effect_manager;
 const components = @import("../lib/game/components/mod.zig");
 const combat = @import("combat.zig");
+const entity_queries = @import("entity_queries.zig");
 
 const Vec2 = math.Vec2;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
@@ -396,7 +397,6 @@ pub const SpellSystem = struct {
             return false;
         };
 
-        const entity_queries = @import("entity_queries.zig");
         const player_pos = entity_queries.getEntityPos(game, controlled_entity) orelse {
             loggers.getGameLog().info("blink_no_position", "Could not get controlled entity position", .{});
             return false;
@@ -438,7 +438,6 @@ pub const SpellSystem = struct {
             return false;
         };
 
-        const entity_queries = @import("entity_queries.zig");
         const player_pos = entity_queries.getEntityPos(game, controlled_entity) orelse {
             loggers.getGameLog().info("phase_no_position", "Could not get controlled entity position", .{});
             return false;

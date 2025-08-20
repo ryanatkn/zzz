@@ -6,6 +6,7 @@ const combat = @import("../lib/game/combat/mod.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const game_systems = @import("../lib/game/systems/mod.zig");
+const entity_queries = @import("entity_queries.zig");
 
 const Vec2 = math.Vec2;
 const hex_game_mod = @import("hex_game.zig");
@@ -22,7 +23,6 @@ const HexCombatInterface = struct {
     pub fn getShooterPos(game: *HexGame) ?Vec2 {
         // Use controlled entity instead of hardcoded player
         if (game.getControlledEntity()) |entity_id| {
-            const entity_queries = @import("entity_queries.zig");
             return entity_queries.getEntityPos(game, entity_id);
         }
         return null;
@@ -87,7 +87,6 @@ fn lifestoneToCheckpoint(lifestone_result: physics.LifestoneResult) game_systems
 fn findBestRespawnCheckpoint(game: *HexGame) ?game_systems.respawn.RespawnInterface.CheckpointResult {
     // Use controlled entity position (controller always has an entity possessed)
     const entity_pos = if (game.getControlledEntity()) |entity_id| blk: {
-        const entity_queries = @import("entity_queries.zig");
         break :blk entity_queries.getEntityPos(game, entity_id) orelse return null;
     } else return null;
 

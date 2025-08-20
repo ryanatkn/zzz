@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("../../../lib/platform/sdl.zig");
 const page = @import("../../../lib/browser/page.zig");
+const constants = @import("../../../lib/browser/constants.zig");
 const bitmap_simple = @import("../../../lib/font/renderers/bitmap_simple.zig");
 const oversampling = @import("../../../lib/font/renderers/oversampling.zig");
 const debug_ascii = @import("../../../lib/font/renderers/debug_ascii.zig");
@@ -58,7 +59,6 @@ pub const FontGridTestPage = struct {
     }
 
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {
-        const constants = @import("../../../lib/browser/constants.zig");
         const screen_width = constants.SCREEN.BASE_WIDTH;
         const screen_height = constants.SCREEN.BASE_HEIGHT;
         _ = self;

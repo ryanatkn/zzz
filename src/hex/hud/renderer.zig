@@ -2,6 +2,7 @@ const std = @import("std");
 const c = @import("../../lib/platform/sdl.zig");
 const math = @import("../../lib/math/mod.zig");
 const colors = @import("../../lib/core/colors.zig");
+const constants = @import("../../lib/core/constants.zig");
 const lib_renderer = @import("../../lib/rendering/interface.zig");
 const game_renderer = @import("../game_renderer.zig");
 const page = @import("../../lib/browser/page.zig");
@@ -197,7 +198,6 @@ pub const BrowserRenderer = struct {
     }
 
     pub fn renderNavigationBar(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, current_path: []const u8, can_go_back: bool, can_go_forward: bool) !void {
-        const constants = @import("../../lib/core/constants.zig");
         const screen_width = constants.SCREEN.BASE_WIDTH;
         const screen_height = constants.SCREEN.BASE_HEIGHT;
 
@@ -439,7 +439,7 @@ pub const BrowserRenderer = struct {
     /// Render terminal content with improved safety checks
     fn renderTerminalContentSafe(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, terminal: *const @import("../../lib/ui/terminal.zig").TerminalComponent, panel_rect: math.Rectangle, is_focused: bool) !void {
         // Get terminal content safely with error handling
-        const content = terminal.terminal_engine.getVisibleContent();
+        const content = terminal.terminal.getVisibleContent();
 
         const line_height = ide_constants.TEXT.LINE_HEIGHT;
         const char_width = ide_constants.TEXT.CHAR_WIDTH;

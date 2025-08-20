@@ -1,5 +1,6 @@
 const std = @import("std");
 const page = @import("../../../../lib/browser/page.zig");
+const constants = @import("../../../../lib/browser/constants.zig");
 
 const VideoSettingsPage = struct {
     base: page.Page,
@@ -20,7 +21,6 @@ const VideoSettingsPage = struct {
     }
 
     fn render(self: *const page.Page, links: *std.ArrayList(page.Link), arena: std.mem.Allocator) !void {
-        const constants = @import("../../../../lib/browser/constants.zig");
         const screen_width = constants.SCREEN.BASE_WIDTH;
         const screen_height = constants.SCREEN.BASE_HEIGHT;
         _ = self;

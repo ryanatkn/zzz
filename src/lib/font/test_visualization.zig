@@ -8,8 +8,8 @@ const ENABLE_DEBUG_OUTPUT = debug_config.font_test_debug.enable_file_output;
 /// Coordinate space options for bitmap generation
 pub const CoordinateSpace = enum {
     screen, // Normal screen coordinates
-    ndc,    // Normalized Device Coordinates (shader space)
-    both,   // Generate both coordinate spaces for comparison
+    ndc, // Normalized Device Coordinates (shader space)
+    both, // Generate both coordinate spaces for comparison
 };
 
 /// Font testing and visualization utilities
@@ -56,17 +56,17 @@ pub const FontTestVisualization = struct {
             .ndc => try self.createCompositeBitmapNDC(rasterizer, test_chars, output_path, target_screen_width, target_screen_height),
             .both => {
                 // Generate screen space version
-                const screen_path = try std.fmt.allocPrint(self.allocator, "{s}_screen.ppm", .{output_path[0..output_path.len-4]});
+                const screen_path = try std.fmt.allocPrint(self.allocator, "{s}_screen.ppm", .{output_path[0 .. output_path.len - 4]});
                 defer self.allocator.free(screen_path);
                 try self.createCompositeBitmapScreen(rasterizer, test_chars, screen_path);
 
                 // Generate NDC space version
-                const ndc_path = try std.fmt.allocPrint(self.allocator, "{s}_ndc.ppm", .{output_path[0..output_path.len-4]});
+                const ndc_path = try std.fmt.allocPrint(self.allocator, "{s}_ndc.ppm", .{output_path[0 .. output_path.len - 4]});
                 defer self.allocator.free(ndc_path);
                 try self.createCompositeBitmapNDC(rasterizer, test_chars, ndc_path, target_screen_width, target_screen_height);
 
                 // Generate comparison report
-                const report_path = try std.fmt.allocPrint(self.allocator, "{s}_comparison.txt", .{output_path[0..output_path.len-4]});
+                const report_path = try std.fmt.allocPrint(self.allocator, "{s}_comparison.txt", .{output_path[0 .. output_path.len - 4]});
                 defer self.allocator.free(report_path);
                 try self.generateCoordinateSpaceComparison(rasterizer, test_chars, report_path, target_screen_width, target_screen_height);
             },
@@ -95,7 +95,7 @@ pub const FontTestVisualization = struct {
         defer self.allocator.free(screen_path);
         try self.createCompositeBitmapScreen(rasterizer, full_charset, screen_path);
 
-        // Generate NDC space composite  
+        // Generate NDC space composite
         const ndc_path = try std.fmt.allocPrint(self.allocator, "{s}_ndc.ppm", .{base_output_path});
         defer self.allocator.free(ndc_path);
         try self.createCompositeBitmapNDC(rasterizer, full_charset, ndc_path, target_screen_width, target_screen_height);
@@ -162,7 +162,7 @@ pub const FontTestVisualization = struct {
         var current_x: u32 = padding;
         for (glyphs.items, 0..) |glyph, i| {
             _ = test_chars[i]; // Character ID for debugging
-            const glyph_width = glyph.bitmap_width;   // Use bitmap dimensions for indexing
+            const glyph_width = glyph.bitmap_width; // Use bitmap dimensions for indexing
             const glyph_height = glyph.bitmap_height;
 
             // Calculate glyph position (baseline-aligned)
@@ -259,10 +259,10 @@ pub const FontTestVisualization = struct {
         defer self.allocator.free(screen_bitmap);
         @memset(screen_bitmap, 0);
 
-        // Render all glyphs to screen space composite  
+        // Render all glyphs to screen space composite
         var current_x: u32 = padding;
         for (glyphs.items) |glyph| {
-            const glyph_width = glyph.bitmap_width;   // Use bitmap dimensions for indexing
+            const glyph_width = glyph.bitmap_width; // Use bitmap dimensions for indexing
             const glyph_height = glyph.bitmap_height;
             const bearing_y_u32 = @as(u32, @intFromFloat(glyph.bearing_y));
             const glyph_y = if (baseline_y >= bearing_y_u32) baseline_y - bearing_y_u32 else 0;
@@ -287,14 +287,12 @@ pub const FontTestVisualization = struct {
 
         // Step 4: Transform the complete composite to NDC coordinates
         var bitmap_transform = coordinate_transform.BitmapTransform.init(self.allocator);
-        
+
         // Scale output based on character count for readability
         const output_width = @min(total_width * 2, 2048); // Cap at reasonable size
         const output_height = @min(composite_height * 2, 1024);
 
-        std.debug.print("NDC transformation: {}x{} -> {}x{} (target screen: {d:.0}x{d:.0})\n", .{
-            total_width, composite_height, output_width, output_height, target_screen_width, target_screen_height
-        });
+        std.debug.print("NDC transformation: {}x{} -> {}x{} (target screen: {d:.0}x{d:.0})\n", .{ total_width, composite_height, output_width, output_height, target_screen_width, target_screen_height });
 
         const transformed_bitmap = try bitmap_transform.createTransformedBitmap(
             screen_bitmap,
@@ -322,7 +320,7 @@ pub const FontTestVisualization = struct {
         target_screen_height: f32,
     ) !void {
         if (!ENABLE_DEBUG_OUTPUT) return; // Skip file generation when debug output is disabled
-        
+
         const file = try std.fs.cwd().createFile(report_path, .{});
         defer file.close();
         const writer = file.writer();
@@ -497,7 +495,7 @@ pub const FontTestVisualization = struct {
         _ = self;
 
         if (!ENABLE_DEBUG_OUTPUT) return; // Skip file generation when debug output is disabled
-        
+
         // Create output directory
         const dirname = std.fs.path.dirname(filename) orelse ".";
         std.fs.cwd().makePath(dirname) catch {};

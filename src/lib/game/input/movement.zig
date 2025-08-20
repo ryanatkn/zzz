@@ -2,6 +2,7 @@ const std = @import("std");
 const math = @import("../../math/mod.zig");
 const input = @import("../../platform/input.zig");
 const actions = @import("actions.zig");
+const c = @import("../../platform/sdl.zig");
 
 const Vec2 = math.Vec2;
 const InputState = input.InputState;
@@ -67,10 +68,10 @@ pub const MovementStyle = struct {
 pub const MovementProcessor = struct {
     /// Extract movement vector from input state using WASD keys
     pub fn getMovementVector(input_state: *const InputState) Vec2 {
-        const up = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_W);
-        const down = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_S);
-        const left = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_A);
-        const right = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_D);
+        const up = input_state.isKeyDown(c.sdl.SDL_SCANCODE_W);
+        const down = input_state.isKeyDown(c.sdl.SDL_SCANCODE_S);
+        const left = input_state.isKeyDown(c.sdl.SDL_SCANCODE_A);
+        const right = input_state.isKeyDown(c.sdl.SDL_SCANCODE_D);
 
         const direction = MovementDirection.fromActions(up, down, left, right);
         return direction.toVector();
@@ -108,10 +109,10 @@ pub const MovementProcessor = struct {
 /// 4-way movement (no diagonals)
 pub const FourWayMovement = struct {
     pub fn getMovementVector(input_state: *const InputState) Vec2 {
-        const up = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_W);
-        const down = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_S);
-        const left = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_A);
-        const right = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_D);
+        const up = input_state.isKeyDown(c.sdl.SDL_SCANCODE_W);
+        const down = input_state.isKeyDown(c.sdl.SDL_SCANCODE_S);
+        const left = input_state.isKeyDown(c.sdl.SDL_SCANCODE_A);
+        const right = input_state.isKeyDown(c.sdl.SDL_SCANCODE_D);
 
         // Priority: vertical over horizontal
         if (up) return Vec2{ .x = 0, .y = -1 };
@@ -133,10 +134,10 @@ pub const TankMovement = struct {
     pub fn getTankInput(input_state: *const InputState) TankInput {
         var tank_input = TankInput{};
 
-        if (input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_W)) tank_input.forward += 1;
-        if (input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_S)) tank_input.forward -= 1;
-        if (input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_A)) tank_input.turn -= 1;
-        if (input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_D)) tank_input.turn += 1;
+        if (input_state.isKeyDown(c.sdl.SDL_SCANCODE_W)) tank_input.forward += 1;
+        if (input_state.isKeyDown(c.sdl.SDL_SCANCODE_S)) tank_input.forward -= 1;
+        if (input_state.isKeyDown(c.sdl.SDL_SCANCODE_A)) tank_input.turn -= 1;
+        if (input_state.isKeyDown(c.sdl.SDL_SCANCODE_D)) tank_input.turn += 1;
 
         return tank_input;
     }
@@ -178,10 +179,10 @@ pub const MovementPatterns = struct {
 
     /// Grid-based movement (Roguelike style)
     pub fn getGridMovement(input_state: *const InputState) MovementDirection {
-        const up = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_W);
-        const down = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_S);
-        const left = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_A);
-        const right = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_D);
+        const up = input_state.isKeyDown(c.sdl.SDL_SCANCODE_W);
+        const down = input_state.isKeyDown(c.sdl.SDL_SCANCODE_S);
+        const left = input_state.isKeyDown(c.sdl.SDL_SCANCODE_A);
+        const right = input_state.isKeyDown(c.sdl.SDL_SCANCODE_D);
 
         return MovementDirection.fromActions(up, down, left, right);
     }
@@ -189,10 +190,10 @@ pub const MovementPatterns = struct {
     /// Platformer movement (only horizontal + jump)
     pub fn getPlatformerMovement(input_state: *const InputState) struct { horizontal: f32, jump: bool } {
         var horizontal: f32 = 0;
-        if (input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_A)) horizontal -= 1;
-        if (input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_D)) horizontal += 1;
+        if (input_state.isKeyDown(c.sdl.SDL_SCANCODE_A)) horizontal -= 1;
+        if (input_state.isKeyDown(c.sdl.SDL_SCANCODE_D)) horizontal += 1;
 
-        const jump = input_state.isKeyDown(@import("../../platform/sdl.zig").sdl.SDL_SCANCODE_SPACE);
+        const jump = input_state.isKeyDown(c.sdl.SDL_SCANCODE_SPACE);
 
         return .{ .horizontal = horizontal, .jump = jump };
     }

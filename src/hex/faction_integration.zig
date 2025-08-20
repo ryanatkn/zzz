@@ -3,6 +3,8 @@ const factions = @import("factions.zig");
 const faction_presets = @import("faction_presets.zig");
 const components = @import("../lib/game/components/mod.zig");
 const hex_game_mod = @import("hex_game.zig");
+const colors = @import("../lib/core/colors.zig");
+const constants = @import("constants.zig");
 
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
@@ -191,9 +193,7 @@ pub fn canEntityBeControlled(game: *const HexGame, entity_id: EntityId) bool {
 }
 
 /// Get color for entity based on faction relationship from viewer's perspective
-pub fn getRelationshipColor(game: *const HexGame, viewer_entity: ?EntityId, target_entity: EntityId) @import("../lib/core/colors.zig").Color {
-    const colors = @import("../lib/core/colors.zig");
-    const constants = @import("constants.zig");
+pub fn getRelationshipColor(game: *const HexGame, viewer_entity: ?EntityId, target_entity: EntityId) colors.Color {
 
     // Default colors if no faction relationship can be determined
     const default_color = constants.COLOR_UNIT_DEFAULT;

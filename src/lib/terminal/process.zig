@@ -1,5 +1,6 @@
 const std = @import("std");
 const loggers = @import("../debug/loggers.zig");
+const builtin = @import("builtin");
 
 /// Process execution result
 pub const ProcessResult = struct {
@@ -466,7 +467,7 @@ pub const ProcessExecutor = struct {
 
     /// Get shell for current platform
     pub fn getDefaultShell() []const u8 {
-        return switch (@import("builtin").target.os.tag) {
+        return switch (builtin.target.os.tag) {
             .windows => "cmd.exe",
             else => "/bin/sh",
         };

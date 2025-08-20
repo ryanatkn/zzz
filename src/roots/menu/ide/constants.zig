@@ -1,5 +1,6 @@
 /// IDE File Explorer Constants
 /// Centralized configuration for the file explorer interface
+const colors = @import("../../../lib/core/colors.zig");
 /// File content reading limits
 pub const FILE_LIMITS = struct {
     /// Maximum file size to read (1MB)
@@ -45,18 +46,18 @@ pub const TEXT = struct {
 /// Color scheme for the file explorer
 pub const COLORS = struct {
     /// Panel background colors
-    pub const HEADER_BG = @import("../../../lib/core/colors.zig").Color{ .r = 25, .g = 30, .b = 40, .a = 255 };
-    pub const PANEL_BG = @import("../../../lib/core/colors.zig").Color{ .r = 35, .g = 40, .b = 50, .a = 255 };
-    pub const PANEL_BORDER = @import("../../../lib/core/colors.zig").Color{ .r = 60, .g = 65, .b = 75, .a = 255 };
+    pub const HEADER_BG = colors.Color{ .r = 25, .g = 30, .b = 40, .a = 255 };
+    pub const PANEL_BG = colors.Color{ .r = 35, .g = 40, .b = 50, .a = 255 };
+    pub const PANEL_BORDER = colors.Color{ .r = 60, .g = 65, .b = 75, .a = 255 };
 
     /// Text colors
-    pub const TEXT_NORMAL = @import("../../../lib/core/colors.zig").Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
-    pub const TEXT_LINE_NUMBERS = @import("../../../lib/core/colors.zig").Color{ .r = 120, .g = 120, .b = 120, .a = 255 };
-    pub const TEXT_TRUNCATION = @import("../../../lib/core/colors.zig").Color{ .r = 150, .g = 150, .b = 50, .a = 255 };
+    pub const TEXT_NORMAL = colors.Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
+    pub const TEXT_LINE_NUMBERS = colors.Color{ .r = 120, .g = 120, .b = 120, .a = 255 };
+    pub const TEXT_TRUNCATION = colors.Color{ .r = 150, .g = 150, .b = 50, .a = 255 };
 
     /// Selection and interaction colors
-    pub const SELECTION_BG = @import("../../../lib/core/colors.zig").Color{ .r = 70, .g = 130, .b = 180, .a = 100 };
-    pub const HOVER_BG = @import("../../../lib/core/colors.zig").Color{ .r = 55, .g = 60, .b = 70, .a = 150 };
+    pub const SELECTION_BG = colors.Color{ .r = 70, .g = 130, .b = 180, .a = 100 };
+    pub const HOVER_BG = colors.Color{ .r = 55, .g = 60, .b = 70, .a = 150 };
 };
 
 /// File tree interaction configuration
@@ -104,7 +105,7 @@ pub const TERMINAL = struct {
     pub const INPUT_PADDING: f32 = 6;
 
     /// Input field colors
-    pub const INPUT_BG_NORMAL = @import("../../../lib/core/colors.zig").Color{ .r = 35, .g = 40, .b = 50, .a = 255 };
-    pub const INPUT_BG_FOCUSED = @import("../../../lib/core/colors.zig").Color{ .r = 55, .g = 60, .b = 70, .a = 150 };
-    pub const INPUT_BORDER_FOCUSED = @import("../../../lib/core/colors.zig").Color{ .r = 70, .g = 130, .b = 180, .a = 255 };
+    pub const INPUT_BG_NORMAL = colors.Color{ .r = 35, .g = 40, .b = 50, .a = 255 };
+    pub const INPUT_BG_FOCUSED = colors.Color{ .r = 55, .g = 60, .b = 70, .a = 150 };
+    pub const INPUT_BORDER_FOCUSED = colors.Color{ .r = 70, .g = 130, .b = 180, .a = 255 };
 };

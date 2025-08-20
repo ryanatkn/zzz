@@ -15,7 +15,7 @@ pub fn screenToNDC(screen_x: f32, screen_y: f32, screen_width: f32, screen_heigh
     return core_coordinates.screenToNDC(Vec2{ .x = screen_x, .y = screen_y }, context);
 }
 
-/// Transform NDC coordinates back to screen coordinates  
+/// Transform NDC coordinates back to screen coordinates
 /// Uses the proven core coordinate utilities for consistency
 pub fn ndcToScreen(ndc_x: f32, ndc_y: f32, screen_width: f32, screen_height: f32) Vec2 {
     const context = core_coordinates.CoordinateContext.init(screen_width, screen_height);
@@ -35,19 +35,19 @@ pub fn bitmapToShaderSpace(
 ) struct { screen: Vec2, ndc: Vec2 } {
     // FIXED: Use font-appropriate scaling instead of stretching bitmap across entire screen
     // For fonts, we want to maintain realistic pixel-to-pixel correspondence
-    
+
     // Note: bitmap_width and bitmap_height are not needed for this fixed scaling approach
     // but are kept for API compatibility
     _ = bitmap_width;
     _ = bitmap_height;
-    
+
     // Scale factor: how much to scale the font for reasonable visibility (adjustable)
     const font_display_scale: f32 = 4.0; // Make font 4x larger for easier visibility
-    
+
     // Position the scaled font in a reasonable screen location (center-left area)
     const base_screen_x: f32 = target_screen_width * 0.25; // 25% from left edge
-    const base_screen_y: f32 = target_screen_height * 0.4;  // 40% from top edge
-    
+    const base_screen_y: f32 = target_screen_height * 0.4; // 40% from top edge
+
     // Convert bitmap coordinates to screen space using realistic scaling
     const screen_x = base_screen_x + (@as(f32, @floatFromInt(bitmap_x)) * font_display_scale);
     const screen_y = base_screen_y + (@as(f32, @floatFromInt(bitmap_y)) * font_display_scale);
@@ -77,10 +77,10 @@ pub const BitmapTransform = struct {
     }
 
     /// Create transformed bitmap that shows post-shader coordinate space (NDC with Y-flip)
-    /// 
-    /// IMPORTANT: This does NOT show what's sent to the GPU. The GPU receives normal readable 
+    ///
+    /// IMPORTANT: This does NOT show what's sent to the GPU. The GPU receives normal readable
     /// bitmap textures. The Y-flip transformation happens IN THE VERTEX SHADER during NDC conversion.
-    /// 
+    ///
     /// This visualization shows what the coordinate space looks like AFTER shader transformation,
     /// which is useful for debugging coordinate-related rendering issues.
     pub fn createTransformedBitmap(
@@ -95,7 +95,7 @@ pub const BitmapTransform = struct {
     ) ![]u8 {
         _ = target_screen_width;
         _ = target_screen_height;
-        
+
         const transformed_bitmap = try self.allocator.alloc(u8, output_width * output_height);
         @memset(transformed_bitmap, 0);
 

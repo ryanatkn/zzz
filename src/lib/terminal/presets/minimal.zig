@@ -4,47 +4,48 @@ const KeyboardInput = @import("../capabilities/input/keyboard.zig").KeyboardInpu
 const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
 const LineBuffer = @import("../capabilities/state/line_buffer.zig").LineBuffer;
 const Cursor = @import("../capabilities/state/cursor.zig").Cursor;
+const core = @import("../core.zig");
 
 /// Minimal terminal preset - basic input/output with line editing
 pub const MinimalTerminal = struct {
     allocator: std.mem.Allocator,
     registry: kernel.TypeSafeCapabilityRegistry,
-    
+
     // Capabilities stored as pointers to heap-allocated instances
     keyboard: *KeyboardInput,
     writer: *BasicWriter,
     line_buffer: *LineBuffer,
     cursor: *Cursor,
-    
+
     // Terminal interface implementation
     event_bus: *kernel.EventBus,
-    
+
     const Self = @This();
 
     /// Initialize minimal terminal with all capabilities
     pub fn init(allocator: std.mem.Allocator) !Self {
         var registry = kernel.createRegistry(allocator);
-        
+
         // Create capabilities using factory methods
         const keyboard = try KeyboardInput.create(allocator);
         const writer = try BasicWriter.create(allocator);
         const line_buffer = try LineBuffer.create(allocator);
         const cursor = try Cursor.create(allocator);
-        
+
         // Create type-safe capability interfaces and register them
         const keyboard_cap = kernel.createCapability(keyboard);
         const writer_cap = kernel.createCapability(writer);
         const line_buffer_cap = kernel.createCapability(line_buffer);
         const cursor_cap = kernel.createCapability(cursor);
-        
+
         try registry.register("keyboard_input", keyboard_cap);
         try registry.register("basic_writer", writer_cap);
         try registry.register("line_buffer", line_buffer_cap);
         try registry.register("cursor", cursor_cap);
-        
+
         // Initialize all capabilities in dependency order
         try registry.initializeAll();
-        
+
         return Self{
             .allocator = allocator,
             .registry = registry,
@@ -60,7 +61,7 @@ pub const MinimalTerminal = struct {
     pub fn deinit(self: *Self) void {
         // Registry deinit will call capability deinit methods
         self.registry.deinit();
-        
+
         // Just free the memory, don't call deinit again (registry already did)
         self.allocator.destroy(self.keyboard);
         self.allocator.destroy(self.writer);
@@ -100,7 +101,7 @@ pub const MinimalTerminal = struct {
     }
 
     /// Get scrollback for rendering
-    pub fn getScrollback(self: *const Self) *const @import("../core.zig").RingBuffer(@import("../core.zig").Line, 1000) {
+    pub fn getScrollback(self: *const Self) *const core.RingBuffer(core.Line, 1000) {
         return self.writer.getScrollback();
     }
 

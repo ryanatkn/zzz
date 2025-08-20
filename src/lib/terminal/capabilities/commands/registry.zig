@@ -13,7 +13,9 @@ pub const CommandContext = struct {
 
     /// Write output to terminal
     pub fn writeOutput(self: *CommandContext, text: []const u8) !void {
+        std.debug.print("DEBUG_CONTEXT: CommandContext.writeOutput called with: '{s}'\n", .{text});
         try self.write_fn(self.write_context, text);
+        std.debug.print("DEBUG_CONTEXT: CommandContext.writeOutput completed\n", .{});
     }
 };
 

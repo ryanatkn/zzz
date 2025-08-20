@@ -17,7 +17,7 @@ pub fn testCoordinateTransformAccuracy() !void {
     std.debug.print("\n🔍 Testing coordinate transformation accuracy...\n", .{});
 
     const TestPoint = struct { x: f32, y: f32, expected_ndc_x: f32, expected_ndc_y: f32 };
-    
+
     const test_cases = [_]struct {
         name: []const u8,
         screen_width: f32,
@@ -218,20 +218,16 @@ pub fn testBitmapTransformation(allocator: std.mem.Allocator) !void {
     // Analyze coordinate transformation at key points
     std.debug.print("🎯 Sample coordinate transformations:\n", .{});
     const test_points = [_]struct { x: u32, y: u32 }{
-        .{ .x = 0, .y = 0 },   // Top-left
-        .{ .x = 4, .y = 0 },   // Top-right quadrant boundary
-        .{ .x = 0, .y = 4 },   // Bottom-left quadrant boundary  
-        .{ .x = 4, .y = 4 },   // Center
-        .{ .x = 7, .y = 7 },   // Bottom-right
+        .{ .x = 0, .y = 0 }, // Top-left
+        .{ .x = 4, .y = 0 }, // Top-right quadrant boundary
+        .{ .x = 0, .y = 4 }, // Bottom-left quadrant boundary
+        .{ .x = 4, .y = 4 }, // Center
+        .{ .x = 7, .y = 7 }, // Bottom-right
     };
-    
+
     for (test_points) |point| {
-        const coord_data = coordinate_transform.bitmapToShaderSpace(
-            point.x, point.y, 8, 8, 800.0, 600.0
-        );
-        std.debug.print("  Bitmap({},{}) -> Screen({d:.1},{d:.1}) -> NDC({d:.3},{d:.3})\n", .{
-            point.x, point.y, coord_data.screen.x, coord_data.screen.y, coord_data.ndc.x, coord_data.ndc.y
-        });
+        const coord_data = coordinate_transform.bitmapToShaderSpace(point.x, point.y, 8, 8, 800.0, 600.0);
+        std.debug.print("  Bitmap({},{}) -> Screen({d:.1},{d:.1}) -> NDC({d:.3},{d:.3})\n", .{ point.x, point.y, coord_data.screen.x, coord_data.screen.y, coord_data.ndc.x, coord_data.ndc.y });
     }
 
     // Should have some recognizable pattern
@@ -244,11 +240,11 @@ pub fn testBitmapTransformation(allocator: std.mem.Allocator) !void {
 /// Test coordinate transformations using real font data with comprehensive text debugging
 pub fn testFontCoordinateTransformation(allocator: std.mem.Allocator) !void {
     std.debug.print("\n🔤 Testing real font coordinate transformations...\n", .{});
-    
+
     // Initialize loggers for font system
     try test_helpers.initTestLoggers(allocator);
     defer test_helpers.deinitTestLoggers();
-    
+
     // Load the same font used in the baseline alignment debugging
     const font_path = "static/fonts/DM_Sans/static/DMSans-Regular.ttf";
     const font_data = std.fs.cwd().readFileAlloc(allocator, font_path, 1024 * 1024) catch |err| switch (err) {
@@ -259,55 +255,55 @@ pub fn testFontCoordinateTransformation(allocator: std.mem.Allocator) !void {
         else => return err,
     };
     defer allocator.free(font_data);
-    
+
     // Parse the font
     var parser = ttf_parser.TTFParser.init(allocator, font_data) catch |err| {
         std.debug.print("❌ Failed to create TTF parser: {}\n", .{err});
         return;
     };
     defer parser.deinit();
-    
+
     var rasterizer = rasterizer_core.RasterizerCore.init(allocator, &parser, 16.0, 96.0);
-    
+
     std.debug.print("🔍 REAL FONT COORDINATE TRANSFORMATION ANALYSIS\n", .{});
     std.debug.print("=" ** 60 ++ "\n", .{});
     std.debug.print("Font: DM Sans Regular, 16pt\n", .{});
     std.debug.print("Font scale: {d:.6}\n", .{rasterizer.metrics.scale});
-    std.debug.print("Ascender: {} units ({d:.1} px)\n", .{rasterizer.metrics.ascender, @as(f32, @floatFromInt(rasterizer.metrics.ascender)) * rasterizer.metrics.scale});
-    std.debug.print("Descender: {} units ({d:.1} px)\n", .{rasterizer.metrics.descender, @as(f32, @floatFromInt(rasterizer.metrics.descender)) * rasterizer.metrics.scale});
-    std.debug.print("Line gap: {} units ({d:.1} px)\n", .{rasterizer.metrics.line_gap, @as(f32, @floatFromInt(rasterizer.metrics.line_gap)) * rasterizer.metrics.scale});
+    std.debug.print("Ascender: {} units ({d:.1} px)\n", .{ rasterizer.metrics.ascender, @as(f32, @floatFromInt(rasterizer.metrics.ascender)) * rasterizer.metrics.scale });
+    std.debug.print("Descender: {} units ({d:.1} px)\n", .{ rasterizer.metrics.descender, @as(f32, @floatFromInt(rasterizer.metrics.descender)) * rasterizer.metrics.scale });
+    std.debug.print("Line gap: {} units ({d:.1} px)\n", .{ rasterizer.metrics.line_gap, @as(f32, @floatFromInt(rasterizer.metrics.line_gap)) * rasterizer.metrics.scale });
     std.debug.print("\n", .{});
-    
+
     // Test the same characters that were proven to work in baseline alignment debugging
     const test_chars = "nopgyj"; // Mix of regular and descender characters
-    
+
     std.debug.print("📋 Character Analysis with Coordinate Transformations:\n", .{});
     std.debug.print("-" ** 60 ++ "\n", .{});
-    
+
     const target_screen_width: f32 = 1920;
     const target_screen_height: f32 = 1080;
-    
+
     for (test_chars, 0..) |char, i| {
-        std.debug.print("\n🔤 Character '{}' (#{}):\n", .{@as(u21, char), i});
-        
+        std.debug.print("\n🔤 Character '{}' (#{}):\n", .{ @as(u21, char), i });
+
         // Rasterize the character using the working system
         const rasterized = rasterizer.rasterizeGlyph(char, 0.0, 0.0) catch |err| {
             std.debug.print("  ❌ Failed to rasterize: {}\n", .{err});
             continue;
         };
         defer allocator.free(rasterized.bitmap);
-        
+
         // Print glyph metrics
         std.debug.print("  📏 Glyph metrics:\n", .{});
-        std.debug.print("    Dimensions: {d:.1} x {d:.1} px\n", .{rasterized.width, rasterized.height});
-        std.debug.print("    Bearing: ({d:.1}, {d:.1})\n", .{rasterized.bearing_x, rasterized.bearing_y});
+        std.debug.print("    Dimensions: {d:.1} x {d:.1} px\n", .{ rasterized.width, rasterized.height });
+        std.debug.print("    Bearing: ({d:.1}, {d:.1})\n", .{ rasterized.bearing_x, rasterized.bearing_y });
         std.debug.print("    Advance: {d:.1} px\n", .{rasterized.advance});
-        
+
         // Test coordinate transformations at key points within the glyph
         std.debug.print("  🎯 Coordinate transformations:\n", .{});
         const glyph_width = @as(u32, @intFromFloat(rasterized.width));
         const glyph_height = @as(u32, @intFromFloat(rasterized.height));
-        
+
         if (glyph_width > 0 and glyph_height > 0) {
             const key_points = [_]struct { x: u32, y: u32, name: []const u8 }{
                 .{ .x = 0, .y = 0, .name = "Top-left" },
@@ -318,25 +314,18 @@ pub fn testFontCoordinateTransformation(allocator: std.mem.Allocator) !void {
                 .{ .x = glyph_width / 2, .y = glyph_height - 1, .name = "Bottom-center" },
                 .{ .x = glyph_width - 1, .y = glyph_height - 1, .name = "Bottom-right" },
             };
-            
+
             for (key_points) |point| {
-                const coord_data = coordinate_transform.bitmapToShaderSpace(
-                    point.x, point.y, glyph_width, glyph_height,
-                    target_screen_width, target_screen_height
-                );
-                std.debug.print("    {s:12}: Bitmap({:2},{:2}) -> Screen({d:6.1},{d:6.1}) -> NDC({d:7.3},{d:7.3})\n", .{
-                    point.name, point.x, point.y, 
-                    coord_data.screen.x, coord_data.screen.y, 
-                    coord_data.ndc.x, coord_data.ndc.y
-                });
+                const coord_data = coordinate_transform.bitmapToShaderSpace(point.x, point.y, glyph_width, glyph_height, target_screen_width, target_screen_height);
+                std.debug.print("    {s:12}: Bitmap({:2},{:2}) -> Screen({d:6.1},{d:6.1}) -> NDC({d:7.3},{d:7.3})\n", .{ point.name, point.x, point.y, coord_data.screen.x, coord_data.screen.y, coord_data.ndc.x, coord_data.ndc.y });
             }
         }
-        
+
         // Print bitmap pattern in text format (top 8 rows for readability)
         std.debug.print("  📄 Bitmap pattern (top 8 rows):\n", .{});
         const display_height = @min(8, glyph_height);
         const display_width = @min(16, glyph_width);
-        
+
         for (0..display_height) |y| {
             std.debug.print("    Row {:2}: ", .{y});
             for (0..display_width) |x| {
@@ -357,19 +346,19 @@ pub fn testFontCoordinateTransformation(allocator: std.mem.Allocator) !void {
             std.debug.print("    ... ({} more rows)\n", .{glyph_height - display_height});
         }
     }
-    
+
     std.debug.print("\n📊 SUMMARY:\n", .{});
     std.debug.print("✅ Analyzed {} characters with real font data\n", .{test_chars.len});
     std.debug.print("✅ Used working baseline-aligned font rasterization system\n", .{});
     std.debug.print("✅ Generated detailed coordinate transformation analysis\n", .{});
-    
+
     std.debug.print("\n✅ Font coordinate transformation test completed\n", .{});
 }
 
 /// Generate visual test output to filesystem for external verification
 pub fn generateVisualTestOutput(allocator: std.mem.Allocator, output_dir: []const u8) !void {
     if (!ENABLE_DEBUG_OUTPUT) return; // Skip when debug output disabled
-    
+
     std.debug.print("\n📁 Generating visual test output to: {s}\n", .{output_dir});
 
     // Ensure test directories exist
@@ -442,20 +431,26 @@ pub fn generateVisualTestOutput(allocator: std.mem.Allocator, output_dir: []cons
 
     // Generate simple "A" pattern
     @memset(test_bitmap, 0);
-    
+
     // Draw a simple "A" pattern
     const a_pattern = [_]struct { x: u32, y: u32 }{
         // Top bar
-        .{ .x = 7, .y = 2 }, .{ .x = 8, .y = 2 },
+        .{ .x = 7, .y = 2 },  .{ .x = 8, .y = 2 },
         // Left vertical
-        .{ .x = 6, .y = 3 }, .{ .x = 5, .y = 4 }, .{ .x = 4, .y = 5 }, .{ .x = 3, .y = 6 },
-        .{ .x = 2, .y = 7 }, .{ .x = 1, .y = 8 }, .{ .x = 0, .y = 9 },
+        .{ .x = 6, .y = 3 },  .{ .x = 5, .y = 4 },
+        .{ .x = 4, .y = 5 },  .{ .x = 3, .y = 6 },
+        .{ .x = 2, .y = 7 },  .{ .x = 1, .y = 8 },
+        .{ .x = 0, .y = 9 },
         // Right vertical
-        .{ .x = 9, .y = 3 }, .{ .x = 10, .y = 4 }, .{ .x = 11, .y = 5 }, .{ .x = 12, .y = 6 },
-        .{ .x = 13, .y = 7 }, .{ .x = 14, .y = 8 }, .{ .x = 15, .y = 9 },
+         .{ .x = 9, .y = 3 },
+        .{ .x = 10, .y = 4 }, .{ .x = 11, .y = 5 },
+        .{ .x = 12, .y = 6 }, .{ .x = 13, .y = 7 },
+        .{ .x = 14, .y = 8 }, .{ .x = 15, .y = 9 },
         // Cross bar
-        .{ .x = 4, .y = 6 }, .{ .x = 5, .y = 6 }, .{ .x = 6, .y = 6 }, .{ .x = 7, .y = 6 },
-        .{ .x = 8, .y = 6 }, .{ .x = 9, .y = 6 }, .{ .x = 10, .y = 6 }, .{ .x = 11, .y = 6 },
+        .{ .x = 4, .y = 6 },  .{ .x = 5, .y = 6 },
+        .{ .x = 6, .y = 6 },  .{ .x = 7, .y = 6 },
+        .{ .x = 8, .y = 6 },  .{ .x = 9, .y = 6 },
+        .{ .x = 10, .y = 6 }, .{ .x = 11, .y = 6 },
     };
 
     for (a_pattern) |point| {
@@ -491,7 +486,7 @@ pub fn generateVisualTestOutput(allocator: std.mem.Allocator, output_dir: []cons
         // Analyze transformation
         var pixel_changes: u32 = 0;
         var max_diff: u32 = 0;
-        
+
         for (test_bitmap, 0..) |original_pixel, i| {
             const diff = @as(i32, @intCast(transformed[i])) - @as(i32, @intCast(original_pixel));
             if (diff != 0) {
@@ -569,4 +564,3 @@ test "bitmap transformation" {
 test "font coordinate transformation" {
     try testFontCoordinateTransformation(std.testing.allocator);
 }
-

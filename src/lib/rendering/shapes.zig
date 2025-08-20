@@ -4,6 +4,7 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
+const constants = @import("../core/constants.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -12,8 +13,8 @@ const Color = colors.Color;
 pub const Shapes = struct {
     /// Calculate rectangular border segments for screen edges
     pub fn calculateBorderRects(width: f32, offset: f32) [4]Rectangle {
-        const screen_width = @import("../core/constants.zig").SCREEN.BASE_WIDTH;
-        const screen_height = @import("../core/constants.zig").SCREEN.BASE_HEIGHT;
+        const screen_width = constants.SCREEN.BASE_WIDTH;
+        const screen_height = constants.SCREEN.BASE_HEIGHT;
 
         return [4]Rectangle{
             // Top border

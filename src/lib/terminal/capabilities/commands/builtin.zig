@@ -155,7 +155,7 @@ fn cmdCd(context: *CommandContext, args: []const []const u8) !void {
 
 fn cmdPwd(context: *CommandContext, args: []const []const u8) !void {
     _ = args;
-    
+
     // Get current working directory
     const cwd = std.fs.cwd().realpathAlloc(context.allocator, ".") catch |err| switch (err) {
         error.AccessDenied => try context.allocator.dupe(u8, "/"),
@@ -245,15 +245,27 @@ fn cmdCat(context: *CommandContext, args: []const []const u8) !void {
 }
 
 fn cmdEcho(context: *CommandContext, args: []const []const u8) !void {
+    std.debug.print("DEBUG_ECHO: cmdEcho called with {d} args\n", .{args.len});
+    for (args, 0..) |arg, i| {
+        std.debug.print("DEBUG_ECHO: arg[{d}] = '{s}'\n", .{ i, arg });
+    }
+
     if (args.len == 0) {
+        std.debug.print("DEBUG_ECHO: No args, calling writeOutput('\\n')\n", .{});
         try context.writeOutput("\n");
         return;
     }
 
+    std.debug.print("DEBUG_ECHO: Processing {d} args\n", .{args.len});
     for (args, 0..) |arg, i| {
-        if (i > 0) try context.writeOutput(" ");
+        if (i > 0) {
+            std.debug.print("DEBUG_ECHO: Writing space\n", .{});
+            try context.writeOutput(" ");
+        }
+        std.debug.print("DEBUG_ECHO: Writing arg '{s}'\n", .{arg});
         try context.writeOutput(arg);
     }
+    std.debug.print("DEBUG_ECHO: Writing final newline\n", .{});
     try context.writeOutput("\n");
 }
 
@@ -328,7 +340,7 @@ test "Builtin capability initialization" {
 
 test "Builtin echo command" {
     const allocator = std.testing.allocator;
-    
+
     // Mock context
     var output = std.ArrayList(u8).init(allocator);
     defer output.deinit();
@@ -355,7 +367,7 @@ test "Builtin echo command" {
 
 test "Builtin clear command" {
     const allocator = std.testing.allocator;
-    
+
     var output = std.ArrayList(u8).init(allocator);
     defer output.deinit();
 

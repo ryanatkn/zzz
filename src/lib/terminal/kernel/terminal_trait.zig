@@ -9,31 +9,31 @@ pub const ITerminal = struct {
     pub const VTable = struct {
         /// Write text to terminal output
         write: *const fn (ptr: *anyopaque, text: []const u8) anyerror!void,
-        
+
         /// Read input from terminal (non-blocking)
         read: *const fn (ptr: *anyopaque, buffer: []u8) anyerror!usize,
-        
+
         /// Clear terminal display
         clear: *const fn (ptr: *anyopaque) void,
-        
+
         /// Resize terminal dimensions
         resize: *const fn (ptr: *anyopaque, columns: usize, rows: usize) void,
-        
+
         /// Handle input event
         handleInput: *const fn (ptr: *anyopaque, input: InputEvent) anyerror!void,
-        
+
         /// Check if capability is supported
         hasCapability: *const fn (ptr: *anyopaque, capability: []const u8) bool,
-        
+
         /// Get capability instance
         getCapability: *const fn (ptr: *anyopaque, capability: []const u8) ?*anyopaque,
-        
+
         /// Emit event to subscribed capabilities
         emit: *const fn (ptr: *anyopaque, event: events.Event) anyerror!void,
-        
+
         /// Subscribe to event type
         subscribe: *const fn (ptr: *anyopaque, event_type: events.EventType, callback: events.EventCallback) anyerror!void,
-        
+
         /// Cleanup terminal resources
         deinit: *const fn (ptr: *anyopaque) void,
     };

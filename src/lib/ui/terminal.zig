@@ -3,6 +3,7 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const input = @import("../platform/input.zig");
+const sdl = @import("../platform/sdl.zig");
 const terminal_mod = @import("../terminal/mod.zig");
 const text_renderer = @import("../text/renderer.zig");
 
@@ -10,15 +11,15 @@ const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
 const Color = colors.Color;
 const InputState = input.InputState;
-const TerminalEngine = terminal_mod.TerminalEngine;
-const Key = terminal_mod.Key;
+const CommandTerminal = terminal_mod.presets.CommandTerminal;
+const Key = terminal_mod.kernel.Key;
 const TextRenderer = text_renderer.TextRenderer;
 
 /// Reactive terminal UI component
 pub const TerminalComponent = struct {
     // Core
     allocator: std.mem.Allocator,
-    terminal_engine: TerminalEngine,
+    terminal: CommandTerminal,
 
     // Reactive state
     bounds: reactive.Signal(Rectangle),
@@ -66,7 +67,7 @@ pub const TerminalComponent = struct {
 
         var component = Self{
             .allocator = allocator,
-            .terminal_engine = try TerminalEngine.init(allocator),
+            .terminal = try CommandTerminal.init(allocator),
             .bounds = bounds_signal,
             .font_size = font_size_signal,
             .line_height = line_height_signal,
@@ -91,7 +92,7 @@ pub const TerminalComponent = struct {
 
     /// Cleanup terminal component
     pub fn deinit(self: *Self) void {
-        self.terminal_engine.deinit();
+        self.terminal.deinit();
         self.bounds.deinit();
         self.font_size.deinit();
         self.line_height.deinit();
@@ -108,7 +109,7 @@ pub const TerminalComponent = struct {
 
     /// Update terminal component (called each frame)
     pub fn update(self: *Self, dt: f32) void {
-        self.terminal_engine.update(dt);
+        self.terminal.update(dt) catch {};
 
         // Handle key repeat
         if (self.current_key) |key| {
@@ -116,7 +117,7 @@ pub const TerminalComponent = struct {
             const delay = if (self.last_key_time < self.key_repeat_delay) self.key_repeat_delay else self.key_repeat_rate;
 
             if (self.last_key_time >= delay) {
-                self.terminal_engine.handleKey(key) catch {};
+                self.terminal.handleKey(key) catch {};
                 self.last_key_time = 0.0;
             }
         }
@@ -127,7 +128,7 @@ pub const TerminalComponent = struct {
         // Update terminal engine dimensions
         const rows = self.visible_rows.get();
         const cols = self.visible_columns.get();
-        self.terminal_engine.resize(cols, rows);
+        self.terminal.resize(cols, rows) catch {};
     }
 
     /// Render terminal content
@@ -141,7 +142,7 @@ pub const TerminalComponent = struct {
         }
 
         // Get visible content from terminal engine
-        const content = self.terminal_engine.getVisibleContent();
+        const content = self.terminal.getVisibleContent();
         const line_height = self.line_height.get();
         const char_width = self.char_width.get();
         const text_color = self.text_color.get();
@@ -252,7 +253,6 @@ pub const TerminalComponent = struct {
         var handled = false;
 
         // Convert SDL scancodes to terminal keys
-        const sdl = @import("../platform/sdl.zig");
 
         // Check for key presses
         if (input_state.isKeyDown(sdl.sdl.SDL_SCANCODE_RETURN)) {
@@ -362,12 +362,12 @@ pub const TerminalComponent = struct {
 
     /// Execute a command
     pub fn executeCommand(self: *Self, command: []const u8) !void {
-        try self.terminal_engine.executeCommand(command);
+        try self.terminal.executeCommand(command);
     }
 
     /// Clear terminal
     pub fn clear(self: *Self) void {
-        self.terminal_engine.clear();
+        self.terminal.clear();
     }
 
     /// Set focus state
@@ -380,7 +380,7 @@ pub const TerminalComponent = struct {
 
     /// Get current working directory
     pub fn getWorkingDirectory(self: *const Self) []const u8 {
-        return self.terminal_engine.getWorkingDirectory();
+        return self.terminal.getWorkingDirectory();
     }
 
     /// Set bounds for terminal component
@@ -391,7 +391,7 @@ pub const TerminalComponent = struct {
 
     /// Handle key press with repeat logic (internal method)
     fn processKey(self: *Self, key: Key) !void {
-        try self.terminal_engine.handleKey(key);
+        try self.terminal.handleKey(key);
         self.current_key = key;
         self.last_key_time = 0.0;
     }
@@ -406,47 +406,50 @@ pub const TerminalComponent = struct {
     }
 
     /// Handle SDL keyboard event directly (called from HUD)
-    pub fn handleKeyPress(self: *Self, key_event: @import("../platform/sdl.zig").sdl.SDL_KeyboardEvent) bool {
+    pub fn handleKeyPress(self: *Self, key_event: sdl.sdl.SDL_KeyboardEvent) bool {
+        const log = std.log.scoped(.terminal_input);
+
+        log.info("Terminal handleKeyPress called - scancode: {d}, focused: {}", .{ key_event.scancode, self.is_focused.get() });
+
         if (!self.is_focused.get()) {
+            log.warn("Terminal not focused, ignoring key input", .{});
             return false;
         }
-
-        const sdl = @import("../platform/sdl.zig");
 
         // Convert SDL key event to terminal key
         var handled = false;
 
         switch (key_event.scancode) {
             sdl.sdl.SDL_SCANCODE_RETURN => {
-                self.terminal_engine.handleKey(.enter) catch {};
+                self.terminal.handleKey(.enter) catch {};
                 handled = true;
             },
             sdl.sdl.SDL_SCANCODE_BACKSPACE => {
-                self.terminal_engine.handleKey(.backspace) catch {};
+                self.terminal.handleKey(.backspace) catch {};
                 handled = true;
             },
             sdl.sdl.SDL_SCANCODE_DELETE => {
-                self.terminal_engine.handleKey(.delete) catch {};
+                self.terminal.handleKey(.delete) catch {};
                 handled = true;
             },
             sdl.sdl.SDL_SCANCODE_TAB => {
-                self.terminal_engine.handleKey(.tab) catch {};
+                self.terminal.handleKey(.tab) catch {};
                 handled = true;
             },
             sdl.sdl.SDL_SCANCODE_UP => {
-                self.terminal_engine.handleKey(.up_arrow) catch {};
+                self.terminal.handleKey(.up_arrow) catch {};
                 handled = true;
             },
             sdl.sdl.SDL_SCANCODE_DOWN => {
-                self.terminal_engine.handleKey(.down_arrow) catch {};
+                self.terminal.handleKey(.down_arrow) catch {};
                 handled = true;
             },
             sdl.sdl.SDL_SCANCODE_LEFT => {
-                self.terminal_engine.handleKey(.left_arrow) catch {};
+                self.terminal.handleKey(.left_arrow) catch {};
                 handled = true;
             },
             sdl.sdl.SDL_SCANCODE_RIGHT => {
-                self.terminal_engine.handleKey(.right_arrow) catch {};
+                self.terminal.handleKey(.right_arrow) catch {};
                 handled = true;
             },
             else => {
@@ -454,8 +457,11 @@ pub const TerminalComponent = struct {
                 const shift_held = (key_event.mod & sdl.sdl.SDL_KMOD_SHIFT) != 0;
 
                 if (self.scancodeToChar(key_event.scancode, shift_held)) |ch| {
-                    self.terminal_engine.handleKey(Key{ .char = ch }) catch {};
+                    log.info("Character input: '{c}' (ASCII {d})", .{ ch, ch });
+                    self.terminal.handleKey(Key{ .char = ch }) catch {};
                     handled = true;
+                } else {
+                    log.warn("Unknown scancode: {d} (shift: {})", .{ key_event.scancode, shift_held });
                 }
             },
         }
@@ -495,7 +501,7 @@ pub const TerminalComponent = struct {
 
     /// Get command prompt string
     fn getPrompt(self: *const Self) ![]u8 {
-        const cwd = self.terminal_engine.getWorkingDirectory();
+        const cwd = self.terminal.getWorkingDirectory();
 
         // Extract directory name from full path
         const dir_name = if (std.fs.path.basename(cwd).len > 0)
@@ -509,7 +515,6 @@ pub const TerminalComponent = struct {
     /// Convert SDL scancode to ASCII character
     fn scancodeToChar(self: *const Self, scancode: u32, shift_held: bool) ?u8 {
         _ = self;
-        const sdl = @import("../platform/sdl.zig");
 
         return switch (scancode) {
             sdl.sdl.SDL_SCANCODE_A => if (shift_held) 'A' else 'a',

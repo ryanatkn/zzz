@@ -1,5 +1,5 @@
 // Terminal Test Barrel File
-// 
+//
 // This file re-exports all tests from the terminal module for clean integration
 // with the main test suite. It ensures all terminal tests are discoverable
 // and runnable through a single import point.

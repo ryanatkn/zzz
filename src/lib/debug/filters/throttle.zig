@@ -1,4 +1,5 @@
 const std = @import("std");
+const config = @import("../config.zig");
 
 /// Throttle filter to reduce log spam while preserving important information
 /// Refactored from the original log_throttle.zig to fit the new architecture
@@ -22,7 +23,6 @@ pub const Throttle = struct {
     first_time_delay_ms: i64 = 1000, // Allow first occurrences for 1 second
 
     pub fn init(allocator: std.mem.Allocator) Self {
-        const config = @import("../config.zig");
         return Self{
             .entries = std.AutoHashMap(u64, LogEntry).init(allocator),
             .allocator = allocator,

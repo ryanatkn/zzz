@@ -1,4 +1,9 @@
 const std = @import("std");
+const reactive = @import("../reactive.zig");
+const signal_mod = @import("signal.zig");
+const derived_mod = @import("derived.zig");
+const effect_mod = @import("effect.zig");
+const Signal = signal_mod.Signal;
 
 /// Test utilities for reactive system tests
 /// Provides cleaner patterns for working around Zig's closure limitations
@@ -158,7 +163,6 @@ pub const ReactiveTestSetup = struct {
     initialized: bool = false,
 
     pub fn init(allocator: std.mem.Allocator) !@This() {
-        const reactive = @import("../reactive.zig");
         try reactive.init(allocator);
 
         return @This(){
@@ -169,30 +173,25 @@ pub const ReactiveTestSetup = struct {
 
     pub fn deinit(self: *@This()) void {
         if (self.initialized) {
-            const reactive = @import("../reactive.zig");
             reactive.deinit(self.allocator);
             self.initialized = false;
         }
     }
 
-    pub fn createSignal(self: *@This(), comptime T: type, initial: T) !@import("signal.zig").Signal(T) {
-        const signal_mod = @import("signal.zig");
+    pub fn createSignal(self: *@This(), comptime T: type, initial: T) !Signal(T) {
         return try signal_mod.signal(self.allocator, T, initial);
     }
 
-    pub fn createDerived(self: *@This(), comptime T: type, derive_fn: *const fn () T) !*@import("derived.zig").Derived(T) {
-        const derived_mod = @import("derived.zig");
+    pub fn createDerived(self: *@This(), comptime T: type, derive_fn: *const fn () T) !*derived_mod.Derived(T) {
         return try derived_mod.derived(self.allocator, T, derive_fn);
     }
 
-    pub fn createEffect(self: *@This(), effect_fn: *const fn () void) !*@import("effect.zig").Effect {
-        const effect_mod = @import("effect.zig");
+    pub fn createEffect(self: *@This(), effect_fn: *const fn () void) !*effect_mod.Effect {
         return try effect_mod.createEffect(self.allocator, effect_fn);
     }
 };
 
-// Export for use by other modules
-const Signal = @import("signal.zig").Signal;
+// Signal is already imported at the top
 
 // Tests for the test utilities themselves
 test "effect counter basic operations" {

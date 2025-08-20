@@ -19,6 +19,7 @@ const combat = @import("combat.zig");
 const portals = @import("portals.zig");
 const controls = @import("controls.zig");
 const behaviors = @import("behaviors/mod.zig");
+const router = @import("hud/router.zig");
 
 // Reactive system imports
 const reactive_context = @import("../lib/reactive/context.zig");
@@ -117,7 +118,6 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     game_state.?.* = try GameState.init(global_allocator);
 
     // Set global reference for world reloading in HUD
-    const router = @import("hud/router.zig");
     router.setGameStateReference(game_state.?);
 
     // Initialize behavior system for modular AI

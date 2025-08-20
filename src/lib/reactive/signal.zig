@@ -3,6 +3,7 @@ const context = @import("context.zig");
 const observer = @import("observer.zig");
 const utils = @import("utils.zig");
 const batch_mod = @import("batch.zig");
+const effect_mod = @import("effect.zig");
 
 /// A reactive signal that holds a value and notifies observers when changed
 /// Uses shallow equality checking for optimal performance
@@ -216,7 +217,6 @@ test "signal shallow equality semantics" {
     defer point_signal.deinit();
 
     var effect_runs: u32 = 0;
-    const effect_mod = @import("effect.zig");
     const TestData = struct {
         var signal_ref: *Signal(Point) = undefined;
         var runs: *u32 = undefined;
@@ -258,7 +258,6 @@ test "signal manual notification" {
     defer list_signal.deinit();
 
     var effect_runs: u32 = 0;
-    const effect_mod = @import("effect.zig");
     const TestData = struct {
         var signal_ref: *Signal([3]i32) = undefined;
         var runs: *u32 = undefined;

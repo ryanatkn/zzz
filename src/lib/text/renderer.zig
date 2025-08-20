@@ -4,6 +4,7 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const persistent_text = @import("cache.zig");
 const loggers = @import("../debug/loggers.zig");
+const texture_utils = @import("../image/texture.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -149,7 +150,6 @@ pub const TextRenderer = struct {
 
     /// Debug function to test text pipeline with checkerboard pattern
     pub fn debugTestTexturePipeline(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
-        const texture_utils = @import("../image/texture.zig");
 
         // Create simple white texture for testing
         const debug_texture = try texture_utils.createWhiteTexture(self.device);

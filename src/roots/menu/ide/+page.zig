@@ -46,7 +46,7 @@ pub const IDEPage = struct {
     terminal_component: ?TerminalComponent = null,
 
     // Focus management
-    focused_panel: FocusedPanel = .FileTree,
+    focused_panel: FocusedPanel = .Terminal,
 
     /// Get currently selected file entry
     pub fn getSelectedEntry(self: *const IDEPage) ?*DirectoryEntry {
@@ -155,12 +155,13 @@ pub const IDEPage = struct {
         {
             self.focused_panel = .Terminal;
 
-            // Ensure terminal is initialized
-            _ = self.getTerminal() catch {
+            // Ensure terminal is initialized and focused
+            if (self.getTerminal()) |terminal| {
+                terminal.setFocus(true);
+                return true;
+            } else |_| {
                 return false;
-            };
-
-            return true;
+            }
         }
 
         return false;
@@ -168,10 +169,21 @@ pub const IDEPage = struct {
 
     /// Handle keyboard input for focused panel
     pub fn handleKeyboardInput(self: *IDEPage, key_event: @import("../../../lib/platform/sdl.zig").sdl.SDL_KeyboardEvent) bool {
-        if (self.focused_panel != .Terminal) return false;
+        const log = std.log.scoped(.ide_input);
+        log.info("IDE handleKeyboardInput - focused_panel: {}, scancode: {d}", .{ self.focused_panel, key_event.scancode });
+
+        if (self.focused_panel != .Terminal) {
+            log.info("Not terminal focused, panel: {}", .{self.focused_panel});
+            return false;
+        }
 
         if (self.terminal_component) |*terminal| {
+            // Ensure terminal component is focused
+            terminal.setFocus(true);
+            log.info("Forwarding key to terminal component", .{});
             return terminal.handleKeyPress(key_event);
+        } else {
+            log.warn("Terminal component not initialized", .{});
         }
 
         return false;

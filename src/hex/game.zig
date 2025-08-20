@@ -37,6 +37,7 @@ const spells = @import("spells.zig");
 const save_data = @import("save_data.zig");
 const spellbar = @import("spellbar.zig");
 const faction_integration = @import("faction_integration.zig");
+const loader = @import("loader.zig");
 
 // HUD modules
 const hud = @import("hud/hud.zig");
@@ -279,8 +280,6 @@ pub const GameState = struct {
 
     /// Reload the game with a different world
     pub fn reloadWithWorld(self: *Self, world_path: []const u8) !void {
-        const loader = @import("loader.zig");
-
         self.logger.info("world_reload", "Reloading with world: {s}", .{world_path});
 
         // Clean up HUD before world reload to prevent reactive state corruption
@@ -300,7 +299,7 @@ pub const GameState = struct {
             self.logger.err("world_reload_failed", "Failed to load world {s}: {}", .{ world_path, err });
 
             // Try to recover by loading the default world
-            const fallback_world = @import("loader.zig").DEFAULT_WORLD;
+            const fallback_world = loader.DEFAULT_WORLD;
             self.logger.info("world_reload_fallback", "Attempting fallback to: {s}", .{fallback_world});
 
             loader.loadWorldData(self.allocator, &self.hex_game, fallback_world) catch |fallback_err| {

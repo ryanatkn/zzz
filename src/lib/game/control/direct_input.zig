@@ -3,6 +3,7 @@ const builtin = @import("builtin");
 const c = @import("../../platform/sdl.zig");
 const input = @import("../../platform/input.zig");
 const math = @import("../../math/mod.zig");
+const loggers = @import("../../debug/loggers.zig");
 
 const Vec2 = math.Vec2;
 
@@ -73,7 +74,6 @@ pub const DirectInputBuffer = extern struct {
         }
 
         pub fn debugLayout() void {
-            const loggers = @import("../../debug/loggers.zig");
             loggers.getGameLog().info("ai_layout", "InputCommand layout: size={}, frame@{}, keys@{}, mouse_x@{}, mouse_y@{}, buttons@{}, padding@{}", .{ @sizeOf(InputCommand), @offsetOf(InputCommand, "frame"), @offsetOf(InputCommand, "keys_down"), @offsetOf(InputCommand, "mouse_x"), @offsetOf(InputCommand, "mouse_y"), @offsetOf(InputCommand, "buttons"), @offsetOf(InputCommand, "_padding") });
         }
     };
@@ -169,7 +169,6 @@ pub const DirectInputBuffer = extern struct {
 
 /// Apply command to input state
 pub fn applyCommand(cmd: DirectInputBuffer.InputCommand, state: *input.InputState) void {
-    const loggers = @import("../../debug/loggers.zig");
 
     // Log raw command bytes for debugging
     const cmd_bytes = @as([*]const u8, @ptrCast(&cmd))[0..@sizeOf(DirectInputBuffer.InputCommand)];
@@ -202,7 +201,6 @@ pub fn applyCommand(cmd: DirectInputBuffer.InputCommand, state: *input.InputStat
 
 /// Process all pending commands for the current frame
 pub fn processCommands(buffer: *DirectInputBuffer, state: *input.InputState, current_frame: u32) void {
-    const loggers = @import("../../debug/loggers.zig");
 
     // Update frame counter in buffer
     buffer.setCurrentFrame(current_frame);

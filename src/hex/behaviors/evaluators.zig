@@ -9,6 +9,7 @@ const ProfileConfigs = @import("profiles.zig").ProfileConfigs;
 const Disposition = @import("../disposition.zig").Disposition;
 const constants = @import("../constants.zig");
 const behaviors_mod = @import("../../lib/game/behaviors/mod.zig");
+const Color = @import("../../lib/core/colors.zig").Color;
 
 // Import individual behavior modules
 const chase_behavior = behaviors_mod.chase_behavior;
@@ -29,7 +30,7 @@ pub const ComposedBehaviorResult = struct {
     stopped_fleeing: bool = false,
 
     /// Get color for this behavior and profile (optional helper)
-    pub fn getColor(self: ComposedBehaviorResult, profile: Disposition) @import("../../lib/core/colors.zig").Color {
+    pub fn getColor(self: ComposedBehaviorResult, profile: Disposition) Color {
         return getBehaviorColor(self.active_behavior, profile);
     }
 };

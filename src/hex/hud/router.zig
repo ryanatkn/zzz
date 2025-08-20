@@ -200,7 +200,7 @@ pub const Router = struct {
             const layout = try root_layout.create(self.allocator);
             try layout.init(self.allocator);
             try self.current_layouts.append(layout);
-            
+
             // Load reactive test page
             self.current_page = try reactive_test_page.create(self.allocator);
         } else {
@@ -259,11 +259,11 @@ pub const Router = struct {
     fn handleReactiveTestAction(self: *Router, query: []const u8) !void {
         const log = std.log.scoped(.reactive_test_action);
         log.info("Handling reactive test action: '{s}'", .{query});
-        
+
         if (self.current_page) |current_page| {
             if (std.mem.eql(u8, current_page.path, "/reactive-test")) {
                 const reactive_page_impl: *reactive_test_page.ReactiveTestPage = @fieldParentPtr("base", current_page);
-                
+
                 if (std.mem.eql(u8, query, "current_increment")) {
                     log.info("Incrementing current system counter", .{});
                     // Increment current system counter

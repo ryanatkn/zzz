@@ -6,6 +6,8 @@ const router_mod = @import("router.zig");
 const game_renderer = @import("../game_renderer.zig");
 const browser_renderer = @import("renderer.zig");
 const page = @import("../../lib/browser/page.zig");
+const math = @import("../../lib/math/mod.zig");
+const ide_page = @import("../../roots/menu/ide/+page.zig");
 
 pub const Hud = struct {
     is_open: bool,
@@ -98,8 +100,8 @@ pub const Hud = struct {
 
                             if (std.mem.eql(u8, current_page.path, "/ide")) {
                                 log.info("On IDE page, handling IDE interactions", .{});
-                                const ide_page_impl: *@import("../../roots/menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
-                                const point = @import("../../lib/math/mod.zig").Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
+                                const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
+                                const point = math.Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
 
                                 // Try terminal click first
                                 if (ide_page_impl.handleTerminalClick(point)) {
@@ -171,13 +173,13 @@ pub const Hud = struct {
                 // Check IDE page-specific hover first
                 if (self.router.getCurrentPage()) |current_page| {
                     if (std.mem.eql(u8, current_page.path, "/ide")) {
-                        const ide_page_impl: *@import("../../roots/menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
+                        const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
 
-                        const point = @import("../../lib/math/mod.zig").Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
+                        const point = math.Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
 
                         // Adjust point to be relative to file explorer panel (same as in handleFileTreeClick)
-                        const explorer_rect = @import("../../lib/math/mod.zig").Vec2{ .x = 8 + 8, .y = 60 + 8 + 30 };
-                        const relative_point = @import("../../lib/math/mod.zig").Vec2{ .x = point.x - explorer_rect.x, .y = point.y - explorer_rect.y };
+                        const explorer_rect = math.Vec2{ .x = 8 + 8, .y = 60 + 8 + 30 };
+                        const relative_point = math.Vec2{ .x = point.x - explorer_rect.x, .y = point.y - explorer_rect.y };
 
                         ide_page_impl.file_tree_component.handleHover(relative_point);
                     }
@@ -212,7 +214,7 @@ pub const Hud = struct {
                 // Route to current page for input handling
                 if (self.router.getCurrentPage()) |current_page| {
                     if (std.mem.eql(u8, current_page.path, "/ide")) {
-                        const ide_page_impl: *@import("../../roots/menu/ide/+page.zig").IDEPage = @fieldParentPtr("base", current_page);
+                        const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
                         if (ide_page_impl.handleKeyboardInput(key_event)) {
                             return true; // IDE page handled the key
                         }

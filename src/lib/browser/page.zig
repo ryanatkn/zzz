@@ -1,5 +1,6 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
+const constants = @import("../core/constants.zig");
 
 pub const Link = struct {
     text: []const u8,
@@ -104,7 +105,6 @@ pub fn createResponsiveLink(text: []const u8, path: []const u8, norm_x: f32, nor
 /// Create a link using base 1920x1080 coordinates converted to current screen size
 /// This allows using existing coordinate values while being responsive
 pub fn createLinkFrom1080p(text: []const u8, path: []const u8, x_1080p: f32, y_1080p: f32, width_1080p: f32, height_1080p: f32, screen_width: f32, screen_height: f32) Link {
-    const constants = @import("../core/constants.zig");
     const scale_x = screen_width / constants.SCREEN.BASE_WIDTH;
     const scale_y = screen_height / constants.SCREEN.BASE_HEIGHT;
     return createLink(
