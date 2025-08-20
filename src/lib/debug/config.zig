@@ -37,6 +37,12 @@ pub const debug_log = .{
     .min_level = .debug,
 };
 
+// Font test debug output configuration
+pub const font_test_debug = .{
+    .enable_file_output = false, // Controls .zz/test-font/ file generation
+    .output_dir = ".zz/test-font",
+};
+
 // Optional: Load runtime overrides from ZON file
 // This is primarily for development/debugging
 pub fn loadOverrides(allocator: std.mem.Allocator) !OverrideConfig {

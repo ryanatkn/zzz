@@ -3,6 +3,9 @@ const events = @import("events.zig");
 
 // Import all capability types
 const KeyboardInput = @import("../capabilities/input/keyboard.zig").KeyboardInput;
+const ReadlineInput = @import("../capabilities/input/readline.zig").ReadlineInput;
+const MouseInput = @import("../capabilities/input/mouse.zig").MouseInput;
+const BufferedOutput = @import("../capabilities/output/buffered.zig").BufferedOutput;
 const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
 const AnsiWriter = @import("../capabilities/output/ansi_writer.zig").AnsiWriter;
 const Cursor = @import("../capabilities/state/cursor.zig").Cursor;
@@ -17,17 +20,18 @@ const Executor = @import("../capabilities/commands/executor.zig").Executor;
 const Builtin = @import("../capabilities/commands/builtin.zig").Builtin;
 const Pipeline = @import("../capabilities/commands/pipeline.zig").Pipeline;
 
-// Import test types for testing
-const MockCapability = @import("test_kernel.zig").MockCapability;
 
 /// Type-safe capability storage using tagged union
 pub const CapabilityData = union(enum) {
     // Input capabilities
     keyboard_input: *KeyboardInput,
+    readline_input: *ReadlineInput,
+    mouse_input: *MouseInput,
     
     // Output capabilities
     basic_writer: *BasicWriter,
     ansi_writer: *AnsiWriter,
+    buffered_output: *BufferedOutput,
     
     // State capabilities
     cursor: *Cursor,
@@ -44,8 +48,6 @@ pub const CapabilityData = union(enum) {
     builtin: *Builtin,
     pipeline: *Pipeline,
     
-    // Test capabilities
-    mock_capability: *MockCapability,
     
     /// Type-safe casting with compile-time validation
     pub fn cast(self: CapabilityData, comptime T: type) ?*T {
@@ -158,7 +160,10 @@ pub fn createCapability(implementation: anytype) TypeSafeCapability {
     
     const data = switch (T) {
         KeyboardInput => CapabilityData{ .keyboard_input = implementation },
+        ReadlineInput => CapabilityData{ .readline_input = implementation },
+        MouseInput => CapabilityData{ .mouse_input = implementation },
         BasicWriter => CapabilityData{ .basic_writer = implementation },
+        BufferedOutput => CapabilityData{ .buffered_output = implementation },
         AnsiWriter => CapabilityData{ .ansi_writer = implementation },
         Cursor => CapabilityData{ .cursor = implementation },
         LineBuffer => CapabilityData{ .line_buffer = implementation },
@@ -171,7 +176,6 @@ pub fn createCapability(implementation: anytype) TypeSafeCapability {
         Executor => CapabilityData{ .executor = implementation },
         Builtin => CapabilityData{ .builtin = implementation },
         Pipeline => CapabilityData{ .pipeline = implementation },
-        MockCapability => CapabilityData{ .mock_capability = implementation },
         else => @compileError("Unsupported capability type: " ++ @typeName(T)),
     };
     
@@ -381,11 +385,3 @@ test "TypeSafeCapabilityRegistry operations" {
     try std.testing.expect(!registry.hasCapability("test"));
 }
 
-// TODO: Fix this test - memory lifecycle issue
-// test "TypeSafeCapabilityRegistry with real capabilities" {
-
-// TODO: Fix this test - memory lifecycle issue
-// test "TypeSafeCapabilityRegistry dependency resolution" {
-
-// TODO: Fix this test - memory lifecycle issue  
-// test "TypeSafeCapabilityRegistry error handling" {

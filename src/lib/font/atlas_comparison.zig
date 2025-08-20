@@ -6,8 +6,8 @@ const font_atlas = @import("font_atlas.zig");
 const test_helpers = @import("test_helpers.zig");
 const test_main = @import("test.zig");
 
-// Output directory for test files
-const TEST_OUTPUT_DIR = ".zz/test-font";
+const debug_config = @import("../debug/config.zig");
+const ENABLE_DEBUG_OUTPUT = debug_config.font_test_debug.enable_file_output;
 
 /// Compare our test rasterizer output with what the font atlas actually uses
 pub fn compareRasterizerWithAtlas() !void {
@@ -63,12 +63,17 @@ pub fn compareRasterizerWithAtlas() !void {
     // Save both regular and Y-flipped versions for comparison
     try saveBitmapComparison(allocator, &rasterized, test_char);
 
-    std.debug.print("\n✅ Character analysis files saved:\n", .{});
-    std.debug.print("  {s}/chars/char{}_orig.ppm\n", .{ TEST_OUTPUT_DIR, test_char });
-    std.debug.print("  {s}/chars/char{}_screen.ppm\n", .{ TEST_OUTPUT_DIR, test_char });
+    if (ENABLE_DEBUG_OUTPUT) {
+        std.debug.print("\n✅ Character analysis files saved:\n", .{});
+        std.debug.print("  .zz/test-font/chars/char{}_orig.ppm\n", .{test_char});
+        std.debug.print("  .zz/test-font/chars/char{}_screen.ppm\n", .{test_char});
+    } else {
+        std.debug.print("\n💡 Debug output disabled (ENABLE_DEBUG_OUTPUT = false)\n", .{});
+    }
 }
 
 fn saveBitmapComparison(allocator: std.mem.Allocator, rasterized: *const rasterizer_core.RasterizedGlyph, char: u8) !void {
+    if (!ENABLE_DEBUG_OUTPUT) return; // Skip file generation when debug output is disabled
 
     const width = @as(u32, @intFromFloat(rasterized.width));
     const height = @as(u32, @intFromFloat(rasterized.height));

@@ -2,6 +2,9 @@ const std = @import("std");
 const rasterizer_core = @import("rasterizer_core.zig");
 const coordinate_transform = @import("coordinate_transform.zig");
 
+const debug_config = @import("../debug/config.zig");
+const ENABLE_DEBUG_OUTPUT = debug_config.font_test_debug.enable_file_output;
+
 /// Coordinate space options for bitmap generation
 pub const CoordinateSpace = enum {
     screen, // Normal screen coordinates
@@ -318,6 +321,8 @@ pub const FontTestVisualization = struct {
         target_screen_width: f32,
         target_screen_height: f32,
     ) !void {
+        if (!ENABLE_DEBUG_OUTPUT) return; // Skip file generation when debug output is disabled
+        
         const file = try std.fs.cwd().createFile(report_path, .{});
         defer file.close();
         const writer = file.writer();
@@ -491,6 +496,8 @@ pub const FontTestVisualization = struct {
     ) !void {
         _ = self;
 
+        if (!ENABLE_DEBUG_OUTPUT) return; // Skip file generation when debug output is disabled
+        
         // Create output directory
         const dirname = std.fs.path.dirname(filename) orelse ".";
         std.fs.cwd().makePath(dirname) catch {};

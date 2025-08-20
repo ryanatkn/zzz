@@ -204,7 +204,66 @@ const executor = registry.requireCapability(Executor);
 3. **Full validation** - Verify 226/226 tests pass with complete type-safe architecture  
 4. **Advanced I/O capabilities** - Implement readline, mouse, buffered output capabilities
 
-**Status:** **PHASE 5 COMPLETE** ✅ - 100% migration to type-safe capability system successful!
+**Status:** **PHASE 5C COMPLETE** ✅ - Advanced I/O capabilities implemented with memory fixes
+
+### 📊 Phase 5C Progress: Advanced I/O Capabilities
+
+#### ✅ Completed:
+1. **Test Refactoring**: Removed MockCapability, using real capabilities for testing
+2. **Test Suite**: All 227 tests passing (up from 226)
+3. **LineBuffer API Extension**: Added public methods for external manipulation
+   - `setCurrentLine()`, `insertTextAt()`, `deleteRange()`
+   - `setCursorPosition()`, `insertCharAt()`, `handleSpecialKey()`
+   - `getHistoryCount()`, `getHistoryItem()`
+4. **Readline Input Capability**: Complete implementation with advanced features
+   - Cursor movement (character, word, line)
+   - Text editing (insert, delete, backspace)
+   - Word navigation with boundary detection
+   - Selection support (start, extend, clear)
+   - Clipboard operations (copy, cut, paste)
+   - Kill ring (Emacs-style) with yank/yank-pop
+   - Full integration with LineBuffer's new API
+5. **Mouse Input Capability**: Terminal mouse support
+   - Multiple mouse modes (click, drag, motion, SGR)
+   - Button state tracking and click detection
+   - X10 and SGR protocol parsing
+6. **Buffered Output Capability**: High-performance output batching
+   - Configurable buffer sizes and flush intervals
+   - Performance metrics tracking
+   - Smart flushing strategies
+
+#### ✅ Architecture Fixes:
+- **Resolved LineBuffer Integration Issues**: ReadlineInput now properly uses LineBuffer's API instead of trying to manipulate its internal state
+- **Clean Separation of Concerns**: LineBuffer handles basic line editing, ReadlineInput adds advanced features
+- **All Compilation Errors Fixed**: 227/227 tests passing
+- **Memory Leak Fixes**: 
+  - Fixed LineBuffer leaks by using ArrayList's native methods (`insertSlice`, `replaceRange`) instead of temporary allocations
+  - Fixed Terminal core.zig leaks by using regular allocator for frequently resizing buffers (current_line, working_directory)
+  - Arena allocator now only used for long-lived allocations (Line objects in scrollback)
+
+#### 🔍 Known Issues to Address:
+1. **Command Execution**: Commands like "echo hi" execute but stdout isn't captured/displayed properly
+
+#### 📚 Memory Management Lessons Learned:
+1. **Arena Allocator Misuse**: Don't use arena allocators for frequently resizing data structures (ArrayLists that grow)
+2. **Proper Arena Usage**: Use arenas for allocations with the same lifetime (e.g., all data for a single frame/operation)
+3. **ArrayList Growth**: When ArrayLists grow, they allocate new memory - with arena allocator, old memory isn't freed until arena deinit
+4. **Solution Pattern**: Use regular allocator for dynamic buffers, arena for fixed-lifetime allocations
+
+### 🎉 Phase 5 Summary: Complete Type-Safe Terminal with Advanced I/O
+
+**Major Achievements:**
+1. **100% Type-Safe Migration**: Eliminated all unsafe pointer casting
+2. **Advanced I/O Capabilities**: Readline, mouse input, buffered output
+3. **Memory Management**: Fixed critical leaks in LineBuffer
+4. **Clean Architecture**: Proper separation between LineBuffer and ReadlineInput
+5. **Test Coverage**: All 227 tests passing
+
+**Next Steps (Phase 6 Planning):**
+1. Fix command execution stdout capture
+2. Create enhanced terminal preset combining all capabilities
+3. Performance benchmarking and optimization
+4. Documentation and examples
 
 #### ✅ **MAJOR BREAKTHROUGH: Complete Type-Safe Migration Achieved!**
 

@@ -9,8 +9,8 @@ const test_main = @import("../test.zig");
 
 const log = std.log.scoped(.coordinate_transform_test);
 
-// Output directory for test files  
-const TEST_OUTPUT_DIR = ".zz/test-font";
+const debug_config = @import("../../debug/config.zig");
+const ENABLE_DEBUG_OUTPUT = debug_config.font_test_debug.enable_file_output;
 
 /// Test coordinate transformation accuracy against known shader values
 pub fn testCoordinateTransformAccuracy() !void {
@@ -368,6 +368,8 @@ pub fn testFontCoordinateTransformation(allocator: std.mem.Allocator) !void {
 
 /// Generate visual test output to filesystem for external verification
 pub fn generateVisualTestOutput(allocator: std.mem.Allocator, output_dir: []const u8) !void {
+    if (!ENABLE_DEBUG_OUTPUT) return; // Skip when debug output disabled
+    
     std.debug.print("\n📁 Generating visual test output to: {s}\n", .{output_dir});
 
     // Ensure test directories exist
@@ -534,6 +536,7 @@ pub fn generateVisualTestOutput(allocator: std.mem.Allocator, output_dir: []cons
 
 /// Run all coordinate transformation tests
 pub fn runAllTests(allocator: std.mem.Allocator) !void {
+    if (!ENABLE_DEBUG_OUTPUT) return; // Skip all file generation when debug output is disabled
     std.debug.print("🚀 Running coordinate transformation test suite...\n", .{});
 
     try testCoordinateTransformAccuracy();
@@ -542,7 +545,7 @@ pub fn runAllTests(allocator: std.mem.Allocator) !void {
     try testFontCoordinateTransformation(allocator);
 
     // Generate visual output for external verification
-    try generateVisualTestOutput(allocator, TEST_OUTPUT_DIR);
+    try generateVisualTestOutput(allocator, debug_config.font_test_debug.output_dir);
 
     std.debug.print("🎉 All coordinate transformation tests completed successfully!\n", .{});
 }
@@ -567,6 +570,3 @@ test "font coordinate transformation" {
     try testFontCoordinateTransformation(std.testing.allocator);
 }
 
-test "visual test output generation" {
-    try generateVisualTestOutput(std.testing.allocator, TEST_OUTPUT_DIR);
-}

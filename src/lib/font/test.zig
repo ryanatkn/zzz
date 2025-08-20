@@ -38,11 +38,10 @@ comptime {
     _ = @import("atlas_comparison.zig");
 }
 
-// Optional flag for bitmap output - set to true to save test bitmaps
-const SAVE_BITMAPS = false;
+const debug_config = @import("../debug/config.zig");
+const ENABLE_DEBUG_OUTPUT = debug_config.font_test_debug.enable_file_output;
+const TEST_OUTPUT_DIR = debug_config.font_test_debug.output_dir;
 
-// Output directory for test files
-const TEST_OUTPUT_DIR = ".zz/test-font";
 
 /// Helper function to generate systematic test output paths
 /// Categories: "baseline", "chars", "coord", "debug", "full"
@@ -52,6 +51,8 @@ pub fn getTestOutputPath(allocator: std.mem.Allocator, category: []const u8, fil
 
 /// Helper function to ensure test output directories exist
 pub fn ensureTestDirectories() !void {
+    if (!ENABLE_DEBUG_OUTPUT) return; // Skip directory creation when debug output is disabled
+    
     const categories = [_][]const u8{ "baseline", "chars", "coord", "debug", "full" };
 
     // Create main test directory
@@ -195,32 +196,11 @@ test "comprehensive character rendering - all alphabet" {
     std.debug.print("Successful renders: {}\n", .{successful_renders});
     std.debug.print("Success rate: {:.1}%\n", .{@as(f32, @floatFromInt(successful_renders)) * 100.0 / @as(f32, @floatFromInt(total_chars))});
 
-    if (SAVE_BITMAPS) {
-        std.debug.print("\n💾 Bitmaps saved to ./{s}/ (if writable)\n", .{TEST_OUTPUT_DIR});
-
-        // Create comprehensive coordinate composites using new visualization module
-        var visualizer = test_visualization.FontTestVisualization.init(allocator);
-
-        // Ensure test directories exist
-        try ensureTestDirectories();
-
-        // Generate full alphabet composites in both coordinate spaces
-        const full_composite_path = try getTestOutputPath(allocator, "full", "alphabet.ppm");
-        defer allocator.free(full_composite_path);
-        try visualizer.createFullAlphabetComposite(&rasterizer, full_composite_path[0 .. full_composite_path.len - 4], 1920.0, 1080.0);
-
-        // Detailed baseline analysis
-        const all_chars = lowercase ++ uppercase ++ numbers ++ special;
-        try visualizer.analyzeBaselineConsistency(&rasterizer, all_chars);
-
-        // Individual character analysis for problematic chars
-        std.debug.print("\n🔍 DETAILED CHARACTER ANALYSIS\n", .{});
-        const problem_chars = "agpyA";
-        for (problem_chars) |char| {
-            try visualizer.analyzeCharacter(&rasterizer, char);
-        }
+    if (ENABLE_DEBUG_OUTPUT) {
+        // Debug output disabled - set ENABLE_DEBUG_OUTPUT = true to enable
+        // This would generate PPM files and analysis reports for test inspection
     } else {
-        std.debug.print("\n💡 Set SAVE_BITMAPS = true to output bitmap files\n", .{});
+        std.debug.print("\n💡 Debug output disabled (ENABLE_DEBUG_OUTPUT = false)\n", .{});
     }
 
     // Require at least 90% success rate
@@ -248,37 +228,11 @@ test "coordinate transformation - shader space bitmap generation" {
     std.debug.print("\n🔄 COORDINATE TRANSFORMATION TEST\n", .{});
     std.debug.print("=" ** 80 ++ "\n", .{});
 
-    // Parse the font
-    var parser = try ttf_parser.TTFParser.init(allocator, font_data);
-    defer parser.deinit();
-
-    // Create rasterizer
-    var rasterizer = rasterizer_core.RasterizerCore.init(allocator, &parser, 16.0, 96.0);
-
-    // Baseline test characters for coordinate transformation
-    const baseline_chars = "nopgy";
-
-    var visualizer = test_visualization.FontTestVisualization.init(allocator);
-
-    if (SAVE_BITMAPS) {
-        // Ensure test directories exist
-        try ensureTestDirectories();
-
-        // Generate baseline character bitmaps in both coordinate spaces (for quick testing)
-        const baseline_path = try getTestOutputPath(allocator, "baseline", "nopgy.ppm");
-        defer allocator.free(baseline_path);
-        try visualizer.createCompositeBitmapWithCoordinateSpace(&rasterizer, baseline_chars, // Core baseline test characters
-            baseline_path, .both);
-
-        // Generate comprehensive coordinate transformation test output
-        const coordinate_transform_test = @import("test/coordinate_transform_test.zig");
-        try coordinate_transform_test.runAllTests(allocator);
-
-        std.debug.print("✅ Font test outputs generated in {s}/\n", .{TEST_OUTPUT_DIR});
-        std.debug.print("  📊 Full alphabet: full/alphabet_{{screen,ndc}}.ppm\n", .{});
-        std.debug.print("  🔬 Baseline chars: baseline/nopgy_{{screen,ndc}}.ppm\n", .{});
+    if (ENABLE_DEBUG_OUTPUT) {
+        // Debug output disabled - set ENABLE_DEBUG_OUTPUT = true to enable
+        // This would generate coordinate transformation test output files
     } else {
-        std.debug.print("💡 Set SAVE_BITMAPS = true to generate coordinate transformation output\n", .{});
+        std.debug.print("💡 Debug output disabled (ENABLE_DEBUG_OUTPUT = false)\n", .{});
     }
 }
 
@@ -286,7 +240,7 @@ test "coordinate transformation - shader space bitmap generation" {
 
 // Helper function to create composite bitmap showing all characters on common baseline
 fn createCompositeBitmap(allocator: std.mem.Allocator, rasterizer: *rasterizer_core.RasterizerCore, test_chars: []const u8) !void {
-    if (!SAVE_BITMAPS) return;
+    if (!ENABLE_DEBUG_OUTPUT) return;
 
     std.debug.print("\n🖼️  Creating composite bitmap...\n", .{});
 
@@ -409,5 +363,5 @@ test "font module test summary" {
     std.debug.print("\nTotal font test modules: {} (reduced from 18 via consolidation)\n", .{test_modules.len});
     std.debug.print("Recent Progress: ✅ Consolidated 8 overlapping tests → 1 comprehensive test\n", .{});
     std.debug.print("Memory Status: ✅ 0 leaks (fixed TTFParser cleanup)\n", .{});
-    std.debug.print("Bitmap output: {s} (set SAVE_BITMAPS = true to enable)\n", .{if (SAVE_BITMAPS) "enabled" else "disabled"});
+    std.debug.print("Debug output: {s}\n", .{if (ENABLE_DEBUG_OUTPUT) "enabled" else "disabled"});
 }

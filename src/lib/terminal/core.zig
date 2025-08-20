@@ -222,21 +222,26 @@ pub const Terminal = struct {
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator) Self {
-        var arena = std.heap.ArenaAllocator.init(allocator);
-        const arena_allocator = arena.allocator();
+        const arena = std.heap.ArenaAllocator.init(allocator);
 
         return Self{
             .allocator = allocator,
             .arena = arena,
             .scrollback = RingBuffer(Line, 1000).init(),
-            .current_line = std.ArrayList(u8).init(arena_allocator),
+            // Use regular allocator for frequently resizing buffers
+            // Arena is for long-lived allocations only (like Line objects in scrollback)
+            .current_line = std.ArrayList(u8).init(allocator),
             .command_history = RingBuffer([]const u8, 100).init(),
-            .working_directory = std.ArrayList(u8).init(arena_allocator),
+            .working_directory = std.ArrayList(u8).init(allocator),
         };
     }
 
     pub fn deinit(self: *Self) void {
-        // Arena allocator cleanup handles all terminal allocations automatically
+        // Clean up ArrayLists that use regular allocator
+        self.current_line.deinit();
+        self.working_directory.deinit();
+        
+        // Arena allocator cleanup handles Line allocations in scrollback
         self.arena.deinit();
     }
 

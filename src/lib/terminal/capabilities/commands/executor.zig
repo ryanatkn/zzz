@@ -50,8 +50,8 @@ pub const Executor = struct {
             try env.put(entry.key_ptr.*, entry.value_ptr.*);
         }
 
-        // Get initial working directory using arena allocator
-        var working_dir = std.ArrayList(u8).init(arena_allocator);
+        // Get initial working directory using regular allocator (not arena - it resizes)
+        var working_dir = std.ArrayList(u8).init(allocator);
         const cwd = std.fs.cwd().realpathAlloc(arena_allocator, ".") catch |err| switch (err) {
             error.AccessDenied => try arena_allocator.dupe(u8, "/"),
             else => try arena_allocator.dupe(u8, "."),
@@ -104,7 +104,10 @@ pub const Executor = struct {
             _ = process.kill() catch {};
         }
         
-        // Arena deinit frees all environment variables and working directory memory
+        // Clean up working directory (uses regular allocator now)
+        self.working_directory.deinit();
+        
+        // Arena deinit frees all environment variables
         self.arena.deinit();
         self.allocator.destroy(self.arena);
         self.event_bus = null;

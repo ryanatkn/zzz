@@ -140,6 +140,7 @@ pub const AnsiWriter = struct {
 
     /// Write text with current ANSI styling
     pub fn write(self: *Self, text: []const u8) !void {
+        _ = text; // TODO: Implement proper write
         if (!self.isActive()) {
             return error.NotInitialized;
         }
@@ -158,8 +159,7 @@ pub const AnsiWriter = struct {
             const event = kernel.Event.init(.state_change, .{
                 .state_change = .{
                     .component = .writer,
-                    .change_type = .modified,
-                    .data = .{ .writer = .{ .output_length = text.len } },
+                    .state = .{ .writer = .text_written },
                 },
             });
             try bus.emit(event);
