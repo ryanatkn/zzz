@@ -2,7 +2,7 @@
 
 A GPU-accelerated game engine built with Zig, SDL3 GPU API, and HLSL shaders, featuring the Hex 2D action RPG as a reference implementation.
 
-Performance is a top priority, and we dont care about backwards compat - always try to get to the final best code.
+Performance is a top priority, and this is a greenfield project so we dont care about backwards compat -- always search for the final best code.
 
 ## Environment
 
@@ -247,6 +247,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - Focus on code-driven visuals and algorithmic generation
 - Test frequently with `zig build run` to ensure each step works
 - Less is more - avoid over-engineering
+- Always update documentation, be concise but thorough 
 - Performance is a top priority - always optimize for the final best code
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - Keep an eye towards extracting or reusing primitives in src/lib
