@@ -22,6 +22,9 @@ pub const presets = struct {
     pub const CommandTerminal = @import("presets/command.zig").CommandTerminal;
 };
 
+// Export builder system for fluent API construction
+pub const builders = @import("builders/mod.zig");
+
 // Export command capabilities
 pub const capabilities = struct {
     pub const commands = struct {

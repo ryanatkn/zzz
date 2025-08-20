@@ -158,24 +158,16 @@ test "CapabilityRegistry - basic registration" {
     var registry = kernel.TypeSafeCapabilityRegistry.init(allocator);
     defer registry.deinit();
 
-    // Create simple capabilities for testing
-
-    const cursor = try cursor_mod.Cursor.create(allocator);
-    defer cursor_mod.Cursor.destroy(cursor, allocator);
-
-    const line_buffer = try line_buffer_mod.LineBuffer.create(allocator);
-    defer line_buffer_mod.LineBuffer.destroy(line_buffer, allocator);
-
-    const cursor_cap = kernel.createCapability(cursor);
-    const line_cap = kernel.createCapability(line_buffer);
-
-    // Register capabilities
-    try registry.register("cursor", cursor_cap);
-    try registry.register("line_buffer", line_cap);
+    // Register capabilities using new enum-based API
+    try registry.registerType(.cursor);
+    try registry.registerType(.line_buffer);
 
     // Verify registration
-    try testing.expect(registry.getCapability("cursor") != null);
-    try testing.expect(registry.getCapability("line_buffer") != null);
+    try testing.expect(registry.getCapability(.cursor) != null);
+    try testing.expect(registry.getCapability(.line_buffer) != null);
+    
+    // Verify capability count
+    try testing.expectEqual(@as(usize, 2), registry.getCapabilityCount());
 }
 
 test "CapabilityRegistry - circular dependency detection" {

@@ -7,6 +7,7 @@ const input = @import("../platform/input.zig");
 const sdl = @import("../platform/sdl.zig");
 const terminal_mod = @import("../terminal/mod.zig");
 const text_renderer = @import("../text/renderer.zig");
+const ui = @import("../ui.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -21,6 +22,7 @@ pub const TerminalComponent = struct {
     // Core
     allocator: std.mem.Allocator,
     terminal: CommandTerminal,
+    layout_renderer: ui.TerminalLayoutRenderer,
 
     // Reactive state
     bounds: reactive.Signal(Rectangle),
@@ -66,9 +68,18 @@ pub const TerminalComponent = struct {
         const scroll_offset_signal = try reactive.signal(allocator, usize, 0);
         const is_focused_signal = try reactive.signal(allocator, bool, true);
 
+        // Create layout renderer with appropriate configuration
+        const layout_config = ui.TerminalLayoutConfig{
+            .input_bg_focused = Color{ .r = 30, .g = 35, .b = 40, .a = 255 },
+            .input_bg_unfocused = Color{ .r = 15, .g = 20, .b = 25, .a = 255 },
+            .input_border = Color{ .r = 70, .g = 130, .b = 180, .a = 255 },
+            .text_color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+        };
+
         var component = Self{
             .allocator = allocator,
             .terminal = try CommandTerminal.init(allocator),
+            .layout_renderer = ui.TerminalLayoutRenderer.init(layout_config),
             .bounds = bounds_signal,
             .font_size = font_size_signal,
             .line_height = line_height_signal,
@@ -143,115 +154,34 @@ pub const TerminalComponent = struct {
         }
 
         // Get visible content from terminal engine
-        const content = self.terminal.getVisibleContent();
+        const terminal_content = self.terminal.getVisibleContent();
         const line_height = self.line_height.get();
         const char_width = self.char_width.get();
-        const text_color = self.text_color.get();
+        const font_size = self.font_size.get();
 
-        // Improved spacing and margins
-        const bottom_margin: f32 = 12; // More bottom margin
-        const top_margin: f32 = 8;
-        const side_margin: f32 = 8;
-        const line_spacing: f32 = line_height * 1.2; // 20% more spacing between lines
-        const input_padding: f32 = 4; // Padding inside input area
-
-        // Start from bottom of the terminal, leaving space for proper margins
-        const bottom_y = bounds_rect.position.y + bounds_rect.size.y - bottom_margin;
-        const input_height = line_height + (input_padding * 2); // Input with padding
-        const current_y = bottom_y - input_height;
-
-        // First render the input background with styling
-        const input_y = current_y;
-        const input_bg_rect = Rectangle{
-            .position = Vec2{ .x = bounds_rect.position.x + side_margin, .y = input_y },
-            .size = Vec2{ .x = bounds_rect.size.x - (side_margin * 2), .y = input_height },
-        };
-
-        // Draw input background - slightly different color when focused
-        const input_bg_color = if (self.is_focused.get())
-            Color{ .r = 30, .g = 35, .b = 40, .a = 255 } // Slightly lighter when focused
-        else
-            Color{ .r = 15, .g = 20, .b = 25, .a = 255 }; // Darker when not focused
-
-        if (@hasDecl(@TypeOf(renderer), "drawRect")) {
-            try renderer.drawRect(input_bg_rect, input_bg_color);
-        }
-
-        // Render input border when focused
-        if (self.is_focused.get()) {
-            const border_color = Color{ .r = 70, .g = 130, .b = 180, .a = 255 }; // Blue border
-            const border_width: f32 = 1;
-
-            if (@hasDecl(@TypeOf(renderer), "drawRect")) {
-                // Top border
-                try renderer.drawRect(Rectangle{
-                    .position = input_bg_rect.position,
-                    .size = Vec2{ .x = input_bg_rect.size.x, .y = border_width },
-                }, border_color);
-                // Bottom border
-                try renderer.drawRect(Rectangle{
-                    .position = Vec2{ .x = input_bg_rect.position.x, .y = input_bg_rect.position.y + input_bg_rect.size.y - border_width },
-                    .size = Vec2{ .x = input_bg_rect.size.x, .y = border_width },
-                }, border_color);
-                // Left border
-                try renderer.drawRect(Rectangle{
-                    .position = input_bg_rect.position,
-                    .size = Vec2{ .x = border_width, .y = input_bg_rect.size.y },
-                }, border_color);
-                // Right border
-                try renderer.drawRect(Rectangle{
-                    .position = Vec2{ .x = input_bg_rect.position.x + input_bg_rect.size.x - border_width, .y = input_bg_rect.position.y },
-                    .size = Vec2{ .x = border_width, .y = input_bg_rect.size.y },
-                }, border_color);
-            }
-        }
-
-        // Render input text with padding
-        const text_y = input_y + input_padding;
-        const text_x = bounds_rect.position.x + side_margin + input_padding;
-
-        // Show prompt
+        // Get prompt
         const prompt = try self.getPrompt();
         defer self.allocator.free(prompt);
 
-        try self.renderLine(renderer, prompt, text_x, text_y, text_color);
-        const prompt_width = @as(f32, @floatFromInt(prompt.len)) * char_width;
+        // Create TerminalContent for the layout renderer
+        var terminal_lines = terminal_content.lines;
+        const layout_content = ui.TerminalContent{
+            .lines = &terminal_lines,
+            .current_input = terminal_content.current,
+            .prompt = prompt,
+            .cursor = terminal_content.cursor,
+            .is_focused = self.is_focused.get(),
+        };
 
-        try self.renderLine(renderer, content.current, text_x + prompt_width, text_y, text_color);
-
-        // Render cursor for input line
-        if (self.is_focused.get() and content.cursor.visible) {
-            const cursor_x = text_x + prompt_width + @as(f32, @floatFromInt(content.cursor.x)) * char_width;
-            const cursor_rect = Rectangle{
-                .position = Vec2{ .x = cursor_x, .y = text_y },
-                .size = Vec2{ .x = char_width, .y = line_height },
-            };
-
-            if (@hasDecl(@TypeOf(renderer), "drawRect")) {
-                try renderer.drawRect(cursor_rect, self.cursor_color.get());
-            }
-        }
-
-        // Calculate how many lines we can display above the input
-        const available_height = current_y - (bounds_rect.position.y + top_margin);
-        const max_display_lines = @as(usize, @intFromFloat(@max(0, available_height / line_spacing)));
-        
-        // Single-pass direct rendering with chronological iterator (oldest first, top to bottom)
-        var lines_iter = content.lines;
-        var render_index: usize = 0;
-        var render_y = bounds_rect.position.y + top_margin; // Start at top of terminal area
-        
-        while (lines_iter.next()) |line| {
-            if (render_index >= max_display_lines) break;
-            if (render_y >= current_y) break; // Don't overlap with current line
-            
-            const line_text = line.getText();
-            if (line_text.len == 0) continue;
-            
-            try self.renderLine(renderer, line_text, bounds_rect.position.x + side_margin, render_y, text_color);
-            render_y += line_spacing;
-            render_index += 1;
-        }
+        // Use the unified layout renderer - this replaces ~120 lines of duplicate code!
+        try self.layout_renderer.render(
+            renderer,
+            bounds_rect,
+            layout_content,
+            font_size,
+            line_height,
+            char_width,
+        );
     }
 
     /// Handle keyboard input
@@ -502,24 +432,6 @@ pub const TerminalComponent = struct {
         self.visible_columns.set(cols);
     }
 
-    /// Render a single line of text using persistent rendering when available
-    fn renderLine(self: *const Self, renderer: anytype, text: []const u8, x: f32, y: f32, color: Color) !void {
-        // Prefer persistent text rendering for better performance
-        if (@hasDecl(@TypeOf(renderer), "queuePersistentText")) {
-            // Use persistent/retained mode rendering for stable text
-            renderer.queuePersistentText(text, Vec2{ .x = x, .y = y }, null, .sans, self.font_size.get(), color) catch |err| {
-                // Fallback to immediate mode on error
-                if (@hasDecl(@TypeOf(renderer), "drawText")) {
-                    try renderer.drawText(text, x, y, self.font_size.get(), color);
-                } else {
-                    _ = err; // Silence unused error
-                }
-            };
-        } else if (@hasDecl(@TypeOf(renderer), "drawText")) {
-            // Fallback to immediate mode for renderers without persistent text
-            try renderer.drawText(text, x, y, self.font_size.get(), color);
-        }
-    }
 
     /// Get command prompt string
     fn getPrompt(self: *const Self) ![]u8 {

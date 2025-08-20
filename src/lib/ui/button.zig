@@ -151,7 +151,7 @@ pub const Button = struct {
         _ = try reactive.createEffect(allocator, state_context.updateVisuals);
     }
 
-    pub fn deinit(self: *Component, allocator: std.mem.Allocator) void {
+    pub fn deinit(self: *Component, _: std.mem.Allocator) void {
         const button: *Button = @fieldParentPtr("base", self);
 
         // Cleanup button-specific signals
@@ -268,7 +268,7 @@ pub const Button = struct {
     fn centerText(self: *Button) void {
         if (self.text_component) |text_comp| {
             const button_bounds = self.base.props.getBounds();
-            const style = self.button_style.get();
+            _ = self.button_style.get();
             const text_impl: *Text = @fieldParentPtr("base", text_comp);
             const text_size = text_impl.getMeasuredSize();
 
@@ -324,7 +324,7 @@ pub const Button = struct {
 pub fn createButton(allocator: std.mem.Allocator, label: []const u8, position: Vec2, size: Vec2, style: ButtonStyle, click_handler: ?*const fn () void) !*Component {
     const button = try allocator.create(Button);
 
-    var props = try ComponentProps.init(allocator, position, size);
+    const props = try ComponentProps.init(allocator, position, size);
 
     button.* = Button{
         .base = Component{
@@ -374,14 +374,13 @@ test "button creation and basic operations" {
     try reactive.init(allocator);
     defer reactive.deinit(allocator);
 
-    var clicked = false;
     const TestClickHandler = struct {
         fn onClick() void {
-            clicked = true;
+            // Test click handler - doesn't modify external state
         }
     };
 
-    var button = try createSimpleButton(allocator, "Test Button", Vec2{ .x = 10, .y = 20 }, TestClickHandler.onClick);
+    const button = try createSimpleButton(allocator, "Test Button", Vec2{ .x = 10, .y = 20 }, TestClickHandler.onClick);
     defer button.destroy(allocator);
 
     const button_impl: *Button = @fieldParentPtr("base", button);

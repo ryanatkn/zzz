@@ -298,10 +298,15 @@ pub const ReadlineInput = struct {
 
     /// Start selection at current cursor position
     pub fn startSelection(self: *Self) void {
-        const line_buffer = self.line_buffer.?;
-        const pos = line_buffer.getCursorPosition();
-        self.selection_start = pos;
-        self.selection_end = pos;
+        if (self.line_buffer) |line_buffer| {
+            const pos = line_buffer.getCursorPosition();
+            self.selection_start = pos;
+            self.selection_end = pos;
+        } else {
+            // If no line buffer, start at position 0
+            self.selection_start = 0;
+            self.selection_end = 0;
+        }
     }
 
     /// Extend selection to current cursor position
@@ -375,7 +380,7 @@ pub const ReadlineInput = struct {
     // Helper functions
 
     /// Update word boundaries for current line
-    fn updateWordBoundaries(self: *Self, line: []const u8) !void {
+    pub fn updateWordBoundaries(self: *Self, line: []const u8) !void {
         self.word_boundaries.clearRetainingCapacity();
 
         var in_word = false;
@@ -394,7 +399,7 @@ pub const ReadlineInput = struct {
     }
 
     /// Add text to kill ring
-    fn addToKillRing(self: *Self, text: []const u8) !void {
+    pub fn addToKillRing(self: *Self, text: []const u8) !void {
         const killed = try self.allocator.dupe(u8, text);
         try self.kill_ring.append(killed);
 

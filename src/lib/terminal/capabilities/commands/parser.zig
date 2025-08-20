@@ -3,8 +3,6 @@ const kernel = @import("../../kernel/mod.zig");
 
 /// Command line parser capability - handles argument parsing, quoting, and escaping
 pub const Parser = struct {
-    pub const name = "command_parser";
-    pub const capability_type = "commands";
 
     allocator: std.mem.Allocator,
     event_bus: ?*kernel.EventBus = null,
@@ -41,17 +39,8 @@ pub const Parser = struct {
         allocator.destroy(self);
     }
 
-    /// ICapability interface implementation
-    pub fn getName(self: *const Self) []const u8 {
-        _ = self;
-        return name;
-    }
 
-    pub fn getType(self: *const Self) []const u8 {
-        _ = self;
-        return capability_type;
-    }
-
+    /// Get dependencies (none for parser)
     pub fn getDependencies(self: *const Self) []const []const u8 {
         _ = self;
         return &[_][]const u8{}; // No dependencies
@@ -224,9 +213,17 @@ test "Parser capability initialization" {
     var parser = try Parser.create(allocator);
     defer parser.destroy(allocator);
 
-    try std.testing.expectEqualStrings("command_parser", parser.getName());
-    try std.testing.expectEqualStrings("commands", parser.getType());
+    // Test that capability can be created and has correct properties
     try std.testing.expect(parser.getDependencies().len == 0);
+    
+    // Test that capability starts inactive  
+    try std.testing.expect(!parser.isActive());
+    
+    // Test that allocator is properly set
+    try std.testing.expect(parser.allocator.ptr == allocator.ptr);
+    
+    // Test that event bus is initially null
+    try std.testing.expect(parser.event_bus == null);
 }
 
 test "Parser basic command parsing" {

@@ -72,8 +72,6 @@ pub const Style = struct {
 
 /// ANSI output writer capability - extends basic writer with ANSI escape sequence support
 pub const AnsiWriter = struct {
-    pub const name = "ansi_writer";
-    pub const capability_type = "output";
 
     allocator: std.mem.Allocator,
     basic_writer_capability: ?*BasicWriter = null,
@@ -96,16 +94,6 @@ pub const AnsiWriter = struct {
         allocator.destroy(self);
     }
 
-    /// ICapability interface implementation
-    pub fn getName(self: *const Self) []const u8 {
-        _ = self;
-        return name;
-    }
-
-    pub fn getType(self: *const Self) []const u8 {
-        _ = self;
-        return capability_type;
-    }
 
     pub fn getDependencies(self: *const Self) []const []const u8 {
         _ = self;
@@ -117,9 +105,8 @@ pub const AnsiWriter = struct {
 
         // Find basic writer dependency using type-safe casting
         for (dependencies) |dep| {
-            const dep_name = dep.getName();
-            if (std.mem.eql(u8, dep_name, "basic_writer")) {
-                self.basic_writer_capability = dep.cast(BasicWriter) orelse return error.InvalidCapabilityType;
+            if (dep.cast(BasicWriter)) |writer| {
+                self.basic_writer_capability = writer;
                 break;
             }
         }
@@ -286,10 +273,14 @@ test "AnsiWriter capability initialization" {
     var writer = try AnsiWriter.create(allocator);
     defer writer.destroy(allocator);
 
-    try std.testing.expectEqualStrings("ansi_writer", writer.getName());
-    try std.testing.expectEqualStrings("output", writer.getType());
+    // Test that capability can be created and has correct properties
     try std.testing.expect(writer.getDependencies().len == 1);
     try std.testing.expectEqualStrings("basic_writer", writer.getDependencies()[0]);
+    
+    // Test initial state
+    try std.testing.expect(writer.basic_writer_capability == null);
+    try std.testing.expect(writer.event_bus == null);
+    try std.testing.expect(writer.allocator.ptr == allocator.ptr);
 }
 
 test "AnsiWriter ANSI color conversion" {

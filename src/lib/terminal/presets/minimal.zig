@@ -26,22 +26,11 @@ pub const MinimalTerminal = struct {
     pub fn init(allocator: std.mem.Allocator) !Self {
         var registry = try kernel.createRegistry(allocator);
 
-        // Create capabilities using factory methods
-        const keyboard = try KeyboardInput.create(allocator);
-        const writer = try BasicWriter.create(allocator);
-        const line_buffer = try LineBuffer.create(allocator);
-        const cursor = try Cursor.create(allocator);
-
-        // Create type-safe capability interfaces and register them
-        const keyboard_cap = kernel.createCapability(keyboard);
-        const writer_cap = kernel.createCapability(writer);
-        const line_buffer_cap = kernel.createCapability(line_buffer);
-        const cursor_cap = kernel.createCapability(cursor);
-
-        try registry.register("keyboard_input", keyboard_cap);
-        try registry.register("basic_writer", writer_cap);
-        try registry.register("line_buffer", line_buffer_cap);
-        try registry.register("cursor", cursor_cap);
+        // Register capabilities using new enum-based API
+        try registry.registerType(.keyboard_input);
+        try registry.registerType(.basic_writer);
+        try registry.registerType(.line_buffer);
+        try registry.registerType(.cursor);
 
         // Initialize all capabilities in dependency order
         try registry.initializeAll();
@@ -49,24 +38,18 @@ pub const MinimalTerminal = struct {
         return Self{
             .allocator = allocator,
             .registry = registry,
-            .keyboard = keyboard,
-            .writer = writer,
-            .line_buffer = line_buffer,
-            .cursor = cursor,
+            .keyboard = registry.getCapabilityTyped(KeyboardInput).?,
+            .writer = registry.getCapabilityTyped(BasicWriter).?,
+            .line_buffer = registry.getCapabilityTyped(LineBuffer).?,
+            .cursor = registry.getCapabilityTyped(Cursor).?,
             .event_bus = registry.getEventBus(),
         };
     }
 
     /// Cleanup minimal terminal
     pub fn deinit(self: *Self) void {
-        // Registry deinit will call capability deinit methods
+        // Registry deinit will handle all capability cleanup (deinit + destroy)
         self.registry.deinit();
-
-        // Just free the memory, don't call deinit again (registry already did)
-        self.allocator.destroy(self.keyboard);
-        self.allocator.destroy(self.writer);
-        self.allocator.destroy(self.line_buffer);
-        self.allocator.destroy(self.cursor);
 
         // Free the registry itself
         self.allocator.destroy(self.registry);

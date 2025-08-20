@@ -5,8 +5,6 @@ const colors = @import("../../../core/colors.zig");
 
 /// Basic writer capability - handles text output to terminal scrollback
 pub const BasicWriter = struct {
-    pub const name = "basic_writer";
-    pub const capability_type = "output";
     pub const dependencies = &[_][]const u8{};
 
     active: bool = false,
@@ -20,6 +18,10 @@ pub const BasicWriter = struct {
     scrollback: core.RingBuffer(core.Line, 1000),
     current_color: colors.Color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
     current_bold: bool = false,
+
+    // Terminal dimensions for line wrapping
+    terminal_width: usize = 80,
+    wrap_lines: bool = true, // Enable line wrapping by default
 
     // Arena allocator for line management
     arena: std.heap.ArenaAllocator,
@@ -37,6 +39,8 @@ pub const BasicWriter = struct {
             .scrollback = core.RingBuffer(core.Line, 1000).init(),
             .current_color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
             .current_bold = false,
+            .terminal_width = 80,
+            .wrap_lines = true,
             .arena = std.heap.ArenaAllocator.init(allocator),
             .current_line = null,
         };
@@ -55,17 +59,6 @@ pub const BasicWriter = struct {
         allocator.destroy(self);
     }
 
-    /// Get capability name
-    pub fn getName(self: *Self) []const u8 {
-        _ = self;
-        return name;
-    }
-
-    /// Get capability type
-    pub fn getType(self: *Self) []const u8 {
-        _ = self;
-        return capability_type;
-    }
 
     /// Get required dependencies
     pub fn getDependencies(self: *Self) []const []const u8 {
@@ -79,8 +72,9 @@ pub const BasicWriter = struct {
 
         self.event_bus = event_bus;
 
-        // Subscribe to output events
+        // Subscribe to output and resize events
         try event_bus.subscribe(.output, outputEventCallback, self);
+        try event_bus.subscribe(.resize, resizeEventCallback, self);
 
         self.initialized = true;
         self.active = true;
@@ -91,6 +85,7 @@ pub const BasicWriter = struct {
         // Unsubscribe from events
         if (self.event_bus) |bus| {
             bus.unsubscribe(.output, outputEventCallback, self);
+            bus.unsubscribe(.resize, resizeEventCallback, self);
         }
 
         // Clean up arena
@@ -157,6 +152,19 @@ pub const BasicWriter = struct {
             self.scrollback.push(self.current_line.?);
         }
 
+        // Check if adding this character would exceed terminal width
+        const current_length = self.current_line.?.length();
+        if (self.wrap_lines and current_length >= self.terminal_width) {
+            // Auto-wrap: start a new line
+            try self.forceNewline();
+            
+            // Initialize new current line for the wrapped character
+            if (self.current_line == null) {
+                self.current_line = core.Line.init(self.arena.allocator());
+                self.scrollback.push(self.current_line.?);
+            }
+        }
+
         // Add character to current line
         try self.current_line.?.appendChar(ch, self.current_color, self.current_bold);
 
@@ -178,6 +186,13 @@ pub const BasicWriter = struct {
         }
 
         // Next character will start a new line
+        self.current_line = null;
+    }
+
+    /// Force a new line without adding empty line to scrollback (for wrapping)
+    fn forceNewline(self: *Self) !void {
+        // Simply finalize current line and reset reference
+        // The current line is already in scrollback, no need to add empty line
         self.current_line = null;
     }
 
@@ -204,7 +219,35 @@ pub const BasicWriter = struct {
             try bus.emit(event);
         }
     }
+
+    /// Configure line wrapping behavior
+    pub fn setLineWrapping(self: *Self, enabled: bool) void {
+        self.wrap_lines = enabled;
+    }
+
+    /// Get current line wrapping setting
+    pub fn isLineWrappingEnabled(self: *const Self) bool {
+        return self.wrap_lines;
+    }
+
+    /// Get current terminal width setting
+    pub fn getTerminalWidth(self: *const Self) usize {
+        return self.terminal_width;
+    }
 };
+
+/// Event callback for handling resize events
+fn resizeEventCallback(event: kernel.Event, context: ?*anyopaque) !void {
+    const self: *BasicWriter = @ptrCast(@alignCast(context.?));
+
+    switch (event.data) {
+        .resize => |resize_data| {
+            // Update terminal width for line wrapping
+            self.terminal_width = resize_data.new_columns;
+        },
+        else => {}, // Ignore other event types
+    }
+}
 
 /// Event callback for handling output events
 fn outputEventCallback(event: kernel.Event, context: ?*anyopaque) !void {

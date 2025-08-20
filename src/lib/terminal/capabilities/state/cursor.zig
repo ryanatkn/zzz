@@ -3,8 +3,6 @@ const kernel = @import("../../kernel/mod.zig");
 
 /// Cursor capability - manages cursor position, visibility, and blinking
 pub const Cursor = struct {
-    pub const name = "cursor";
-    pub const capability_type = "state";
     pub const dependencies = &[_][]const u8{};
 
     active: bool = false,
@@ -43,17 +41,6 @@ pub const Cursor = struct {
         allocator.destroy(self);
     }
 
-    /// Get capability name
-    pub fn getName(self: *Self) []const u8 {
-        _ = self;
-        return name;
-    }
-
-    /// Get capability type
-    pub fn getType(self: *Self) []const u8 {
-        _ = self;
-        return capability_type;
-    }
 
     /// Get required dependencies
     pub fn getDependencies(self: *Self) []const []const u8 {

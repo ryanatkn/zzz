@@ -9,6 +9,11 @@ test {
     _ = @import("kernel/test_kernel.zig");
 }
 
+// Data-oriented capability registry tests (Phase 6B)
+test {
+    _ = @import("kernel/typesafe_capabilities.zig");
+}
+
 // Core capability tests (Phase 2)
 test {
     _ = @import("capabilities/test_capabilities.zig");
@@ -25,6 +30,11 @@ test {
 
 test {
     _ = @import("capabilities/state/scrollback.zig");
+}
+
+// Builder system tests (Phase 6)
+test {
+    _ = @import("builders/test_builders.zig");
 }
 
 test {
@@ -50,6 +60,11 @@ test {
 
 test {
     _ = @import("capabilities/commands/pipeline.zig");
+}
+
+// Input capability tests
+test {
+    _ = @import("capabilities/input/test_readline.zig");
 }
 
 // Output capability tests (Phase 4)

@@ -20,6 +20,7 @@ const syntax_highlighter = @import("../../roots/menu/ide/syntax_highlighter.zig"
 const bitmap_simple = @import("../../lib/font/renderers/bitmap_simple.zig");
 const text_alignment = @import("../../lib/text/alignment.zig");
 const file_tree_mod = @import("../../lib/ui/file_tree.zig");
+const ui = @import("../../lib/ui.zig");
 
 // Throttled logging to prevent spam
 const Logger = @import("../../lib/debug/logger.zig").Logger;
@@ -29,6 +30,32 @@ const filters = @import("../../lib/debug/filters.zig");
 const Color = colors.Color;
 const Vec2 = math.Vec2;
 const FileIcon = file_tree_mod.FileIcon;
+
+/// Adapter to make SDL GPU compatible with TerminalLayoutRenderer interface
+const SDLGPUTerminalAdapter = struct {
+    renderer: *BrowserRenderer,
+    cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
+    render_pass: *c.sdl.SDL_GPURenderPass,
+
+    pub fn drawRect(self: SDLGPUTerminalAdapter, rect: Rectangle, color: Color) void {
+        self.renderer.base_renderer.gpu.drawRect(self.cmd_buffer, self.render_pass, rect.position, rect.size, color);
+    }
+
+    pub fn drawText(self: SDLGPUTerminalAdapter, text: []const u8, x: f32, y: f32, font_size: f32, color: Color) void {
+        _ = font_size; // HUD uses fixed font size from constants
+        _ = color; // HUD uses fixed text color 
+        self.renderer.drawSimpleText(self.cmd_buffer, self.render_pass, text, Vec2{ .x = x, .y = y });
+    }
+};
+
+const Rectangle = math.Rectangle;
+
+/// Terminal helper messages (consolidated to eliminate duplication)
+const TERMINAL_MESSAGES = struct {
+    pub const CLICK_TO_FOCUS = "Click to focus and start typing";
+    pub const READY_FOR_INPUT = "Ready for input! Try typing 'help'";
+    pub const INITIALIZING = "Terminal initializing...";
+};
 
 // Configure throttled logger for rendering (compile-time)
 const ThrottledLogger = Logger(.{
@@ -74,11 +101,28 @@ pub const BrowserRenderer = struct {
 
     // Font grid test configuration
     font_grid_config: FontGridConfig,
+    
+    // Terminal layout renderer for unified rendering
+    terminal_layout_renderer: ui.TerminalLayoutRenderer,
 
     pub fn init(base_renderer: *game_renderer.GameRenderer) BrowserRenderer {
+        // Create layout renderer with HUD-specific configuration
+        const hud_terminal_config = ui.TerminalLayoutConfig{
+            .top_margin = 10,
+            .bottom_margin = 15,
+            .side_margin = 10,
+            .input_padding = 6,
+            .line_spacing_multiplier = 1.3,
+            .input_bg_focused = Color{ .r = 40, .g = 40, .b = 40, .a = 255 },
+            .input_bg_unfocused = Color{ .r = 25, .g = 25, .b = 25, .a = 255 },
+            .input_border = ide_constants.COLORS.TEXT_NORMAL,
+            .text_color = ide_constants.COLORS.TEXT_NORMAL,
+        };
+
         return .{
             .base_renderer = base_renderer,
             .font_grid_config = FontGridConfig.default(),
+            .terminal_layout_renderer = ui.TerminalLayoutRenderer.init(hud_terminal_config),
         };
     }
 
@@ -420,8 +464,8 @@ pub const BrowserRenderer = struct {
             try self.renderTerminalContentSafe(cmd_buffer, render_pass, terminal, panel_rect, is_terminal_focused);
         } else {
             // Fallback display when terminal not initialized
-            self.drawSimpleText(cmd_buffer, render_pass, "Terminal initializing...", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
-            self.drawSimpleText(cmd_buffer, render_pass, "Click to focus and start typing", Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
+            self.drawSimpleText(cmd_buffer, render_pass, TERMINAL_MESSAGES.INITIALIZING, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 40 });
+            self.drawSimpleText(cmd_buffer, render_pass, TERMINAL_MESSAGES.CLICK_TO_FOCUS, Vec2{ .x = panel_rect.position.x + 10, .y = panel_rect.position.y + 60 });
         }
     }
 
@@ -443,135 +487,51 @@ pub const BrowserRenderer = struct {
     /// Render terminal content with improved safety checks
     fn renderTerminalContentSafe(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, terminal: *const TerminalComponent, panel_rect: math.Rectangle, is_focused: bool) !void {
         // Get terminal content safely with error handling
-        const content = terminal.terminal.getVisibleContent();
+        const terminal_content = terminal.terminal.getVisibleContent();
+        
+        // Create SDL GPU adapter for the layout renderer
+        const gpu_adapter = SDLGPUTerminalAdapter{
+            .renderer = self,
+            .cmd_buffer = cmd_buffer,
+            .render_pass = render_pass,
+        };
 
-        const line_height = ide_constants.TEXT.LINE_HEIGHT;
-        const char_width = ide_constants.TEXT.CHAR_WIDTH;
-        const margin = 10;
-        const start_x = panel_rect.position.x + margin;
+        // Create TerminalContent for the layout renderer
+        var terminal_lines = terminal_content.lines;
+        
+        // Convert capability cursor to simple cursor for layout renderer
+        const simple_cursor = @import("../../lib/terminal/core.zig").Cursor{
+            .x = terminal_content.cursor.x,
+            .y = terminal_content.cursor.y,
+            .visible = terminal_content.cursor.visible,
+            .blink_timer = terminal_content.cursor.blink_timer,
+            .blink_rate = terminal_content.cursor.blink_rate,
+        };
+        
+        const layout_content = ui.TerminalContent{
+            .lines = &terminal_lines,
+            .current_input = terminal_content.current,
+            .prompt = "$ ",
+            .cursor = simple_cursor,
+            .is_focused = is_focused,
+        };
 
-        const max_lines = @as(usize, @intFromFloat(@max(0, (panel_rect.size.y - 40) / line_height)));
-        const max_chars_per_line = @as(usize, @intFromFloat(@max(0, (panel_rect.size.x - 20) / char_width)));
-
-        // Improved spacing and margins
-        const bottom_margin: f32 = 15; // More bottom margin
-        const side_margin: f32 = 10;
-        const line_spacing: f32 = line_height * 1.3; // 30% more spacing between lines
-        const input_padding: f32 = 6;
-
-        // Start from bottom of panel with proper margins
-        const bottom_y = panel_rect.position.y + panel_rect.size.y - bottom_margin;
-        const input_height = line_height + (input_padding * 2);
-        const current_y = bottom_y - input_height;
-
-        // Render input background with styling
-        const input_y = current_y;
-        const input_bg_rect_pos = Vec2{ .x = panel_rect.position.x + side_margin, .y = input_y };
-        const input_bg_rect_size = Vec2{ .x = panel_rect.size.x - (side_margin * 2), .y = input_height };
-
-        // Draw input background - different color based on focus
-        const input_bg_color = if (is_focused)
-            ide_constants.COLORS.HOVER_BG // Use hover color for focused state
-        else
-            ide_constants.COLORS.PANEL_BG;
-
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, input_bg_rect_pos, input_bg_rect_size, input_bg_color);
-
-        // Draw input border when focused
+        // Use the unified layout renderer - this replaces ~134 lines of duplicate code!
+        try self.terminal_layout_renderer.render(
+            gpu_adapter,
+            panel_rect,
+            layout_content,
+            ide_constants.TEXT.CONTENT_FONT_SIZE, // HUD uses fixed font size
+            ide_constants.TEXT.LINE_HEIGHT,
+            ide_constants.TEXT.CHAR_WIDTH,
+        );
+        
+        // Show helpful message if no terminal content and there's space (simplified)
+        const content_area_top = panel_rect.position.y + 30;
         if (is_focused) {
-            const border_color = ide_constants.COLORS.SELECTION_BG;
-            const border_width: f32 = 1;
-
-            // Top border
-            self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, input_bg_rect_pos, Vec2{ .x = input_bg_rect_size.x, .y = border_width }, border_color);
-            // Bottom border
-            self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = input_bg_rect_pos.x, .y = input_bg_rect_pos.y + input_bg_rect_size.y - border_width }, Vec2{ .x = input_bg_rect_size.x, .y = border_width }, border_color);
-            // Left border
-            self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, input_bg_rect_pos, Vec2{ .x = border_width, .y = input_bg_rect_size.y }, border_color);
-            // Right border
-            self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = input_bg_rect_pos.x + input_bg_rect_size.x - border_width, .y = input_bg_rect_pos.y }, Vec2{ .x = border_width, .y = input_bg_rect_size.y }, border_color);
-        }
-
-        // Render input text with padding
-        const text_x = panel_rect.position.x + side_margin + input_padding;
-        const text_y = input_y + input_padding;
-
-        // First render current input line in the styled input area
-        const prompt_text = "$ ";
-        const input_text = content.current;
-
-        // Safely combine prompt and input
-        var display_buffer: [256]u8 = undefined;
-        const prompt_len = @min(prompt_text.len, display_buffer.len);
-        @memcpy(display_buffer[0..prompt_len], prompt_text[0..prompt_len]);
-
-        const remaining_space = if (display_buffer.len > prompt_len) display_buffer.len - prompt_len else 0;
-        const input_copy_len = @min(input_text.len, remaining_space);
-
-        if (input_copy_len > 0 and prompt_len + input_copy_len <= display_buffer.len) {
-            @memcpy(display_buffer[prompt_len .. prompt_len + input_copy_len], input_text[0..input_copy_len]);
-        }
-
-        const total_len = prompt_len + input_copy_len;
-        const final_display = display_buffer[0..total_len];
-
-        // Truncate if still too long (account for reduced width due to padding)
-        const available_chars = @as(usize, @intFromFloat((input_bg_rect_size.x - (input_padding * 2)) / char_width));
-        const truncated_display = if (final_display.len > available_chars and available_chars > 0)
-            final_display[0..available_chars]
-        else
-            final_display;
-
-        if (self.isTextSafe(truncated_display)) {
-            self.drawSimpleText(cmd_buffer, render_pass, truncated_display, Vec2{ .x = text_x, .y = text_y });
-        }
-
-        // Render cursor for input line if visible and focused
-        if (is_focused and content.cursor.visible) {
-            const cursor_x = text_x + @as(f32, @floatFromInt(@min(prompt_text.len + content.cursor.x, available_chars))) * char_width;
-            if (cursor_x < input_bg_rect_pos.x + input_bg_rect_size.x - input_padding) {
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = cursor_x, .y = text_y }, Vec2{ .x = char_width, .y = line_height }, ide_constants.COLORS.TEXT_NORMAL);
-            }
-        }
-
-        // Calculate available space for scrollback lines
-        const available_height = current_y - (panel_rect.position.y + 30); // Above header
-        const max_scrollback_lines = @min(max_lines, @as(usize, @intFromFloat(@max(0, available_height / line_spacing))));
-        
-        // Single-pass direct rendering with chronological iterator (oldest first, top to bottom)
-        var lines_iter = content.lines;
-        var render_index: usize = 0;
-        var render_y = panel_rect.position.y + 30; // Start below header
-        
-        while (lines_iter.next()) |line| {
-            if (render_index >= max_scrollback_lines) break;
-            if (render_y >= current_y) break; // Don't overlap with current line
-            
-            const text = line.getText();
-            if (text.len == 0) continue;
-            
-            // Safely truncate text if too long
-            const line_display_text = if (text.len > max_chars_per_line and max_chars_per_line > 0)
-                text[0..max_chars_per_line]
-            else
-                text;
-                
-            // Only render safe, printable text
-            if (self.isTextSafe(line_display_text)) {
-                self.drawSimpleText(cmd_buffer, render_pass, line_display_text, Vec2{ .x = panel_rect.position.x + side_margin, .y = render_y });
-                render_y += line_spacing;
-                render_index += 1;
-            }
-        }
-
-        // Show input instructions at the top if there's space
-        if (current_y > panel_rect.position.y + 30 + line_height) {
-            const instruction_y = panel_rect.position.y + 30; // Just below header
-            if (is_focused) {
-                self.drawSimpleText(cmd_buffer, render_pass, "Ready for input! Try typing 'help'", Vec2{ .x = start_x, .y = instruction_y });
-            } else {
-                self.drawSimpleText(cmd_buffer, render_pass, "Click to focus and start typing", Vec2{ .x = start_x, .y = instruction_y });
-            }
+            self.drawSimpleText(cmd_buffer, render_pass, TERMINAL_MESSAGES.READY_FOR_INPUT, Vec2{ .x = panel_rect.position.x + 10, .y = content_area_top });
+        } else {
+            self.drawSimpleText(cmd_buffer, render_pass, TERMINAL_MESSAGES.CLICK_TO_FOCUS, Vec2{ .x = panel_rect.position.x + 10, .y = content_area_top });
         }
     }
 
@@ -581,7 +541,7 @@ pub const BrowserRenderer = struct {
         if (text.len == 0) return false;
 
         for (text) |ch| {
-            // Allow printable ASCII and common whitespace
+            // Allow printable ASCII and common whitespace  
             if (ch < 32 or ch > 126) {
                 if (ch != ' ' and ch != '\t') {
                     return false;
@@ -590,6 +550,8 @@ pub const BrowserRenderer = struct {
         }
         return true;
     }
+
+
 
     /// Draw file type icon
     fn drawFileIcon(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, icon: FileIcon, position: Vec2) !void {

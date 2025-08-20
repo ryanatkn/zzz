@@ -91,9 +91,8 @@ pub const Persistence = struct {
 
         // Find history capability in dependencies using type-safe casting
         for (deps) |dep| {
-            const dep_name = dep.getName();
-            if (std.mem.eql(u8, dep_name, "history")) {
-                self.history_capability = dep.cast(History) orelse return error.InvalidCapabilityType;
+            if (dep.cast(History)) |history| {
+                self.history_capability = history;
                 break;
             }
         }

@@ -27,8 +27,6 @@ pub const Command = struct {
 
 /// Command registry capability - manages command registration and lookup
 pub const Registry = struct {
-    pub const name = "command_registry";
-    pub const capability_type = "commands";
 
     allocator: std.mem.Allocator,
     commands: std.StringHashMap(Command),
@@ -54,16 +52,6 @@ pub const Registry = struct {
         allocator.destroy(self);
     }
 
-    /// ICapability interface implementation
-    pub fn getName(self: *const Self) []const u8 {
-        _ = self;
-        return name;
-    }
-
-    pub fn getType(self: *const Self) []const u8 {
-        _ = self;
-        return capability_type;
-    }
 
     pub fn getDependencies(self: *const Self) []const []const u8 {
         _ = self;
@@ -196,10 +184,13 @@ test "Registry capability initialization" {
     var registry = try Registry.create(allocator);
     defer registry.destroy(allocator);
 
-    try std.testing.expectEqualStrings("command_registry", registry.getName());
-    try std.testing.expectEqualStrings("commands", registry.getType());
+    // Test that capability can be created and has correct properties
     try std.testing.expect(registry.getDependencies().len == 0);
     try std.testing.expect(registry.getCommandCount() == 0);
+    
+    // Test initial state
+    try std.testing.expect(registry.event_bus == null);
+    try std.testing.expect(registry.allocator.ptr == allocator.ptr);
 }
 
 test "Registry command registration" {

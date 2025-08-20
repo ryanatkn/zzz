@@ -146,12 +146,6 @@ pub const Line = struct {
     }
 
     pub fn getText(self: *const Self) []const u8 {
-        // Only log non-empty, long lines to reduce spam
-        if (self.text.items.len > 10) {
-            if (loggers.game_log) |*log| {
-                log.debug("line_content", "Line.getText() returning long line: '{s}' (len: {d})", .{ self.text.items, self.text.items.len });
-            }
-        }
         return self.text.items;
     }
 };

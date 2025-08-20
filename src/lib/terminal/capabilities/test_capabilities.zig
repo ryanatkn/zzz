@@ -326,30 +326,31 @@ test "Capability Integration - event flow" {
         allocator.destroy(registry);
     }
 
-    // Create all capabilities
-    var keyboard = KeyboardInput{};
-    var writer = BasicWriter.init(allocator);
-    var line_buffer = LineBuffer.init(allocator);
-    var cursor = Cursor.init();
-
-    // Register capabilities
-    const keyboard_cap = kernel.createCapability(&keyboard);
-    const writer_cap = kernel.createCapability(&writer);
-    const line_buffer_cap = kernel.createCapability(&line_buffer);
-    const cursor_cap = kernel.createCapability(&cursor);
-
-    try registry.*.register("keyboard_input", keyboard_cap);
-    try registry.*.register("basic_writer", writer_cap);
-    try registry.*.register("line_buffer", line_buffer_cap);
-    try registry.*.register("cursor", cursor_cap);
+    // Register capabilities using new enum-based API
+    try registry.*.registerType(.keyboard_input);
+    try registry.*.registerType(.basic_writer);
+    try registry.*.registerType(.line_buffer);
+    try registry.*.registerType(.cursor);
 
     // Initialize all capabilities
     try registry.*.initializeAll();
 
     // Verify all capabilities are initialized
     try testing.expectEqual(@as(usize, 4), registry.*.getInitializedCount());
-    try testing.expect(keyboard.isActive());
-    try testing.expect(writer.isActive());
-    try testing.expect(line_buffer.isActive());
-    try testing.expect(cursor.isActive());
+    
+    // Get capabilities and verify they're active
+    const keyboard_cap = registry.*.getCapability(.keyboard_input);
+    const writer_cap = registry.*.getCapability(.basic_writer);
+    const line_buffer_cap = registry.*.getCapability(.line_buffer);
+    const cursor_cap = registry.*.getCapability(.cursor);
+    
+    try testing.expect(keyboard_cap != null);
+    try testing.expect(writer_cap != null);
+    try testing.expect(line_buffer_cap != null);
+    try testing.expect(cursor_cap != null);
+    
+    try testing.expect(keyboard_cap.?.isActive());
+    try testing.expect(writer_cap.?.isActive());
+    try testing.expect(line_buffer_cap.?.isActive());
+    try testing.expect(cursor_cap.?.isActive());
 }

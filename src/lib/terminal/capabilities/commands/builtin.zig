@@ -8,8 +8,6 @@ const CommandContext = registry.CommandContext;
 
 /// Built-in commands capability - provides essential terminal commands
 pub const Builtin = struct {
-    pub const name = "builtin_commands";
-    pub const capability_type = "commands";
 
     allocator: std.mem.Allocator,
     registry_capability: ?*Registry = null,
@@ -31,17 +29,7 @@ pub const Builtin = struct {
         allocator.destroy(self);
     }
 
-    /// ICapability interface implementation
-    pub fn getName(self: *const Self) []const u8 {
-        _ = self;
-        return name;
-    }
-
-    pub fn getType(self: *const Self) []const u8 {
-        _ = self;
-        return capability_type;
-    }
-
+    /// Get dependencies (command registry)
     pub fn getDependencies(self: *const Self) []const []const u8 {
         _ = self;
         return &[_][]const u8{"command_registry"};
@@ -52,9 +40,8 @@ pub const Builtin = struct {
 
         // Find registry dependency using type-safe casting
         for (dependencies) |dep| {
-            const dep_name = dep.getName();
-            if (std.mem.eql(u8, dep_name, "command_registry")) {
-                self.registry_capability = dep.cast(Registry) orelse return error.InvalidCapabilityType;
+            if (dep.cast(Registry)) |reg| {
+                self.registry_capability = reg;
                 break;
             }
         }
@@ -324,10 +311,15 @@ test "Builtin capability initialization" {
     var builtin = try Builtin.create(allocator);
     defer builtin.destroy(allocator);
 
-    try std.testing.expectEqualStrings("builtin_commands", builtin.getName());
-    try std.testing.expectEqualStrings("commands", builtin.getType());
+    // Test that capability can be created and has correct properties
     try std.testing.expect(builtin.getDependencies().len == 1);
     try std.testing.expectEqualStrings("command_registry", builtin.getDependencies()[0]);
+    
+    // Test that capability starts inactive
+    try std.testing.expect(!builtin.isActive());
+    
+    // Test that allocator is properly set
+    try std.testing.expect(builtin.allocator.ptr == allocator.ptr);
 }
 
 test "Builtin echo command" {

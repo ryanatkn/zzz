@@ -2,6 +2,10 @@ const std = @import("std");
 const kernel = @import("../kernel/mod.zig");
 const loggers = @import("../../debug/loggers.zig");
 const MinimalTerminal = @import("minimal.zig").MinimalTerminal;
+const KeyboardInput = @import("../capabilities/input/keyboard.zig").KeyboardInput;
+const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
+const LineBuffer = @import("../capabilities/state/line_buffer.zig").LineBuffer;
+const Cursor = @import("../capabilities/state/cursor.zig").Cursor;
 const History = @import("../capabilities/state/history.zig").History;
 const ScreenBuffer = @import("../capabilities/state/screen_buffer.zig").ScreenBuffer;
 const Scrollback = @import("../capabilities/state/scrollback.zig").Scrollback;
@@ -28,60 +32,50 @@ pub const StandardTerminal = struct {
 
     /// Initialize standard terminal with all capabilities
     pub fn init(allocator: std.mem.Allocator) !Self {
-        // Start with minimal terminal as base
-        var minimal = try MinimalTerminal.init(allocator);
-        errdefer minimal.deinit();
+        // Create registry and register all standard capabilities 
+        var registry = try kernel.createRegistry(allocator);
+        errdefer allocator.destroy(registry);
+        
+        // Register all capabilities for standard terminal using new enum-based API
+        try registry.registerType(.keyboard_input);
+        try registry.registerType(.basic_writer);
+        try registry.registerType(.line_buffer);
+        try registry.registerType(.cursor);
+        try registry.registerType(.history);
+        try registry.registerType(.screen_buffer);
+        try registry.registerType(.scrollback);
+        try registry.registerType(.persistence);
 
-        // Create additional capabilities using factory methods
-        const history = try History.create(allocator);
-        errdefer history.destroy(allocator);
-
-        const screen_buffer = try ScreenBuffer.create(allocator);
-        errdefer screen_buffer.destroy(allocator);
-
-        const scrollback = try Scrollback.create(allocator);
-        errdefer scrollback.destroy(allocator);
-
-        const persistence = try Persistence.create(allocator);
-        errdefer persistence.destroy(allocator);
-
-        // Create capability interfaces and register them
-        const history_cap = kernel.createCapability(history);
-        const screen_buffer_cap = kernel.createCapability(screen_buffer);
-        const scrollback_cap = kernel.createCapability(scrollback);
-        const persistence_cap = kernel.createCapability(persistence);
-
-        // Register additional capabilities
-        try minimal.registry.register("history", history_cap);
-        try minimal.registry.register("screen_buffer", screen_buffer_cap);
-        try minimal.registry.register("scrollback", scrollback_cap);
-        try minimal.registry.register("persistence", persistence_cap);
-
-        // Re-initialize all capabilities to resolve new dependencies
-        try minimal.registry.initializeAll();
+        // Initialize all capabilities
+        try registry.initializeAll();
 
         return Self{
             .allocator = allocator,
-            .registry = minimal.registry,
-            .minimal = minimal,
-            .history = history,
-            .screen_buffer = screen_buffer,
-            .scrollback = scrollback,
-            .persistence = persistence,
-            .event_bus = minimal.event_bus,
+            .registry = registry,
+            .minimal = MinimalTerminal{
+                .allocator = allocator,
+                .registry = registry,
+                .keyboard = registry.getCapabilityTyped(KeyboardInput).?,
+                .writer = registry.getCapabilityTyped(BasicWriter).?,
+                .line_buffer = registry.getCapabilityTyped(LineBuffer).?,
+                .cursor = registry.getCapabilityTyped(Cursor).?,
+                .event_bus = registry.getEventBus(),
+            },
+            .history = registry.getCapabilityTyped(History).?,
+            .screen_buffer = registry.getCapabilityTyped(ScreenBuffer).?,
+            .scrollback = registry.getCapabilityTyped(Scrollback).?,
+            .persistence = registry.getCapabilityTyped(Persistence).?,
+            .event_bus = registry.getEventBus(),
         };
     }
 
     /// Cleanup standard terminal
     pub fn deinit(self: *Self) void {
-        // Delegate cleanup to the minimal terminal, which will handle the registry
-        self.minimal.deinit();
+        // Registry deinit will handle all capability cleanup (deinit + destroy)
+        self.registry.deinit();
 
-        // Just free our additional capabilities
-        self.allocator.destroy(self.history);
-        self.allocator.destroy(self.screen_buffer);
-        self.allocator.destroy(self.scrollback);
-        self.allocator.destroy(self.persistence);
+        // Free the registry itself
+        self.allocator.destroy(self.registry);
     }
 
     // ===== Core Terminal Functions (delegated to minimal) =====
@@ -233,14 +227,6 @@ pub const StandardTerminal = struct {
 
     // ===== Utility Functions =====
 
-    /// Get capability by name (type-safe version)
-    pub fn getCapability(self: *Self, comptime T: type, name: []const u8) ?*T {
-        if (self.registry.getCapability(name)) |cap| {
-            // Cast the capability interface to the concrete type
-            return cap.cast(T);
-        }
-        return null;
-    }
 
     /// Resize terminal
     pub fn resize(self: *Self, columns: usize, rows: usize) !void {
@@ -264,14 +250,14 @@ test "StandardTerminal initialization" {
     defer terminal.deinit();
 
     // Verify all capabilities are registered
-    try std.testing.expect(terminal.registry.getCapability("keyboard_input") != null);
-    try std.testing.expect(terminal.registry.getCapability("basic_writer") != null);
-    try std.testing.expect(terminal.registry.getCapability("line_buffer") != null);
-    try std.testing.expect(terminal.registry.getCapability("cursor") != null);
-    try std.testing.expect(terminal.registry.getCapability("history") != null);
-    try std.testing.expect(terminal.registry.getCapability("screen_buffer") != null);
-    try std.testing.expect(terminal.registry.getCapability("scrollback") != null);
-    try std.testing.expect(terminal.registry.getCapability("persistence") != null);
+    try std.testing.expect(terminal.registry.getCapability(.keyboard_input) != null);
+    try std.testing.expect(terminal.registry.getCapability(.basic_writer) != null);
+    try std.testing.expect(terminal.registry.getCapability(.line_buffer) != null);
+    try std.testing.expect(terminal.registry.getCapability(.cursor) != null);
+    try std.testing.expect(terminal.registry.getCapability(.history) != null);
+    try std.testing.expect(terminal.registry.getCapability(.screen_buffer) != null);
+    try std.testing.expect(terminal.registry.getCapability(.scrollback) != null);
+    try std.testing.expect(terminal.registry.getCapability(.persistence) != null);
 }
 
 test "StandardTerminal screen switching" {

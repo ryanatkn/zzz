@@ -2,12 +2,18 @@ const std = @import("std");
 const kernel = @import("../kernel/mod.zig");
 const loggers = @import("../../debug/loggers.zig");
 const StandardTerminal = @import("standard.zig").StandardTerminal;
+const MinimalTerminal = @import("minimal.zig").MinimalTerminal;
+
+// Basic capabilities
+const KeyboardInput = @import("../capabilities/input/keyboard.zig").KeyboardInput;
 const BasicWriter = @import("../capabilities/output/basic_writer.zig").BasicWriter;
-const core = @import("../core.zig");
-const viewport = @import("../viewport.zig");
-const ScrollbackCapability = @import("../capabilities/state/scrollback.zig").Scrollback;
-const VisibleLinesIterator = core.VisibleLinesIterator;
-const Cursor = core.Cursor;
+const AnsiWriter = @import("../capabilities/output/ansi_writer.zig").AnsiWriter;
+const LineBuffer = @import("../capabilities/state/line_buffer.zig").LineBuffer;
+const Cursor = @import("../capabilities/state/cursor.zig").Cursor;
+const History = @import("../capabilities/state/history.zig").History;
+const ScreenBuffer = @import("../capabilities/state/screen_buffer.zig").ScreenBuffer;
+const Scrollback = @import("../capabilities/state/scrollback.zig").Scrollback;
+const Persistence = @import("../capabilities/state/persistence.zig").Persistence;
 
 // Command capabilities
 const Parser = @import("../capabilities/commands/parser.zig").Parser;
@@ -15,7 +21,11 @@ const Registry = @import("../capabilities/commands/registry.zig").Registry;
 const Executor = @import("../capabilities/commands/executor.zig").Executor;
 const Builtin = @import("../capabilities/commands/builtin.zig").Builtin;
 const Pipeline = @import("../capabilities/commands/pipeline.zig").Pipeline;
-const AnsiWriter = @import("../capabilities/output/ansi_writer.zig").AnsiWriter;
+
+// Other imports for existing methods
+const core = @import("../core.zig");
+const viewport = @import("../viewport.zig");
+const VisibleLinesIterator = core.VisibleLinesIterator;
 
 /// Command terminal preset - extends StandardTerminal with full command execution capabilities
 pub const CommandTerminal = struct {
@@ -40,74 +50,67 @@ pub const CommandTerminal = struct {
 
     /// Initialize command terminal with all capabilities
     pub fn init(allocator: std.mem.Allocator) !Self {
-        // Start with standard terminal as base
-        var standard = try StandardTerminal.init(allocator);
-        errdefer standard.deinit();
+        // Create registry and register all command terminal capabilities
+        var registry = try kernel.createRegistry(allocator);
+        errdefer allocator.destroy(registry);
 
-        // Create command capabilities using factory methods
-        const parser = try Parser.create(allocator);
-        errdefer parser.destroy(allocator);
+        // Register all capabilities for command terminal using new enum-based API
+        try registry.registerType(.keyboard_input);
+        try registry.registerType(.basic_writer);
+        try registry.registerType(.line_buffer);
+        try registry.registerType(.cursor);
+        try registry.registerType(.history);
+        try registry.registerType(.screen_buffer);
+        try registry.registerType(.scrollback);
+        try registry.registerType(.persistence);
+        try registry.registerType(.parser);
+        try registry.registerType(.registry);
+        try registry.registerType(.executor);
+        try registry.registerType(.builtin);
+        try registry.registerType(.pipeline);
+        try registry.registerType(.ansi_writer);
 
-        const command_registry = try Registry.create(allocator);
-        errdefer command_registry.destroy(allocator);
-
-        const executor = try Executor.create(allocator);
-        errdefer executor.destroy(allocator);
-
-        const builtin = try Builtin.create(allocator);
-        errdefer builtin.destroy(allocator);
-
-        const pipeline = try Pipeline.create(allocator);
-        errdefer pipeline.destroy(allocator);
-
-        const ansi_writer = try AnsiWriter.create(allocator);
-        errdefer ansi_writer.destroy(allocator);
-
-        // Create capability interfaces and register them
-        const parser_cap = kernel.createCapability(parser);
-        const registry_cap = kernel.createCapability(command_registry);
-        const executor_cap = kernel.createCapability(executor);
-        const builtin_cap = kernel.createCapability(builtin);
-        const pipeline_cap = kernel.createCapability(pipeline);
-        const ansi_writer_cap = kernel.createCapability(ansi_writer);
-
-        // Register command capabilities with the standard terminal's registry
-        try standard.registry.register("command_parser", parser_cap);
-        try standard.registry.register("command_registry", registry_cap);
-        try standard.registry.register("process_executor", executor_cap);
-        try standard.registry.register("builtin_commands", builtin_cap);
-        try standard.registry.register("command_pipeline", pipeline_cap);
-        try standard.registry.register("ansi_writer", ansi_writer_cap);
-
-        // Re-initialize all capabilities to resolve new dependencies
-        try standard.registry.initializeAll();
+        // Initialize all capabilities
+        try registry.initializeAll();
 
         return Self{
             .allocator = allocator,
-            .registry = standard.registry,
-            .standard = standard,
-            .parser = parser,
-            .command_registry = command_registry,
-            .executor = executor,
-            .builtin = builtin,
-            .pipeline = pipeline,
-            .ansi_writer = ansi_writer,
-            .event_bus = standard.event_bus,
+            .registry = registry,
+            .standard = StandardTerminal{
+                .allocator = allocator,
+                .registry = registry,
+                .minimal = MinimalTerminal{
+                    .allocator = allocator,
+                    .registry = registry,
+                    .keyboard = registry.getCapabilityTyped(KeyboardInput).?,
+                    .writer = registry.getCapabilityTyped(BasicWriter).?,
+                    .line_buffer = registry.getCapabilityTyped(LineBuffer).?,
+                    .cursor = registry.getCapabilityTyped(Cursor).?,
+                    .event_bus = registry.getEventBus(),
+                },
+                .history = registry.getCapabilityTyped(History).?,
+                .screen_buffer = registry.getCapabilityTyped(ScreenBuffer).?,
+                .scrollback = registry.getCapabilityTyped(Scrollback).?,
+                .persistence = registry.getCapabilityTyped(Persistence).?,
+                .event_bus = registry.getEventBus(),
+            },
+            .parser = registry.getCapabilityTyped(Parser).?,
+            .command_registry = registry.getCapabilityTyped(Registry).?,
+            .executor = registry.getCapabilityTyped(Executor).?,
+            .builtin = registry.getCapabilityTyped(Builtin).?,
+            .pipeline = registry.getCapabilityTyped(Pipeline).?,
+            .ansi_writer = registry.getCapabilityTyped(AnsiWriter).?,
+            .event_bus = registry.getEventBus(),
         };
     }
 
     /// Cleanup command terminal
     pub fn deinit(self: *Self) void {
-        // Delegate cleanup to standard terminal, which will handle registry and base capabilities
-        self.standard.deinit();
+        // Registry deinit will handle all capability cleanup (deinit + destroy)
+        self.registry.deinit();
 
-        // Free our command capabilities
-        self.allocator.destroy(self.parser);
-        self.allocator.destroy(self.command_registry);
-        self.allocator.destroy(self.executor);
-        self.allocator.destroy(self.builtin);
-        self.allocator.destroy(self.pipeline);
-        self.allocator.destroy(self.ansi_writer);
+        // Free the registry itself
+        self.allocator.destroy(self.registry);
     }
 
     // ===== Core Terminal Functions (delegated to standard) =====
@@ -265,10 +268,6 @@ pub const CommandTerminal = struct {
         try self.standard.loadSession(name);
     }
 
-    /// Get capability by name (type-safe version)
-    pub fn getCapability(self: *Self, comptime T: type, name: []const u8) ?*T {
-        return self.standard.getCapability(T, name);
-    }
 
     /// Resize terminal
     pub fn resize(self: *Self, columns: usize, rows: usize) !void {
@@ -279,31 +278,32 @@ pub const CommandTerminal = struct {
     pub fn getVisibleContent(self: *const Self) struct { lines: VisibleLinesIterator, current: []const u8, cursor: Cursor } {
         const ui_log = loggers.getUILog();
 
-        // Cast away const to access mutable getCapability method
-        const mutable_self: *Self = @constCast(self);
-
-        // Try to get both BasicWriter and Scrollback capability
+        // Get capabilities using proper enum-based API
+        const writer = self.registry.getCapabilityTyped(BasicWriter);
+        const scrollback_capability = self.registry.getCapabilityTyped(Scrollback);
+        const cursor_capability = self.registry.getCapabilityTyped(Cursor);
+        
         var basic_writer_scrollback: ?*const core.RingBuffer(core.Line, 1000) = null;
-        var scrollback_capability: ?*ScrollbackCapability = null;
-
-        if (mutable_self.getCapability(BasicWriter, "basic_writer")) |writer| {
-            basic_writer_scrollback = writer.getScrollback();
-        }
-
-        if (mutable_self.getCapability(ScrollbackCapability, "scrollback")) |scrollback_cap| {
-            scrollback_capability = scrollback_cap;
+        if (writer) |w| {
+            basic_writer_scrollback = w.getScrollback();
         }
 
         // If we have at least one scrollback source, try to merge them
         if (basic_writer_scrollback != null or scrollback_capability != null) {
             const current_line = self.getCurrentLine();
             
+            // Get capability cursor or default
+            const cursor_to_return = if (cursor_capability) |cursor_cap| 
+                cursor_cap.*
+            else 
+                Cursor{};
+            
             // Use chronological iterator for oldest-first ordering (natural terminal behavior)
             if (basic_writer_scrollback) |scrollback| {
                 return .{
                     .lines = VisibleLinesIterator.init(scrollback, 25), // Show 25 lines, oldest first
                     .current = current_line,
-                    .cursor = core.Cursor{}, // Default cursor for now
+                    .cursor = cursor_to_return,
                 };
             } else if (scrollback_capability) |scrollback_cap| {
                 // Use the scrollback capability's own visible lines iterator
@@ -316,7 +316,7 @@ pub const CommandTerminal = struct {
                 return .{
                     .lines = VisibleLinesIterator.init(&temp_scrollback, 0), // Empty for now with chronological iterator
                     .current = current_line,
-                    .cursor = core.Cursor{},
+                    .cursor = cursor_to_return,
                 };
             }
         }
@@ -328,7 +328,7 @@ pub const CommandTerminal = struct {
         return .{
             .lines = VisibleLinesIterator.init(&empty_scrollback, 0),
             .current = "",
-            .cursor = core.Cursor{},
+            .cursor = Cursor{},
         };
     }
 };
@@ -340,20 +340,20 @@ test "CommandTerminal initialization" {
     defer terminal.deinit();
 
     // Verify all capabilities are registered
-    try std.testing.expect(terminal.registry.getCapability("keyboard_input") != null);
-    try std.testing.expect(terminal.registry.getCapability("basic_writer") != null);
-    try std.testing.expect(terminal.registry.getCapability("line_buffer") != null);
-    try std.testing.expect(terminal.registry.getCapability("cursor") != null);
-    try std.testing.expect(terminal.registry.getCapability("history") != null);
-    try std.testing.expect(terminal.registry.getCapability("screen_buffer") != null);
-    try std.testing.expect(terminal.registry.getCapability("scrollback") != null);
-    try std.testing.expect(terminal.registry.getCapability("persistence") != null);
-    try std.testing.expect(terminal.registry.getCapability("command_parser") != null);
-    try std.testing.expect(terminal.registry.getCapability("command_registry") != null);
-    try std.testing.expect(terminal.registry.getCapability("process_executor") != null);
-    try std.testing.expect(terminal.registry.getCapability("builtin_commands") != null);
-    try std.testing.expect(terminal.registry.getCapability("command_pipeline") != null);
-    try std.testing.expect(terminal.registry.getCapability("ansi_writer") != null);
+    try std.testing.expect(terminal.registry.getCapability(.keyboard_input) != null);
+    try std.testing.expect(terminal.registry.getCapability(.basic_writer) != null);
+    try std.testing.expect(terminal.registry.getCapability(.line_buffer) != null);
+    try std.testing.expect(terminal.registry.getCapability(.cursor) != null);
+    try std.testing.expect(terminal.registry.getCapability(.history) != null);
+    try std.testing.expect(terminal.registry.getCapability(.screen_buffer) != null);
+    try std.testing.expect(terminal.registry.getCapability(.scrollback) != null);
+    try std.testing.expect(terminal.registry.getCapability(.persistence) != null);
+    try std.testing.expect(terminal.registry.getCapability(.parser) != null);
+    try std.testing.expect(terminal.registry.getCapability(.registry) != null);
+    try std.testing.expect(terminal.registry.getCapability(.executor) != null);
+    try std.testing.expect(terminal.registry.getCapability(.builtin) != null);
+    try std.testing.expect(terminal.registry.getCapability(.pipeline) != null);
+    try std.testing.expect(terminal.registry.getCapability(.ansi_writer) != null);
 }
 
 test "CommandTerminal command operations" {

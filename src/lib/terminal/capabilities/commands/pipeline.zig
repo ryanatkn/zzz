@@ -12,8 +12,6 @@ const CommandContext = registry.CommandContext;
 
 /// Command pipeline capability - coordinates command parsing, registration, and execution
 pub const Pipeline = struct {
-    pub const name = "command_pipeline";
-    pub const capability_type = "commands";
 
     allocator: std.mem.Allocator,
     parser_capability: ?*Parser = null,
@@ -38,17 +36,7 @@ pub const Pipeline = struct {
         allocator.destroy(self);
     }
 
-    /// ICapability interface implementation
-    pub fn getName(self: *const Self) []const u8 {
-        _ = self;
-        return name;
-    }
-
-    pub fn getType(self: *const Self) []const u8 {
-        _ = self;
-        return capability_type;
-    }
-
+    /// Get dependencies (parser, registry, executor, writer)
     pub fn getDependencies(self: *const Self) []const []const u8 {
         _ = self;
         return &[_][]const u8{ "command_parser", "command_registry", "process_executor", "basic_writer" };
@@ -59,15 +47,14 @@ pub const Pipeline = struct {
 
         // Find all dependencies using type-safe casting
         for (dependencies) |dep| {
-            const dep_name = dep.getName();
-            if (std.mem.eql(u8, dep_name, "command_parser")) {
-                self.parser_capability = dep.cast(Parser) orelse return error.InvalidCapabilityType;
-            } else if (std.mem.eql(u8, dep_name, "command_registry")) {
-                self.registry_capability = dep.cast(Registry) orelse return error.InvalidCapabilityType;
-            } else if (std.mem.eql(u8, dep_name, "process_executor")) {
-                self.executor_capability = dep.cast(Executor) orelse return error.InvalidCapabilityType;
-            } else if (std.mem.eql(u8, dep_name, "basic_writer")) {
-                self.writer_capability = dep.cast(BasicWriter) orelse return error.InvalidCapabilityType;
+            if (dep.cast(Parser)) |pars| {
+                self.parser_capability = pars;
+            } else if (dep.cast(Registry)) |reg| {
+                self.registry_capability = reg;
+            } else if (dep.cast(Executor)) |exec| {
+                self.executor_capability = exec;
+            } else if (dep.cast(BasicWriter)) |writer| {
+                self.writer_capability = writer;
             }
         }
 
@@ -294,10 +281,18 @@ test "Pipeline capability initialization" {
     var pipeline = try Pipeline.create(allocator);
     defer pipeline.destroy(allocator);
 
-    try std.testing.expectEqualStrings("command_pipeline", pipeline.getName());
-    try std.testing.expectEqualStrings("commands", pipeline.getType());
+    // Test that capability can be created and has correct properties
     try std.testing.expect(pipeline.getDependencies().len == 4);
     try std.testing.expect(!pipeline.isActive());
+    
+    // Test that all dependency pointers start as null
+    try std.testing.expect(pipeline.parser_capability == null);
+    try std.testing.expect(pipeline.registry_capability == null);
+    try std.testing.expect(pipeline.executor_capability == null);
+    try std.testing.expect(pipeline.writer_capability == null);
+    
+    // Test that allocator is properly set
+    try std.testing.expect(pipeline.allocator.ptr == allocator.ptr);
 }
 
 test "Pipeline dependency validation" {
