@@ -3,6 +3,7 @@ const kernel = @import("../../kernel/mod.zig");
 const parser = @import("parser.zig");
 const registry = @import("registry.zig");
 const executor = @import("executor.zig");
+const BasicWriter = @import("../output/basic_writer.zig").BasicWriter;
 
 const Parser = parser.Parser;
 const Registry = registry.Registry;
@@ -18,11 +19,8 @@ pub const Pipeline = struct {
     parser_capability: ?*Parser = null,
     registry_capability: ?*Registry = null,
     executor_capability: ?*Executor = null,
+    writer_capability: ?*BasicWriter = null,
     event_bus: ?*kernel.EventBus = null,
-
-    // Output callback for command results
-    output_callback: ?*const fn (context: *anyopaque, text: []const u8) anyerror!void = null,
-    output_context: ?*anyopaque = null,
 
     const Self = @This();
 
@@ -53,7 +51,7 @@ pub const Pipeline = struct {
 
     pub fn getDependencies(self: *const Self) []const []const u8 {
         _ = self;
-        return &[_][]const u8{ "command_parser", "command_registry", "process_executor" };
+        return &[_][]const u8{ "command_parser", "command_registry", "process_executor", "basic_writer" };
     }
 
     pub fn initialize(self: *Self, dependencies: []const kernel.TypeSafeCapability, event_bus: *kernel.EventBus) !void {
@@ -68,36 +66,43 @@ pub const Pipeline = struct {
                 self.registry_capability = dep.cast(Registry) orelse return error.InvalidCapabilityType;
             } else if (std.mem.eql(u8, dep_name, "process_executor")) {
                 self.executor_capability = dep.cast(Executor) orelse return error.InvalidCapabilityType;
+            } else if (std.mem.eql(u8, dep_name, "basic_writer")) {
+                self.writer_capability = dep.cast(BasicWriter) orelse return error.InvalidCapabilityType;
             }
         }
 
         // Verify all dependencies are available
         if (self.parser_capability == null or
             self.registry_capability == null or
-            self.executor_capability == null)
+            self.executor_capability == null or
+            self.writer_capability == null)
         {
             return error.MissingDependency;
         }
+        
+        // Subscribe to command_execute events to handle user input
+        try event_bus.subscribe(.command_execute, handleCommandExecuteEvent, self);
     }
 
     pub fn deinit(self: *Self) void {
+        // Unsubscribe from events first
+        if (self.event_bus) |bus| {
+            bus.unsubscribe(.command_execute, handleCommandExecuteEvent, self);
+        }
+        
         self.event_bus = null;
         self.parser_capability = null;
         self.registry_capability = null;
         self.executor_capability = null;
+        self.writer_capability = null;
     }
 
     pub fn isActive(self: *const Self) bool {
         return self.event_bus != null and
             self.parser_capability != null and
             self.registry_capability != null and
-            self.executor_capability != null;
-    }
-
-    /// Set output callback for command results
-    pub fn setOutputCallback(self: *Self, callback: *const fn (context: *anyopaque, text: []const u8) anyerror!void, context: *anyopaque) void {
-        self.output_callback = callback;
-        self.output_context = context;
+            self.executor_capability != null and
+            self.writer_capability != null;
     }
 
     /// Execute a command line through the complete pipeline
@@ -129,7 +134,7 @@ pub const Pipeline = struct {
         var command_context = CommandContext{
             .allocator = self.allocator,
             .event_bus = self.event_bus.?,
-            .write_fn = pipelineWriteOutput,
+            .write_fn = writeToOutput,
             .write_context = self,
         };
 
@@ -164,7 +169,9 @@ pub const Pipeline = struct {
     fn executeExternalCommand(self: *Self, command: []const u8, args: []const []const u8, executor_impl: *Executor) !void {
         var result = executor_impl.execute(command, args) catch |err| switch (err) {
             error.FileNotFound => {
-                try self.writeOutput(std.fmt.allocPrint(self.allocator, "{s}: command not found\n", .{command}) catch "command not found\n");
+                const error_msg = std.fmt.allocPrint(self.allocator, "{s}: command not found\n", .{command}) catch "command not found\n";
+                defer if (std.mem.startsWith(u8, error_msg, command)) self.allocator.free(error_msg); // Only free if allocation succeeded
+                try self.writeOutput(error_msg);
                 return;
             },
             else => return err,
@@ -183,22 +190,24 @@ pub const Pipeline = struct {
 
         // If command failed, show exit code
         if (result.exit_code != 0) {
-            try self.writeOutput(std.fmt.allocPrint(self.allocator, "Command exited with code {d}\n", .{result.exit_code}) catch "Command failed\n");
+            const exit_msg = std.fmt.allocPrint(self.allocator, "Command exited with code {d}\n", .{result.exit_code}) catch "Command failed\n";
+            defer if (!std.mem.eql(u8, exit_msg, "Command failed\n")) self.allocator.free(exit_msg); // Only free if allocation succeeded
+            try self.writeOutput(exit_msg);
         }
     }
 
     /// Internal write output function used by command context
-    fn pipelineWriteOutput(context: *anyopaque, text: []const u8) !void {
+    fn writeToOutput(context: *anyopaque, text: []const u8) !void {
         const self: *Pipeline = @ptrCast(@alignCast(context));
         try self.writeOutput(text);
     }
 
-    /// Write output via callback or to stdout
+    /// Write output directly to BasicWriter
     fn writeOutput(self: *Self, text: []const u8) !void {
-        if (self.output_callback) |callback| {
-            try callback(self.output_context.?, text);
+        if (self.writer_capability) |writer| {
+            try writer.write(text);
         } else {
-            // Fallback to stdout if no callback set
+            // Fallback to stdout if no writer available
             const stdout = std.io.getStdOut().writer();
             try stdout.writeAll(text);
         }
@@ -264,6 +273,21 @@ pub const Pipeline = struct {
     }
 };
 
+/// Event handler for command_execute events from LineBuffer
+fn handleCommandExecuteEvent(event: kernel.Event, context: ?*anyopaque) !void {
+    if (context == null) return;
+    
+    const pipeline = @as(*Pipeline, @ptrCast(@alignCast(context.?)));
+    
+    switch (event.data) {
+        .command_execute => |cmd_data| {
+            // Execute the command through the pipeline
+            try pipeline.executeCommand(cmd_data.command);
+        },
+        else => {}, // Ignore other event types
+    }
+}
+
 // Tests
 test "Pipeline capability initialization" {
     const allocator = std.testing.allocator;
@@ -272,7 +296,7 @@ test "Pipeline capability initialization" {
 
     try std.testing.expectEqualStrings("command_pipeline", pipeline.getName());
     try std.testing.expectEqualStrings("commands", pipeline.getType());
-    try std.testing.expect(pipeline.getDependencies().len == 3);
+    try std.testing.expect(pipeline.getDependencies().len == 4);
     try std.testing.expect(!pipeline.isActive());
 }
 

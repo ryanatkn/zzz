@@ -493,9 +493,21 @@ pub const TerminalComponent = struct {
         self.visible_columns.set(cols);
     }
 
-    /// Render a single line of text
+    /// Render a single line of text using persistent rendering when available
     fn renderLine(self: *const Self, renderer: anytype, text: []const u8, x: f32, y: f32, color: Color) !void {
-        if (@hasDecl(@TypeOf(renderer), "drawText")) {
+        // Prefer persistent text rendering for better performance
+        if (@hasDecl(@TypeOf(renderer), "queuePersistentText")) {
+            // Use persistent/retained mode rendering for stable text
+            renderer.queuePersistentText(text, Vec2{ .x = x, .y = y }, null, .sans, self.font_size.get(), color) catch |err| {
+                // Fallback to immediate mode on error
+                if (@hasDecl(@TypeOf(renderer), "drawText")) {
+                    try renderer.drawText(text, x, y, self.font_size.get(), color);
+                } else {
+                    _ = err; // Silence unused error
+                }
+            };
+        } else if (@hasDecl(@TypeOf(renderer), "drawText")) {
+            // Fallback to immediate mode for renderers without persistent text
             try renderer.drawText(text, x, y, self.font_size.get(), color);
         }
     }

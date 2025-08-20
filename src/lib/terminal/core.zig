@@ -121,9 +121,11 @@ pub const Line = struct {
     }
 
     pub fn getText(self: *const Self) []const u8 {
-        // DEBUG: Log what getText returns
-        if (loggers.game_log) |*log| {
-            log.info("line_gettext", "Line.getText() returning: '{s}' (length: {d})", .{ self.text.items, self.text.items.len });
+        // Only log non-empty, long lines to reduce spam
+        if (self.text.items.len > 10) {
+            if (loggers.game_log) |*log| {
+                log.debug("line_content", "Line.getText() returning long line: '{s}' (len: {d})", .{ self.text.items, self.text.items.len });
+            }
         }
         return self.text.items;
     }
@@ -183,11 +185,6 @@ pub const VisibleLinesIterator = struct {
         const line_index = self.start_index + self.current;
         const line = self.scrollback.get(line_index) orelse return null;
         self.current += 1;
-
-        // DEBUG: Log what the iterator returns
-        if (loggers.game_log) |*log| {
-            log.info("lines_iterator", "Iterator returning line {d}/{d}: '{s}'", .{ self.current, self.count, line.getText() });
-        }
 
         return line;
     }
