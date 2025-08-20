@@ -266,13 +266,12 @@ pub const CommandTerminal = struct {
         try self.standard.loadSession(name);
     }
 
-
     /// Resize terminal
     pub fn resize(self: *CommandTerminal, columns: usize, rows: usize) !void {
         try self.standard.resize(columns, rows);
     }
 
-    /// Get visible content for rendering (unified method)  
+    /// Get visible content for rendering (unified method)
     pub fn getVisibleContent(self: *const CommandTerminal) struct { lines: VisibleLinesIterator, current: []const u8, cursor: Cursor } {
         const ui_log = loggers.getUILog();
 
@@ -280,7 +279,7 @@ pub const CommandTerminal = struct {
         const writer = self.registry.getCapabilityTyped(BasicWriter);
         const scrollback_capability = self.registry.getCapabilityTyped(Scrollback);
         const cursor_capability = self.registry.getCapabilityTyped(Cursor);
-        
+
         var basic_writer_scrollback: ?*const core.RingBuffer(core.Line, 1000) = null;
         if (writer) |w| {
             basic_writer_scrollback = w.getScrollback();
@@ -289,13 +288,13 @@ pub const CommandTerminal = struct {
         // If we have at least one scrollback source, try to merge them
         if (basic_writer_scrollback != null or scrollback_capability != null) {
             const current_line = self.getCurrentLine();
-            
+
             // Get capability cursor or default
-            const cursor_to_return = if (cursor_capability) |cursor_cap| 
+            const cursor_to_return = if (cursor_capability) |cursor_cap|
                 cursor_cap.*
-            else 
+            else
                 Cursor{};
-            
+
             // Use chronological iterator for oldest-first ordering (natural terminal behavior)
             if (basic_writer_scrollback) |scrollback| {
                 return .{
@@ -307,7 +306,7 @@ pub const CommandTerminal = struct {
                 // Use the scrollback capability's own visible lines iterator
                 ui_log.info("terminal_content", "Using Scrollback capability with {} lines", .{scrollback_cap.getLineCount()});
                 _ = scrollback_cap.getVisibleLines(25); // Unused for now
-                
+
                 // For now, we need to create a compatible iterator
                 // This is a bridging solution until we can fully merge the systems
                 var temp_scrollback = core.RingBuffer(core.Line, 1000).init();

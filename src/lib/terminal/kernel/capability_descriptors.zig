@@ -25,12 +25,12 @@ pub const CapabilityType = enum(u8) {
     keyboard_input = 0,
     readline_input = 1,
     mouse_input = 2,
-    
+
     // Output capabilities
     basic_writer = 10,
     ansi_writer = 11,
     buffered_output = 12,
-    
+
     // State capabilities
     cursor = 20,
     line_buffer = 21,
@@ -38,16 +38,16 @@ pub const CapabilityType = enum(u8) {
     screen_buffer = 23,
     scrollback = 24,
     persistence = 25,
-    
+
     // Command capabilities
     parser = 30,
     registry = 31,
     executor = 32,
     builtin = 33,
     pipeline = 34,
-    
+
     // Note: Extensible enums would use _ field, but for now using fixed set
-    
+
     pub const Count = 35; // Max enum value + 1 (pipeline = 34)
 };
 
@@ -66,12 +66,12 @@ pub const CapabilityData = union(CapabilityType) {
     keyboard_input: *KeyboardInput,
     readline_input: *ReadlineInput,
     mouse_input: *MouseInput,
-    
+
     // Output capabilities
     basic_writer: *BasicWriter,
     ansi_writer: *AnsiWriter,
     buffered_output: *BufferedOutput,
-    
+
     // State capabilities
     cursor: *Cursor,
     line_buffer: *LineBuffer,
@@ -79,26 +79,26 @@ pub const CapabilityData = union(CapabilityType) {
     screen_buffer: *ScreenBuffer,
     scrollback: *Scrollback,
     persistence: *Persistence,
-    
+
     // Command capabilities
     parser: *Parser,
     registry: *Registry,
     executor: *Executor,
     builtin: *Builtin,
     pipeline: *Pipeline,
-    
+
     /// Get the capability type enum value
     pub fn getType(self: CapabilityData) CapabilityType {
         return std.meta.activeTag(self);
     }
-    
+
     /// Get pointer to capability for generic operations
     pub fn getPtr(self: CapabilityData) *anyopaque {
         return switch (self) {
             inline else => |cap| @as(*anyopaque, @ptrCast(cap)),
         };
     }
-    
+
     /// Type-safe casting to concrete capability type
     pub fn cast(self: CapabilityData, comptime T: type) ?*T {
         return switch (self) {
@@ -137,31 +137,31 @@ pub const CapabilityDescriptor = struct {
 pub const DependencyGraph = struct {
     adjacency_list: [CapabilityType.Count][]const CapabilityType,
     initialization_order: [17]CapabilityType, // Fixed size for all builtin capabilities
-    
+
     /// Build dependency graph at compile time
     pub fn build(comptime descriptors: []const CapabilityDescriptor) DependencyGraph {
         // Build adjacency list
         var adjacency: [CapabilityType.Count][]const CapabilityType = undefined;
-        
+
         inline for (descriptors) |desc| {
             adjacency[@intFromEnum(desc.type)] = desc.metadata.dependencies;
         }
-        
+
         // Compute topological sort for initialization order
         const init_order = computeInitializationOrder(descriptors);
-        
+
         return DependencyGraph{
             .adjacency_list = adjacency,
             .initialization_order = init_order,
         };
     }
-    
+
     /// Detect circular dependencies at compile time
     fn computeInitializationOrder(comptime descriptors: []const CapabilityDescriptor) [descriptors.len]CapabilityType {
         // Simplified topological sort - in real implementation would be more robust
         var order: [descriptors.len]CapabilityType = undefined;
         var index: usize = 0;
-        
+
         // Add capabilities with no dependencies first
         inline for (descriptors) |desc| {
             if (desc.metadata.dependencies.len == 0) {
@@ -169,7 +169,7 @@ pub const DependencyGraph = struct {
                 index += 1;
             }
         }
-        
+
         // Add remaining capabilities (simplified - real implementation needs proper topo sort)
         inline for (descriptors) |desc| {
             if (desc.metadata.dependencies.len > 0) {
@@ -177,7 +177,7 @@ pub const DependencyGraph = struct {
                 index += 1;
             }
         }
-        
+
         return order;
     }
 };
@@ -187,67 +187,67 @@ const Factories = struct {
     fn createKeyboardInput(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .keyboard_input = try KeyboardInput.create(allocator) };
     }
-    
+
     fn createReadlineInput(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .readline_input = try ReadlineInput.create(allocator) };
     }
-    
+
     fn createMouseInput(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .mouse_input = try MouseInput.create(allocator) };
     }
-    
+
     fn createBasicWriter(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .basic_writer = try BasicWriter.create(allocator) };
     }
-    
+
     fn createAnsiWriter(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .ansi_writer = try AnsiWriter.create(allocator) };
     }
-    
+
     fn createBufferedOutput(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .buffered_output = try BufferedOutput.create(allocator) };
     }
-    
+
     fn createCursor(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .cursor = try Cursor.create(allocator) };
     }
-    
+
     fn createLineBuffer(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .line_buffer = try LineBuffer.create(allocator) };
     }
-    
+
     fn createHistory(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .history = try History.create(allocator) };
     }
-    
+
     fn createScreenBuffer(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .screen_buffer = try ScreenBuffer.create(allocator) };
     }
-    
+
     fn createScrollback(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .scrollback = try Scrollback.create(allocator) };
     }
-    
+
     fn createPersistence(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .persistence = try Persistence.create(allocator) };
     }
-    
+
     fn createParser(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .parser = try Parser.create(allocator) };
     }
-    
+
     fn createRegistry(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .registry = try Registry.create(allocator) };
     }
-    
+
     fn createExecutor(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .executor = try Executor.create(allocator) };
     }
-    
+
     fn createBuiltin(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .builtin = try Builtin.create(allocator) };
     }
-    
+
     fn createPipeline(allocator: std.mem.Allocator) !CapabilityData {
         return CapabilityData{ .pipeline = try Pipeline.create(allocator) };
     }
@@ -272,12 +272,12 @@ pub const BuiltinRegistry = struct {
         .{
             .type = .readline_input,
             .metadata = .{
-                .name = "Readline Input", 
+                .name = "Readline Input",
                 .description = "Advanced line editing with cursor movement",
                 .category = .input,
                 .dependencies = &[_]CapabilityType{ .keyboard_input, .cursor, .line_buffer },
                 .conflicts = &[_]CapabilityType{},
-                .optional_dependencies = &[_]CapabilityType{ .history },
+                .optional_dependencies = &[_]CapabilityType{.history},
             },
             .factory = Factories.createReadlineInput,
         },
@@ -293,7 +293,7 @@ pub const BuiltinRegistry = struct {
             },
             .factory = Factories.createMouseInput,
         },
-        
+
         // Output capabilities
         .{
             .type = .basic_writer,
@@ -331,7 +331,7 @@ pub const BuiltinRegistry = struct {
             },
             .factory = Factories.createBufferedOutput,
         },
-        
+
         // State capabilities
         .{
             .type = .cursor,
@@ -399,13 +399,13 @@ pub const BuiltinRegistry = struct {
                 .name = "Persistence",
                 .description = "Save and restore terminal state",
                 .category = .state,
-                .dependencies = &[_]CapabilityType{ .history },
+                .dependencies = &[_]CapabilityType{.history},
                 .conflicts = &[_]CapabilityType{},
-                .optional_dependencies = &[_]CapabilityType{ .scrollback },
+                .optional_dependencies = &[_]CapabilityType{.scrollback},
             },
             .factory = Factories.createPersistence,
         },
-        
+
         // Command capabilities
         .{
             .type = .parser,
@@ -449,7 +449,7 @@ pub const BuiltinRegistry = struct {
                 .name = "Builtin Commands",
                 .description = "Built-in terminal commands",
                 .category = .command,
-                .dependencies = &[_]CapabilityType{ .registry },
+                .dependencies = &[_]CapabilityType{.registry},
                 .conflicts = &[_]CapabilityType{},
                 .optional_dependencies = &[_]CapabilityType{},
             },
@@ -468,10 +468,10 @@ pub const BuiltinRegistry = struct {
             .factory = Factories.createPipeline,
         },
     };
-    
+
     /// Compute dependency graph at compile time
     pub const dependency_graph = DependencyGraph.build(&descriptors);
-    
+
     /// Get descriptor by type - O(1) lookup using switch
     pub fn getDescriptor(capability_type: CapabilityType) CapabilityDescriptor {
         return switch (capability_type) {
@@ -494,48 +494,47 @@ pub const BuiltinRegistry = struct {
             .pipeline => descriptors[16],
         };
     }
-    
-    /// Get metadata by type - O(1) lookup  
+
+    /// Get metadata by type - O(1) lookup
     pub fn getMetadata(capability_type: CapabilityType) CapabilityMetadata {
         return getDescriptor(capability_type).metadata;
     }
-    
+
     /// Get factory by type - O(1) lookup
     pub fn getFactory(capability_type: CapabilityType) CapabilityFactory {
         return getDescriptor(capability_type).factory;
     }
 };
 
-/// Simplified dispatch - use direct switch dispatch for now 
+/// Simplified dispatch - use direct switch dispatch for now
 /// (Can optimize to indexed tables later if needed)
 pub const DispatchTable = struct {
-    
     /// Get capability name via enum lookup (no runtime dispatch needed)
     pub fn getName(data: CapabilityData) []const u8 {
         return BuiltinRegistry.getMetadata(data.getType()).name;
     }
-    
+
     /// Destroy capability via switch dispatch
     pub fn destroy(data: CapabilityData, allocator: std.mem.Allocator) void {
         switch (data) {
             inline else => |cap| cap.destroy(allocator),
         }
     }
-    
-    /// Initialize capability via switch dispatch  
+
+    /// Initialize capability via switch dispatch
     pub fn initialize(data: CapabilityData, dependencies: anytype, event_bus: anytype) !void {
         switch (data) {
             inline else => |cap| try cap.initialize(dependencies, event_bus),
         }
     }
-    
+
     /// Deinitialize capability via switch dispatch
     pub fn deinit(data: CapabilityData) void {
         switch (data) {
             inline else => |cap| cap.deinit(),
         }
     }
-    
+
     /// Simplified instance for compatibility
     pub const instance = @This(){};
 };
@@ -545,7 +544,7 @@ pub fn ExtensibleRegistry(comptime extensions: []const CapabilityDescriptor) typ
     return struct {
         pub const all_descriptors = BuiltinRegistry.descriptors ++ extensions;
         pub const dependency_graph = DependencyGraph.build(all_descriptors);
-        
+
         pub fn getDescriptor(capability_type: CapabilityType) CapabilityDescriptor {
             inline for (all_descriptors) |desc| {
                 if (desc.type == capability_type) {

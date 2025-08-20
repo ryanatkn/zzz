@@ -17,7 +17,7 @@ const ZigHighlighter = syntax_highlighter.ZigHighlighter;
 const TerminalComponent = terminal_ui.TerminalComponent;
 const KeyboardEvent = sdl.sdl.SDL_KeyboardEvent;
 
-/// Which panel currently has focus for input handling  
+/// Which panel currently has focus for input handling
 pub const FocusedPanel = enum {
     file_tree,
     content_editor,

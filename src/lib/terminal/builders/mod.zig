@@ -76,7 +76,7 @@ pub fn createFromConfig(allocator: std.mem.Allocator, config_path: []const u8) !
 pub fn validateCapabilities(allocator: std.mem.Allocator, capabilities: []const CapabilityType) !ValidationResult {
     var validator = try ValidationSystem.init(allocator);
     defer validator.deinit();
-    
+
     return validator.validateCapabilities(capabilities);
 }
 

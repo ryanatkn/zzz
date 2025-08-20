@@ -163,7 +163,7 @@ test "CapabilityRegistry - basic registration" {
     // Verify registration
     try testing.expect(registry.getCapability(.cursor) != null);
     try testing.expect(registry.getCapability(.line_buffer) != null);
-    
+
     // Verify capability count
     try testing.expectEqual(@as(usize, 2), registry.getCapabilityCount());
 }

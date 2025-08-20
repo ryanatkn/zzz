@@ -213,7 +213,6 @@ pub const VisibleLinesIterator = struct {
     }
 };
 
-
 /// Terminal state and configuration
 pub const Terminal = struct {
     allocator: std.mem.Allocator,

@@ -22,7 +22,6 @@ pub const Cursor = struct {
     max_columns: usize = 80,
     max_rows: usize = 24,
 
-
     pub fn init() Cursor {
         return Cursor{};
     }
@@ -39,7 +38,6 @@ pub const Cursor = struct {
         self.deinit();
         allocator.destroy(self);
     }
-
 
     /// Get required dependencies
     pub fn getDependencies(self: *Cursor) []const []const u8 {

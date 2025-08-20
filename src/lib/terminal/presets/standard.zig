@@ -30,10 +30,10 @@ pub const StandardTerminal = struct {
 
     /// Initialize standard terminal with all capabilities
     pub fn init(allocator: std.mem.Allocator) !StandardTerminal {
-        // Create registry and register all standard capabilities 
+        // Create registry and register all standard capabilities
         var registry = try kernel.createRegistry(allocator);
         errdefer allocator.destroy(registry);
-        
+
         // Register all capabilities for standard terminal using new enum-based API
         try registry.registerType(.keyboard_input);
         try registry.registerType(.basic_writer);
@@ -224,7 +224,6 @@ pub const StandardTerminal = struct {
     }
 
     // ===== Utility Functions =====
-
 
     /// Resize terminal
     pub fn resize(self: *StandardTerminal, columns: usize, rows: usize) !void {

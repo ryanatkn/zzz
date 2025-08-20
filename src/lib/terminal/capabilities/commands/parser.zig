@@ -3,7 +3,6 @@ const kernel = @import("../../kernel/mod.zig");
 
 /// Command line parser capability - handles argument parsing, quoting, and escaping
 pub const Parser = struct {
-
     allocator: std.mem.Allocator,
     event_bus: ?*kernel.EventBus = null,
 
@@ -38,7 +37,6 @@ pub const Parser = struct {
     pub fn destroy(self: *Self, allocator: std.mem.Allocator) void {
         allocator.destroy(self);
     }
-
 
     /// Get dependencies (none for parser)
     pub fn getDependencies(self: *const Self) []const []const u8 {
@@ -215,13 +213,13 @@ test "Parser capability initialization" {
 
     // Test that capability can be created and has correct properties
     try std.testing.expect(parser.getDependencies().len == 0);
-    
-    // Test that capability starts inactive  
+
+    // Test that capability starts inactive
     try std.testing.expect(!parser.isActive());
-    
+
     // Test that allocator is properly set
     try std.testing.expect(parser.allocator.ptr == allocator.ptr);
-    
+
     // Test that event bus is initially null
     try std.testing.expect(parser.event_bus == null);
 }

@@ -18,7 +18,7 @@ pub const TerminalLayoutConfig = struct {
     input_padding: f32 = 4,
     content_to_input_spacing: f32 = 2, // Small gap between content and input area
     line_spacing_multiplier: f32 = 1.2, // 20% extra spacing
-    
+
     // Buffer limits
     max_lines_buffer: usize = 200, // Maximum lines to buffer for rendering (increased from hardcoded 100)
 
@@ -35,8 +35,8 @@ pub const TerminalLayoutConfig = struct {
 };
 
 pub const RenderDirection = enum {
-    top_down,   // Render from top of content area downward
-    bottom_up,  // Render from input area upward (traditional terminal approach)
+    top_down, // Render from top of content area downward
+    bottom_up, // Render from input area upward (traditional terminal approach)
 };
 
 /// Content structure for terminal rendering
@@ -47,7 +47,6 @@ pub const TerminalContent = struct {
     cursor: Cursor,
     is_focused: bool = true,
 };
-
 
 /// Unified terminal layout renderer
 pub const TerminalLayoutRenderer = struct {
@@ -100,14 +99,14 @@ pub const TerminalLayoutRenderer = struct {
             .bounds = bounds,
             .content_area = Rectangle{
                 .position = Vec2{ .x = bounds.position.x + self.config.side_margin, .y = content_top },
-                .size = Vec2{ 
+                .size = Vec2{
                     .x = bounds.size.x - (self.config.side_margin * 2),
                     .y = available_height,
                 },
             },
             .input_area = Rectangle{
                 .position = Vec2{ .x = bounds.position.x + self.config.side_margin, .y = input_y },
-                .size = Vec2{ 
+                .size = Vec2{
                     .x = bounds.size.x - (self.config.side_margin * 2),
                     .y = input_height,
                 },
@@ -138,9 +137,9 @@ pub const TerminalLayoutRenderer = struct {
         char_width: f32,
     ) !void {
         // Draw input background
-        const bg_color = if (content.is_focused) 
-            self.config.input_bg_focused 
-        else 
+        const bg_color = if (content.is_focused)
+            self.config.input_bg_focused
+        else
             self.config.input_bg_unfocused;
 
         if (@hasDecl(@TypeOf(renderer), "drawRect")) {
@@ -232,7 +231,7 @@ pub const TerminalLayoutRenderer = struct {
 
         // Collect lines from iterator
         while (content.lines.next()) |line| {
-            if (lines_count >= lines_buffer.len) break;  // Prevent overflow
+            if (lines_count >= lines_buffer.len) break; // Prevent overflow
             if (lines_count >= layout.max_content_lines) break;
 
             const line_text = line.getText();
@@ -335,11 +334,11 @@ const TerminalLayout = struct {
 // Tests
 test "TerminalLayoutConfig buffer size configuration" {
     const testing = std.testing;
-    
+
     // Test default configuration
     const default_config = TerminalLayoutConfig{};
     try testing.expect(default_config.max_lines_buffer == 200);
-    
+
     // Test custom configuration
     const custom_config = TerminalLayoutConfig{ .max_lines_buffer = 500 };
     try testing.expect(custom_config.max_lines_buffer == 500);
@@ -347,22 +346,22 @@ test "TerminalLayoutConfig buffer size configuration" {
 
 test "TerminalLayoutRenderer layout calculation" {
     const testing = std.testing;
-    
+
     const renderer = TerminalLayoutRenderer.initDefault();
     const bounds = Rectangle{
         .position = Vec2{ .x = 0, .y = 0 },
         .size = Vec2{ .x = 400, .y = 300 },
     };
-    
+
     const layout = renderer.calculateLayout(bounds, 16.0, 20.0);
-    
+
     // Check that input area is at the bottom
     try testing.expect(layout.input_area.position.y > layout.content_area.position.y);
-    
+
     // Check that content area respects margins
     try testing.expect(layout.content_area.position.x == renderer.config.side_margin);
     try testing.expect(layout.content_area.position.y == renderer.config.top_margin);
-    
+
     // Check that spacing between content and input is small
     const gap = layout.input_area.position.y - (layout.content_area.position.y + layout.content_area.size.y);
     try testing.expect(gap == renderer.config.content_to_input_spacing);

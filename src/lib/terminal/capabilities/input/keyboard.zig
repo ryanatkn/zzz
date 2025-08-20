@@ -13,7 +13,6 @@ pub const KeyboardInput = struct {
     // Event bus for emitting events
     event_bus: ?*kernel.EventBus = null,
 
-
     /// Create a new keyboard input capability
     pub fn create(allocator: std.mem.Allocator) !*KeyboardInput {
         const self = try allocator.create(KeyboardInput);

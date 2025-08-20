@@ -43,7 +43,7 @@ const SDLGPUTerminalAdapter = struct {
 
     pub fn drawText(self: SDLGPUTerminalAdapter, text: []const u8, x: f32, y: f32, font_size: f32, color: Color) void {
         _ = font_size; // HUD uses fixed font size from constants
-        _ = color; // HUD uses fixed text color 
+        _ = color; // HUD uses fixed text color
         self.renderer.drawSimpleText(self.cmd_buffer, self.render_pass, text, Vec2{ .x = x, .y = y });
     }
 };
@@ -101,7 +101,7 @@ pub const BrowserRenderer = struct {
 
     // Font grid test configuration
     font_grid_config: FontGridConfig,
-    
+
     // Terminal layout renderer for unified rendering
     terminal_layout_renderer: ui.TerminalLayoutRenderer,
 
@@ -488,7 +488,7 @@ pub const BrowserRenderer = struct {
     fn renderTerminalContentSafe(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, terminal: *const TerminalComponent, panel_rect: math.Rectangle, is_focused: bool) !void {
         // Get terminal content safely with error handling
         const terminal_content = terminal.terminal.getVisibleContent();
-        
+
         // Create SDL GPU adapter for the layout renderer
         const gpu_adapter = SDLGPUTerminalAdapter{
             .renderer = self,
@@ -498,7 +498,7 @@ pub const BrowserRenderer = struct {
 
         // Create TerminalContent for the layout renderer
         var terminal_lines = terminal_content.lines;
-        
+
         // Convert capability cursor to simple cursor for layout renderer
         const simple_cursor = @import("../../lib/terminal/core.zig").Cursor{
             .x = terminal_content.cursor.x,
@@ -507,7 +507,7 @@ pub const BrowserRenderer = struct {
             .blink_timer = terminal_content.cursor.blink_timer,
             .blink_rate = terminal_content.cursor.blink_rate,
         };
-        
+
         const layout_content = ui.TerminalContent{
             .lines = &terminal_lines,
             .current_input = terminal_content.current,
@@ -525,7 +525,7 @@ pub const BrowserRenderer = struct {
             ide_constants.TEXT.LINE_HEIGHT,
             ide_constants.TEXT.CHAR_WIDTH,
         );
-        
+
         // Show helpful message if no terminal content and there's space (simplified)
         const content_area_top = panel_rect.position.y + 30;
         if (is_focused) {
@@ -541,7 +541,7 @@ pub const BrowserRenderer = struct {
         if (text.len == 0) return false;
 
         for (text) |ch| {
-            // Allow printable ASCII and common whitespace  
+            // Allow printable ASCII and common whitespace
             if (ch < 32 or ch > 126) {
                 if (ch != ' ' and ch != '\t') {
                     return false;
@@ -550,8 +550,6 @@ pub const BrowserRenderer = struct {
         }
         return true;
     }
-
-
 
     /// Draw file type icon
     fn drawFileIcon(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, icon: FileIcon, position: Vec2) !void {

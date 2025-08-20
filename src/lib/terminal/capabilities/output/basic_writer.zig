@@ -28,7 +28,6 @@ pub const BasicWriter = struct {
     // Current line being built (accumulates characters until newline)
     current_line: ?core.Line = null,
 
-
     pub fn init(allocator: std.mem.Allocator) BasicWriter {
         return BasicWriter{
             .active = false,
@@ -57,7 +56,6 @@ pub const BasicWriter = struct {
         self.deinit();
         allocator.destroy(self);
     }
-
 
     /// Get required dependencies
     pub fn getDependencies(self: *BasicWriter) []const []const u8 {
@@ -156,7 +154,7 @@ pub const BasicWriter = struct {
         if (self.wrap_lines and current_length >= self.terminal_width) {
             // Auto-wrap: start a new line
             try self.forceNewline();
-            
+
             // Initialize new current line for the wrapped character
             if (self.current_line == null) {
                 self.current_line = core.Line.init(self.arena.allocator());

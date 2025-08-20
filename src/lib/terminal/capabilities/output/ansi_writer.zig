@@ -72,7 +72,6 @@ pub const Style = struct {
 
 /// ANSI output writer capability - extends basic writer with ANSI escape sequence support
 pub const AnsiWriter = struct {
-
     allocator: std.mem.Allocator,
     basic_writer_capability: ?*BasicWriter = null,
     event_bus: ?*kernel.EventBus = null,
@@ -91,7 +90,6 @@ pub const AnsiWriter = struct {
     pub fn destroy(self: *AnsiWriter, allocator: std.mem.Allocator) void {
         allocator.destroy(self);
     }
-
 
     pub fn getDependencies(self: *const AnsiWriter) []const []const u8 {
         _ = self;
@@ -274,7 +272,7 @@ test "AnsiWriter capability initialization" {
     // Test that capability can be created and has correct properties
     try std.testing.expect(writer.getDependencies().len == 1);
     try std.testing.expectEqualStrings("basic_writer", writer.getDependencies()[0]);
-    
+
     // Test initial state
     try std.testing.expect(writer.basic_writer_capability == null);
     try std.testing.expect(writer.event_bus == null);

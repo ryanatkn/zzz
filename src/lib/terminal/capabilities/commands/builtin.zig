@@ -8,7 +8,6 @@ const CommandContext = registry.CommandContext;
 
 /// Built-in commands capability - provides essential terminal commands
 pub const Builtin = struct {
-
     allocator: std.mem.Allocator,
     registry_capability: ?*Registry = null,
     event_bus: ?*kernel.EventBus = null,
@@ -314,10 +313,10 @@ test "Builtin capability initialization" {
     // Test that capability can be created and has correct properties
     try std.testing.expect(builtin.getDependencies().len == 1);
     try std.testing.expectEqualStrings("command_registry", builtin.getDependencies()[0]);
-    
+
     // Test that capability starts inactive
     try std.testing.expect(!builtin.isActive());
-    
+
     // Test that allocator is properly set
     try std.testing.expect(builtin.allocator.ptr == allocator.ptr);
 }

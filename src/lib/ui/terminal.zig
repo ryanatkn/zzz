@@ -432,7 +432,6 @@ pub const TerminalComponent = struct {
         self.visible_columns.set(cols);
     }
 
-
     /// Get command prompt string
     fn getPrompt(self: *const Self) ![]u8 {
         const cwd = self.terminal.getWorkingDirectory();

@@ -12,7 +12,6 @@ const CommandContext = registry.CommandContext;
 
 /// Command pipeline capability - coordinates command parsing, registration, and execution
 pub const Pipeline = struct {
-
     allocator: std.mem.Allocator,
     parser_capability: ?*Parser = null,
     registry_capability: ?*Registry = null,
@@ -284,13 +283,13 @@ test "Pipeline capability initialization" {
     // Test that capability can be created and has correct properties
     try std.testing.expect(pipeline.getDependencies().len == 4);
     try std.testing.expect(!pipeline.isActive());
-    
+
     // Test that all dependency pointers start as null
     try std.testing.expect(pipeline.parser_capability == null);
     try std.testing.expect(pipeline.registry_capability == null);
     try std.testing.expect(pipeline.executor_capability == null);
     try std.testing.expect(pipeline.writer_capability == null);
-    
+
     // Test that allocator is properly set
     try std.testing.expect(pipeline.allocator.ptr == allocator.ptr);
 }

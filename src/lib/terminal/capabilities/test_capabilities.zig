@@ -337,18 +337,18 @@ test "Capability Integration - event flow" {
 
     // Verify all capabilities are initialized
     try testing.expectEqual(@as(usize, 4), registry.*.getInitializedCount());
-    
+
     // Get capabilities and verify they're active
     const keyboard_cap = registry.*.getCapability(.keyboard_input);
     const writer_cap = registry.*.getCapability(.basic_writer);
     const line_buffer_cap = registry.*.getCapability(.line_buffer);
     const cursor_cap = registry.*.getCapability(.cursor);
-    
+
     try testing.expect(keyboard_cap != null);
     try testing.expect(writer_cap != null);
     try testing.expect(line_buffer_cap != null);
     try testing.expect(cursor_cap != null);
-    
+
     try testing.expect(keyboard_cap.?.isActive());
     try testing.expect(writer_cap.?.isActive());
     try testing.expect(line_buffer_cap.?.isActive());

@@ -1,7 +1,7 @@
 const std = @import("std");
 const kernel = @import("../../kernel/mod.zig");
 
-/// Command function signature for registered commands  
+/// Command function signature for registered commands
 pub const CommandFn = *const fn (context: *CommandContext, args: []const []const u8) anyerror!void;
 
 /// Command execution context provided to command functions
@@ -27,7 +27,6 @@ pub const Command = struct {
 
 /// Command registry capability - manages command registration and lookup
 pub const Registry = struct {
-
     allocator: std.mem.Allocator,
     commands: std.StringHashMap(Command),
     event_bus: ?*kernel.EventBus = null,
@@ -49,7 +48,6 @@ pub const Registry = struct {
         // Then free the memory
         allocator.destroy(self);
     }
-
 
     pub fn getDependencies(self: *const Registry) []const []const u8 {
         _ = self;
@@ -185,7 +183,7 @@ test "Registry capability initialization" {
     // Test that capability can be created and has correct properties
     try std.testing.expect(registry.getDependencies().len == 0);
     try std.testing.expect(registry.getCommandCount() == 0);
-    
+
     // Test initial state
     try std.testing.expect(registry.event_bus == null);
     try std.testing.expect(registry.allocator.ptr == allocator.ptr);
