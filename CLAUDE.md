@@ -60,6 +60,8 @@ $ zig build run          # Build and run
 $ zig build test                          # Run all tests
 $ zig build test -Dtest-filter="pattern"  # Run tests matching pattern
 $ zig build test --summary all            # Show detailed test results
+$ zig run src/scripts/check_test_coverage.zig  # Analyze test coverage tree structure
+$ zig run src/scripts/check_test_coverage.zig -- --help
 
 # Dependency management
 $ zig build update-deps  # Update vendored SDL dependencies  

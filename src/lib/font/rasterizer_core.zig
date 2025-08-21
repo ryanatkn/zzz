@@ -3,6 +3,7 @@ const ttf_parser = @import("ttf_parser.zig");
 const glyph_extractor = @import("glyph_extractor.zig");
 const font_metrics = @import("font_metrics.zig");
 const bitmap_utils = @import("../image/bitmap.zig");
+const interpolation = @import("../math/interpolation.zig");
 // Deleted modules: edge_builder, scanline_renderer, font_debug, curve_tessellation
 
 const log = std.log.scoped(.rasterizer_core);
@@ -124,7 +125,11 @@ fn tessellateContour(allocator: std.mem.Allocator, contour: glyph_extractor.Cont
             var step: u32 = 1;
             while (step <= steps) : (step += 1) {
                 const t = @as(f32, @floatFromInt(step)) / @as(f32, @floatFromInt(steps));
-                const point = quadraticBezier(current, next, end_point, t);
+                const point = glyph_extractor.Point{
+                    .x = interpolation.bezierQuadratic(current.x, next.x, end_point.x, t),
+                    .y = interpolation.bezierQuadratic(current.y, next.y, end_point.y, t),
+                    .on_curve = true,
+                };
                 try tessellated.append(point);
             }
 
@@ -138,19 +143,6 @@ fn tessellateContour(allocator: std.mem.Allocator, contour: glyph_extractor.Cont
     return tessellated.toOwnedSlice();
 }
 
-/// Evaluate quadratic bezier curve at parameter t
-fn quadraticBezier(p0: glyph_extractor.Point, p1: glyph_extractor.Point, p2: glyph_extractor.Point, t: f32) glyph_extractor.Point {
-    const one_minus_t = 1.0 - t;
-    const a = one_minus_t * one_minus_t;
-    const b = 2.0 * one_minus_t * t;
-    const c = t * t;
-
-    return glyph_extractor.Point{
-        .x = a * p0.x + b * p1.x + c * p2.x,
-        .y = a * p0.y + b * p1.y + c * p2.y,
-        .on_curve = true,
-    };
-}
 
 /// Calculate pixel coverage with basic edge anti-aliasing
 fn calculatePixelCoverage(center_x: f32, center_y: f32, contours: []const glyph_extractor.Contour, allocator: std.mem.Allocator) !f32 {

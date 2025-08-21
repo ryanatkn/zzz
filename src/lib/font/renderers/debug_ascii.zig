@@ -3,6 +3,8 @@ const font_types = @import("../font_types.zig");
 const renderer_interface = @import("renderer_interface.zig");
 const loggers = @import("../../debug/loggers.zig");
 const bitmap_utils = @import("../../image/bitmap.zig");
+const interpolation = @import("../../math/interpolation.zig");
+const Vec2 = @import("../../math/vec2.zig").Vec2;
 
 const Point = font_types.Point;
 const Contour = font_types.Contour;
@@ -200,8 +202,9 @@ pub const DebugAsciiRenderer = struct {
         var i: u32 = 0;
         while (i <= @as(u32, @intFromFloat(steps))) : (i += 1) {
             const t = @as(f32, @floatFromInt(i)) / steps;
-            const x = x1 + t * (x2 - x1);
-            const y = y1 + t * (y2 - y1);
+            const interpolated = interpolation.lerpVec2(Vec2{ .x = x1, .y = y1 }, Vec2{ .x = x2, .y = y2 }, t);
+            const x = interpolated.x;
+            const y = interpolated.y;
 
             const grid_x = @as(i32, @intFromFloat(@round(x)));
             const grid_y = @as(i32, @intFromFloat(@round(y)));

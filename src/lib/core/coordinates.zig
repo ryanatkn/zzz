@@ -332,8 +332,8 @@ pub const GridCoordinates = struct {
             var x: f32 = center_cell.x - cell_radius;
             while (x <= center_cell.x + cell_radius) : (x += 1) {
                 const cell_world_pos = self.gridToWorld(Vec2{ .x = x, .y = y });
-                const diff = Vec2{ .x = cell_world_pos.x - center.x, .y = cell_world_pos.y - center.y };
-                const distance = @sqrt(diff.x * diff.x + diff.y * diff.y);
+                const diff = cell_world_pos.sub(center);
+                const distance = diff.length();
 
                 if (distance <= radius + self.cell_size * std.math.sqrt2) {
                     try cells.append(Vec2{ .x = x, .y = y });
@@ -385,8 +385,8 @@ pub fn lerp(a: Vec2, b: Vec2, t: f32) Vec2 {
 
 /// Get normalized direction vector between two points
 pub fn directionBetween(from: Vec2, to: Vec2) Vec2 {
-    const diff = Vec2{ .x = to.x - from.x, .y = to.y - from.y };
-    const length = @sqrt(diff.x * diff.x + diff.y * diff.y);
+    const diff = to.sub(from);
+    const length = diff.length();
 
     if (length < constants.PHYSICS.COLLISION_EPSILON) {
         return Vec2{ .x = 0, .y = 0 };

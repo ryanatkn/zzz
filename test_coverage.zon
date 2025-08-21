@@ -1,0 +1,1538 @@
+.{
+    .analysis_timestamp = "1755732680",
+    .config = .{
+        .depth_tolerance = 1,
+        .src_root = "src",
+    },
+    .files = .{
+        .@"roots/menu/stats/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/text/layout.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/controlled_entity.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/text/primitives.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/coordinate_transform.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/ui/menu_text.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/geometric_text.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/builders/test_builders.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/terminal/test.zig",
+        },
+        .@"lib/reactive/utils.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"roots/menu/ide/constants.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/health.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test/pipeline_debug.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/font/font_atlas.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/storage/generic_archetypes.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/text/alignment.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/platform/sdl.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test/simple_font_test.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/core/pool.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/panel.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/cache/glyph_cache.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/persistence/statistics.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/faction_presets.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/output/basic_writer.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/borders.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/primitives.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/effect.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/input/dead_player_handler.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/behaviors/flee_behavior.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/ui/animated_borders.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/kernel/capability_descriptors.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/behaviors/context.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/output_capture.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/ttf_parser.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/font/test/basic_rendering.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/game/input/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/opaque.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/core.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"test.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = true,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/glyph_extractor.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/kernel/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/combat/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/shaders.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/physics/queries.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/control/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/animation.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/process_control.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/terminal_text.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/settings/fonts/save/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test/coordinate_transform_test.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/game/systems/respawn.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/awakeable.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/vector_test/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/platform/window.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/phaseable.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/world/zone_travel_manager.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/result.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/focus_manager.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/interactable.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"main.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/faction_integration.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/rasterizer_core.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/font/renderers/debug_ascii.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/terminal.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/input/actions.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/batch.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/capabilities/output/ansi_writer.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/rendering/vector_utils.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/platform/resources.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/list_view.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/renderers/bitmap_simple.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/font_types.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/reactive/observer.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/projectiles/bullet_pool.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/control/direct_input.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/outputs.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/portals.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/debug_overlay.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/save_data.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/timer.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/input/movement.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/renderers/oversampling.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/platform/input.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/test_capabilities.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/terminal/test.zig",
+        },
+        .@"lib/text/renderer.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/behaviors/profiles.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/builders/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/state/screen_buffer.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/behaviors/behavior_state_machine.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"roots/menu/settings/audio/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/drawing.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/kernel/events.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/gpu.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/commands/pipeline.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/ansi.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/commands/parser.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/presets/standard.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/terminal/test.zig",
+        },
+        .@"hex/spellbar.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/terminal_layout_renderer.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/game_renderer.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/hazard.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/browser/page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/test_expected_behavior.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/behaviors/chase_behavior.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/font/test/bearing_analysis.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/rendering/entity_renderer.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/behaviors/composer.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/factions.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"hex/hex_game.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test/font_rendering.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/platform/directory_scanner.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/hud/reactive_hud.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/entity_queries.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/zones/zone_manager.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/abilities/ability_interface.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/behaviors/return_home_behavior.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/world/zone_travel.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/atlas_comparison.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/gannaway/state.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/builders/configuration.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/settings/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/magic_target.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/profiles.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/tracking.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/particles/duration.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/math/mod.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/charmable.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/state_machine.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/ui/reactive_label.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/combat/combat_actions.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/outputs/multi.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/timer_patterns.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/input/keyboard.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/text_cache.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/vector/path.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/teleportable.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/hud/hud.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/behaviors/wander_behavior.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/storage/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/commands/registry.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/capabilities/input/test_readline.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/debug/loggers.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/behaviors/guard_behavior.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/debug/formatters.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/terrain.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/time.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/hud/router.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/text_input.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/outputs/console.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/font_grid_test/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/gannaway/mod.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/unit_ext.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/abilities/effect_manager.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/manager.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/controller.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/filters/throttle.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/controls.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/viewport.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/visual.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/loader.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/derived.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/components/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/filters.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/mod.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"hex/behaviors/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/unit.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/viewport.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/tree_view.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test_helpers.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/components/transform.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/persistence/save_system.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/state/persistence.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/capabilities/commands/builtin.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/builders/terminal_builder.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/+layout.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/state/history.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/debug/formatters/timestamped.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/button.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test_visualization.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/behaviors/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/abilities/spell_slots.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/solid.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/interface.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/shapes.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/kernel/terminal_trait.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/frame.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/behaviors/patrol_behavior.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/math/interpolation.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/capabilities/state/line_buffer.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/math/shapes.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/reactive/collections.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"hex/combat.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/physics/collision.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/spells.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/events.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/behaviors/integration.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/abilities/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/test.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = true,
+            .imported_by_count = 1,
+        },
+        .@"lib/reactive/context.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/text/sdf_renderer.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/settings/fonts/save.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/game.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/filters/level.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/camera.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/main.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test/pixel_analysis.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/test_utils/font_helpers.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/input/modifiers.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/resources.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/statuses.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/focusable_border.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/persistence/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/storage/entity_storage.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/builders/builder_presets.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/logger.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/combat/damage_system.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/image/texture.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/capabilities.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/ide/syntax_highlighter.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/text.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/debug/outputs/file.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/state/scrollback.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/components/projectile.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/renderers/renderer_interface.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/combat.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/text_area.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/settings/fonts/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/component.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/core/object_pools.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/constants.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/core/colors.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/font/renderer_display.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/fps_counter.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/font_metrics.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"roots/menu/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/particles/core.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/kernel/typesafe_capabilities.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/terminal/test.zig",
+        },
+        .@"lib/terminal/capabilities/output/buffered.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/image/bitmap.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/config.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/physics/shapes.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/text/multi_renderer.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/filters/passthrough.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/particles/game_particles.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/kernel/test_kernel.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/terminal/test.zig",
+        },
+        .@"lib/terminal/capabilities/state/cursor.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/player_input.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test/character_analysis.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/debug/builder.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/world/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/modes.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/systems/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/zones/mod.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/abilities/spell_casting.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/systems/checkpoint.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/math/scalar.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/terminal/capabilities/input/mouse.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = true,
+            .imported_by_count = 1,
+        },
+        .@"lib/font/test/metrics_debug.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/components/surface.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/test_utils.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/builders/capability_loader.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/presets/minimal.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/components/movement.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/signal.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"roots/menu/settings/video/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/text/cache.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/extended_storage.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/scrollable.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/font/test/font_debug.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/font/test.zig",
+        },
+        .@"lib/core/coordinates.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/gannaway/watch.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/commands/executor.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/game/combat/targeting.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/performance.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/font/config.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/constants.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/browser/constants.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/hud.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/builders/validation.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/hud/renderer.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/gannaway/compute.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/math/vec2.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"scripts/check_test_coverage.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/game/world/teleporter_interface.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/disposition.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/debug/formatters/passthrough.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/reactive/time.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/core/collections.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/capabilities/input/readline.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/reactive_test/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/math/easing.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/physics.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/rendering/camera_utils.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/terminal/presets/command.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+            .expected_test_barrel = "src/lib/terminal/test.zig",
+        },
+        .@"lib/ui/component.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 1,
+        },
+        .@"lib/ui/layout.zig" = .{
+            .has_tests = true,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"lib/ui/file_tree.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"hex/behaviors/evaluators.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+        .@"roots/menu/ide/+page.zig" = .{
+            .has_tests = false,
+            .is_test_barrel = false,
+            .imported_by_count = 0,
+        },
+    },
+}
