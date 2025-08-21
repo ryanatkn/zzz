@@ -1,5 +1,5 @@
 const std = @import("std");
-const reactive = @import("../reactive.zig");
+const reactive = @import("mod.zig");
 const signal_mod = @import("signal.zig");
 const derived_mod = @import("derived.zig");
 const effect_mod = @import("effect.zig");

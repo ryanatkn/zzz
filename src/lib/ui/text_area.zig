@@ -1,14 +1,19 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
+const constants = @import("../core/constants.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
+const text_baseline = @import("../layout/text_baseline.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
 const Color = colors.Color;
 const Component = component.Component;
 const ComponentProps = component.ComponentProps;
+
+// Text area content padding (replaces hardcoded magic numbers)
+const CONTENT_PADDING = 5.0;
 
 pub const TextArea = struct {
     base: Component,
@@ -113,8 +118,9 @@ pub const TextArea = struct {
             }
         }
 
-        const text_start_x = bounds.position.x + line_num_width + 5;
-        var y = bounds.position.y + 5 - scroll.y;
+        // Use semantic padding instead of hardcoded offset
+        const text_start_x = bounds.position.x + line_num_width + CONTENT_PADDING;
+        var y = bounds.position.y + CONTENT_PADDING - scroll.y;
 
         for (area.lines.items, 0..) |line, i| {
             if (y > bounds.position.y + bounds.size.y) break;
@@ -126,7 +132,7 @@ pub const TextArea = struct {
             if (show_line_nums and @hasDecl(@TypeOf(renderer), "drawText")) {
                 var num_buf: [16]u8 = undefined;
                 const num_str = std.fmt.bufPrint(&num_buf, "{d}", .{i + 1}) catch "?";
-                const num_x = bounds.position.x + line_num_width - @as(f32, @floatFromInt(num_str.len)) * area.char_width - 5;
+                const num_x = bounds.position.x + line_num_width - @as(f32, @floatFromInt(num_str.len)) * area.char_width - constants.UI.DEFAULT_PADDING;
                 try renderer.drawText(num_str, Vec2{ .x = num_x, .y = y }, area.line_number_color.get(), 12.0);
             }
 
@@ -164,10 +170,10 @@ pub const TextArea = struct {
                     area.is_focused.set(true);
 
                     const line_num_width = if (area.show_line_numbers.get()) area.line_number_width.get() else 0;
-                    const text_start_x = bounds.position.x + line_num_width + 5;
+                    const text_start_x = bounds.position.x + line_num_width + CONTENT_PADDING;
                     const scroll = area.scroll_offset.get();
 
-                    const clicked_line = @as(usize, @intFromFloat(@max(0, (mouse_pos.y - bounds.position.y - 5 + scroll.y) / area.line_height)));
+                    const clicked_line = @as(usize, @intFromFloat(@max(0, (mouse_pos.y - bounds.position.y - CONTENT_PADDING + scroll.y) / area.line_height)));
                     const clicked_col = @as(usize, @intFromFloat(@max(0, (mouse_pos.x - text_start_x + scroll.x) / area.char_width)));
 
                     if (clicked_line < area.lines.items.len) {

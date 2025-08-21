@@ -3,12 +3,14 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
+const box_model = @import("../layout/box_model.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
 const Color = colors.Color;
 const Component = component.Component;
 const ComponentProps = component.ComponentProps;
+const BoxModel = box_model.BoxModel;
 
 pub const PanelSplitDirection = enum {
     horizontal,
@@ -24,24 +26,32 @@ pub const Panel = struct {
     base: Component,
 
     border: reactive.Signal(PanelBorder),
-    content_padding: reactive.Signal(Vec2),
+    
+    // Modern layout using BoxModel instead of manual calculations
+    box_layout: BoxModel,
 
     const Self = @This();
 
     pub fn init(self: *Component, allocator: std.mem.Allocator, props: ComponentProps) !void {
-        _ = props;
         const panel: *Panel = @fieldParentPtr("base", self);
 
         panel.border = try reactive.signal(allocator, PanelBorder, PanelBorder{});
-        panel.content_padding = try reactive.signal(allocator, Vec2, Vec2{ .x = 4, .y = 4 });
+        
+        // Initialize BoxModel with panel position and size
+        const position = props.position.get();
+        const size = props.size.get();
+        panel.box_layout = try BoxModel.initWithReactivity(allocator, position, size);
+        
+        // Configure box model with default panel spacing
+        panel.box_layout.setPadding(4.0);  // Default content padding
+        panel.box_layout.setBorderWidth(1.0); // Default border width
     }
 
     pub fn deinit(self: *Component, allocator: std.mem.Allocator) void {
-        _ = allocator;
         const panel: *Panel = @fieldParentPtr("base", self);
 
         panel.border.deinit();
-        panel.content_padding.deinit();
+        panel.box_layout.deinit(allocator);
     }
 
     pub fn update(self: *Component, dt: f32) void {
@@ -81,21 +91,38 @@ pub const Panel = struct {
         allocator.destroy(panel);
     }
 
-    pub fn getContentBounds(self: *const Panel) Rectangle {
-        const bounds = self.base.props.getBounds();
-        const padding = self.content_padding.get();
-        const border = self.border.get();
+    pub fn getContentBounds(self: *Panel) Rectangle {
+        // Update box model with current component position/size
+        const current_pos = self.base.props.position.get();
+        const current_size = self.base.props.size.get();
+        self.box_layout.setPosition(current_pos);
+        self.box_layout.setSize(current_size);
+        
+        // Use BoxModel to calculate content bounds automatically
+        return self.box_layout.getContentBounds();
+    }
 
-        return Rectangle{
-            .position = Vec2{
-                .x = bounds.position.x + padding.x + border.width,
-                .y = bounds.position.y + padding.y + border.width,
-            },
-            .size = Vec2{
-                .x = bounds.size.x - (padding.x * 2) - (border.width * 2),
-                .y = bounds.size.y - (padding.y * 2) - (border.width * 2),
-            },
-        };
+    /// Set panel padding (modern BoxModel approach)
+    pub fn setPadding(self: *Panel, padding: f32) void {
+        self.box_layout.setPadding(padding);
+    }
+
+    /// Set panel border width (updates both visual border and BoxModel)
+    pub fn setBorderWidth(self: *Panel, width: f32) void {
+        // Update visual border
+        var border = self.border.get();
+        border.width = width;
+        self.border.set(border);
+        
+        // Update box model border for layout calculations
+        self.box_layout.setBorderWidth(width);
+    }
+
+    /// Set panel border color
+    pub fn setBorderColor(self: *Panel, color: Color) void {
+        var border = self.border.get();
+        border.color = color;
+        self.border.set(border);
     }
 };
 

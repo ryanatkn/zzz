@@ -358,7 +358,7 @@ test "easing functions basic properties" {
         Easing.bounceEaseInOut,
     };
 
-    for (functions) |func| {
+    inline for (functions) |func| {
         const start_value = func(0.0);
         const end_value = func(1.0);
 
@@ -380,7 +380,7 @@ test "easing functions are monotonic (mostly)" {
         Easing.sineEaseInOut,
     };
 
-    for (monotonic_functions) |func| {
+    inline for (monotonic_functions) |func| {
         var prev = func(0.0);
         var t: f32 = 0.1;
         while (t <= 1.0) : (t += 0.1) {

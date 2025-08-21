@@ -66,18 +66,7 @@ pub const Text = struct {
         text.style = try reactive.signal(allocator, TextStyle, TextStyle{});
 
         // Set up automatic cache invalidation when content or style changes
-        const InvalidateCacheContext = struct {
-            text_ptr: *Text,
-
-            fn invalidate(context: @This()) void {
-                context.text_ptr.cache_valid = false;
-            }
-        };
-
-        const cache_context = InvalidateCacheContext{ .text_ptr = text };
-
-        // Create effects to invalidate cache when properties change
-        _ = try reactive.createEffect(allocator, cache_context.invalidate);
+        // For now, disable reactive cache invalidation until pattern is properly implemented
     }
 
     pub fn deinit(self: *Component, allocator: std.mem.Allocator) void {

@@ -48,17 +48,25 @@ pub const ComponentProps = struct {
         self.hovered.deinit();
     }
 
-    /// Get current bounds as a Rectangle
-    pub fn getBounds(self: *const ComponentProps) Rectangle {
+    /// Get current bounds as a Rectangle (reactive - registers dependencies)
+    pub fn getBounds(self: *ComponentProps) Rectangle {
         return Rectangle{
             .position = self.position.get(),
             .size = self.size.get(),
         };
     }
 
+    /// Get current bounds as a Rectangle (non-reactive - no dependencies)
+    pub fn getBoundsConst(self: *const ComponentProps) Rectangle {
+        return Rectangle{
+            .position = self.position.peek(),
+            .size = self.size.peek(),
+        };
+    }
+
     /// Check if point is within component bounds
     pub fn containsPoint(self: *const ComponentProps, point: Vec2) bool {
-        const bounds = self.getBounds();
+        const bounds = self.getBoundsConst();
         return point.x >= bounds.position.x and
             point.x <= bounds.position.x + bounds.size.x and
             point.y >= bounds.position.y and
@@ -166,52 +174,6 @@ pub const Component = struct {
     }
 };
 
-/// Layout constraints for responsive design
-pub const LayoutConstraints = struct {
-    min_width: f32 = 0,
-    min_height: f32 = 0,
-    max_width: f32 = std.math.inf(f32),
-    max_height: f32 = std.math.inf(f32),
-
-    // Relative sizing (0.0 to 1.0 of parent)
-    relative_width: ?f32 = null,
-    relative_height: ?f32 = null,
-
-    // Margins
-    margin_left: f32 = 0,
-    margin_right: f32 = 0,
-    margin_top: f32 = 0,
-    margin_bottom: f32 = 0,
-
-    pub fn applyConstraints(self: *const LayoutConstraints, desired_size: Vec2, parent_size: Vec2) Vec2 {
-        var result = desired_size;
-
-        // Apply relative sizing if specified
-        if (self.relative_width) |rel_width| {
-            result.x = parent_size.x * rel_width;
-        }
-        if (self.relative_height) |rel_height| {
-            result.y = parent_size.y * rel_height;
-        }
-
-        // Apply constraints
-        result.x = std.math.clamp(result.x, self.min_width, self.max_width);
-        result.y = std.math.clamp(result.y, self.min_height, self.max_height);
-
-        // Account for margins
-        result.x = std.math.max(0, result.x - self.margin_left - self.margin_right);
-        result.y = std.math.max(0, result.y - self.margin_top - self.margin_bottom);
-
-        return result;
-    }
-
-    pub fn getContentPosition(self: *const LayoutConstraints, component_position: Vec2) Vec2 {
-        return Vec2{
-            .x = component_position.x + self.margin_left,
-            .y = component_position.y + self.margin_top,
-        };
-    }
-};
 
 /// Screen-relative units for responsive design
 pub const ScreenUnits = struct {
@@ -288,24 +250,6 @@ test "component basic functionality" {
     try std.testing.expect(!props.containsPoint(Vec2{ .x = 5, .y = 30 }));
 }
 
-test "layout constraints" {
-    const constraints = LayoutConstraints{
-        .min_width = 50,
-        .max_width = 200,
-        .relative_width = 0.5, // 50% of parent
-        .margin_left = 10,
-        .margin_right = 10,
-    };
-
-    const parent_size = Vec2{ .x = 300, .y = 200 };
-    const desired_size = Vec2{ .x = 400, .y = 100 }; // Too wide, should be clamped
-
-    const result = constraints.applyConstraints(desired_size, parent_size);
-
-    // Should be 50% of parent width (150) minus margins (20) = 130
-    try std.testing.expect(result.x == 130);
-    try std.testing.expect(result.y == 100); // Height unchanged
-}
 
 test "screen units responsive calculations" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};

@@ -4,12 +4,16 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const terminal_core = @import("../terminal/core.zig");
+const text_baseline = @import("../layout/text_baseline.zig");
+const font_metrics = @import("../font/font_metrics.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
 const Color = colors.Color;
 const Line = terminal_core.Line;
 const Cursor = terminal_core.Cursor;
+const FontMetrics = font_metrics.FontMetrics;
+const TextPositioning = text_baseline.TextPositioning;
 
 pub const CursorStyle = enum {
     block,
@@ -26,6 +30,14 @@ pub const TerminalTextConfig = struct {
     cursor_style: CursorStyle = .block,
     cursor_blink_rate: f32 = 1.0, // blinks per second
     max_line_length: usize = 1000,
+    // Font metrics for proper baseline calculations
+    font_metrics_info: FontMetrics = FontMetrics.init(
+        1000,    // units_per_em
+        800,     // ascender
+        -200,    // descender
+        100,     // line_gap
+        0.016    // scale factor for 16pt
+    ),
 };
 
 pub const TerminalText = struct {
@@ -109,11 +121,16 @@ pub const TerminalText = struct {
             try self.renderText(renderer, sanitized_input, input_position, config.text_color);
         }
 
-        // Render cursor
+        // Render cursor using proper baseline positioning
         if (cursor.visible and self.cursor_visible.get()) {
-            const cursor_x = input_position.x + @as(f32, @floatFromInt(@min(cursor.x, max_input_chars))) * config.char_width;
-            const cursor_position = Vec2{ .x = cursor_x, .y = position.y };
-            try self.renderCursor(renderer, cursor_position);
+            const cursor_char_pos = @min(cursor.x, max_input_chars);
+            const cursor_position = TextPositioning.getCursorPosition(
+                input_position, 
+                cursor_char_pos, 
+                config.char_width, 
+                config.font_metrics_info
+            );
+            try self.renderCursor(renderer, cursor_position, config.font_metrics_info);
         }
     }
 
@@ -128,21 +145,27 @@ pub const TerminalText = struct {
         }
     }
 
-    /// Render cursor based on style
-    fn renderCursor(self: *const Self, renderer: anytype, position: Vec2) !void {
+    /// Render cursor based on style with proper baseline alignment
+    fn renderCursor(self: *const Self, renderer: anytype, position: Vec2, font_metrics_info: FontMetrics) !void {
         const config = self.config.get();
 
         if (!@hasDecl(@TypeOf(renderer), "drawRect")) return;
 
+        // Calculate cursor height using font metrics
+        const cursor_height = TextPositioning.getCursorHeight(font_metrics_info);
+        
         const cursor_size = switch (config.cursor_style) {
-            .block => Vec2{ .x = config.char_width, .y = config.line_height },
+            .block => Vec2{ .x = config.char_width, .y = cursor_height },
             .underline => Vec2{ .x = config.char_width, .y = 2.0 },
-            .vertical_bar => Vec2{ .x = 2.0, .y = config.line_height },
+            .vertical_bar => Vec2{ .x = 2.0, .y = cursor_height },
         };
 
         const cursor_position = switch (config.cursor_style) {
             .block => position,
-            .underline => Vec2{ .x = position.x, .y = position.y + config.line_height - 2.0 },
+            .underline => Vec2{ 
+                .x = position.x, 
+                .y = position.y + cursor_height - 2.0 
+            },
             .vertical_bar => position,
         };
 

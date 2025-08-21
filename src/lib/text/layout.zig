@@ -158,18 +158,8 @@ pub const TextLayoutEngine = struct {
             try self.finalizeLine(&lines, &current_line_glyphs, cursor_x, cursor_y, line_height, options.alignment);
         }
 
-        // Calculate total height based on our positioning scheme
-        // We position glyphs using: glyph_y = cursor_y + (font_ascender_px - bearing_y)
-        // This means the texture needs to accommodate the actual glyph positions, not just line_height
-        const font_ascender_px = @as(f32, @floatFromInt(self.rasterizer.metrics.ascender)) * self.rasterizer.metrics.scale;
-        const font_descender_px = @as(f32, @floatFromInt(-self.rasterizer.metrics.descender)) * self.rasterizer.metrics.scale; // Make positive
-        const rasterizer_padding: f32 = 6.0; // Account for: bitmap padding (2px) + positioning safety margin (4px)
-
-        // Total height needs: font ascender + font descender + padding
-        const total_height = if (lines.items.len <= 1)
-            font_ascender_px + font_descender_px + rasterizer_padding // Single line: full font metrics + padding
-        else
-            cursor_y + font_ascender_px + font_descender_px + rasterizer_padding; // Multiple lines: cursor_y + full font metrics + padding
+        // Calculate total height for the layouted text
+        const total_height = self.calculateTotalTextHeight(lines.items.len, cursor_y);
 
         const owned_lines = try self.allocator.alloc(LayoutedLine, lines.items.len);
         for (lines.items, 0..) |line, idx| {
@@ -204,11 +194,14 @@ pub const TextLayoutEngine = struct {
             }
         }
 
+        // Calculate proper baseline position (distance from top of line to baseline)
+        const baseline_from_top = self.rasterizer.metrics.getBaselineOffset();
+        
         try lines.append(LayoutedLine{
             .glyphs = owned_glyphs,
             .width = line_width,
             .height = line_height,
-            .baseline = y_offset + line_height * 0.8,
+            .baseline = y_offset + baseline_from_top,
         });
 
         glyphs.clearRetainingCapacity();
@@ -219,6 +212,25 @@ pub const TextLayoutEngine = struct {
             self.allocator.free(line.glyphs);
         }
         self.allocator.free(layout.lines);
+    }
+
+    /// Calculate total height needed for text layout
+    /// Accounts for font metrics and safety margins
+    fn calculateTotalTextHeight(self: *TextLayoutEngine, line_count: usize, cursor_y: f32) f32 {
+        const font_ascender_px = @as(f32, @floatFromInt(self.rasterizer.metrics.ascender)) * self.rasterizer.metrics.scale;
+        const font_descender_px = @as(f32, @floatFromInt(-self.rasterizer.metrics.descender)) * self.rasterizer.metrics.scale; // Make positive
+        
+        // Constants for text layout calculations
+        const bitmap_padding: f32 = 2.0; // Padding in rasterized bitmaps
+        const positioning_margin: f32 = 4.0; // Safety margin for positioning
+        const rasterizer_padding = bitmap_padding + positioning_margin;
+
+        // Total height calculation based on positioning scheme:
+        // We position glyphs using: glyph_y = cursor_y + (font_ascender_px - bearing_y)
+        return if (line_count <= 1)
+            font_ascender_px + font_descender_px + rasterizer_padding // Single line: full font metrics + padding
+        else
+            cursor_y + font_ascender_px + font_descender_px + rasterizer_padding; // Multiple lines: cursor_y + full font metrics + padding
     }
 };
 

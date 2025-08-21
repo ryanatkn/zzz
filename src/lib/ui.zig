@@ -7,6 +7,9 @@ pub const terminal_layout_renderer = @import("ui/terminal_layout_renderer.zig");
 pub const focus_manager = @import("ui/focus_manager.zig");
 pub const primitives = @import("ui/primitives.zig");
 
+// Unified layout system (dedicated barrel module)
+pub const layout = @import("layout/mod.zig");
+
 // Re-export terminal layout types (only ones actually used)
 pub const TerminalLayoutRenderer = terminal_layout_renderer.TerminalLayoutRenderer;
 pub const TerminalLayoutConfig = terminal_layout_renderer.TerminalLayoutConfig;
@@ -25,3 +28,21 @@ pub const InputField = primitives.InputField;
 pub const InputFieldConfig = primitives.InputFieldConfig;
 pub const Button = primitives.Button;
 pub const ButtonConfig = primitives.ButtonConfig;
+
+// Re-export layout system types for backward compatibility
+pub const BoxModel = layout.BoxModel;
+pub const TextBaseline = layout.TextBaseline;
+pub const TextPositioning = layout.TextPositioning;
+pub const Flexbox = layout.Flexbox;
+pub const FlexItem = layout.FlexItem;
+pub const FlexItemLayout = layout.FlexItemLayout;
+pub const SpacingUtils = layout.SpacingUtils;
+pub const SizingUtils = layout.SizingUtils;
+pub const PositioningUtils = layout.PositioningUtils;
+
+// Re-export layout enums for convenience
+pub const JustifyContent = layout.JustifyContent;
+pub const AlignItems = layout.AlignItems;
+pub const Direction = layout.Direction;
+pub const PositionMode = layout.PositionMode;
+pub const Alignment = layout.Alignment;

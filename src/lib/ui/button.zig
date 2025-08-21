@@ -1,9 +1,12 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
+const constants = @import("../core/constants.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
 const text = @import("text.zig");
+const text_baseline = @import("../layout/text_baseline.zig");
+const font_metrics = @import("../font/font_metrics.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -11,6 +14,8 @@ const Component = component.Component;
 const ComponentProps = component.ComponentProps;
 const Text = text.Text;
 const TextStyle = text.TextStyle;
+const TextPositioning = text_baseline.TextPositioning;
+const FontMetrics = font_metrics.FontMetrics;
 
 /// Button states for visual feedback
 pub const ButtonState = enum {
@@ -101,7 +106,7 @@ pub const Button = struct {
         // Create child text component for the label
         const initial_label = button.label.get();
         const initial_text_style = button.text_style.get();
-        const button_bounds = props.getBounds();
+        const button_bounds = self.props.getBounds();
         const text_position = Vec2{
             .x = button_bounds.position.x + button.button_style.get().padding.x,
             .y = button_bounds.position.y + button.button_style.get().padding.y,
@@ -264,7 +269,7 @@ pub const Button = struct {
         // State is updated by event handling
     }
 
-    /// Center the text within the button
+    /// Center the text within the button using modern TextBaseline system
     fn centerText(self: *Button) void {
         if (self.text_component) |text_comp| {
             const button_bounds = self.base.props.getBounds();
@@ -272,10 +277,20 @@ pub const Button = struct {
             const text_impl: *Text = @fieldParentPtr("base", text_comp);
             const text_size = text_impl.getMeasuredSize();
 
-            // Center the text within the button
+            // Use proper text baseline positioning for consistent alignment
+            // Create font metrics for text centering calculations
+            const font_metrics_info = FontMetrics.init(
+                1000, 800, -200, 100, 0.012  // Standard font metrics for 12pt text
+            );
+            
+            // Center text horizontally and use proper baseline for vertical
             const centered_pos = Vec2{
                 .x = button_bounds.position.x + (button_bounds.size.x - text_size.x) / 2,
-                .y = button_bounds.position.y + (button_bounds.size.y - text_size.y) / 2,
+                .y = TextPositioning.getCenteredTextY(
+                    button_bounds.position.y, 
+                    button_bounds.size.y, 
+                    font_metrics_info
+                ),
             };
 
             text_comp.props.position.set(centered_pos);
@@ -359,7 +374,7 @@ pub fn createButton(allocator: std.mem.Allocator, label: []const u8, position: V
 /// Create a simple button with default styling
 pub fn createSimpleButton(allocator: std.mem.Allocator, label: []const u8, position: Vec2, click_handler: ?*const fn () void) !*Component {
     // Calculate size based on text length
-    const estimated_width = @as(f32, @floatFromInt(label.len)) * 8.0 + 32.0; // Rough estimate + padding
+    const estimated_width = @as(f32, @floatFromInt(label.len)) * 8.0 + (constants.UI.DEFAULT_PADDING * 6.0); // Rough estimate + padding
     const size = Vec2{ .x = estimated_width, .y = 36.0 };
 
     return try createButton(allocator, label, position, size, ButtonStyle{}, click_handler);

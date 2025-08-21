@@ -35,7 +35,7 @@ pub fn Result(comptime T: type, comptime E: type) type {
         pub fn unwrap(self: Self) T {
             return switch (self) {
                 .ok => |value| value,
-                .err => |error_value| @panic("called unwrap() on an Err value"),
+                .err => |_| @panic("called unwrap() on an Err value"),
             };
         }
 

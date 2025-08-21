@@ -17,6 +17,9 @@ const CommandTerminal = terminal_mod.presets.CommandTerminal;
 const Key = terminal_mod.kernel.Key;
 const TextRenderer = text_renderer.TextRenderer;
 
+// Terminal display margins (replaces hardcoded magic numbers)
+const TERMINAL_MARGIN = 8.0;
+
 /// Reactive terminal UI component
 pub const TerminalComponent = struct {
     // Core
@@ -422,8 +425,8 @@ pub const TerminalComponent = struct {
         const line_height = self.line_height.get();
         const char_width = self.char_width.get();
 
-        const available_height = bounds_rect.size.y - 8; // Margins
-        const available_width = bounds_rect.size.x - 8;
+        const available_height = bounds_rect.size.y - TERMINAL_MARGIN; // Content height after margins
+        const available_width = bounds_rect.size.x - TERMINAL_MARGIN;
 
         const rows = @max(1, @as(usize, @intFromFloat(available_height / line_height)));
         const cols = @max(1, @as(usize, @intFromFloat(available_width / char_width)));

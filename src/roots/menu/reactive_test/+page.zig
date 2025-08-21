@@ -102,13 +102,18 @@ pub const ReactiveTestPage = struct {
     }
 
     fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
-        _ = allocator;
         const test_page: *ReactiveTestPage = @fieldParentPtr("base", self);
 
         // Clean up current reactive system
         test_page.current_count.deinit();
+        
+        // Clean up heap-allocated reactive objects (fix memory leak)
         test_page.current_doubled.deinit();
+        allocator.destroy(test_page.current_doubled);
+        
         test_page.current_effect.deinit();
+        allocator.destroy(test_page.current_effect);
+        
         test_page.current_log.deinit();
 
         // Clean up Gannaway system

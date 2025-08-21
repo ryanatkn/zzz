@@ -7,6 +7,9 @@ const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
 const Color = colors.Color;
 
+// Input field content padding (replaces hardcoded magic numbers)
+const INPUT_PADDING = 4.0;
+
 /// Base UI component with retained mode optimizations
 pub const UIComponent = struct {
     bounds: reactive.Signal(Rectangle),
@@ -53,17 +56,17 @@ pub const UIComponent = struct {
 
     /// Check if component is visible and needs rendering
     pub fn shouldRender(self: *const UIComponent) bool {
-        return self.visible.get() and self.dirty.get();
+        return self.visible.peek() and self.dirty.peek();
     }
 
     /// Get current bounds
     pub fn getBounds(self: *const UIComponent) Rectangle {
-        return self.bounds.get();
+        return self.bounds.peek();
     }
 
     /// Check if point is inside component bounds
     pub fn containsPoint(self: *const UIComponent, point: Vec2) bool {
-        const bounds = self.bounds.get();
+        const bounds = self.bounds.peek();
         return point.x >= bounds.position.x and
             point.x <= bounds.position.x + bounds.size.x and
             point.y >= bounds.position.y and
@@ -102,7 +105,7 @@ pub const Panel = struct {
     /// Get content area (bounds minus padding)
     pub fn getContentArea(self: *const Panel) Rectangle {
         const bounds = self.base.getBounds();
-        const pad = self.padding.get();
+        const pad = self.padding.peek();
         return Rectangle{
             .position = Vec2{ .x = bounds.position.x + pad, .y = bounds.position.y + pad },
             .size = Vec2{ .x = bounds.size.x - (pad * 2), .y = bounds.size.y - (pad * 2) },
@@ -305,7 +308,7 @@ pub const InputField = struct {
         // Draw text
         if (text.len > 0) {
             if (@hasDecl(@TypeOf(renderer), "drawText")) {
-                renderer.drawText(text, bounds.position.x + 4, bounds.position.y + 4, font_size, text_color);
+                renderer.drawText(text, bounds.position.x + INPUT_PADDING, bounds.position.y + INPUT_PADDING, font_size, text_color);
             }
         }
 
@@ -313,11 +316,11 @@ pub const InputField = struct {
         if (is_focused) {
             const cursor_pos = self.cursor_position.get();
             const char_width = font_size * 0.6; // Estimate character width
-            const cursor_x = bounds.position.x + 4 + @as(f32, @floatFromInt(cursor_pos)) * char_width;
+            const cursor_x = bounds.position.x + INPUT_PADDING + @as(f32, @floatFromInt(cursor_pos)) * char_width;
 
             if (@hasDecl(@TypeOf(renderer), "drawRect")) {
                 renderer.drawRect(Rectangle{
-                    .position = Vec2{ .x = cursor_x, .y = bounds.position.y + 4 },
+                    .position = Vec2{ .x = cursor_x, .y = bounds.position.y + INPUT_PADDING },
                     .size = Vec2{ .x = 1, .y = font_size },
                 }, text_color);
             }

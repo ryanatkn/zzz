@@ -1,14 +1,20 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
+const constants = @import("../core/constants.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
+const text_baseline = @import("../layout/text_baseline.zig");
+const box_model = @import("../layout/box_model.zig");
+const font_metrics = @import("../font/font_metrics.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
 const Color = colors.Color;
 const Component = component.Component;
 const ComponentProps = component.ComponentProps;
+const FontMetrics = font_metrics.FontMetrics;
+const TextPositioning = text_baseline.TextPositioning;
 
 pub const TextInput = struct {
     base: Component,
@@ -31,6 +37,10 @@ pub const TextInput = struct {
     cursor_visible: bool = true,
 
     text_buffer: std.ArrayList(u8),
+
+    // Font metrics for proper text positioning
+    font_metrics_info: FontMetrics,
+    font_size: f32,
 
     on_change: ?*const fn ([]const u8) void = null,
     on_submit: ?*const fn ([]const u8) void = null,
@@ -56,6 +66,17 @@ pub const TextInput = struct {
 
         input.is_focused = try reactive.signal(allocator, bool, false);
         input.text_buffer = std.ArrayList(u8).init(allocator);
+        
+        // Initialize font metrics for 12pt font (typical web default)
+        // These values are estimates - should be replaced with actual font metrics when available
+        input.font_size = 12.0;
+        input.font_metrics_info = FontMetrics.init(
+            1000,    // units_per_em (typical for TrueType fonts)
+            800,     // ascender
+            -200,    // descender
+            100,     // line_gap
+            0.012    // scale factor for 12pt (12px / 1000 units)
+        );
     }
 
     pub fn deinit(self: *Component, allocator: std.mem.Allocator) void {
@@ -126,8 +147,8 @@ pub const TextInput = struct {
             input.placeholder_color.get();
 
         const text_pos = Vec2{
-            .x = bounds.position.x + 5,
-            .y = bounds.position.y + bounds.size.y / 2 - 6,
+            .x = bounds.position.x + constants.UI.DEFAULT_PADDING,
+            .y = TextPositioning.getInputTextY(bounds.position.y, bounds.size.y, input.font_metrics_info),
         };
 
         if (@hasDecl(@TypeOf(renderer), "drawText") and text_to_display.len > 0) {
@@ -135,10 +156,17 @@ pub const TextInput = struct {
         }
 
         if (input.is_focused.get() and input.cursor_visible) {
-            const cursor_x = text_pos.x + @as(f32, @floatFromInt(input.cursor_pos.get())) * 7.0;
+            const cursor_position = TextPositioning.getCursorPosition(
+                text_pos, 
+                input.cursor_pos.get(), 
+                7.0, // character width estimate
+                input.font_metrics_info
+            );
+            const cursor_height = TextPositioning.getCursorHeight(input.font_metrics_info);
+            
             const cursor_rect = Rectangle{
-                .position = Vec2{ .x = cursor_x, .y = bounds.position.y + 4 },
-                .size = Vec2{ .x = 1, .y = bounds.size.y - 8 },
+                .position = cursor_position,
+                .size = Vec2{ .x = 1, .y = cursor_height },
             };
 
             if (@hasDecl(@TypeOf(renderer), "drawRect")) {
@@ -154,9 +182,14 @@ pub const TextInput = struct {
                 const sel_x = text_pos.x + @as(f32, @floatFromInt(sel_start)) * 7.0;
                 const sel_width = @as(f32, @floatFromInt(sel_end - sel_start)) * 7.0;
 
+                // Use semantic padding instead of hardcoded offsets (manual calculation to avoid allocator)
+                const padding = 2.0;
+                const content_y = bounds.position.y + padding;
+                const content_height = bounds.size.y - (padding * 2.0);
+                
                 const selection_rect = Rectangle{
-                    .position = Vec2{ .x = sel_x, .y = bounds.position.y + 2 },
-                    .size = Vec2{ .x = sel_width, .y = bounds.size.y - 4 },
+                    .position = Vec2{ .x = sel_x, .y = content_y },
+                    .size = Vec2{ .x = sel_width, .y = content_height },
                 };
 
                 if (@hasDecl(@TypeOf(renderer), "drawRect")) {
@@ -181,7 +214,7 @@ pub const TextInput = struct {
                     input.cursor_visible = true;
                     input.cursor_blink_timer = 0;
 
-                    const text_x = bounds.position.x + 5;
+                    const text_x = bounds.position.x + constants.UI.DEFAULT_PADDING;
                     const char_index = @as(usize, @intFromFloat(@max(0, (mouse_pos.x - text_x) / 7.0)));
                     const new_pos = @min(char_index, input.text.get().len);
                     input.cursor_pos.set(new_pos);
@@ -314,6 +347,8 @@ pub fn createTextInput(allocator: std.mem.Allocator, position: Vec2, size: Vec2)
         .selection_color = undefined,
         .is_focused = undefined,
         .text_buffer = undefined,
+        .font_metrics_info = undefined,
+        .font_size = 12.0,
     };
 
     try input.base.init(allocator, props);

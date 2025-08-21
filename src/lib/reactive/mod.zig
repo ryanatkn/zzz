@@ -93,6 +93,7 @@ const derived_mod = @import("derived.zig");
 const effect_mod = @import("effect.zig");
 const batch_mod = @import("batch.zig");
 const collections_mod = @import("collections.zig");
+const ref_mod = @import("ref.zig");
 
 // Re-export core types with new names
 pub const Signal = signal_mod.Signal; // Reactive state with shallow equality (Svelte 5 $state)
@@ -102,6 +103,11 @@ pub const EffectRoot = effect_mod.EffectRoot; // Root effect scope (Svelte 5 $ef
 pub const EffectTiming = effect_mod.EffectTiming; // Effect timing modes
 pub const BatchManager = batch_mod.BatchManager;
 pub const ReactiveContext = context_mod.ReactiveContext;
+
+// Re-export RAII helpers for automatic cleanup
+pub const ReactiveRef = ref_mod.ReactiveRef;
+pub const EffectRef = ref_mod.EffectRef;
+pub const DerivedRef = ref_mod.DerivedRef;
 
 // Re-export reactive collections
 pub const ReactiveArray = collections_mod.ReactiveArray; // Reactive fixed-size arrays
@@ -189,6 +195,16 @@ pub fn batch(batch_fn: *const fn () void) void {
 /// This provides a convenient generic interface for snapshots
 pub fn snapshot(value: anytype) @TypeOf(value.snapshot()) {
     return value.snapshot();
+}
+
+/// Create a managed Effect reference (RAII cleanup)
+pub fn createEffectRef(allocator: std.mem.Allocator, effect_fn: *const fn () void) !EffectRef {
+    return try ref_mod.createEffectRef(allocator, effect_fn);
+}
+
+/// Create a managed Derived reference (RAII cleanup)
+pub fn createDerivedRef(allocator: std.mem.Allocator, comptime T: type, derive_fn: *const fn () T) !ReactiveRef(Derived(T)) {
+    return try ref_mod.createDerivedRef(allocator, T, derive_fn);
 }
 
 // Tests
