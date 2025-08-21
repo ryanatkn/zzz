@@ -4,7 +4,7 @@
 /// size constraints, aspect ratios, and constraint resolution algorithms.
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 
 const Vec2 = math.Vec2;
 const Constraints = types.Constraints;

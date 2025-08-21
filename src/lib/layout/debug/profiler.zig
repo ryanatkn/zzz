@@ -4,7 +4,7 @@
 /// helping identify bottlenecks and optimization opportunities.
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 
 const Vec2 = math.Vec2;
 
@@ -14,17 +14,17 @@ pub const Timer = struct {
 
     pub fn start() Timer {
         return Timer{
-            .start_time = std.time.nanoTimestamp(),
+            .start_time = @intCast(std.time.nanoTimestamp()),
         };
     }
 
     pub fn end(self: Timer) f64 {
-        const end_time = std.time.nanoTimestamp();
+        const end_time: i64 = @intCast(std.time.nanoTimestamp());
         return @as(f64, @floatFromInt(end_time - self.start_time)) / 1_000_000.0; // Convert to milliseconds
     }
 
     pub fn endMicroseconds(self: Timer) f64 {
-        const end_time = std.time.nanoTimestamp();
+        const end_time: i64 = @intCast(std.time.nanoTimestamp());
         return @as(f64, @floatFromInt(end_time - self.start_time)) / 1_000.0; // Convert to microseconds
     }
 };
@@ -187,7 +187,7 @@ pub const LayoutProfiler = struct {
                     .operation = operation,
                     .duration_ms = duration_ms,
                     .element_count = element_count,
-                    .timestamp = std.time.nanoTimestamp(),
+                    .timestamp = @intCast(std.time.nanoTimestamp()),
                     .memory_usage = if (self.config.collect_memory_stats) self.getCurrentMemoryUsage() else null,
                 };
 
@@ -421,11 +421,11 @@ test "performance measurement calculation" {
         .operation = .layout_pass,
         .duration_ms = 10.0,
         .element_count = 100,
-        .timestamp = std.time.nanoTimestamp(),
+        .timestamp = @intCast(std.time.nanoTimestamp()),
     };
 
     const ops_per_second = measurement.getOpsPerSecond();
-    try testing.expect(ops_per_second == 10.0); // 100 elements in 10ms = 10 ops/sec
+    try testing.expect(ops_per_second == 10000.0); // 100 elements in 10ms = 100/0.01 = 10,000 ops/sec
 
     const time_per_element = measurement.getTimePerElement();
     try testing.expect(time_per_element == 100.0); // 10ms * 1000 / 100 elements = 100 µs per element
@@ -440,14 +440,14 @@ test "performance stats aggregation" {
         .operation = .layout_pass,
         .duration_ms = 5.0,
         .element_count = 50,
-        .timestamp = std.time.nanoTimestamp(),
+        .timestamp = @intCast(std.time.nanoTimestamp()),
     });
 
     stats.addMeasurement(PerformanceMeasurement{
         .operation = .layout_pass,
         .duration_ms = 15.0,
         .element_count = 150,
-        .timestamp = std.time.nanoTimestamp(),
+        .timestamp = @intCast(std.time.nanoTimestamp()),
     });
 
     try testing.expect(stats.measurement_count == 2);
@@ -471,7 +471,7 @@ test "profiler basic operation" {
         .operation = .cpu_layout,
         .duration_ms = 5.5,
         .element_count = 42,
-        .timestamp = std.time.nanoTimestamp(),
+        .timestamp = @intCast(std.time.nanoTimestamp()),
     };
 
     try profiler.recordMeasurement(measurement);

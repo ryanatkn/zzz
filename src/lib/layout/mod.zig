@@ -1,374 +1,169 @@
-/// Unified Layout System
+/// Clean Layout System - Algorithm-First Architecture
 ///
-/// This module provides comprehensive layout functionality for the engine,
-/// organized into focused capabilities:
-/// - Core Types: Common layout types and enums
-/// - Layout Engines: Box model and flexbox engines
-/// - Measurement: Constraint resolution and intrinsic sizing
-/// - Arrangement: Flow, alignment, and stacking algorithms
-/// - Backends: CPU, GPU, and hybrid layout calculation
-/// - Animation: Springs, transitions, and sequences
-/// - Algorithms: Block, flexbox, grid, and absolute positioning
-/// - Debug: Validation, profiling, and debugging tools
-/// - Text Integration: Layout system integration with text rendering
+/// This module provides a comprehensive layout system organized by algorithm type.
+/// Each algorithm (box model, flexbox, grid, text) has dedicated CPU and GPU implementations
+/// with a unified interface for easy selection and performance comparison.
 ///
-/// This consolidates all layout functionality following the engine's
-/// capability-based architectural principles.
+/// Key Design Principles:
+/// - Algorithm-first organization for natural scaling
+/// - Clean separation between CPU and GPU implementations
+/// - No backwards compatibility exports - breaking change for cleaner architecture
+/// - Real performance benchmarking without fake implementations
+/// - CPU-first development with GPU acceleration experiments
+const std = @import("std");
 
-// Core layout types and enums
-pub const types = @import("types.zig");
+// Core types and interfaces (shared across all algorithms)
+pub const core = struct {
+    pub usingnamespace @import("core/types.zig");
+    pub const interface = @import("core/interface.zig");
+};
 
-// Layout engines
-pub const engines = @import("engines/mod.zig");
-
-// Measurement systems
-pub const measurement = @import("measurement/mod.zig");
-
-// Arrangement algorithms
-pub const arrangement = @import("arrangement/mod.zig");
-
-// Backend implementations
-pub const backends = @import("backends/interface.zig");
-
-// Animation systems
-pub const animation = @import("animation/mod.zig");
-
-// Core layout algorithms
+// Algorithm implementations
 pub const algorithms = @import("algorithms/mod.zig");
 
-// Debug and profiling tools
-pub const debug = @import("debug/mod.zig");
-
-// Text layout integration
-pub const text_integration = @import("text_integration.zig");
-
-// Legacy compatibility - keep existing imports for backward compatibility
-pub const box_model = @import("box_model.zig");
-pub const text_baseline = @import("text_baseline.zig");
-pub const primitives = @import("primitives/mod.zig");
-pub const text = @import("../text/layout.zig");
-pub const gpu = @import("gpu/mod.zig");
+// Runtime engine and benchmarking
+pub const runtime = struct {
+    pub const engine = @import("runtime/engine.zig");
+    pub const benchmark = @import("runtime/benchmark.zig");
+};
 
 // Re-export core types for convenience
-pub const LayoutResult = types.LayoutResult;
-pub const LayoutContext = types.LayoutContext;
-pub const Constraints = types.Constraints;
-pub const FlexConstraint = types.FlexConstraint;
-pub const Spacing = types.Spacing;
-pub const Offset = types.Offset;
-pub const DirtyFlags = types.DirtyFlags;
+pub const LayoutMode = core.LayoutMode;
+pub const LayoutResult = core.LayoutResult;
+pub const LayoutContext = core.LayoutContext;
+pub const LayoutElement = core.interface.LayoutElement;
+pub const LayoutAlgorithm = core.interface.LayoutAlgorithm;
+pub const LayoutEngine = runtime.engine.LayoutEngine;
 
-// Re-export layout enums
-pub const PositionMode = types.PositionMode;
-pub const Alignment = types.Alignment;
-pub const Direction = types.Direction;
-pub const JustifyContent = types.JustifyContent;
-pub const AlignItems = types.AlignItems;
-pub const SizingMode = types.SizingMode;
-pub const LayoutMode = types.LayoutMode;
-pub const BaselineMode = types.BaselineMode;
-pub const FlexWrap = types.FlexWrap;
+// Re-export essential types
+pub const Vec2 = core.Vec2;
+pub const Rectangle = core.Rectangle;
+pub const Spacing = core.Spacing;
+pub const Constraints = core.Constraints;
+pub const Alignment = core.Alignment;
+pub const Direction = core.Direction;
 
-// Re-export engines
-pub const BoxModel = engines.BoxModel;
-pub const FlexboxEngine = engines.FlexboxEngine;
+// Main layout engine creation
+pub fn createEngine(allocator: std.mem.Allocator) LayoutEngine {
+    return LayoutEngine.init(allocator);
+}
 
-// Re-export measurement utilities
-pub const ConstraintResolver = measurement.ConstraintResolver;
-pub const IntrinsicSizing = measurement.IntrinsicSizing;
-pub const ContentSizing = measurement.ContentSizing;
+// Algorithm creation helpers
+pub fn createBoxModel(
+    allocator: std.mem.Allocator,
+    config: algorithms.box_model.Config,
+    gpu_device: ?*anyopaque,
+) !LayoutAlgorithm {
+    return algorithms.box_model.createAlgorithm(allocator, config, gpu_device);
+}
 
-// Re-export arrangement utilities
-pub const BlockFlow = arrangement.BlockFlow;
-pub const InlineFlow = arrangement.InlineFlow;
-pub const ContentAlignment = arrangement.ContentAlignment;
-pub const StackingContext = arrangement.StackingContext;
+// Benchmark creation
+pub fn createBenchmark(allocator: std.mem.Allocator) !runtime.benchmark.LayoutBenchmark {
+    return runtime.benchmark.LayoutBenchmark.init(allocator);
+}
 
-// Re-export backend interfaces
-pub const LayoutBackend = backends.LayoutBackend;
-pub const BackendCapabilities = backends.BackendCapabilities;
-pub const BackendConfig = backends.BackendConfig;
-pub const BackendStrategy = backends.BackendStrategy;
+/// Quick layout calculation for simple use cases
+pub fn calculateSimpleLayout(
+    allocator: std.mem.Allocator,
+    elements: []LayoutElement,
+    container_bounds: Rectangle,
+    algorithm_type: LayoutMode,
+) ![]LayoutResult {
+    var engine = createEngine(allocator);
+    defer engine.deinit();
 
-// Re-export animation systems
-pub const SpringConfig = animation.SpringConfig;
-pub const LayoutSpring = animation.LayoutSpring;
-pub const LayoutTransition = animation.LayoutTransition;
-pub const AnimationSequence = animation.AnimationSequence;
-pub const TimingPresets = animation.TimingPresets;
+    // Register appropriate algorithm
+    const config = core.interface.AlgorithmConfig{};
+    try engine.registerAlgorithm(algorithm_type, config);
 
-// Re-export algorithms
-pub const BlockLayout = algorithms.BlockLayout;
-pub const FlexLayout = algorithms.FlexLayout;
-pub const GridLayout = algorithms.GridLayout;
-pub const AbsoluteLayout = algorithms.AbsoluteLayout;
-pub const LayoutAlgorithm = algorithms.LayoutAlgorithm;
-pub const AlgorithmRecommender = algorithms.AlgorithmRecommender;
+    const context = LayoutContext{
+        .container_bounds = container_bounds,
+        .algorithm = algorithm_type,
+    };
 
-// Re-export debug tools
-pub const LayoutValidator = debug.LayoutValidator;
-pub const LayoutProfiler = debug.LayoutProfiler;
-pub const LayoutDebugSuite = debug.LayoutDebugSuite;
+    return engine.calculateLayout(elements, context);
+}
 
-// Re-export text integration
-pub const TextMeasurer = text_integration.TextMeasurer;
-pub const TextLayoutElement = text_integration.TextLayoutElement;
-pub const TextMeasurementOptions = text_integration.TextMeasurementOptions;
+/// Layout system information
+pub const Info = struct {
+    pub const version = "2.0.0";
+    pub const architecture = "Algorithm-First";
 
-// Legacy re-exports for backward compatibility
-pub const TextBaseline = text_baseline.TextBaseline;
-pub const TextPositioning = text_baseline.TextPositioning;
-pub const SpacingUtils = primitives.SpacingUtils;
-pub const SizingUtils = primitives.SizingUtils;
-pub const PositioningUtils = primitives.PositioningUtils;
-pub const Flexbox = primitives.Flexbox;
-pub const FlexItem = primitives.FlexItem;
-pub const FlexItemLayout = primitives.FlexItemLayout;
-pub const TextLayoutEngine = text.TextLayoutEngine;
-pub const LayoutOptions = text.LayoutOptions;
-pub const LayoutedText = text.LayoutedText;
-pub const LayoutedLine = text.LayoutedLine;
-pub const LayoutedGlyph = text.LayoutedGlyph;
-pub const TextAlign = text.TextAlign;
-pub const GPULayoutEngine = gpu.GPULayoutEngine;
-pub const UIElement = gpu.UIElement;
-pub const LayoutConstraint = gpu.LayoutConstraint;
-pub const SpringState = gpu.SpringState;
+    pub const supported_algorithms = [_]LayoutMode{
+        .block, // Box model (CPU + GPU)
+        .absolute, // Box model absolute positioning
+        // .flex,   // TODO: Flexbox (CPU + GPU)
+        // .grid,   // TODO: CSS Grid (CPU + GPU)
+        // .relative, // TODO: Relative positioning
+    };
 
-/// Layout system configuration
-pub const LayoutConfig = struct {
-    /// Default backend selection strategy
-    backend_strategy: BackendStrategy = .{},
-    /// Enable debug validation
-    enable_validation: bool = false,
-    /// Enable performance profiling
-    enable_profiling: bool = false,
-    /// Animation configuration
-    animation_config: AnimationConfig = .{},
-
-    pub const AnimationConfig = struct {
-        /// Default spring configuration
-        default_spring: SpringConfig = animation.SpringPresets.stiff,
-        /// Default transition timing
-        default_timing: animation.TimingConfig = animation.TimingPresets.standard,
-        /// Enable animation by default
-        enable_animations: bool = true,
+    pub const features = struct {
+        pub const cpu_algorithms = true;
+        pub const gpu_acceleration = true; // Via compute shaders
+        pub const real_benchmarking = true;
+        pub const reactive_updates = true;
+        pub const backwards_compatibility = false; // Intentionally removed
     };
 };
-
-/// Unified layout calculator
-pub const LayoutCalculator = struct {
-    allocator: std.mem.Allocator,
-    config: LayoutConfig,
-    backend: ?LayoutBackend = null,
-    validator: ?LayoutValidator = null,
-    profiler: ?LayoutProfiler = null,
-
-    pub fn init(allocator: std.mem.Allocator, config: LayoutConfig) LayoutCalculator {
-        return LayoutCalculator{
-            .allocator = allocator,
-            .config = config,
-        };
-    }
-
-    pub fn deinit(self: *LayoutCalculator) void {
-        if (self.validator) |*validator| {
-            validator.deinit();
-        }
-        if (self.profiler) |*profiler| {
-            profiler.deinit();
-        }
-    }
-
-    /// Initialize layout system with backend selection
-    pub fn initializeBackend(self: *LayoutCalculator, gpu_device: ?*anyopaque) !void {
-        // Create hybrid backend for automatic CPU/GPU selection
-        self.backend = try @import("backends/hybrid.zig").createHybridBackend(
-            self.allocator,
-            gpu_device,
-            self.config.backend_strategy.config,
-        );
-
-        // Initialize debug tools if enabled
-        if (self.config.enable_validation) {
-            self.validator = LayoutValidator.init(self.allocator, .{});
-        }
-
-        if (self.config.enable_profiling) {
-            self.profiler = LayoutProfiler.init(self.allocator, .{});
-        }
-    }
-
-    /// Perform layout calculation
-    pub fn calculateLayout(
-        self: *LayoutCalculator,
-        elements: []const backends.LayoutElement,
-        context: LayoutContext,
-    ) ![]LayoutResult {
-        if (self.backend == null) {
-            return error.BackendNotInitialized;
-        }
-
-        // Profile the operation if enabled
-        if (self.profiler) |*profiler| {
-            try profiler.startTiming(.complete_layout);
-            defer profiler.endTiming(.complete_layout, elements.len) catch {};
-        }
-
-        // Perform layout calculation
-        const results = try self.backend.?.performLayout(elements, context);
-
-        // Validate results if enabled
-        if (self.validator) |*validator| {
-            try validator.validateLayout(results, context.container_bounds);
-        }
-
-        return results;
-    }
-
-    /// Get performance statistics
-    pub fn getPerformanceStats(self: *const LayoutCalculator) ?debug.LayoutProfiler.PerformanceSummary {
-        if (self.profiler) |profiler| {
-            return profiler.getPerformanceSummary();
-        }
-        return null;
-    }
-
-    /// Get validation errors
-    pub fn getValidationErrors(self: *const LayoutCalculator) ?[]const debug.ValidationError {
-        if (self.validator) |validator| {
-            return validator.getErrors();
-        }
-        return null;
-    }
-};
-
-/// High-level layout utilities
-pub const LayoutUtils = struct {
-    /// Create a simple block layout
-    pub fn createBlockLayout(
-        allocator: std.mem.Allocator,
-        container_bounds: math.Rectangle,
-        element_sizes: []const math.Vec2,
-    ) ![]LayoutResult {
-        var block_elements = try allocator.alloc(algorithms.BlockLayout.BlockElement, element_sizes.len);
-        defer allocator.free(block_elements);
-
-        for (element_sizes, 0..) |size, i| {
-            block_elements[i] = algorithms.BlockLayout.BlockElement{
-                .size = size,
-                .margin = Spacing{},
-                .constraints = Constraints{},
-                .index = i,
-            };
-        }
-
-        return algorithms.BlockLayout.calculateLayout(
-            container_bounds,
-            block_elements,
-            .{},
-            allocator,
-        );
-    }
-
-    /// Create a simple flex layout
-    pub fn createFlexLayout(
-        allocator: std.mem.Allocator,
-        container_bounds: math.Rectangle,
-        element_sizes: []const math.Vec2,
-        direction: Direction,
-    ) ![]LayoutResult {
-        var flex_items = try allocator.alloc(algorithms.FlexLayout.FlexItem, element_sizes.len);
-        defer allocator.free(flex_items);
-
-        for (element_sizes, 0..) |size, i| {
-            flex_items[i] = algorithms.FlexLayout.FlexItem{
-                .size = size,
-                .margin = Spacing{},
-                .constraints = Constraints{},
-                .index = i,
-            };
-        }
-
-        const config = algorithms.FlexLayout.Config{ .direction = direction };
-        return algorithms.FlexLayout.calculateLayout(
-            container_bounds,
-            flex_items,
-            config,
-            allocator,
-        );
-    }
-
-    /// Recommend layout algorithm for given requirements
-    pub fn recommendAlgorithm(requirements: algorithms.AlgorithmRecommender.LayoutRequirements) LayoutAlgorithm {
-        return algorithms.AlgorithmRecommender.recommend(requirements);
-    }
-};
-
-const std = @import("std");
-const math = @import("../math/mod.zig");
 
 // Tests
-test "layout system integration" {
+test "layout system info" {
+    const testing = std.testing;
+
+    try testing.expectEqualStrings("2.0.0", Info.version);
+    try testing.expectEqualStrings("Algorithm-First", Info.architecture);
+    try testing.expect(Info.supported_algorithms.len >= 2);
+    try testing.expect(Info.features.cpu_algorithms);
+    try testing.expect(Info.features.gpu_acceleration);
+    try testing.expect(!Info.features.backwards_compatibility);
+}
+
+test "engine creation and algorithm registration" {
     const testing = std.testing;
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
-    // Test layout calculator initialization
-    const config = LayoutConfig{
-        .enable_validation = true,
-        .enable_profiling = true,
-    };
+    var engine = createEngine(allocator);
+    defer engine.deinit();
 
-    var calculator = LayoutCalculator.init(allocator, config);
-    defer calculator.deinit();
+    // Register box model algorithm
+    const config = core.interface.AlgorithmConfig{};
+    try engine.registerAlgorithm(.block, config);
 
-    // Test that config is properly set
-    try testing.expect(calculator.config.enable_validation);
-    try testing.expect(calculator.config.enable_profiling);
+    // Should have algorithm registered
+    const algorithms_list = engine.listAlgorithms();
+    defer allocator.free(algorithms_list);
+
+    try testing.expect(algorithms_list.len == 1);
+    try testing.expect(algorithms_list[0] == .block);
 }
 
-test "layout utilities" {
+test "simple layout calculation" {
     const testing = std.testing;
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
-    const container = math.Rectangle{
-        .position = math.Vec2.ZERO,
-        .size = math.Vec2{ .x = 400, .y = 300 },
+    // Create test elements
+    var elements = [_]LayoutElement{
+        LayoutElement{
+            .position = Vec2{ .x = 10, .y = 10 },
+            .size = Vec2{ .x = 100, .y = 50 },
+            .margin = Spacing.uniform(5),
+            .padding = Spacing.uniform(10),
+            .constraints = Constraints{},
+        },
     };
 
-    const element_sizes = [_]math.Vec2{
-        math.Vec2{ .x = 100, .y = 50 },
-        math.Vec2{ .x = 120, .y = 60 },
+    const container = Rectangle{
+        .position = Vec2.ZERO,
+        .size = Vec2{ .x = 800, .y = 600 },
     };
 
-    // Test block layout utility
-    const block_results = try LayoutUtils.createBlockLayout(allocator, container, &element_sizes);
-    defer allocator.free(block_results);
+    const results = try calculateSimpleLayout(allocator, &elements, container, .block);
+    defer allocator.free(results);
 
-    try testing.expect(block_results.len == 2);
-    try testing.expect(block_results[0].size.x == 100);
-    try testing.expect(block_results[1].size.x == 120);
-
-    // Test flex layout utility
-    const flex_results = try LayoutUtils.createFlexLayout(allocator, container, &element_sizes, .row);
-    defer allocator.free(flex_results);
-
-    try testing.expect(flex_results.len == 2);
-    try testing.expect(flex_results[0].position.x < flex_results[1].position.x); // Row layout
-}
-
-test "algorithm recommendation" {
-    const testing = std.testing;
-
-    const requirements = algorithms.AlgorithmRecommender.LayoutRequirements{
-        .needs_flexible_sizing = true,
-        .element_count = 5,
-    };
-
-    const recommended = LayoutUtils.recommendAlgorithm(requirements);
-    try testing.expect(recommended == .flex);
+    try testing.expect(results.len == 1);
+    try testing.expect(results[0].valid);
 }

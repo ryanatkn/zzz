@@ -4,7 +4,7 @@
 /// of layout animations with precise timing control.
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 const springs = @import("springs.zig");
 const transitions = @import("transitions.zig");
 

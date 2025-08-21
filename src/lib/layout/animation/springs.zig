@@ -4,7 +4,7 @@
 /// transitions. Springs are used for position, size, and other layout properties.
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 
 const Vec2 = math.Vec2;
 

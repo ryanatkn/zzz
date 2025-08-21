@@ -4,7 +4,7 @@
 /// common layout issues, and providing helpful debugging information.
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -282,7 +282,18 @@ pub const LayoutValidator = struct {
                 .size = element.size,
             };
 
-            if (!container_bounds.contains(element_rect)) {
+            // Check if element rectangle is entirely contained within container bounds
+            const element_right = element_rect.position.x + element_rect.size.x;
+            const element_bottom = element_rect.position.y + element_rect.size.y;
+            const container_right = container_bounds.position.x + container_bounds.size.x;
+            const container_bottom = container_bounds.position.y + container_bounds.size.y;
+            
+            const is_contained = element_rect.position.x >= container_bounds.position.x and
+                               element_rect.position.y >= container_bounds.position.y and
+                               element_right <= container_right and
+                               element_bottom <= container_bottom;
+            
+            if (!is_contained) {
                 try self.addError(
                     .container_overflow,
                     .warning,
@@ -406,7 +417,7 @@ pub const LayoutDebugger = struct {
         after_state: ?DebugEntry.ElementState,
     ) !void {
         try self.debug_data.append(DebugEntry{
-            .timestamp = std.time.nanoTimestamp(),
+            .timestamp = @intCast(std.time.nanoTimestamp()),
             .element_index = element_index,
             .operation = operation,
             .before_state = before_state,
@@ -469,11 +480,13 @@ test "validator basic functionality" {
         types.LayoutResult{
             .position = Vec2{ .x = 0, .y = 0 },
             .size = Vec2{ .x = 100, .y = 50 },
+            .content = Rectangle{ .position = Vec2{ .x = 0, .y = 0 }, .size = Vec2{ .x = 100, .y = 50 } },
             .element_index = 0,
         },
         types.LayoutResult{
             .position = Vec2{ .x = 150, .y = 0 },
             .size = Vec2{ .x = 100, .y = 50 },
+            .content = Rectangle{ .position = Vec2{ .x = 150, .y = 0 }, .size = Vec2{ .x = 100, .y = 50 } },
             .element_index = 1,
         },
     };
@@ -502,6 +515,7 @@ test "validator detects negative size" {
         types.LayoutResult{
             .position = Vec2{ .x = 0, .y = 0 },
             .size = Vec2{ .x = -10, .y = 50 }, // Negative width
+            .content = Rectangle{ .position = Vec2{ .x = 0, .y = 0 }, .size = Vec2{ .x = -10, .y = 50 } },
             .element_index = 0,
         },
     };
@@ -531,11 +545,13 @@ test "validator detects overlaps" {
         types.LayoutResult{
             .position = Vec2{ .x = 0, .y = 0 },
             .size = Vec2{ .x = 100, .y = 100 },
+            .content = Rectangle{ .position = Vec2{ .x = 0, .y = 0 }, .size = Vec2{ .x = 100, .y = 100 } },
             .element_index = 0,
         },
         types.LayoutResult{
             .position = Vec2{ .x = 50, .y = 50 }, // Overlaps with first element
             .size = Vec2{ .x = 100, .y = 100 },
+            .content = Rectangle{ .position = Vec2{ .x = 50, .y = 50 }, .size = Vec2{ .x = 100, .y = 100 } },
             .element_index = 1,
         },
     };

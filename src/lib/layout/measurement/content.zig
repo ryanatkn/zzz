@@ -4,7 +4,7 @@
 /// to determine their natural sizes for layout calculations.
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;

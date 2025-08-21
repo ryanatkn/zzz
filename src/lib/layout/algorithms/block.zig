@@ -4,7 +4,7 @@
 /// are laid out vertically in a block-formatting context.
 const std = @import("std");
 const math = @import("../../math/mod.zig");
-const types = @import("../types.zig");
+const types = @import("../core/types.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -54,16 +54,22 @@ pub const BlockLayout = struct {
         var previous_margin_bottom: f32 = 0.0;
 
         for (elements, 0..) |element, i| {
-            // Calculate margin collapse
-            var effective_margin_top = element.margin.top;
-            if (config.collapse_margins and i > 0) {
-                effective_margin_top = @max(element.margin.top, previous_margin_bottom) -
-                    @min(element.margin.top, previous_margin_bottom);
-            }
-
-            // Apply top margin and spacing
-            current_y += effective_margin_top;
-            if (i > 0) {
+            // Calculate margin for this element
+            if (i == 0) {
+                // First element: apply its top margin
+                current_y += element.margin.top;
+            } else {
+                // Subsequent elements: handle margin collapse or normal spacing
+                if (config.collapse_margins) {
+                    // Use the maximum of previous bottom margin and current top margin
+                    const collapsed_margin = @max(previous_margin_bottom, element.margin.top);
+                    current_y += collapsed_margin;
+                } else {
+                    // No collapse: add both margins
+                    current_y += previous_margin_bottom + element.margin.top;
+                }
+                
+                // Add block spacing if configured
                 current_y += config.block_spacing;
             }
 
@@ -93,17 +99,26 @@ pub const BlockLayout = struct {
                 .stretch => {
                     element_width = @max(element_width, available_width);
                 },
+                .baseline => {
+                    // For block layout, baseline alignment behaves like start
+                },
             }
 
             // Create layout result
             results[i] = types.LayoutResult{
                 .position = Vec2{ .x = element_x, .y = current_y },
                 .size = Vec2{ .x = element_width, .y = element_height },
+                .content = Rectangle{
+                    .position = Vec2{ .x = element_x, .y = current_y },
+                    .size = Vec2{ .x = element_width, .y = element_height },
+                },
                 .element_index = element.index,
             };
 
-            // Advance to next position
-            current_y += element_height + element.margin.bottom;
+            // Advance to next position (only add height, not margin)
+            current_y += element_height;
+            
+            // Store this element's bottom margin for next iteration
             previous_margin_bottom = element.margin.bottom;
         }
 
@@ -121,15 +136,22 @@ pub const BlockLayout = struct {
         var previous_margin_bottom: f32 = 0.0;
 
         for (elements, 0..) |element, i| {
-            // Margin collapse calculation
-            var effective_margin_top = element.margin.top;
-            if (config.collapse_margins and i > 0) {
-                effective_margin_top = @max(element.margin.top, previous_margin_bottom) -
-                    @min(element.margin.top, previous_margin_bottom);
-            }
-
-            total_height += effective_margin_top;
-            if (i > 0) {
+            // Calculate margin for this element
+            if (i == 0) {
+                // First element: apply its top margin
+                total_height += element.margin.top;
+            } else {
+                // Subsequent elements: handle margin collapse or normal spacing
+                if (config.collapse_margins) {
+                    // Use the maximum of previous bottom margin and current top margin
+                    const collapsed_margin = @max(previous_margin_bottom, element.margin.top);
+                    total_height += collapsed_margin;
+                } else {
+                    // No collapse: add both margins
+                    total_height += previous_margin_bottom + element.margin.top;
+                }
+                
+                // Add block spacing
                 total_height += config.block_spacing;
             }
 

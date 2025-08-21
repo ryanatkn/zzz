@@ -235,29 +235,9 @@ test {
     std.testing.refAllDeclsRecursive(@import("lib/ui/geometric_text.zig"));
 }
 
-// Layout system tests (unified layout module with primitives)
+// Layout system tests (unified layout module with algorithms)
 test {
-    std.testing.refAllDeclsRecursive(@import("lib/layout/box_model.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/layout/text_baseline.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/layout/primitives/spacing.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/layout/primitives/sizing.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/layout/primitives/positioning.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/layout/primitives/flexbox.zig"));
+    _ = @import("lib/layout/test.zig");
 }
 
 // UI integration tests (tests interaction between layout and UI components)

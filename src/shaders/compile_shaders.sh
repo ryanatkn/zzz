@@ -46,7 +46,7 @@ FAILED_SHADERS=()
 SUCCESS_COUNT=0
 TOTAL_COUNT=0
 
-for shader in triangle triangle_uniforms simple_circle debug_circle circle rectangle particle simple_rectangle text text_sdf test_compute layout_box_model layout_constraints layout_spring_physics; do
+for shader in triangle triangle_uniforms simple_circle debug_circle circle rectangle particle simple_rectangle text text_sdf test_compute layout_constraints layout_spring_physics; do
     echo "Compiling $shader..."
     
     # Check if source file exists
