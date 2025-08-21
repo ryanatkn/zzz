@@ -243,11 +243,9 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 
 ## Notes to LLMs
 
-- Game is fully functional - focus on performance and gameplay improvements
-- Avoid magic numbers, extract constants
-- Do what has been asked; nothing more, nothing less
 - Prioritize procedural generation and performance over asset-based approaches
 - Focus on code-driven visuals and algorithmic generation
+- Avoid magic numbers, extract constants
 - Test frequently with `zig build run` to ensure each step works
 - Less is more - avoid over-engineering
 - Always update documentation, be concise but thorough 
