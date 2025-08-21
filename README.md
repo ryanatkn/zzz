@@ -153,4 +153,8 @@ Built with (see [./deps](./deps)):
   and toolchain for maintaining robust, optimal and reusable software"
 - [SDL3](https://libsdl.org/) - cross-platform GPU API
 - [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross) - shader compilation
+- [fonts](./static/fonts):
+  - [DM Font Family](https://github.com/googlefonts/dm-fonts) - Sans, Mono, Serif Display, and Serif Text variants
+    by the DM Fonts Project Authors under SIL Open Font License
 - [Claude Code](https://claude.ai/code) - AI-assisted development, thank you Anthropic people
+

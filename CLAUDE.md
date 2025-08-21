@@ -245,6 +245,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 
 - Game is fully functional - focus on performance and gameplay improvements
 - Avoid magic numbers, extract constants
+- Do what has been asked; nothing more, nothing less
 - Prioritize procedural generation and performance over asset-based approaches
 - Focus on code-driven visuals and algorithmic generation
 - Test frequently with `zig build run` to ensure each step works
@@ -254,6 +255,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - Keep an eye towards extracting or reusing primitives in src/lib
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
+- Prefer `rg` over `grep`/`find`/`cat`/`sed`
 - **Architecture principle:** Engine (lib/game) provides interfaces, games (hex) provide implementations
 - **When refactoring:** Move generic patterns to lib/game, keep game-specific logic in hex
 - **Goal:** Games should be extremely open-ended and customizable
@@ -339,12 +341,9 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - **Performance Examples:** FPS (persistent, 2-3 changes/sec), Mouse coords (immediate, 60/sec)
 - **Decision Tree:** Static text → persistent, Debug values → immediate, User actions → persistent
 
-**General Guidelines:**
-- Do what has been asked; nothing more, nothing less
-- Prefer `rg` over `grep`/`find`/`cat`/`sed`
-- NEVER create files unless they're absolutely necessary for achieving your goal
-- ALWAYS prefer editing an existing file to creating a new one
-- NEVER proactively create documentation files (*.md) or README files unless explicitly requested
+## Fonts
+
+DM Font Family (Sans, Mono, Serif Display, Serif Text) - geometric/transitional design with clean grid alignment. GPU rendering should optimize for their design grain: consistent stroke weights, geometric construction, and predictable metrics.
 
 ## Documentation
 
