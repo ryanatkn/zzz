@@ -148,7 +148,9 @@ pub fn generateDebugInfo(
     const ndc = screenToNDC(screen_x, screen_y, screen_width, screen_height);
     const back_to_screen = ndcToScreen(ndc.x, ndc.y, screen_width, screen_height);
 
-    const error_vec = Vec2{ .x = back_to_screen.x, .y = back_to_screen.y }.sub(Vec2{ .x = screen_x, .y = screen_y });
+    const vec1 = Vec2{ .x = back_to_screen.x, .y = back_to_screen.y };
+    const vec2 = Vec2{ .x = screen_x, .y = screen_y };
+    const error_vec = vec1.sub(vec2);
     const transformation_error = error_vec.length();
 
     return .{

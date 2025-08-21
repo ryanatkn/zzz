@@ -18,7 +18,7 @@ Successfully completed the Pure Simulation Architecture Phase 2 with all core fe
 
 ### ✅ Faction-Based Color Vision System  
 **Implementation:** `src/hex/faction_integration.zig`, updated `src/hex/game.zig`
-- **Relationship colors**: Hostile=Red, Friendly=Cyan, Neutral=Yellow, Suspicious=Orange, Allied=Green
+- **Relationship colors**: Hostile=Red, Friendly=Cyan, Neutral=Brown, Suspicious=Orange, Allied=Green
 - **Dynamic perspective**: Colors change based on possessed entity's faction view
 - **Real-time updates**: Visual feedback updates immediately upon possession
 - **Performance optimized**: Color calculation integrated into existing render loop

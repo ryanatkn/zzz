@@ -143,7 +143,6 @@ fn tessellateContour(allocator: std.mem.Allocator, contour: glyph_extractor.Cont
     return tessellated.toOwnedSlice();
 }
 
-
 /// Calculate pixel coverage with basic edge anti-aliasing
 fn calculatePixelCoverage(center_x: f32, center_y: f32, contours: []const glyph_extractor.Contour, allocator: std.mem.Allocator) !f32 {
     // First check center point

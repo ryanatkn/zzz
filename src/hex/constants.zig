@@ -1,4 +1,5 @@
 const colors = @import("../lib/core/colors.zig");
+const color_mappings = @import("color_mappings.zig");
 const constants = @import("../lib/core/constants.zig");
 
 // Game-specific screen utilities derived from engine constants
@@ -46,6 +47,13 @@ pub const BORDER_PULSE_DEAD = 1.2;
 pub const IRIS_WIPE_DURATION = 2.5; // seconds
 pub const IRIS_WIPE_BAND_COUNT = 6;
 pub const IRIS_WIPE_BAND_WIDTH = 30.0; // pixels
+
+// Energy level for entity color intensity
+pub const EnergyLevel = enum {
+    lowered, // Low energy - idle, passive, non-threatening
+    normal, // Standard energy - default behavior, ready, patrolling
+    raised, // High energy - active, excited, aggressive
+};
 
 // Camera modes (moved from entities.zig)
 pub const CameraMode = enum {
@@ -173,18 +181,7 @@ pub const COLOR_LIFESTONE_UNATTUNED = colors.LIFESTONE_UNATTUNED;
 pub const COLOR_DEAD = colors.DEAD;
 
 // Disposition color mapping - centralized color logic for unit temperament
-pub fn getDispositionColor(_: anytype, disposition: anytype) @TypeOf(COLOR_UNIT_AGGRESSIVE) {
-    // Primary color is determined by disposition (temperament), not behavior state
-    return switch (disposition) {
-        .hostile => COLOR_UNIT_AGGRESSIVE, // Always red - aggressive/dangerous
-        .fearful => COLOR_OBSTACLE_DEADLY, // Orange - runs away but still dangerous
-        .neutral => COLOR_UNIT_NON_AGGRO, // Gray - ignores player
-        .friendly => COLOR_PLAYER_ALIVE, // Green/Blue - safe to approach
-    };
-
-    // Note: We could add behavior-specific shading in the future:
-    // - Slightly brighter when actively chasing/fleeing
-    // - Slightly dimmer when idle
-    // - Different shade when returning home
-    // But for now, consistent disposition-based colors provide clear visual feedback
+pub fn getDispositionColor(_: anytype, disposition: anytype) colors.Color {
+    // Use the hex-specific color mapping for disposition colors with normal energy
+    return color_mappings.getDispositionEnergyColor(disposition, EnergyLevel.normal);
 }

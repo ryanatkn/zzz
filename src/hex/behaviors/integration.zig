@@ -96,6 +96,25 @@ pub fn applyBehaviorResult(context: UnitUpdateContext, result: evaluators.Compos
     context.transform.vel = result.velocity;
     context.transform.pos = context.transform.pos.add(result.velocity.scale(dt));
 
+    // Update energy level based on behavior
+    context.unit.energy_level = switch (result.active_behavior) {
+        .chasing => .raised, // Actively pursuing target
+        .fleeing => .raised, // Panicked/running away
+        .returning_home => .normal, // Going home
+        .wandering => .normal, // Casual movement
+        .idle => .lowered, // Resting/passive
+    };
+
+    // Special case: Neutral units become alert (raised energy) when player is nearby
+    if (context.unit.disposition == .neutral and context.player_alive) {
+        const distance_to_player = context.transform.pos.distance(context.player_pos);
+        const detection_range = context.unit.aggro_range; // Use aggro_range as detection range
+
+        if (distance_to_player < detection_range) {
+            context.unit.energy_level = .raised; // Alert but not aggressive
+        }
+    }
+
     // Apply visual color (caller can override this by calling evaluateUnitBehavior directly)
     context.visual.color = result.getColor(context.unit.disposition);
 }

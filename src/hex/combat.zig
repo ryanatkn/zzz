@@ -1,4 +1,5 @@
 const std = @import("std");
+
 const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
 const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
@@ -7,10 +8,10 @@ const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const game_systems = @import("../lib/game/systems/mod.zig");
 const entity_queries = @import("entity_queries.zig");
-
-const Vec2 = math.Vec2;
 const hex_game_mod = @import("hex_game.zig");
 const game_controller = @import("game.zig");
+
+const Vec2 = math.Vec2;
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
 const GameState = game_controller.GameState;

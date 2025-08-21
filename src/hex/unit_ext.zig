@@ -4,6 +4,7 @@
 const Unit = @import("../lib/game/components/unit.zig").Unit;
 const Disposition = @import("disposition.zig").Disposition;
 const Vec2 = @import("../lib/math/mod.zig").Vec2;
+const EnergyLevel = @import("constants.zig").EnergyLevel;
 
 /// Hex-specific unit extension with disposition and aggro
 pub const HexUnit = struct {
@@ -15,6 +16,7 @@ pub const HexUnit = struct {
     aggro_range: f32,
     aggro_factor: f32,
     entity_id: u32,
+    energy_level: EnergyLevel,
 
     pub fn init(unit_type: Unit.UnitType, home_pos: Vec2, disposition: Disposition, entity_id: u32) HexUnit {
         return .{
@@ -23,10 +25,12 @@ pub const HexUnit = struct {
             .aggro_range = switch (unit_type) {
                 .enemy => 150.0,
                 .friendly => 100.0,
+                .neutral => 120.0, // Detection range for alertness
                 else => 0.0,
             },
             .aggro_factor = 1.0,
             .entity_id = entity_id,
+            .energy_level = .normal, // Start at normal energy
         };
     }
 

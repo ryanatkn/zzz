@@ -1,4 +1,5 @@
 const std = @import("std");
+
 const components = @import("../lib/game/components/mod.zig");
 const storage = @import("../lib/game/storage/generic_archetypes.zig");
 const factions = @import("factions.zig");

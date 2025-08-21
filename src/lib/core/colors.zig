@@ -46,6 +46,7 @@ pub const PURPLE_BRIGHT = Color{ .r = 180, .g = 100, .b = 240, .a = 255 };
 pub const RED_BRIGHT = Color{ .r = 255, .g = 100, .b = 100, .a = 255 };
 pub const YELLOW_BRIGHT = Color{ .r = 255, .g = 220, .b = 80, .a = 255 };
 pub const ORANGE_BRIGHT = Color{ .r = 255, .g = 180, .b = 80, .a = 255 };
+pub const BROWN = Color{ .r = 139, .g = 69, .b = 19, .a = 255 }; // Saddle brown
 pub const CYAN = Color{ .r = 0, .g = 200, .b = 200, .a = 255 };
 
 // Color utility functions
