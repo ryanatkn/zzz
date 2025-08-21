@@ -82,7 +82,7 @@ pub const ReactiveComponent = struct {
                 if (is_mounted) {
                     comp.component_vtable.onMount(comp.component_state) catch |err| {
                         const ui_log = loggers.getUILog();
-                        ui_log.err("reactive_component", "Component onMount error: {}", .{err});
+                        ui_log.err("reactive_component", "Component onMount error: {any}", .{err});
                     };
                 }
             }
@@ -105,7 +105,7 @@ pub const ReactiveComponent = struct {
                     if (should_render) {
                         comp.component_vtable.onRender(comp.component_state) catch |err| {
                             const ui_log = loggers.getUILog();
-                            ui_log.err("reactive_component", "Component onRender error: {}", .{err});
+                            ui_log.err("reactive_component", "Component onRender error: {any}", .{err});
                         };
 
                         // Update render time
@@ -210,20 +210,20 @@ const TestComponent = struct {
     fn onMount(state: *anyopaque) !void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
         const ui_log = loggers.getUILog();
-        ui_log.debug("test_component", "TestComponent '{}' mounted", .{self.name});
+        ui_log.debug("test_component", "TestComponent '{s}' mounted", .{self.name});
     }
 
     fn onUnmount(state: *anyopaque) void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
         const ui_log = loggers.getUILog();
-        ui_log.debug("test_component", "TestComponent '{}' unmounted", .{self.name});
+        ui_log.debug("test_component", "TestComponent '{s}' unmounted", .{self.name});
     }
 
     fn onRender(state: *anyopaque) !void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
         self.render_count += 1;
         const ui_log = loggers.getUILog();
-        ui_log.debug("test_component", "TestComponent '{}' rendered (count: {})", .{ self.name, self.render_count });
+        ui_log.debug("test_component", "TestComponent '{s}' rendered (count: {})", .{ self.name, self.render_count });
     }
 
     fn shouldRender(state: *anyopaque) bool {
@@ -235,7 +235,7 @@ const TestComponent = struct {
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
         const ui_log = loggers.getUILog();
-        ui_log.debug("test_component", "TestComponent '{}' destroyed", .{self.name});
+        ui_log.debug("test_component", "TestComponent '{s}' destroyed", .{self.name});
         allocator.destroy(self);
     }
 

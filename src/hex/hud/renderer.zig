@@ -580,8 +580,13 @@ pub const BrowserRenderer = struct {
         const max_lines = @as(u32, @intFromFloat((panel_rect.size.y - 50) / line_height)); // Available space for content
         const max_chars_per_line = @as(u32, @intFromFloat((panel_rect.size.x - 20) / char_width)); // Characters that fit
 
+        // Safety check: disable highlighting for large files
+        const file_too_large = content.len > ide_constants.SYNTAX.MAX_FILE_SIZE_BYTES;
+        
         // Check if syntax highlighting should be enabled
-        const enable_highlighting = ide_constants.SYNTAX.ENABLE_HIGHLIGHTING and ide_page_impl.*.shouldHighlightCurrentFile();
+        const enable_highlighting = ide_constants.SYNTAX.ENABLE_HIGHLIGHTING 
+            and ide_page_impl.*.shouldHighlightCurrentFile() 
+            and !file_too_large;
 
         var line_num: u32 = 0;
         var lines = std.mem.splitScalar(u8, content, '\n');
@@ -629,12 +634,24 @@ pub const BrowserRenderer = struct {
         const ide_page_mut = @constCast(ide_page_impl);
         var highlighter = ide_page_mut.*.getSyntaxHighlighter();
 
-        // Highlight the line
+        // Highlight the line with timeout protection
+        const start_time = std.time.milliTimestamp();
         const tokens = highlighter.highlightLine(line) catch {
             // Fallback to normal rendering on error
             self.drawTextWithColor(line, position, ide_constants.COLORS.TEXT_NORMAL);
             return;
         };
+        const end_time = std.time.milliTimestamp();
+        
+        // Check if highlighting took too long (safety measure)
+        if (end_time - start_time > ide_constants.SYNTAX.HIGHLIGHT_TIMEOUT_MS) {
+            // Log warning but still render the tokens we got
+            var throttled_logger = @import("../../lib/debug/logger.zig").Logger(.{
+                .output = @import("../../lib/debug/outputs.zig").Console,
+                .filter = @import("../../lib/debug/filters.zig").Throttle,
+            }).init(std.heap.c_allocator);
+            throttled_logger.warn("syntax_highlight", "Highlighting took {d}ms (limit: {d}ms)", .{ end_time - start_time, ide_constants.SYNTAX.HIGHLIGHT_TIMEOUT_MS });
+        }
         defer highlighter.freeTokens(tokens);
 
         // Render each token with its appropriate color

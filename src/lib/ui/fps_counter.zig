@@ -392,3 +392,107 @@ test "FPS counter presets" {
     try std.testing.expectEqual(text_alignment.TextAlign.left, corner_data.alignment);
     try std.testing.expectEqual(text_alignment.TextAlign.right, top_right_data.alignment);
 }
+
+test "fps counter initialization" {
+    const testing = std.testing;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    try reactive.init(allocator);
+    defer reactive.deinit(allocator);
+
+    const position = Vec2{ .x = 10, .y = 10 };
+    const font_size = 16.0;
+    const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+    const update_interval = 100;
+    const alignment = text_alignment.TextAlign.left;
+    const screen_width = 1920.0;
+
+    var counter = try FPSCounterData.init(
+        allocator,
+        position,
+        font_size,
+        color,
+        update_interval,
+        alignment,
+        screen_width
+    );
+    defer counter.deinit(allocator);
+
+    // Test initial values
+    try testing.expectEqual(position, counter.position);
+    try testing.expectEqual(font_size, counter.font_size);
+    try testing.expectEqual(color, counter.color);
+    try testing.expectEqual(alignment, counter.alignment);
+    try testing.expectEqual(screen_width, counter.screen_width);
+    try testing.expectEqual(@as(u64, update_interval), counter.update_interval_ms);
+
+    // Test initial signal values
+    try testing.expectEqual(@as(u32, 0), counter.current_fps.get());
+    try testing.expectEqual(true, counter.is_visible.get());
+}
+
+test "fps counter visibility toggle" {
+    const testing = std.testing;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    try reactive.init(allocator);
+    defer reactive.deinit(allocator);
+
+    var counter = try FPSCounterData.init(
+        allocator,
+        Vec2.ZERO,
+        16.0,
+        Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+        100,
+        text_alignment.TextAlign.left,
+        1920.0
+    );
+    defer counter.deinit(allocator);
+
+    // Test initial visibility
+    try testing.expectEqual(true, counter.is_visible.get());
+
+    // Toggle visibility
+    counter.is_visible.set(false);
+    try testing.expectEqual(false, counter.is_visible.get());
+
+    // Toggle back
+    counter.is_visible.set(true);
+    try testing.expectEqual(true, counter.is_visible.get());
+}
+
+test "fps counter value updates" {
+    const testing = std.testing;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    try reactive.init(allocator);
+    defer reactive.deinit(allocator);
+
+    var counter = try FPSCounterData.init(
+        allocator,
+        Vec2.ZERO,
+        16.0,
+        Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+        100,
+        text_alignment.TextAlign.left,
+        1920.0
+    );
+    defer counter.deinit(allocator);
+
+    // Test initial FPS
+    try testing.expectEqual(@as(u32, 0), counter.current_fps.get());
+
+    // Update FPS
+    counter.current_fps.set(60);
+    try testing.expectEqual(@as(u32, 60), counter.current_fps.get());
+
+    // Update again
+    counter.current_fps.set(120);
+    try testing.expectEqual(@as(u32, 120), counter.current_fps.get());
+}

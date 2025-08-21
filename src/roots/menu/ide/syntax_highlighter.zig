@@ -2,6 +2,7 @@
 /// Pattern-based highlighting without full AST parsing
 const std = @import("std");
 const colors = @import("../../../lib/core/colors.zig");
+const constants = @import("constants.zig");
 const Color = colors.Color;
 
 /// Token type for syntax highlighting
@@ -77,13 +78,28 @@ pub const ZigHighlighter = struct {
         };
     }
 
-    /// Highlight a line of Zig code
+    /// Highlight a line of Zig code with safety limits
     pub fn highlightLine(self: *Self, line: []const u8) ![]HighlightedToken {
+        // Safety check: line length limit
+        if (line.len > constants.SYNTAX.MAX_HIGHLIGHT_LINE_LENGTH) {
+            // Return single token for oversized lines
+            const tokens = try self.allocator.alloc(HighlightedToken, 1);
+            tokens[0] = HighlightedToken{
+                .text = line,
+                .token_type = .normal,
+                .start_pos = 0,
+                .end_pos = @intCast(line.len),
+            };
+            return tokens;
+        }
+
         var tokens = std.ArrayList(HighlightedToken).init(self.allocator);
         defer tokens.deinit();
 
+        // Safety check: token count limit
+        var token_count: u32 = 0;
         var i: u32 = 0;
-        while (i < line.len) {
+        while (i < line.len and token_count < constants.SYNTAX.MAX_TOKENS_PER_LINE) {
             const start_pos = i;
 
             // Skip whitespace
@@ -100,6 +116,7 @@ pub const ZigHighlighter = struct {
                     .start_pos = start_pos,
                     .end_pos = @intCast(line.len),
                 });
+                token_count += 1;
                 break; // Rest of line is comment
             }
 
@@ -112,6 +129,7 @@ pub const ZigHighlighter = struct {
                     .start_pos = start_pos,
                     .end_pos = end,
                 });
+                token_count += 1;
                 i = end;
                 continue;
             }
@@ -125,6 +143,7 @@ pub const ZigHighlighter = struct {
                     .start_pos = start_pos,
                     .end_pos = end,
                 });
+                token_count += 1;
                 i = end;
                 continue;
             }
@@ -138,6 +157,7 @@ pub const ZigHighlighter = struct {
                     .start_pos = start_pos,
                     .end_pos = end,
                 });
+                token_count += 1;
                 i = end;
                 continue;
             }
@@ -154,6 +174,7 @@ pub const ZigHighlighter = struct {
                     .start_pos = start_pos,
                     .end_pos = end,
                 });
+                token_count += 1;
                 i = end;
                 continue;
             }

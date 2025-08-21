@@ -430,3 +430,126 @@ test "debug overlay creation and basic operations" {
     try std.testing.expectEqual(@as(u32, 2), stats.total_values);
     try std.testing.expectEqual(false, stats.is_visible);
 }
+
+test "debug value int formatting" {
+    const testing = std.testing;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    const debug_val = DebugValue{
+        .key = "Counter",
+        .format_string = "Value: {d}",
+        .rendering_mode = rendering_modes.RenderingMode.immediate,
+        .change_frequency = 60.0,
+        .value = .{ .int = 42 },
+    };
+
+    const formatted = try debug_val.formatValue(allocator);
+    defer allocator.free(formatted);
+
+    try testing.expectEqualStrings("Value: 42", formatted);
+}
+
+test "debug value float formatting" {
+    const testing = std.testing;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    const debug_val = DebugValue{
+        .key = "FPS",
+        .format_string = "{d:.1} fps",
+        .rendering_mode = rendering_modes.RenderingMode.persistent,
+        .change_frequency = 2.0,
+        .value = .{ .float = 59.8 },
+    };
+
+    const formatted = try debug_val.formatValue(allocator);
+    defer allocator.free(formatted);
+
+    try testing.expectEqualStrings("59.8 fps", formatted);
+}
+
+test "debug value string formatting" {
+    const testing = std.testing;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    const debug_val = DebugValue{
+        .key = "Status",
+        .format_string = "State: {s}",
+        .rendering_mode = rendering_modes.RenderingMode.persistent,
+        .change_frequency = 1.0,
+        .value = .{ .string = "Active" },
+    };
+
+    const formatted = try debug_val.formatValue(allocator);
+    defer allocator.free(formatted);
+
+    try testing.expectEqualStrings("State: Active", formatted);
+}
+
+test "debug value bool formatting" {
+    const testing = std.testing;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    const debug_val = DebugValue{
+        .key = "Enabled",
+        .format_string = "Enabled: {}",
+        .rendering_mode = rendering_modes.RenderingMode.persistent,
+        .change_frequency = 0.1,
+        .value = .{ .bool = true },
+    };
+
+    const formatted = try debug_val.formatValue(allocator);
+    defer allocator.free(formatted);
+
+    try testing.expectEqualStrings("Enabled: true", formatted);
+}
+
+test "debug value setValue functionality" {
+    const testing = std.testing;
+
+    var debug_val = DebugValue{
+        .key = "Counter",
+        .format_string = "{d}",
+        .rendering_mode = rendering_modes.RenderingMode.immediate,
+        .change_frequency = 10.0,
+        .value = .{ .int = 0 },
+    };
+
+    // Test initial value
+    try testing.expectEqual(@as(i64, 0), debug_val.value.int);
+
+    // Update value
+    debug_val.setValue(.{ .int = 100 });
+    try testing.expectEqual(@as(i64, 100), debug_val.value.int);
+
+    // Update with different type (float)
+    debug_val.setValue(.{ .float = 3.14 });
+    try testing.expectEqual(@as(f64, 3.14), debug_val.value.float);
+}
+
+test "debug value uint formatting" {
+    const testing = std.testing;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    const debug_val = DebugValue{
+        .key = "Memory",
+        .format_string = "{d} bytes",
+        .rendering_mode = rendering_modes.RenderingMode.immediate,
+        .change_frequency = 30.0,
+        .value = .{ .uint = 1024 },
+    };
+
+    const formatted = try debug_val.formatValue(allocator);
+    defer allocator.free(formatted);
+
+    try testing.expectEqualStrings("1024 bytes", formatted);
+}

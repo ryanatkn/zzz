@@ -429,3 +429,63 @@ test "button style color handling" {
     const hover_color = style.getBackgroundColor(.hovered);
     try std.testing.expect(!(hover_color.r == 255 and hover_color.g == 255 and hover_color.b == 0));
 }
+
+test "button state color mapping" {
+    const testing = std.testing;
+    
+    const style = ButtonStyle{};
+    
+    // Test normal state
+    const normal_color = style.getBackgroundColor(.normal);
+    try testing.expectEqual(Color{ .r = 60, .g = 60, .b = 60, .a = 255 }, normal_color);
+    
+    // Test hover state
+    const hover_color = style.getBackgroundColor(.hovered);
+    try testing.expectEqual(Color{ .r = 80, .g = 80, .b = 80, .a = 255 }, hover_color);
+    
+    // Test pressed state  
+    const pressed_color = style.getBackgroundColor(.pressed);
+    try testing.expectEqual(Color{ .r = 40, .g = 40, .b = 40, .a = 255 }, pressed_color);
+    
+    // Test disabled state
+    const disabled_color = style.getBackgroundColor(.disabled);
+    try testing.expectEqual(Color{ .r = 30, .g = 30, .b = 30, .a = 255 }, disabled_color);
+}
+
+test "button border color mapping" {
+    const testing = std.testing;
+    
+    const style = ButtonStyle{};
+    
+    // Test all border states
+    try testing.expectEqual(Color{ .r = 120, .g = 120, .b = 120, .a = 255 }, style.getBorderColor(.normal));
+    try testing.expectEqual(Color{ .r = 160, .g = 160, .b = 160, .a = 255 }, style.getBorderColor(.hovered));
+    try testing.expectEqual(Color{ .r = 100, .g = 100, .b = 100, .a = 255 }, style.getBorderColor(.pressed));
+    try testing.expectEqual(Color{ .r = 60, .g = 60, .b = 60, .a = 255 }, style.getBorderColor(.disabled));
+}
+
+test "button style defaults" {
+    const testing = std.testing;
+    
+    const style = ButtonStyle{};
+    
+    // Test default values
+    try testing.expectEqual(@as(f32, 1.0), style.border_width);
+    try testing.expectEqual(@as(f32, 4.0), style.corner_radius);
+    try testing.expectEqual(@as(f32, 16.0), style.padding.x);
+    try testing.expectEqual(@as(f32, 8.0), style.padding.y);
+}
+
+test "button custom style" {
+    const testing = std.testing;
+    
+    const custom_style = ButtonStyle{
+        .border_width = 2.0,
+        .corner_radius = 8.0,
+        .normal_color = Color{ .r = 255, .g = 0, .b = 0, .a = 255 },
+    };
+    
+    try testing.expectEqual(@as(f32, 2.0), custom_style.border_width);
+    try testing.expectEqual(@as(f32, 8.0), custom_style.corner_radius);
+    try testing.expectEqual(Color{ .r = 255, .g = 0, .b = 0, .a = 255 }, custom_style.getBackgroundColor(.normal));
+}

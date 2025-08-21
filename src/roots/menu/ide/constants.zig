@@ -81,13 +81,19 @@ pub const FILE_TREE = struct {
 /// Syntax highlighting configuration
 pub const SYNTAX = struct {
     /// Enable syntax highlighting for supported file types
-    pub const ENABLE_HIGHLIGHTING: bool = false; // Temporarily disabled to test freeze issue
+    pub const ENABLE_HIGHLIGHTING: bool = true;
 
     /// Maximum line length to highlight (performance limit)
     pub const MAX_HIGHLIGHT_LINE_LENGTH: u32 = 500;
 
     /// Maximum tokens per line (performance limit)
     pub const MAX_TOKENS_PER_LINE: u32 = 100;
+    
+    /// Maximum file size to highlight (10KB limit for safety)
+    pub const MAX_FILE_SIZE_BYTES: u32 = 10 * 1024;
+    
+    /// Timeout for syntax highlighting per file (100ms)
+    pub const HIGHLIGHT_TIMEOUT_MS: u32 = 100;
 };
 
 /// Terminal styling configuration

@@ -233,6 +233,50 @@ pub const IDEPage = struct {
 
         self.current_file_content = content;
     }
+
+    /// Handle keyboard input for navigation
+    pub fn handleKeyboard(self: *IDEPage, key_event: KeyboardEvent) !void {
+        // Only handle input if file tree has focus
+        if (self.focus_manager.getFocus() != .file_tree) return;
+
+        switch (key_event.scancode) {
+            sdl.sdl.SDL_SCANCODE_DOWN => {
+                self.file_tree_component.selectNext();
+                // Load content if it's a file
+                if (self.getSelectedEntry()) |selected| {
+                    if (!selected.metadata.is_directory) {
+                        try self.loadFileContent(selected);
+                    }
+                }
+            },
+            sdl.sdl.SDL_SCANCODE_UP => {
+                self.file_tree_component.selectPrevious();
+                // Load content if it's a file
+                if (self.getSelectedEntry()) |selected| {
+                    if (!selected.metadata.is_directory) {
+                        try self.loadFileContent(selected);
+                    }
+                }
+            },
+            sdl.sdl.SDL_SCANCODE_RIGHT => {
+                self.file_tree_component.toggleSelectedExpansion();
+            },
+            sdl.sdl.SDL_SCANCODE_LEFT => {
+                self.file_tree_component.toggleSelectedExpansion();
+            },
+            sdl.sdl.SDL_SCANCODE_RETURN => {
+                // Enter key - expand/collapse or open file
+                if (self.getSelectedEntry()) |selected| {
+                    if (selected.metadata.is_directory) {
+                        self.file_tree_component.toggleSelectedExpansion();
+                    } else {
+                        try self.loadFileContent(selected);
+                    }
+                }
+            },
+            else => {},
+        }
+    }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {

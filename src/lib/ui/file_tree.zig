@@ -349,4 +349,73 @@ pub const FileTreeComponent = struct {
     pub fn getState(self: *const Self) *const FileTreeState {
         return &self.state;
     }
+
+    /// Move selection to next visible item (Down arrow)
+    pub fn selectNext(self: *Self) void {
+        const items = self.getVisibleItems();
+        if (items.len == 0) return;
+
+        if (self.state.selected_entry) |current| {
+            // Find current selection and move to next
+            for (items, 0..) |item, i| {
+                if (item.entry == current) {
+                    if (i + 1 < items.len) {
+                        self.state.selectEntry(items[i + 1].entry);
+                    }
+                    return;
+                }
+            }
+        }
+        
+        // No selection or not found - select first item
+        if (items.len > 0) {
+            self.state.selectEntry(items[0].entry);
+        }
+    }
+
+    /// Move selection to previous visible item (Up arrow)
+    pub fn selectPrevious(self: *Self) void {
+        const items = self.getVisibleItems();
+        if (items.len == 0) return;
+
+        if (self.state.selected_entry) |current| {
+            // Find current selection and move to previous
+            for (items, 0..) |item, i| {
+                if (item.entry == current) {
+                    if (i > 0) {
+                        self.state.selectEntry(items[i - 1].entry);
+                    }
+                    return;
+                }
+            }
+        }
+        
+        // No selection or not found - select last item
+        if (items.len > 0) {
+            self.state.selectEntry(items[items.len - 1].entry);
+        }
+    }
+
+    /// Expand/collapse selected directory (Right/Left arrow)
+    pub fn toggleSelectedExpansion(self: *Self) void {
+        if (self.state.selected_entry) |selected| {
+            if (selected.metadata.is_directory) {
+                self.renderer.toggleExpanded(selected);
+                // Rebuild render list to reflect changes
+                if (self.root_entry) |root| {
+                    self.renderer.buildRenderList(root, Vec2{ .x = 0.0, .y = 0.0 }) catch {};
+                }
+            }
+        }
+    }
+
+    /// Get selected file path for opening
+    pub fn getSelectedFilePath(self: *const Self) ?[]const u8 {
+        if (self.state.selected_entry) |selected| {
+            if (!selected.metadata.is_directory) {
+                return selected.getFullPath();
+            }
+        }
+        return null;
+    }
 };
