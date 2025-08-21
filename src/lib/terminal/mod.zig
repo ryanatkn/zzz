@@ -68,4 +68,3 @@ pub const Key = core.Key;
 pub const RingBuffer = core.RingBuffer;
 pub const CommandExecutorFn = core.CommandExecutorFn;
 pub const VisibleLinesIterator = core.VisibleLinesIterator;
-

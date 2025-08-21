@@ -1,5 +1,5 @@
 /// Positioning algorithms module
-/// 
+///
 /// Provides absolute, relative, and sticky positioning layout algorithms.
 pub const shared = @import("shared.zig");
 pub const absolute = @import("absolute.zig");

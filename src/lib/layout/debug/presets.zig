@@ -2,7 +2,6 @@
 ///
 /// This module provides pre-configured debug setups for different use cases,
 /// from development debugging to production monitoring.
-
 const debug_suite = @import("debug_suite.zig");
 
 /// Debug presets for common scenarios

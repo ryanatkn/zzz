@@ -2,7 +2,6 @@
 ///
 /// This module contains tests that verify GPU data structure sizes, alignment,
 /// and basic functionality to ensure compatibility with compute shaders.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const structures = @import("structures.zig");

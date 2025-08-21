@@ -287,12 +287,12 @@ pub const LayoutValidator = struct {
             const element_bottom = element_rect.position.y + element_rect.size.y;
             const container_right = container_bounds.position.x + container_bounds.size.x;
             const container_bottom = container_bounds.position.y + container_bounds.size.y;
-            
+
             const is_contained = element_rect.position.x >= container_bounds.position.x and
-                               element_rect.position.y >= container_bounds.position.y and
-                               element_right <= container_right and
-                               element_bottom <= container_bottom;
-            
+                element_rect.position.y >= container_bounds.position.y and
+                element_right <= container_right and
+                element_bottom <= container_bottom;
+
             if (!is_contained) {
                 try self.addError(
                     .container_overflow,

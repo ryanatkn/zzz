@@ -13,7 +13,6 @@ const FlexItem = shared.FlexItem;
 
 /// Flex layout algorithm
 pub const FlexLayout = struct {
-
     /// Perform flex layout calculation
     pub fn calculateLayout(
         container_bounds: Rectangle,

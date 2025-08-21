@@ -2,7 +2,6 @@
 ///
 /// This module contains tests that verify the layout debugging system
 /// functionality including debug suite initialization and validation.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../core/types.zig");

@@ -2,7 +2,6 @@
 ///
 /// This module contains tests that verify the animation system functionality
 /// including type recommendations and manager operations.
-
 const std = @import("std");
 const utils = @import("utils.zig");
 

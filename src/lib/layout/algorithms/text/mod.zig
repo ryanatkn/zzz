@@ -21,4 +21,3 @@ pub const TextMeasurer = measurement.TextMeasurer;
 // Re-export factory functionality
 pub const Config = factory.Config;
 pub const createAlgorithm = factory.createAlgorithm;
-

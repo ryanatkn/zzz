@@ -188,10 +188,9 @@ pub const BoxModelGPU = struct {
         // 4. SDL_BindGPUComputeStorageBuffers() - Bind element/constraint buffers
         // 5. SDL_DispatchGPUCompute() - Execute layout calculation
         // 6. SDL_EndGPUComputePass() - Finish compute work
-        
-        loggers.getRenderLog().info("gpu_compute_not_implemented", 
-            "GPU compute shader dispatch not yet implemented - need SDL3 pipeline integration", .{});
-        
+
+        loggers.getRenderLog().info("gpu_compute_not_implemented", "GPU compute shader dispatch not yet implemented - need SDL3 pipeline integration", .{});
+
         return error.GPUComputeNotImplemented;
     }
 

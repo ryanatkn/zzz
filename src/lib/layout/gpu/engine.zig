@@ -2,7 +2,6 @@
 ///
 /// This module provides a complete GPU-based layout system using compute shaders
 /// for high-performance layout calculation on large numbers of UI elements.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const loggers = @import("../../debug/loggers.zig");

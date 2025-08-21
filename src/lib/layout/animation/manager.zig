@@ -2,7 +2,6 @@
 ///
 /// This module provides a comprehensive animation management system that handles
 /// springs, transitions, sequences, and timelines in a unified interface.
-
 const std = @import("std");
 const springs = @import("springs.zig");
 const transitions = @import("transitions.zig");

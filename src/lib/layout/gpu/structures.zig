@@ -2,7 +2,6 @@
 ///
 /// These structures must match HLSL shader definitions exactly for compute pipeline compatibility.
 /// All structures are carefully aligned and sized for optimal GPU memory access patterns.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 

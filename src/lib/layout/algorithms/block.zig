@@ -68,7 +68,7 @@ pub const BlockLayout = struct {
                     // No collapse: add both margins
                     current_y += previous_margin_bottom + element.margin.top;
                 }
-                
+
                 // Add block spacing if configured
                 current_y += config.block_spacing;
             }
@@ -117,7 +117,7 @@ pub const BlockLayout = struct {
 
             // Advance to next position (only add height, not margin)
             current_y += element_height;
-            
+
             // Store this element's bottom margin for next iteration
             previous_margin_bottom = element.margin.bottom;
         }
@@ -150,7 +150,7 @@ pub const BlockLayout = struct {
                     // No collapse: add both margins
                     total_height += previous_margin_bottom + element.margin.top;
                 }
-                
+
                 // Add block spacing
                 total_height += config.block_spacing;
             }

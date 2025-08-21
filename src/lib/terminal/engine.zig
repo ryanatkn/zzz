@@ -2,7 +2,6 @@
 ///
 /// This module provides the complete TerminalEngine that combines all terminal
 /// components into a unified system for command execution and process management.
-
 const std = @import("std");
 const loggers = @import("../debug/loggers.zig");
 const core = @import("core.zig");

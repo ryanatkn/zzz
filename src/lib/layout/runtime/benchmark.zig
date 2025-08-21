@@ -184,7 +184,7 @@ pub const LayoutBenchmark = struct {
         {
             // Reset arena before each iteration for consistent allocation patterns
             _ = arena.reset(.retain_capacity);
-            
+
             const iter_start = std.time.nanoTimestamp();
             _ = self.engine.calculateLayout(elements, context) catch {
                 iteration += 1;

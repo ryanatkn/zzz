@@ -2,7 +2,6 @@
 ///
 /// This module provides factory functions and vtable wrappers for creating
 /// text layout algorithm instances with CPU or GPU implementations.
-
 const std = @import("std");
 const core = @import("../../core/types.zig");
 const interface = @import("../../core/interface.zig");

@@ -52,7 +52,7 @@ test "UI integration: text input with proper baseline and cursor alignment" {
 //     const reactive = @import("../reactive/mod.zig");
 //     const math = @import("../math/mod.zig");
 
-//     var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+//     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 //     defer _ = gpa.deinit();
 //     const allocator = gpa.allocator();
 //
@@ -101,7 +101,7 @@ test "UI integration: text input with proper baseline and cursor alignment" {
 //     const reactive = @import("../reactive/mod.zig");
 //     const math = @import("../math/mod.zig");
 //
-//     var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+//     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 //     defer _ = gpa.deinit();
 //     const allocator = gpa.allocator();
 //

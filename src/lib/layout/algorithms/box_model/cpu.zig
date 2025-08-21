@@ -26,7 +26,7 @@ pub const BoxModelCPU = struct {
 
     // Cached computed layout
     cached_layout: ?ComputedLayout,
-    
+
     // Dirty tracking
     dirty: bool,
 
@@ -95,12 +95,11 @@ pub const BoxModelCPU = struct {
         }
         return self.cached_layout.?;
     }
-    
+
     /// Compute layout from current box model state
     fn computeLayout(self: *const BoxModelCPU) ComputedLayout {
         return calculateBoxModel(self.position, self.size, self.padding, self.margin, self.border);
     }
-    
 
     /// Set position and mark dirty
     pub fn setPosition(self: *BoxModelCPU, position: Vec2) void {
@@ -166,7 +165,7 @@ pub fn calculateBoxModel(position: Vec2, content_size: Vec2, padding: Spacing, m
         },
         .size = content_size,
     };
-    
+
     // Padding area (content + padding)
     const padding_area = Rectangle{
         .position = Vec2{
@@ -178,7 +177,7 @@ pub fn calculateBoxModel(position: Vec2, content_size: Vec2, padding: Spacing, m
             .y = content_size.y + padding.top + padding.bottom,
         },
     };
-    
+
     // Border area (content + padding + border)
     const border_area = Rectangle{
         .position = Vec2{
@@ -190,7 +189,7 @@ pub fn calculateBoxModel(position: Vec2, content_size: Vec2, padding: Spacing, m
             .y = content_size.y + padding.top + padding.bottom + border.top + border.bottom,
         },
     };
-    
+
     // Margin area (outermost - full element bounds)
     const margin_area = Rectangle{
         .position = position,
@@ -199,7 +198,7 @@ pub fn calculateBoxModel(position: Vec2, content_size: Vec2, padding: Spacing, m
             .y = content_size.y + padding.top + padding.bottom + border.top + border.bottom + margin.top + margin.bottom,
         },
     };
-    
+
     return BoxModelCPU.ComputedLayout{
         .content = content,
         .padding = padding_area,

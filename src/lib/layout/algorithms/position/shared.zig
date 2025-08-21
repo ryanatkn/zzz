@@ -1,5 +1,5 @@
 /// Shared positioning utilities
-/// 
+///
 /// Common types and functions used by absolute, relative, and sticky positioning algorithms.
 const std = @import("std");
 const math = @import("../../../math/mod.zig");

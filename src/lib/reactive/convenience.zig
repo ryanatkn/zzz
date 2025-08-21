@@ -3,7 +3,6 @@
 /// This module provides easy-to-use factory functions that wrap the core reactive
 /// primitives with sensible defaults and simplified APIs. These functions handle
 /// common patterns like signal creation, derived value setup, and effect management.
-
 const std = @import("std");
 const context_mod = @import("context.zig");
 const signal_mod = @import("signal.zig");

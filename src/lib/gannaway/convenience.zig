@@ -2,7 +2,6 @@
 ///
 /// This module provides easy-to-use factory functions and utilities
 /// for working with the Gannaway alternative reactive system.
-
 const std = @import("std");
 const state_mod = @import("state.zig");
 const compute_mod = @import("compute.zig");
