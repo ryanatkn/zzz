@@ -5,6 +5,9 @@ const layout_mod = @import("../../../lib/layout/mod.zig");
 const reactive = @import("../../../lib/reactive/mod.zig");
 const loggers = @import("../../../lib/debug/loggers.zig");
 const sdl = @import("../../../lib/platform/sdl.zig");
+const layout_backends = @import("layout_backends.zig");
+const layout_validator = @import("layout_validator.zig");
+const statistical_analysis = @import("statistical_analysis.zig");
 
 const Vec2 = math.Vec2;
 const HybridLayoutManager = layout_mod.gpu.hybrid.HybridLayoutManager;
@@ -33,9 +36,20 @@ pub const LayoutBenchmarkPage = struct {
 
     // GPU device for actual GPU benchmarking
     gpu_device: ?*sdl.sdl.SDL_GPUDevice = null,
+    gpu_available: bool = false, // True only if real GPU backend successfully initialized
+
+    // Layout backends for real layout calculations
+    cpu_backend: layout_backends.CpuLayoutEngine,
+    gpu_backend: ?layout_backends.GpuLayoutEngine,
 
     // Reusable buffer for layout calculations to avoid allocations per iteration
     results_buffer: std.ArrayList(UIElement),
+    
+    // Layout validation system
+    validator: layout_validator.LayoutValidator,
+    
+    // Statistical analysis system
+    statistical_analyzer: statistical_analysis.StatisticalAnalysis,
 
     // Configuration
     element_counts: []const usize = &[_]usize{ 10, 50, 100, 200, 500, 1000 },
@@ -75,6 +89,11 @@ pub const LayoutBenchmarkPage = struct {
         max_time_us: f64,
         std_dev_us: f64,
         iterations: usize,
+        // Enhanced statistics
+        median_time_us: f64,
+        outlier_count: usize,
+        measurement_quality: statistical_analysis.MeasurementQuality,
+        coefficient_of_variation: f64,
     };
 
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
@@ -102,6 +121,21 @@ pub const LayoutBenchmarkPage = struct {
         // Clean up completed tests and buffers
         benchmark_page.completed_tests.deinit();
         benchmark_page.results_buffer.deinit();
+
+        // Clean up layout backends
+        benchmark_page.cpu_backend.deinit();
+        if (benchmark_page.gpu_backend) |*gpu| {
+            gpu.deinit();
+        }
+        
+        // Clean up validator
+        benchmark_page.validator.deinit();
+
+        // Free any remaining results text content before deinit signals
+        const current_results = benchmark_page.results_text.get();
+        if (current_results.len > 0) {
+            benchmark_page.allocator.free(current_results);
+        }
 
         // Clean up reactive signals
         benchmark_page.status_text.deinit();
@@ -143,6 +177,12 @@ pub const LayoutBenchmarkPage = struct {
         try self.results_buffer.appendSlice(test_run.test_data.elements);
         const results = self.results_buffer.items;
 
+        // Pre-allocate any backend resources to avoid allocation during timing
+        self.cpu_backend.ensureBoxModels(results.len) catch {
+            loggers.getUILog().err("backend_prealloc_fail", "Failed to pre-allocate CPU backend resources for {} elements", .{results.len});
+            return;
+        };
+
         // Get GPU device for layout operations (may be null for CPU-only)
         const device: ?*sdl.sdl.SDL_GPUDevice = self.gpu_device;
         var cmd_buffer: ?*sdl.sdl.SDL_GPUCommandBuffer = null;
@@ -156,8 +196,12 @@ pub const LayoutBenchmarkPage = struct {
         // Perform layout calculations
         if (test_run.backend_type == .cpu) {
             self.performCPULayout(results);
+        } else if (test_run.backend_type == .gpu and self.gpu_available) {
+            self.performGPULayout(results, true);
         } else {
-            self.performGPULayout(results, device != null);
+            // This should not happen - indicates scheduling logic error
+            loggers.getUILog().err("invalid_gpu_test", "GPU test scheduled but GPU not available", .{});
+            return;
         }
 
         const end_time = @as(i64, @intCast(std.time.nanoTimestamp()));
@@ -189,39 +233,40 @@ pub const LayoutBenchmarkPage = struct {
     fn finishCurrentTest(self: *LayoutBenchmarkPage) !void {
         const test_run = self.current_test.?;
 
-        // Calculate statistics
+        // Enhanced statistical analysis with outlier detection
         const times = test_run.times.items;
         if (times.len == 0) return;
 
-        var sum: f64 = 0;
-        var min_time: f64 = std.math.floatMax(f64);
-        var max_time: f64 = -std.math.floatMax(f64);
+        // Perform comprehensive statistical analysis
+        var stats = try self.statistical_analyzer.analyzeData(times);
+        defer self.statistical_analyzer.freeOutlierResult(&stats.outliers);
 
-        for (times) |time| {
-            sum += time;
-            min_time = @min(min_time, time);
-            max_time = @max(max_time, time);
+        // Log measurement quality
+        const quality_str = switch (stats.measurement_quality) {
+            .excellent => "excellent",
+            .good => "good", 
+            .fair => "fair",
+            .poor => "poor",
+        };
+        
+        if (stats.outliers.outlier_count > 0) {
+            loggers.getUILog().info("benchmark_outliers", "Test {s} {} elements: {} outliers detected, quality: {s}, CV: {d:.3}", 
+                .{ if (test_run.backend_type == .gpu) "GPU" else "CPU", test_run.element_count, stats.outliers.outlier_count, quality_str, stats.coefficient_of_variation });
         }
 
-        const avg_time = sum / @as(f64, @floatFromInt(times.len));
-
-        // Calculate standard deviation
-        var variance_sum: f64 = 0;
-        for (times) |time| {
-            const diff = time - avg_time;
-            variance_sum += diff * diff;
-        }
-        const std_dev = @sqrt(variance_sum / @as(f64, @floatFromInt(times.len)));
-
-        // Create result
+        // Create result with enhanced statistics
         const result = BenchmarkResult{
             .element_count = test_run.element_count,
             .backend_used = test_run.backend_type,
-            .avg_time_us = avg_time,
-            .min_time_us = min_time,
-            .max_time_us = max_time,
-            .std_dev_us = std_dev,
+            .avg_time_us = stats.mean,
+            .min_time_us = stats.min,
+            .max_time_us = stats.max,
+            .std_dev_us = stats.std_dev,
             .iterations = times.len,
+            .median_time_us = stats.median,
+            .outlier_count = stats.outliers.outlier_count,
+            .measurement_quality = stats.measurement_quality,
+            .coefficient_of_variation = stats.coefficient_of_variation,
         };
 
         try self.completed_tests.append(result);
@@ -267,7 +312,7 @@ pub const LayoutBenchmarkPage = struct {
                 next_element_count = count;
                 next_backend = .cpu;
                 break;
-            } else if (!gpu_tested and self.gpu_device != null) {
+            } else if (!gpu_tested and self.gpu_available) {
                 next_element_count = count;
                 next_backend = .gpu;
                 break;
@@ -295,6 +340,13 @@ pub const LayoutBenchmarkPage = struct {
             .springs = test_data_result.springs,
         };
 
+        // Pre-allocate CPU backend resources for this test size to avoid allocations during timing
+        self.cpu_backend.ensureBoxModels(element_count) catch |err| {
+            loggers.getUILog().err("backend_prealloc_startup_fail", "Failed to pre-allocate CPU backend resources for {} elements: {}", .{ element_count, err });
+            test_data.deinit(self.allocator);
+            return err;
+        };
+
         // Create test run with specified backend
         self.current_test = TestRun{
             .element_count = element_count,
@@ -309,76 +361,59 @@ pub const LayoutBenchmarkPage = struct {
         const backend_name = if (backend == .gpu) "GPU" else "CPU";
         const status_msg = std.fmt.bufPrint(&self.status_buffer, "Starting test for {} elements ({s} backend)", .{ element_count, backend_name }) catch "Status update error";
         self.status_text.set(status_msg);
+
+        // Perform validation check once per test to ensure correctness
+        self.validateLayoutResults(test_data.elements) catch |err| {
+            loggers.getUILog().err("validation_setup_error", "Failed to validate layout for {} elements: {}", .{ element_count, err });
+        };
     }
 
     fn performCPULayout(self: *LayoutBenchmarkPage, results: []UIElement) void {
-        _ = self;
-        // CPU layout calculation - multiple passes to simulate real layout work
-
-        // Pass 1: Apply margins
-        for (results) |*elem| {
-            elem.position[0] += elem.margin[3]; // left margin
-            elem.position[1] += elem.margin[0]; // top margin
-        }
-
-        // Pass 2: Parent-child layout relationships
-        for (results) |*elem| {
-            if (elem.parent_index != UIElement.INVALID_PARENT and elem.parent_index < results.len) {
-                const parent = &results[elem.parent_index];
-
-                // Apply parent positioning based on layout mode
-                if (elem.layout_mode == @intFromEnum(UIElement.LayoutMode.relative)) {
-                    elem.position[0] += parent.position[0] + parent.padding[3]; // Add parent left padding
-                    elem.position[1] += parent.position[1] + parent.padding[0]; // Add parent top padding
-                }
-            }
-        }
-
-        // Pass 3: Constraint solving and cleanup
-        for (results, 0..) |*elem, i| {
-            // Apply size constraints
-            if (elem.size[0] < 10.0) elem.size[0] = 10.0; // min width
-            if (elem.size[1] < 10.0) elem.size[1] = 10.0; // min height
-
-            // Simulate complex layout calculations
-            const index_f = @as(f32, @floatFromInt(i));
-            elem.position[0] += @sin(index_f * 0.01) * 0.1; // Tiny adjustment
-            elem.position[1] += @cos(index_f * 0.01) * 0.1; // Tiny adjustment
-
-            // Clear dirty flags
-            elem.dirty_flags = 0;
-        }
+        // Use real CPU layout backend with box model calculations
+        self.cpu_backend.performLayout(results);
     }
 
     fn performGPULayout(self: *LayoutBenchmarkPage, results: []UIElement, has_gpu: bool) void {
-        _ = self;
-        // GPU layout calculation simulation
-        if (has_gpu) {
-            // Simulate GPU-style parallel computation
-            for (results, 0..) |*elem, i| {
-                const thread_id = @as(f32, @floatFromInt(i));
-
-                // Apply margins (parallel style)
-                elem.position[0] += elem.margin[3];
-                elem.position[1] += elem.margin[0];
-
-                // GPU constraint solving
-                if (elem.size[0] < 10.0) elem.size[0] = 10.0;
-                if (elem.size[1] < 10.0) elem.size[1] = 10.0;
-
-                // GPU-style calculation pattern
-                elem.position[0] += @sin(thread_id * 0.02) * 0.05;
-                elem.position[1] += @cos(thread_id * 0.02) * 0.05;
-
-                elem.dirty_flags = 0;
-            }
+        _ = has_gpu; // Parameter no longer needed since function only called when GPU available
+        
+        if (self.gpu_backend) |*gpu| {
+            // Use real GPU layout backend
+            gpu.performLayout(results);
         } else {
-            // Fallback to basic CPU computation when no GPU available
-            for (results) |*elem| {
-                elem.position[0] += elem.margin[3];
-                elem.position[1] += elem.margin[0];
-                elem.dirty_flags = 0;
-            }
+            // This should never happen since gpu_available is checked before calling
+            loggers.getUILog().err("gpu_backend_missing", "GPU layout called but backend is null", .{});
+        }
+    }
+
+    /// Validate that CPU and GPU backends produce equivalent results
+    fn validateLayoutResults(self: *LayoutBenchmarkPage, elements: []UIElement) !void {
+        if (!self.validator.validation_enabled) return;
+        
+        // Skip validation when GPU is not available
+        if (!self.gpu_available) {
+            loggers.getUILog().debug("validation_skipped", "Skipping cross-backend validation - GPU not available", .{});
+            return;
+        }
+
+        // Create a copy of elements for CPU layout
+        const cpu_elements = try self.validator.copyElements(elements);
+        self.performCPULayout(cpu_elements);
+
+        // Create another copy for GPU layout  
+        const gpu_elements = try self.validator.copyElements(elements);
+        self.performGPULayout(gpu_elements, true);
+
+        // Validate the results match
+        const validation_result = try self.validator.validateResults(cpu_elements, gpu_elements);
+
+        if (!validation_result.is_valid) {
+            const error_msg = std.fmt.bufPrint(&self.error_buffer, 
+                "Layout validation failed: max pos error {d:.6}, max size error {d:.6}", 
+                .{ validation_result.max_position_error, validation_result.max_size_error }) catch "Validation error";
+            loggers.getUILog().err("layout_validation_error", "{s}", .{error_msg});
+            
+            // For development, we could pause the benchmark or show warnings
+            // For now, just log the error and continue
         }
     }
 
@@ -405,6 +440,16 @@ pub const LayoutBenchmarkPage = struct {
         std.sort.pdq(BenchmarkResult, gpu_results.items, {}, compareByElementCount);
 
         try results_buffer.appendSlice("CPU vs GPU LAYOUT BENCHMARK RESULTS\n\n");
+        
+        // Backend availability status
+        try results_buffer.appendSlice("Backend Status:\n");
+        try results_buffer.appendSlice("• CPU Backend: Available\n");
+        if (self.gpu_available) {
+            try results_buffer.appendSlice("• GPU Backend: Available (Simulated - not real GPU compute)\n");
+        } else {
+            try results_buffer.appendSlice("• GPU Backend: Not Available (skipped GPU tests)\n");
+        }
+        try results_buffer.appendSlice("\n");
 
         // Table header
         try results_buffer.appendSlice("┌──────────────┬────────────┬────────────┬──────────┬─────────┐\n");
@@ -458,8 +503,12 @@ pub const LayoutBenchmarkPage = struct {
             // GPU time column
             if (gpu_time) |gpu| {
                 try results_buffer.writer().print(" {d:>8.1} μs │", .{gpu});
-            } else {
+            } else if (self.gpu_available) {
+                // GPU available but no result yet (test pending)
                 try results_buffer.appendSlice("     --     │");
+            } else {
+                // GPU not available
+                try results_buffer.appendSlice("    N/A     │");
             }
 
             // Speedup and winner columns (GPU perspective)
@@ -480,7 +529,11 @@ pub const LayoutBenchmarkPage = struct {
                     const slowdown = gpu / cpu;
                     try results_buffer.writer().print(" {d:>6.1}x │   ↓     │\n", .{slowdown});
                 }
+            } else if (!self.gpu_available) {
+                // GPU not available - show N/A instead of --
+                try results_buffer.appendSlice("   N/A   │  N/A    │\n");
             } else {
+                // GPU available but no results yet (tests pending)
                 try results_buffer.appendSlice("    --    │   --    │\n");
             }
         }
@@ -488,9 +541,26 @@ pub const LayoutBenchmarkPage = struct {
         try results_buffer.appendSlice("└──────────────┴────────────┴────────────┴──────────┴─────────┘\n");
 
         // Summary statistics
-        if (comparison_count > 0) {
-            try results_buffer.appendSlice("\nSUMMARY STATISTICS:\n");
-
+        try results_buffer.appendSlice("\nSUMMARY STATISTICS:\n");
+        
+        if (!self.gpu_available) {
+            try results_buffer.appendSlice("• GPU Performance: Not Available (GPU device or backend unavailable)\n");
+            
+            // Show CPU-only statistics
+            var cpu_tests: usize = 0;
+            var total_cpu_only_time: f64 = 0;
+            
+            for (cpu_results.items) |result| {
+                total_cpu_only_time += result.avg_time_us;
+                cpu_tests += 1;
+            }
+            
+            if (cpu_tests > 0) {
+                const avg_cpu_only_time = total_cpu_only_time / @as(f64, @floatFromInt(cpu_tests));
+                try results_buffer.writer().print("• Average CPU Time: {d:.1} μs\n", .{avg_cpu_only_time});
+                try results_buffer.writer().print("• CPU Tests Completed: {} of {} element counts\n", .{ cpu_tests, all_element_counts.items.len });
+            }
+        } else if (comparison_count > 0) {
             const avg_cpu_time = total_cpu_time / @as(f64, @floatFromInt(comparison_count));
             const avg_gpu_time = total_gpu_time / @as(f64, @floatFromInt(comparison_count));
             const overall_speedup = avg_cpu_time / avg_gpu_time;
@@ -505,6 +575,8 @@ pub const LayoutBenchmarkPage = struct {
             try results_buffer.writer().print("• Average CPU Time: {d:.1} μs\n", .{avg_cpu_time});
             try results_buffer.writer().print("• Average GPU Time: {d:.1} μs\n", .{avg_gpu_time});
             try results_buffer.writer().print("• Tests Completed: {} of {} element counts\n", .{ comparison_count, all_element_counts.items.len });
+        } else {
+            try results_buffer.appendSlice("• GPU Backend: Available but no GPU vs CPU comparisons yet\n");
         }
 
         // Fix memory leak: free old results before setting new ones
@@ -612,6 +684,22 @@ pub const LayoutBenchmarkPage = struct {
 
     pub fn setGPUDevice(self: *LayoutBenchmarkPage, device: *sdl.sdl.SDL_GPUDevice) void {
         self.gpu_device = device;
+        
+        // Try to initialize GPU backend (currently simulated, but tests the architecture)
+        self.gpu_backend = layout_backends.GpuLayoutEngine.init(self.allocator, device) catch |err| blk: {
+            loggers.getUILog().err("gpu_backend_init_fail", "Failed to initialize GPU layout backend: {}", .{err});
+            self.gpu_available = false;
+            break :blk null;
+        };
+        
+        if (self.gpu_backend != null) {
+            self.gpu_available = true;
+            loggers.getUILog().info("gpu_backend_ready", "GPU layout backend initialized successfully (simulated)", .{});
+            loggers.getUILog().warn("gpu_backend_simulated", "GPU backend is currently simulated - results show architecture performance, not real GPU compute", .{});
+        } else {
+            self.gpu_available = false;
+            loggers.getUILog().warn("gpu_backend_unavailable", "GPU layout backend unavailable - GPU tests will be skipped", .{});
+        }
     }
 
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
@@ -637,6 +725,10 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
         .allocator = allocator,
         .completed_tests = std.ArrayList(LayoutBenchmarkPage.BenchmarkResult).init(allocator),
         .results_buffer = std.ArrayList(UIElement).init(allocator),
+        .cpu_backend = layout_backends.CpuLayoutEngine.init(allocator),
+        .gpu_backend = null, // Will be initialized if GPU device is available
+        .validator = layout_validator.LayoutValidator.init(allocator, 0.01), // Default validation tolerance
+        .statistical_analyzer = statistical_analysis.StatisticalAnalysis.init(allocator, statistical_analysis.StatisticalAnalysis.OutlierConfig{}),
         .status_text = undefined, // Will be initialized in init()
         .progress_text = undefined,
         .results_text = undefined,

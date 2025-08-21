@@ -225,8 +225,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - Constants extracted for easy tuning and upgrades
 
 **Workflow with root TODO_*.md docs:**
-- **Active TODO docs** should be placed in root directory with `TODO_*.md` prefix and caps like TODO_FOO.md or TODO_BAR.md for high visibility
-- **Completed TODO docs** should be **updated in place** with completion status, not moved
+- Update TODO_*.md docs in-place in the root cwd
   - Update title: `# TODO: Task Name` → `# ✅ COMPLETED: Task Name`
   - Add completion date and final status summary
   - Keep file in root to show what major work has been accomplished
@@ -237,17 +236,18 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
   - User and machine independently verify results, conclusions, and presented data
   - Only after convening and getting user approval does the machine proceed to archive validated TODO files
 - **Permanent docs** (README.md, CLAUDE.md) remain unprefixed in root
-- **Only archive to `docs/archive/`** when TODO docs become stale, superseded, or fully validated as complete
 - **Always commit todo docs** to git both during work and after completion
 - This workflow ensures completed work remains visible while tracking major accomplishments
 
 ## Notes to LLMs
 
+- It's useful to leave TODOs around! Especially for known future work. Use them as inline docs.
 - Prioritize procedural generation and performance over asset-based approaches
 - Focus on code-driven visuals and algorithmic generation
 - Avoid magic numbers, extract constants
 - Check frequently with `zig build test`, and to check runtime behavior, `zig build run`
 - Less is more - avoid over-engineering
+- `mod.zig` files should re-export and not contain impls themselves
 - Always update documentation, be concise but thorough 
 - Performance is a top priority - always optimize for the final best code
 - When working with shaders, follow the SDL3 GPU patterns documented here

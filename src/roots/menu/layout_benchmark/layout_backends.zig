@@ -1,6 +1,8 @@
 const std = @import("std");
 const layout_mod = @import("../../../lib/layout/mod.zig");
 const box_model = @import("../../../lib/layout/box_model.zig");
+const math = @import("../../../lib/math/mod.zig");
+const loggers = @import("../../../lib/debug/loggers.zig");
 const sdl = @import("../../../lib/platform/sdl.zig");
 
 const UIElement = layout_mod.UIElement;
@@ -10,28 +12,25 @@ const BoxModel = box_model.BoxModel;
 pub const LayoutBackend = union(enum) {
     cpu: CpuLayoutEngine,
     gpu: GpuLayoutEngine,
-    gpu_fallback: CpuLayoutEngine, // GPU unavailable, using CPU
 
     pub fn performLayout(self: *LayoutBackend, elements: []UIElement) void {
         switch (self.*) {
             .cpu => |*cpu| cpu.performLayout(elements),
             .gpu => |*gpu| gpu.performLayout(elements),
-            .gpu_fallback => |*cpu| cpu.performLayout(elements),
         }
     }
 
     pub fn getName(self: *const LayoutBackend) []const u8 {
         return switch (self.*) {
             .cpu => "CPU",
-            .gpu => "GPU",
-            .gpu_fallback => "GPU (CPU Fallback)",
+            .gpu => "GPU (Simulated)",
         };
     }
 
     pub fn isRealGPU(self: *const LayoutBackend) bool {
         return switch (self.*) {
-            .gpu => true,
-            .cpu, .gpu_fallback => false,
+            .gpu => false, // Currently simulated, not real GPU compute
+            .cpu => false,
         };
     }
 };
@@ -39,52 +38,120 @@ pub const LayoutBackend = union(enum) {
 /// CPU layout engine using real box model calculations
 pub const CpuLayoutEngine = struct {
     allocator: std.mem.Allocator,
+    box_models: std.ArrayList(BoxModel),
 
     pub fn init(allocator: std.mem.Allocator) CpuLayoutEngine {
-        return .{ .allocator = allocator };
+        return .{ 
+            .allocator = allocator,
+            .box_models = std.ArrayList(BoxModel).init(allocator),
+        };
     }
 
     pub fn deinit(self: *CpuLayoutEngine) void {
-        _ = self;
+        for (self.box_models.items) |*box| {
+            box.deinit(self.allocator);
+        }
+        self.box_models.deinit();
     }
 
     /// Perform CPU layout using real box model calculations
+    /// NOTE: ensureBoxModels() must be called before this for allocation-free operation
     pub fn performLayout(self: *CpuLayoutEngine, elements: []UIElement) void {
-        _ = self;
-
-        // Pass 1: Apply margins and basic positioning
-        for (elements) |*elem| {
-            elem.position[0] += elem.margin[3]; // left margin
-            elem.position[1] += elem.margin[0]; // top margin
+        // Box models should already be pre-allocated by ensureBoxModels()
+        if (self.box_models.items.len < elements.len) {
+            loggers.getUILog().err("cpu_layout_insufficient_models", "Insufficient box models: have {}, need {}", .{ self.box_models.items.len, elements.len });
+            return;
         }
 
-        // Pass 2: Parent-child layout relationships
-        for (elements) |*elem| {
-            if (elem.parent_index != UIElement.INVALID_PARENT and elem.parent_index < elements.len) {
-                const parent = &elements[elem.parent_index];
+        // Convert UIElements to BoxModels
+        for (elements, 0..) |*elem, i| {
+            self.uielementToBoxModel(elem, &self.box_models.items[i]);
+        }
 
-                // Apply parent positioning based on layout mode
-                if (elem.layout_mode == @intFromEnum(UIElement.LayoutMode.relative)) {
-                    elem.position[0] += parent.position[0] + parent.padding[3]; // Add parent left padding
-                    elem.position[1] += parent.position[1] + parent.padding[0]; // Add parent top padding
+        // Perform real box model layout calculations
+        for (self.box_models.items[0..elements.len], 0..) |*box, i| {
+            // Handle parent-child relationships
+            if (elements[i].parent_index != UIElement.INVALID_PARENT and 
+                elements[i].parent_index < elements.len) {
+                
+                const parent_box = &self.box_models.items[elements[i].parent_index];
+                const parent_computed = parent_box.getLayout();
+                
+                // Position relative to parent's content area
+                if (elements[i].layout_mode == @intFromEnum(UIElement.LayoutMode.relative)) {
+                    const new_pos = math.Vec2{
+                        .x = parent_computed.content.position.x + elements[i].position[0],
+                        .y = parent_computed.content.position.y + elements[i].position[1],
+                    };
+                    box.setPosition(new_pos);
                 }
             }
+
+            // Force layout calculation
+            _ = box.getLayout();
         }
 
-        // Pass 3: Constraint solving and finalization
-        for (elements, 0..) |*elem, i| {
-            // Apply size constraints
-            if (elem.size[0] < 10.0) elem.size[0] = 10.0; // min width
-            if (elem.size[1] < 10.0) elem.size[1] = 10.0; // min height
-
-            // Simulate complex layout calculations (represents real CSS layout work)
-            const index_f = @as(f32, @floatFromInt(i));
-            elem.position[0] += @sin(index_f * 0.01) * 0.1; // Sub-pixel adjustment
-            elem.position[1] += @cos(index_f * 0.01) * 0.1; // Sub-pixel adjustment
-
-            // Clear dirty flags
-            elem.dirty_flags = 0;
+        // Convert BoxModels back to UIElements
+        for (self.box_models.items[0..elements.len], 0..) |*box, i| {
+            self.boxModelToUIElement(box, &elements[i]);
         }
+    }
+
+    /// Ensure we have enough box models allocated - should be called before timing
+    pub fn ensureBoxModels(self: *CpuLayoutEngine, count: usize) !void {
+        while (self.box_models.items.len < count) {
+            const box = try BoxModel.init(self.allocator, math.Vec2.ZERO, math.Vec2.ZERO);
+            try self.box_models.append(box);
+        }
+    }
+
+    /// Convert UIElement to BoxModel for real layout calculations
+    fn uielementToBoxModel(self: *CpuLayoutEngine, elem: *const UIElement, box: *BoxModel) void {
+        _ = self;
+        
+        // Set position and size
+        box.setPosition(math.Vec2{ .x = elem.position[0], .y = elem.position[1] });
+        box.setSize(math.Vec2{ .x = elem.size[0], .y = elem.size[1] });
+        
+        // Set spacing (TRBL format: top, right, bottom, left)
+        box.setPaddingDetailed(elem.padding[0], elem.padding[1], elem.padding[2], elem.padding[3]);
+        
+        // Set margin per side - create a custom spacing
+        const margin_spacing = BoxModel.Spacing{
+            .top = elem.margin[0],
+            .right = elem.margin[1], 
+            .bottom = elem.margin[2],
+            .left = elem.margin[3],
+        };
+        box.margin.set(margin_spacing);
+        box.markDirty();
+        
+        // Set constraints if element is dirty
+        if (elem.isDirty(.constraint)) {
+            // Apply basic constraints
+            box.setConstraints(BoxModel.Constraints{
+                .min_width = 10.0,
+                .min_height = 10.0,
+                .max_width = 2000.0,
+                .max_height = 2000.0,
+            });
+        }
+    }
+
+    /// Convert BoxModel back to UIElement after layout calculations
+    fn boxModelToUIElement(self: *CpuLayoutEngine, box: *BoxModel, elem: *UIElement) void {
+        _ = self;
+        
+        const computed = box.getLayout();
+        
+        // Update position and size from computed layout
+        elem.position[0] = computed.content.position.x;
+        elem.position[1] = computed.content.position.y;
+        elem.size[0] = computed.content.size.x;
+        elem.size[1] = computed.content.size.y;
+        
+        // Clear dirty flags
+        elem.dirty_flags = 0;
     }
 };
 
@@ -129,6 +196,9 @@ pub const GpuLayoutEngine = struct {
     }
 };
 
+/// GPU backend initialization error for when GPU is unavailable
+pub const GPUUnavailableError = error{GPUDeviceNotAvailable};
+
 /// Create appropriate backend based on available hardware
 pub fn createBackend(allocator: std.mem.Allocator, force_cpu: bool, gpu_device: ?*sdl.sdl.SDL_GPUDevice) !LayoutBackend {
     if (force_cpu) {
@@ -139,7 +209,7 @@ pub fn createBackend(allocator: std.mem.Allocator, force_cpu: bool, gpu_device: 
         const gpu_engine = try GpuLayoutEngine.init(allocator, device);
         return LayoutBackend{ .gpu = gpu_engine };
     } else {
-        // GPU not available, use CPU fallback
-        return LayoutBackend{ .gpu_fallback = CpuLayoutEngine.init(allocator) };
+        // GPU not available - return error instead of fake fallback
+        return GPUUnavailableError.GPUDeviceNotAvailable;
     }
 }

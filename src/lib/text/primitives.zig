@@ -8,6 +8,7 @@ const bitmap_utils = @import("../image/bitmap.zig");
 const glyph_extractor = @import("../font/glyph_extractor.zig");
 const sdf_renderer = @import("sdf_renderer.zig");
 const vector_path = @import("../vector/path.zig");
+const font_debug = @import("../font/test/font_debug.zig");
 const text_cache = @import("cache.zig");
 
 const Vec2 = math.Vec2;
