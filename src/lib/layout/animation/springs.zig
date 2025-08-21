@@ -2,7 +2,6 @@
 ///
 /// This module provides physically-based spring animations for smooth layout
 /// transitions. Springs are used for position, size, and other layout properties.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -74,9 +73,9 @@ pub const Spring1D = struct {
         const displacement = self.current - self.target;
         const spring_force = -self.config.stiffness * displacement;
         const damping_force = -self.config.damping * self.velocity;
-        
+
         const acceleration = (spring_force + damping_force) / self.config.mass;
-        
+
         self.velocity += acceleration * delta_time;
         self.current += self.velocity * delta_time;
     }
@@ -85,9 +84,9 @@ pub const Spring1D = struct {
     pub fn isAtRest(self: *const Spring1D) bool {
         const displacement = @abs(self.current - self.target);
         const velocity = @abs(self.velocity);
-        
-        return displacement < self.config.position_threshold and 
-               velocity < self.config.velocity_threshold;
+
+        return displacement < self.config.position_threshold and
+            velocity < self.config.velocity_threshold;
     }
 
     /// Snap to target (stops animation)
@@ -123,9 +122,9 @@ pub const Spring2D = struct {
         const displacement = self.current.subtract(self.target);
         const spring_force = displacement.scale(-self.config.stiffness);
         const damping_force = self.velocity.scale(-self.config.damping);
-        
+
         const acceleration = spring_force.add(damping_force).scale(1.0 / self.config.mass);
-        
+
         self.velocity = self.velocity.add(acceleration.scale(delta_time));
         self.current = self.current.add(self.velocity.scale(delta_time));
     }
@@ -134,9 +133,9 @@ pub const Spring2D = struct {
     pub fn isAtRest(self: *const Spring2D) bool {
         const displacement = self.current.subtract(self.target).length();
         const velocity = self.velocity.length();
-        
-        return displacement < self.config.position_threshold and 
-               velocity < self.config.velocity_threshold;
+
+        return displacement < self.config.position_threshold and
+            velocity < self.config.velocity_threshold;
     }
 
     /// Snap to target (stops animation)
@@ -176,10 +175,10 @@ pub const LayoutSpring = struct {
     /// Check if all animations are complete
     pub fn isAtRest(self: *const LayoutSpring) bool {
         return self.position.isAtRest() and
-               self.size.isAtRest() and
-               self.opacity.isAtRest() and
-               self.rotation.isAtRest() and
-               self.scale.isAtRest();
+            self.size.isAtRest() and
+            self.opacity.isAtRest() and
+            self.rotation.isAtRest() and
+            self.scale.isAtRest();
     }
 
     /// Set target layout state
@@ -265,39 +264,39 @@ pub const SpringPresets = struct {
 // Tests
 test "spring 1D basic animation" {
     const testing = std.testing;
-    
+
     var spring = Spring1D.init(0.0, SpringPresets.stiff);
     spring.setTarget(100.0);
-    
+
     // Should not be at rest initially
     try testing.expect(!spring.isAtRest());
-    
+
     // Animate for several frames
     for (0..60) |_| {
         spring.update(1.0 / 60.0); // 60 FPS
     }
-    
+
     // Should be close to target
     try testing.expect(@abs(spring.current - 100.0) < 1.0);
 }
 
 test "spring 2D vector animation" {
     const testing = std.testing;
-    
+
     const start = Vec2{ .x = 0.0, .y = 0.0 };
     const target = Vec2{ .x = 100.0, .y = 50.0 };
-    
+
     var spring = Spring2D.init(start, SpringPresets.stiff);
     spring.setTarget(target);
-    
+
     // Should not be at rest initially
     try testing.expect(!spring.isAtRest());
-    
+
     // Animate for several frames
     for (0..60) |_| {
         spring.update(1.0 / 60.0);
     }
-    
+
     // Should be close to target
     const distance = spring.current.subtract(target).length();
     try testing.expect(distance < 2.0);
@@ -305,28 +304,28 @@ test "spring 2D vector animation" {
 
 test "layout spring comprehensive animation" {
     const testing = std.testing;
-    
+
     const initial_pos = Vec2{ .x = 10.0, .y = 20.0 };
     const initial_size = Vec2{ .x = 100.0, .y = 50.0 };
-    
+
     var layout_spring = LayoutSpring.init(initial_pos, initial_size, SpringPresets.gentle);
-    
+
     // Set new targets
     layout_spring.setTarget(Vec2{ .x = 50.0, .y = 100.0 }, Vec2{ .x = 200.0, .y = 150.0 });
     layout_spring.setTargetOpacity(0.5);
     layout_spring.setTargetRotation(std.math.pi / 4.0);
     layout_spring.setTargetScale(1.5);
-    
+
     // Should not be at rest initially
     try testing.expect(!layout_spring.isAtRest());
-    
+
     // Animate for several frames
     for (0..120) |_| {
         layout_spring.update(1.0 / 60.0);
     }
-    
+
     const state = layout_spring.getCurrentState();
-    
+
     // Check that values are close to targets
     try testing.expect(@abs(state.position.x - 50.0) < 2.0);
     try testing.expect(@abs(state.position.y - 100.0) < 2.0);
@@ -338,7 +337,7 @@ test "layout spring comprehensive animation" {
 
 test "spring damping characteristics" {
     const testing = std.testing;
-    
+
     // Test critically damped spring
     const critical_config = SpringConfig{
         .stiffness = 100.0,
@@ -346,7 +345,7 @@ test "spring damping characteristics" {
         .mass = 1.0,
     };
     try testing.expect(critical_config.isCriticallyDamped());
-    
+
     // Test overdamped spring
     const overdamped_config = SpringConfig{
         .stiffness = 100.0,
@@ -354,7 +353,7 @@ test "spring damping characteristics" {
         .mass = 1.0,
     };
     try testing.expect(overdamped_config.isOverdamped());
-    
+
     // Test underdamped spring
     const underdamped_config = SpringConfig{
         .stiffness = 100.0,

@@ -44,10 +44,10 @@ pub const LayoutBenchmarkPage = struct {
 
     // Reusable buffer for layout calculations to avoid allocations per iteration
     results_buffer: std.ArrayList(UIElement),
-    
+
     // Layout validation system
     validator: layout_validator.LayoutValidator,
-    
+
     // Statistical analysis system
     statistical_analyzer: statistical_analysis.StatisticalAnalysis,
 
@@ -127,7 +127,7 @@ pub const LayoutBenchmarkPage = struct {
         if (benchmark_page.gpu_backend) |*gpu| {
             gpu.deinit();
         }
-        
+
         // Clean up validator
         benchmark_page.validator.deinit();
 
@@ -244,14 +244,13 @@ pub const LayoutBenchmarkPage = struct {
         // Log measurement quality
         const quality_str = switch (stats.measurement_quality) {
             .excellent => "excellent",
-            .good => "good", 
+            .good => "good",
             .fair => "fair",
             .poor => "poor",
         };
-        
+
         if (stats.outliers.outlier_count > 0) {
-            loggers.getUILog().info("benchmark_outliers", "Test {s} {} elements: {} outliers detected, quality: {s}, CV: {d:.3}", 
-                .{ if (test_run.backend_type == .gpu) "GPU" else "CPU", test_run.element_count, stats.outliers.outlier_count, quality_str, stats.coefficient_of_variation });
+            loggers.getUILog().info("benchmark_outliers", "Test {s} {} elements: {} outliers detected, quality: {s}, CV: {d:.3}", .{ if (test_run.backend_type == .gpu) "GPU" else "CPU", test_run.element_count, stats.outliers.outlier_count, quality_str, stats.coefficient_of_variation });
         }
 
         // Create result with enhanced statistics
@@ -375,7 +374,7 @@ pub const LayoutBenchmarkPage = struct {
 
     fn performGPULayout(self: *LayoutBenchmarkPage, results: []UIElement, has_gpu: bool) void {
         _ = has_gpu; // Parameter no longer needed since function only called when GPU available
-        
+
         if (self.gpu_backend) |*gpu| {
             // Use real GPU layout backend
             gpu.performLayout(results);
@@ -388,7 +387,7 @@ pub const LayoutBenchmarkPage = struct {
     /// Validate that CPU and GPU backends produce equivalent results
     fn validateLayoutResults(self: *LayoutBenchmarkPage, elements: []UIElement) !void {
         if (!self.validator.validation_enabled) return;
-        
+
         // Skip validation when GPU is not available
         if (!self.gpu_available) {
             loggers.getUILog().debug("validation_skipped", "Skipping cross-backend validation - GPU not available", .{});
@@ -399,7 +398,7 @@ pub const LayoutBenchmarkPage = struct {
         const cpu_elements = try self.validator.copyElements(elements);
         self.performCPULayout(cpu_elements);
 
-        // Create another copy for GPU layout  
+        // Create another copy for GPU layout
         const gpu_elements = try self.validator.copyElements(elements);
         self.performGPULayout(gpu_elements, true);
 
@@ -407,11 +406,9 @@ pub const LayoutBenchmarkPage = struct {
         const validation_result = try self.validator.validateResults(cpu_elements, gpu_elements);
 
         if (!validation_result.is_valid) {
-            const error_msg = std.fmt.bufPrint(&self.error_buffer, 
-                "Layout validation failed: max pos error {d:.6}, max size error {d:.6}", 
-                .{ validation_result.max_position_error, validation_result.max_size_error }) catch "Validation error";
+            const error_msg = std.fmt.bufPrint(&self.error_buffer, "Layout validation failed: max pos error {d:.6}, max size error {d:.6}", .{ validation_result.max_position_error, validation_result.max_size_error }) catch "Validation error";
             loggers.getUILog().err("layout_validation_error", "{s}", .{error_msg});
-            
+
             // For development, we could pause the benchmark or show warnings
             // For now, just log the error and continue
         }
@@ -440,7 +437,7 @@ pub const LayoutBenchmarkPage = struct {
         std.sort.pdq(BenchmarkResult, gpu_results.items, {}, compareByElementCount);
 
         try results_buffer.appendSlice("CPU vs GPU LAYOUT BENCHMARK RESULTS\n\n");
-        
+
         // Backend availability status
         try results_buffer.appendSlice("Backend Status:\n");
         try results_buffer.appendSlice("• CPU Backend: Available\n");
@@ -542,19 +539,19 @@ pub const LayoutBenchmarkPage = struct {
 
         // Summary statistics
         try results_buffer.appendSlice("\nSUMMARY STATISTICS:\n");
-        
+
         if (!self.gpu_available) {
             try results_buffer.appendSlice("• GPU Performance: Not Available (GPU device or backend unavailable)\n");
-            
+
             // Show CPU-only statistics
             var cpu_tests: usize = 0;
             var total_cpu_only_time: f64 = 0;
-            
+
             for (cpu_results.items) |result| {
                 total_cpu_only_time += result.avg_time_us;
                 cpu_tests += 1;
             }
-            
+
             if (cpu_tests > 0) {
                 const avg_cpu_only_time = total_cpu_only_time / @as(f64, @floatFromInt(cpu_tests));
                 try results_buffer.writer().print("• Average CPU Time: {d:.1} μs\n", .{avg_cpu_only_time});
@@ -684,14 +681,14 @@ pub const LayoutBenchmarkPage = struct {
 
     pub fn setGPUDevice(self: *LayoutBenchmarkPage, device: *sdl.sdl.SDL_GPUDevice) void {
         self.gpu_device = device;
-        
+
         // Try to initialize GPU backend (currently simulated, but tests the architecture)
         self.gpu_backend = layout_backends.GpuLayoutEngine.init(self.allocator, device) catch |err| blk: {
             loggers.getUILog().err("gpu_backend_init_fail", "Failed to initialize GPU layout backend: {}", .{err});
             self.gpu_available = false;
             break :blk null;
         };
-        
+
         if (self.gpu_backend != null) {
             self.gpu_available = true;
             loggers.getUILog().info("gpu_backend_ready", "GPU layout backend initialized successfully (simulated)", .{});

@@ -2,7 +2,6 @@
 ///
 /// This module implements the CSS Flexbox layout algorithm with support for
 /// flex direction, wrapping, alignment, and flex grow/shrink properties.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -110,9 +109,9 @@ pub const FlexLayout = struct {
             // Add gap between lines
             current_cross_offset += line_cross_size;
             if (lines.items.len > 1) {
-                const cross_gap = if (is_row) 
-                    (config.row_gap orelse config.gap) 
-                else 
+                const cross_gap = if (is_row)
+                    (config.row_gap orelse config.gap)
+                else
                     (config.column_gap orelse config.gap);
                 current_cross_offset += cross_gap;
             }
@@ -134,7 +133,7 @@ pub const FlexLayout = struct {
         allocator: std.mem.Allocator,
     ) !std.ArrayList(std.ArrayList(FlexItem)) {
         var lines = std.ArrayList(std.ArrayList(FlexItem)).init(allocator);
-        
+
         if (config.wrap == .no_wrap) {
             // Single line - all items
             var line = std.ArrayList(FlexItem).init(allocator);
@@ -146,7 +145,7 @@ pub const FlexLayout = struct {
         // Multi-line wrapping
         var current_line = std.ArrayList(FlexItem).init(allocator);
         var current_line_size: f32 = 0;
-        
+
         const main_gap = if (config.direction == .row or config.direction == .row_reverse)
             (config.column_gap orelse config.gap)
         else
@@ -155,7 +154,7 @@ pub const FlexLayout = struct {
         for (items) |item| {
             const item_main_size = getItemMainSize(item, config.direction);
             const item_size_with_gap = item_main_size + if (current_line.items.len > 0) main_gap else 0;
-            
+
             // Check if item fits on current line
             if (current_line.items.len > 0 and current_line_size + item_size_with_gap > container_main_size) {
                 // Start new line
@@ -163,11 +162,11 @@ pub const FlexLayout = struct {
                 current_line = std.ArrayList(FlexItem).init(allocator);
                 current_line_size = 0;
             }
-            
+
             try current_line.append(item);
             current_line_size += item_size_with_gap;
         }
-        
+
         // Add final line if not empty
         if (current_line.items.len > 0) {
             try lines.append(current_line);
@@ -188,11 +187,11 @@ pub const FlexLayout = struct {
     ) ![]types.LayoutResult {
         const is_row = config.direction == .row or config.direction == .row_reverse;
         var results = try allocator.alloc(types.LayoutResult, line_items.len);
-        
+
         // Calculate flex item sizes
         const item_sizes = try calculateFlexItemSizes(line_items, container_main_size, config, allocator);
         defer allocator.free(item_sizes);
-        
+
         // Calculate main axis positions using justify-content
         const positions = try calculateMainAxisPositions(
             item_sizes,
@@ -202,30 +201,30 @@ pub const FlexLayout = struct {
             allocator,
         );
         defer allocator.free(positions);
-        
+
         // Create results
         for (line_items, 0..) |item, i| {
             const main_pos = positions[i];
             const main_size = item_sizes[i].main;
             const cross_size = item_sizes[i].cross;
-            
+
             // Calculate cross axis position based on align-items or align-self
             const alignment = item.align_self orelse config.align_items;
             const cross_pos = calculateCrossAxisPosition(cross_size, container_cross_size, alignment) + cross_offset;
-            
+
             results[i] = types.LayoutResult{
-                .position = if (is_row) 
+                .position = if (is_row)
                     Vec2{ .x = container_bounds.position.x + main_pos, .y = container_bounds.position.y + cross_pos }
-                else 
+                else
                     Vec2{ .x = container_bounds.position.x + cross_pos, .y = container_bounds.position.y + main_pos },
-                .size = if (is_row) 
+                .size = if (is_row)
                     Vec2{ .x = main_size, .y = cross_size }
-                else 
+                else
                     Vec2{ .x = cross_size, .y = main_size },
                 .element_index = item.index,
             };
         }
-        
+
         return results;
     }
 
@@ -243,42 +242,42 @@ pub const FlexLayout = struct {
         allocator: std.mem.Allocator,
     ) ![]ItemSize {
         var item_sizes = try allocator.alloc(ItemSize, items.len);
-        
+
         const is_row = config.direction == .row or config.direction == .row_reverse;
-        
+
         // Calculate base sizes and total
         var total_base_size: f32 = 0;
         var total_grow: f32 = 0;
         var total_shrink: f32 = 0;
-        
-        const main_gap = if (is_row) 
-            (config.column_gap orelse config.gap) 
-        else 
+
+        const main_gap = if (is_row)
+            (config.column_gap orelse config.gap)
+        else
             (config.row_gap orelse config.gap);
-        
+
         const total_gap = if (items.len > 1) @as(f32, @floatFromInt(items.len - 1)) * main_gap else 0;
-        
+
         for (items, 0..) |item, i| {
             const base_main_size = item.flex_basis orelse getItemMainSize(item, config.direction);
             const base_cross_size = getItemCrossSize(item, config.direction);
-            
+
             item_sizes[i] = ItemSize{
                 .main = item.constraints.constrainWidth(base_main_size),
                 .cross = item.constraints.constrainHeight(base_cross_size),
             };
-            
+
             total_base_size += item_sizes[i].main;
             total_grow += item.flex_grow;
             total_shrink += item.flex_shrink;
         }
-        
+
         // Calculate available space for growing/shrinking
         const available_space = container_main_size - total_base_size - total_gap;
-        
+
         if (available_space > 0 and total_grow > 0) {
             // Distribute extra space to growing items
             const space_per_grow_unit = available_space / total_grow;
-            
+
             for (items, 0..) |item, i| {
                 if (item.flex_grow > 0) {
                     const growth = space_per_grow_unit * item.flex_grow;
@@ -289,7 +288,7 @@ pub const FlexLayout = struct {
         } else if (available_space < 0 and total_shrink > 0) {
             // Shrink items to fit
             const shrink_factor = @min(1.0, -available_space / total_base_size);
-            
+
             for (items, 0..) |item, i| {
                 if (item.flex_shrink > 0) {
                     const shrinkage = item_sizes[i].main * shrink_factor * item.flex_shrink / total_shrink;
@@ -299,7 +298,7 @@ pub const FlexLayout = struct {
                 }
             }
         }
-        
+
         return item_sizes;
     }
 
@@ -312,24 +311,24 @@ pub const FlexLayout = struct {
         allocator: std.mem.Allocator,
     ) ![]f32 {
         var positions = try allocator.alloc(f32, item_sizes.len);
-        
+
         if (item_sizes.len == 0) return positions;
-        
+
         // Calculate total size of all items
         var total_item_size: f32 = 0;
         for (item_sizes) |size| {
             total_item_size += size.main;
         }
-        
+
         const is_row = config.direction == .row or config.direction == .row_reverse;
-        const main_gap = if (is_row) 
-            (config.column_gap orelse config.gap) 
-        else 
+        const main_gap = if (is_row)
+            (config.column_gap orelse config.gap)
+        else
             (config.row_gap orelse config.gap);
-        
+
         const total_gap = if (item_sizes.len > 1) @as(f32, @floatFromInt(item_sizes.len - 1)) * main_gap else 0;
         const remaining_space = container_main_size - total_item_size - total_gap;
-        
+
         switch (justify_content) {
             .flex_start => {
                 var current_pos: f32 = 0;
@@ -381,7 +380,7 @@ pub const FlexLayout = struct {
                 }
             },
         }
-        
+
         return positions;
     }
 
@@ -430,15 +429,15 @@ pub const FlexLayout = struct {
 // Tests
 test "flex layout basic row layout" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     const container = Rectangle{
         .position = Vec2.ZERO,
         .size = Vec2{ .x = 400, .y = 200 },
     };
-    
+
     const items = [_]FlexLayout.FlexItem{
         .{
             .size = Vec2{ .x = 100, .y = 50 },
@@ -453,32 +452,32 @@ test "flex layout basic row layout" {
             .index = 1,
         },
     };
-    
+
     const config = FlexLayout.Config{ .direction = .row };
     const results = try FlexLayout.calculateLayout(container, &items, config, allocator);
     defer allocator.free(results);
-    
+
     try testing.expect(results.len == 2);
-    
+
     // Items should be laid out horizontally
     try testing.expect(results[0].position.x == 0);
     try testing.expect(results[1].position.x == 100); // After first item
-    
+
     // Both items should start at same Y position
     try testing.expect(results[0].position.y == results[1].position.y);
 }
 
 test "flex layout with justify content center" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     const container = Rectangle{
         .position = Vec2.ZERO,
         .size = Vec2{ .x = 400, .y = 200 },
     };
-    
+
     const items = [_]FlexLayout.FlexItem{
         .{
             .size = Vec2{ .x = 100, .y = 50 },
@@ -487,14 +486,14 @@ test "flex layout with justify content center" {
             .index = 0,
         },
     };
-    
+
     const config = FlexLayout.Config{
         .direction = .row,
         .justify_content = .center,
     };
     const results = try FlexLayout.calculateLayout(container, &items, config, allocator);
     defer allocator.free(results);
-    
+
     // Item should be centered horizontally
     const expected_x = (container.size.x - items[0].size.x) / 2.0;
     try testing.expect(@abs(results[0].position.x - expected_x) < 0.1);
@@ -502,15 +501,15 @@ test "flex layout with justify content center" {
 
 test "flex layout with flex grow" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     const container = Rectangle{
         .position = Vec2.ZERO,
         .size = Vec2{ .x = 400, .y = 200 },
     };
-    
+
     const items = [_]FlexLayout.FlexItem{
         .{
             .size = Vec2{ .x = 100, .y = 50 },
@@ -527,11 +526,11 @@ test "flex layout with flex grow" {
             .index = 1,
         },
     };
-    
+
     const config = FlexLayout.Config{ .direction = .row };
     const results = try FlexLayout.calculateLayout(container, &items, config, allocator);
     defer allocator.free(results);
-    
+
     // Items should grow to fill available space equally
     const expected_width = container.size.x / 2.0;
     try testing.expect(@abs(results[0].size.x - expected_width) < 0.1);

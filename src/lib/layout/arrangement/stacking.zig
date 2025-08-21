@@ -2,7 +2,6 @@
 ///
 /// This module provides utilities for managing layered elements,
 /// stacking contexts, and z-index ordering in layout systems.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -196,11 +195,11 @@ pub const StackingManager = struct {
     fn compareContextZIndex(self: *StackingManager, a_id: usize, b_id: usize) bool {
         const a_context = self.getContext(a_id) orelse return false;
         const b_context = self.getContext(b_id) orelse return true;
-        
+
         if (a_context.z_index != b_context.z_index) {
             return a_context.z_index < b_context.z_index;
         }
-        
+
         // Same z-index, order by context creation order
         return a_context.id < b_context.id;
     }
@@ -325,7 +324,7 @@ pub const LayerManager = struct {
             // Create new layer when z-index changes significantly
             if (z_element.z_index != current_z or i == z_elements.len - 1) {
                 const layer_end = if (z_element.z_index != current_z) i else i + 1;
-                
+
                 var layer = Layer.init(self.allocator, self.next_layer_id, current_z, current_z);
                 self.next_layer_id += 1;
 
@@ -453,7 +452,7 @@ test "layer management" {
     try testing.expect(layer_manager.layers.items.len >= 1);
 
     // Mark some elements as dirty
-    const dirty_elements = [_]usize{0, 2};
+    const dirty_elements = [_]usize{ 0, 2 };
     layer_manager.markDirty(&dirty_elements);
 
     const dirty_layers = try layer_manager.getDirtyLayers(allocator);

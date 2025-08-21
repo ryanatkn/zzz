@@ -3,7 +3,6 @@
 /// This module defines the core types used throughout the layout system,
 /// providing a single source of truth for layout-related data structures
 /// and enumerations.
-
 const std = @import("std");
 const math = @import("../math/mod.zig");
 
@@ -232,7 +231,7 @@ pub const LayoutContext = struct {
 /// Dirty flags for layout optimization
 pub const DirtyFlags = packed struct(u32) {
     layout: bool = false, // Layout calculation needed
-    measure: bool = false, // Measure pass needed  
+    measure: bool = false, // Measure pass needed
     constraint: bool = false, // Constraint solving needed
     spring: bool = false, // Spring animation active
     _reserved: u28 = 0,

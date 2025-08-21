@@ -3,7 +3,6 @@
 /// This module defines the common interface for layout backends,
 /// allowing the system to switch between CPU and GPU implementations
 /// transparently based on performance requirements and availability.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -185,11 +184,11 @@ pub const BackendStrategy = struct {
             },
             .auto_select => {
                 if (element_count < self.gpu_threshold) {
-                    return self.selectCPUBackend(backends, element_count, context) orelse 
-                           self.selectGPUBackend(backends, element_count, context);
+                    return self.selectCPUBackend(backends, element_count, context) orelse
+                        self.selectGPUBackend(backends, element_count, context);
                 } else if (element_count > self.force_gpu_threshold) {
                     return self.selectGPUBackend(backends, element_count, context) orelse
-                           self.selectCPUBackend(backends, element_count, context);
+                        self.selectCPUBackend(backends, element_count, context);
                 } else {
                     // In the middle range - compare performance estimates
                     return self.selectFastestBackend(backends, element_count, context);
@@ -235,8 +234,8 @@ pub const BackendStrategy = struct {
             const capabilities = backend.getCapabilities();
             if (!capabilities.available) continue;
 
-            const estimated_time = capabilities.setup_cost_us + 
-                                 capabilities.cost_per_element_us * @as(f64, @floatFromInt(element_count));
+            const estimated_time = capabilities.setup_cost_us +
+                capabilities.cost_per_element_us * @as(f64, @floatFromInt(element_count));
 
             if (estimated_time < fastest_time) {
                 fastest_time = estimated_time;
@@ -251,7 +250,7 @@ pub const BackendStrategy = struct {
         // For now, just prefer CPU backend as it typically uses less memory
         // In a real implementation, this would consider actual memory usage
         return self.selectCPUBackend(backends, element_count, context) orelse
-               backends[0]; // Fallback to first available
+            backends[0]; // Fallback to first available
     }
 };
 

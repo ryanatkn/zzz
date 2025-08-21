@@ -3,7 +3,6 @@
 /// This module provides a GPU implementation of the layout backend interface.
 /// This is a simplified version that demonstrates the architecture - a full
 /// implementation would use compute shaders for parallel layout calculations.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -24,7 +23,7 @@ pub const GpuLayoutBackend = struct {
     device: ?*c.sdl.SDL_GPUDevice,
     config: BackendConfig,
     initialized: bool = false,
-    
+
     // Simplified GPU buffers (in real implementation these would be GPU buffers)
     element_buffer: std.ArrayList(GPUElement),
     result_buffer: std.ArrayList(LayoutResult),
@@ -110,12 +109,12 @@ pub const GpuLayoutBackend = struct {
     fn initBackend(self: *Self, allocator: std.mem.Allocator, config: BackendConfig) !void {
         _ = allocator; // Already stored in self
         self.config = config;
-        
+
         // In a real implementation, this would initialize GPU resources:
         // - Create compute pipeline
         // - Allocate GPU buffers
         // - Load shaders
-        
+
         self.initialized = true;
     }
 
@@ -123,19 +122,19 @@ pub const GpuLayoutBackend = struct {
     fn deinitBackend(self: *Self) void {
         self.element_buffer.deinit();
         self.result_buffer.deinit();
-        
+
         // In a real implementation, this would clean up GPU resources:
         // - Destroy compute pipeline
         // - Free GPU buffers
         // - Release GPU context
-        
+
         self.initialized = false;
     }
 
     /// Perform GPU layout calculation (simulated)
     fn performLayout(self: *Self, elements: []LayoutElement, context: LayoutContext) ![]LayoutResult {
         if (!self.initialized) return error.BackendNotInitialized;
-        
+
         // Check if we have a GPU device (in real implementation)
         if (self.device == null and !self.config.debug_mode) {
             return error.GPUNotAvailable;
@@ -144,7 +143,7 @@ pub const GpuLayoutBackend = struct {
         // Clear and resize buffers
         self.element_buffer.clearRetainingCapacity();
         self.result_buffer.clearRetainingCapacity();
-        
+
         try self.element_buffer.ensureTotalCapacity(elements.len);
         try self.result_buffer.ensureTotalCapacity(elements.len);
 
@@ -168,7 +167,7 @@ pub const GpuLayoutBackend = struct {
         // 1. Upload element data to GPU buffers
         // 2. Dispatch compute shaders for parallel layout calculation
         // 3. Download results from GPU
-        
+
         // For simulation, we do simplified parallel-style processing
         for (self.element_buffer.items) |gpu_element| {
             const result = self.simulateGPULayout(gpu_element, context);
@@ -179,7 +178,7 @@ pub const GpuLayoutBackend = struct {
         for (self.result_buffer.items, self.element_buffer.items) |*result, gpu_element| {
             if (gpu_element.parent_index != std.math.maxInt(u32) and gpu_element.parent_index < self.result_buffer.items.len) {
                 const parent_result = &self.result_buffer.items[gpu_element.parent_index];
-                
+
                 // Position relative to parent (simplified)
                 result.position.x += parent_result.position.x;
                 result.position.y += parent_result.position.y;
@@ -194,26 +193,26 @@ pub const GpuLayoutBackend = struct {
     fn simulateGPULayout(self: *Self, gpu_element: GPUElement, context: LayoutContext) LayoutResult {
         _ = self;
         _ = context;
-        
+
         // This simulates what a GPU compute shader would do
         // In reality, this would be massively parallel across all elements
-        
+
         var position = Vec2{ .x = gpu_element.position[0], .y = gpu_element.position[1] };
         var size = Vec2{ .x = gpu_element.size[0], .y = gpu_element.size[1] };
-        
+
         // Apply margins
         position.x += gpu_element.margin[3]; // left margin
         position.y += gpu_element.margin[0]; // top margin
-        
+
         // Apply constraints
         size.x = std.math.clamp(size.x, gpu_element.constraints_min[0], gpu_element.constraints_max[0]);
         size.y = std.math.clamp(size.y, gpu_element.constraints_min[1], gpu_element.constraints_max[1]);
-        
+
         // Add some GPU-style computation patterns (just for simulation)
         const thread_id = @as(f32, @floatFromInt(gpu_element.element_index));
         position.x += @sin(thread_id * 0.01) * 0.01; // Minimal GPU-style offset
         position.y += @cos(thread_id * 0.01) * 0.01;
-        
+
         return LayoutResult{
             .position = position,
             .size = size,
@@ -224,7 +223,7 @@ pub const GpuLayoutBackend = struct {
     /// Get backend capabilities
     fn getCapabilities(self: *Self) BackendCapabilities {
         const has_gpu = self.device != null;
-        
+
         return BackendCapabilities{
             .max_elements = if (has_gpu) 10000 else 1000, // GPU can handle more elements
             .supports_parallel = true, // GPU backend supports parallel processing
@@ -239,7 +238,7 @@ pub const GpuLayoutBackend = struct {
     fn canHandle(self: *Self, element_count: usize, context: LayoutContext) bool {
         _ = context;
         if (!self.initialized) return false;
-        
+
         const caps = self.getCapabilities();
         return caps.available and element_count <= caps.max_elements;
     }
@@ -325,7 +324,7 @@ test "GPU backend layout calculation (simulated)" {
 
     try testing.expect(results.len == 1);
     try testing.expect(results[0].element_index == 0);
-    
+
     // Position should have margin applied
     try testing.expect(results[0].position.x >= 15); // 10 + 5 (margin)
     try testing.expect(results[0].position.y >= 25); // 20 + 5 (margin)

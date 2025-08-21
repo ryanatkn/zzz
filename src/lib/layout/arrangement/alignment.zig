@@ -3,7 +3,6 @@
 /// This module provides utilities for aligning elements within containers
 /// using various alignment strategies including baseline alignment,
 /// content alignment, and distribution algorithms.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -45,7 +44,7 @@ pub const ContentAlignment = struct {
                 if (results.len > 1) {
                     const extra_space = available_width - content_width;
                     const space_per_gap = extra_space / @as(f32, @floatFromInt(results.len - 1));
-                    
+
                     for (results, 0..) |*result, i| {
                         result.position.x += container_left - min_x + @as(f32, @floatFromInt(i)) * space_per_gap;
                     }
@@ -95,11 +94,11 @@ pub const ContentAlignment = struct {
                     results[0].size.y = available_height;
                     return;
                 }
-                
+
                 // For multiple elements, distribute extra space
                 const extra_space = available_height - content_height;
                 const space_per_gap = if (results.len > 1) extra_space / @as(f32, @floatFromInt(results.len - 1)) else 0;
-                
+
                 for (results, 0..) |*result, i| {
                     result.position.y += container_top - min_y + @as(f32, @floatFromInt(i)) * space_per_gap;
                 }

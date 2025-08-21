@@ -41,7 +41,7 @@ pub const CpuLayoutEngine = struct {
     box_models: std.ArrayList(BoxModel),
 
     pub fn init(allocator: std.mem.Allocator) CpuLayoutEngine {
-        return .{ 
+        return .{
             .allocator = allocator,
             .box_models = std.ArrayList(BoxModel).init(allocator),
         };
@@ -71,12 +71,12 @@ pub const CpuLayoutEngine = struct {
         // Perform real box model layout calculations
         for (self.box_models.items[0..elements.len], 0..) |*box, i| {
             // Handle parent-child relationships
-            if (elements[i].parent_index != UIElement.INVALID_PARENT and 
-                elements[i].parent_index < elements.len) {
-                
+            if (elements[i].parent_index != UIElement.INVALID_PARENT and
+                elements[i].parent_index < elements.len)
+            {
                 const parent_box = &self.box_models.items[elements[i].parent_index];
                 const parent_computed = parent_box.getLayout();
-                
+
                 // Position relative to parent's content area
                 if (elements[i].layout_mode == @intFromEnum(UIElement.LayoutMode.relative)) {
                     const new_pos = math.Vec2{
@@ -108,24 +108,24 @@ pub const CpuLayoutEngine = struct {
     /// Convert UIElement to BoxModel for real layout calculations
     fn uielementToBoxModel(self: *CpuLayoutEngine, elem: *const UIElement, box: *BoxModel) void {
         _ = self;
-        
+
         // Set position and size
         box.setPosition(math.Vec2{ .x = elem.position[0], .y = elem.position[1] });
         box.setSize(math.Vec2{ .x = elem.size[0], .y = elem.size[1] });
-        
+
         // Set spacing (TRBL format: top, right, bottom, left)
         box.setPaddingDetailed(elem.padding[0], elem.padding[1], elem.padding[2], elem.padding[3]);
-        
+
         // Set margin per side - create a custom spacing
         const margin_spacing = BoxModel.Spacing{
             .top = elem.margin[0],
-            .right = elem.margin[1], 
+            .right = elem.margin[1],
             .bottom = elem.margin[2],
             .left = elem.margin[3],
         };
         box.margin.set(margin_spacing);
         box.markDirty();
-        
+
         // Set constraints if element is dirty
         if (elem.isDirty(.constraint)) {
             // Apply basic constraints
@@ -141,15 +141,15 @@ pub const CpuLayoutEngine = struct {
     /// Convert BoxModel back to UIElement after layout calculations
     fn boxModelToUIElement(self: *CpuLayoutEngine, box: *BoxModel, elem: *UIElement) void {
         _ = self;
-        
+
         const computed = box.getLayout();
-        
+
         // Update position and size from computed layout
         elem.position[0] = computed.content.position.x;
         elem.position[1] = computed.content.position.y;
         elem.size[0] = computed.content.size.x;
         elem.size[1] = computed.content.size.y;
-        
+
         // Clear dirty flags
         elem.dirty_flags = 0;
     }

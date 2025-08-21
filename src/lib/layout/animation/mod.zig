@@ -2,7 +2,6 @@
 ///
 /// This module provides comprehensive animation support for layout properties,
 /// including springs, transitions, and animation sequencing.
-
 pub const springs = @import("springs.zig");
 pub const transitions = @import("transitions.zig");
 pub const sequencer = @import("sequencer.zig");

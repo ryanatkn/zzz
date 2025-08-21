@@ -2,7 +2,6 @@
 ///
 /// This module provides comprehensive debugging and performance analysis tools
 /// for layout systems, including validation, profiling, and diagnostic utilities.
-
 pub const validator = @import("validator.zig");
 pub const profiler = @import("profiler.zig");
 
@@ -183,13 +182,13 @@ pub const LayoutDebugSuite = struct {
         // Check performance health
         if (self.config.enable_profiling) {
             const perf_summary = self.profiler.getPerformanceSummary();
-            
+
             // Consider layout unhealthy if average duration is too high
             const duration_threshold_ms = 16.67; // ~60 FPS frame budget
             if (perf_summary.average_duration_ms > duration_threshold_ms) {
                 return false;
             }
-            
+
             // Check for very low throughput
             const min_ops_per_second = 100.0;
             if (perf_summary.average_ops_per_second < min_ops_per_second and perf_summary.total_measurements > 5) {
@@ -306,7 +305,7 @@ const types = @import("../types.zig");
 // Tests
 test "debug suite initialization" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
@@ -322,7 +321,7 @@ test "debug suite initialization" {
 
 test "debug suite layout validation" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 

@@ -71,7 +71,7 @@ pub const StatisticalAnalysis = struct {
         const std_dev = calculateStdDev(data, mean);
         const min = sorted_data[0];
         const max = sorted_data[sorted_data.len - 1];
-        
+
         // Percentiles
         const median = calculatePercentile(sorted_data, 0.5);
         const q1 = calculatePercentile(sorted_data, 0.25);
@@ -171,7 +171,7 @@ pub const StatisticalAnalysis = struct {
     /// Calculate standard deviation
     fn calculateStdDev(data: []const f64, mean: f64) f64 {
         if (data.len <= 1) return 0;
-        
+
         var variance_sum: f64 = 0;
         for (data) |value| {
             const diff = value - mean;
@@ -188,11 +188,11 @@ pub const StatisticalAnalysis = struct {
         const index = percentile * @as(f64, @floatFromInt(sorted_data.len - 1));
         const lower_index = @as(usize, @intFromFloat(@floor(index)));
         const upper_index = @min(lower_index + 1, sorted_data.len - 1);
-        
+
         if (lower_index == upper_index) {
             return sorted_data[lower_index];
         }
-        
+
         const fraction = index - @floor(index);
         return sorted_data[lower_index] * (1.0 - fraction) + sorted_data[upper_index] * fraction;
     }
@@ -200,7 +200,7 @@ pub const StatisticalAnalysis = struct {
     /// Assess measurement quality based on coefficient of variation and outliers
     fn assessMeasurementQuality(cv: f64, outlier_count: usize, total_count: usize) MeasurementQuality {
         const outlier_ratio = @as(f64, @floatFromInt(outlier_count)) / @as(f64, @floatFromInt(total_count));
-        
+
         // Excellent: Low CV, very few outliers
         if (cv < 0.05 and outlier_ratio < 0.05) {
             return .excellent;
@@ -228,12 +228,12 @@ test "statistical analysis basic functionality" {
     const allocator = gpa.allocator();
 
     var analyzer = StatisticalAnalysis.init(allocator, StatisticalAnalysis.OutlierConfig{});
-    
+
     // Test with clean data (no outliers)
     const clean_data = [_]f64{ 10.0, 10.1, 10.2, 9.9, 9.8, 10.3, 10.0, 9.7, 10.4, 10.1 };
     var stats = try analyzer.analyzeData(&clean_data);
     defer analyzer.freeOutlierResult(&stats.outliers);
-    
+
     try testing.expect(stats.count == 10);
     try testing.expect(stats.outliers.outlier_count == 0);
     try testing.expect(stats.measurement_quality == .excellent);
@@ -246,12 +246,12 @@ test "outlier detection" {
     const allocator = gpa.allocator();
 
     var analyzer = StatisticalAnalysis.init(allocator, StatisticalAnalysis.OutlierConfig{});
-    
+
     // Test with outliers
     const outlier_data = [_]f64{ 10.0, 10.1, 10.2, 9.9, 100.0, 10.3, 10.0, 9.7, 10.4, 0.1 };
     var stats = try analyzer.analyzeData(&outlier_data);
     defer analyzer.freeOutlierResult(&stats.outliers);
-    
+
     try testing.expect(stats.outliers.outlier_count == 2); // 100.0 and 0.1 should be outliers
     try testing.expect(stats.measurement_quality != .excellent);
 }

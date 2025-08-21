@@ -11,10 +11,10 @@ pub const LayoutValidator = struct {
     tolerance: f32,
     validation_buffer: std.ArrayList(UIElement),
     validation_enabled: bool,
-    
+
     // Reusable error message buffer to avoid allocations
     error_message_buffer: [512]u8 = undefined,
-    
+
     // Statistics
     total_validations: u32 = 0,
     failed_validations: u32 = 0,
@@ -97,10 +97,7 @@ pub const LayoutValidator = struct {
             // Record first error for detailed reporting using reusable buffer
             if ((pos_error > self.tolerance or size_error > self.tolerance) and first_error_index == null) {
                 first_error_index = i;
-                error_details = std.fmt.bufPrint(&self.error_message_buffer, 
-                    "element[{}]: pos({:.3},{:.3}) vs ({:.3},{:.3}), size({:.3},{:.3}) vs ({:.3},{:.3})",
-                    .{ i, cpu_elem.position[0], cpu_elem.position[1], gpu_elem.position[0], gpu_elem.position[1],
-                       cpu_elem.size[0], cpu_elem.size[1], gpu_elem.size[0], gpu_elem.size[1] }) catch "error formatting";
+                error_details = std.fmt.bufPrint(&self.error_message_buffer, "element[{}]: pos({:.3},{:.3}) vs ({:.3},{:.3}), size({:.3},{:.3}) vs ({:.3},{:.3})", .{ i, cpu_elem.position[0], cpu_elem.position[1], gpu_elem.position[0], gpu_elem.position[1], cpu_elem.size[0], cpu_elem.size[1], gpu_elem.size[0], gpu_elem.size[1] }) catch "error formatting";
             }
         }
 
@@ -111,11 +108,9 @@ pub const LayoutValidator = struct {
         const is_valid = max_pos_error <= self.tolerance and max_size_error <= self.tolerance;
         if (!is_valid) {
             self.failed_validations += 1;
-            loggers.getUILog().err("layout_validation_fail", "Validation failed: pos_error={d:.6}, size_error={d:.6}, tolerance={d:.6}", 
-                .{ max_pos_error, max_size_error, self.tolerance });
+            loggers.getUILog().err("layout_validation_fail", "Validation failed: pos_error={d:.6}, size_error={d:.6}, tolerance={d:.6}", .{ max_pos_error, max_size_error, self.tolerance });
         } else {
-            loggers.getUILog().debug("layout_validation_pass", "Validation passed: {} elements, max_errors: pos={d:.6}, size={d:.6}", 
-                .{ cpu_results.len, max_pos_error, max_size_error });
+            loggers.getUILog().debug("layout_validation_pass", "Validation passed: {} elements, max_errors: pos={d:.6}, size={d:.6}", .{ cpu_results.len, max_pos_error, max_size_error });
         }
 
         return ValidationResult{
@@ -142,9 +137,9 @@ pub const LayoutValidator = struct {
         max_position_error: f32,
         max_size_error: f32,
     } {
-        const success_rate = if (self.total_validations > 0) 
+        const success_rate = if (self.total_validations > 0)
             (1.0 - @as(f32, @floatFromInt(self.failed_validations)) / @as(f32, @floatFromInt(self.total_validations))) * 100.0
-        else 
+        else
             100.0;
 
         return .{

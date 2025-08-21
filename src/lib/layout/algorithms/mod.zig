@@ -2,7 +2,6 @@
 ///
 /// This module provides implementations of various layout algorithms
 /// including block, flexbox, grid, and absolute positioning.
-
 pub const block = @import("block.zig");
 pub const flex = @import("flex.zig");
 pub const grid = @import("grid.zig");
@@ -134,10 +133,10 @@ pub const AlgorithmPerformance = struct {
     performance_profile: PerformanceProfile,
 
     pub const Complexity = enum {
-        constant,    // O(1)
-        linear,      // O(n)
-        log_linear,  // O(n log n)
-        quadratic,   // O(n²)
+        constant, // O(1)
+        linear, // O(n)
+        log_linear, // O(n log n)
+        quadratic, // O(n²)
         exponential, // O(2^n)
 
         pub fn toString(self: Complexity) []const u8 {
@@ -242,20 +241,20 @@ pub const AlgorithmComparator = struct {
     ) ComparisonResult {
         const perf_a = AlgorithmPerformance.getForAlgorithm(algorithm_a);
         const perf_b = AlgorithmPerformance.getForAlgorithm(algorithm_b);
-        
+
         const rating_a = perf_a.performance_profile.getRating(requirements.element_count);
         const rating_b = perf_b.performance_profile.getRating(requirements.element_count);
-        
+
         var score_a: i32 = @intCast(rating_a);
         var score_b: i32 = @intCast(rating_b);
-        
+
         // Adjust scores based on requirements
         if (requirements.performance_priority >= 4) {
             // High performance priority - favor simpler algorithms
             score_a += @intCast(5 - algorithm_a.getComplexity());
             score_b += @intCast(5 - algorithm_b.getComplexity());
         }
-        
+
         return ComparisonResult{
             .preferred = if (score_a > score_b) algorithm_a else algorithm_b,
             .score_difference = @abs(score_a - score_b),

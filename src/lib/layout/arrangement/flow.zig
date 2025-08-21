@@ -2,7 +2,6 @@
 ///
 /// This module implements various flow algorithms for arranging elements
 /// within containers, including block flow, inline flow, and floating.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -161,7 +160,7 @@ pub const InlineFlow = struct {
             if (config.wrap_mode != .none and line_start < i and current_x + element_width > container_bounds.position.x + container_bounds.size.x) {
                 // Start new line
                 try finalizeLine(&lines, line_start, i, line_width, line_height, current_y, config);
-                
+
                 current_x = container_bounds.position.x;
                 current_y += line_height;
                 line_start = i;
@@ -171,10 +170,7 @@ pub const InlineFlow = struct {
 
             // Position element on current line
             results[i] = LayoutResult{
-                .position = Vec2{ 
-                    .x = current_x + margin.left, 
-                    .y = current_y + margin.top 
-                },
+                .position = Vec2{ .x = current_x + margin.left, .y = current_y + margin.top },
                 .size = size,
                 .element_index = i,
             };
@@ -192,8 +188,7 @@ pub const InlineFlow = struct {
 
         // Apply text alignment to each line
         for (lines.items) |line_info| {
-            alignLineElements(results[line_info.start_index..line_info.end_index], 
-                            container_bounds, line_info, config.text_align);
+            alignLineElements(results[line_info.start_index..line_info.end_index], container_bounds, line_info, config.text_align);
         }
 
         return .{
@@ -229,7 +224,7 @@ pub const InlineFlow = struct {
     ) void {
         const available_width = container_bounds.size.x;
         const content_width = line_info.width;
-        
+
         const offset = switch (alignment) {
             .start => 0,
             .center => (available_width - content_width) / 2,
@@ -310,9 +305,9 @@ pub const FloatLayout = struct {
 
         fn rectanglesOverlap(rect1: Rectangle, rect2: Rectangle) bool {
             return !(rect1.position.x + rect1.size.x <= rect2.position.x or
-                    rect2.position.x + rect2.size.x <= rect1.position.x or
-                    rect1.position.y + rect1.size.y <= rect2.position.y or
-                    rect2.position.y + rect2.size.y <= rect1.position.y);
+                rect2.position.x + rect2.size.x <= rect1.position.x or
+                rect1.position.y + rect1.size.y <= rect2.position.y or
+                rect2.position.y + rect2.size.y <= rect1.position.y);
         }
     };
 
@@ -385,11 +380,11 @@ pub const FloatLayout = struct {
         // Find first available position
         while (true) {
             const available = float_area.getAvailableSpace(container_bounds, y, element_rect.size.y);
-            
+
             if (available.size.x >= element_rect.size.x) {
                 return Vec2{ .x = available.position.x, .y = y };
             }
-            
+
             y += 1; // Move down incrementally
             if (y + element_rect.size.y > container_bounds.position.y + container_bounds.size.y) {
                 break; // Can't fit in container
@@ -412,12 +407,12 @@ pub const FloatLayout = struct {
         // Find first available position
         while (true) {
             const available = float_area.getAvailableSpace(container_bounds, y, element_rect.size.y);
-            
+
             if (available.size.x >= element_rect.size.x) {
                 const x = available.position.x + available.size.x - element_rect.size.x;
                 return Vec2{ .x = x, .y = y };
             }
-            
+
             y += 1; // Move down incrementally
             if (y + element_rect.size.y > container_bounds.position.y + container_bounds.size.y) {
                 break; // Can't fit in container
@@ -516,7 +511,7 @@ test "inline flow layout" {
 
     // First two elements on first line
     try testing.expect(layout.results[0].position.y == layout.results[1].position.y);
-    
+
     // Third element on second line
     try testing.expect(layout.results[2].position.y > layout.results[1].position.y);
 }

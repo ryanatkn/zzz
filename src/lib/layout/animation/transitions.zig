@@ -2,7 +2,6 @@
 ///
 /// This module provides declarative transitions for layout properties,
 /// supporting various easing functions and transition orchestration.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -44,14 +43,14 @@ pub const EasingFunction = enum {
     /// Apply easing function to normalized time (0.0 to 1.0)
     pub fn apply(self: EasingFunction, t: f32) f32 {
         const clamped_t = std.math.clamp(t, 0.0, 1.0);
-        
+
         return switch (self) {
             .linear => clamped_t,
             .ease_in_quad => clamped_t * clamped_t,
             .ease_out_quad => 1.0 - (1.0 - clamped_t) * (1.0 - clamped_t),
-            .ease_in_out_quad => if (clamped_t < 0.5) 
-                2.0 * clamped_t * clamped_t 
-            else 
+            .ease_in_out_quad => if (clamped_t < 0.5)
+                2.0 * clamped_t * clamped_t
+            else
                 1.0 - std.math.pow(f32, -2.0 * clamped_t + 2.0, 2.0) / 2.0,
             .ease_in_cubic => clamped_t * clamped_t * clamped_t,
             .ease_out_cubic => 1.0 - std.math.pow(f32, 1.0 - clamped_t, 3.0),
@@ -104,7 +103,7 @@ pub fn Transition(comptime T: type) type {
         timing: TimingConfig,
         state: TransitionState,
         elapsed_time: f32,
-        
+
         const Self = @This();
 
         pub fn init(start_value: T, end_value: T, timing: TimingConfig) Self {
@@ -187,7 +186,7 @@ pub fn Transition(comptime T: type) type {
         /// Interpolate between two values
         fn interpolate(self: *Self, start_value: T, end_value: T, t: f32) T {
             _ = self;
-            
+
             // Type-specific interpolation
             return switch (@typeInfo(T)) {
                 .Float => start_value + (end_value - start_value) * t,
@@ -280,10 +279,10 @@ pub const LayoutTransition = struct {
     /// Check if all transitions are complete
     pub fn isComplete(self: *const LayoutTransition) bool {
         return self.position.isComplete() and
-               self.size.isComplete() and
-               self.opacity.isComplete() and
-               self.rotation.isComplete() and
-               self.scale.isComplete();
+            self.size.isComplete() and
+            self.opacity.isComplete() and
+            self.rotation.isComplete() and
+            self.scale.isComplete();
     }
 
     /// Start all transitions
@@ -326,11 +325,11 @@ pub const TransitionGroup = struct {
     /// Add transition to group
     pub fn addTransition(self: *TransitionGroup, transition: *LayoutTransition) !void {
         try self.transitions.append(transition);
-        
+
         // Apply stagger delay
         const index = self.transitions.items.len - 1;
         const stagger = @as(f32, @floatFromInt(index)) * self.stagger_delay;
-        
+
         transition.position.timing.delay += stagger;
         transition.size.timing.delay += stagger;
         transition.opacity.timing.delay += stagger;
@@ -406,17 +405,17 @@ pub const TimingPresets = struct {
 // Tests
 test "float transition basic animation" {
     const testing = std.testing;
-    
+
     var transition = FloatTransition.init(0.0, 100.0, TimingPresets.quick);
     transition.start();
-    
+
     // Should be running
     try testing.expect(transition.isRunning());
-    
+
     // Update halfway through
     transition.update(TimingPresets.quick.duration / 2.0);
     try testing.expect(@abs(transition.current_value - 50.0) < 5.0); // Approximate halfway
-    
+
     // Complete the transition
     transition.update(TimingPresets.quick.duration);
     try testing.expect(transition.isComplete());
@@ -425,21 +424,21 @@ test "float transition basic animation" {
 
 test "vec2 transition with easing" {
     const testing = std.testing;
-    
+
     const start = Vec2{ .x = 0.0, .y = 0.0 };
     const end = Vec2{ .x = 100.0, .y = 50.0 };
-    
+
     var transition = Vec2Transition.init(start, end, TimingConfig{
         .duration = 1.0,
         .easing = .linear,
     });
     transition.start();
-    
+
     // Update to 25% progress
     transition.update(0.25);
     try testing.expect(@abs(transition.current_value.x - 25.0) < 0.1);
     try testing.expect(@abs(transition.current_value.y - 12.5) < 0.1);
-    
+
     // Update to completion
     transition.update(0.75);
     try testing.expect(transition.isComplete());
@@ -449,22 +448,22 @@ test "vec2 transition with easing" {
 
 test "layout transition orchestration" {
     const testing = std.testing;
-    
+
     const initial_pos = Vec2{ .x = 10.0, .y = 20.0 };
     const initial_size = Vec2{ .x = 100.0, .y = 50.0 };
-    
+
     var layout_transition = LayoutTransition.init(initial_pos, initial_size, TimingPresets.standard);
-    
+
     // Set targets
     layout_transition.setTarget(Vec2{ .x = 50.0, .y = 100.0 }, Vec2{ .x = 200.0, .y = 150.0 });
     layout_transition.setTargetOpacity(0.5);
-    
+
     layout_transition.start();
     try testing.expect(!layout_transition.isComplete());
-    
+
     // Animate to completion
     layout_transition.update(TimingPresets.standard.duration);
-    
+
     const state = layout_transition.getCurrentState();
     try testing.expect(state.position.x == 50.0);
     try testing.expect(state.position.y == 100.0);
@@ -473,19 +472,19 @@ test "layout transition orchestration" {
 
 test "easing function behavior" {
     const testing = std.testing;
-    
+
     // Linear should be exactly proportional
     try testing.expect(EasingFunction.linear.apply(0.5) == 0.5);
-    
+
     // Ease in quad should be slower at the start
     const ease_in_half = EasingFunction.ease_in_quad.apply(0.5);
     try testing.expect(ease_in_half < 0.5);
     try testing.expect(ease_in_half == 0.25); // 0.5^2
-    
+
     // Ease out quad should be faster at the start
     const ease_out_half = EasingFunction.ease_out_quad.apply(0.5);
     try testing.expect(ease_out_half > 0.5);
-    
+
     // All functions should return 0 at t=0 and 1 at t=1
     const functions = [_]EasingFunction{ .linear, .ease_in_quad, .ease_out_quad, .ease_in_out_quad };
     for (functions) |func| {

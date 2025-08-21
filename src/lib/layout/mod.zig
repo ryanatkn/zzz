@@ -3,7 +3,7 @@
 /// This module provides comprehensive layout functionality for the engine,
 /// organized into focused capabilities:
 /// - Core Types: Common layout types and enums
-/// - Layout Engines: Box model and flexbox engines  
+/// - Layout Engines: Box model and flexbox engines
 /// - Measurement: Constraint resolution and intrinsic sizing
 /// - Arrangement: Flow, alignment, and stacking algorithms
 /// - Backends: CPU, GPU, and hybrid layout calculation
@@ -311,7 +311,7 @@ const math = @import("../math/mod.zig");
 // Tests
 test "layout system integration" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
@@ -320,7 +320,7 @@ test "layout system integration" {
         .enable_validation = true,
         .enable_profiling = true,
     };
-    
+
     var calculator = LayoutCalculator.init(allocator, config);
     defer calculator.deinit();
 
@@ -331,7 +331,7 @@ test "layout system integration" {
 
 test "layout utilities" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
@@ -348,7 +348,7 @@ test "layout utilities" {
     // Test block layout utility
     const block_results = try LayoutUtils.createBlockLayout(allocator, container, &element_sizes);
     defer allocator.free(block_results);
-    
+
     try testing.expect(block_results.len == 2);
     try testing.expect(block_results[0].size.x == 100);
     try testing.expect(block_results[1].size.x == 120);
@@ -356,7 +356,7 @@ test "layout utilities" {
     // Test flex layout utility
     const flex_results = try LayoutUtils.createFlexLayout(allocator, container, &element_sizes, .row);
     defer allocator.free(flex_results);
-    
+
     try testing.expect(flex_results.len == 2);
     try testing.expect(flex_results[0].position.x < flex_results[1].position.x); // Row layout
 }

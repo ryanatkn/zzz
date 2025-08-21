@@ -2,7 +2,6 @@
 ///
 /// This module provides a backend that automatically selects between CPU and GPU
 /// implementations based on workload characteristics and system capabilities.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -27,7 +26,7 @@ pub const HybridLayoutBackend = struct {
     strategy: BackendStrategy,
     config: BackendConfig,
     initialized: bool = false,
-    
+
     // Performance tracking
     performance_stats: PerformanceStats,
 
@@ -74,7 +73,7 @@ pub const HybridLayoutBackend = struct {
                 .gpu_config = BackendConfig.GPUConfig{ .device = device },
             };
             backend.gpu_backend = gpu_backend.createGpuBackend(allocator, @ptrCast(device), gpu_config) catch |err| blk: {
-                // TODO: Log error - GPU backend failed to initialize  
+                // TODO: Log error - GPU backend failed to initialize
                 std.log.warn("Failed to initialize GPU backend: {}", .{err});
                 break :blk null;
             };
@@ -145,12 +144,12 @@ pub const HybridLayoutBackend = struct {
             cpu.deinit();
             cpu_backend.CpuLayoutBackend.destroy(cpu, self.allocator);
         }
-        
+
         if (self.gpu_backend) |gpu| {
             gpu.deinit();
             gpu_backend.GpuLayoutBackend.destroy(gpu, self.allocator);
         }
-        
+
         self.initialized = false;
     }
 

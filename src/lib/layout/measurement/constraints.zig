@@ -2,7 +2,6 @@
 ///
 /// This module provides utilities for handling layout constraints including
 /// size constraints, aspect ratios, and constraint resolution algorithms.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");

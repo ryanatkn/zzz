@@ -2,7 +2,6 @@
 ///
 /// This module provides a CPU implementation of the layout backend interface,
 /// using the box model engine and other CPU-optimized algorithms.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -124,7 +123,7 @@ pub const CpuLayoutBackend = struct {
                 if (parent_idx < elements.len) {
                     const parent_box = &self.box_models.items[parent_idx];
                     const parent_layout = parent_box.getLayout();
-                    
+
                     // Position relative to parent's content area
                     const new_pos = Vec2{
                         .x = parent_layout.content.position.x + element.position.x,
@@ -181,27 +180,27 @@ pub const CpuLayoutBackend = struct {
     /// Convert LayoutElement to BoxModel
     fn elementToBoxModel(self: *Self, element: *const LayoutElement, box: *BoxModel) !void {
         _ = self;
-        
+
         // Set position and size
         box.setPosition(element.position);
         box.setSize(element.size);
-        
+
         // Set spacing
         box.padding.set(element.padding);
         box.margin.set(element.margin);
-        
+
         // Set constraints
         box.setConstraints(element.constraints);
-        
+
         box.markDirty();
     }
 
     /// Convert BoxModel to LayoutResult
     fn boxModelToResult(self: *Self, box: *BoxModel, element_index: usize) LayoutResult {
         _ = self;
-        
+
         const computed = box.getLayout();
-        
+
         return LayoutResult{
             .position = computed.content.position,
             .size = computed.content.size,
@@ -212,20 +211,20 @@ pub const CpuLayoutBackend = struct {
     /// Clip results to container bounds
     fn clipToContainer(self: *Self, results: []LayoutResult, container_bounds: math.Rectangle) void {
         _ = self;
-        
+
         for (results) |*result| {
             // Clip position
             result.position.x = @max(result.position.x, container_bounds.position.x);
             result.position.y = @max(result.position.y, container_bounds.position.y);
-            
+
             // Clip size
             const max_right = container_bounds.position.x + container_bounds.size.x;
             const max_bottom = container_bounds.position.y + container_bounds.size.y;
-            
+
             if (result.position.x + result.size.x > max_right) {
                 result.size.x = @max(0, max_right - result.position.x);
             }
-            
+
             if (result.position.y + result.size.y > max_bottom) {
                 result.size.y = @max(0, max_bottom - result.position.y);
             }
@@ -329,11 +328,11 @@ test "CPU backend layout calculation" {
     defer allocator.free(results);
 
     try testing.expect(results.len == 2);
-    
+
     // Parent element should have its margins and padding applied
     try testing.expect(results[0].size.x == 100);
     try testing.expect(results[0].size.y == 50);
-    
+
     // Child element should be positioned relative to parent's content area
     // (This is a simplified test - actual positioning depends on box model calculations)
     try testing.expect(results[1].element_index == 1);

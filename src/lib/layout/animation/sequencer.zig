@@ -2,7 +2,6 @@
 ///
 /// This module provides tools for creating sequences, groups, and timelines
 /// of layout animations with precise timing control.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -83,7 +82,7 @@ pub const AnimationSequence = struct {
     sequence_time: f32,
     is_playing: bool,
     is_looping: bool,
-    
+
     // Element state
     element_transition: transitions.LayoutTransition,
     initial_position: Vec2,
@@ -95,7 +94,7 @@ pub const AnimationSequence = struct {
         initial_size: Vec2,
     ) AnimationSequence {
         const timing = transitions.TimingConfig{ .duration = 1.0 };
-        
+
         return AnimationSequence{
             .allocator = allocator,
             .steps = std.ArrayList(AnimationStep).init(allocator),
@@ -116,7 +115,7 @@ pub const AnimationSequence = struct {
     /// Add animation step to sequence
     pub fn addStep(self: *AnimationSequence, step: AnimationStep) !void {
         try self.steps.append(step);
-        
+
         // Sort steps by start time
         std.sort.pdq(AnimationStep, self.steps.items, {}, stepLessThan);
     }
@@ -130,7 +129,7 @@ pub const AnimationSequence = struct {
         self.is_playing = true;
         self.sequence_time = 0.0;
         self.current_step = null;
-        
+
         // Reset to initial state
         self.element_transition.position.current_value = self.initial_position;
         self.element_transition.size.current_value = self.initial_size;
@@ -166,7 +165,7 @@ pub const AnimationSequence = struct {
         if (!self.is_playing) return;
 
         self.sequence_time += delta_time;
-        
+
         // Check for sequence completion
         if (self.steps.items.len > 0) {
             const last_step = self.steps.items[self.steps.items.len - 1];
@@ -183,9 +182,9 @@ pub const AnimationSequence = struct {
 
         // Find and execute active steps
         for (self.steps.items, 0..) |step, i| {
-            if (self.sequence_time >= step.start_time and 
-                self.sequence_time <= step.getEndTime()) {
-                
+            if (self.sequence_time >= step.start_time and
+                self.sequence_time <= step.getEndTime())
+            {
                 self.executeStep(step, i);
             }
         }
@@ -296,8 +295,7 @@ pub const AnimationSequence = struct {
 
         // Start the relevant transitions
         switch (step.animation_type) {
-            .position, .slide_in_left, .slide_in_right, .slide_in_up, .slide_in_down,
-            .slide_out_left, .slide_out_right, .slide_out_up, .slide_out_down => {
+            .position, .slide_in_left, .slide_in_right, .slide_in_up, .slide_in_down, .slide_out_left, .slide_out_right, .slide_out_up, .slide_out_down => {
                 self.element_transition.position.start();
             },
             .size => {
@@ -328,7 +326,7 @@ pub const AnimationSequence = struct {
     /// Get sequence duration
     pub fn getDuration(self: *const AnimationSequence) f32 {
         if (self.steps.items.len == 0) return 0.0;
-        
+
         var max_end_time: f32 = 0.0;
         for (self.steps.items) |step| {
             max_end_time = @max(max_end_time, step.getEndTime());
@@ -373,7 +371,7 @@ pub const AnimationTimeline = struct {
     pub fn play(self: *AnimationTimeline) void {
         self.is_playing = true;
         self.timeline_time = 0.0;
-        
+
         for (self.sequences.items) |sequence| {
             sequence.play();
         }
@@ -382,7 +380,7 @@ pub const AnimationTimeline = struct {
     /// Stop all sequences
     pub fn stop(self: *AnimationTimeline) void {
         self.is_playing = false;
-        
+
         for (self.sequences.items) |sequence| {
             sequence.stop();
         }
@@ -412,7 +410,7 @@ pub const AnimationTimeline = struct {
     /// Set looping behavior
     pub fn setLooping(self: *AnimationTimeline, looping: bool) void {
         self.is_looping = looping;
-        
+
         // Update all sequences
         for (self.sequences.items) |sequence| {
             sequence.setLooping(looping);
@@ -449,10 +447,10 @@ pub const SequenceBuilder = struct {
         duration: f32,
     ) !AnimationSequence {
         var sequence = AnimationSequence.init(allocator, position, size);
-        
+
         // Start with opacity 0, animate to 1
         sequence.element_transition.opacity.current_value = 0.0;
-        
+
         try sequence.addStep(AnimationStep{
             .start_time = 0.0,
             .duration = duration,
@@ -460,7 +458,7 @@ pub const SequenceBuilder = struct {
             .target = .{ .fade_in = 1.0 },
             .easing = .ease_out_cubic,
         });
-        
+
         return sequence;
     }
 
@@ -473,13 +471,13 @@ pub const SequenceBuilder = struct {
         duration: f32,
     ) !AnimationSequence {
         var sequence = AnimationSequence.init(allocator, position, size);
-        
+
         // Start offset to the left
         sequence.element_transition.position.current_value = Vec2{
             .x = position.x - distance,
             .y = position.y,
         };
-        
+
         try sequence.addStep(AnimationStep{
             .start_time = 0.0,
             .duration = duration,
@@ -487,7 +485,7 @@ pub const SequenceBuilder = struct {
             .target = .{ .slide_in_left = distance },
             .easing = .ease_out_cubic,
         });
-        
+
         return sequence;
     }
 
@@ -499,10 +497,10 @@ pub const SequenceBuilder = struct {
         duration: f32,
     ) !AnimationSequence {
         var sequence = AnimationSequence.init(allocator, position, size);
-        
+
         // Start with scale 0
         sequence.element_transition.scale.current_value = 0.0;
-        
+
         try sequence.addStep(AnimationStep{
             .start_time = 0.0,
             .duration = duration,
@@ -510,7 +508,7 @@ pub const SequenceBuilder = struct {
             .target = .{ .scale_in = 1.0 },
             .easing = .ease_out_back,
         });
-        
+
         return sequence;
     }
 };
@@ -518,29 +516,29 @@ pub const SequenceBuilder = struct {
 // Tests
 test "animation step timing" {
     const testing = std.testing;
-    
+
     const step = AnimationStep{
         .start_time = 1.0,
         .duration = 0.5,
         .animation_type = .position,
         .target = .{ .position = Vec2{ .x = 100.0, .y = 50.0 } },
     };
-    
+
     try testing.expect(step.getEndTime() == 1.5);
 }
 
 test "animation sequence basic playback" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     const initial_pos = Vec2{ .x = 0.0, .y = 0.0 };
     const initial_size = Vec2{ .x = 100.0, .y = 50.0 };
-    
+
     var sequence = AnimationSequence.init(allocator, initial_pos, initial_size);
     defer sequence.deinit();
-    
+
     // Add a position animation step
     try sequence.addStep(AnimationStep{
         .start_time = 0.0,
@@ -548,19 +546,19 @@ test "animation sequence basic playback" {
         .animation_type = .position,
         .target = .{ .position = Vec2{ .x = 100.0, .y = 100.0 } },
     });
-    
+
     try testing.expect(sequence.getDuration() == 1.0);
-    
+
     sequence.play();
     try testing.expect(sequence.is_playing);
-    
+
     // Update partway through
     sequence.update(0.5);
     const state = sequence.getCurrentState();
-    
+
     // Should be partway to target
     try testing.expect(state.position.x > 0.0 and state.position.x < 100.0);
-    
+
     // Complete the animation
     sequence.update(0.5);
     // Note: Due to easing, we need to check if it's close to the target
@@ -570,25 +568,25 @@ test "animation sequence basic playback" {
 
 test "sequence builder fade in" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     const position = Vec2{ .x = 50.0, .y = 100.0 };
     const size = Vec2{ .x = 200.0, .y = 150.0 };
-    
+
     var sequence = try SequenceBuilder.fadeIn(allocator, position, size, 0.5);
     defer sequence.deinit();
-    
+
     try testing.expect(sequence.steps.items.len == 1);
     try testing.expect(sequence.getDuration() == 0.5);
-    
+
     // Should start with opacity 0
     try testing.expect(sequence.element_transition.opacity.current_value == 0.0);
-    
+
     sequence.play();
     sequence.update(0.5); // Complete the animation
-    
+
     const state = sequence.getCurrentState();
     try testing.expect(@abs(state.opacity - 1.0) < 0.1);
 }

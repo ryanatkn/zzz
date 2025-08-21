@@ -2,7 +2,6 @@
 ///
 /// This module provides utilities for measuring various types of content
 /// to determine their natural sizes for layout calculations.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -14,10 +13,10 @@ const Rectangle = math.Rectangle;
 pub const ContentMeasurer = struct {
     /// Function pointer for measuring text content
     measureTextFn: ?*const fn (text: []const u8, font_size: f32, max_width: ?f32) Vec2 = null,
-    
-    /// Function pointer for measuring image content  
+
+    /// Function pointer for measuring image content
     measureImageFn: ?*const fn (image_data: []const u8) Vec2 = null,
-    
+
     /// Function pointer for measuring custom content
     measureCustomFn: ?*const fn (content_data: *anyopaque) Vec2 = null,
 
@@ -52,13 +51,13 @@ pub const ContentMeasurer = struct {
 /// Estimated text measurement (fallback when no font system available)
 pub fn estimateTextSize(text: []const u8, font_size: f32, max_width: ?f32) Vec2 {
     if (text.len == 0) return Vec2.ZERO;
-    
+
     // Rough estimates based on typical font metrics
     const char_width = font_size * 0.6; // Average character width
     const line_height = font_size * 1.2; // Typical line height
-    
+
     const total_width = @as(f32, @floatFromInt(text.len)) * char_width;
-    
+
     if (max_width) |max_w| {
         if (total_width <= max_w) {
             // Single line
@@ -67,10 +66,7 @@ pub fn estimateTextSize(text: []const u8, font_size: f32, max_width: ?f32) Vec2 
             // Multiple lines needed
             const chars_per_line = @as(usize, @intFromFloat(max_w / char_width));
             const lines_needed = (text.len + chars_per_line - 1) / chars_per_line; // Ceiling division
-            return Vec2{ 
-                .x = max_w, 
-                .y = @as(f32, @floatFromInt(lines_needed)) * line_height 
-            };
+            return Vec2{ .x = max_w, .y = @as(f32, @floatFromInt(lines_needed)) * line_height };
         }
     } else {
         // No width constraint - single line
@@ -128,7 +124,7 @@ pub const ContentMeasurement = struct {
             .image => {
                 const image_data = info.data.image;
                 var size = image_data.natural_size;
-                
+
                 // Constrain to available width if specified
                 if (available_width) |max_w| {
                     if (size.x > max_w) {
@@ -136,13 +132,13 @@ pub const ContentMeasurement = struct {
                         size = Vec2{ .x = max_w, .y = size.y * scale };
                     }
                 }
-                
+
                 return size;
             },
             .replaced => {
                 const replaced_data = info.data.replaced;
                 var size = replaced_data.natural_size;
-                
+
                 // Apply aspect ratio constraint if available width is specified
                 if (available_width) |max_w| {
                     if (size.x > max_w) {
@@ -152,18 +148,18 @@ pub const ContentMeasurement = struct {
                         }
                     }
                 }
-                
+
                 return size;
             },
             .container => {
                 const container_data = info.data.container;
                 // For containers, return minimum size based on children
                 var size = container_data.min_child_size;
-                
+
                 if (available_width) |max_w| {
                     size.x = @min(size.x, max_w);
                 }
-                
+
                 return size;
             },
             .empty => Vec2.ZERO,
@@ -176,10 +172,7 @@ pub const ContentMeasurement = struct {
             .text => {
                 const text_data = info.data.text;
                 // Minimum is roughly one character wide
-                return Vec2{ 
-                    .x = text_data.font_size * 0.6, 
-                    .y = text_data.line_height 
-                };
+                return Vec2{ .x = text_data.font_size * 0.6, .y = text_data.line_height };
             },
             .image, .replaced => {
                 // Images can't be smaller than 1x1
@@ -328,7 +321,7 @@ test "content measurement" {
             .text = "Hello World",
             .font_size = 16,
             .line_height = 20,
-        }},
+        } },
     };
 
     const measurer = ContentMeasurer{};

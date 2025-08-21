@@ -2,7 +2,6 @@
 ///
 /// This module implements a simplified CSS Grid layout algorithm with support
 /// for explicit grid definitions, auto-placement, and basic grid properties.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -72,7 +71,7 @@ pub const TrackSize = union(enum) {
 pub const GridArea = struct {
     /// Row start (1-based, inclusive)
     row_start: u32,
-    /// Row end (1-based, exclusive)  
+    /// Row end (1-based, exclusive)
     row_end: u32,
     /// Column start (1-based, inclusive)
     column_start: u32,
@@ -402,21 +401,21 @@ pub const GridLayout = struct {
         allocator: std.mem.Allocator,
     ) ![]GridTrack {
         var tracks = try allocator.alloc(GridTrack, track_count);
-        
+
         // Calculate total gap space
         const total_gap = if (track_count > 1) @as(f32, @floatFromInt(track_count - 1)) * gap else 0;
         const space_for_tracks = available_space - total_gap;
-        
+
         // Determine track sizes
         var total_fr: f32 = 0;
         var used_space: f32 = 0;
-        
+
         for (0..track_count) |i| {
             const track_size = if (i < template_tracks.items.len)
                 template_tracks.items[i]
             else
                 auto_track_size;
-                
+
             if (track_size.isFlexible()) {
                 total_fr += track_size.getFrValue();
             } else {
@@ -426,29 +425,29 @@ pub const GridLayout = struct {
                 used_space += resolved_size;
             }
         }
-        
+
         // Distribute remaining space to fr tracks
         const remaining_space = @max(0, space_for_tracks - used_space);
         const space_per_fr = if (total_fr > 0) remaining_space / total_fr else 0;
-        
+
         for (0..track_count) |i| {
             const track_size = if (i < template_tracks.items.len)
                 template_tracks.items[i]
             else
                 auto_track_size;
-                
+
             if (track_size.isFlexible()) {
                 tracks[i].size = space_per_fr * track_size.getFrValue();
             }
         }
-        
+
         // Calculate positions
         var current_position: f32 = 0;
         for (tracks) |*track| {
             track.position = current_position;
             current_position += track.size + gap;
         }
-        
+
         return tracks;
     }
 
@@ -463,20 +462,20 @@ pub const GridLayout = struct {
         allocator: std.mem.Allocator,
     ) ![]types.LayoutResult {
         var results = try allocator.alloc(types.LayoutResult, items.len);
-        
+
         for (grid.item_placements.items) |placement| {
             const item = items[placement.item_index];
             const area = placement.area;
-            
+
             // Calculate grid area bounds
             const start_row = @min(area.row_start - 1, row_tracks.len - 1);
             const end_row = @min(area.row_end - 1, row_tracks.len);
             const start_col = @min(area.column_start - 1, column_tracks.len - 1);
             const end_col = @min(area.column_end - 1, column_tracks.len);
-            
+
             const area_x = column_tracks[start_col].position;
             const area_y = row_tracks[start_row].position;
-            
+
             var area_width: f32 = 0;
             for (start_col..end_col) |col_idx| {
                 area_width += column_tracks[col_idx].size;
@@ -484,7 +483,7 @@ pub const GridLayout = struct {
                     area_width += config.column_gap;
                 }
             }
-            
+
             var area_height: f32 = 0;
             for (start_row..end_row) |row_idx| {
                 area_height += row_tracks[row_idx].size;
@@ -492,14 +491,14 @@ pub const GridLayout = struct {
                     area_height += config.row_gap;
                 }
             }
-            
+
             // Calculate item size within grid area
             const item_size = calculateItemSizeInArea(
                 item,
                 Vec2{ .x = area_width, .y = area_height },
                 config,
             );
-            
+
             // Calculate item position within grid area
             const item_position = calculateItemPositionInArea(
                 item,
@@ -507,7 +506,7 @@ pub const GridLayout = struct {
                 Vec2{ .x = area_width, .y = area_height },
                 config,
             );
-            
+
             results[placement.item_index] = types.LayoutResult{
                 .position = Vec2{
                     .x = container_bounds.position.x + area_x + item_position.x,
@@ -517,7 +516,7 @@ pub const GridLayout = struct {
                 .element_index = item.index,
             };
         }
-        
+
         return results;
     }
 
@@ -528,23 +527,23 @@ pub const GridLayout = struct {
         config: Config,
     ) Vec2 {
         var size = item.size;
-        
+
         // Apply constraints
         size.x = item.constraints.constrainWidth(size.x);
         size.y = item.constraints.constrainHeight(size.y);
-        
+
         // Apply justification and alignment
         const justify = item.justify_self orelse config.justify_items;
         const alignment = item.align_self orelse config.align_items;
-        
+
         if (justify == .stretch) {
             size.x = area_size.x;
         }
-        
+
         if (alignment == .stretch) {
             size.y = area_size.y;
         }
-        
+
         return size;
     }
 
@@ -557,9 +556,9 @@ pub const GridLayout = struct {
     ) Vec2 {
         const justify = item.justify_self orelse config.justify_items;
         const alignment = item.align_self orelse config.align_items;
-        
+
         var position = Vec2.ZERO;
-        
+
         // Horizontal positioning
         switch (justify) {
             .flex_start, .stretch => position.x = 0,
@@ -567,7 +566,7 @@ pub const GridLayout = struct {
             .center => position.x = (area_size.x - item_size.x) / 2.0,
             else => position.x = 0,
         }
-        
+
         // Vertical positioning
         switch (alignment) {
             .flex_start, .stretch => position.y = 0,
@@ -575,7 +574,7 @@ pub const GridLayout = struct {
             .center => position.y = (area_size.y - item_size.y) / 2.0,
             else => position.y = 0,
         }
-        
+
         return position;
     }
 };
@@ -583,33 +582,35 @@ pub const GridLayout = struct {
 // Tests
 test "grid layout basic 2x2 grid" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
+
     var template_rows = std.ArrayList(TrackSize).init(allocator);
     defer template_rows.deinit();
     try template_rows.append(.{ .fixed = 100 });
     try template_rows.append(.{ .fixed = 100 });
-    
+
     var template_columns = std.ArrayList(TrackSize).init(allocator);
     defer template_columns.deinit();
     try template_columns.append(.{ .fixed = 150 });
     try template_columns.append(.{ .fixed = 150 });
-    
+
     const container = Rectangle{
         .position = Vec2.ZERO,
         .size = Vec2{ .x = 300, .y = 200 },
     };
-    
+
     const items = [_]GridLayout.GridItem{
         .{
             .size = Vec2{ .x = 100, .y = 80 },
             .margin = types.Spacing{},
             .constraints = types.Constraints{},
             .grid_area = GridArea{
-                .row_start = 1, .row_end = 2,
-                .column_start = 1, .column_end = 2,
+                .row_start = 1,
+                .row_end = 2,
+                .column_start = 1,
+                .column_end = 2,
             },
             .index = 0,
         },
@@ -618,27 +619,29 @@ test "grid layout basic 2x2 grid" {
             .margin = types.Spacing{},
             .constraints = types.Constraints{},
             .grid_area = GridArea{
-                .row_start = 2, .row_end = 3,
-                .column_start = 2, .column_end = 3,
+                .row_start = 2,
+                .row_end = 3,
+                .column_start = 2,
+                .column_end = 3,
             },
             .index = 1,
         },
     };
-    
+
     const config = GridLayout.Config{
         .grid_template_rows = template_rows,
         .grid_template_columns = template_columns,
     };
-    
+
     const results = try GridLayout.calculateLayout(container, &items, config, allocator);
     defer allocator.free(results);
-    
+
     try testing.expect(results.len == 2);
-    
+
     // First item should be in top-left grid cell
     try testing.expect(results[0].position.x == 0);
     try testing.expect(results[0].position.y == 0);
-    
+
     // Second item should be in bottom-right grid cell
     try testing.expect(results[1].position.x == 150); // Second column
     try testing.expect(results[1].position.y == 100); // Second row

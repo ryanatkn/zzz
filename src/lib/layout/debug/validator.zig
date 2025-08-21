@@ -2,7 +2,6 @@
 ///
 /// This module provides tools for validating layout calculations, detecting
 /// common layout issues, and providing helpful debugging information.
-
 const std = @import("std");
 const math = @import("../../math/mod.zig");
 const types = @import("../types.zig");
@@ -25,21 +24,21 @@ pub const ValidationError = struct {
         position_constraint_violation,
         negative_size,
         infinite_size,
-        
+
         // Overlap issues
         element_overlap,
         container_overflow,
-        
+
         // Hierarchy issues
         parent_child_inconsistency,
         circular_dependency,
         orphaned_element,
-        
+
         // Performance issues
         excessive_elements,
         deep_nesting,
         frequent_recalculation,
-        
+
         // Configuration issues
         invalid_constraints,
         conflicting_properties,
@@ -120,7 +119,7 @@ pub const LayoutValidator = struct {
         args: anytype,
     ) !void {
         const message = try std.fmt.allocPrint(self.allocator, fmt, args);
-        
+
         try self.errors.append(ValidationError{
             .type = error_type,
             .element_index = element_index,
@@ -226,7 +225,7 @@ pub const LayoutValidator = struct {
         container_bounds: Rectangle,
     ) !void {
         _ = container_bounds;
-        
+
         for (elements, 0..) |element, i| {
             // Check for infinite positions
             if (!std.math.isFinite(element.position.x) or !std.math.isFinite(element.position.y)) {
@@ -325,7 +324,7 @@ pub const LayoutValidator = struct {
     pub fn formatReport(self: *const LayoutValidator, writer: anytype) !void {
         try writer.print("Layout Validation Report\n");
         try writer.print("========================\n");
-        
+
         const total_errors = self.errors.items.len;
         if (total_errors == 0) {
             try writer.print("✓ No issues found\n");
@@ -333,7 +332,7 @@ pub const LayoutValidator = struct {
         }
 
         try writer.print("Total issues: {d}\n", .{total_errors});
-        
+
         // Count by severity
         const critical_count = self.getErrorCountBySeverity(.critical);
         const error_count = self.getErrorCountBySeverity(.err);
@@ -350,11 +349,11 @@ pub const LayoutValidator = struct {
 
         for (self.errors.items, 0..) |error_item, i| {
             try writer.print("{d}. [{s}] ", .{ i + 1, error_item.severity.toString() });
-            
+
             if (error_item.element_index) |idx| {
                 try writer.print("Element {d}: ", .{idx});
             }
-            
+
             try writer.print("{s}\n", .{error_item.message});
         }
     }
@@ -437,18 +436,18 @@ pub const LayoutDebugger = struct {
 
         for (self.debug_data.items, 0..) |entry, i| {
             try writer.print("{d}. Element {d}: {s}\n", .{ i + 1, entry.element_index, @tagName(entry.operation) });
-            
+
             if (entry.before_state) |before| {
                 try writer.print("   Before: pos({d}, {d}) size({d}, {d})\n", .{
                     before.position.x, before.position.y,
-                    before.size.x, before.size.y,
+                    before.size.x,     before.size.y,
                 });
             }
-            
+
             if (entry.after_state) |after| {
                 try writer.print("   After:  pos({d}, {d}) size({d}, {d})\n", .{
                     after.position.x, after.position.y,
-                    after.size.x, after.size.y,
+                    after.size.x,     after.size.y,
                 });
             }
         }
@@ -458,7 +457,7 @@ pub const LayoutDebugger = struct {
 // Tests
 test "validator basic functionality" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
@@ -491,7 +490,7 @@ test "validator basic functionality" {
 
 test "validator detects negative size" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
@@ -520,7 +519,7 @@ test "validator detects negative size" {
 
 test "validator detects overlaps" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
@@ -548,7 +547,7 @@ test "validator detects overlaps" {
 
     try validator.validateLayout(&overlapping_elements, container);
     try testing.expect(validator.getErrors().len > 0);
-    
+
     // Should detect overlap
     var found_overlap = false;
     for (validator.getErrors()) |error_item| {
@@ -562,7 +561,7 @@ test "validator detects overlaps" {
 
 test "debugger records operations" {
     const testing = std.testing;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
