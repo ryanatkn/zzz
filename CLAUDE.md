@@ -246,7 +246,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - Prioritize procedural generation and performance over asset-based approaches
 - Focus on code-driven visuals and algorithmic generation
 - Avoid magic numbers, extract constants
-- Test frequently with `zig build run` to ensure each step works
+- Check frequently with `zig build test`, and to check runtime behavior, `zig build run`
 - Less is more - avoid over-engineering
 - Always update documentation, be concise but thorough 
 - Performance is a top priority - always optimize for the final best code
