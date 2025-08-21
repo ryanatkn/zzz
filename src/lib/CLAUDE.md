@@ -36,7 +36,7 @@ const types = @import("core/types.zig");
 const input = @import("platform/input.zig");
 
 // Barrel imports for subsystems
-const reactive = @import("reactive.zig");
+const reactive = @import("reactive/mod.zig");
 const ui = @import("ui.zig");
 ```
 

@@ -1,5 +1,5 @@
 /// Unified Layout System
-/// 
+///
 /// This module provides all layout calculation functionality for the engine:
 /// - Box Model: CSS-like box model with padding, border, margin
 /// - Text Baseline: Proper text positioning and alignment
@@ -21,7 +21,7 @@ pub const text = @import("../text/layout.zig");
 
 // Re-export commonly used types for convenience
 pub const BoxModel = box_model.BoxModel;
-pub const TextBaseline = text_baseline.TextBaseline; 
+pub const TextBaseline = text_baseline.TextBaseline;
 pub const TextPositioning = text_baseline.TextPositioning;
 
 // Re-export primitive types
@@ -46,3 +46,10 @@ pub const LayoutedText = text.LayoutedText;
 pub const LayoutedLine = text.LayoutedLine;
 pub const LayoutedGlyph = text.LayoutedGlyph;
 pub const TextAlign = text.TextAlign;
+
+// GPU layout system
+pub const gpu = @import("gpu/mod.zig");
+pub const GPULayoutEngine = gpu.GPULayoutEngine;
+pub const UIElement = gpu.UIElement;
+pub const LayoutConstraint = gpu.LayoutConstraint;
+pub const SpringState = gpu.SpringState;

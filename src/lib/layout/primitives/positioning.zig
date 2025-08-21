@@ -6,7 +6,6 @@ const Rectangle = math.Rectangle;
 
 /// Position calculation utilities for layout primitives
 pub const PositioningUtils = struct {
-    
     /// CSS-like position modes
     pub const PositionMode = enum {
         /// Normal document flow (CSS static)
@@ -23,10 +22,10 @@ pub const PositioningUtils = struct {
 
     /// Alignment options for positioning
     pub const Alignment = enum {
-        start,    // left/top
-        center,   // center
-        end,      // right/bottom
-        stretch,  // fill available space
+        start, // left/top
+        center, // center
+        end, // right/bottom
+        stretch, // fill available space
     };
 
     /// Position offset specification
@@ -105,7 +104,7 @@ pub const PositioningUtils = struct {
     ) Vec2 {
         const width = if (horizontal_align == .stretch) container.size.x else original_size.x;
         const height = if (vertical_align == .stretch) container.size.y else original_size.y;
-        
+
         return Vec2{ .x = width, .y = height };
     }
 
@@ -186,9 +185,9 @@ pub const PositioningUtils = struct {
     /// Check if two rectangles overlap
     pub fn rectanglesOverlap(rect1: Rectangle, rect2: Rectangle) bool {
         return !(rect1.position.x + rect1.size.x <= rect2.position.x or
-                rect2.position.x + rect2.size.x <= rect1.position.x or
-                rect1.position.y + rect1.size.y <= rect2.position.y or
-                rect2.position.y + rect2.size.y <= rect1.position.y);
+            rect2.position.x + rect2.size.x <= rect1.position.x or
+            rect1.position.y + rect1.size.y <= rect2.position.y or
+            rect2.position.y + rect2.size.y <= rect1.position.y);
     }
 
     /// Calculate overlap area between two rectangles
@@ -207,97 +206,77 @@ pub const PositioningUtils = struct {
 // Tests
 test "absolute positioning" {
     const testing = std.testing;
-    
-    const container = Rectangle{ 
-        .position = Vec2{ .x = 10, .y = 20 }, 
-        .size = Vec2{ .x = 200, .y = 100 } 
-    };
+
+    const container = Rectangle{ .position = Vec2{ .x = 10, .y = 20 }, .size = Vec2{ .x = 200, .y = 100 } };
     const item_size = Vec2{ .x = 50, .y = 30 };
-    
+
     // Top-left positioning
     const offset1 = PositioningUtils.Offset.fromValues(10, null, null, 15);
     const pos1 = PositioningUtils.calculateAbsolutePosition(container, item_size, offset1);
     try testing.expect(pos1.x == 25); // 10 + 15
     try testing.expect(pos1.y == 30); // 20 + 10
-    
+
     // Bottom-right positioning
     const offset2 = PositioningUtils.Offset.fromValues(null, 10, 5, null);
     const pos2 = PositioningUtils.calculateAbsolutePosition(container, item_size, offset2);
     try testing.expect(pos2.x == 150); // 10 + 200 - 10 - 50
-    try testing.expect(pos2.y == 85);  // 20 + 100 - 5 - 30
+    try testing.expect(pos2.y == 85); // 20 + 100 - 5 - 30
 }
 
 test "aligned positioning" {
     const testing = std.testing;
-    
-    const container = Rectangle{ 
-        .position = Vec2{ .x = 10, .y = 20 }, 
-        .size = Vec2{ .x = 200, .y = 100 } 
-    };
+
+    const container = Rectangle{ .position = Vec2{ .x = 10, .y = 20 }, .size = Vec2{ .x = 200, .y = 100 } };
     const item_size = Vec2{ .x = 50, .y = 30 };
-    
+
     // Center alignment
-    const center_pos = PositioningUtils.calculateAlignedPosition(
-        container, item_size, .center, .center
-    );
-    try testing.expect(center_pos.x == 85);  // 10 + (200-50)/2
-    try testing.expect(center_pos.y == 55);  // 20 + (100-30)/2
-    
+    const center_pos = PositioningUtils.calculateAlignedPosition(container, item_size, .center, .center);
+    try testing.expect(center_pos.x == 85); // 10 + (200-50)/2
+    try testing.expect(center_pos.y == 55); // 20 + (100-30)/2
+
     // End alignment
-    const end_pos = PositioningUtils.calculateAlignedPosition(
-        container, item_size, .end, .end
-    );
+    const end_pos = PositioningUtils.calculateAlignedPosition(container, item_size, .end, .end);
     try testing.expect(end_pos.x == 160); // 10 + 200 - 50
-    try testing.expect(end_pos.y == 90);  // 20 + 100 - 30
+    try testing.expect(end_pos.y == 90); // 20 + 100 - 30
 }
 
 test "stretch sizing" {
     const testing = std.testing;
-    
-    const container = Rectangle{ 
-        .position = Vec2{ .x = 10, .y = 20 }, 
-        .size = Vec2{ .x = 200, .y = 100 } 
-    };
+
+    const container = Rectangle{ .position = Vec2{ .x = 10, .y = 20 }, .size = Vec2{ .x = 200, .y = 100 } };
     const original_size = Vec2{ .x = 50, .y = 30 };
-    
-    const stretched_size = PositioningUtils.calculateStretchSize(
-        container, original_size, .stretch, .center
-    );
-    
+
+    const stretched_size = PositioningUtils.calculateStretchSize(container, original_size, .stretch, .center);
+
     try testing.expect(stretched_size.x == 200); // Stretched to container width
-    try testing.expect(stretched_size.y == 30);  // Original height
+    try testing.expect(stretched_size.y == 30); // Original height
 }
 
 test "clipping to bounds" {
     const testing = std.testing;
-    
-    const bounds = Rectangle{ 
-        .position = Vec2{ .x = 10, .y = 10 }, 
-        .size = Vec2{ .x = 100, .y = 80 } 
-    };
-    
+
+    const bounds = Rectangle{ .position = Vec2{ .x = 10, .y = 10 }, .size = Vec2{ .x = 100, .y = 80 } };
+
     // Item partially outside left edge
-    const result = PositioningUtils.clipToBounds(
-        Vec2{ .x = 5, .y = 20 },    // position
-        Vec2{ .x = 20, .y = 10 },   // size
-        bounds
-    );
-    
+    const result = PositioningUtils.clipToBounds(Vec2{ .x = 5, .y = 20 }, // position
+        Vec2{ .x = 20, .y = 10 }, // size
+        bounds);
+
     try testing.expect(result.clipped);
     try testing.expect(result.position.x == 10); // Clipped to bounds
-    try testing.expect(result.size.x == 15);     // Reduced size
+    try testing.expect(result.size.x == 15); // Reduced size
 }
 
 test "rectangle overlap detection" {
     const testing = std.testing;
-    
+
     const rect1 = Rectangle{ .position = Vec2{ .x = 0, .y = 0 }, .size = Vec2{ .x = 50, .y = 50 } };
     const rect2 = Rectangle{ .position = Vec2{ .x = 25, .y = 25 }, .size = Vec2{ .x = 50, .y = 50 } };
     const rect3 = Rectangle{ .position = Vec2{ .x = 100, .y = 100 }, .size = Vec2{ .x = 50, .y = 50 } };
-    
+
     try testing.expect(PositioningUtils.rectanglesOverlap(rect1, rect2)); // Overlapping
     try testing.expect(!PositioningUtils.rectanglesOverlap(rect1, rect3)); // Not overlapping
-    
+
     const overlap_area = PositioningUtils.calculateOverlapArea(rect1, rect2);
     try testing.expect(overlap_area == 25 * 25); // 25x25 overlap
 }

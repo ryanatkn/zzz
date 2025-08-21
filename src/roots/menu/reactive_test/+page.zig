@@ -106,14 +106,14 @@ pub const ReactiveTestPage = struct {
 
         // Clean up current reactive system
         test_page.current_count.deinit();
-        
+
         // Clean up heap-allocated reactive objects (fix memory leak)
         test_page.current_doubled.deinit();
         allocator.destroy(test_page.current_doubled);
-        
+
         test_page.current_effect.deinit();
         allocator.destroy(test_page.current_effect);
-        
+
         test_page.current_log.deinit();
 
         // Clean up Gannaway system

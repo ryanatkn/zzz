@@ -56,9 +56,9 @@ pub const ReactiveRefDemoPage = struct {
         const demo_page: *ReactiveRefDemoPage = @fieldParentPtr("base", self);
 
         // Clean up reactive objects - ReactiveRef handles destroy() automatically!
-        demo_page.count.deinit();          // Regular signal cleanup
-        demo_page.doubled.deinit();        // ReactiveRef automatically calls destroy()
-        demo_page.effect.deinit();         // ReactiveRef automatically calls destroy()
+        demo_page.count.deinit(); // Regular signal cleanup
+        demo_page.doubled.deinit(); // ReactiveRef automatically calls destroy()
+        demo_page.effect.deinit(); // ReactiveRef automatically calls destroy()
 
         // Clean up arena
         demo_page.arena.deinit();

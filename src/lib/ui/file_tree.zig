@@ -366,7 +366,7 @@ pub const FileTreeComponent = struct {
                 }
             }
         }
-        
+
         // No selection or not found - select first item
         if (items.len > 0) {
             self.state.selectEntry(items[0].entry);
@@ -389,7 +389,7 @@ pub const FileTreeComponent = struct {
                 }
             }
         }
-        
+
         // No selection or not found - select last item
         if (items.len > 0) {
             self.state.selectEntry(items[items.len - 1].entry);

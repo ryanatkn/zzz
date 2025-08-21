@@ -8,7 +8,6 @@ const Rectangle = math.Rectangle;
 /// CSS-like box model for UI layout with dirty flag optimization
 /// Follows web standards: content -> padding -> border -> margin
 pub const BoxModel = struct {
-    
     /// Box sizing mode (CSS box-sizing)
     pub const SizingMode = enum {
         /// Width/height includes only content (CSS content-box)
@@ -56,10 +55,10 @@ pub const BoxModel = struct {
         }
 
         pub fn eql(self: Spacing, other: Spacing) bool {
-            return self.top == other.top and 
-                   self.right == other.right and 
-                   self.bottom == other.bottom and 
-                   self.left == other.left;
+            return self.top == other.top and
+                self.right == other.right and
+                self.bottom == other.bottom and
+                self.left == other.left;
         }
     };
 
@@ -79,9 +78,9 @@ pub const BoxModel = struct {
 
         pub fn eql(self: Constraints, other: Constraints) bool {
             return self.min_width == other.min_width and
-                   self.max_width == other.max_width and
-                   self.min_height == other.min_height and
-                   self.max_height == other.max_height;
+                self.max_width == other.max_width and
+                self.min_height == other.min_height and
+                self.max_height == other.max_height;
         }
     };
 
@@ -95,10 +94,10 @@ pub const BoxModel = struct {
         border: Rectangle,
         /// Margin area (content + padding + border + margin)
         margin: Rectangle,
-        
+
         /// Full outer bounds (same as margin area)
         outer_bounds: Rectangle,
-        
+
         /// Dirty flag - set to true when layout needs recalculation
         dirty: bool = true,
 
@@ -119,21 +118,21 @@ pub const BoxModel = struct {
     position: reactive.Signal(Vec2),
     size: reactive.Signal(Vec2),
     sizing_mode: reactive.Signal(SizingMode),
-    
+
     // Spacing properties
     padding: reactive.Signal(Spacing),
     border_width: reactive.Signal(Spacing),
     margin: reactive.Signal(Spacing),
-    
+
     // Layout constraints
     constraints: reactive.Signal(Constraints),
-    
+
     // Computed layout (cached, invalidated by dirty flag)
     computed: ComputedLayout,
-    
+
     // Layout invalidation tracking
     layout_effect: ?*reactive.Effect = null,
-    
+
     const Self = @This();
 
     /// Initialize a new box model
@@ -154,12 +153,12 @@ pub const BoxModel = struct {
     /// Initialize with reactive layout invalidation
     pub fn initWithReactivity(allocator: std.mem.Allocator, initial_position: Vec2, initial_size: Vec2) !Self {
         var self = try Self.init(allocator, initial_position, initial_size);
-        
+
         // Create effect to mark layout dirty when any property changes
         // We'll need to store the pointer globally for the effect function to access
         // For now, disable reactivity until this pattern is properly implemented
         self.layout_effect = null;
-        
+
         return self;
     }
 
@@ -172,7 +171,7 @@ pub const BoxModel = struct {
         self.border_width.deinit();
         self.margin.deinit();
         self.constraints.deinit();
-        
+
         if (self.layout_effect) |effect| {
             effect.deinit();
             allocator.destroy(effect);
@@ -231,7 +230,7 @@ pub const BoxModel = struct {
         };
 
         // Calculate areas from inside out (content -> padding -> border -> margin)
-        
+
         // Content area
         self.computed.content = Rectangle{
             .position = Vec2{
@@ -279,7 +278,7 @@ pub const BoxModel = struct {
 
         // Outer bounds (same as margin area)
         self.computed.outer_bounds = self.computed.margin;
-        
+
         // Mark as clean
         self.computed.dirty = false;
     }
@@ -389,15 +388,15 @@ test "box model with padding" {
     box.setPadding(10);
 
     const layout = box.getLayout();
-    
+
     // Content area should be same size
     try testing.expect(layout.content.size.x == 100);
     try testing.expect(layout.content.size.y == 50);
-    
+
     // Content should be offset by padding
     try testing.expect(layout.content.position.x == 10);
     try testing.expect(layout.content.position.y == 10);
-    
+
     // Padding area should be larger
     try testing.expect(layout.padding.size.x == 120);
     try testing.expect(layout.padding.size.y == 70);
@@ -419,11 +418,11 @@ test "box model border-box sizing" {
     box.setSizingMode(.border_box);
 
     const layout = box.getLayout();
-    
+
     // In border-box mode, total size should be 100x50
     try testing.expect(layout.padding.size.x == 100);
     try testing.expect(layout.padding.size.y == 50);
-    
+
     // Content should be reduced by padding
     try testing.expect(layout.content.size.x == 80); // 100 - 20
     try testing.expect(layout.content.size.y == 30); // 50 - 20
@@ -443,11 +442,11 @@ test "box model dirty flags" {
 
     // Layout should be dirty initially
     try testing.expect(box.isDirty());
-    
+
     // Access should clean it
     _ = box.getLayout();
     try testing.expect(!box.isDirty());
-    
+
     // Changing properties should mark dirty
     box.setPadding(5);
     try testing.expect(box.isDirty());
@@ -455,12 +454,12 @@ test "box model dirty flags" {
 
 test "spacing utilities" {
     const testing = std.testing;
-    
+
     const uniform = BoxModel.Spacing.uniform(10);
     try testing.expect(uniform.top == 10);
     try testing.expect(uniform.getHorizontal() == 20);
     try testing.expect(uniform.getVertical() == 20);
-    
+
     const asymmetric = BoxModel.Spacing.asymmetric(5, 8);
     try testing.expect(asymmetric.top == 5);
     try testing.expect(asymmetric.right == 8);

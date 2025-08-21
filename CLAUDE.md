@@ -308,7 +308,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
   const input = @import("../lib/platform/input.zig");
   const camera = @import("../lib/rendering/camera.zig");
   const collision = @import("../lib/physics/collision.zig");
-  const reactive = @import("../lib/reactive.zig"); // Barrel import
+  const reactive = @import("../lib/reactive/mod.zig"); // Barrel import
   ```
 
 **Reactive System Guidelines:**

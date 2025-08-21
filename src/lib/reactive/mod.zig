@@ -14,7 +14,7 @@
 //! ## Basic Usage
 //!
 //! ```zig
-//! const reactive = @import("lib/reactive.zig");
+//! const reactive = @import("lib/reactive/mod.zig");
 //!
 //! // Initialize reactive context (once per thread)
 //! try reactive.init(allocator);

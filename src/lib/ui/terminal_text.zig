@@ -31,12 +31,11 @@ pub const TerminalTextConfig = struct {
     cursor_blink_rate: f32 = 1.0, // blinks per second
     max_line_length: usize = 1000,
     // Font metrics for proper baseline calculations
-    font_metrics_info: FontMetrics = FontMetrics.init(
-        1000,    // units_per_em
-        800,     // ascender
-        -200,    // descender
-        100,     // line_gap
-        0.016    // scale factor for 16pt
+    font_metrics_info: FontMetrics = FontMetrics.init(1000, // units_per_em
+        800, // ascender
+        -200, // descender
+        100, // line_gap
+        0.016 // scale factor for 16pt
     ),
 };
 
@@ -124,12 +123,7 @@ pub const TerminalText = struct {
         // Render cursor using proper baseline positioning
         if (cursor.visible and self.cursor_visible.get()) {
             const cursor_char_pos = @min(cursor.x, max_input_chars);
-            const cursor_position = TextPositioning.getCursorPosition(
-                input_position, 
-                cursor_char_pos, 
-                config.char_width, 
-                config.font_metrics_info
-            );
+            const cursor_position = TextPositioning.getCursorPosition(input_position, cursor_char_pos, config.char_width, config.font_metrics_info);
             try self.renderCursor(renderer, cursor_position, config.font_metrics_info);
         }
     }
@@ -153,7 +147,7 @@ pub const TerminalText = struct {
 
         // Calculate cursor height using font metrics
         const cursor_height = TextPositioning.getCursorHeight(font_metrics_info);
-        
+
         const cursor_size = switch (config.cursor_style) {
             .block => Vec2{ .x = config.char_width, .y = cursor_height },
             .underline => Vec2{ .x = config.char_width, .y = 2.0 },
@@ -162,10 +156,7 @@ pub const TerminalText = struct {
 
         const cursor_position = switch (config.cursor_style) {
             .block => position,
-            .underline => Vec2{ 
-                .x = position.x, 
-                .y = position.y + cursor_height - 2.0 
-            },
+            .underline => Vec2{ .x = position.x, .y = position.y + cursor_height - 2.0 },
             .vertical_bar => position,
         };
 

@@ -66,16 +66,15 @@ pub const TextInput = struct {
 
         input.is_focused = try reactive.signal(allocator, bool, false);
         input.text_buffer = std.ArrayList(u8).init(allocator);
-        
+
         // Initialize font metrics for 12pt font (typical web default)
         // These values are estimates - should be replaced with actual font metrics when available
         input.font_size = 12.0;
-        input.font_metrics_info = FontMetrics.init(
-            1000,    // units_per_em (typical for TrueType fonts)
-            800,     // ascender
-            -200,    // descender
-            100,     // line_gap
-            0.012    // scale factor for 12pt (12px / 1000 units)
+        input.font_metrics_info = FontMetrics.init(1000, // units_per_em (typical for TrueType fonts)
+            800, // ascender
+            -200, // descender
+            100, // line_gap
+            0.012 // scale factor for 12pt (12px / 1000 units)
         );
     }
 
@@ -156,14 +155,10 @@ pub const TextInput = struct {
         }
 
         if (input.is_focused.get() and input.cursor_visible) {
-            const cursor_position = TextPositioning.getCursorPosition(
-                text_pos, 
-                input.cursor_pos.get(), 
-                7.0, // character width estimate
-                input.font_metrics_info
-            );
+            const cursor_position = TextPositioning.getCursorPosition(text_pos, input.cursor_pos.get(), 7.0, // character width estimate
+                input.font_metrics_info);
             const cursor_height = TextPositioning.getCursorHeight(input.font_metrics_info);
-            
+
             const cursor_rect = Rectangle{
                 .position = cursor_position,
                 .size = Vec2{ .x = 1, .y = cursor_height },
@@ -186,7 +181,7 @@ pub const TextInput = struct {
                 const padding = 2.0;
                 const content_y = bounds.position.y + padding;
                 const content_height = bounds.size.y - (padding * 2.0);
-                
+
                 const selection_rect = Rectangle{
                     .position = Vec2{ .x = sel_x, .y = content_y },
                     .size = Vec2{ .x = sel_width, .y = content_height },

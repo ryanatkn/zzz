@@ -196,7 +196,7 @@ pub const TextLayoutEngine = struct {
 
         // Calculate proper baseline position (distance from top of line to baseline)
         const baseline_from_top = self.rasterizer.metrics.getBaselineOffset();
-        
+
         try lines.append(LayoutedLine{
             .glyphs = owned_glyphs,
             .width = line_width,
@@ -219,7 +219,7 @@ pub const TextLayoutEngine = struct {
     fn calculateTotalTextHeight(self: *TextLayoutEngine, line_count: usize, cursor_y: f32) f32 {
         const font_ascender_px = @as(f32, @floatFromInt(self.rasterizer.metrics.ascender)) * self.rasterizer.metrics.scale;
         const font_descender_px = @as(f32, @floatFromInt(-self.rasterizer.metrics.descender)) * self.rasterizer.metrics.scale; // Make positive
-        
+
         // Constants for text layout calculations
         const bitmap_padding: f32 = 2.0; // Padding in rasterized bitmaps
         const positioning_margin: f32 = 4.0; // Safety margin for positioning

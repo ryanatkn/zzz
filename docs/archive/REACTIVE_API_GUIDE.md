@@ -27,7 +27,7 @@ This guide covers the complete Svelte 5 reactive system implementation, featurin
 
 ### Basic Setup
 ```zig
-const reactive = @import("lib/reactive.zig");
+const reactive = @import("lib/reactive/mod.zig");
 
 // Initialize reactive context (once per thread)
 try reactive.context.initContext(allocator);
@@ -253,7 +253,7 @@ The `untrack()` function executes code without tracking any dependencies, even i
 
 ### Basic Usage
 ```zig
-const reactive = @import("lib/reactive.zig");
+const reactive = @import("lib/reactive/mod.zig");
 
 var signal_a = try signal.Signal(i32).init(allocator, 10);
 defer signal_a.deinit();

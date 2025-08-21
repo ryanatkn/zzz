@@ -62,9 +62,12 @@ pub const ReactiveHudData = struct {
         const needs_rerender_signal = try allocator.create(signal.Signal(bool));
         needs_rerender_signal.* = try signal.Signal(bool).init(allocator, true);
 
+        var router = router_mod.Router.init(allocator);
+        router.setGameRenderer(base_renderer);
+
         var self = Self{
             .history = history.SimpleHistory.init(),
-            .router = router_mod.Router.init(allocator),
+            .router = router,
             .renderer = browser_renderer.BrowserRenderer.init(base_renderer),
             .links = std.ArrayList(page.Link).init(allocator),
             .allocator = allocator,

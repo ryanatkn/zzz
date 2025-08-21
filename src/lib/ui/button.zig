@@ -279,18 +279,13 @@ pub const Button = struct {
 
             // Use proper text baseline positioning for consistent alignment
             // Create font metrics for text centering calculations
-            const font_metrics_info = FontMetrics.init(
-                1000, 800, -200, 100, 0.012  // Standard font metrics for 12pt text
+            const font_metrics_info = FontMetrics.init(1000, 800, -200, 100, 0.012 // Standard font metrics for 12pt text
             );
-            
+
             // Center text horizontally and use proper baseline for vertical
             const centered_pos = Vec2{
                 .x = button_bounds.position.x + (button_bounds.size.x - text_size.x) / 2,
-                .y = TextPositioning.getCenteredTextY(
-                    button_bounds.position.y, 
-                    button_bounds.size.y, 
-                    font_metrics_info
-                ),
+                .y = TextPositioning.getCenteredTextY(button_bounds.position.y, button_bounds.size.y, font_metrics_info),
             };
 
             text_comp.props.position.set(centered_pos);
@@ -432,21 +427,21 @@ test "button style color handling" {
 
 test "button state color mapping" {
     const testing = std.testing;
-    
+
     const style = ButtonStyle{};
-    
+
     // Test normal state
     const normal_color = style.getBackgroundColor(.normal);
     try testing.expectEqual(Color{ .r = 60, .g = 60, .b = 60, .a = 255 }, normal_color);
-    
+
     // Test hover state
     const hover_color = style.getBackgroundColor(.hovered);
     try testing.expectEqual(Color{ .r = 80, .g = 80, .b = 80, .a = 255 }, hover_color);
-    
-    // Test pressed state  
+
+    // Test pressed state
     const pressed_color = style.getBackgroundColor(.pressed);
     try testing.expectEqual(Color{ .r = 40, .g = 40, .b = 40, .a = 255 }, pressed_color);
-    
+
     // Test disabled state
     const disabled_color = style.getBackgroundColor(.disabled);
     try testing.expectEqual(Color{ .r = 30, .g = 30, .b = 30, .a = 255 }, disabled_color);
@@ -454,9 +449,9 @@ test "button state color mapping" {
 
 test "button border color mapping" {
     const testing = std.testing;
-    
+
     const style = ButtonStyle{};
-    
+
     // Test all border states
     try testing.expectEqual(Color{ .r = 120, .g = 120, .b = 120, .a = 255 }, style.getBorderColor(.normal));
     try testing.expectEqual(Color{ .r = 160, .g = 160, .b = 160, .a = 255 }, style.getBorderColor(.hovered));
@@ -466,9 +461,9 @@ test "button border color mapping" {
 
 test "button style defaults" {
     const testing = std.testing;
-    
+
     const style = ButtonStyle{};
-    
+
     // Test default values
     try testing.expectEqual(@as(f32, 1.0), style.border_width);
     try testing.expectEqual(@as(f32, 4.0), style.corner_radius);
@@ -478,13 +473,13 @@ test "button style defaults" {
 
 test "button custom style" {
     const testing = std.testing;
-    
+
     const custom_style = ButtonStyle{
         .border_width = 2.0,
         .corner_radius = 8.0,
         .normal_color = Color{ .r = 255, .g = 0, .b = 0, .a = 255 },
     };
-    
+
     try testing.expectEqual(@as(f32, 2.0), custom_style.border_width);
     try testing.expectEqual(@as(f32, 8.0), custom_style.corner_radius);
     try testing.expectEqual(Color{ .r = 255, .g = 0, .b = 0, .a = 255 }, custom_style.getBackgroundColor(.normal));

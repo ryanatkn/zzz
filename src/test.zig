@@ -296,7 +296,7 @@ test {
     std.testing.refAllDeclsRecursive(@import("lib/terminal/test.zig"));
 }
 
-// TEMPORARILY EXCLUDED: Runtime segfault in text component test  
+// TEMPORARILY EXCLUDED: Runtime segfault in text component test
 // test {
 //     std.testing.refAllDeclsRecursive(@import("lib/ui/text.zig"));
 // }

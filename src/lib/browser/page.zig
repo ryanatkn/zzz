@@ -89,6 +89,12 @@ pub fn createLink(text: []const u8, path: []const u8, x: f32, y: f32, width: f32
     };
 }
 
+/// Create a non-interactive label (text display only)
+/// This creates a Link with an empty path to prevent navigation
+pub fn createLabel(text: []const u8, x: f32, y: f32, width: f32, height: f32) Link {
+    return createLink(text, "", x, y, width, height);
+}
+
 /// Create a link using normalized coordinates (0-1) that scale with screen size
 /// This is better than hardcoded coordinates for responsive design
 pub fn createResponsiveLink(text: []const u8, path: []const u8, norm_x: f32, norm_y: f32, norm_width: f32, norm_height: f32, screen_width: f32, screen_height: f32) Link {

@@ -46,7 +46,7 @@ FAILED_SHADERS=()
 SUCCESS_COUNT=0
 TOTAL_COUNT=0
 
-for shader in triangle triangle_uniforms simple_circle debug_circle circle rectangle particle simple_rectangle text text_sdf; do
+for shader in triangle triangle_uniforms simple_circle debug_circle circle rectangle particle simple_rectangle text text_sdf test_compute layout_box_model layout_constraints layout_spring_physics; do
     echo "Compiling $shader..."
     
     # Check if source file exists
@@ -55,19 +55,36 @@ for shader in triangle triangle_uniforms simple_circle debug_circle circle recta
         continue
     fi
     
+    # Determine if this is a compute shader
+    IS_COMPUTE=false
+    case "$shader" in
+        *compute*|layout_*) IS_COMPUTE=true ;;
+    esac
+    
     # Check if we need to rebuild (source newer than compiled files)
     NEEDS_REBUILD=false
     if [ "$CLEAN_BUILD" = true ]; then
         NEEDS_REBUILD=true
     else
         # Check if any target files are missing or older than source
-        for target in "compiled/vulkan/${shader}_vs.spv" "compiled/vulkan/${shader}_ps.spv" \
-                     "compiled/d3d12/${shader}_vs.dxil" "compiled/d3d12/${shader}_ps.dxil"; do
-            if [ ! -f "$target" ] || [ "source/${shader}.hlsl" -nt "$target" ]; then
-                NEEDS_REBUILD=true
-                break
-            fi
-        done
+        if [ "$IS_COMPUTE" = true ]; then
+            # Compute shaders only have one stage
+            for target in "compiled/vulkan/${shader}_cs.spv" "compiled/d3d12/${shader}_cs.dxil"; do
+                if [ ! -f "$target" ] || [ "source/${shader}.hlsl" -nt "$target" ]; then
+                    NEEDS_REBUILD=true
+                    break
+                fi
+            done
+        else
+            # Vertex and pixel shaders
+            for target in "compiled/vulkan/${shader}_vs.spv" "compiled/vulkan/${shader}_ps.spv" \
+                         "compiled/d3d12/${shader}_vs.dxil" "compiled/d3d12/${shader}_ps.dxil"; do
+                if [ ! -f "$target" ] || [ "source/${shader}.hlsl" -nt "$target" ]; then
+                    NEEDS_REBUILD=true
+                    break
+                fi
+            done
+        fi
     fi
     
     if [ "$NEEDS_REBUILD" = false ]; then
@@ -79,26 +96,41 @@ for shader in triangle triangle_uniforms simple_circle debug_circle circle recta
     
     SHADER_SUCCESS=true
     
-    # Vulkan (SPIRV)
-    echo "  → SPIRV..."
-    if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d SPIRV -t vertex -e vs_main -o compiled/vulkan/${shader}_vs.spv 2>/dev/null; then
-        echo "    🞪 Failed to compile ${shader} vertex shader to SPIRV"
-        SHADER_SUCCESS=false
-    fi
-    if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d SPIRV -t fragment -e ps_main -o compiled/vulkan/${shader}_ps.spv 2>/dev/null; then
-        echo "    🞪 Failed to compile ${shader} fragment shader to SPIRV"
-        SHADER_SUCCESS=false
-    fi
-    
-    # D3D12 (DXIL)
-    echo "  → DXIL..."
-    if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d DXIL -t vertex -e vs_main -o compiled/d3d12/${shader}_vs.dxil 2>/dev/null; then
-        echo "    🞪 Failed to compile ${shader} vertex shader to DXIL"
-        SHADER_SUCCESS=false
-    fi
-    if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d DXIL -t fragment -e ps_main -o compiled/d3d12/${shader}_ps.dxil 2>/dev/null; then
-        echo "    🞪 Failed to compile ${shader} fragment shader to DXIL"
-        SHADER_SUCCESS=false
+    if [ "$IS_COMPUTE" = true ]; then
+        # Compute shader compilation
+        echo "  → SPIRV (Compute)..."
+        if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d SPIRV -t compute -e cs_main -o compiled/vulkan/${shader}_cs.spv 2>/dev/null; then
+            echo "    🞪 Failed to compile ${shader} compute shader to SPIRV"
+            SHADER_SUCCESS=false
+        fi
+        
+        echo "  → DXIL (Compute)..."
+        if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d DXIL -t compute -e cs_main -o compiled/d3d12/${shader}_cs.dxil 2>/dev/null; then
+            echo "    🞪 Failed to compile ${shader} compute shader to DXIL"
+            SHADER_SUCCESS=false
+        fi
+    else
+        # Vertex and pixel shader compilation
+        echo "  → SPIRV..."
+        if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d SPIRV -t vertex -e vs_main -o compiled/vulkan/${shader}_vs.spv 2>/dev/null; then
+            echo "    🞪 Failed to compile ${shader} vertex shader to SPIRV"
+            SHADER_SUCCESS=false
+        fi
+        if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d SPIRV -t fragment -e ps_main -o compiled/vulkan/${shader}_ps.spv 2>/dev/null; then
+            echo "    🞪 Failed to compile ${shader} fragment shader to SPIRV"
+            SHADER_SUCCESS=false
+        fi
+        
+        # D3D12 (DXIL)
+        echo "  → DXIL..."
+        if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d DXIL -t vertex -e vs_main -o compiled/d3d12/${shader}_vs.dxil 2>/dev/null; then
+            echo "    🞪 Failed to compile ${shader} vertex shader to DXIL"
+            SHADER_SUCCESS=false
+        fi
+        if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d DXIL -t fragment -e ps_main -o compiled/d3d12/${shader}_ps.dxil 2>/dev/null; then
+            echo "    🞪 Failed to compile ${shader} fragment shader to DXIL"
+            SHADER_SUCCESS=false
+        fi
     fi
     
     if $SHADER_SUCCESS; then

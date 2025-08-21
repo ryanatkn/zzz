@@ -26,7 +26,7 @@ pub const Panel = struct {
     base: Component,
 
     border: reactive.Signal(PanelBorder),
-    
+
     // Modern layout using BoxModel instead of manual calculations
     box_layout: BoxModel,
 
@@ -36,14 +36,14 @@ pub const Panel = struct {
         const panel: *Panel = @fieldParentPtr("base", self);
 
         panel.border = try reactive.signal(allocator, PanelBorder, PanelBorder{});
-        
+
         // Initialize BoxModel with panel position and size
         const position = props.position.get();
         const size = props.size.get();
         panel.box_layout = try BoxModel.initWithReactivity(allocator, position, size);
-        
+
         // Configure box model with default panel spacing
-        panel.box_layout.setPadding(4.0);  // Default content padding
+        panel.box_layout.setPadding(4.0); // Default content padding
         panel.box_layout.setBorderWidth(1.0); // Default border width
     }
 
@@ -97,7 +97,7 @@ pub const Panel = struct {
         const current_size = self.base.props.size.get();
         self.box_layout.setPosition(current_pos);
         self.box_layout.setSize(current_size);
-        
+
         // Use BoxModel to calculate content bounds automatically
         return self.box_layout.getContentBounds();
     }
@@ -113,7 +113,7 @@ pub const Panel = struct {
         var border = self.border.get();
         border.width = width;
         self.border.set(border);
-        
+
         // Update box model border for layout calculations
         self.box_layout.setBorderWidth(width);
     }

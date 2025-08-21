@@ -482,9 +482,9 @@ pub const PerformanceAnalysis = struct {
 
 test "label style defaults" {
     const testing = std.testing;
-    
+
     const style = LabelStyle.default;
-    
+
     // Test default values
     try testing.expectEqual(@as(f32, 24.0), style.font_size);
     try testing.expectEqual(Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, style.color);
@@ -495,9 +495,9 @@ test "label style defaults" {
 
 test "label style button preset" {
     const testing = std.testing;
-    
+
     const style = LabelStyle.button;
-    
+
     // Test button preset values
     try testing.expectEqual(@as(f32, 18.0), style.font_size);
     try testing.expectEqual(Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, style.color);
@@ -508,21 +508,21 @@ test "label style button preset" {
 
 test "label style title preset" {
     const testing = std.testing;
-    
+
     const style = LabelStyle.title;
-    
+
     // Test title preset values
     try testing.expectEqual(@as(f32, 36.0), style.font_size);
 }
 
 test "text alignment enum values" {
     const testing = std.testing;
-    
+
     // Test that all alignment values exist and are distinct
     const left = LabelStyle.TextAlignment.left;
     const center = LabelStyle.TextAlignment.center;
     const right = LabelStyle.TextAlignment.right;
-    
+
     try testing.expect(left != center);
     try testing.expect(center != right);
     try testing.expect(left != right);
@@ -530,7 +530,7 @@ test "text alignment enum values" {
 
 test "custom label style" {
     const testing = std.testing;
-    
+
     const custom_style = LabelStyle{
         .font_size = 20.0,
         .color = Color{ .r = 255, .g = 0, .b = 0, .a = 255 },
@@ -538,7 +538,7 @@ test "custom label style" {
         .padding = Vec2{ .x = 12, .y = 6 },
         .alignment = .right,
     };
-    
+
     try testing.expectEqual(@as(f32, 20.0), custom_style.font_size);
     try testing.expectEqual(Color{ .r = 255, .g = 0, .b = 0, .a = 255 }, custom_style.color);
     try testing.expectEqual(Color{ .r = 0, .g = 0, .b = 0, .a = 128 }, custom_style.background_color.?);

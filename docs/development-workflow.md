@@ -49,7 +49,7 @@ const camera = @import("../lib/rendering/camera.zig");
 const collision = @import("../lib/physics/collision.zig");
 
 // Barrel imports for subsystems
-const reactive = @import("../lib/reactive.zig");
+const reactive = @import("../lib/reactive/mod.zig");
 const ui = @import("../lib/ui.zig");
 ```
 

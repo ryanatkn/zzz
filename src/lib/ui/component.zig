@@ -174,7 +174,6 @@ pub const Component = struct {
     }
 };
 
-
 /// Screen-relative units for responsive design
 pub const ScreenUnits = struct {
     screen_width: *reactive.Signal(f32),
@@ -249,7 +248,6 @@ test "component basic functionality" {
     try std.testing.expect(props.containsPoint(Vec2{ .x = 50, .y = 30 }));
     try std.testing.expect(!props.containsPoint(Vec2{ .x = 5, .y = 30 }));
 }
-
 
 test "screen units responsive calculations" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};

@@ -57,7 +57,7 @@ src/lib/reactive/
 ### **Signals (`$state`) - Shallow Reactivity**
 
 ```zig
-const reactive = @import("lib/reactive.zig");
+const reactive = @import("lib/reactive/mod.zig");
 
 // Create a reactive signal with shallow equality
 var count = try reactive.signal(allocator, i32, 0);

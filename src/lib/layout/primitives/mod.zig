@@ -1,16 +1,15 @@
 /// Layout primitives for the UI system
-/// 
+///
 /// This module provides the core building blocks for layout calculations:
 /// - Spacing: distribution of space between elements
 /// - Sizing: flexible and constraint-based sizing
-/// - Positioning: absolute, relative, and aligned positioning  
+/// - Positioning: absolute, relative, and aligned positioning
 /// - Flexbox: CSS flexbox layout implementation
 ///
 /// These primitives are designed to be composable and efficient, with
 /// minimal allocations and cache-friendly data structures.
-
 pub const spacing = @import("spacing.zig");
-pub const sizing = @import("sizing.zig"); 
+pub const sizing = @import("sizing.zig");
 pub const positioning = @import("positioning.zig");
 pub const flexbox = @import("flexbox.zig");
 

@@ -202,7 +202,7 @@ const camera = @import("../lib/rendering/camera.zig");
 
 ### Barrel Imports for Subsystems
 ```zig
-const reactive = @import("../lib/reactive.zig");
+const reactive = @import("../lib/reactive/mod.zig");
 const ui = @import("../lib/ui.zig");
 ```
 

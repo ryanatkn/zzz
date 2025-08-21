@@ -582,11 +582,9 @@ pub const BrowserRenderer = struct {
 
         // Safety check: disable highlighting for large files
         const file_too_large = content.len > ide_constants.SYNTAX.MAX_FILE_SIZE_BYTES;
-        
+
         // Check if syntax highlighting should be enabled
-        const enable_highlighting = ide_constants.SYNTAX.ENABLE_HIGHLIGHTING 
-            and ide_page_impl.*.shouldHighlightCurrentFile() 
-            and !file_too_large;
+        const enable_highlighting = ide_constants.SYNTAX.ENABLE_HIGHLIGHTING and ide_page_impl.*.shouldHighlightCurrentFile() and !file_too_large;
 
         var line_num: u32 = 0;
         var lines = std.mem.splitScalar(u8, content, '\n');
@@ -642,7 +640,7 @@ pub const BrowserRenderer = struct {
             return;
         };
         const end_time = std.time.milliTimestamp();
-        
+
         // Check if highlighting took too long (safety measure)
         if (end_time - start_time > ide_constants.SYNTAX.HIGHLIGHT_TIMEOUT_MS) {
             // Log warning but still render the tokens we got

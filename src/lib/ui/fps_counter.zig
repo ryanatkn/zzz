@@ -409,15 +409,7 @@ test "fps counter initialization" {
     const alignment = text_alignment.TextAlign.left;
     const screen_width = 1920.0;
 
-    var counter = try FPSCounterData.init(
-        allocator,
-        position,
-        font_size,
-        color,
-        update_interval,
-        alignment,
-        screen_width
-    );
+    var counter = try FPSCounterData.init(allocator, position, font_size, color, update_interval, alignment, screen_width);
     defer counter.deinit(allocator);
 
     // Test initial values
@@ -442,15 +434,7 @@ test "fps counter visibility toggle" {
     try reactive.init(allocator);
     defer reactive.deinit(allocator);
 
-    var counter = try FPSCounterData.init(
-        allocator,
-        Vec2.ZERO,
-        16.0,
-        Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
-        100,
-        text_alignment.TextAlign.left,
-        1920.0
-    );
+    var counter = try FPSCounterData.init(allocator, Vec2.ZERO, 16.0, Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, 100, text_alignment.TextAlign.left, 1920.0);
     defer counter.deinit(allocator);
 
     // Test initial visibility
@@ -474,15 +458,7 @@ test "fps counter value updates" {
     try reactive.init(allocator);
     defer reactive.deinit(allocator);
 
-    var counter = try FPSCounterData.init(
-        allocator,
-        Vec2.ZERO,
-        16.0,
-        Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
-        100,
-        text_alignment.TextAlign.left,
-        1920.0
-    );
+    var counter = try FPSCounterData.init(allocator, Vec2.ZERO, 16.0, Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, 100, text_alignment.TextAlign.left, 1920.0);
     defer counter.deinit(allocator);
 
     // Test initial FPS

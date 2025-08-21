@@ -5,7 +5,6 @@ const Vec2 = math.Vec2;
 
 /// Spacing calculation utilities for layout primitives
 pub const SpacingUtils = struct {
-    
     /// Calculate distributed spacing for justify-content: space-between
     pub fn calculateSpaceBetween(total_width: f32, content_width: f32, item_count: u32) f32 {
         if (item_count <= 1) return 0;
@@ -48,11 +47,11 @@ pub const SpacingUtils = struct {
 // Tests
 test "space-between calculation" {
     const testing = std.testing;
-    
+
     // 300px total width, 200px content, 3 items = 50px spacing between each
     const spacing = SpacingUtils.calculateSpaceBetween(300, 200, 3);
     try testing.expect(@abs(spacing - 50.0) < 0.01);
-    
+
     // Single item should have 0 spacing
     const single_spacing = SpacingUtils.calculateSpaceBetween(300, 200, 1);
     try testing.expect(single_spacing == 0);
@@ -60,7 +59,7 @@ test "space-between calculation" {
 
 test "space-around calculation" {
     const testing = std.testing;
-    
+
     const result = SpacingUtils.calculateSpaceAround(300, 200, 4);
     // 100px extra space / 4 items = 25px per item
     try testing.expect(@abs(result.spacing - 25.0) < 0.01);
@@ -70,7 +69,7 @@ test "space-around calculation" {
 
 test "space-evenly calculation" {
     const testing = std.testing;
-    
+
     const result = SpacingUtils.calculateSpaceEvenly(300, 200, 4);
     // 100px extra space / 5 gaps = 20px per gap
     try testing.expect(@abs(result.spacing - 20.0) < 0.01);
@@ -79,11 +78,11 @@ test "space-evenly calculation" {
 
 test "gap spacing" {
     const testing = std.testing;
-    
+
     // 4 items with 10px gap = 3 gaps = 30px total
     const total_gap = SpacingUtils.calculateGapSpacing(4, 10);
     try testing.expect(total_gap == 30);
-    
+
     // Single item should have no gap spacing
     const no_gap = SpacingUtils.calculateGapSpacing(1, 10);
     try testing.expect(no_gap == 0);

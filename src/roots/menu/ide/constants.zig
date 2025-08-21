@@ -88,10 +88,10 @@ pub const SYNTAX = struct {
 
     /// Maximum tokens per line (performance limit)
     pub const MAX_TOKENS_PER_LINE: u32 = 100;
-    
+
     /// Maximum file size to highlight (10KB limit for safety)
     pub const MAX_FILE_SIZE_BYTES: u32 = 10 * 1024;
-    
+
     /// Timeout for syntax highlighting per file (100ms)
     pub const HIGHLIGHT_TIMEOUT_MS: u32 = 100;
 };
