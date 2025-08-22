@@ -4,6 +4,7 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
+const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -36,8 +37,8 @@ pub const FocusableBorder = struct {
         // Initialize reactive signals with sensible defaults
         border.is_focused = try reactive.signal(allocator, bool, false);
         border.border_width = try reactive.signal(allocator, f32, 2.0);
-        border.focus_color = try reactive.signal(allocator, Color, Color{ .r = 70, .g = 130, .b = 180, .a = 255 }); // Selection blue
-        border.normal_color = try reactive.signal(allocator, Color, Color{ .r = 60, .g = 65, .b = 75, .a = 255 }); // Subtle gray
+        border.focus_color = try reactive.signal(allocator, Color, styles.Colors.border_focus);
+        border.normal_color = try reactive.signal(allocator, Color, styles.Colors.bg_secondary);
         border.border_style = try reactive.signal(allocator, BorderStyle, .solid);
     }
 
@@ -138,7 +139,7 @@ pub fn createFocusableBorder(allocator: std.mem.Allocator, bounds: Rectangle) !*
     const props = ComponentProps{
         .bounds = try reactive.signal(allocator, Rectangle, bounds),
         .visible = try reactive.signal(allocator, bool, true),
-        .background_color = try reactive.signal(allocator, Color, Color{ .r = 0, .g = 0, .b = 0, .a = 0 }), // Transparent
+        .background_color = try reactive.signal(allocator, Color, styles.Colors.transparent),
     };
 
     border.* = FocusableBorder{

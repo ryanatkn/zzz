@@ -8,6 +8,7 @@ const reactive_time = @import("../reactive/time.zig");
 const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../reactive/component.zig").createComponent;
 const getComponentData = @import("../reactive/component.zig").getComponentData;
+const styles = @import("styles/mod.zig");
 const castComponentState = @import("../reactive/component.zig").castComponentState;
 const signal = @import("../reactive/signal.zig");
 const derived = @import("../reactive/derived.zig");
@@ -259,7 +260,7 @@ pub const FPSCounter = struct {
 pub const FPSCounterPresets = struct {
     pub const default_white = struct {
         pub const position = Vec2{ .x = 100.0, .y = 100.0 };
-        pub const font_size = 48.0;
+        pub const font_size = styles.FontSizes.header;
         pub const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
         pub const update_interval_ms = 500; // Update twice per second
         pub const alignment = text_alignment.TextAlign.left;
@@ -268,7 +269,7 @@ pub const FPSCounterPresets = struct {
 
     pub const debug_overlay = struct {
         pub const position = Vec2{ .x = 1910.0, .y = 1060.0 }; // Right edge with margin
-        pub const font_size = 24.0;
+        pub const font_size = styles.FontSizes.title;
         pub const color = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
         pub const update_interval_ms = 1000; // Update once per second
         pub const alignment = text_alignment.TextAlign.right; // Right-aligned
@@ -277,7 +278,7 @@ pub const FPSCounterPresets = struct {
 
     pub const small_corner = struct {
         pub const position = Vec2{ .x = 10.0, .y = 10.0 };
-        pub const font_size = 18.0;
+        pub const font_size = styles.FontSizes.large;
         pub const color = Color{ .r = 200, .g = 200, .b = 200, .a = 180 };
         pub const update_interval_ms = 1000; // Update once per second
         pub const alignment = text_alignment.TextAlign.left;
@@ -287,7 +288,7 @@ pub const FPSCounterPresets = struct {
     /// New right-aligned top corner preset
     pub const top_right_corner = struct {
         pub const position = Vec2{ .x = 1910.0, .y = 10.0 }; // Top-right with margin
-        pub const font_size = 18.0;
+        pub const font_size = styles.FontSizes.large;
         pub const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
         pub const update_interval_ms = 1000; // Update once per second
         pub const alignment = text_alignment.TextAlign.right; // Right-aligned
@@ -403,7 +404,7 @@ test "fps counter initialization" {
     defer reactive.deinit(allocator);
 
     const position = Vec2{ .x = 10, .y = 10 };
-    const font_size = 16.0;
+    const font_size = styles.FontSizes.medium;
     const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
     const update_interval = 100;
     const alignment = text_alignment.TextAlign.left;

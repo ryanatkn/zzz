@@ -1,10 +1,12 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
+const color_math = @import("../math/color.zig");
 const directory_scanner = @import("../platform/directory_scanner.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
+const ColorBuilder = color_math.ColorBuilder;
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const FileType = directory_scanner.FileType;
 
@@ -62,13 +64,13 @@ pub const FileIcon = enum {
     /// Get color for icon
     pub fn getColor(self: FileIcon) Color {
         return switch (self) {
-            .folder_closed, .folder_open => Color{ .r = 100, .g = 149, .b = 237, .a = 255 }, // Blue
-            .file_zig => Color{ .r = 255, .g = 140, .b = 0, .a = 255 }, // Orange
-            .file_markdown => Color{ .r = 50, .g = 205, .b = 50, .a = 255 }, // Green
-            .file_shader => Color{ .r = 255, .g = 20, .b = 147, .a = 255 }, // Pink
-            .file_config => Color{ .r = 255, .g = 215, .b = 0, .a = 255 }, // Gold
-            .file_text => Color{ .r = 169, .g = 169, .b = 169, .a = 255 }, // Gray
-            .file_unknown => Color{ .r = 128, .g = 128, .b = 128, .a = 255 }, // Dark Gray
+            .folder_closed, .folder_open => ColorBuilder.rgb(100, 149, 237), // Blue
+            .file_zig => ColorBuilder.rgb(255, 140, 0), // Orange
+            .file_markdown => ColorBuilder.rgb(50, 205, 50), // Green
+            .file_shader => ColorBuilder.rgb(255, 20, 147), // Pink
+            .file_config => ColorBuilder.rgb(255, 215, 0), // Gold
+            .file_text => ColorBuilder.rgb(169, 169, 169), // Gray
+            .file_unknown => ColorBuilder.gray(128), // Dark Gray
         };
     }
 };
@@ -92,10 +94,7 @@ pub const TreeItem = struct {
             .entry = entry,
             .depth = depth,
             .position = position,
-            .bounds = math.Rectangle{
-                .position = position,
-                .size = Vec2{ .x = item_width, .y = item_height },
-            },
+            .bounds = math.Rectangle.init(position, Vec2.size(item_width, item_height)),
             .icon = icon,
             .visible = true,
         };
@@ -291,7 +290,7 @@ pub const FileTreeComponent = struct {
             // Auto-expand root
             r.expanded = true;
             // Build initial render list with panel-relative coordinates
-            try self.renderer.buildRenderList(r, Vec2{ .x = 0.0, .y = 0.0 });
+            try self.renderer.buildRenderList(r, Vec2.ZERO);
         }
     }
 
@@ -302,7 +301,7 @@ pub const FileTreeComponent = struct {
             // Auto-expand root
             r.expanded = true;
             // Build filtered render list with panel-relative coordinates
-            try self.renderer.buildFilteredRenderList(r, Vec2{ .x = 0.0, .y = 0.0 }, search_query, file_type_filter);
+            try self.renderer.buildFilteredRenderList(r, Vec2.ZERO, search_query, file_type_filter);
         }
     }
 
@@ -317,7 +316,7 @@ pub const FileTreeComponent = struct {
                 self.renderer.toggleExpanded(item.entry);
                 // Rebuild render list after expansion change
                 if (self.root_entry) |root| {
-                    try self.renderer.buildRenderList(root, Vec2{ .x = 0.0, .y = 0.0 });
+                    try self.renderer.buildRenderList(root, Vec2.ZERO);
                 }
             }
 
@@ -403,7 +402,7 @@ pub const FileTreeComponent = struct {
                 self.renderer.toggleExpanded(selected);
                 // Rebuild render list to reflect changes
                 if (self.root_entry) |root| {
-                    self.renderer.buildRenderList(root, Vec2{ .x = 0.0, .y = 0.0 }) catch {};
+                    self.renderer.buildRenderList(root, Vec2.ZERO) catch {};
                 }
             }
         }

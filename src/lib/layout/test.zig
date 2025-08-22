@@ -26,7 +26,6 @@ test {
     _ = @import("runtime/engine.zig");
 }
 
-// TODO: Fix broken test modules
-// _ = @import("math.zig"); // Layout math utilities (needs fixing)
+// Note: math.zig was removed - it was just a barrel import with no testable logic
 
 // TODO: Add text and flex algorithm tests once imports are fixed

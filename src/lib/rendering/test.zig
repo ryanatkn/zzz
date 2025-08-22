@@ -8,14 +8,13 @@ const std = @import("std");
 // Working rendering modules
 test {
     _ = @import("shapes.zig");
+    _ = @import("performance.zig"); // Fixed: Now uses optional logger access
 
     // TODO: Fix broken test modules
-    // _ = @import("compute.zig"); // Needs fixing
     // _ = @import("modes.zig"); // Imports text/renderer.zig which depends on SDL - should be legitimate exclusion
-    // _ = @import("performance.zig"); // Runtime failure - needs logger initialization
-    // _ = @import("structured_buffers.zig"); // Needs fixing
 }
+
+// Note: compute.zig and structured_buffers.zig were removed - they were unused GPU compute infrastructure
 
 // TODO: The following modules are excluded:
 // - modes.zig: Imports text/renderer.zig which depends on SDL (legitimate exclusion)
-// - performance.zig: Runtime failure - needs logger initialization (needs fixing)

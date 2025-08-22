@@ -2,6 +2,7 @@ const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
+const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -333,7 +334,7 @@ pub const InputField = struct {
 /// Configuration for input field styling
 pub const InputFieldConfig = struct {
     initial_text: []const u8 = "",
-    font_size: f32 = 14.0,
+    font_size: f32 = styles.FontSizes.normal,
     text_color: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
     background_color: Color = Color{ .r = 30, .g = 30, .b = 30, .a = 255 },
 };
@@ -450,7 +451,7 @@ pub const Button = struct {
 
 /// Configuration for button styling
 pub const ButtonConfig = struct {
-    font_size: f32 = 14.0,
+    font_size: f32 = styles.FontSizes.normal,
     normal_color: Color = Color{ .r = 60, .g = 60, .b = 60, .a = 255 },
     hover_color: Color = Color{ .r = 80, .g = 80, .b = 80, .a = 255 },
     pressed_color: Color = Color{ .r = 40, .g = 40, .b = 40, .a = 255 },
@@ -465,7 +466,7 @@ test "UIComponent basic functionality" {
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const bounds = Rectangle{ .position = Vec2{ .x = 0, .y = 0 }, .size = Vec2{ .x = 100, .y = 50 } };
+    const bounds = Rectangle.sizedWH(100, 50);
     var component = try UIComponent.init(allocator, bounds);
     defer component.deinit();
 
@@ -485,7 +486,7 @@ test "Panel rendering preparation" {
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const bounds = Rectangle{ .position = Vec2{ .x = 0, .y = 0 }, .size = Vec2{ .x = 100, .y = 50 } };
+    const bounds = Rectangle.sizedWH(100, 50);
     var panel = try Panel.init(allocator, bounds, PanelConfig{});
     defer panel.deinit();
 

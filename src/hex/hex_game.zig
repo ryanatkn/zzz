@@ -127,7 +127,7 @@ const HexTravelInterface = struct {
             return zone.spawn_pos;
         }
         // Fallback to screen center
-        return Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
+        return Vec2.screenCenter(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
     }
 
     pub fn transferPlayer(game: *HexGame, destination_zone: usize, spawn_pos: Vec2) world.ZoneTravelInterface.TravelResult {
@@ -238,7 +238,7 @@ pub const HexGame = struct {
                     .overworld => 1.0,
                     else => 2.0,
                 },
-                .spawn_pos = Vec2{ .x = 400, .y = 300 },
+                .spawn_pos = Vec2.screenCenter(800, 600),
                 .background_color = getZoneBackgroundColor(zone_type),
                 .entity_count = 0,
             };
@@ -279,7 +279,7 @@ pub const HexGame = struct {
             .zone_manager = zones.ZoneManager(ZoneData, MAX_ZONES).init(),
             .player_entity = null,
             .player_zone = 0,
-            .player_start_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y },
+            .player_start_pos = Vec2.screenCenter(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT),
             .primary_controller = controller_mod.createPlayerController(),
             .bullet_pool = BulletPool.init(),
             .entity_allocator = EntityAllocator{},

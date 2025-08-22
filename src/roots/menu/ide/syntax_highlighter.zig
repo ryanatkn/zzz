@@ -2,8 +2,10 @@
 /// Pattern-based highlighting without full AST parsing
 const std = @import("std");
 const colors = @import("../../../lib/core/colors.zig");
+const color_math = @import("../../../lib/math/color.zig");
 const constants = @import("constants.zig");
 const Color = colors.Color;
+const ColorBuilder = color_math.ColorBuilder;
 
 /// Token type for syntax highlighting
 pub const TokenType = enum {
@@ -18,14 +20,14 @@ pub const TokenType = enum {
 
     pub fn getColor(self: TokenType) Color {
         return switch (self) {
-            .normal => Color{ .r = 200, .g = 200, .b = 200, .a = 255 },
-            .keyword => Color{ .r = 150, .g = 120, .b = 255, .a = 255 }, // Purple-blue
-            .type => Color{ .r = 80, .g = 200, .b = 180, .a = 255 }, // Cyan-green
-            .string => Color{ .r = 255, .g = 200, .b = 100, .a = 255 }, // Yellow-orange
-            .comment => Color{ .r = 120, .g = 120, .b = 120, .a = 255 }, // Gray
-            .number => Color{ .r = 255, .g = 150, .b = 150, .a = 255 }, // Light red
-            .function => Color{ .r = 100, .g = 255, .b = 150, .a = 255 }, // Light green
-            .builtin => Color{ .r = 255, .g = 180, .b = 120, .a = 255 }, // Orange
+            .normal => ColorBuilder.rgb(200, 200, 200),
+            .keyword => ColorBuilder.rgb(150, 120, 255), // Purple-blue
+            .type => ColorBuilder.rgb(80, 200, 180), // Cyan-green
+            .string => ColorBuilder.rgb(255, 200, 100), // Yellow-orange
+            .comment => ColorBuilder.gray(120), // Gray
+            .number => ColorBuilder.rgb(255, 150, 150), // Light red
+            .function => ColorBuilder.rgb(100, 255, 150), // Light green
+            .builtin => ColorBuilder.rgb(255, 180, 120), // Orange
         };
     }
 };

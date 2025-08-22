@@ -4,6 +4,7 @@ const colors = @import("../core/colors.zig");
 const constants = @import("../core/constants.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
+const styles = @import("styles/mod.zig");
 const text_baseline = @import("../layout/text_baseline.zig");
 const box_model = @import("../layout/box_model.zig");
 const font_metrics = @import("../font/font_metrics.zig");
@@ -59,17 +60,17 @@ pub const TextInput = struct {
         input.placeholder = try reactive.signal(allocator, []const u8, "Enter text...");
         input.max_length = try reactive.signal(allocator, usize, 255);
 
-        input.text_color = try reactive.signal(allocator, Color, Color{ .r = 255, .g = 255, .b = 255, .a = 255 });
-        input.placeholder_color = try reactive.signal(allocator, Color, Color{ .r = 128, .g = 128, .b = 128, .a = 255 });
-        input.cursor_color = try reactive.signal(allocator, Color, Color{ .r = 255, .g = 255, .b = 255, .a = 255 });
-        input.selection_color = try reactive.signal(allocator, Color, Color{ .r = 60, .g = 100, .b = 160, .a = 128 });
+        input.text_color = try reactive.signal(allocator, Color, styles.Colors.text_primary);
+        input.placeholder_color = try reactive.signal(allocator, Color, styles.Colors.text_disabled);
+        input.cursor_color = try reactive.signal(allocator, Color, styles.Colors.text_primary);
+        input.selection_color = try reactive.signal(allocator, Color, styles.Colors.selection);
 
         input.is_focused = try reactive.signal(allocator, bool, false);
         input.text_buffer = std.ArrayList(u8).init(allocator);
 
         // Initialize font metrics for 12pt font (typical web default)
         // These values are estimates - should be replaced with actual font metrics when available
-        input.font_size = 12.0;
+        input.font_size = styles.FontSizes.small;
         input.font_metrics_info = FontMetrics.init(1000, // units_per_em (typical for TrueType fonts)
             800, // ascender
             -200, // descender
@@ -117,16 +118,16 @@ pub const TextInput = struct {
 
         if (@hasDecl(@TypeOf(renderer), "drawRect")) {
             const bg_color = if (input.is_focused.get())
-                Color{ .r = 50, .g = 50, .b = 50, .a = 255 }
+                styles.Colors.bg_secondary
             else
-                Color{ .r = 40, .g = 40, .b = 40, .a = 255 };
+                styles.Colors.bg_primary;
 
             try renderer.drawRect(bounds, bg_color);
 
             const border_color = if (input.is_focused.get())
-                Color{ .r = 100, .g = 150, .b = 200, .a = 255 }
+                styles.Colors.input_focus
             else
-                Color{ .r = 80, .g = 80, .b = 80, .a = 255 };
+                styles.Colors.input_unfocus;
 
             if (@hasDecl(@TypeOf(renderer), "drawRectBorder")) {
                 try renderer.drawRectBorder(bounds, border_color, 1.0);
@@ -159,10 +160,7 @@ pub const TextInput = struct {
                 input.font_metrics_info);
             const cursor_height = TextPositioning.getCursorHeight(input.font_metrics_info);
 
-            const cursor_rect = Rectangle{
-                .position = cursor_position,
-                .size = Vec2{ .x = 1, .y = cursor_height },
-            };
+            const cursor_rect = Rectangle.init(cursor_position, Vec2{ .x = 1, .y = cursor_height });
 
             if (@hasDecl(@TypeOf(renderer), "drawRect")) {
                 try renderer.drawRect(cursor_rect, input.cursor_color.get());
@@ -182,10 +180,7 @@ pub const TextInput = struct {
                 const content_y = bounds.position.y + padding;
                 const content_height = bounds.size.y - (padding * 2.0);
 
-                const selection_rect = Rectangle{
-                    .position = Vec2{ .x = sel_x, .y = content_y },
-                    .size = Vec2{ .x = sel_width, .y = content_height },
-                };
+                const selection_rect = Rectangle.init(Vec2{ .x = sel_x, .y = content_y }, Vec2{ .x = sel_width, .y = content_height });
 
                 if (@hasDecl(@TypeOf(renderer), "drawRect")) {
                     try renderer.drawRect(selection_rect, input.selection_color.get());
@@ -200,7 +195,7 @@ pub const TextInput = struct {
         if (!self.props.enabled.get() or !self.props.visible.get()) return false;
 
         if (@hasField(@TypeOf(event), "mouse_x") and @hasField(@TypeOf(event), "mouse_y")) {
-            const mouse_pos = Vec2{ .x = event.mouse_x, .y = event.mouse_y };
+            const mouse_pos = Vec2.position(event.mouse_x, event.mouse_y);
             const bounds = self.props.getBounds();
 
             if (@hasField(@TypeOf(event), "mouse_pressed") and event.mouse_pressed) {
@@ -343,7 +338,7 @@ pub fn createTextInput(allocator: std.mem.Allocator, position: Vec2, size: Vec2)
         .is_focused = undefined,
         .text_buffer = undefined,
         .font_metrics_info = undefined,
-        .font_size = 12.0,
+        .font_size = styles.FontSizes.small,
     };
 
     try input.base.init(allocator, props);

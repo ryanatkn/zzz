@@ -3,6 +3,7 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
+const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -19,9 +20,9 @@ pub const ScrollDirection = enum {
 pub const ScrollBar = struct {
     visible: bool = true,
     width: f32 = 12.0,
-    thumb_color: Color = Color{ .r = 100, .g = 100, .b = 100, .a = 255 },
-    track_color: Color = Color{ .r = 40, .g = 40, .b = 40, .a = 255 },
-    thumb_hover_color: Color = Color{ .r = 120, .g = 120, .b = 120, .a = 255 },
+    thumb_color: Color = styles.Colors.scrollbar_thumb,
+    track_color: Color = styles.Colors.bg_primary,
+    thumb_hover_color: Color = styles.Colors.border_primary,
 };
 
 pub const ScrollableView = struct {
@@ -330,7 +331,7 @@ pub fn createScrollableView(
     const scrollable = try allocator.create(ScrollableView);
 
     var props = try ComponentProps.init(allocator, position, size);
-    props.background_color.set(Color{ .r = 30, .g = 30, .b = 30, .a = 255 });
+    props.background_color.set(styles.Colors.bg_pressed);
 
     scrollable.* = ScrollableView{
         .base = Component{

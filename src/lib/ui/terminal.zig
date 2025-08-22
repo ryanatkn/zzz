@@ -8,6 +8,7 @@ const sdl = @import("../platform/sdl.zig");
 const terminal_mod = @import("../terminal/mod.zig");
 const text_renderer = @import("../text/renderer.zig");
 const ui = @import("../ui.zig");
+const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -57,14 +58,14 @@ pub const TerminalComponent = struct {
     pub fn init(allocator: std.mem.Allocator, bounds: Rectangle) !Self {
         // Initialize all reactive signals first, then create the component
         const bounds_signal = try reactive.signal(allocator, Rectangle, bounds);
-        const font_size_signal = try reactive.signal(allocator, f32, 14.0);
+        const font_size_signal = try reactive.signal(allocator, f32, styles.FontSizes.normal);
         const line_height_signal = try reactive.signal(allocator, f32, 18.0);
         const char_width_signal = try reactive.signal(allocator, f32, 8.0);
 
-        const background_color_signal = try reactive.signal(allocator, Color, Color{ .r = 0, .g = 0, .b = 0, .a = 255 });
-        const text_color_signal = try reactive.signal(allocator, Color, Color{ .r = 255, .g = 255, .b = 255, .a = 255 });
-        const cursor_color_signal = try reactive.signal(allocator, Color, Color{ .r = 255, .g = 255, .b = 255, .a = 255 });
-        const selection_color_signal = try reactive.signal(allocator, Color, Color{ .r = 60, .g = 100, .b = 160, .a = 128 });
+        const background_color_signal = try reactive.signal(allocator, Color, styles.Colors.terminal_black); // Full black for terminal
+        const text_color_signal = try reactive.signal(allocator, Color, styles.Colors.text_primary);
+        const cursor_color_signal = try reactive.signal(allocator, Color, styles.Colors.text_primary);
+        const selection_color_signal = try reactive.signal(allocator, Color, styles.Colors.selection);
 
         const visible_rows_signal = try reactive.signal(allocator, usize, 24);
         const visible_columns_signal = try reactive.signal(allocator, usize, 80);
@@ -73,10 +74,10 @@ pub const TerminalComponent = struct {
 
         // Create layout renderer with appropriate configuration
         const layout_config = ui.TerminalLayoutConfig{
-            .input_bg_focused = Color{ .r = 30, .g = 35, .b = 40, .a = 255 },
-            .input_bg_unfocused = Color{ .r = 15, .g = 20, .b = 25, .a = 255 },
-            .input_border = Color{ .r = 70, .g = 130, .b = 180, .a = 255 },
-            .text_color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+            .input_bg_focused = styles.Colors.terminal_bg_focus, // Custom dark blue for terminal focus
+            .input_bg_unfocused = styles.Colors.terminal_bg_unfocus, // Custom darker blue for terminal
+            .input_border = styles.Colors.border_focus,
+            .text_color = styles.Colors.text_primary,
         };
 
         var component = Self{

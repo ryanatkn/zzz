@@ -338,11 +338,11 @@ test "effect basic functionality" {
     _ = try speed_mgr.addEffect(1.5, 2.0, 1); // 50% speed boost
     try std.testing.expectApproxEqAbs(@as(f32, 150.0), speed_mgr.calculateValue(100.0), 0.1);
 
-    // Add another speed boost
-    _ = try speed_mgr.addEffect(1.2, 1.0, 2); // 20% speed boost
+    // Add another speed boost with longer duration
+    _ = try speed_mgr.addEffect(1.2, 3.0, 2); // 20% speed boost, 3 second duration
     try std.testing.expectApproxEqAbs(@as(f32, 180.0), speed_mgr.calculateValue(100.0), 0.1); // 1.5 * 1.2 * 100
 
-    // Update and let first effect expire
+    // Update and let first effect expire (2.0s), but keep second (3.0s)
     speed_mgr.update(2.1);
     try std.testing.expectApproxEqAbs(@as(f32, 120.0), speed_mgr.calculateValue(100.0), 0.1); // Only 1.2 multiplier remains
 }
@@ -360,7 +360,7 @@ test "effect stacking types" {
     try std.testing.expectApproxEqAbs(@as(f32, 75.0), replace_mgr.calculateValue(25.0), 0.1); // Should be replaced value
 
     // Test add stacking
-    var add_mgr = DamageManager.init(allocator, .{ .stack_type = .add });
+    var add_mgr = DamageManager.init(allocator, .{ .stack_type = .add, .max_stacks = 3 });
     defer add_mgr.deinit();
 
     _ = try add_mgr.addEffect(10.0, 1.0, 1);

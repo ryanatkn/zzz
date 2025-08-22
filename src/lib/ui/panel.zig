@@ -4,6 +4,7 @@ const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
 const box_model = @import("../layout/algorithms/box_model/mod.zig");
+const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -19,7 +20,7 @@ pub const PanelSplitDirection = enum {
 
 pub const PanelBorder = struct {
     width: f32 = 1.0,
-    color: Color = Color{ .r = 80, .g = 80, .b = 80, .a = 255 },
+    color: Color = styles.Colors.bg_hover,
 };
 
 pub const Panel = struct {
@@ -151,7 +152,7 @@ pub const PanelLayout = struct {
         layout.split_direction = try reactive.signal(allocator, PanelSplitDirection, .horizontal);
         layout.split_ratio = try reactive.signal(allocator, f32, 0.5);
         layout.divider_width = try reactive.signal(allocator, f32, 4.0);
-        layout.divider_color = try reactive.signal(allocator, Color, Color{ .r = 60, .g = 60, .b = 60, .a = 255 });
+        layout.divider_color = try reactive.signal(allocator, Color, styles.Colors.bg_secondary);
         layout.min_panel_size = try reactive.signal(allocator, f32, 50.0);
     }
 
@@ -303,7 +304,7 @@ pub fn createPanel(allocator: std.mem.Allocator, position: Vec2, size: Vec2) !*C
     const panel = try allocator.create(Panel);
 
     const props = try ComponentProps.init(allocator, position, size);
-    props.background_color.set(Color{ .r = 40, .g = 40, .b = 40, .a = 255 });
+    props.background_color.set(styles.Colors.bg_primary);
 
     panel.* = Panel{
         .base = Component{

@@ -6,6 +6,7 @@ const reactive = @import("../reactive/mod.zig");
 const terminal_core = @import("../terminal/core.zig");
 const text_baseline = @import("../layout/text_baseline.zig");
 const font_metrics = @import("../font/font_metrics.zig");
+const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -22,7 +23,7 @@ pub const CursorStyle = enum {
 };
 
 pub const TerminalTextConfig = struct {
-    font_size: f32 = 16.0,
+    font_size: f32 = styles.FontSizes.medium,
     line_height: f32 = 18.0,
     char_width: f32 = 8.0,
     text_color: Color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 },

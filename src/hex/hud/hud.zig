@@ -103,7 +103,7 @@ pub const Hud = struct {
                             if (std.mem.eql(u8, current_page.path, "/ide")) {
                                 ui_log.info("hud_routing", "On IDE page, handling IDE interactions", .{});
                                 const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
-                                const point = math.Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
+                                const point = math.Vec2.position(@floatFromInt(mouse_x), @floatFromInt(mouse_y));
 
                                 // Try terminal click first
                                 if (ide_page_impl.handleTerminalClick(point)) {
@@ -178,7 +178,7 @@ pub const Hud = struct {
                     if (std.mem.eql(u8, current_page.path, "/ide")) {
                         const ide_page_impl: *ide_page.IDEPage = @fieldParentPtr("base", current_page);
 
-                        const point = math.Vec2{ .x = @floatFromInt(mouse_x), .y = @floatFromInt(mouse_y) };
+                        const point = math.Vec2.position(@floatFromInt(mouse_x), @floatFromInt(mouse_y));
 
                         // Adjust point to be relative to file explorer panel (same as in handleFileTreeClick)
                         const explorer_rect = math.Vec2{ .x = 8 + 8, .y = 60 + 8 + 30 };

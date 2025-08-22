@@ -75,13 +75,13 @@ test {
 // - lib/ui/text.zig - Runtime segfault in reactive system
 // - lib/ui/fps_counter.zig - SDL dependencies + reactive issues
 // - lib/ui/debug_overlay.zig - Comptime value issues
-// - lib/ui/reactive_label.zig - FormatArg API changes
 // - lib/ui/focus_manager.zig - Derived pointer issues
 //
 // Other Broken Tests:
 // - lib/gannaway/compute.zig, state.zig, watch.zig - Various issues
-// - lib/layout/math.zig - Needs investigation
-// - lib/rendering/compute.zig, modes.zig, structured_buffers.zig - Various issues
+// - lib/layout/math.zig - Removed (was just a barrel import with no testable logic)
+// - lib/rendering/modes.zig - SDL dependencies (legitimate exclusion)
+// - lib/rendering/compute.zig, structured_buffers.zig - Removed (unused GPU compute infrastructure)
 // - lib/text/sdf_renderer.zig - May have external dependencies
 //
 // Behavioral System (cascade from patrol_behavior issues):

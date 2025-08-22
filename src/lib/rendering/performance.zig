@@ -55,18 +55,22 @@ pub const PerformanceMonitor = struct {
 
         // Log on first frame to confirm monitoring is active
         if (self.frame_counter == 1) {
-            loggers.getGameLog().info("gpu_perf_init", "🎯 GPU performance monitoring started - first frame: {d:.2}ms", .{self.current_metrics.frame_time_ms});
+            if (loggers.getGameLogOptional()) |logger| {
+                logger.info("gpu_perf_init", "🎯 GPU performance monitoring started - first frame: {d:.2}ms", .{self.current_metrics.frame_time_ms});
+            }
         }
 
         // Log performance summary at specified frequency
         if (self.frame_counter % self.logging_frequency == 0) {
-            loggers.getGameLog().info("gpu_perf", "📊 Frame: {d:.2}ms | Draw calls: {d} (individual: {d}, batched: {d}) | Frames: {d}", .{
-                self.current_metrics.frame_time_ms,
-                self.current_metrics.draw_call_count,
-                self.current_metrics.individual_draw_calls,
-                self.current_metrics.batched_draw_calls,
-                self.frame_counter,
-            });
+            if (loggers.getGameLogOptional()) |logger| {
+                logger.info("gpu_perf", "📊 Frame: {d:.2}ms | Draw calls: {d} (individual: {d}, batched: {d}) | Frames: {d}", .{
+                    self.current_metrics.frame_time_ms,
+                    self.current_metrics.draw_call_count,
+                    self.current_metrics.individual_draw_calls,
+                    self.current_metrics.batched_draw_calls,
+                    self.frame_counter,
+                });
+            }
         }
     }
 

@@ -1,486 +1,246 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
-const constants = @import("../core/constants.zig");
 const reactive = @import("../reactive/mod.zig");
-const component = @import("component.zig");
-const text = @import("text.zig");
-const text_baseline = @import("../layout/text_baseline.zig");
-const font_metrics = @import("../font/font_metrics.zig");
+const base_component = @import("base_component.zig");
+const text_display = @import("text_display.zig");
+const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
-const Component = component.Component;
-const ComponentProps = component.ComponentProps;
-const Text = text.Text;
-const TextStyle = text.TextStyle;
-const TextPositioning = text_baseline.TextPositioning;
-const FontMetrics = font_metrics.FontMetrics;
+const ComponentProps = base_component.ComponentProps;
+const Component = base_component.Component;
+const TextDisplay = text_display.TextDisplay;
 
-/// Button states for visual feedback
-pub const ButtonState = enum {
-    normal,
-    hovered,
-    pressed,
-    disabled,
-};
+// Re-export unified button styling
+pub const ButtonState = styles.ButtonState;
+pub const ButtonStyle = styles.ButtonStyle;
 
-/// Button styling configuration
-pub const ButtonStyle = struct {
-    // Background colors for different states
-    normal_color: Color = Color{ .r = 60, .g = 60, .b = 60, .a = 255 },
-    hover_color: Color = Color{ .r = 80, .g = 80, .b = 80, .a = 255 },
-    pressed_color: Color = Color{ .r = 40, .g = 40, .b = 40, .a = 255 },
-    disabled_color: Color = Color{ .r = 30, .g = 30, .b = 30, .a = 255 },
-
-    // Border colors
-    border_normal: Color = Color{ .r = 120, .g = 120, .b = 120, .a = 255 },
-    border_hover: Color = Color{ .r = 160, .g = 160, .b = 160, .a = 255 },
-    border_pressed: Color = Color{ .r = 100, .g = 100, .b = 100, .a = 255 },
-    border_disabled: Color = Color{ .r = 60, .g = 60, .b = 60, .a = 255 },
-
-    // Border width
-    border_width: f32 = 1.0,
-
-    // Corner radius for rounded buttons
-    corner_radius: f32 = 4.0,
-
-    // Padding inside the button
-    padding: Vec2 = Vec2{ .x = 16, .y = 8 },
-
-    pub fn getBackgroundColor(self: *const ButtonStyle, state: ButtonState) Color {
-        return switch (state) {
-            .normal => self.normal_color,
-            .hovered => self.hover_color,
-            .pressed => self.pressed_color,
-            .disabled => self.disabled_color,
-        };
-    }
-
-    pub fn getBorderColor(self: *const ButtonStyle, state: ButtonState) Color {
-        return switch (state) {
-            .normal => self.border_normal,
-            .hovered => self.border_hover,
-            .pressed => self.border_pressed,
-            .disabled => self.border_disabled,
-        };
-    }
-};
-
-/// Interactive button component with text label
-pub const Button = struct {
-    base: Component,
-
-    // Button properties (reactive)
-    label: reactive.Signal([]const u8),
-    button_style: reactive.Signal(ButtonStyle),
-    text_style: reactive.Signal(TextStyle),
+/// Button component data
+pub const ButtonData = struct {
+    text: reactive.Signal([]const u8),
     state: reactive.Signal(ButtonState),
-
-    // Child text component
-    text_component: ?*Component = null,
+    style: ButtonStyle,
 
     // Event handlers
     on_click: ?*const fn () void = null,
     on_hover_start: ?*const fn () void = null,
     on_hover_end: ?*const fn () void = null,
 
-    // Internal state tracking
+    // Internal tracking
     is_pressed: bool = false,
+    mouse_inside: bool = false,
+
+    allocator: std.mem.Allocator,
 
     const Self = @This();
 
-    pub fn init(self: *Component, allocator: std.mem.Allocator, props: ComponentProps) !void {
-        const button: *Button = @fieldParentPtr("base", self);
-
-        // Initialize button-specific signals
-        button.label = try reactive.signal(allocator, []const u8, "Button");
-        button.button_style = try reactive.signal(allocator, ButtonStyle, ButtonStyle{});
-        button.text_style = try reactive.signal(allocator, TextStyle, TextStyle{
-            .font_size = 14.0,
-            .color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, // White text
-            // Note: Text alignment handled separately by text renderer
-        });
-        button.state = try reactive.signal(allocator, ButtonState, .normal);
-
-        // Create child text component for the label
-        const initial_label = button.label.get();
-        const initial_text_style = button.text_style.get();
-        const button_bounds = self.props.getBounds();
-        const text_position = Vec2{
-            .x = button_bounds.position.x + button.button_style.get().padding.x,
-            .y = button_bounds.position.y + button.button_style.get().padding.y,
+    pub fn init(allocator: std.mem.Allocator, text: []const u8, style: ButtonStyle) !Self {
+        return Self{
+            .text = try reactive.signal(allocator, []const u8, text),
+            .state = try reactive.signal(allocator, ButtonState, .normal),
+            .style = style,
+            .allocator = allocator,
         };
-
-        button.text_component = try text.createText(allocator, initial_label, text_position, initial_text_style);
-        try self.addChild(button.text_component.?);
-
-        // Set up reactive effects to update child text when label or style changes
-        const UpdateTextContext = struct {
-            button_ptr: *Button,
-
-            fn updateText(context: @This()) void {
-                if (context.button_ptr.text_component) |text_comp| {
-                    const text_impl: *Text = @fieldParentPtr("base", text_comp);
-                    text_impl.setText(context.button_ptr.label.get());
-                    text_impl.setStyle(context.button_ptr.text_style.get());
-
-                    // Update text position to center it in the button
-                    context.button_ptr.centerText();
-                }
-            }
-        };
-
-        const update_context = UpdateTextContext{ .button_ptr = button };
-        _ = try reactive.createEffect(allocator, update_context.updateText);
-
-        // Set up reactive effect to update visual state
-        const UpdateStateContext = struct {
-            button_ptr: *Button,
-
-            fn updateVisuals(context: @This()) void {
-                const current_state = context.button_ptr.state.get();
-                const style = context.button_ptr.button_style.get();
-
-                // Update component background and border colors
-                context.button_ptr.base.props.background_color.set(style.getBackgroundColor(current_state));
-                context.button_ptr.base.props.border_color.set(style.getBorderColor(current_state));
-
-                // Update hover state in base component
-                context.button_ptr.base.props.hovered.set(current_state == .hovered);
-                context.button_ptr.base.props.enabled.set(current_state != .disabled);
-            }
-        };
-
-        const state_context = UpdateStateContext{ .button_ptr = button };
-        _ = try reactive.createEffect(allocator, state_context.updateVisuals);
     }
 
-    pub fn deinit(self: *Component, _: std.mem.Allocator) void {
-        const button: *Button = @fieldParentPtr("base", self);
-
-        // Cleanup button-specific signals
-        button.label.deinit();
-        button.button_style.deinit();
-        button.text_style.deinit();
-        button.state.deinit();
-
-        // Child text component will be cleaned up by base Component.deinit()
+    pub fn deinit(self: *Self) void {
+        self.text.deinit();
+        self.state.deinit();
     }
 
-    pub fn update(self: *Component, dt: f32) void {
-        _ = dt;
-        const button: *Button = @fieldParentPtr("base", self);
-
-        // Update button state based on interaction
-        button.updateInteractionState();
+    /// Set button text
+    pub fn setText(self: *Self, new_text: []const u8) void {
+        self.text.set(new_text);
     }
 
-    pub fn render(self: *const Component, renderer: anytype) !void {
-        const button: *const Button = @fieldParentPtr("base", self);
-
-        if (!self.props.visible.get()) return;
-
-        const bounds = self.props.getBounds();
-        const style = button.button_style.get();
-        const current_state = button.state.get();
-
-        // Render button background
-        const bg_color = style.getBackgroundColor(current_state);
-        if (@hasDecl(@TypeOf(renderer), "drawRoundedRect")) {
-            try renderer.drawRoundedRect(bounds, bg_color, style.corner_radius);
-        } else if (@hasDecl(@TypeOf(renderer), "drawRect")) {
-            try renderer.drawRect(bounds, bg_color);
-        }
-
-        // Render button border
-        if (style.border_width > 0) {
-            const border_color = style.getBorderColor(current_state);
-            if (@hasDecl(@TypeOf(renderer), "drawRoundedRectBorder")) {
-                try renderer.drawRoundedRectBorder(bounds, border_color, style.border_width, style.corner_radius);
-            } else if (@hasDecl(@TypeOf(renderer), "drawRectBorder")) {
-                try renderer.drawRectBorder(bounds, border_color, style.border_width);
-            }
-        }
-
-        // Child text component will render itself via base Component.render()
+    /// Get button text (reactive)
+    pub fn getText(self: *Self) []const u8 {
+        return self.text.get();
     }
 
-    pub fn handleEvent(self: *Component, event: anytype) bool {
-        const button: *Button = @fieldParentPtr("base", self);
-
-        if (!self.props.enabled.get() or !self.props.visible.get()) return false;
-
-        // Handle mouse events (assuming event has mouse_x, mouse_y, mouse_pressed, etc.)
-        if (@hasField(@TypeOf(event), "mouse_x") and @hasField(@TypeOf(event), "mouse_y")) {
-            const mouse_pos = Vec2{ .x = event.mouse_x, .y = event.mouse_y };
-            const is_over = self.props.containsPoint(mouse_pos);
-
-            if (is_over) {
-                // Mouse is over button
-                if (@hasField(@TypeOf(event), "mouse_pressed") and event.mouse_pressed and !button.is_pressed) {
-                    // Mouse press started
-                    button.is_pressed = true;
-                    button.state.set(.pressed);
-                    return true;
-                } else if (@hasField(@TypeOf(event), "mouse_released") and event.mouse_released and button.is_pressed) {
-                    // Mouse released over button - trigger click
-                    button.is_pressed = false;
-                    button.state.set(.hovered);
-
-                    if (button.on_click) |click_handler| {
-                        click_handler();
-                    }
-                    return true;
-                } else if (!button.is_pressed and button.state.get() != .hovered) {
-                    // Just hovering
-                    button.state.set(.hovered);
-                    if (button.on_hover_start) |hover_handler| {
-                        hover_handler();
-                    }
-                }
-            } else {
-                // Mouse is not over button
-                if (button.state.get() == .hovered or button.state.get() == .pressed) {
-                    button.state.set(.normal);
-                    button.is_pressed = false;
-                    if (button.on_hover_end) |hover_end_handler| {
-                        hover_end_handler();
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    pub fn destroy(self: *Component, allocator: std.mem.Allocator) void {
-        const button: *Button = @fieldParentPtr("base", self);
-        allocator.destroy(button);
-    }
-
-    /// Update interaction state based on current conditions
-    fn updateInteractionState(self: *Button) void {
-        if (!self.base.props.enabled.get()) {
-            self.state.set(.disabled);
-            return;
-        }
-
-        // State is updated by event handling
-    }
-
-    /// Center the text within the button using modern TextBaseline system
-    fn centerText(self: *Button) void {
-        if (self.text_component) |text_comp| {
-            const button_bounds = self.base.props.getBounds();
-            _ = self.button_style.get();
-            const text_impl: *Text = @fieldParentPtr("base", text_comp);
-            const text_size = text_impl.getMeasuredSize();
-
-            // Use proper text baseline positioning for consistent alignment
-            // Create font metrics for text centering calculations
-            const font_metrics_info = FontMetrics.init(1000, 800, -200, 100, 0.012 // Standard font metrics for 12pt text
-            );
-
-            // Center text horizontally and use proper baseline for vertical
-            const centered_pos = Vec2{
-                .x = button_bounds.position.x + (button_bounds.size.x - text_size.x) / 2,
-                .y = TextPositioning.getCenteredTextY(button_bounds.position.y, button_bounds.size.y, font_metrics_info),
-            };
-
-            text_comp.props.position.set(centered_pos);
-        }
-    }
-
-    /// Set the button label text
-    pub fn setLabel(self: *Button, new_label: []const u8) void {
-        self.label.set(new_label);
-    }
-
-    /// Set button style
-    pub fn setButtonStyle(self: *Button, new_style: ButtonStyle) void {
-        self.button_style.set(new_style);
-    }
-
-    /// Set text style
-    pub fn setTextStyle(self: *Button, new_style: TextStyle) void {
-        self.text_style.set(new_style);
+    /// Peek at button text (non-reactive)
+    pub fn peekText(self: *const Self) []const u8 {
+        return self.text.peek();
     }
 
     /// Set click handler
-    pub fn setOnClick(self: *Button, click_handler: *const fn () void) void {
-        self.on_click = click_handler;
+    pub fn setOnClick(self: *Self, handler: *const fn () void) void {
+        self.on_click = handler;
     }
 
     /// Set hover handlers
-    pub fn setOnHover(self: *Button, hover_start: ?*const fn () void, hover_end: ?*const fn () void) void {
+    pub fn setOnHover(self: *Self, hover_start: ?*const fn () void, hover_end: ?*const fn () void) void {
         self.on_hover_start = hover_start;
         self.on_hover_end = hover_end;
     }
 
-    /// Enable or disable the button
-    pub fn setEnabled(self: *Button, enabled: bool) void {
-        self.base.props.enabled.set(enabled);
-        if (!enabled) {
-            self.state.set(.disabled);
-            self.is_pressed = false;
-        } else if (self.state.get() == .disabled) {
-            self.state.set(.normal);
+    /// Update button state based on interactions
+    pub fn updateState(self: *Self, mouse_pos: Vec2, mouse_pressed: bool, mouse_released: bool, button_bounds: Vec2, button_size: Vec2) void {
+        const mouse_in_bounds = mouse_pos.x >= button_bounds.x and
+            mouse_pos.x <= button_bounds.x + button_size.x and
+            mouse_pos.y >= button_bounds.y and
+            mouse_pos.y <= button_bounds.y + button_size.y;
+
+        // Handle mouse enter/leave
+        if (mouse_in_bounds != self.mouse_inside) {
+            self.mouse_inside = mouse_in_bounds;
+            if (mouse_in_bounds and self.on_hover_start) |handler| {
+                handler();
+            } else if (!mouse_in_bounds and self.on_hover_end) |handler| {
+                handler();
+            }
         }
+
+        // Update state based on interaction
+        if (!mouse_in_bounds) {
+            self.state.set(.normal);
+            self.is_pressed = false;
+        } else {
+            if (mouse_pressed and !self.is_pressed) {
+                self.is_pressed = true;
+                self.state.set(.pressed);
+            } else if (mouse_released and self.is_pressed) {
+                self.is_pressed = false;
+                self.state.set(.hovered);
+
+                // Trigger click event
+                if (self.on_click) |handler| {
+                    handler();
+                }
+            } else if (!self.is_pressed) {
+                self.state.set(.hovered);
+            }
+        }
+    }
+
+    /// Get estimated button size based on text
+    pub fn getEstimatedSize(self: *const Self) Vec2 {
+        const text_content = self.text.peek();
+        const text_width = @as(f32, @floatFromInt(text_content.len)) * self.style.font_size * 0.6;
+        return Vec2{
+            .x = text_width + (self.style.padding.x * 2),
+            .y = self.style.font_size + (self.style.padding.y * 2),
+        };
     }
 };
 
-/// Create a new button component
-pub fn createButton(allocator: std.mem.Allocator, label: []const u8, position: Vec2, size: Vec2, style: ButtonStyle, click_handler: ?*const fn () void) !*Component {
-    const button = try allocator.create(Button);
+/// Type alias for complete button component
+pub const SimpleButton = Component(ButtonData);
 
-    const props = try ComponentProps.init(allocator, position, size);
+/// Render function for button
+pub fn renderButton(button_ref: *const anyopaque, renderer: anytype, props: *const ComponentProps) !void {
+    const button: *const SimpleButton = @ptrCast(@alignCast(button_ref));
 
-    button.* = Button{
-        .base = Component{
-            .vtable = Component.VTable{
-                .init = Button.init,
-                .deinit = Button.deinit,
-                .update = Button.update,
-                .render = Button.render,
-                .handle_event = Button.handleEvent,
-                .destroy = Button.destroy,
-            },
-            .props = props,
-            .children = std.ArrayList(*Component).init(allocator),
-            .parent = null,
-        },
-        .label = undefined, // Will be initialized in init()
-        .button_style = undefined,
-        .text_style = undefined,
-        .state = undefined,
-        .on_click = click_handler,
-    };
+    if (!button.shouldRender()) return;
 
-    try button.base.init(allocator, props);
+    const button_data = button.getDataConst();
+    const position = props.peekPosition();
+    const size = button_data.getEstimatedSize();
+    const current_state = button_data.state.peek();
 
-    // Set initial label and style
-    button.setLabel(label);
-    button.setButtonStyle(style);
+    // Get colors based on state
+    const bg_color = button_data.style.getBackgroundColor(current_state);
+    const border_color = button_data.style.getBorderColor(current_state);
 
-    return &button.base;
+    // Draw button background
+    if (@hasDecl(@TypeOf(renderer), "drawRoundedRect")) {
+        try renderer.drawRoundedRect(math.Rectangle.init(position, size), bg_color, button_data.style.corner_radius);
+    } else if (@hasDecl(@TypeOf(renderer), "drawRect")) {
+        try renderer.drawRect(math.Rectangle.init(position, size), bg_color);
+    }
+
+    // Draw border
+    if (button_data.style.border_width > 0) {
+        if (@hasDecl(@TypeOf(renderer), "drawRoundedRectBorder")) {
+            try renderer.drawRoundedRectBorder(math.Rectangle.init(position, size), border_color, button_data.style.border_width, button_data.style.corner_radius);
+        }
+    }
+
+    // Draw text (centered)
+    const text = button_data.text.peek();
+    if (text.len > 0) {
+        if (@hasDecl(@TypeOf(renderer), "drawText")) {
+            const text_width = @as(f32, @floatFromInt(text.len)) * button_data.style.font_size * 0.6;
+            const text_pos = Vec2{
+                .x = position.x + (size.x - text_width) / 2,
+                .y = position.y + (size.y - button_data.style.font_size) / 2,
+            };
+
+            try renderer.drawText(text, text_pos.x, text_pos.y, button_data.style.font_size, button_data.style.text_color);
+        }
+    }
 }
 
-/// Create a simple button with default styling
-pub fn createSimpleButton(allocator: std.mem.Allocator, label: []const u8, position: Vec2, click_handler: ?*const fn () void) !*Component {
-    // Calculate size based on text length
-    const estimated_width = @as(f32, @floatFromInt(label.len)) * 8.0 + (constants.UI.DEFAULT_PADDING * 6.0); // Rough estimate + padding
-    const size = Vec2{ .x = estimated_width, .y = 36.0 };
+/// Handle events for button
+pub fn handleButtonEvent(button_ref: *anyopaque, event: anytype, props: *ComponentProps) bool {
+    const button: *SimpleButton = @ptrCast(@alignCast(button_ref));
 
-    return try createButton(allocator, label, position, size, ButtonStyle{}, click_handler);
+    if (!button.getPropsConst().isActive()) return false;
+
+    const button_data = button.getData();
+
+    // Handle mouse events
+    if (@hasField(@TypeOf(event), "mouse_x") and @hasField(@TypeOf(event), "mouse_y")) {
+        const mouse_pos = Vec2{ .x = event.mouse_x, .y = event.mouse_y };
+        const mouse_pressed = @hasField(@TypeOf(event), "mouse_pressed") and event.mouse_pressed;
+        const mouse_released = @hasField(@TypeOf(event), "mouse_released") and event.mouse_released;
+
+        const position = props.peekPosition();
+        const size = button_data.getEstimatedSize();
+
+        button_data.updateState(mouse_pos, mouse_pressed, mouse_released, position, size);
+        return true;
+    }
+
+    return false;
+}
+
+/// Create a simple button
+pub fn createButton(allocator: std.mem.Allocator, text: []const u8, position: Vec2, style: ButtonStyle, click_handler: ?*const fn () void) !SimpleButton {
+    var button_data = try ButtonData.init(allocator, text, style);
+
+    if (click_handler) |handler| {
+        button_data.setOnClick(handler);
+    }
+
+    return SimpleButton.init(allocator, position, button_data);
+}
+
+/// Create a button with default styling
+pub fn createDefaultButton(allocator: std.mem.Allocator, text: []const u8, position: Vec2, click_handler: ?*const fn () void) !SimpleButton {
+    return createButton(allocator, text, position, ButtonStyle{}, click_handler);
 }
 
 // Tests
-test "button creation and basic operations" {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
+test "simple button creation" {
+    const testing = std.testing;
+    var arena = std.heap.ArenaAllocator.init(testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
 
-    try reactive.init(allocator);
-    defer reactive.deinit(allocator);
+    const reactive_mod = @import("../reactive/mod.zig");
+    try reactive_mod.init(allocator);
+    defer reactive_mod.deinit(allocator);
 
-    const TestClickHandler = struct {
-        fn onClick() void {
-            // Test click handler - doesn't modify external state
-        }
+    const TestClick = struct {
+        fn onClick() void {}
     };
 
-    const button = try createSimpleButton(allocator, "Test Button", Vec2{ .x = 10, .y = 20 }, TestClickHandler.onClick);
-    defer button.destroy(allocator);
-
-    const button_impl: *Button = @fieldParentPtr("base", button);
+    var button = try createDefaultButton(allocator, "Test Button", Vec2{ .x = 10, .y = 20 }, TestClick.onClick);
+    defer button.deinit();
 
     // Test initial state
-    try std.testing.expect(std.mem.eql(u8, button_impl.label.get(), "Test Button"));
-    try std.testing.expect(button_impl.state.get() == .normal);
+    try testing.expect(std.mem.eql(u8, button.getData().peekText(), "Test Button"));
+    try testing.expectEqual(Vec2{ .x = 10, .y = 20 }, button.peekPosition());
+    try testing.expect(button.shouldRender());
 
-    // Test label change
-    button_impl.setLabel("New Label");
-    try std.testing.expect(std.mem.eql(u8, button_impl.label.get(), "New Label"));
+    // Test text change
+    button.getData().setText("New Text");
+    try testing.expect(std.mem.eql(u8, button.getData().peekText(), "New Text"));
 
-    // Test enable/disable
-    button_impl.setEnabled(false);
-    try std.testing.expect(button_impl.state.get() == .disabled);
-
-    button_impl.setEnabled(true);
-    try std.testing.expect(button_impl.state.get() == .normal);
-}
-
-test "button style color handling" {
-    const style = ButtonStyle{};
-
-    // Test different state colors
-    try std.testing.expect(style.getBackgroundColor(.normal).r == 60);
-    try std.testing.expect(style.getBackgroundColor(.hovered).r == 80);
-    try std.testing.expect(style.getBackgroundColor(.pressed).r == 40);
-    try std.testing.expect(style.getBackgroundColor(.disabled).r == 30);
-
-    // Ensure no bright yellow colors
-    const hover_color = style.getBackgroundColor(.hovered);
-    try std.testing.expect(!(hover_color.r == 255 and hover_color.g == 255 and hover_color.b == 0));
-}
-
-test "button state color mapping" {
-    const testing = std.testing;
-
-    const style = ButtonStyle{};
-
-    // Test normal state
-    const normal_color = style.getBackgroundColor(.normal);
-    try testing.expectEqual(Color{ .r = 60, .g = 60, .b = 60, .a = 255 }, normal_color);
-
-    // Test hover state
-    const hover_color = style.getBackgroundColor(.hovered);
-    try testing.expectEqual(Color{ .r = 80, .g = 80, .b = 80, .a = 255 }, hover_color);
-
-    // Test pressed state
-    const pressed_color = style.getBackgroundColor(.pressed);
-    try testing.expectEqual(Color{ .r = 40, .g = 40, .b = 40, .a = 255 }, pressed_color);
-
-    // Test disabled state
-    const disabled_color = style.getBackgroundColor(.disabled);
-    try testing.expectEqual(Color{ .r = 30, .g = 30, .b = 30, .a = 255 }, disabled_color);
-}
-
-test "button border color mapping" {
-    const testing = std.testing;
-
-    const style = ButtonStyle{};
-
-    // Test all border states
-    try testing.expectEqual(Color{ .r = 120, .g = 120, .b = 120, .a = 255 }, style.getBorderColor(.normal));
-    try testing.expectEqual(Color{ .r = 160, .g = 160, .b = 160, .a = 255 }, style.getBorderColor(.hovered));
-    try testing.expectEqual(Color{ .r = 100, .g = 100, .b = 100, .a = 255 }, style.getBorderColor(.pressed));
-    try testing.expectEqual(Color{ .r = 60, .g = 60, .b = 60, .a = 255 }, style.getBorderColor(.disabled));
-}
-
-test "button style defaults" {
-    const testing = std.testing;
-
-    const style = ButtonStyle{};
-
-    // Test default values
-    try testing.expectEqual(@as(f32, 1.0), style.border_width);
-    try testing.expectEqual(@as(f32, 4.0), style.corner_radius);
-    try testing.expectEqual(@as(f32, 16.0), style.padding.x);
-    try testing.expectEqual(@as(f32, 8.0), style.padding.y);
-}
-
-test "button custom style" {
-    const testing = std.testing;
-
-    const custom_style = ButtonStyle{
-        .border_width = 2.0,
-        .corner_radius = 8.0,
-        .normal_color = Color{ .r = 255, .g = 0, .b = 0, .a = 255 },
-    };
-
-    try testing.expectEqual(@as(f32, 2.0), custom_style.border_width);
-    try testing.expectEqual(@as(f32, 8.0), custom_style.corner_radius);
-    try testing.expectEqual(Color{ .r = 255, .g = 0, .b = 0, .a = 255 }, custom_style.getBackgroundColor(.normal));
+    // Test size estimation
+    const estimated_size = button.getDataConst().getEstimatedSize();
+    try testing.expect(estimated_size.x > 0);
+    try testing.expect(estimated_size.y > 0);
 }

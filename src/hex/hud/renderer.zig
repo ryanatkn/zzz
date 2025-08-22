@@ -229,10 +229,7 @@ pub const BrowserRenderer = struct {
             self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, link.bounds.position, link.bounds.size, link_color);
 
             // Render the link text using menu text renderer directly
-            const link_rect = drawing.Rectangle{
-                .position = link.bounds.position,
-                .size = link.bounds.size,
-            };
+            const link_rect = drawing.Rectangle.init(link.bounds.position, link.bounds.size);
             var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
 
             // Use left alignment for filesystem buttons (IDE file/directory listings)
@@ -353,35 +350,23 @@ pub const BrowserRenderer = struct {
         const content_width = @min(max_content_width, available_width);
 
         // Header panel
-        const header_rect = math.Rectangle{
-            .position = Vec2{ .x = 0, .y = 0 },
-            .size = Vec2{ .x = screen_size.x, .y = header_height },
-        };
+        const header_rect = math.Rectangle.sized(Vec2{ .x = screen_size.x, .y = header_height });
         self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, header_rect.position, header_rect.size, ide_constants.COLORS.HEADER_BG);
 
         // File explorer panel (left)
-        const explorer_rect = math.Rectangle{
-            .position = Vec2{ .x = panel_gap, .y = header_height + panel_gap },
-            .size = Vec2{ .x = explorer_width, .y = screen_size.y - header_height - (panel_gap * 2) },
-        };
+        const explorer_rect = math.Rectangle.init(Vec2{ .x = panel_gap, .y = header_height + panel_gap }, Vec2{ .x = explorer_width, .y = screen_size.y - header_height - (panel_gap * 2) });
 
         drawing.drawBorderedRect(&self.base_renderer.gpu, cmd_buffer, render_pass, explorer_rect.position, explorer_rect.size, ide_constants.COLORS.PANEL_BG, ide_constants.COLORS.PANEL_BORDER, 1.0);
 
         // Main content panel (center, constrained width)
         const content_x = explorer_width + (panel_gap * 2);
-        const content_rect = math.Rectangle{
-            .position = Vec2{ .x = content_x, .y = header_height + panel_gap },
-            .size = Vec2{ .x = content_width, .y = screen_size.y - header_height - (panel_gap * 2) },
-        };
+        const content_rect = math.Rectangle.init(Vec2{ .x = content_x, .y = header_height + panel_gap }, Vec2{ .x = content_width, .y = screen_size.y - header_height - (panel_gap * 2) });
 
         drawing.drawBorderedRect(&self.base_renderer.gpu, cmd_buffer, render_pass, content_rect.position, content_rect.size, ide_constants.COLORS.PANEL_BG, ide_constants.COLORS.PANEL_BORDER, 1.0);
 
         // Preview panel (right)
         const preview_x = content_x + content_width + panel_gap;
-        const preview_rect = math.Rectangle{
-            .position = Vec2{ .x = preview_x, .y = header_height + panel_gap },
-            .size = Vec2{ .x = preview_width, .y = screen_size.y - header_height - (panel_gap * 2) },
-        };
+        const preview_rect = math.Rectangle.init(Vec2{ .x = preview_x, .y = header_height + panel_gap }, Vec2{ .x = preview_width, .y = screen_size.y - header_height - (panel_gap * 2) });
 
         drawing.drawBorderedRect(&self.base_renderer.gpu, cmd_buffer, render_pass, preview_rect.position, preview_rect.size, ide_constants.COLORS.PANEL_BG, ide_constants.COLORS.PANEL_BORDER, 1.0);
 

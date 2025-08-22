@@ -1,4 +1,4 @@
-const colors = @import("../lib/core/colors.zig");
+const hex_colors = @import("colors.zig");
 const color_mappings = @import("color_mappings.zig");
 const constants = @import("../lib/core/constants.zig");
 
@@ -166,22 +166,22 @@ pub const PatrolPattern = enum {
 };
 
 // Color constants (imported from shared colors module)
-pub const COLOR_PLAYER_ALIVE = colors.PLAYER_ALIVE;
-pub const COLOR_UNIT_DEFAULT = colors.UNIT_DEFAULT;
-pub const COLOR_UNIT_AGGRO = colors.UNIT_AGGRO;
-pub const COLOR_UNIT_NON_AGGRO = colors.UNIT_NON_AGGRO;
-pub const COLOR_UNIT_AGGRESSIVE = colors.UNIT_AGGRO;
-pub const COLOR_UNIT_RETURNING = colors.UNIT_NON_AGGRO;
-pub const COLOR_OBSTACLE_DEADLY = colors.OBSTACLE_DEADLY;
-pub const COLOR_OBSTACLE_BLOCKING = colors.OBSTACLE_BLOCKING;
-pub const COLOR_BULLET = colors.BULLET;
-pub const COLOR_PORTAL = colors.PORTAL;
-pub const COLOR_LIFESTONE_ATTUNED = colors.LIFESTONE_ATTUNED;
-pub const COLOR_LIFESTONE_UNATTUNED = colors.LIFESTONE_UNATTUNED;
-pub const COLOR_DEAD = colors.DEAD;
+pub const COLOR_PLAYER_ALIVE = hex_colors.PLAYER_ALIVE;
+pub const COLOR_UNIT_DEFAULT = hex_colors.UNIT_DEFAULT;
+pub const COLOR_UNIT_AGGRO = hex_colors.UNIT_AGGRO;
+pub const COLOR_UNIT_NON_AGGRO = hex_colors.UNIT_NON_AGGRO;
+pub const COLOR_UNIT_AGGRESSIVE = hex_colors.UNIT_AGGRO;
+pub const COLOR_UNIT_RETURNING = hex_colors.UNIT_NON_AGGRO;
+pub const COLOR_OBSTACLE_DEADLY = hex_colors.OBSTACLE_DEADLY;
+pub const COLOR_OBSTACLE_BLOCKING = hex_colors.OBSTACLE_BLOCKING;
+pub const COLOR_BULLET = hex_colors.BULLET;
+pub const COLOR_PORTAL = hex_colors.PORTAL;
+pub const COLOR_LIFESTONE_ATTUNED = hex_colors.LIFESTONE_ATTUNED;
+pub const COLOR_LIFESTONE_UNATTUNED = hex_colors.LIFESTONE_UNATTUNED;
+pub const COLOR_DEAD = hex_colors.DEAD;
 
 // Disposition color mapping - centralized color logic for unit temperament
-pub fn getDispositionColor(_: anytype, disposition: anytype) colors.Color {
+pub fn getDispositionColor(_: anytype, disposition: anytype) hex_colors.Color {
     // Use the hex-specific color mapping for disposition colors with normal energy
     return color_mappings.getDispositionEnergyColor(disposition, EnergyLevel.normal);
 }

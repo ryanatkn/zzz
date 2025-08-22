@@ -1,25 +1,26 @@
 const math = @import("../lib/math/mod.zig");
-const colors = @import("../lib/core/colors.zig");
+const core_colors = @import("../lib/core/colors.zig");
+const hex_colors = @import("colors.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
 
 const Vec2 = math.Vec2;
-const Color = colors.Color;
+const Color = core_colors.Color;
 const SpellType = spells.SpellType;
 
 /// Visual configuration for the spellbar
 pub const SpellbarConfig = struct {
-    slot_size: Vec2 = Vec2{ .x = 50, .y = 50 },
+    slot_size: Vec2 = Vec2.size(50, 50),
     slot_spacing: f32 = 5.0,
     bottom_margin: f32 = 100.0,
     border_width: f32 = 2.0,
     cooldown_alpha: f32 = 0.6, // Semi-transparent cooldown overlay
 
     // Colors
-    active_border_color: Color = colors.WHITE,
-    hover_border_color: Color = colors.BACKGROUND_LIGHT,
+    active_border_color: Color = core_colors.WHITE,
+    hover_border_color: Color = hex_colors.BACKGROUND_LIGHT,
     cooldown_overlay_color: Color = Color{ .r = 60, .g = 60, .b = 60, .a = 150 },
-    empty_slot_color: Color = colors.BACKGROUND_DARK,
+    empty_slot_color: Color = hex_colors.BACKGROUND_DARK,
 };
 
 /// Hotkey labels for each slot (0-7)
@@ -28,15 +29,15 @@ const HOTKEY_LABELS = [8][]const u8{ "1", "2", "3", "4", "Q", "E", "R", "F" };
 /// Bright spell colors (always visible base colors)
 pub fn getSpellColor(spell_type: SpellType) Color {
     return switch (spell_type) {
-        .None => colors.BACKGROUND_DARK,
-        .Lull => colors.GREEN_BRIGHT, // Calming effect
-        .Blink => colors.PURPLE_BRIGHT, // Teleportation magic
-        .Phase => colors.CYAN, // Ethereal state
-        .Charm => colors.YELLOW_BRIGHT, // Control magic
-        .Lethargy => colors.INFO, // Movement slow
-        .Haste => colors.ORANGE_BRIGHT, // Speed boost
-        .Multishot => colors.RED_BRIGHT, // Combat enhancement
-        .Dazzle => colors.PRIMARY, // Area confusion
+        .None => hex_colors.BACKGROUND_DARK,
+        .Lull => hex_colors.GREEN_BRIGHT, // Calming effect
+        .Blink => hex_colors.PURPLE_BRIGHT, // Teleportation magic
+        .Phase => hex_colors.CYAN, // Ethereal state
+        .Charm => hex_colors.YELLOW_BRIGHT, // Control magic
+        .Lethargy => hex_colors.CYAN, // Movement slow - using CYAN as placeholder for INFO
+        .Haste => hex_colors.ORANGE_BRIGHT, // Speed boost
+        .Multishot => hex_colors.RED_BRIGHT, // Combat enhancement
+        .Dazzle => hex_colors.BLUE_BRIGHT, // Area confusion - using BLUE_BRIGHT as placeholder for PRIMARY
     };
 }
 
@@ -142,7 +143,7 @@ pub const Spellbar = struct {
         } else if (is_hovered) {
             return self.config.hover_border_color;
         }
-        return colors.TRANSPARENT; // No border for inactive slots
+        return core_colors.TRANSPARENT; // No border for inactive slots
     }
 
     /// Get the hotkey label for a slot

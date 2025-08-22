@@ -163,9 +163,9 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
 
     // Set spawn position (default to screen center if not specified)
     zone.spawn_pos = if (data.spawn_pos) |pos|
-        Vec2{ .x = pos.x, .y = pos.y }
+        Vec2.position(pos.x, pos.y)
     else
-        Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
+        Vec2.screenCenter(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
 
     // Load obstacles
     if (data.obstacles) |obstacles| {
@@ -175,8 +175,8 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
             // Create obstacle entity
             const obstacle_id = game.createObstacle(
                 @intCast(zone_index),
-                Vec2{ .x = obstacle_data.position.x, .y = obstacle_data.position.y },
-                Vec2{ .x = obstacle_data.size.x, .y = obstacle_data.size.y },
+                Vec2.position(obstacle_data.position.x, obstacle_data.position.y),
+                Vec2.size(obstacle_data.size.x, obstacle_data.size.y),
                 is_deadly,
             ) catch |err| {
                 loggers.getGameLog().err("obstacle_create_fail", "Failed to create obstacle entity: {}", .{err});
@@ -193,7 +193,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
             // Create ECS unit entity with disposition from ZON data
             const unit_id = game.createUnit(
                 @intCast(zone_index),
-                Vec2{ .x = unit_data.position.x, .y = unit_data.position.y },
+                Vec2.position(unit_data.position.x, unit_data.position.y),
                 unit_data.radius,
                 unit_data.disposition, // Pass enum directly, defaults to .neutral
             ) catch |err| {
@@ -211,7 +211,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
             // Create ECS portal entity
             const portal_id = game.createPortal(
                 zone_index,
-                Vec2{ .x = portal_data.position.x, .y = portal_data.position.y },
+                Vec2.position(portal_data.position.x, portal_data.position.y),
                 portal_data.radius,
                 portal_data.destination,
             ) catch |err| {
@@ -232,7 +232,7 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
             // Create ECS lifestone entity
             const lifestone_id = game.createLifestone(
                 @intCast(zone_index),
-                Vec2{ .x = lifestone_data.position.x, .y = lifestone_data.position.y },
+                Vec2.position(lifestone_data.position.x, lifestone_data.position.y),
                 lifestone_data.radius,
                 pre_attuned,
             ) catch |err| {

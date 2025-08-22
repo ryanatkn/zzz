@@ -131,7 +131,7 @@ pub fn respawnPlayer(game_state: *GameState) void {
                 loggers.getGameLog().err("respawn_overworld_failed", "Failed to travel to overworld for respawn: {}", .{err});
             };
         }
-        respawn_pos = Vec2{ .x = constants.SCREEN_CENTER_X, .y = constants.SCREEN_CENTER_Y };
+        respawn_pos = Vec2.screenCenter(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
     }
 
     // Common respawn logic - create respawn effects

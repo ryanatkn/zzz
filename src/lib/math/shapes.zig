@@ -333,6 +333,64 @@ pub const Rectangle = struct {
             },
         };
     }
+
+    /// Create a rectangle centered at the given point with the specified size
+    pub fn centered(center_point: Vec2, rect_size: Vec2) Rectangle {
+        return Rectangle{
+            .position = Vec2{
+                .x = center_point.x - rect_size.x * 0.5,
+                .y = center_point.y - rect_size.y * 0.5,
+            },
+            .size = rect_size,
+        };
+    }
+
+    /// Create a rectangle with specified size at origin (0,0)
+    pub fn sized(rect_size: Vec2) Rectangle {
+        return Rectangle{
+            .position = Vec2.ZERO,
+            .size = rect_size,
+        };
+    }
+
+    /// Create a rectangle with specified size at origin using width/height
+    pub fn sizedWH(width: f32, height: f32) Rectangle {
+        return Rectangle{
+            .position = Vec2.ZERO,
+            .size = Vec2.size(width, height),
+        };
+    }
+
+    /// Create a rectangle from bounds (semantic alias for fromBounds)
+    pub fn bounds_rect(rect_bounds: Bounds) Rectangle {
+        return fromBounds(rect_bounds);
+    }
+
+    /// Create a square centered at the given point
+    pub fn centeredSquare(center_point: Vec2, side_length: f32) Rectangle {
+        const half_side = side_length * 0.5;
+        return Rectangle{
+            .position = Vec2{
+                .x = center_point.x - half_side,
+                .y = center_point.y - half_side,
+            },
+            .size = Vec2{
+                .x = side_length,
+                .y = side_length,
+            },
+        };
+    }
+
+    /// Create a square with specified side length at origin
+    pub fn square(side_length: f32) Rectangle {
+        return Rectangle{
+            .position = Vec2.ZERO,
+            .size = Vec2{
+                .x = side_length,
+                .y = side_length,
+            },
+        };
+    }
 };
 
 /// Circle shape

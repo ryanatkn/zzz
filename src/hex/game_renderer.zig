@@ -2,7 +2,8 @@ const std = @import("std");
 
 // Core capabilities
 const math = @import("../lib/math/mod.zig");
-const colors = @import("../lib/core/colors.zig");
+const core_colors = @import("../lib/core/colors.zig");
+const hex_colors = @import("colors.zig");
 const time_utils = @import("../lib/core/time.zig");
 
 // Platform capabilities
@@ -41,7 +42,7 @@ const spellbar = @import("spellbar.zig");
 const spells = @import("spells.zig");
 
 const Vec2 = math.Vec2;
-const Color = colors.Color;
+const Color = core_colors.Color;
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
@@ -228,12 +229,12 @@ pub const GameRenderer = struct {
             const elapsed_sec = game_state.iris_wipe_start_time.getElapsedSec();
 
             const wipe_colors = [_]Color{
-                colors.BLUE_BRIGHT,
-                colors.GREEN_BRIGHT,
-                colors.YELLOW_BRIGHT,
-                colors.ORANGE_BRIGHT,
-                colors.PURPLE_BRIGHT,
-                colors.CYAN,
+                hex_colors.BLUE_BRIGHT,
+                hex_colors.GREEN_BRIGHT,
+                hex_colors.YELLOW_BRIGHT,
+                hex_colors.ORANGE_BRIGHT,
+                hex_colors.PURPLE_BRIGHT,
+                hex_colors.CYAN,
             };
 
             const iris_wipe = animated_borders.IrisWipe{
@@ -289,7 +290,7 @@ pub const GameRenderer = struct {
     pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
 
         // Use white color for FPS display
-        const WHITE = colors.WHITE;
+        const WHITE = core_colors.WHITE;
 
         // Position at top-left corner as requested (make it very visible)
         const fps_x = constants.FPS_POSITION_X; // Left margin
@@ -314,7 +315,7 @@ pub const GameRenderer = struct {
         if (!ai_enabled) return;
 
         // Use bright green color for AI mode indicator
-        const AI_COLOR = colors.Color{ .r = 0, .g = 255, .b = 128, .a = 255 };
+        const AI_COLOR = Color{ .r = 0, .g = 255, .b = 128, .a = 255 };
 
         const ai_text = "AI MODE ACTIVE";
         const font_size = font_config.getGlobalConfig().fpsFontSize();
@@ -372,8 +373,8 @@ pub const GameRenderer = struct {
                 if (pattern[row * config.char_width + col]) {
                     const px = x + @as(f32, @floatFromInt(col)) * config.pixel_size;
                     const py = y + @as(f32, @floatFromInt(row)) * config.pixel_size;
-                    const pixel_size = Vec2{ .x = config.pixel_size, .y = config.pixel_size };
-                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = px, .y = py }, pixel_size, color);
+                    const pixel_size = Vec2.size(config.pixel_size, config.pixel_size);
+                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2.position(px, py), pixel_size, color);
                 }
             }
         }
@@ -427,7 +428,7 @@ pub const GameRenderer = struct {
             const label_y = slot_rect.y + 2.0;
 
             // Draw label using geometric text
-            self.drawHotkeyLabel(cmd_buffer, render_pass, label, label_x, label_y, colors.WHITE);
+            self.drawHotkeyLabel(cmd_buffer, render_pass, label, label_x, label_y, core_colors.WHITE);
         }
     }
 
@@ -449,8 +450,8 @@ pub const GameRenderer = struct {
                 if (pattern[row * config.char_width + col]) {
                     const px = x + @as(f32, @floatFromInt(col)) * config.pixel_size;
                     const py = y + @as(f32, @floatFromInt(row)) * config.pixel_size;
-                    const pixel_size = Vec2{ .x = config.pixel_size, .y = config.pixel_size };
-                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = px, .y = py }, pixel_size, color);
+                    const pixel_size = Vec2.size(config.pixel_size, config.pixel_size);
+                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2.position(px, py), pixel_size, color);
                 }
             }
         }

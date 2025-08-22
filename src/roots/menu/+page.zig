@@ -32,12 +32,12 @@ const IndexPage = struct {
         // World selection section at top
 
         // World selection header
-        try links.append(page.createLabel("WORLD SELECTION", 100, 100, 300, 40));
+        try links.append(page.createTextElement("WORLD SELECTION", 100, 100, 300, 40));
 
         // Current world display
         const current_world_name = loader.getCurrentWorldDisplayName();
         const current_text = try std.fmt.allocPrint(arena, "Current: {s}", .{current_world_name});
-        try links.append(page.createLabel(current_text, 100, 140, 400, 30));
+        try links.append(page.createTextElement(current_text, 100, 140, 400, 30));
 
         // World selection buttons
         const world_button_width = 150.0;
@@ -48,7 +48,7 @@ const IndexPage = struct {
         try links.append(page.createLink("Game World", "/?load_world=worlds/game_world.zon", 270, world_button_y, world_button_width, world_button_height));
 
         // Header spanning full width (moved down)
-        try links.append(page.createLabel("CHARACTER SHEET", 760, 250, 400, 60));
+        try links.append(page.createTextElement("CHARACTER SHEET", 760, 250, 400, 60));
 
         // Left column - Spells
         const left_x = 100.0;
@@ -56,55 +56,55 @@ const IndexPage = struct {
         const spell_height = 35.0;
         const spell_spacing = 10.0;
 
-        try links.append(page.createLabel("EQUIPPED SPELLS", left_x, 350, 400, 40));
+        try links.append(page.createTextElement("EQUIPPED SPELLS", left_x, 350, 400, 40));
 
         // Spell row 1: Keys 1-4
-        try links.append(page.createLabel("1 LULL", left_x, 400, spell_width, spell_height));
-        try links.append(page.createLabel("2 BLINK", left_x + spell_width + spell_spacing, 400, spell_width, spell_height));
-        try links.append(page.createLabel("3 EMPTY", left_x + (spell_width + spell_spacing) * 2, 400, spell_width, spell_height));
-        try links.append(page.createLabel("4 EMPTY", left_x + (spell_width + spell_spacing) * 3, 400, spell_width, spell_height));
+        try links.append(page.createTextElement("1 LULL", left_x, 400, spell_width, spell_height));
+        try links.append(page.createTextElement("2 BLINK", left_x + spell_width + spell_spacing, 400, spell_width, spell_height));
+        try links.append(page.createTextElement("3 EMPTY", left_x + (spell_width + spell_spacing) * 2, 400, spell_width, spell_height));
+        try links.append(page.createTextElement("4 EMPTY", left_x + (spell_width + spell_spacing) * 3, 400, spell_width, spell_height));
 
         // Spell row 2: Keys Q E R F
-        try links.append(page.createLabel("Q EMPTY", left_x, 450, spell_width, spell_height));
-        try links.append(page.createLabel("E EMPTY", left_x + spell_width + spell_spacing, 450, spell_width, spell_height));
-        try links.append(page.createLabel("R EMPTY", left_x + (spell_width + spell_spacing) * 2, 450, spell_width, spell_height));
-        try links.append(page.createLabel("F EMPTY", left_x + (spell_width + spell_spacing) * 3, 450, spell_width, spell_height));
+        try links.append(page.createTextElement("Q EMPTY", left_x, 450, spell_width, spell_height));
+        try links.append(page.createTextElement("E EMPTY", left_x + spell_width + spell_spacing, 450, spell_width, spell_height));
+        try links.append(page.createTextElement("R EMPTY", left_x + (spell_width + spell_spacing) * 2, 450, spell_width, spell_height));
+        try links.append(page.createTextElement("F EMPTY", left_x + (spell_width + spell_spacing) * 3, 450, spell_width, spell_height));
 
         // Center column - Stats
         const center_x = 450.0;
         const stat_width = 250.0;
         const stat_height = 35.0;
 
-        try links.append(page.createLabel("PLAYER STATS", center_x, 350, stat_width, 40));
-        try links.append(page.createLabel("Health: Full (100/100)", center_x, 400, stat_width, stat_height));
-        try links.append(page.createLabel("Speed: Normal (200 u/s)", center_x, 450, stat_width, stat_height));
-        try links.append(page.createLabel("Bullets: 6 max", center_x, 500, stat_width, stat_height));
-        try links.append(page.createLabel("Recharge: 2/sec", center_x, 550, stat_width, stat_height));
-        try links.append(page.createLabel("Damage: Normal", center_x, 600, stat_width, stat_height));
+        try links.append(page.createTextElement("PLAYER STATS", center_x, 350, stat_width, 40));
+        try links.append(page.createTextElement("Health: Full (100/100)", center_x, 400, stat_width, stat_height));
+        try links.append(page.createTextElement("Speed: Normal (200 u/s)", center_x, 450, stat_width, stat_height));
+        try links.append(page.createTextElement("Bullets: 6 max", center_x, 500, stat_width, stat_height));
+        try links.append(page.createTextElement("Recharge: 2/sec", center_x, 550, stat_width, stat_height));
+        try links.append(page.createTextElement("Damage: Normal", center_x, 600, stat_width, stat_height));
 
         // Right column - Upgrades
         const right_x = 950.0;
         const upgrade_width = 250.0;
         const upgrade_height = 35.0;
 
-        try links.append(page.createLabel("UPGRADES", right_x, 350, upgrade_width, 40));
-        try links.append(page.createLabel("Bullet Range", right_x, 400, upgrade_width, upgrade_height));
-        try links.append(page.createLabel("Multi-shot", right_x, 450, upgrade_width, upgrade_height));
-        try links.append(page.createLabel("Recharge Rate", right_x, 500, upgrade_width, upgrade_height));
-        try links.append(page.createLabel("Damage Boost", right_x, 550, upgrade_width, upgrade_height));
-        try links.append(page.createLabel("Health Boost", right_x, 600, upgrade_width, upgrade_height));
+        try links.append(page.createTextElement("UPGRADES", right_x, 350, upgrade_width, 40));
+        try links.append(page.createTextElement("Bullet Range", right_x, 400, upgrade_width, upgrade_height));
+        try links.append(page.createTextElement("Multi-shot", right_x, 450, upgrade_width, upgrade_height));
+        try links.append(page.createTextElement("Recharge Rate", right_x, 500, upgrade_width, upgrade_height));
+        try links.append(page.createTextElement("Damage Boost", right_x, 550, upgrade_width, upgrade_height));
+        try links.append(page.createTextElement("Health Boost", right_x, 600, upgrade_width, upgrade_height));
 
         // Far right - Combat info
         const far_right_x = 1350.0;
         const combat_width = 280.0;
         const combat_height = 35.0;
 
-        try links.append(page.createLabel("COMBAT INFO", far_right_x, 350, combat_width, 40));
-        try links.append(page.createLabel("Hold LMB: Burst mode", far_right_x, 400, combat_width, combat_height));
-        try links.append(page.createLabel("Click LMB: Rhythm mode", far_right_x, 450, combat_width, combat_height));
-        try links.append(page.createLabel("RMB: Cast spell", far_right_x, 500, combat_width, combat_height));
-        try links.append(page.createLabel("Ctrl+RMB: Self-cast", far_right_x, 550, combat_width, combat_height));
-        try links.append(page.createLabel("Bullet lifetime: 4s", far_right_x, 600, combat_width, combat_height));
+        try links.append(page.createTextElement("COMBAT INFO", far_right_x, 350, combat_width, 40));
+        try links.append(page.createTextElement("Hold LMB: Burst mode", far_right_x, 400, combat_width, combat_height));
+        try links.append(page.createTextElement("Click LMB: Rhythm mode", far_right_x, 450, combat_width, combat_height));
+        try links.append(page.createTextElement("RMB: Cast spell", far_right_x, 500, combat_width, combat_height));
+        try links.append(page.createTextElement("Ctrl+RMB: Self-cast", far_right_x, 550, combat_width, combat_height));
+        try links.append(page.createTextElement("Bullet lifetime: 4s", far_right_x, 600, combat_width, combat_height));
 
         // Bottom navigation
         const nav_y = screen_height * 0.79; // 850/1080 ≈ 0.79
@@ -133,23 +133,23 @@ const IndexPage = struct {
         // try links.append(page.createLink("", "", 100, test_y, 1720, 200));
 
         // Panel header
-        try links.append(page.createLabel("FONT TEST PANEL", 100, test_y - 30, 300, 25));
+        try links.append(page.createTextElement("FONT TEST PANEL", 100, test_y - 30, 300, 25));
 
         // Row 1: Full ASCII uppercase alphabet
-        try links.append(page.createLabel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 150, test_y + 20, 1620, 40));
+        try links.append(page.createTextElement("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 150, test_y + 20, 1620, 40));
 
         // Row 2: Lowercase alphabet
-        try links.append(page.createLabel("abcdefghijklmnopqrstuvwxyz", 150, test_y + 60, 1620, 40));
+        try links.append(page.createTextElement("abcdefghijklmnopqrstuvwxyz", 150, test_y + 60, 1620, 40));
 
         // Row 3: Numbers and common symbols
-        try links.append(page.createLabel("0123456789 !@#$%^&*()[]{}+-=<>?/", 150, test_y + 100, 1620, 40));
+        try links.append(page.createTextElement("0123456789 !@#$%^&*()[]{}+-=<>?/", 150, test_y + 100, 1620, 40));
 
         // Row 4: Mixed case pangram to test kerning and spacing
-        try links.append(page.createLabel("The Quick Brown Fox Jumps Over The Lazy Dog 1234567890", 150, test_y + 140, 1620, 40));
+        try links.append(page.createTextElement("The Quick Brown Fox Jumps Over The Lazy Dog 1234567890", 150, test_y + 140, 1620, 40));
 
         // Single large letter test for debugging
-        try links.append(page.createLabel("A", 850, 400, 100, 100));
-        try links.append(page.createLabel("SINGLE LETTER TEST", 750, 370, 300, 25));
+        try links.append(page.createTextElement("A", 850, 400, 100, 100));
+        try links.append(page.createTextElement("SINGLE LETTER TEST", 750, 370, 300, 25));
     }
 
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {

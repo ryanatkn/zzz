@@ -34,7 +34,7 @@ fn extractGameAction(event: *const c.sdl.SDL_Event) GameAction {
 /// Create coordinate context from camera state
 fn createCoordinateContext(cam: *const camera.Camera) coordinates.CoordinateContext {
     return coordinates.CoordinateContext.init(cam.screen_width, cam.screen_height)
-        .withCamera(math.Vec2{ .x = cam.view_x + cam.view_width / 2.0, .y = cam.view_y + cam.view_height / 2.0 }, cam.scale);
+        .withCamera(math.Vec2.position(cam.view_x + cam.view_width / 2.0, cam.view_y + cam.view_height / 2.0), cam.scale);
 }
 
 pub fn handleSDLEvent(

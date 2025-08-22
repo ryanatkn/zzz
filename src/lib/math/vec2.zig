@@ -12,6 +12,26 @@ pub const Vec2 = extern struct {
         return .{ .x = x, .y = y };
     }
 
+    /// Create a position vector (semantic alias for init)
+    pub fn position(x: f32, y: f32) Vec2 {
+        return init(x, y);
+    }
+
+    /// Create a size vector (semantic alias for init)
+    pub fn size(width: f32, height: f32) Vec2 {
+        return init(width, height);
+    }
+
+    /// Create screen center position
+    pub fn screenCenter(screen_width: f32, screen_height: f32) Vec2 {
+        return init(screen_width / 2.0, screen_height / 2.0);
+    }
+
+    /// Create an offset from a base position
+    pub fn offset(base: Vec2, dx: f32, dy: f32) Vec2 {
+        return init(base.x + dx, base.y + dy);
+    }
+
     /// Common constants
     pub const ZERO = Vec2{ .x = 0.0, .y = 0.0 };
     pub const ONE = Vec2{ .x = 1.0, .y = 1.0 };
@@ -187,6 +207,44 @@ pub const Vec2 = extern struct {
             .y = scalar.clamp(self.y, rect_pos.y, rect_pos.y + rect_size.y),
         };
     }
+
+    /// Center this size within bounds, returning position
+    pub fn centerIn(self: Vec2, bounds_pos: Vec2, bounds_size: Vec2) Vec2 {
+        return Vec2{
+            .x = bounds_pos.x + (bounds_size.x - self.x) / 2.0,
+            .y = bounds_pos.y + (bounds_size.y - self.y) / 2.0,
+        };
+    }
+
+    /// Align to top-left of bounds
+    pub fn alignTopLeft(self: Vec2, bounds_pos: Vec2) Vec2 {
+        _ = self; // Size not needed for top-left alignment
+        return bounds_pos;
+    }
+
+    /// Align to top-right of bounds
+    pub fn alignTopRight(self: Vec2, bounds_pos: Vec2, bounds_size: Vec2) Vec2 {
+        return Vec2{
+            .x = bounds_pos.x + bounds_size.x - self.x,
+            .y = bounds_pos.y,
+        };
+    }
+
+    /// Align to bottom-left of bounds
+    pub fn alignBottomLeft(self: Vec2, bounds_pos: Vec2, bounds_size: Vec2) Vec2 {
+        return Vec2{
+            .x = bounds_pos.x,
+            .y = bounds_pos.y + bounds_size.y - self.y,
+        };
+    }
+
+    /// Align to bottom-right of bounds
+    pub fn alignBottomRight(self: Vec2, bounds_pos: Vec2, bounds_size: Vec2) Vec2 {
+        return Vec2{
+            .x = bounds_pos.x + bounds_size.x - self.x,
+            .y = bounds_pos.y + bounds_size.y - self.y,
+        };
+    }
 };
 
 /// Function-style API for compatibility with existing codebase
@@ -347,4 +405,32 @@ test "Vec2 operations" {
 
     const sum2 = vec2_add(v1, v2);
     try std.testing.expect(sum2.x == 4.0 and sum2.y == 6.0);
+}
+
+test "Vec2 builder methods" {
+    // Test semantic aliases
+    const pos = Vec2.position(10.0, 20.0);
+    const size = Vec2.size(100.0, 50.0);
+    try std.testing.expect(pos.x == 10.0 and pos.y == 20.0);
+    try std.testing.expect(size.x == 100.0 and size.y == 50.0);
+
+    // Test screen center
+    const center = Vec2.screenCenter(800.0, 600.0);
+    try std.testing.expect(center.x == 400.0 and center.y == 300.0);
+
+    // Test offset
+    const base = Vec2.position(100.0, 100.0);
+    const offset_pos = Vec2.offset(base, 10.0, -5.0);
+    try std.testing.expect(offset_pos.x == 110.0 and offset_pos.y == 95.0);
+
+    // Test layout helpers
+    const item_size = Vec2.size(50.0, 30.0);
+    const bounds_pos = Vec2.position(0.0, 0.0);
+    const bounds_size = Vec2.size(200.0, 100.0);
+
+    const centered = item_size.centerIn(bounds_pos, bounds_size);
+    try std.testing.expect(centered.x == 75.0 and centered.y == 35.0); // (200-50)/2, (100-30)/2
+
+    const top_right = item_size.alignTopRight(bounds_pos, bounds_size);
+    try std.testing.expect(top_right.x == 150.0 and top_right.y == 0.0); // 200-50, 0
 }

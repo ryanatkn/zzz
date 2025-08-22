@@ -2,6 +2,7 @@ const std = @import("std");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
+const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -30,8 +31,8 @@ pub const ComponentProps = struct {
         return ComponentProps{
             .position = try reactive.signal(allocator, Vec2, initial_position),
             .size = try reactive.signal(allocator, Vec2, initial_size),
-            .background_color = try reactive.signal(allocator, Color, Color{ .r = 50, .g = 50, .b = 50, .a = 255 }),
-            .border_color = try reactive.signal(allocator, Color, Color{ .r = 150, .g = 150, .b = 150, .a = 255 }),
+            .background_color = try reactive.signal(allocator, Color, styles.Colors.bg_secondary),
+            .border_color = try reactive.signal(allocator, Color, styles.Colors.border_primary),
             .visible = try reactive.signal(allocator, bool, true),
             .enabled = try reactive.signal(allocator, bool, true),
             .hovered = try reactive.signal(allocator, bool, false),

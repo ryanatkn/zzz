@@ -3,7 +3,7 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
-const text = @import("text.zig");
+const text_display = @import("text_display.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;

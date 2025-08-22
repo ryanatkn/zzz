@@ -1,10 +1,10 @@
 /// Shared utilities and types for flex layout algorithms
 const std = @import("std");
-const layout_math = @import("../../math.zig");
+const math_mod = @import("../../../math/mod.zig");
 const types = @import("../../core/types.zig");
 
-pub const Vec2 = layout_math.Vec2;
-pub const Rectangle = layout_math.Rectangle;
+pub const Vec2 = math_mod.Vec2;
+pub const Rectangle = math_mod.Rectangle;
 
 /// Flex container configuration
 pub const Config = struct {
@@ -48,17 +48,28 @@ pub const FlexItem = struct {
 
 /// Get item size along main axis
 pub fn getItemMainSize(item: FlexItem, direction: types.Direction) f32 {
-    return layout_math.getMainAxisSize(item.size, direction);
+    return switch (direction) {
+        .row, .row_reverse => item.size.x,
+        .column, .column_reverse => item.size.y,
+    };
 }
 
 /// Get item size along cross axis
 pub fn getItemCrossSize(item: FlexItem, direction: types.Direction) f32 {
-    return layout_math.getCrossAxisSize(item.size, direction);
+    return switch (direction) {
+        .row, .row_reverse => item.size.y,
+        .column, .column_reverse => item.size.x,
+    };
 }
 
 /// Reverse layout results based on direction
 pub fn reverseResults(results: []types.LayoutResult, direction: types.Direction) void {
-    if (layout_math.shouldReverseOrder(direction)) {
+    const should_reverse = switch (direction) {
+        .row_reverse, .column_reverse => true,
+        else => false,
+    };
+
+    if (should_reverse) {
         // Reverse the order of results
         var i: usize = 0;
         var j: usize = results.len - 1;

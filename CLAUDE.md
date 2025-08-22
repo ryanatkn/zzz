@@ -335,7 +335,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - **Choose Immediate Mode when:** Content changes >10 times/sec (particle counts, debug values)
 - **Choose Persistent Mode when:** Content changes <5 times/sec (FPS counter, UI labels, menus)
 - **Use Auto-Selection:** `rendering_modes.recommendModeByRate(changes_per_second)` 
-- **UI Components Available:** `fps_counter.zig`, `debug_overlay.zig`, `reactive_label.zig`
+- **UI Components Available:** `fps_counter.zig`, `debug_overlay.zig`, `text_display.zig`
 - **Performance Examples:** FPS (persistent, 2-3 changes/sec), Mouse coords (immediate, 60/sec)
 - **Decision Tree:** Static text → persistent, Debug values → immediate, User actions → persistent
 

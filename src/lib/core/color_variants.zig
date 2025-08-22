@@ -1,5 +1,6 @@
 const std = @import("std");
 const colors = @import("colors.zig");
+const color_math = @import("../math/color.zig");
 const Color = colors.Color;
 
 /// Base color palette - 11 distinct colors for maximum visual variety
@@ -263,9 +264,9 @@ test "color variant generation" {
     const red_bright = BaseColor.red.getVariant(10);
 
     // Dark should be darker than mid
-    try std.testing.expect(colors.getLuminance(red_dark) < colors.getLuminance(red_mid));
+    try std.testing.expect(color_math.ColorAdvanced.getLuminance(red_dark) < color_math.ColorAdvanced.getLuminance(red_mid));
     // Mid should be darker than bright
-    try std.testing.expect(colors.getLuminance(red_mid) < colors.getLuminance(red_bright));
+    try std.testing.expect(color_math.ColorAdvanced.getLuminance(red_mid) < color_math.ColorAdvanced.getLuminance(red_bright));
 
     // Test ColorVariant struct
     const fearful_neutral = ColorVariant{ .base = .brown, .variant = 8 };
@@ -283,8 +284,8 @@ test "all base colors have valid palettes" {
         try std.testing.expect(palette.len == 11);
 
         // Check progression from dark to light
-        const dark_lum = colors.getLuminance(palette[0]);
-        const bright_lum = colors.getLuminance(palette[10]);
+        const dark_lum = color_math.ColorAdvanced.getLuminance(palette[0]);
+        const bright_lum = color_math.ColorAdvanced.getLuminance(palette[10]);
         try std.testing.expect(dark_lum < bright_lum);
     }
 }
