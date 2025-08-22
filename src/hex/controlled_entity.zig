@@ -43,7 +43,7 @@ pub fn updateControlledEntity(game: *HexGame, entity_id: EntityId, frame_ctx: Fr
     };
 
     // Apply movement bounds based on zone camera mode
-    new_pos = entity_queries.applyMovementBounds(game, entity_id, new_pos);
+    new_pos = entity_queries.applyMovementBounds(game, entity_id, new_pos, cam);
 
     // Check collision with obstacles before moving
     if (physics.canEntityMoveTo(game, entity_id, new_pos)) {

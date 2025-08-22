@@ -251,7 +251,7 @@ pub fn getEntityType(world: *const HexGame, entity_id: EntityId) EntityType {
 }
 
 /// Movement bounds helper for controlled entities
-pub fn applyMovementBounds(world: *const HexGame, entity_id: EntityId, pos: Vec2) Vec2 {
+pub fn applyMovementBounds(world: *const HexGame, entity_id: EntityId, pos: Vec2, camera: *const @import("../lib/rendering/camera.zig").Camera) Vec2 {
     const zone = world.getCurrentZoneConst();
     var new_pos = pos;
 
@@ -262,8 +262,8 @@ pub fn applyMovementBounds(world: *const HexGame, entity_id: EntityId, pos: Vec2
 
         if (new_pos.x < margin) new_pos.x = margin;
         if (new_pos.y < margin) new_pos.y = margin;
-        if (new_pos.x > 1600.0 - margin) new_pos.x = 1600.0 - margin; // SCREEN_WIDTH
-        if (new_pos.y > 1200.0 - margin) new_pos.y = 1200.0 - margin; // SCREEN_HEIGHT
+        if (new_pos.x > camera.screen_width - margin) new_pos.x = camera.screen_width - margin;
+        if (new_pos.y > camera.screen_height - margin) new_pos.y = camera.screen_height - margin;
     }
 
     return new_pos;
