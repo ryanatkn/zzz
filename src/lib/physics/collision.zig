@@ -53,8 +53,8 @@ pub fn checkCircleCollision(pos1: Vec2, radius1: f32, pos2: Vec2, radius2: f32) 
 /// Circle-rectangle collision detection
 pub fn circleRectangle(circle: Circle, rect: Rectangle) bool {
     // Find closest point on rectangle to circle center
-    const closest_x = std.math.clamp(circle.center.x, rect.position.x, rect.position.x + rect.size.x);
-    const closest_y = std.math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
+    const closest_x = math.clamp(circle.center.x, rect.position.x, rect.position.x + rect.size.x);
+    const closest_y = math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
 
     const closest_point = Vec2{ .x = closest_x, .y = closest_y };
     const distance_sq = math.distanceSquared(circle.center, closest_point);
@@ -152,8 +152,8 @@ fn circleCircleDetailed(c1: Shape.Circle, c2: Shape.Circle) CollisionResult {
 }
 
 fn circleRectangleDetailed(circle: Shape.Circle, rect: Shape.Rectangle) CollisionResult {
-    const closest_x = std.math.clamp(circle.center.x, rect.position.x, rect.position.x + rect.size.x);
-    const closest_y = std.math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
+    const closest_x = math.clamp(circle.center.x, rect.position.x, rect.position.x + rect.size.x);
+    const closest_y = math.clamp(circle.center.y, rect.position.y, rect.position.y + rect.size.y);
     const closest_point = Vec2{ .x = closest_x, .y = closest_y };
 
     const distance = math.distance(circle.center, closest_point);

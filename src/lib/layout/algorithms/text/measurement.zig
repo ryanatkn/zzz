@@ -5,6 +5,7 @@
 /// the broader layout framework.
 const std = @import("std");
 const math = @import("../../../math/mod.zig");
+const scalar = @import("../../../math/scalar.zig");
 const types = @import("../../core/types.zig");
 const text_layout = @import("../../../text/layout.zig");
 const text_primitives = @import("../../../text/primitives.zig");
@@ -65,8 +66,8 @@ pub const TextMeasurer = struct {
         var result = measureText(text, font_size, max_width, options);
 
         // Apply constraints
-        result.width = std.math.clamp(result.width, constraints.min_width, constraints.max_width);
-        result.height = std.math.clamp(result.height, constraints.min_height, constraints.max_height);
+        result.width = scalar.clamp(result.width, constraints.min_width, constraints.max_width);
+        result.height = scalar.clamp(result.height, constraints.min_height, constraints.max_height);
 
         // Check if text fits after constraint application
         const unconstrained_result = measureText(text, font_size, max_width, options);
@@ -82,11 +83,12 @@ pub const TextMeasurer = struct {
         font_size: f32,
         options: TextMeasurementOptions,
     ) IntrinsicTextSize {
-        // Minimum width is the width of the longest word (approximated)
-        const min_width = font_size * 8.0; // Assume longest word is ~8 characters
-
         // Preferred width is single-line width
         const preferred_width = measureText(text, font_size, null, options).width;
+
+        // Minimum width is width of longest word (approximated as 60% of preferred width)
+        // TODO: Implement proper word-break analysis for accurate min_width
+        const min_width = preferred_width * 0.6;
 
         // Height is consistent for given font size
         const height = font_size * options.line_height_multiplier;
@@ -177,8 +179,8 @@ pub const TextLayoutElement = struct {
 
         pub fn init(allocator: std.mem.Allocator) TextLayoutState {
             return TextLayoutState{
-                .bounds = Rectangle.ZERO,
-                .text_bounds = Rectangle.ZERO,
+                .bounds = Rectangle.fromXYWH(0, 0, 0, 0),
+                .text_bounds = Rectangle.fromXYWH(0, 0, 0, 0),
                 .is_clipped = false,
                 .line_breaks = std.ArrayList(usize).init(allocator),
             };

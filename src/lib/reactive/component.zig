@@ -209,21 +209,24 @@ const TestComponent = struct {
 
     fn onMount(state: *anyopaque) !void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
-        const ui_log = loggers.getUILog();
-        ui_log.debug("test_component", "TestComponent '{s}' mounted", .{self.name});
+        if (loggers.getUILogOptional()) |ui_log| {
+            ui_log.debug("test_component", "TestComponent '{s}' mounted", .{self.name});
+        }
     }
 
     fn onUnmount(state: *anyopaque) void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
-        const ui_log = loggers.getUILog();
-        ui_log.debug("test_component", "TestComponent '{s}' unmounted", .{self.name});
+        if (loggers.getUILogOptional()) |ui_log| {
+            ui_log.debug("test_component", "TestComponent '{s}' unmounted", .{self.name});
+        }
     }
 
     fn onRender(state: *anyopaque) !void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
         self.render_count += 1;
-        const ui_log = loggers.getUILog();
-        ui_log.debug("test_component", "TestComponent '{s}' rendered (count: {})", .{ self.name, self.render_count });
+        if (loggers.getUILogOptional()) |ui_log| {
+            ui_log.debug("test_component", "TestComponent '{s}' rendered (count: {})", .{ self.name, self.render_count });
+        }
     }
 
     fn shouldRender(state: *anyopaque) bool {
@@ -234,8 +237,9 @@ const TestComponent = struct {
 
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
         const self = @as(*TestComponent, @ptrCast(@alignCast(state)));
-        const ui_log = loggers.getUILog();
-        ui_log.debug("test_component", "TestComponent '{s}' destroyed", .{self.name});
+        if (loggers.getUILogOptional()) |ui_log| {
+            ui_log.debug("test_component", "TestComponent '{s}' destroyed", .{self.name});
+        }
         allocator.destroy(self);
     }
 

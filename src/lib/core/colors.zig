@@ -1,4 +1,5 @@
 const std = @import("std");
+const scalar = @import("../math/scalar.zig");
 
 /// RGBA color struct compatible with GPU buffers
 pub const Color = extern struct {
@@ -49,52 +50,16 @@ pub const ORANGE_BRIGHT = Color{ .r = 255, .g = 180, .b = 80, .a = 255 };
 pub const BROWN = Color{ .r = 139, .g = 69, .b = 19, .a = 255 }; // Saddle brown
 pub const CYAN = Color{ .r = 0, .g = 200, .b = 200, .a = 255 };
 
-// Color utility functions
+// TODO: Consider removing this module entirely and moving:
+// - Color type definition to math/color.zig
+// - Game-specific color constants to hex/colors.zig
+// - UI color constants to ui/colors.zig or ui/theme.zig
+// - Generic color constants to math/color.zig
+// This would eliminate the circular dependency and improve organization
 
-/// Create a color with specified alpha transparency
-pub fn withAlpha(color: Color, alpha: u8) Color {
-    return Color{
-        .r = color.r,
-        .g = color.g,
-        .b = color.b,
-        .a = alpha,
-    };
-}
-
-/// Darken a color by reducing RGB values by percentage (0.0 to 1.0)
-pub fn darken(color: Color, factor: f32) Color {
-    const clamped_factor = std.math.clamp(factor, 0.0, 1.0);
-    const multiplier = 1.0 - clamped_factor;
-    return Color{
-        .r = @intFromFloat(@as(f32, @floatFromInt(color.r)) * multiplier),
-        .g = @intFromFloat(@as(f32, @floatFromInt(color.g)) * multiplier),
-        .b = @intFromFloat(@as(f32, @floatFromInt(color.b)) * multiplier),
-        .a = color.a,
-    };
-}
-
-/// Lighten a color by increasing RGB values by percentage (0.0 to 1.0)
-pub fn lighten(color: Color, factor: f32) Color {
-    const clamped_factor = std.math.clamp(factor, 0.0, 1.0);
-    return Color{
-        .r = @intFromFloat(@as(f32, @floatFromInt(color.r)) + (255.0 - @as(f32, @floatFromInt(color.r))) * clamped_factor),
-        .g = @intFromFloat(@as(f32, @floatFromInt(color.g)) + (255.0 - @as(f32, @floatFromInt(color.g))) * clamped_factor),
-        .b = @intFromFloat(@as(f32, @floatFromInt(color.b)) + (255.0 - @as(f32, @floatFromInt(color.b))) * clamped_factor),
-        .a = color.a,
-    };
-}
-
-/// Mix two colors with a blend factor (0.0 = first color, 1.0 = second color)
-pub fn mix(color1: Color, color2: Color, factor: f32) Color {
-    const clamped_factor = std.math.clamp(factor, 0.0, 1.0);
-    const inv_factor = 1.0 - clamped_factor;
-    return Color{
-        .r = @intFromFloat(@as(f32, @floatFromInt(color1.r)) * inv_factor + @as(f32, @floatFromInt(color2.r)) * clamped_factor),
-        .g = @intFromFloat(@as(f32, @floatFromInt(color1.g)) * inv_factor + @as(f32, @floatFromInt(color2.g)) * clamped_factor),
-        .b = @intFromFloat(@as(f32, @floatFromInt(color1.b)) * inv_factor + @as(f32, @floatFromInt(color2.b)) * clamped_factor),
-        .a = @intFromFloat(@as(f32, @floatFromInt(color1.a)) * inv_factor + @as(f32, @floatFromInt(color2.a)) * clamped_factor),
-    };
-}
+// Color utility functions have been moved to src/lib/math/color.zig
+// Import math.ColorMath for darken, lighten, withAlpha, lerp, etc.
+// This module currently focuses on color constants and the Color type definition
 
 /// Convert RGB to HSV for advanced color manipulation
 pub const HSV = struct {
@@ -179,14 +144,14 @@ pub fn fromHSV(hsv: HSV) Color {
 /// Adjust saturation of a color (0.0 = grayscale, 1.0 = original, >1.0 = oversaturated)
 pub fn adjustSaturation(color: Color, saturation_factor: f32) Color {
     var hsv = toHSV(color);
-    hsv.s = std.math.clamp(hsv.s * saturation_factor, 0.0, 1.0);
+    hsv.s = scalar.clamp(hsv.s * saturation_factor, 0.0, 1.0);
     return fromHSV(hsv);
 }
 
 /// Adjust brightness/value of a color (0.0 = black, 1.0 = original, >1.0 = brighter)
 pub fn adjustBrightness(color: Color, brightness_factor: f32) Color {
     var hsv = toHSV(color);
-    hsv.v = std.math.clamp(hsv.v * brightness_factor, 0.0, 1.0);
+    hsv.v = scalar.clamp(hsv.v * brightness_factor, 0.0, 1.0);
     return fromHSV(hsv);
 }
 
@@ -399,12 +364,13 @@ pub const Palette = struct {
 };
 
 test "color manipulation functions" {
+    const math = @import("../math/mod.zig");
     // Test basic color creation
     const red = Color{ .r = 255, .g = 0, .b = 0, .a = 255 };
     const blue = Color{ .r = 0, .g = 0, .b = 255, .a = 255 };
 
-    // Test mix
-    const purple = mix(red, blue, 0.5);
+    // Test mix (now in math.ColorMath)
+    const purple = math.ColorMath.lerp(red, blue, 0.5);
     try std.testing.expect(purple.r > 100 and purple.r < 140); // Should be around 127
     try std.testing.expect(purple.b > 100 and purple.b < 140);
 

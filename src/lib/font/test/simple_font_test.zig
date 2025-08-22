@@ -23,9 +23,6 @@ test "simple font metrics examination" {
     };
     defer allocator.free(font_data);
 
-    std.debug.print("\n=== FONT DEBUG TEST ===\n", .{});
-    std.debug.print("Font file loaded: {s} ({} bytes)\n", .{ font_path, font_data.len });
-
     // Parse the font
     var parser = try ttf_parser.TTFParser.init(allocator, font_data);
     defer parser.deinit();

@@ -220,8 +220,8 @@ pub fn DurationManager(comptime ValueType: type) type {
             for (self.effects.items) |effect| {
                 if (effect.active) {
                     switch (@typeInfo(ValueType)) {
-                        .Float, .ComptimeFloat => result += effect.value,
-                        .Int, .ComptimeInt => result += effect.value,
+                        .float, .comptime_float => result += effect.value,
+                        .int, .comptime_int => result += effect.value,
                         else => @compileError("Add operation not supported for type " ++ @typeName(ValueType)),
                     }
                 }
@@ -234,8 +234,8 @@ pub fn DurationManager(comptime ValueType: type) type {
             for (self.effects.items) |effect| {
                 if (effect.active) {
                     switch (@typeInfo(ValueType)) {
-                        .Float, .ComptimeFloat => result *= effect.value,
-                        .Int, .ComptimeInt => result = @intFromFloat(@as(f32, @floatFromInt(result)) * @as(f32, @floatFromInt(effect.value))),
+                        .float, .comptime_float => result *= effect.value,
+                        .int, .comptime_int => result = @intFromFloat(@as(f32, @floatFromInt(result)) * @as(f32, @floatFromInt(effect.value))),
                         else => @compileError("Multiply operation not supported for type " ++ @typeName(ValueType)),
                     }
                 }

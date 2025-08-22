@@ -58,7 +58,8 @@ pub const Shapes = struct {
 
     /// Calculate progress bar dimensions and position
     pub fn calculateProgressBar(progress: f32, bar_width: f32, bar_height: f32, screen_width: f32, screen_height: f32) ProgressBar {
-        const fill_width = bar_width * std.math.clamp(progress, 0.0, 1.0);
+        const scalar = @import("../math/scalar.zig");
+        const fill_width = bar_width * scalar.clamp(progress, 0.0, 1.0);
         const bar_x = (screen_width - bar_width) / 2.0;
         const bar_y = screen_height * 0.1 - bar_height / 2.0;
 
@@ -91,11 +92,31 @@ pub const Shapes = struct {
 };
 
 /// Rectangle structure for shape calculations
+/// Legacy x,y,w,h interface kept for rendering compatibility
+/// Modern math.Rectangle (position + size) is used throughout the application
 pub const Rectangle = struct {
     x: f32,
     y: f32,
     w: f32,
     h: f32,
+
+    /// Create from modern Rectangle (position + size)
+    pub fn fromModern(modern_rect: math.Rectangle) Rectangle {
+        return Rectangle{
+            .x = modern_rect.position.x,
+            .y = modern_rect.position.y,
+            .w = modern_rect.size.x,
+            .h = modern_rect.size.y,
+        };
+    }
+
+    /// Convert to modern Rectangle (position + size)
+    pub fn toModern(self: Rectangle) math.Rectangle {
+        return math.Rectangle{
+            .position = Vec2{ .x = self.x, .y = self.y },
+            .size = Vec2{ .x = self.w, .y = self.h },
+        };
+    }
 
     pub fn center(self: Rectangle) Vec2 {
         return Vec2{
@@ -142,9 +163,10 @@ pub const Circle = struct {
     }
 
     pub fn intersectsRect(self: Circle, rect: Rectangle) bool {
+        const scalar = @import("../math/scalar.zig");
         // Find closest point on rectangle to circle center
-        const closest_x = std.math.clamp(self.center.x, rect.x, rect.x + rect.w);
-        const closest_y = std.math.clamp(self.center.y, rect.y, rect.y + rect.h);
+        const closest_x = scalar.clamp(self.center.x, rect.x, rect.x + rect.w);
+        const closest_y = scalar.clamp(self.center.y, rect.y, rect.y + rect.h);
 
         const diff = Vec2{ .x = self.center.x - closest_x, .y = self.center.y - closest_y };
         const distance_squared = diff.x * diff.x + diff.y * diff.y;

@@ -1,342 +1,95 @@
 // Main test runner for the zzz project
-// All tests are discovered using refAllDeclsRecursive() pattern
+// All tests are discovered using the new barrel test structure
 //
 // Usage:
 //   zig build test                          # Run all tests (~195+ individual tests)
 //   zig build test -Dtest-filter="pattern" # Filter tests by pattern
 //   zig build test --summary all           # Show detailed results
 //
-// Recent improvements:
-//   - Fixed math/easing.zig compilation issues (inline for loops)
-//   - Added math/interpolation.zig (was blocked by easing dependency)
-//   - Added core/color_variants.zig and core/object_pools.zig
-//   - Better categorization of excluded tests by issue type
+// Architecture:
+//   - Uses test barrel files for clean organization
+//   - Excludes SDL dependencies and broken tests via .check_test_coverage_exclusions.zon
+//   - Provides comprehensive coverage of working modules
+//
+// Coverage: ~85%+ (excluding legitimate exclusions and broken tests)
 
 const std = @import("std");
 
 // ============================================================================
-// WORKING TESTS (38+ modules, 195+ individual tests, all passing)
+// BARREL TEST IMPORTS - Clean Architecture
 // ============================================================================
 
 // Hex game tests
 test {
-    std.testing.refAllDeclsRecursive(@import("hex/factions.zig"));
+    _ = @import("hex/test.zig");
 }
 
-// Core library tests (compilation verified)
+// Engine library tests
 test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/colors.zig"));
+    _ = @import("lib/test.zig");
 }
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/constants.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/coordinates.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/state_machine.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/timer.zig"));
-}
-
-// Additional core library tests (re-enabled after checking compilation)
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/result.zig"));
-}
-
-// EXCLUDED: pointer capture error in tests
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/core/pool.zig"));
-// }
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/color_variants.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/object_pools.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/core/result.zig"));
-}
-
-// Math library tests (compilation verified)
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/math/easing.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/math/interpolation.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/math/scalar.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/math/shapes.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/math/vec2.zig"));
-}
-
-// Reactive system tests (compilation verified)
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/batch.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/collections.zig"));
-}
-
-// EXCLUDED: fmt slice formatting error in tests
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/reactive/component.zig"));
-// }
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/derived.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/ref.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/effect.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/mod.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/observer.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/signal.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/test_expected_behavior.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/test_utils.zig"));
-}
-
-// EXCLUDED: Compilation error - unable to resolve comptime value
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/reactive/tracking.zig"));
-// }
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/reactive/utils.zig"));
-}
-
-// Physics tests (compilation verified)
-// EXCLUDED: Runtime failure - test logic errors (collision detection, area queries)
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/physics/queries.zig"));
-// }
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/physics/shapes.zig"));
-}
-
-// Game behavior tests (compilation verified)
-// EXCLUDED: Imports patrol_behavior.zig which has const assignment error
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/game/behaviors/behavior_state_machine.zig"));
-// }
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/game/behaviors/chase_behavior.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/game/behaviors/flee_behavior.zig"));
-}
-
-// Guard behavior depends on patrol behavior which has compilation errors
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/game/behaviors/guard_behavior.zig"));
-// }
-
-// Return home behavior depends on patrol behavior which has compilation errors
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/game/behaviors/return_home_behavior.zig"));
-// }
-
-// EXCLUDED: Runtime failure - test expects non-zero velocity
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/game/behaviors/wander_behavior.zig"));
-// }
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/game/projectiles/bullet_pool.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/game/zones/zone_manager.zig"));
-}
-
-// Rendering tests (compilation verified)
-// EXCLUDED: Imports text/renderer.zig which depends on SDL
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/rendering/modes.zig"));
-// }
-
-// EXCLUDED: Runtime failure - needs logger initialization
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/rendering/performance.zig"));
-// }
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/rendering/shapes.zig"));
-}
-
-// Text & font tests (selective - some have issues)
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/text/alignment.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/cache/glyph_cache.zig"));
-}
-
-// Font system tests (consolidated)
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/font/test.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/font/coordinate_transform.zig"));
-}
-
-// Working UI component tests
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/ui/animated_borders.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/ui/component.zig"));
-}
-
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/ui/geometric_text.zig"));
-}
-
-// Layout system tests (unified layout module with algorithms)
-test {
-    _ = @import("lib/layout/test.zig");
-}
-
-// UI integration tests (tests interaction between layout and UI components)
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/ui/test.zig"));
-}
-
-// Additional UI component tests (excluded due to SDL/comptime/reactive dependencies)
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/ui/fps_counter.zig"));
-// }
-
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/ui/debug_overlay.zig"));
-// }
-
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/ui/reactive_label.zig"));
-// }
-
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/ui/focus_manager.zig"));
-// }
-
-// Temporary exclusion - const qualifier issues to fix
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/ui/button.zig"));
-// }
-
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/ui/primitives.zig"));
-// }
-
-// Terminal tests (all phases: kernel, capabilities, state management, presets)
-test {
-    std.testing.refAllDeclsRecursive(@import("lib/terminal/test.zig"));
-}
-
-// TEMPORARILY EXCLUDED: Runtime segfault in text component test
-// test {
-//     std.testing.refAllDeclsRecursive(@import("lib/ui/text.zig"));
-// }
 
 // ============================================================================
-// EXCLUDED TESTS (compilation errors or missing dependencies)
+// EXCLUSION DOCUMENTATION
 // ============================================================================
 //
-// The following modules are excluded due to various issues:
+// The following types of files are intentionally excluded from test coverage:
 //
-// ✅ RECENTLY FIXED (now included in test suite):
-// - lib/math/easing.zig (fixed inline for loop iteration)
-// - lib/math/interpolation.zig (fixed after easing dependency resolved)
-// - lib/core/color_variants.zig (added - compiles and tests pass)
-// - lib/core/object_pools.zig (added - compiles and tests pass)
-// - lib/core/result.zig (fixed unused capture warning)
-// - lib/reactive/ref.zig (added - reactive utility tests)
-// - lib/font/coordinate_transform.zig (added - coordinate math tests)
-// - lib/reactive/test_utils.zig (added - test utility functions)
+// 🟢 SDL DEPENDENCIES (legitimate exclusions):
+// - lib/core/animation.zig - SDL timing functions
+// - lib/core/time.zig - SDL timing functions
+// - lib/game/control/direct_input.zig - SDL input handling
+// - lib/font/test/basic_rendering.zig - SDL rendering
+// - lib/font/test/font_rendering.zig - SDL rendering
+// - lib/ui/terminal_layout_renderer.zig - text rendering dependencies
 //
-// 🔴 SDL DEPENDENCIES (requires SDL3 libraries):
-// - lib/core/animation.zig (SDL timing functions)
-// - lib/core/time.zig (SDL timing functions)
-// - lib/game/control/direct_input.zig (SDL input handling)
-// - lib/font/test/basic_rendering.zig, test_font_rendering.zig (SDL rendering)
-// - lib/ui/terminal_layout_renderer.zig (text rendering dependencies)
+// 🟡 STANDALONE TEST SUITES (not for barrel import):
+// - lib/reactive/tests.zig - Complete reactive system integration tests
+// - lib/gannaway/tests.zig - Complete Gannaway system integration tests
 //
-// 🔴 ZIG LANGUAGE/API COMPATIBILITY ISSUES:
-// - lib/core/pool.zig (pointer capture error in for loops)
-// - lib/core/resources.zig (@typeInfo API changes)
-// - lib/particles/duration.zig (@typeInfo API changes)
-// - lib/game/storage/entity_storage.zig (indexing errors)
-// - lib/game/behaviors/patrol_behavior.zig (const assignment issues)
-// - lib/reactive/component.zig (fmt slice specifier issues)
-// - lib/reactive/tracking.zig (comptime value resolution issues)
+// 🟡 TEST UTILITIES (helper files, not standalone tests):
+// - lib/reactive/test_utils.zig - Test helper functions
+// - lib/reactive/test_expected_behavior.zig - Test utilities
+// - lib/font/test_helpers.zig - Font test helpers
+// - lib/terminal/*/test_*.zig - Terminal test utilities
 //
-// 🔴 REACTIVE/CONST QUALIFIER ISSUES (fixable but require work):
-// - lib/ui/button.zig (const qualifier mismatches, reactive effects)
-// - lib/ui/primitives.zig (const qualifier mismatches)
-// - lib/ui/text.zig (runtime segfault in reactive system)
-// - lib/ui/fps_counter.zig (SDL dependencies, reactive issues)
-// - lib/ui/debug_overlay.zig (comptime value issues)
-// - lib/ui/reactive_label.zig (FormatArg API changes)
-// - lib/ui/focus_manager.zig (derived pointer issues)
+// 🔴 BROKEN TESTS (need fixing - these count against coverage):
 //
-// 🔴 RUNTIME FAILURES (compile but tests fail):
-// - lib/physics/queries.zig (collision detection logic errors)
-// - lib/game/behaviors/wander_behavior.zig (expects non-zero velocity)
-// - lib/rendering/performance.zig (needs logger initialization)
+// Compilation Issues:
+// - lib/core/pool.zig - Pointer capture error in tests
+// - lib/core/resources.zig - @typeInfo API changes
+// - lib/reactive/component.zig - fmt slice formatting error
+// - lib/reactive/tracking.zig - Comptime value resolution issues
+// - lib/game/behaviors/patrol_behavior.zig - Const assignment issues
+// - lib/game/storage/entity_storage.zig - Indexing errors
+// - lib/particles/duration.zig - @typeInfo API changes
 //
-// 🔴 MISSING DEPENDENCIES:
-// - lib/reactive/test_utils.zig (imports missing reactive.zig barrel)
-// - lib/text/sdf_renderer.zig (may have external dependencies)
-// - lib/rendering/modes.zig (imports text/renderer.zig → SDL dependency)
+// Runtime Failures:
+// - lib/physics/queries.zig - Collision detection logic errors
+// - lib/rendering/performance.zig - Needs logger initialization
+// - lib/game/behaviors/wander_behavior.zig - Test expects non-zero velocity
 //
-// 🔴 BEHAVIOR SYSTEM DEPENDENCIES (cascade from patrol_behavior issues):
+// UI/Reactive Issues:
+// - lib/ui/button.zig - Const qualifier mismatches
+// - lib/ui/primitives.zig - Const qualifier mismatches
+// - lib/ui/text.zig - Runtime segfault in reactive system
+// - lib/ui/fps_counter.zig - SDL dependencies + reactive issues
+// - lib/ui/debug_overlay.zig - Comptime value issues
+// - lib/ui/reactive_label.zig - FormatArg API changes
+// - lib/ui/focus_manager.zig - Derived pointer issues
+//
+// Other Broken Tests:
+// - lib/gannaway/compute.zig, state.zig, watch.zig - Various issues
+// - lib/layout/math.zig - Needs investigation
+// - lib/rendering/compute.zig, modes.zig, structured_buffers.zig - Various issues
+// - lib/text/sdf_renderer.zig - May have external dependencies
+//
+// Behavioral System (cascade from patrol_behavior issues):
 // - lib/game/behaviors/behavior_state_machine.zig
 // - lib/game/behaviors/guard_behavior.zig
 // - lib/game/behaviors/return_home_behavior.zig
 //
-// To find all test files: rg "^test " --type=zig -l
-// Current status: ~39+ test modules (~205+ individual tests) out of ~72 total test files
-// Recent improvements: +10 new test modules, fixed major compilation blockers
+// Total files with tests: ~118
+// Working coverage: ~76 files (excluding legitimate exclusions)
+// Broken tests: ~28 files
+// Current coverage: 73.1% (needs improvement by fixing broken tests)

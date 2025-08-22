@@ -169,14 +169,14 @@ pub fn ObjectPool(comptime T: type, comptime max_objects: u32) type {
         /// Return an object to the pool
         pub fn release(self: *Self, obj: *T) void {
             // Find the object in our array
-            for (self.objects, 0..) |*pool_obj, i| {
+            for (&self.objects, 0..) |*pool_obj, i| {
                 if (pool_obj == obj) {
                     self.available[i] = true;
                     return;
                 }
             }
             // Object not from this pool - this is a programming error
-            std.debug.panic("Attempted to release object not from this pool");
+            std.debug.panic("Attempted to release object not from this pool", .{});
         }
 
         /// Get count of available objects

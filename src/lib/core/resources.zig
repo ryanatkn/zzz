@@ -187,7 +187,7 @@ pub fn MultiResourceManager(comptime ResourceSet: type) type {
 
         /// Update all resource pools
         pub fn updateAll(self: *Self, delta_time: f32) void {
-            const fields = @typeInfo(ResourceSet).Struct.fields;
+            const fields = @typeInfo(ResourceSet).@"struct".fields;
             inline for (fields) |field| {
                 const resource = &@field(self.resources, field.name);
                 if (@hasDecl(@TypeOf(resource.*), "update")) {

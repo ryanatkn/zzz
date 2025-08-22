@@ -1,10 +1,10 @@
 /// Shared utilities and types for flex layout algorithms
 const std = @import("std");
-const math = @import("../../../math/mod.zig");
+const layout_math = @import("../../math.zig");
 const types = @import("../../core/types.zig");
 
-pub const Vec2 = math.Vec2;
-pub const Rectangle = math.Rectangle;
+pub const Vec2 = layout_math.Vec2;
+pub const Rectangle = layout_math.Rectangle;
 
 /// Flex container configuration
 pub const Config = struct {
@@ -48,37 +48,26 @@ pub const FlexItem = struct {
 
 /// Get item size along main axis
 pub fn getItemMainSize(item: FlexItem, direction: types.Direction) f32 {
-    return switch (direction) {
-        .row, .row_reverse => item.size.x,
-        .column, .column_reverse => item.size.y,
-    };
+    return layout_math.getMainAxisSize(item.size, direction);
 }
 
 /// Get item size along cross axis
 pub fn getItemCrossSize(item: FlexItem, direction: types.Direction) f32 {
-    return switch (direction) {
-        .row, .row_reverse => item.size.y,
-        .column, .column_reverse => item.size.x,
-    };
+    return layout_math.getCrossAxisSize(item.size, direction);
 }
 
 /// Reverse layout results based on direction
 pub fn reverseResults(results: []types.LayoutResult, direction: types.Direction) void {
-    switch (direction) {
-        .row_reverse, .column_reverse => {
-            // Reverse the order of results
-            var i: usize = 0;
-            var j: usize = results.len - 1;
-            while (i < j) {
-                const temp = results[i];
-                results[i] = results[j];
-                results[j] = temp;
-                i += 1;
-                j -= 1;
-            }
-        },
-        else => {
-            // No reversal needed
-        },
+    if (layout_math.shouldReverseOrder(direction)) {
+        // Reverse the order of results
+        var i: usize = 0;
+        var j: usize = results.len - 1;
+        while (i < j) {
+            const temp = results[i];
+            results[i] = results[j];
+            results[j] = temp;
+            i += 1;
+            j -= 1;
+        }
     }
 }

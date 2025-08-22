@@ -165,6 +165,7 @@ pub fn evaluateGuard(
     switch (state.mode) {
         .at_post => {
             // Check for threats to intercept
+            var threat_detected = false;
             if (threat_active and threat_pos != null) {
                 const threat_pos_val = threat_pos.?;
                 const to_threat = threat_pos_val.sub(unit_pos);
@@ -174,12 +175,13 @@ pub fn evaluateGuard(
                 if (threat_dist_sq <= detection_sq) {
                     state.startIntercept(threat_pos_val, config.pursuit_duration);
                     result.detected_threat = true;
+                    threat_detected = true;
                     if (config.track_state_changes) result.state_changed = true;
                 }
             }
 
-            // If too far from guard position, return
-            if (guard_dist_sq > pos_tolerance_sq) {
+            // If too far from guard position, return (but not if we just detected a threat)
+            if (!threat_detected and guard_dist_sq > pos_tolerance_sq) {
                 state.mode = .returning;
                 if (config.track_state_changes) result.state_changed = true;
             }
@@ -334,7 +336,7 @@ test "guard behavior basic functionality" {
     var state = GuardState.init();
     const config = GuardConfig.init(guard_pos, 150.0, 80.0, 100.0, 150.0, 3.0);
 
-    const unit_pos = Vec2{ .x = 100, .y = 100 }; // At guard position
+    const unit_pos = Vec2{ .x = 120, .y = 100 }; // Away from guard position
     const threat_pos = Vec2{ .x = 120, .y = 100 }; // Nearby threat
 
     // Test threat detection

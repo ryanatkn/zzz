@@ -13,6 +13,10 @@ pub const scalar = @import("scalar.zig");
 pub const shapes = @import("shapes.zig");
 pub const easing = @import("easing.zig");
 pub const interpolation = @import("interpolation.zig");
+pub const color = @import("color.zig");
+pub const waves = @import("waves.zig");
+pub const geometry = @import("geometry.zig");
+pub const smoothing = @import("smoothing.zig");
 
 // Re-export scalar utilities
 pub const lerp = scalar.lerp;
@@ -30,6 +34,33 @@ pub const Circle = shapes.Circle;
 pub const Line = shapes.Line;
 pub const Bounds = shapes.Bounds;
 pub const GlyphBounds = shapes.GlyphBounds;
+pub const Spacing = shapes.Spacing;
+
+// Re-export color utilities
+pub const Color = color.Color;
+pub const ColorF32 = color.ColorF32;
+pub const ColorPair = color.ColorPair;
+pub const ColorMath = color.ColorMath;
+
+// Re-export wave utilities
+pub const WaveGenerator = waves.WaveGenerator;
+pub const AnimationWaves = waves.AnimationWaves;
+pub const WaveUtils = waves.WaveUtils;
+
+// Re-export geometry utilities
+pub const GeometryUtils = geometry.GeometryUtils;
+
+// Re-export smoothing utilities
+pub const SmoothingUtils = smoothing.SmoothingUtils;
+
+// Commonly used geometry functions for convenience
+pub const geometryDistance = geometry.GeometryUtils.distance;
+pub const geometryDistanceSquared = geometry.GeometryUtils.distanceSquared;
+pub const geometryCentroid = geometry.GeometryUtils.centroid;
+
+// Commonly used smoothing functions for convenience
+pub const exponentialSmooth = smoothing.SmoothingUtils.exponentialSmooth;
+pub const exponentialSmoothVec2 = smoothing.SmoothingUtils.exponentialSmoothVec2;
 
 // Re-export Vec2 function-style API for compatibility
 const vec2 = @import("vec2.zig");

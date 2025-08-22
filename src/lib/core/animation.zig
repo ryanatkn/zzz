@@ -21,112 +21,43 @@ pub const Time = struct {
     }
 };
 
-/// Animation wave functions
+/// Animation wave functions - delegated to math.waves for consistency
+/// TODO: Consider removing this wrapper and using math.WaveGenerator directly
 pub const Waves = struct {
     /// Sine wave oscillation between 0.0 and 1.0
     pub fn sine(time: f32, frequency: f32) f32 {
-        return (math.sin(time * frequency) + 1.0) * 0.5;
+        return math.WaveGenerator.sine(time, frequency);
     }
 
     /// Cosine wave oscillation between 0.0 and 1.0
     pub fn cosine(time: f32, frequency: f32) f32 {
-        return (math.cos(time * frequency) + 1.0) * 0.5;
+        return math.WaveGenerator.cosine(time, frequency);
     }
 
     /// Triangle wave that goes 0->1->0 linearly
     pub fn triangle(time: f32, frequency: f32) f32 {
-        const period = 1.0 / frequency;
-        const t = @mod(time, period) / period; // 0 to 1
-        return if (t < 0.5) t * 2.0 else 2.0 - (t * 2.0);
+        return math.WaveGenerator.triangle(time, frequency);
     }
 
     /// Sawtooth wave that goes 0->1 linearly then jumps back to 0
     pub fn sawtooth(time: f32, frequency: f32) f32 {
-        const period = 1.0 / frequency;
-        return @mod(time, period) / period;
+        return math.WaveGenerator.sawtooth(time, frequency);
     }
 
     /// Square wave alternating between 0.0 and 1.0
     pub fn square(time: f32, frequency: f32) f32 {
-        return if (sine(time, frequency) >= 0.5) 1.0 else 0.0;
+        return math.WaveGenerator.square(time, frequency, 0.5);
     }
 
     /// Pulse wave with configurable duty cycle (0.0-1.0)
     pub fn pulse(time: f32, frequency: f32, duty_cycle: f32) f32 {
-        const t = @mod(time * frequency, 1.0);
-        return if (t < duty_cycle) 1.0 else 0.0;
+        return math.WaveGenerator.square(time, frequency, duty_cycle);
     }
 };
 
 /// Easing functions for smooth animations
-pub const Easing = struct {
-    /// Linear interpolation (no easing)
-    pub fn linear(t: f32) f32 {
-        return math.clamp(t, 0.0, 1.0);
-    }
-
-    /// Smooth step function (ease in and out)
-    pub fn smoothstep(t: f32) f32 {
-        const clamped = math.clamp(t, 0.0, 1.0);
-        return clamped * clamped * (3.0 - 2.0 * clamped);
-    }
-
-    /// Smoother step function (even smoother than smoothstep)
-    pub fn smootherstep(t: f32) f32 {
-        const clamped = math.clamp(t, 0.0, 1.0);
-        return clamped * clamped * clamped * (clamped * (clamped * 6.0 - 15.0) + 10.0);
-    }
-
-    /// Ease in quadratic
-    pub fn easeInQuad(t: f32) f32 {
-        const clamped = math.clamp(t, 0.0, 1.0);
-        return clamped * clamped;
-    }
-
-    /// Ease out quadratic
-    pub fn easeOutQuad(t: f32) f32 {
-        const clamped = math.clamp(t, 0.0, 1.0);
-        return 1.0 - (1.0 - clamped) * (1.0 - clamped);
-    }
-
-    /// Ease in-out quadratic
-    pub fn easeInOutQuad(t: f32) f32 {
-        const clamped = math.clamp(t, 0.0, 1.0);
-        return if (clamped < 0.5)
-            2.0 * clamped * clamped
-        else
-            1.0 - 2.0 * (1.0 - clamped) * (1.0 - clamped);
-    }
-
-    /// Elastic ease out (bouncy effect)
-    pub fn easeOutElastic(t: f32) f32 {
-        const clamped = math.clamp(t, 0.0, 1.0);
-        if (clamped == 0.0 or clamped == 1.0) return clamped;
-
-        const c4 = (2.0 * std.math.pi) / 3.0;
-        return std.math.pow(f32, 2.0, -10.0 * clamped) * math.sin((clamped * 10.0 - 0.75) * c4) + 1.0;
-    }
-
-    /// Bounce ease out
-    pub fn easeOutBounce(t: f32) f32 {
-        const clamped = math.clamp(t, 0.0, 1.0);
-        const n1 = 7.5625;
-        const d1 = 2.75;
-
-        if (clamped < 1.0 / d1) {
-            return n1 * clamped * clamped;
-        } else if (clamped < 2.0 / d1) {
-            const t2 = clamped - 1.5 / d1;
-            return n1 * t2 * t2 + 0.75;
-        } else if (clamped < 2.5 / d1) {
-            const t2 = clamped - 2.25 / d1;
-            return n1 * t2 * t2 + 0.9375;
-        } else {
-            const t2 = clamped - 2.625 / d1;
-            return n1 * t2 * t2 + 0.984375;
-        }
-    }
-};
+/// Re-exported from math module for convenience
+pub const Easing = math.easing.Easing;
 
 /// Animation sequencing utilities
 pub const Sequence = struct {
@@ -163,15 +94,9 @@ pub const ColorAnimation = struct {
         };
     }
 
-    /// Apply intensity multiplier to a color
+    /// Apply intensity multiplier to a color - delegated to math.ColorMath
     pub fn applyIntensity(color: Color, intensity: f32) Color {
-        const clamped = math.clamp(intensity, 0.0, 1.0);
-        return Color{
-            .r = @intFromFloat(@as(f32, @floatFromInt(color.r)) * clamped),
-            .g = @intFromFloat(@as(f32, @floatFromInt(color.g)) * clamped),
-            .b = @intFromFloat(@as(f32, @floatFromInt(color.b)) * clamped),
-            .a = color.a, // Keep alpha unchanged
-        };
+        return math.ColorMath.applyIntensity(color, intensity);
     }
 };
 
@@ -189,10 +114,10 @@ test "Easing functionality" {
     try std.testing.expectApproxEqAbs(@as(f32, 0.5), Easing.linear(0.5), 0.01);
     try std.testing.expectApproxEqAbs(@as(f32, 1.0), Easing.linear(1.0), 0.01);
 
-    // Test smoothstep
-    try std.testing.expectApproxEqAbs(@as(f32, 0.0), Easing.smoothstep(0.0), 0.01);
-    try std.testing.expectApproxEqAbs(@as(f32, 0.5), Easing.smoothstep(0.5), 0.01);
-    try std.testing.expectApproxEqAbs(@as(f32, 1.0), Easing.smoothstep(1.0), 0.01);
+    // Test quadratic ease in
+    try std.testing.expectApproxEqAbs(@as(f32, 0.0), Easing.quadraticEaseIn(0.0), 0.01);
+    try std.testing.expectApproxEqAbs(@as(f32, 0.25), Easing.quadraticEaseIn(0.5), 0.01);
+    try std.testing.expectApproxEqAbs(@as(f32, 1.0), Easing.quadraticEaseIn(1.0), 0.01);
 }
 
 test "Sequence functionality" {

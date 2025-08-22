@@ -14,30 +14,13 @@ pub fn lerpVec2(a: Vec2, b: Vec2, t: f32) Vec2 {
     };
 }
 
-/// Interpolate between two colors
+/// Interpolate between two colors - delegated to color math module
 pub fn lerpColor(a: Color, b: Color, t: f32) Color {
-    const clamped_t = @max(0.0, @min(1.0, t));
-
-    return Color{
-        .r = @intFromFloat(@as(f32, @floatFromInt(a.r)) + (@as(f32, @floatFromInt(b.r)) - @as(f32, @floatFromInt(a.r))) * clamped_t),
-        .g = @intFromFloat(@as(f32, @floatFromInt(a.g)) + (@as(f32, @floatFromInt(b.g)) - @as(f32, @floatFromInt(a.g))) * clamped_t),
-        .b = @intFromFloat(@as(f32, @floatFromInt(a.b)) + (@as(f32, @floatFromInt(b.b)) - @as(f32, @floatFromInt(a.b))) * clamped_t),
-        .a = @intFromFloat(@as(f32, @floatFromInt(a.a)) + (@as(f32, @floatFromInt(b.a)) - @as(f32, @floatFromInt(a.a))) * clamped_t),
-    };
+    const color_math = @import("color.zig");
+    return color_math.ColorMath.lerp(a, b, t);
 }
 
-/// Interpolate between colors using floating point RGB values
-pub fn lerpColorF32(a: struct { r: f32, g: f32, b: f32 }, b: struct { r: f32, g: f32, b: f32 }, t: f32) struct { r: f32, g: f32, b: f32 } {
-    const clamped_t = @max(0.0, @min(1.0, t));
-
-    return .{
-        .r = a.r + (b.r - a.r) * clamped_t,
-        .g = a.g + (b.g - a.g) * clamped_t,
-        .b = a.b + (b.b - a.b) * clamped_t,
-    };
-}
-
-/// Smoothstep interpolation between two values
+/// Smoothstep interpolation between two values (different from scalar smoothstep)
 pub fn smoothstep(a: f32, b: f32, t: f32) f32 {
     const clamped_t = @max(0.0, @min(1.0, t));
     const smooth_t = clamped_t * clamped_t * (3.0 - 2.0 * clamped_t);

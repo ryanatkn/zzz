@@ -222,8 +222,8 @@ test "obstacle collision detection" {
         .{ .position = Vec2{ .x = 50, .y = 50 }, .size = Vec2{ .x = 10, .y = 10 }, .is_solid = false, .is_deadly = true },
     };
 
-    const config_solid = ObstacleQueryConfig{ .check_solid_only = true };
-    const config_deadly = ObstacleQueryConfig{ .check_deadly_only = true };
+    const config_solid = ObstacleQueryConfig{ .check_solid_only = true, .check_deadly_only = false };
+    const config_deadly = ObstacleQueryConfig{ .check_solid_only = false, .check_deadly_only = true };
 
     // Test collision with solid obstacle
     const result1 = PhysicsQueries.checkCircleObstacleCollision(Vec2{ .x = 5, .y = 5 }, 2.0, &obstacles, config_solid);
@@ -271,8 +271,8 @@ test "area queries" {
 
     try std.testing.expect(results.items.len == 2); // Should find entities at (0,0) and (5,5)
 
-    // Test rectangular area query
-    var rect_results = try PhysicsQueries.findEntitiesInRect(allocator, Vec2{ .x = 7.5, .y = 7.5 }, Vec2{ .x = 15, .y = 15 }, &entities, true);
+    // Test rectangular area query - rectangle from (2.5,2.5) to (17.5,17.5) to include (5,5) and (15,15) but not (0,0)
+    var rect_results = try PhysicsQueries.findEntitiesInRect(allocator, Vec2{ .x = 10, .y = 10 }, Vec2{ .x = 15, .y = 15 }, &entities, true);
     defer rect_results.deinit();
 
     try std.testing.expect(rect_results.items.len == 2); // Should find entities at (5,5) and (15,15)

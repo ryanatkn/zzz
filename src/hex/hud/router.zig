@@ -17,7 +17,6 @@ const font_grid_test_page = @import("../../roots/menu/font_grid_test/+page.zig")
 const vector_test_page = @import("../../roots/menu/vector_test/+page.zig");
 const ide_page = @import("../../roots/menu/ide/+page.zig");
 const reactive_test_page = @import("../../roots/menu/reactive_test/+page.zig");
-const layout_benchmark_page = @import("../../roots/menu/layout_benchmark/+page.zig");
 
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const Vec2 = math.Vec2;
@@ -103,9 +102,6 @@ pub const Router = struct {
                     } else if (std.mem.eql(u8, current_base_path, "/reactive-test")) {
                         ui_log.info("router_navigate", "Calling handleReactiveTestAction with query: '{s}'", .{query});
                         try self.handleReactiveTestAction(query);
-                    } else if (std.mem.eql(u8, current_base_path, "/layout-benchmark")) {
-                        ui_log.info("router_navigate", "Calling handleLayoutBenchmarkAction with query: '{s}'", .{query});
-                        try self.handleLayoutBenchmarkAction(query);
                     } else {
                         ui_log.info("router_navigate", "Calling handleIDEAction with query: '{s}'", .{query});
                         try self.handleIDEAction(query);
@@ -226,21 +222,6 @@ pub const Router = struct {
 
             // Load reactive test page
             self.current_page = try reactive_test_page.create(self.allocator);
-        } else if (std.mem.eql(u8, path, "/layout-benchmark") or std.mem.startsWith(u8, path, "/layout-benchmark?")) {
-            // Handle layout benchmark page
-            // Load root layout
-            const layout = try root_layout.create(self.allocator);
-            try layout.init(self.allocator);
-            try self.current_layouts.append(layout);
-
-            // Load layout benchmark page
-            self.current_page = try layout_benchmark_page.create(self.allocator);
-
-            // Handle benchmark actions (query parameters)
-            if (std.mem.indexOf(u8, path, "?")) |query_start| {
-                const query = path[query_start + 1 ..];
-                try self.handleLayoutBenchmarkAction(query);
-            }
         } else {
             // Default to index for unknown paths
             // Load root layout
@@ -312,30 +293,6 @@ pub const Router = struct {
                     reactive_page_impl.gannaway_count.update(reactive_page_impl.gannaway_count.get() + 1);
                 } else {
                     ui_log.info("reactive_test_action", "Unknown reactive test action: '{s}'", .{query});
-                }
-            }
-        }
-    }
-
-    /// Handle layout benchmark actions from query parameters
-    fn handleLayoutBenchmarkAction(self: *Router, query: []const u8) !void {
-        const ui_log = loggers.getUILog();
-        ui_log.info("layout_benchmark_action", "Handling layout benchmark action: '{s}'", .{query});
-        if (self.current_page) |current_page| {
-            if (std.mem.eql(u8, current_page.path, "/layout-benchmark")) {
-                const benchmark_page_impl: *layout_benchmark_page.LayoutBenchmarkPage = @fieldParentPtr("base", current_page);
-
-                // Pass GPU device if available
-                if (self.game_renderer) |renderer| {
-                    benchmark_page_impl.setGPUDevice(renderer.gpu.device);
-                }
-
-                if (std.mem.startsWith(u8, query, "action=")) {
-                    const action = query[7..]; // Skip "action="
-                    try benchmark_page_impl.handleAction(action);
-                    ui_log.info("layout_benchmark_action", "Executed benchmark action: '{s}'", .{action});
-                } else {
-                    ui_log.info("layout_benchmark_action", "Unknown layout benchmark query: '{s}'", .{query});
                 }
             }
         }

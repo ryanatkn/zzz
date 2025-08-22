@@ -1,4 +1,5 @@
 const std = @import("std");
+const scalar = @import("scalar.zig");
 
 /// 2D vector with floating-point coordinates
 /// This is the canonical type for 2D positions, directions, and sizes
@@ -99,8 +100,8 @@ pub const Vec2 = extern struct {
     /// Clamp vector components to range
     pub fn clamp(self: Vec2, min: Vec2, max: Vec2) Vec2 {
         return .{
-            .x = std.math.clamp(self.x, min.x, max.x),
-            .y = std.math.clamp(self.y, min.y, max.y),
+            .x = scalar.clamp(self.x, min.x, max.x),
+            .y = scalar.clamp(self.y, min.y, max.y),
         };
     }
 
@@ -182,8 +183,8 @@ pub const Vec2 = extern struct {
     /// Clamp point to rectangle boundary
     pub fn clampToRect(self: Vec2, rect_pos: Vec2, rect_size: Vec2) Vec2 {
         return .{
-            .x = std.math.clamp(self.x, rect_pos.x, rect_pos.x + rect_size.x),
-            .y = std.math.clamp(self.y, rect_pos.y, rect_pos.y + rect_size.y),
+            .x = scalar.clamp(self.x, rect_pos.x, rect_pos.x + rect_size.x),
+            .y = scalar.clamp(self.y, rect_pos.y, rect_pos.y + rect_size.y),
         };
     }
 };
@@ -210,12 +211,12 @@ pub fn vec2_subtract(a: Vec2, b: Vec2) Vec2 {
     return a.sub(b);
 }
 
-pub fn vec2_multiply(v: Vec2, scalar: f32) Vec2 {
-    return v.scale(scalar);
+pub fn vec2_multiply(v: Vec2, scale_factor: f32) Vec2 {
+    return v.scale(scale_factor);
 }
 
-pub fn vec2_divide(v: Vec2, scalar: f32) Vec2 {
-    return v.divide(scalar);
+pub fn vec2_divide(v: Vec2, divisor: f32) Vec2 {
+    return v.divide(divisor);
 }
 
 pub fn vec2_dot(a: Vec2, b: Vec2) f32 {

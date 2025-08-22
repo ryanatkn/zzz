@@ -273,12 +273,13 @@ pub const ScrollableView = struct {
         const content_size = self.content_size.get();
         const viewport_size = self.getViewportSize();
 
+        const scalar = @import("../math/scalar.zig");
         const max_x = @max(0, content_size.x - viewport_size.x);
         const max_y = @max(0, content_size.y - viewport_size.y);
 
         const clamped = Vec2{
-            .x = std.math.clamp(offset.x, 0, max_x),
-            .y = std.math.clamp(offset.y, 0, max_y),
+            .x = scalar.clamp(offset.x, 0, max_x),
+            .y = scalar.clamp(offset.y, 0, max_y),
         };
 
         if (!offset.equals(clamped)) {

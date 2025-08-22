@@ -106,3 +106,14 @@ pub fn getRenderLog() *RenderLogger {
 pub fn getFontLog() *FontLogger {
     return &(font_log orelse @panic("Global font logger not initialized. Call initGlobalLoggers() first."));
 }
+
+/// Test-safe helper that returns null if UI logger not initialized
+/// Use this in tests to avoid initialization requirements
+pub fn getUILogOptional() ?*UILogger {
+    return if (ui_log) |*log| log else null;
+}
+
+/// Test-safe helper that returns null if game logger not initialized
+pub fn getGameLogOptional() ?*GameLogger {
+    return if (game_log) |*log| log else null;
+}

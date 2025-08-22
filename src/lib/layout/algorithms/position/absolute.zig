@@ -95,6 +95,10 @@ pub const AbsoluteLayout = struct {
         var result = types.LayoutResult{
             .position = element_position,
             .size = element_size,
+            .content = types.Rectangle{
+                .position = element_position,
+                .size = element_size,
+            },
             .element_index = element.index,
         };
 
@@ -242,7 +246,7 @@ test "absolute layout basic positioning" {
 
     // Second element: positioned from bottom-right
     try testing.expect(results[1].position.x == 305); // 10 + 400 - 25 - 80
-    try testing.expect(results[1].position.y == 200); // 20 + 300 - 40 - 60
+    try testing.expect(results[1].position.y == 220); // 20 + 300 - 40 - 60 = 220
 }
 
 test "absolute layout conflict resolution" {

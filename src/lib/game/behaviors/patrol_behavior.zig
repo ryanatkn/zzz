@@ -174,7 +174,7 @@ pub fn evaluatePatrol(
 
     // Check if reached current waypoint
     if (dist_sq <= tolerance_sq) {
-        _ = state.current_waypoint; // Track waypoint for potential future use
+        // Current waypoint reached
 
         // Start pause if configured
         if (config.pause_duration > 0) {
@@ -274,7 +274,7 @@ test "patrol behavior basic functionality" {
     const unit_pos = Vec2{ .x = 5, .y = 0 }; // Near first waypoint
 
     // Test reaching waypoint
-    const result = evaluatePatrol(unit_pos, &state, config, 1.0, 0.1);
+    var result = evaluatePatrol(unit_pos, &state, config, 1.0, 0.1);
     try std.testing.expect(result.reached_waypoint);
     try std.testing.expect(state.current_waypoint == 1); // Advanced to next
 

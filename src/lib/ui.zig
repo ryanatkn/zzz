@@ -29,20 +29,17 @@ pub const InputFieldConfig = primitives.InputFieldConfig;
 pub const Button = primitives.Button;
 pub const ButtonConfig = primitives.ButtonConfig;
 
-// Re-export layout system types for backward compatibility
-pub const BoxModel = layout.BoxModel;
-pub const TextBaseline = layout.TextBaseline;
-pub const TextPositioning = layout.TextPositioning;
-pub const Flexbox = layout.Flexbox;
-pub const FlexItem = layout.FlexItem;
-pub const FlexItemLayout = layout.FlexItemLayout;
-pub const SpacingUtils = layout.SpacingUtils;
-pub const SizingUtils = layout.SizingUtils;
-pub const PositioningUtils = layout.PositioningUtils;
+// Re-export core layout types that actually exist
+pub const LayoutEngine = layout.LayoutEngine;
+pub const LayoutResult = layout.LayoutResult;
+pub const LayoutElement = layout.LayoutElement;
+pub const LayoutContext = layout.LayoutContext;
+pub const Vec2 = layout.Vec2;
+pub const Rectangle = layout.Rectangle;
+pub const Spacing = layout.Spacing;
+pub const Constraints = layout.Constraints;
 
-// Re-export layout enums for convenience
-pub const JustifyContent = layout.JustifyContent;
-pub const AlignItems = layout.AlignItems;
-pub const Direction = layout.Direction;
-pub const PositionMode = layout.PositionMode;
+// Re-export layout enums that actually exist
+pub const LayoutMode = layout.LayoutMode;
 pub const Alignment = layout.Alignment;
+pub const Direction = layout.Direction;

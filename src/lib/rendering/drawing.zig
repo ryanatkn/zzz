@@ -76,13 +76,13 @@ pub fn drawButton(gpu: *SimpleGPURenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuff
     const style = switch (state) {
         .normal => PanelStyle.button,
         .hovered => PanelStyle{
-            .background = colors.lighten(PanelStyle.button.background, 0.1),
-            .border = colors.lighten(PanelStyle.button.border, 0.1),
+            .background = math.ColorMath.lighten(PanelStyle.button.background, 0.1),
+            .border = math.ColorMath.lighten(PanelStyle.button.border, 0.1),
             .border_width = 1.0,
         },
         .pressed => PanelStyle{
-            .background = colors.darken(PanelStyle.button.background, 0.1),
-            .border = colors.darken(PanelStyle.button.border, 0.1),
+            .background = math.ColorMath.darken(PanelStyle.button.background, 0.1),
+            .border = math.ColorMath.darken(PanelStyle.button.border, 0.1),
             .border_width = 1.0,
         },
         .disabled => PanelStyle.button_disabled,
@@ -129,7 +129,8 @@ pub fn drawProgressBar(
     fill_color: Color,
     border_color: Color,
 ) void {
-    const clamped_progress = std.math.clamp(progress, 0.0, 1.0);
+    const scalar = @import("../math/scalar.zig");
+    const clamped_progress = scalar.clamp(progress, 0.0, 1.0);
 
     // Draw background
     gpu.drawRect(cmd_buffer, render_pass, pos, size, background_color);

@@ -1,5 +1,6 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
+const scalar = @import("../math/scalar.zig");
 const vector_path = @import("../vector/path.zig");
 const font_metrics = @import("../font/font_metrics.zig");
 
@@ -76,8 +77,8 @@ pub const SDFTexture = struct {
 
     /// Sample the SDF at normalized coordinates (0.0 to 1.0)
     pub fn sample(self: *const SDFTexture, u: f32, v: f32) f32 {
-        const x = @as(f32, @floatFromInt(self.width - 1)) * std.math.clamp(u, 0.0, 1.0);
-        const y = @as(f32, @floatFromInt(self.height - 1)) * std.math.clamp(v, 0.0, 1.0);
+        const x = @as(f32, @floatFromInt(self.width - 1)) * scalar.clamp(u, 0.0, 1.0);
+        const y = @as(f32, @floatFromInt(self.height - 1)) * scalar.clamp(v, 0.0, 1.0);
 
         const x0 = @as(u32, @intFromFloat(@floor(x)));
         const y0 = @as(u32, @intFromFloat(@floor(y)));
@@ -170,7 +171,7 @@ pub const SDFGenerator = struct {
 
                 // Normalize distance to 0-255 range
                 const normalized = (distance / self.config.range + 1.0) * 0.5;
-                const pixel_value = @as(u8, @intFromFloat(std.math.clamp(normalized * 255.0, 0, 255)));
+                const pixel_value = @as(u8, @intFromFloat(scalar.clamp(normalized * 255.0, 0, 255)));
 
                 texture.setPixel(x, y, &[_]u8{pixel_value});
             }
@@ -200,7 +201,7 @@ pub const SDFGenerator = struct {
                 }
 
                 const normalized = (distance / self.config.range + 1.0) * 0.5;
-                const pixel_value = @as(u8, @intFromFloat(std.math.clamp(normalized * 255.0, 0, 255)));
+                const pixel_value = @as(u8, @intFromFloat(scalar.clamp(normalized * 255.0, 0, 255)));
 
                 texture.setPixel(x, y, &[_]u8{ pixel_value, pixel_value, pixel_value });
             }
@@ -252,7 +253,7 @@ pub const SDFGenerator = struct {
             return math.vec2_length(point_vec);
         }
 
-        const t = std.math.clamp(math.vec2_dot(point_vec, line_vec) / line_len_sq, 0, 1);
+        const t = scalar.clamp(math.vec2_dot(point_vec, line_vec) / line_len_sq, 0, 1);
         const projection = math.vec2_add(start, math.vec2_multiply(line_vec, t));
 
         return math.vec2_length(math.vec2_subtract(point, projection));

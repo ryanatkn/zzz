@@ -41,6 +41,10 @@ pub const RelativeLayout = struct {
                 types.LayoutResult{
                     .position = Vec2.ZERO,
                     .size = Vec2.ZERO,
+                    .content = types.Rectangle{
+                        .position = Vec2.ZERO,
+                        .size = Vec2.ZERO,
+                    },
                     .element_index = element.index,
                 };
 
@@ -83,6 +87,10 @@ test "relative layout offset application" {
         .{
             .position = Vec2{ .x = 100, .y = 50 },
             .size = Vec2{ .x = 80, .y = 60 },
+            .content = types.Rectangle{
+                .position = Vec2{ .x = 100, .y = 50 },
+                .size = Vec2{ .x = 80, .y = 60 },
+            },
             .element_index = 0,
         },
     };

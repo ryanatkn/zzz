@@ -1,5 +1,5 @@
 const std = @import("std");
-const math = std.math;
+const math_mod = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const easing = @import("../math/easing.zig");
 
@@ -49,16 +49,14 @@ pub const ColorPairs = struct {
 
 /// Animation timing functions for borders
 pub const BorderAnimation = struct {
-    /// Calculate animation pulse using sine wave
+    /// Calculate animation pulse using sine wave - delegated to math.waves
     pub fn calculatePulse(frequency: f32, time_ms: f32) f32 {
-        const time_sec = time_ms / 1000.0;
-        return (math.sin(time_sec * frequency) + 1.0) * 0.5;
+        return math_mod.AnimationWaves.calculatePulse(frequency, time_ms);
     }
 
-    /// Calculate color cycle animation
+    /// Calculate color cycle animation - delegated to math.waves
     pub fn calculateColorCycle(frequency: f32, time_ms: f32) f32 {
-        const time_sec = time_ms / 1000.0;
-        return (math.sin(time_sec * frequency) + 1.0) * 0.5;
+        return math_mod.AnimationWaves.calculateColorCycle(frequency, time_ms);
     }
 
     /// Interpolate between two colors using a factor t (0.0 to 1.0)

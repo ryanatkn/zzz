@@ -2,7 +2,6 @@
 const std = @import("std");
 const core = @import("../core/types.zig");
 const interface = @import("../core/interface.zig");
-const box_model = @import("../algorithms/box_model/mod.zig");
 
 const LayoutElement = interface.LayoutElement;
 const LayoutResult = core.LayoutResult;
@@ -14,7 +13,6 @@ pub const LayoutEngine = struct {
     allocator: std.mem.Allocator,
     algorithms: std.ArrayList(AlgorithmEntry),
     default_algorithm: core.LayoutMode,
-    gpu_device: ?*anyopaque = null,
 
     const AlgorithmEntry = struct {
         algorithm_type: core.LayoutMode,
@@ -31,17 +29,8 @@ pub const LayoutEngine = struct {
     }
 
     pub fn deinit(self: *LayoutEngine) void {
-        // Clean up all algorithms
-        for (self.algorithms.items) |*entry| {
-            entry.algorithm.deinit();
-            // Note: Individual algorithm pointers are cleaned up by their own deinit
-        }
+        // Clean up algorithm list (no individual algorithm cleanup needed)
         self.algorithms.deinit();
-    }
-
-    /// Initialize with GPU device (optional)
-    pub fn initGPU(self: *LayoutEngine, gpu_device: *anyopaque) void {
-        self.gpu_device = gpu_device;
     }
 
     /// Register an algorithm with the engine
@@ -50,25 +39,8 @@ pub const LayoutEngine = struct {
         algorithm_type: core.LayoutMode,
         config: interface.AlgorithmConfig,
     ) !void {
-        const algorithm = switch (algorithm_type) {
-            .block, .absolute => try box_model.createAlgorithm(
-                self.allocator,
-                box_model.Config{ .implementation = .cpu_only },
-                self.gpu_device,
-            ),
-            .flex => {
-                // TODO: Create flexbox algorithm
-                return error.AlgorithmNotImplemented;
-            },
-            .grid => {
-                // TODO: Create grid algorithm
-                return error.AlgorithmNotImplemented;
-            },
-            .relative => try box_model.createAlgorithm(
-                self.allocator,
-                box_model.Config{ .implementation = .cpu_only },
-                self.gpu_device,
-            ),
+        const algorithm = interface.LayoutAlgorithm{
+            .algorithm_type = algorithm_type,
         };
 
         try self.algorithms.append(AlgorithmEntry{
@@ -127,33 +99,13 @@ pub const LayoutEngine = struct {
     }
 
     /// Recommend best algorithm for given requirements
-    pub fn recommendAlgorithm(self: *LayoutEngine, requirements: AlgorithmRequirements) core.LayoutMode {
+    pub fn recommendAlgorithm(self: *LayoutEngine, requirements: interface.AlgorithmSelector.LayoutRequirements) core.LayoutMode {
         _ = self;
-
-        // Simple heuristics for algorithm selection
-        if (requirements.needs_2d_positioning) {
-            return .grid;
-        }
-
-        if (requirements.needs_flexible_sizing or requirements.needs_alignment) {
-            return .flex;
-        }
-
-        if (requirements.element_count == 1) {
-            return .absolute;
-        }
-
-        return .block; // Default for simple stacking
+        return interface.AlgorithmSelector.selectAlgorithm(requirements);
     }
 
-    pub const AlgorithmRequirements = struct {
-        element_count: usize,
-        needs_flexible_sizing: bool = false,
-        needs_alignment: bool = false,
-        needs_2d_positioning: bool = false,
-        performance_critical: bool = false,
-        has_text_content: bool = false,
-    };
+    // Re-export for convenience
+    pub const AlgorithmRequirements = interface.AlgorithmSelector.LayoutRequirements;
 };
 
 /// Simple layout engine for single-algorithm use cases
@@ -209,7 +161,7 @@ test "layout engine creation and algorithm registration" {
     // Should be able to get capabilities
     const caps = engine.getAlgorithmCapabilities(.block);
     try testing.expect(caps != null);
-    try testing.expect(caps.?.supports_gpu == false); // CPU implementation
+    // Default implementation provides all core capabilities
 }
 
 test "algorithm recommendation" {

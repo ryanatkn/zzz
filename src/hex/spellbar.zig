@@ -49,7 +49,7 @@ pub fn getDarkSpellColor(spell_type: SpellType) Color {
         return bright_color;
     }
 
-    return colors.darken(bright_color, 0.6);
+    return math.ColorMath.darken(bright_color, 0.6);
 }
 
 /// Spellbar UI component
@@ -129,7 +129,7 @@ pub const Spellbar = struct {
 
         // Brighten slightly on hover
         if (is_hovered and spell_type != .None) {
-            color = colors.lighten(color, 0.2);
+            color = math.ColorMath.lighten(color, 0.2);
         }
 
         return color;

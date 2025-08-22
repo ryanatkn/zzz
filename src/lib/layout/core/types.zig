@@ -89,37 +89,8 @@ pub const BaselineMode = enum {
     hanging,
 };
 
-/// Spacing values for margins, padding, borders
-pub const Spacing = struct {
-    top: f32 = 0,
-    right: f32 = 0,
-    bottom: f32 = 0,
-    left: f32 = 0,
-
-    pub fn uniform(value: f32) Spacing {
-        return Spacing{ .top = value, .right = value, .bottom = value, .left = value };
-    }
-
-    pub fn horizontal(value: f32) Spacing {
-        return Spacing{ .left = value, .right = value };
-    }
-
-    pub fn vertical(value: f32) Spacing {
-        return Spacing{ .top = value, .bottom = value };
-    }
-
-    pub fn asymmetric(vert: f32, horiz: f32) Spacing {
-        return Spacing{ .top = vert, .right = horiz, .bottom = vert, .left = horiz };
-    }
-
-    pub fn getHorizontal(self: Spacing) f32 {
-        return self.left + self.right;
-    }
-
-    pub fn getVertical(self: Spacing) f32 {
-        return self.top + self.bottom;
-    }
-};
+/// Re-export Spacing from consolidated math utilities
+pub const Spacing = math.Spacing;
 
 /// Offset for positioning
 pub const Offset = struct {
@@ -141,8 +112,8 @@ pub const Constraints = struct {
 
     pub fn constrain(self: Constraints, size: Vec2) Vec2 {
         var result = size;
-        result.x = std.math.clamp(result.x, self.min_width, self.max_width);
-        result.y = std.math.clamp(result.y, self.min_height, self.max_height);
+        result.x = math.clamp(result.x, self.min_width, self.max_width);
+        result.y = math.clamp(result.y, self.min_height, self.max_height);
 
         // Apply aspect ratio if specified
         if (self.aspect_ratio) |ratio| {
@@ -158,11 +129,11 @@ pub const Constraints = struct {
     }
 
     pub fn constrainWidth(self: Constraints, width: f32) f32 {
-        return std.math.clamp(width, self.min_width, self.max_width);
+        return math.clamp(width, self.min_width, self.max_width);
     }
 
     pub fn constrainHeight(self: Constraints, height: f32) f32 {
-        return std.math.clamp(height, self.min_height, self.max_height);
+        return math.clamp(height, self.min_height, self.max_height);
     }
 };
 

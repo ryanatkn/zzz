@@ -257,7 +257,8 @@ pub fn simpleWander(
 test "wander behavior basic functionality" {
     const home_pos = Vec2{ .x = 100, .y = 100 };
     var state = WanderState.init(home_pos, 12345);
-    const config = WanderConfig.init(80.0, 50.0, 2.0);
+    var config = WanderConfig.init(80.0, 50.0, 2.0);
+    config.target_tolerance = 5.0; // Smaller tolerance for test
 
     const unit_pos = Vec2{ .x = 100, .y = 100 }; // At home position
 

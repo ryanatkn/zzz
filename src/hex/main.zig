@@ -149,14 +149,6 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
         }
     };
 
-    // Optional: Run hybrid layout performance benchmark (uncomment for performance testing)
-    // const layout_benchmark = @import("../test_hybrid_layout_benchmark.zig");
-    // layout_benchmark.integrateWithHexGame(global_allocator, game_renderer.?.gpu.device) catch |err| {
-    //     if (logger) |*log| {
-    //         log.info("layout_benchmark_skip", "Layout benchmark skipped: {}", .{err});
-    //     }
-    // };
-
     // Show window after initialization
     _ = c.sdl.SDL_ShowWindow(window);
 

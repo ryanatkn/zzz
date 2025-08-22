@@ -9,7 +9,7 @@ pub fn EntityStorage(comptime ComponentTuple: type, comptime max_entities: usize
         const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
 
         entities: [max_entities]EntityId,
-        components: ComponentTuple,
+        components: [max_entities]ComponentTuple,
         count: usize,
 
         pub fn init() Self {
@@ -129,10 +129,10 @@ pub fn ArchetypeStorage(comptime ComponentArrays: type, comptime max_entities: u
 
             // Assign each component from args tuple
             const args_info = @typeInfo(@TypeOf(args));
-            if (args_info != .Struct) @compileError("Args must be a struct/tuple");
+            if (args_info != .@"struct") @compileError("Args must be a struct/tuple");
 
-            inline for (component_fields, 0..) |field, i| {
-                @field(self.components, field.name)[index] = args[i];
+            inline for (component_fields) |field| {
+                @field(self.components, field.name)[index] = @field(args, field.name)[0];
             }
 
             self.count += 1;
@@ -220,7 +220,7 @@ fn componentEnumToFieldName(component_type: anytype) []const u8 {
 /// Helper to get component type from enum and arrays struct
 fn ComponentTypeFromEnum(comptime EnumType: type, comptime ComponentArrays: type) type {
     const enum_info = @typeInfo(EnumType);
-    if (enum_info != .Enum) @compileError("Expected enum type");
+    if (enum_info != .@"enum") @compileError("Expected enum type");
 
     // This is a bit of a hack - we'll determine the type at the call site
     // For now, return a generic type that will be resolved by the caller

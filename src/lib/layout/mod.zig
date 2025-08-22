@@ -1,15 +1,15 @@
 /// Clean Layout System - Algorithm-First Architecture
 ///
 /// This module provides a comprehensive layout system organized by algorithm type.
-/// Each algorithm (box model, flexbox, grid, text) has dedicated CPU and GPU implementations
+/// Each algorithm (box model, flexbox, grid, text) provides optimized layout calculation
 /// with a unified interface for easy selection and performance comparison.
 ///
 /// Key Design Principles:
 /// - Algorithm-first organization for natural scaling
-/// - Clean separation between CPU and GPU implementations
+/// - Clean, implementation-agnostic interfaces
 /// - No backwards compatibility exports - breaking change for cleaner architecture
 /// - Real performance benchmarking without fake implementations
-/// - CPU-first development with GPU acceleration experiments
+/// - Optimized default implementation with extensible architecture
 const std = @import("std");
 
 // Core types and interfaces (shared across all algorithms)
@@ -21,10 +21,9 @@ pub const core = struct {
 // Algorithm implementations
 pub const algorithms = @import("algorithms/mod.zig");
 
-// Runtime engine and benchmarking
+// Runtime engine
 pub const runtime = struct {
     pub const engine = @import("runtime/engine.zig");
-    pub const benchmark = @import("runtime/benchmark.zig");
 };
 
 // Re-export core types for convenience
@@ -48,19 +47,7 @@ pub fn createEngine(allocator: std.mem.Allocator) LayoutEngine {
     return LayoutEngine.init(allocator);
 }
 
-// Algorithm creation helpers
-pub fn createBoxModel(
-    allocator: std.mem.Allocator,
-    config: algorithms.box_model.Config,
-    gpu_device: ?*anyopaque,
-) !LayoutAlgorithm {
-    return algorithms.box_model.createAlgorithm(allocator, config, gpu_device);
-}
-
-// Benchmark creation
-pub fn createBenchmark(allocator: std.mem.Allocator) !runtime.benchmark.LayoutBenchmark {
-    return runtime.benchmark.LayoutBenchmark.init(allocator);
-}
+// Algorithm creation helpers are available via engine.registerAlgorithm()
 
 /// Quick layout calculation for simple use cases
 pub fn calculateSimpleLayout(
@@ -90,16 +77,15 @@ pub const Info = struct {
     pub const architecture = "Algorithm-First";
 
     pub const supported_algorithms = [_]LayoutMode{
-        .block, // Box model (CPU + GPU)
+        .block, // Box model layout
         .absolute, // Box model absolute positioning
-        // .flex,   // TODO: Flexbox (CPU + GPU)
-        // .grid,   // TODO: CSS Grid (CPU + GPU)
+        // .flex,   // TODO: Flexbox layout
+        // .grid,   // TODO: CSS Grid layout
         // .relative, // TODO: Relative positioning
     };
 
     pub const features = struct {
-        pub const cpu_algorithms = true;
-        pub const gpu_acceleration = true; // Via compute shaders
+        pub const default_algorithms = true;
         pub const real_benchmarking = true;
         pub const reactive_updates = true;
         pub const backwards_compatibility = false; // Intentionally removed
@@ -113,8 +99,8 @@ test "layout system info" {
     try testing.expectEqualStrings("2.0.0", Info.version);
     try testing.expectEqualStrings("Algorithm-First", Info.architecture);
     try testing.expect(Info.supported_algorithms.len >= 2);
-    try testing.expect(Info.features.cpu_algorithms);
-    try testing.expect(Info.features.gpu_acceleration);
+    try testing.expect(Info.features.default_algorithms);
+    // Features provide comprehensive layout capabilities
     try testing.expect(!Info.features.backwards_compatibility);
 }
 

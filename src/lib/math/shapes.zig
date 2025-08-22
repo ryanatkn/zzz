@@ -1,5 +1,6 @@
 const std = @import("std");
 const Vec2 = @import("vec2.zig").Vec2;
+const scalar = @import("scalar.zig");
 
 /// Axis-aligned bounding box with floating-point coordinates
 pub const Bounds = struct {
@@ -147,6 +148,56 @@ pub const GlyphBounds = struct {
     }
 };
 
+/// Spacing for margins, padding, and borders (CSS-style)
+pub const Spacing = struct {
+    top: f32 = 0,
+    right: f32 = 0,
+    bottom: f32 = 0,
+    left: f32 = 0,
+
+    pub fn uniform(value: f32) Spacing {
+        return Spacing{ .top = value, .right = value, .bottom = value, .left = value };
+    }
+
+    pub fn horizontal(value: f32) Spacing {
+        return Spacing{ .left = value, .right = value };
+    }
+
+    pub fn vertical(value: f32) Spacing {
+        return Spacing{ .top = value, .bottom = value };
+    }
+
+    pub fn asymmetric(vert: f32, horiz: f32) Spacing {
+        return Spacing{ .top = vert, .right = horiz, .bottom = vert, .left = horiz };
+    }
+
+    pub fn getHorizontal(self: Spacing) f32 {
+        return self.left + self.right;
+    }
+
+    pub fn getVertical(self: Spacing) f32 {
+        return self.top + self.bottom;
+    }
+
+    pub fn add(self: Spacing, other: Spacing) Spacing {
+        return Spacing{
+            .top = self.top + other.top,
+            .right = self.right + other.right,
+            .bottom = self.bottom + other.bottom,
+            .left = self.left + other.left,
+        };
+    }
+
+    pub fn scale(self: Spacing, factor: f32) Spacing {
+        return Spacing{
+            .top = self.top * factor,
+            .right = self.right * factor,
+            .bottom = self.bottom * factor,
+            .left = self.left * factor,
+        };
+    }
+};
+
 /// Rectangle shape with position and size fields for compatibility
 pub const Rectangle = struct {
     position: Vec2,
@@ -200,6 +251,87 @@ pub const Rectangle = struct {
     /// Get perimeter
     pub fn perimeter(self: Rectangle) f32 {
         return 2.0 * (self.size.x + self.size.y);
+    }
+
+    /// Apply spacing insets to rectangle (shrink by spacing)
+    pub fn applySpacing(self: Rectangle, spacing: Spacing) Rectangle {
+        return Rectangle{
+            .position = Vec2{
+                .x = self.position.x + spacing.left,
+                .y = self.position.y + spacing.top,
+            },
+            .size = Vec2{
+                .x = @max(0, self.size.x - spacing.getHorizontal()),
+                .y = @max(0, self.size.y - spacing.getVertical()),
+            },
+        };
+    }
+
+    /// Expand rectangle by spacing (grow by spacing)
+    pub fn expandBySpacing(self: Rectangle, spacing: Spacing) Rectangle {
+        return Rectangle{
+            .position = Vec2{
+                .x = self.position.x - spacing.left,
+                .y = self.position.y - spacing.top,
+            },
+            .size = Vec2{
+                .x = self.size.x + spacing.getHorizontal(),
+                .y = self.size.y + spacing.getVertical(),
+            },
+        };
+    }
+
+    /// Get content area (rectangle minus padding)
+    pub fn getContentArea(self: Rectangle, padding: Spacing) Rectangle {
+        return self.applySpacing(padding);
+    }
+
+    /// Get padding area (content plus padding)
+    pub fn getPaddingArea(self: Rectangle, padding: Spacing) Rectangle {
+        return self.expandBySpacing(padding);
+    }
+
+    /// Apply margin outsets (expand by margin)
+    pub fn applyMargin(self: Rectangle, margin: Spacing) Rectangle {
+        return self.expandBySpacing(margin);
+    }
+
+    /// Layout-specific rectangle operations
+    pub fn split(self: Rectangle, axis: enum { horizontal, vertical }, ratio: f32) struct { first: Rectangle, second: Rectangle } {
+        const clamped_ratio = scalar.clamp(ratio, 0.0, 1.0);
+
+        return switch (axis) {
+            .horizontal => blk: {
+                const first_width = self.size.x * clamped_ratio;
+                const second_width = self.size.x - first_width;
+
+                break :blk .{
+                    .first = Rectangle{
+                        .position = self.position,
+                        .size = Vec2{ .x = first_width, .y = self.size.y },
+                    },
+                    .second = Rectangle{
+                        .position = Vec2{ .x = self.position.x + first_width, .y = self.position.y },
+                        .size = Vec2{ .x = second_width, .y = self.size.y },
+                    },
+                };
+            },
+            .vertical => blk: {
+                const first_height = self.size.y * clamped_ratio;
+                const second_height = self.size.y - first_height;
+
+                break :blk .{
+                    .first = Rectangle{
+                        .position = self.position,
+                        .size = Vec2{ .x = self.size.x, .y = first_height },
+                    },
+                    .second = Rectangle{
+                        .position = Vec2{ .x = self.position.x, .y = self.position.y + first_height },
+                        .size = Vec2{ .x = self.size.x, .y = second_height },
+                    },
+                };
+            },
+        };
     }
 };
 
@@ -294,7 +426,7 @@ pub const Line = struct {
 
         if (line_len_sq == 0) return self.start;
 
-        const t = std.math.clamp(point_vec.dot(line_vec) / line_len_sq, 0.0, 1.0);
+        const t = scalar.clamp(point_vec.dot(line_vec) / line_len_sq, 0.0, 1.0);
         return self.pointAt(t);
     }
 
@@ -342,4 +474,41 @@ test "Bounds operations" {
 
     try std.testing.expect(bounds.contains(Vec2.init(30.0, 40.0)));
     try std.testing.expect(!bounds.contains(Vec2.init(5.0, 40.0)));
+}
+
+test "Spacing operations" {
+    const spacing = Spacing.asymmetric(10.0, 20.0);
+    try std.testing.expect(spacing.getVertical() == 20.0); // top + bottom
+    try std.testing.expect(spacing.getHorizontal() == 40.0); // left + right
+
+    const uniform = Spacing.uniform(15.0);
+    try std.testing.expect(uniform.top == 15.0 and uniform.right == 15.0);
+    try std.testing.expect(uniform.bottom == 15.0 and uniform.left == 15.0);
+
+    const added = spacing.add(uniform);
+    try std.testing.expect(added.top == 25.0 and added.right == 35.0);
+
+    const scaled = spacing.scale(2.0);
+    try std.testing.expect(scaled.top == 20.0 and scaled.left == 40.0);
+}
+
+test "Rectangle layout operations" {
+    const rect = Rectangle.fromXYWH(10.0, 10.0, 100.0, 80.0);
+    const spacing = Spacing.uniform(10.0);
+
+    // Test spacing application (shrink)
+    const content = rect.applySpacing(spacing);
+    try std.testing.expect(content.position.x == 20.0 and content.position.y == 20.0);
+    try std.testing.expect(content.size.x == 80.0 and content.size.y == 60.0);
+
+    // Test spacing expansion (grow)
+    const expanded = rect.expandBySpacing(spacing);
+    try std.testing.expect(expanded.position.x == 0.0 and expanded.position.y == 0.0);
+    try std.testing.expect(expanded.size.x == 120.0 and expanded.size.y == 100.0);
+
+    // Test rectangle split
+    const split_result = rect.split(.horizontal, 0.3);
+    try std.testing.expectApproxEqAbs(@as(f32, 30.0), split_result.first.size.x, 0.01);
+    try std.testing.expectApproxEqAbs(@as(f32, 70.0), split_result.second.size.x, 0.01);
+    try std.testing.expectApproxEqAbs(@as(f32, 40.0), split_result.second.position.x, 0.01);
 }

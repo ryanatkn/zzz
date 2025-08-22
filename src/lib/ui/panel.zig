@@ -3,7 +3,7 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const component = @import("component.zig");
-const box_model = @import("../layout/box_model.zig");
+const box_model = @import("../layout/algorithms/box_model/mod.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;
@@ -209,7 +209,8 @@ pub const PanelLayout = struct {
                 else
                     (mouse_pos.y - layout.drag_start_pos.y) / comp_bounds.size.y;
 
-                const new_ratio = std.math.clamp(layout.drag_start_ratio + delta, 0.1, 0.9);
+                const scalar = @import("../math/scalar.zig");
+                const new_ratio = scalar.clamp(layout.drag_start_ratio + delta, 0.1, 0.9);
                 layout.split_ratio.set(new_ratio);
                 return true;
             }

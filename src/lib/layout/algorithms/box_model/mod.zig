@@ -1,18 +1,16 @@
 /// Box Model Layout Algorithm
 ///
-/// CSS-like box model implementation with CPU and GPU variants.
+/// CSS-like box model layout implementation.
 /// Provides content -> padding -> border -> margin layout areas
 /// with dirty flag caching and constraint-based sizing.
 
-// Import CPU and GPU implementations
-pub const cpu = @import("cpu.zig");
-pub const gpu = @import("gpu.zig");
+// Import layout implementation
+pub const layout = @import("layout.zig");
 pub const factory = @import("factory.zig");
 
 // Re-export main types
-pub const BoxModelCPU = cpu.BoxModelCPU;
-pub const BoxModelGPU = gpu.BoxModelGPU;
-pub const BoxModelAlgorithm = cpu.BoxModelAlgorithm;
+pub const BoxModel = layout.BoxModel;
+pub const BoxModelAlgorithm = layout.BoxModelAlgorithm;
 
 // Re-export factory functionality
 pub const Config = factory.Config;
@@ -22,7 +20,6 @@ pub const createAlgorithm = factory.createAlgorithm;
 pub const Info = struct {
     pub const name = "Box Model";
     pub const description = "CSS-like box model with content, padding, border, and margin areas";
-    pub const supports_gpu = true;
     pub const supports_nesting = true;
     pub const supports_constraints = true;
 
@@ -40,7 +37,7 @@ test "box model info" {
     const testing = std.testing;
 
     try testing.expectEqualStrings("Box Model", Info.name);
-    try testing.expect(Info.supports_gpu);
+    // Algorithm info provides all necessary metadata
     try testing.expect(Info.supports_nesting);
     try testing.expect(Info.typical_use_cases.len == 4);
 }

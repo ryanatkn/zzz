@@ -352,8 +352,8 @@ pub const GridCoordinates = struct {
 /// Clamp coordinates to stay within bounds
 pub fn clampToBounds(pos: Vec2, min_bounds: Vec2, max_bounds: Vec2) Vec2 {
     return Vec2{
-        .x = std.math.clamp(pos.x, min_bounds.x, max_bounds.x),
-        .y = std.math.clamp(pos.y, min_bounds.y, max_bounds.y),
+        .x = math.clamp(pos.x, min_bounds.x, max_bounds.x),
+        .y = math.clamp(pos.y, min_bounds.y, max_bounds.y),
     };
 }
 
@@ -376,7 +376,7 @@ pub fn closestPointOnBounds(pos: Vec2, min_bounds: Vec2, max_bounds: Vec2) Vec2 
 
 /// Linear interpolation between two coordinates
 pub fn lerp(a: Vec2, b: Vec2, t: f32) Vec2 {
-    const clamped_t = std.math.clamp(t, 0.0, 1.0);
+    const clamped_t = math.clamp(t, 0.0, 1.0);
     return Vec2{
         .x = a.x + (b.x - a.x) * clamped_t,
         .y = a.y + (b.y - a.y) * clamped_t,

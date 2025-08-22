@@ -1,0 +1,39 @@
+.{
+    // Test coverage configuration
+    .expected_uncovered = 11, // Current broken tests count - reduced from 25 via API fixes + SDL exclusions
+    .src_root = "src",
+
+    // Test exclusions (legitimate reasons to skip coverage)
+    .exclusions = .{
+        // Files that depend on SDL3 and cannot be tested without runtime SDL
+        .sdl_dependencies = .{
+            "src/lib/core/animation.zig", // SDL timing functions
+            "src/lib/core/time.zig", // SDL timing functions
+            "src/lib/game/control/direct_input.zig", // SDL input handling
+            "src/lib/font/test/basic_rendering.zig", // SDL rendering
+            "src/lib/font/test/font_rendering.zig", // SDL rendering
+            "src/lib/ui/terminal_layout_renderer.zig", // text rendering dependencies
+            "src/lib/rendering/modes.zig", // imports text/renderer.zig which depends on SDL
+            "src/lib/text/sdf_renderer.zig", // SDL rendering dependencies
+            "src/lib/ui/fps_counter.zig", // SDL timing and rendering dependencies
+        },
+
+        // Standalone comprehensive integration test suites (not for barrel import)
+        .standalone_suites = .{
+            "src/lib/reactive/tests.zig", // Complete reactive system integration tests
+            "src/lib/gannaway/tests.zig", // Complete Gannaway system integration tests
+        },
+
+        // Test utility files (helpers, not standalone tests)
+        .test_utilities = .{
+            "src/lib/reactive/test_utils.zig", // Test helper functions
+            "src/lib/reactive/test_expected_behavior.zig", // Test utilities
+            "src/lib/font/test_helpers.zig", // Font test helpers
+            "src/lib/font/test_visualization.zig", // Font visualization helpers
+            "src/lib/terminal/builders/test_builders.zig", // Terminal test builders
+            "src/lib/terminal/capabilities/input/test_readline.zig", // Readline test helpers
+            "src/lib/terminal/capabilities/test_capabilities.zig", // Capability test helpers
+            "src/lib/terminal/kernel/test_kernel.zig", // Kernel test helpers
+        },
+    },
+}

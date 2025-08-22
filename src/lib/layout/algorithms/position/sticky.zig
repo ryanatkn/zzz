@@ -1,6 +1,7 @@
 /// Sticky positioning layout algorithm
 const std = @import("std");
 const math = @import("../../../math/mod.zig");
+const scalar = @import("../../../math/scalar.zig");
 const types = @import("../../core/types.zig");
 const shared = @import("shared.zig");
 
@@ -92,13 +93,13 @@ pub const StickyLayout = struct {
         const cb_right = element.containing_block.position.x + element.containing_block.size.x;
         const cb_bottom = element.containing_block.position.y + element.containing_block.size.y;
 
-        result.position.x = std.math.clamp(
+        result.position.x = scalar.clamp(
             result.position.x,
             element.containing_block.position.x,
             cb_right - result.size.x,
         );
 
-        result.position.y = std.math.clamp(
+        result.position.y = scalar.clamp(
             result.position.y,
             element.containing_block.position.y,
             cb_bottom - result.size.y,

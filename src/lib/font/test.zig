@@ -10,6 +10,7 @@ comptime {
     // Core font metrics tests
     _ = @import("font_metrics.zig");
     _ = @import("font_types.zig");
+    _ = @import("coordinate_transform.zig");
 
     // Test directory modules
     _ = @import("test/simple_font_test.zig");
@@ -104,9 +105,6 @@ test "comprehensive character rendering - all alphabet" {
     };
     defer allocator.free(font_data);
 
-    std.debug.print("\n📝 COMPREHENSIVE CHARACTER RENDERING TEST\n", .{});
-    std.debug.print("=" ** 80 ++ "\n", .{});
-
     // Parse the font
     var parser = try ttf_parser.TTFParser.init(allocator, font_data);
     defer parser.deinit();
@@ -198,8 +196,6 @@ test "comprehensive character rendering - all alphabet" {
     if (ENABLE_DEBUG_OUTPUT) {
         // Debug output disabled - set ENABLE_DEBUG_OUTPUT = true to enable
         // This would generate PPM files and analysis reports for test inspection
-    } else {
-        std.debug.print("\n💡 Debug output disabled (ENABLE_DEBUG_OUTPUT = false)\n", .{});
     }
 
     // Require at least 90% success rate
@@ -230,8 +226,6 @@ test "coordinate transformation - shader space bitmap generation" {
     if (ENABLE_DEBUG_OUTPUT) {
         // Debug output disabled - set ENABLE_DEBUG_OUTPUT = true to enable
         // This would generate coordinate transformation test output files
-    } else {
-        std.debug.print("💡 Debug output disabled (ENABLE_DEBUG_OUTPUT = false)\n", .{});
     }
 }
 

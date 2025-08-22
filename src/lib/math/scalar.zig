@@ -108,6 +108,85 @@ pub fn radiansToDegrees(radians: f32) f32 {
     return radians * 180.0 / std.math.pi;
 }
 
+/// Distribute value proportionally among items based on flex factors
+pub fn distributeProportional(
+    total_value: f32,
+    factors: []const f32,
+    results: []f32,
+) void {
+    std.debug.assert(factors.len == results.len);
+
+    // Calculate total factor
+    var total_factor: f32 = 0;
+    for (factors) |factor| {
+        total_factor += factor;
+    }
+
+    if (total_factor <= 0) {
+        // No factors, distribute equally
+        const equal_share = total_value / @as(f32, @floatFromInt(factors.len));
+        for (results) |*result| {
+            result.* = equal_share;
+        }
+        return;
+    }
+
+    // Distribute proportionally
+    for (factors, results) |factor, *result| {
+        result.* = total_value * (factor / total_factor);
+    }
+}
+
+/// Calculate optimal size within constraints with aspect ratio
+pub fn constrainWithAspect(
+    preferred_width: f32,
+    preferred_height: f32,
+    max_width: f32,
+    max_height: f32,
+    aspect_ratio: ?f32,
+) struct { width: f32, height: f32 } {
+    var width = clamp(preferred_width, 0, max_width);
+    var height = clamp(preferred_height, 0, max_height);
+
+    if (aspect_ratio) |ratio| {
+        const current_ratio = width / height;
+        if (current_ratio > ratio) {
+            // Too wide, constrain by height
+            width = height * ratio;
+        } else if (current_ratio < ratio) {
+            // Too tall, constrain by width
+            height = width / ratio;
+        }
+
+        // Ensure we still fit within max bounds
+        width = clamp(width, 0, max_width);
+        height = clamp(height, 0, max_height);
+    }
+
+    return .{ .width = width, .height = height };
+}
+
+/// Smooth step interpolation for layout animations
+pub fn smoothLayout(from: f32, to: f32, t: f32) f32 {
+    const clamped_t = clamp(t, 0.0, 1.0);
+    return from + (to - from) * smoothstep(0.0, 1.0, clamped_t);
+}
+
+/// Calculate spacing between items for even distribution
+pub fn calculateEvenSpacing(container_size: f32, item_size: f32, item_count: usize) f32 {
+    if (item_count <= 1) return 0;
+
+    const total_item_size = item_size * @as(f32, @floatFromInt(item_count));
+    const available_space = @max(0, container_size - total_item_size);
+
+    return available_space / @as(f32, @floatFromInt(item_count - 1));
+}
+
+/// Round to nearest pixel boundary for crisp layout
+pub fn roundToPixel(value: f32, pixel_ratio: f32) f32 {
+    return @round(value * pixel_ratio) / pixel_ratio;
+}
+
 test "scalar math operations" {
     // Test lerp
     try std.testing.expect(equals(lerp(0.0, 10.0, 0.5), 5.0, 0.001));
@@ -142,4 +221,28 @@ test "scalar math operations" {
     // Test angle conversions
     try std.testing.expect(equals(degreesToRadians(180.0), std.math.pi, 0.001));
     try std.testing.expect(equals(radiansToDegrees(std.math.pi), 180.0, 0.001));
+}
+
+test "layout-specific scalar functions" {
+    // Test distributeProportional
+    const factors = [_]f32{ 1.0, 2.0, 1.0 }; // Total factor = 4
+    var results = [_]f32{ 0, 0, 0 };
+    distributeProportional(100.0, &factors, &results);
+
+    try std.testing.expectApproxEqAbs(@as(f32, 25.0), results[0], 0.001); // 100 * 1/4
+    try std.testing.expectApproxEqAbs(@as(f32, 50.0), results[1], 0.001); // 100 * 2/4
+    try std.testing.expectApproxEqAbs(@as(f32, 25.0), results[2], 0.001); // 100 * 1/4
+
+    // Test constrainWithAspect
+    const constrained = constrainWithAspect(200.0, 100.0, 150.0, 100.0, 2.0);
+    try std.testing.expectApproxEqAbs(@as(f32, 150.0), constrained.width, 0.001);
+    try std.testing.expectApproxEqAbs(@as(f32, 75.0), constrained.height, 0.001); // 150 / 2.0
+
+    // Test calculateEvenSpacing
+    const spacing = calculateEvenSpacing(300.0, 50.0, 3); // Container 300, 3 items of 50 each
+    try std.testing.expectApproxEqAbs(@as(f32, 75.0), spacing, 0.001); // (300 - 150) / 2
+
+    // Test roundToPixel
+    try std.testing.expectApproxEqAbs(@as(f32, 10.0), roundToPixel(10.3, 1.0), 0.001);
+    try std.testing.expectApproxEqAbs(@as(f32, 10.5), roundToPixel(10.3, 2.0), 0.001);
 }
