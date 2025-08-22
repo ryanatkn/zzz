@@ -1,33 +1,23 @@
-// Hex-specific color mappings for faction relationships and dispositions
-// Bridges between hex game logic and the generic color variant system
+// Hex-specific color mappings for the unified disposition system
+// Single source of truth for all entity colors - all coloring flows through dispositionToBaseColor()
 
 const color_variants = @import("../lib/core/color_variants.zig");
 const colors = @import("../lib/core/colors.zig");
-const FactionRelation = @import("factions.zig").FactionRelation;
 const Disposition = @import("disposition.zig").Disposition;
 const EnergyLevel = @import("constants.zig").EnergyLevel;
 
 const BaseColor = color_variants.BaseColor;
 const Color = colors.Color;
 
-/// Map faction relationships to base colors
-pub inline fn relationshipToBaseColor(relationship: FactionRelation) BaseColor {
-    return switch (relationship) {
-        .hostile => .red,
-        .suspicious => .orange,
-        .neutral => .brown,
-        .friendly => .teal,
-        .allied => .green,
-    };
-}
-
-/// Map dispositions to base colors
+/// Single authoritative color mapping - all entity colors flow through this function
+/// Uses distinct colors that are easily distinguishable in gameplay
 pub inline fn dispositionToBaseColor(disposition: Disposition) BaseColor {
     return switch (disposition) {
-        .hostile => .red,
-        .fearful => .yellow,
-        .neutral => .brown,
-        .friendly => .teal,
+        .hostile => .red,    // Danger - attacks on sight
+        .fearful => .yellow, // Caution - flees from player (distinct from orange)
+        .neutral => .brown,  // Passive - ignores player
+        .friendly => .teal,  // Safe - won't attack, may help
+        .allied => .green,   // Helpful - actively assists player
     };
 }
 
@@ -41,13 +31,7 @@ pub inline fn getEnergyColor(base: BaseColor, energy: EnergyLevel) Color {
     return base.getVariant(variant);
 }
 
-/// Get color for relationship with energy level
-pub inline fn getRelationshipEnergyColor(relationship: FactionRelation, energy: EnergyLevel) Color {
-    const base = relationshipToBaseColor(relationship);
-    return getEnergyColor(base, energy);
-}
-
-/// Get color for disposition with energy level
+/// Get color for disposition with energy level - unified system
 pub inline fn getDispositionEnergyColor(disposition: Disposition, energy: EnergyLevel) Color {
     const base = dispositionToBaseColor(disposition);
     return getEnergyColor(base, energy);

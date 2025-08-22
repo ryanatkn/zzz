@@ -115,8 +115,7 @@ pub fn applyBehaviorResult(context: UnitUpdateContext, result: evaluators.Compos
         }
     }
 
-    // Apply visual color (caller can override this by calling evaluateUnitBehavior directly)
-    context.visual.color = result.getColor(context.unit.disposition);
+    // Note: Visual color is now handled by main game loop for consistency
 }
 
 /// Legacy function for backward compatibility - will be removed

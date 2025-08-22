@@ -33,10 +33,10 @@ const combat = @import("combat.zig");
 const portals = @import("portals.zig");
 const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
+const color_mappings = @import("color_mappings.zig");
 const spells = @import("spells.zig");
 const save_data = @import("save_data.zig");
 const spellbar = @import("spellbar.zig");
-const faction_integration = @import("faction_integration.zig");
 const loader = @import("loader.zig");
 
 // HUD modules
@@ -451,9 +451,8 @@ fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
                             behaviors.updateUnitWithAggroMod(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, frame_ctx);
                         }
 
-                        // Apply faction-based colors from controlled entity's perspective
-                        const viewer_entity = world.getControlledEntity();
-                        visual.color = faction_integration.getRelationshipColor(world, viewer_entity, unit_id);
+                        // Apply disposition-based color with energy level for brightness
+                        visual.color = color_mappings.getDispositionEnergyColor(unit_comp.disposition, unit_comp.energy_level);
                     }
 
                     // Check collision with obstacles

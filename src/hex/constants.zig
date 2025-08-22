@@ -180,8 +180,3 @@ pub const COLOR_LIFESTONE_ATTUNED = hex_colors.LIFESTONE_ATTUNED;
 pub const COLOR_LIFESTONE_UNATTUNED = hex_colors.LIFESTONE_UNATTUNED;
 pub const COLOR_DEAD = hex_colors.DEAD;
 
-// Disposition color mapping - centralized color logic for unit temperament
-pub fn getDispositionColor(_: anytype, disposition: anytype) hex_colors.Color {
-    // Use the hex-specific color mapping for disposition colors with normal energy
-    return color_mappings.getDispositionEnergyColor(disposition, EnergyLevel.normal);
-}

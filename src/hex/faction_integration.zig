@@ -4,15 +4,13 @@ const factions = @import("factions.zig");
 const faction_presets = @import("faction_presets.zig");
 const components = @import("../lib/game/components/mod.zig");
 const hex_game_mod = @import("hex_game.zig");
-const colors = @import("../lib/core/colors.zig");
-const color_mappings = @import("color_mappings.zig");
 const constants = @import("constants.zig");
 
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
 const EntityFactions = factions.EntityFactions;
 const FactionRelation = factions.FactionRelation;
-const EnergyLevel = constants.EnergyLevel;
+
 
 /// Helper functions to integrate faction system with existing hex game code
 /// Get entity factions from player storage
@@ -195,51 +193,3 @@ pub fn canEntityBeControlled(game: *const HexGame, entity_id: EntityId) bool {
     return false;
 }
 
-/// Get color for entity based on faction relationship from viewer's perspective
-pub fn getRelationshipColor(game: *const HexGame, viewer_entity: ?EntityId, target_entity: EntityId) colors.Color {
-
-    // Default colors if no faction relationship can be determined
-    const default_color = constants.COLOR_UNIT_DEFAULT;
-
-    // Get viewer's factions (controlled entity or fallback)
-    const viewer_factions = if (viewer_entity) |viewer|
-        getEntityFactions(game, viewer)
-    else
-        null;
-
-    const target_factions = getEntityFactions(game, target_entity) orelse return default_color;
-
-    if (viewer_factions) |v_factions| {
-        const relation = factions.calculateRelation(v_factions, target_factions);
-
-        // Get energy level from unit's actual state
-        var energy = EnergyLevel.normal;
-
-        // Try to get unit's stored energy level
-        const zone = game.getCurrentZoneConst();
-        if (zone.units.getComponent(target_entity, .unit)) |unit| {
-            // Use the unit's current energy level set by behavior system
-            energy = unit.energy_level;
-
-            // Log for debugging when energy is raised
-            if (energy == .raised) {
-                const mutable_game = @constCast(game);
-                mutable_game.logger.debug("energy", "Unit {} has energy={s}, disposition={s}", .{ target_entity, @tagName(energy), @tagName(unit.disposition) });
-            }
-        }
-
-        // Get color based on relationship and energy level
-        const result_color = color_mappings.getRelationshipEnergyColor(relation, energy);
-
-        // Log the final color selection for debugging
-        if (energy == .raised) {
-            const mutable_game = @constCast(game);
-            mutable_game.logger.debug("color", "Unit {} with relation={s} energy={s} -> RGB({},{},{})", .{ target_entity, @tagName(relation), @tagName(energy), result_color.r, result_color.g, result_color.b });
-        }
-
-        return result_color;
-    }
-
-    // No viewer faction - use traditional disposition colors
-    return default_color;
-}

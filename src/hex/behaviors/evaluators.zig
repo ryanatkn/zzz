@@ -8,6 +8,7 @@ const BehaviorType = @import("composer.zig").BehaviorType;
 const ProfileConfigs = @import("profiles.zig").ProfileConfigs;
 const Disposition = @import("../disposition.zig").Disposition;
 const constants = @import("../constants.zig");
+const color_mappings = @import("../color_mappings.zig");
 const behaviors_mod = @import("../../lib/game/behaviors/mod.zig");
 const Color = @import("../../lib/core/colors.zig").Color;
 
@@ -71,6 +72,7 @@ pub fn evaluateBehaviorForProfile(composer: *BehaviorComposer, context: Behavior
         .fearful => evaluateFearfulBehavior(composer, context),
         .neutral => evaluateNeutralBehavior(composer, context),
         .friendly => evaluateFriendlyBehavior(composer, context),
+        .allied => evaluateFriendlyBehavior(composer, context), // Allied uses same behavior as friendly
     };
 }
 
@@ -272,14 +274,14 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
 
 /// Get behavior color for visualization (hex-specific)
 pub fn getBehaviorColor(behavior: BehaviorType, profile: Disposition) Color {
-    // Map BehaviorType to legacy BehaviorState for color compatibility
-    const legacy_behavior = switch (behavior) {
-        .idle => behaviors_mod.behavior_state_machine.BehaviorState.idle,
-        .chasing => behaviors_mod.behavior_state_machine.BehaviorState.chasing,
-        .fleeing => behaviors_mod.behavior_state_machine.BehaviorState.fleeing,
-        .wandering => behaviors_mod.behavior_state_machine.BehaviorState.idle,
-        .returning_home => behaviors_mod.behavior_state_machine.BehaviorState.returning_home,
+    // Map behavior to energy level for brightness variation
+    const energy_level = switch (behavior) {
+        .chasing => constants.EnergyLevel.raised,  // Bright when chasing
+        .fleeing => constants.EnergyLevel.raised,  // Bright when fleeing
+        .idle => constants.EnergyLevel.lowered,    // Dim when idle
+        .wandering => constants.EnergyLevel.normal, // Normal when wandering
+        .returning_home => constants.EnergyLevel.normal, // Normal when going home
     };
 
-    return constants.getDispositionColor(legacy_behavior, profile);
+    return color_mappings.getDispositionEnergyColor(profile, energy_level);
 }

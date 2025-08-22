@@ -34,6 +34,12 @@ pub fn getUnitFactions(disposition: Disposition, unit_type: UnitType) EntityFact
             .living,
             .kingdom_guard, // Friendly units serve the kingdom
         }),
+        .allied => EntityFactions.initWithTags(&.{
+            .halfling, // Allied units are same race as player
+            .living,
+            .kingdom_guard, // Strong alliance with the kingdom
+            .guardian, // Actively protects player
+        }),
         .hostile => switch (unit_type) {
             .enemy => EntityFactions.initWithTags(&.{
                 .goblin, // Default hostile race
@@ -65,6 +71,7 @@ pub fn getUnitFactions(disposition: Disposition, unit_type: UnitType) EntityFact
 pub fn getUnitCapabilities(disposition: Disposition) Capabilities {
     return switch (disposition) {
         .friendly => Capabilities.initFriendlyUnit(constants.UNIT_SPEED),
+        .allied => Capabilities.initFriendlyUnit(constants.UNIT_SPEED * 1.1), // Slightly faster allies
         .hostile => Capabilities.initHostileUnit(constants.UNIT_SPEED, constants.UNIT_DAMAGE),
         .fearful => .{
             .can_move = true,
