@@ -104,23 +104,24 @@ pub const SpatialGrid = struct {
     pub fn addShape(self: *SpatialGrid, shape_index: usize, shape: Shape) !void {
         // Pre-calculate shape bounds to avoid repeated switch evaluations
         const bounds: types.Bounds = switch (shape) {
-            .circle => |c| types.Bounds{
-                .min = Vec2{ .x = c.center.x - c.radius, .y = c.center.y - c.radius },
-                .max = Vec2{ .x = c.center.x + c.radius, .y = c.center.y + c.radius },
-            },
-            .rectangle => |r| types.Bounds{
-                .min = r.position,
-                .max = Vec2{ .x = r.position.x + r.size.x, .y = r.position.y + r.size.y },
-            },
-            .point => |p| types.Bounds{ .min = p, .max = p },
-            .line => |l| types.Bounds{
-                .min = Vec2{ .x = @min(l.start.x, l.end.x), .y = @min(l.start.y, l.end.y) },
-                .max = Vec2{ .x = @max(l.start.x, l.end.x), .y = @max(l.start.y, l.end.y) },
-            },
+            .circle => |c| types.Bounds.init(
+                c.center.x - c.radius,
+                c.center.y - c.radius,
+                c.center.x + c.radius,
+                c.center.y + c.radius,
+            ),
+            .rectangle => |r| types.Bounds.init(
+                r.position.x,
+                r.position.y,
+                r.position.x + r.size.x,
+                r.position.y + r.size.y,
+            ),
+            .point => |p| types.Bounds.init(p.x, p.y, p.x, p.y),
+            .line => |l| types.Bounds.fromPoints(l.start, l.end),
         };
 
-        const min_grid = self.worldToGrid(bounds.min);
-        const max_grid = self.worldToGrid(bounds.max);
+        const min_grid = self.worldToGrid(bounds.getMin());
+        const max_grid = self.worldToGrid(bounds.getMax());
 
         // Cache width to avoid member access in inner loop
         const width = self.width;

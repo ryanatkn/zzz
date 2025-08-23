@@ -2,7 +2,7 @@ const std = @import("std");
 const c = @import("sdl.zig");
 
 const math = @import("../math/mod.zig");
-const viewport = @import("../core/viewport.zig");
+const camera_mod = @import("../game/camera/mod.zig");
 
 const Vec2 = math.Vec2;
 
@@ -75,8 +75,8 @@ pub const InputState = struct {
         return self.mouse_pos;
     }
 
-    pub fn getWorldMousePos(self: *const Self, vp: viewport.Viewport) Vec2 {
-        return vp.screenToWorld(self.mouse_pos);
+    pub fn getWorldMousePos(self: *const Self, camera: *const camera_mod.Camera) Vec2 {
+        return camera.screenToWorldSafe(self.mouse_pos);
     }
 
     pub fn getMovementVector(self: *const Self) Vec2 {

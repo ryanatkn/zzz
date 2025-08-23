@@ -1,7 +1,7 @@
 /// Font coordinate transformation utilities
 /// Provides shader-matching coordinate transformations for testing bitmap output in final coordinate space
 const std = @import("std");
-const core_coordinates = @import("../core/coordinates.zig");
+const spatial = @import("../rendering/spatial/mod.zig");
 const Vec2 = @import("../math/vec2.zig").Vec2;
 
 // ========================
@@ -9,17 +9,17 @@ const Vec2 = @import("../math/vec2.zig").Vec2;
 // ========================
 
 /// Transform screen coordinates to NDC (Normalized Device Coordinates)
-/// Uses the proven core coordinate utilities to ensure consistency across the engine
+/// Uses the proven spatial coordinate utilities to ensure consistency across the engine
 pub fn screenToNDC(screen_x: f32, screen_y: f32, screen_width: f32, screen_height: f32) Vec2 {
-    const context = core_coordinates.CoordinateContext.init(screen_width, screen_height);
-    return core_coordinates.screenToNDC(Vec2{ .x = screen_x, .y = screen_y }, context);
+    const context = spatial.CoordinateContext.init(screen_width, screen_height);
+    return spatial.screenToNDC(Vec2{ .x = screen_x, .y = screen_y }, context);
 }
 
 /// Transform NDC coordinates back to screen coordinates
-/// Uses the proven core coordinate utilities for consistency
+/// Uses the proven spatial coordinate utilities for consistency
 pub fn ndcToScreen(ndc_x: f32, ndc_y: f32, screen_width: f32, screen_height: f32) Vec2 {
-    const context = core_coordinates.CoordinateContext.init(screen_width, screen_height);
-    return core_coordinates.ndcToScreen(Vec2{ .x = ndc_x, .y = ndc_y }, context);
+    const context = spatial.CoordinateContext.init(screen_width, screen_height);
+    return spatial.ndcToScreen(Vec2{ .x = ndc_x, .y = ndc_y }, context);
 }
 
 /// Transform bitmap pixel coordinates to shader coordinate space

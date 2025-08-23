@@ -26,6 +26,9 @@ pub const ui = @import("ui/mod.zig");
 // Performance and optimization
 pub const optimization = @import("optimization/mod.zig");
 
+// Spatial coordinate and transformation systems
+pub const spatial = @import("spatial/mod.zig");
+
 // Convenience re-exports for common usage
 pub const GPURenderer = core.GPURenderer;
 pub const RendererInterface = core.RendererInterface;
@@ -34,6 +37,8 @@ pub const ShaderManager = resources.ShaderManager;
 pub const EntityBatchRenderer = systems.EntityBatchRenderer;
 pub const PerformanceMonitor = optimization.PerformanceMonitor;
 pub const RenderingMode = optimization.RenderingMode;
+pub const Viewport = spatial.Viewport;
+pub const CoordinateContext = spatial.CoordinateContext;
 
 // For backward compatibility during transition
 pub const gpu = core.gpu;

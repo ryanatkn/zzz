@@ -18,7 +18,6 @@ For detailed architecture documentation, see [docs/architecture.md](../../docs/a
 Fundamental types and utilities:
 - **types.zig** - Vec2, Color, Rectangle
 - **colors.zig** - Color manipulation, HSV, theming
-- **viewport.zig** - Dependency inversion interface
 - **result.zig** - Result(T, E) error handling
 - **pool.zig** - Resource and object pooling
 - **id.zig** - Type-safe IDs, handle systems
@@ -35,9 +34,13 @@ GPU graphics capabilities:
 - **interface.zig** - Abstract renderer interface
 - **gpu.zig** - SDL3 GPU backend
 - **shaders.zig** - HLSL compilation and caching
-- **camera.zig** - Fixed/follow camera modes
 - **modes.zig** - Immediate vs persistent rendering
 - **drawing.zig** - High-level UI utilities
+- **spatial/** - Coordinate transformations and viewport management
+  - **transforms.zig** - World↔screen, NDC coordinate conversions
+  - **viewport.zig** - Unified viewport using math.Bounds
+  - **visibility.zig** - Culling and frustum queries
+  - **grid.zig** - Spatial partitioning and hash grid
 
 ### Physics System (`physics/`)
 Collision and spatial reasoning:

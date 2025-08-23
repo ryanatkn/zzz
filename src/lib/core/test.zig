@@ -9,7 +9,7 @@ const std = @import("std");
 test {
     _ = @import("colors.zig");
     _ = @import("constants.zig");
-    _ = @import("coordinates.zig");
+    // coordinates.zig moved to rendering/spatial/
     _ = @import("state_machine.zig");
     _ = @import("timer.zig");
     _ = @import("result.zig");

@@ -12,6 +12,12 @@ test {
     _ = @import("optimization/performance.zig"); // Fixed: Now uses optional logger access
     _ = @import("core/uniforms.zig"); // Pure data structures, no dependencies
 
+    // Spatial coordinate and transformation system
+    _ = @import("spatial/transforms.zig");
+    _ = @import("spatial/viewport.zig");
+    _ = @import("spatial/visibility.zig");
+    _ = @import("spatial/grid.zig");
+
     // TODO: Fix broken test modules
     // _ = @import("optimization/modes.zig"); // Imports text/renderer.zig which depends on SDL - should be legitimate exclusion
 }
