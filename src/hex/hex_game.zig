@@ -70,15 +70,11 @@ pub const PlayerInput = components.PlayerInput;
 pub const HexProjectile = struct {
     base: components.Projectile,
     damage: f32,
-    ricochet_count: u8, // Bounces remaining
-    max_ricochets: u8, // Maximum bounces allowed
 
     pub fn init(owner: EntityId, max_lifetime: f32, damage: f32) HexProjectile {
         return .{
             .base = components.Projectile.init(owner, max_lifetime),
             .damage = damage,
-            .ricochet_count = 0,
-            .max_ricochets = 2, // Default 2 bounces before death
         };
     }
 
@@ -93,20 +89,6 @@ pub const HexProjectile = struct {
 
     pub fn pierce(self: *HexProjectile) void {
         self.base.pierce();
-    }
-
-    // Ricochet methods
-    pub fn canRicochet(self: HexProjectile) bool {
-        return self.ricochet_count < self.max_ricochets;
-    }
-
-    pub fn ricochet(self: *HexProjectile) void {
-        self.ricochet_count += 1;
-    }
-
-    pub fn getRemainingRicochets(self: HexProjectile) u8 {
-        if (self.ricochet_count >= self.max_ricochets) return 0;
-        return self.max_ricochets - self.ricochet_count;
     }
 };
 
@@ -839,7 +821,7 @@ pub const HexGame = struct {
                                             remove_count += 1;
                                         }
                                         break;
-                                    } else if (terrain.allows_ricochet and projectile.canRicochet()) {
+                                    } else if (terrain.allows_ricochet) {
                                         // Calculate ricochet off solid terrain (rocks, doors)
                                         const detailed_result = collision_mod.checkCollisionDetailed(projectile_circle, terrain_rect);
 
@@ -855,11 +837,6 @@ pub const HexGame = struct {
                                             // Move projectile slightly away from surface to prevent re-collision
                                             const separation = detailed_result.normal.scale(detailed_result.penetration_depth + 0.01);
                                             transform.pos = transform.pos.add(separation);
-
-                                            // Track ricochet
-                                            projectile.ricochet();
-
-                                            self.logger.info("projectile_ricochet", "Projectile {} ricocheted ({} bounces remaining)", .{ projectile_id, projectile.getRemainingRicochets() });
                                         }
                                         break;
                                     } else {
