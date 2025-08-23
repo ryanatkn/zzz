@@ -1,6 +1,6 @@
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
-const collision = @import("../lib/physics/collision.zig");
+const collision = @import("../lib/physics/collision/mod.zig");
 const queries = @import("../lib/physics/queries.zig");
 const hex_game_mod = @import("hex_game.zig");
 const HexGame = hex_game_mod.HexGame;
@@ -20,7 +20,7 @@ fn isDeadlyTerrain(terrain: *const components.Terrain) bool {
 
 // Check if entity can move to position (obstacle collision) - generic version
 pub fn canEntityMoveTo(game: *HexGame, entity_id: hex_game_mod.EntityId, new_pos: math.Vec2) bool {
-    const entity_radius = entity_queries.getEntityRadius(game, entity_id) orelse 20.0;
+    const entity_radius = entity_queries.getEntityRadius(game, entity_id) orelse 0.2; // 20cm default radius
     return canEntityMoveToWithRadius(game, new_pos, entity_radius);
 }
 

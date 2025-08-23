@@ -4,7 +4,6 @@ const window_mod = @import("window.zig");
 const font_manager = @import("../font/manager.zig");
 const loggers = @import("../debug/loggers.zig");
 
-const WindowGPU = window_mod.WindowGPU;
 const FontManager = font_manager.FontManager;
 
 /// Common error types for resource initialization
@@ -12,7 +11,6 @@ pub const ResourceError = error{
     RendererInitFailed,
     FontManagerInitFailed,
     WindowCreationFailed,
-    DeviceCreationFailed,
     OutOfMemory,
 };
 
@@ -77,10 +75,6 @@ pub const ResourceErrorHandler = struct {
                 platform_log.err("resource_manager", "Out of memory during {s}", .{context});
                 return ResourceError.OutOfMemory;
             },
-            error.DeviceCreationFailed => {
-                platform_log.err("resource_manager", "GPU device creation failed during {s}", .{context});
-                return ResourceError.DeviceCreationFailed;
-            },
             error.WindowCreationFailed => {
                 platform_log.err("resource_manager", "Window creation failed during {s}", .{context});
                 return ResourceError.WindowCreationFailed;
@@ -100,49 +94,5 @@ pub const ResourceErrorHandler = struct {
     }
 };
 
-/// Basic platform resources without rendering dependency
-pub const PlatformResources = struct {
-    window_gpu: WindowGPU,
-    font_manager: *FontManager,
-    allocator: std.mem.Allocator,
-
-    pub fn init(allocator: std.mem.Allocator, window_config: window_mod.WindowConfig) ResourceError!PlatformResources {
-        const window_gpu = window_mod.WindowGPU.init(window_config) catch |err| {
-            return ResourceErrorHandler.logAndHandleError(err, "window/GPU initialization");
-        };
-        errdefer window_gpu.deinit();
-
-        const fm = allocator.create(FontManager) catch {
-            return ResourceError.OutOfMemory;
-        };
-
-        fm.* = FontManager.init(allocator, window_gpu.device) catch |err| {
-            const platform_log = loggers.getPlatformLog();
-            platform_log.err("resource_manager", "Failed to initialize FontManager: {}", .{err});
-            allocator.destroy(fm);
-            return ResourceError.FontManagerInitFailed;
-        };
-
-        return PlatformResources{
-            .window_gpu = window_gpu,
-            .font_manager = fm,
-            .allocator = allocator,
-        };
-    }
-
-    pub fn deinit(self: *PlatformResources) void {
-        self.font_manager.deinit();
-        self.allocator.destroy(self.font_manager);
-        self.window_gpu.deinit();
-    }
-
-    /// Get the window pointer
-    pub fn getWindow(self: *const PlatformResources) *c.sdl.SDL_Window {
-        return self.window_gpu.window;
-    }
-
-    /// Get the GPU device pointer
-    pub fn getDevice(self: *const PlatformResources) *c.sdl.SDL_GPUDevice {
-        return self.window_gpu.device;
-    }
-};
+// NOTE: PlatformResources was removed as part of WindowGPU architectural cleanup
+// Individual resource types (like SharedFontManager) are still available

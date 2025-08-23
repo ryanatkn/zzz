@@ -251,19 +251,19 @@ pub fn getEntityType(world: *const HexGame, entity_id: EntityId) EntityType {
 }
 
 /// Movement bounds helper for controlled entities
-pub fn applyMovementBounds(world: *const HexGame, entity_id: EntityId, pos: Vec2, camera: *const @import("../lib/rendering/camera.zig").Camera) Vec2 {
+pub fn applyMovementBounds(world: *const HexGame, entity_id: EntityId, pos: Vec2) Vec2 {
     const zone = world.getCurrentZoneConst();
     var new_pos = pos;
 
-    // Use screen bounds only in fixed camera mode (overworld)
+    // Apply world bounds only in fixed camera mode (overworld)
     if (zone.camera_mode == .fixed) {
-        const entity_radius = getEntityRadius(world, entity_id) orelse 20.0;
-        const margin = entity_radius + 10.0; // PLAYER_BOUNDARY_MARGIN equivalent
+        const entity_radius = getEntityRadius(world, entity_id) orelse 0.2; // 20cm default radius
+        const margin = entity_radius + 0.1; // 10cm boundary margin
 
         if (new_pos.x < margin) new_pos.x = margin;
         if (new_pos.y < margin) new_pos.y = margin;
-        if (new_pos.x > camera.screen_width - margin) new_pos.x = camera.screen_width - margin;
-        if (new_pos.y > camera.screen_height - margin) new_pos.y = camera.screen_height - margin;
+        if (new_pos.x > zone.world_width - margin) new_pos.x = zone.world_width - margin;
+        if (new_pos.y > zone.world_height - margin) new_pos.y = zone.world_height - margin;
     }
 
     return new_pos;

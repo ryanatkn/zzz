@@ -38,14 +38,14 @@ pub const ComposedBehaviorResult = struct {
 
 /// Context for behavior evaluation - optimized for performance
 pub const BehaviorContext = struct {
-    unit_pos: Vec2,
-    home_pos: Vec2,
-    player_pos: ?Vec2,
+    unit_pos: Vec2, // world space (meters)
+    home_pos: Vec2, // world space (meters)
+    player_pos: ?Vec2, // world space (meters)
     player_alive: bool,
     aggro_multiplier: f32,
     dt: f32,
-    distance_to_player: f32,
-    distance_from_home_sq: f32, // Squared for performance
+    distance_to_player: f32, // world space distance (meters)
+    distance_from_home_sq: f32, // world space distance squared (meters²)
 
     pub fn init(unit_pos: Vec2, home_pos: Vec2, player_pos: ?Vec2, player_alive: bool, aggro_multiplier: f32, dt: f32) BehaviorContext {
         const distance_to_player = if (player_pos) |pp| unit_pos.sub(pp).length() else std.math.inf(f32);
@@ -276,9 +276,9 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
 pub fn getBehaviorColor(behavior: BehaviorType, profile: Disposition) Color {
     // Map behavior to energy level for brightness variation
     const energy_level = switch (behavior) {
-        .chasing => constants.EnergyLevel.raised,  // Bright when chasing
-        .fleeing => constants.EnergyLevel.raised,  // Bright when fleeing
-        .idle => constants.EnergyLevel.lowered,    // Dim when idle
+        .chasing => constants.EnergyLevel.raised, // Bright when chasing
+        .fleeing => constants.EnergyLevel.raised, // Bright when fleeing
+        .idle => constants.EnergyLevel.lowered, // Dim when idle
         .wandering => constants.EnergyLevel.normal, // Normal when wandering
         .returning_home => constants.EnergyLevel.normal, // Normal when going home
     };

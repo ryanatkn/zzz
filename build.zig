@@ -121,7 +121,7 @@ pub fn build(b: *std.Build) void {
         // Show filter being applied
         const filter_info_cmd = b.addSystemCommand(&.{ "echo", b.fmt("Running tests matching filter: '{s}'", .{filter}) });
         test_step.dependOn(&filter_info_cmd.step);
-        
+
         const run_test = b.addRunArtifact(exe_unit_tests);
         run_test.step.dependOn(&filter_info_cmd.step);
         test_step.dependOn(&run_test.step);

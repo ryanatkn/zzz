@@ -1,6 +1,6 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
-const collision = @import("collision.zig");
+const collision = @import("collision/mod.zig");
 
 const Vec2 = math.Vec2;
 

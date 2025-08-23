@@ -425,7 +425,7 @@ pub const SpellSystem = struct {
         );
 
         // Visual effects
-        const entity_radius = entity_queries.getEntityRadius(game, controlled_entity) orelse 20.0;
+        const entity_radius = entity_queries.getEntityRadius(game, controlled_entity) orelse 0.2; // 20cm default radius
         effect_system.addPortalTravelParticle(player_pos, entity_radius);
         loggers.getGameLog().info("blink_teleport", "Blink teleport to {any}", .{final_pos});
         return true;

@@ -45,7 +45,7 @@ Active development uses TODO documents for task tracking and planning:
 // Capability imports
 const types = @import("../lib/core/types.zig");
 const input = @import("../lib/platform/input.zig");
-const camera = @import("../lib/rendering/camera.zig");
+const camera = @import("../lib/game/camera/camera.zig");
 const collision = @import("../lib/physics/collision.zig");
 
 // Barrel imports for subsystems

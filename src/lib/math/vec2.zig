@@ -109,7 +109,7 @@ pub const Vec2 = extern struct {
 
     /// Get direction vector from this point to another
     pub fn directionTo(self: Vec2, other: Vec2) Vec2 {
-        return self.sub(other).normalize();
+        return other.sub(self).normalize();
     }
 
     /// Check if vector is zero
@@ -247,112 +247,6 @@ pub const Vec2 = extern struct {
     }
 };
 
-/// Function-style API for compatibility with existing codebase
-/// These provide the vec2_ prefixed functions that match the old maths.zig API
-pub fn vec2_length(v: Vec2) f32 {
-    return v.length();
-}
-
-pub fn vec2_lengthSquared(v: Vec2) f32 {
-    return v.lengthSquared();
-}
-
-pub fn vec2_normalize(v: Vec2) Vec2 {
-    return v.normalize();
-}
-
-pub fn vec2_add(a: Vec2, b: Vec2) Vec2 {
-    return a.add(b);
-}
-
-pub fn vec2_subtract(a: Vec2, b: Vec2) Vec2 {
-    return a.sub(b);
-}
-
-pub fn vec2_multiply(v: Vec2, scale_factor: f32) Vec2 {
-    return v.scale(scale_factor);
-}
-
-pub fn vec2_divide(v: Vec2, divisor: f32) Vec2 {
-    return v.divide(divisor);
-}
-
-pub fn vec2_dot(a: Vec2, b: Vec2) f32 {
-    return a.dot(b);
-}
-
-pub fn vec2_lerp(a: Vec2, b: Vec2, t: f32) Vec2 {
-    return a.lerp(b, t);
-}
-
-pub fn vec2_direction(from: Vec2, to: Vec2) Vec2 {
-    return directionBetween(from, to);
-}
-
-pub fn vec2_isZero(v: Vec2) bool {
-    return v.isZero();
-}
-
-pub fn vec2_isEqual(a: Vec2, b: Vec2, tolerance: f32) bool {
-    return a.equals(b, tolerance);
-}
-
-pub fn vec2_clamp(v: Vec2, min: Vec2, max: Vec2) Vec2 {
-    return v.clamp(min, max);
-}
-
-pub fn vec2_angleTo(from: Vec2, to: Vec2) f32 {
-    return from.angleTo(to);
-}
-
-pub fn vec2_rotate(v: Vec2, angle: f32) Vec2 {
-    return v.rotate(angle);
-}
-
-pub fn vec2_reflect(v: Vec2, normal: Vec2) Vec2 {
-    return v.reflect(normal);
-}
-
-pub fn vec2_project(a: Vec2, b: Vec2) Vec2 {
-    return a.project(b);
-}
-
-pub fn vec2_perpendicular(v: Vec2) Vec2 {
-    return v.perpendicular();
-}
-
-pub fn vec2_moveTowards(from: Vec2, to: Vec2, max_distance: f32) Vec2 {
-    return from.moveTowards(to, max_distance);
-}
-
-pub fn vec2_smoothDamp(current: Vec2, target: Vec2, smooth_time: f32, delta_time: f32) Vec2 {
-    return current.smoothDamp(target, smooth_time, delta_time);
-}
-
-pub fn vec2_isWithinCircle(point: Vec2, center: Vec2, radius: f32) bool {
-    return point.isWithinCircle(center, radius);
-}
-
-pub fn vec2_isWithinRect(point: Vec2, rect_pos: Vec2, rect_size: Vec2) bool {
-    return point.isWithinRect(rect_pos, rect_size);
-}
-
-pub fn vec2_clampToCircle(point: Vec2, center: Vec2, radius: f32) Vec2 {
-    return point.clampToCircle(center, radius);
-}
-
-pub fn vec2_clampToRect(point: Vec2, rect_pos: Vec2, rect_size: Vec2) Vec2 {
-    return point.clampToRect(rect_pos, rect_size);
-}
-
-pub fn vec2_worldToScreen(world_pos: Vec2, camera_pos: Vec2, camera_scale: f32, screen_center: Vec2) Vec2 {
-    return worldToScreen(world_pos, camera_pos, camera_scale, screen_center);
-}
-
-pub fn vec2_screenToWorld(screen_pos: Vec2, camera_pos: Vec2, camera_scale: f32, screen_center: Vec2) Vec2 {
-    return screenToWorld(screen_pos, camera_pos, camera_scale, screen_center);
-}
-
 /// Helper function for direction between two points (not a method)
 pub fn directionBetween(from: Vec2, to: Vec2) Vec2 {
     return to.sub(from).normalize();
@@ -365,19 +259,6 @@ pub fn distance(a: Vec2, b: Vec2) f32 {
 
 pub fn distanceSquared(a: Vec2, b: Vec2) f32 {
     return a.distanceSquared(b);
-}
-
-/// Coordinate system transformations
-pub fn worldToScreen(world_pos: Vec2, camera_pos: Vec2, camera_scale: f32, screen_center: Vec2) Vec2 {
-    const relative_pos = world_pos.sub(camera_pos);
-    const scaled_pos = relative_pos.scale(camera_scale);
-    return screen_center.add(scaled_pos);
-}
-
-pub fn screenToWorld(screen_pos: Vec2, camera_pos: Vec2, camera_scale: f32, screen_center: Vec2) Vec2 {
-    const relative_pos = screen_pos.sub(screen_center);
-    const unscaled_pos = relative_pos.divide(camera_scale);
-    return camera_pos.add(unscaled_pos);
 }
 
 test "Vec2 operations" {
@@ -399,11 +280,11 @@ test "Vec2 operations" {
     const normalized = v1.normalize();
     try std.testing.expect(@abs(normalized.length() - 1.0) < 0.001);
 
-    // Test compatibility wrappers
-    const len2 = vec2_length(v1);
+    // Test method API
+    const len2 = v1.length();
     try std.testing.expect(@abs(len2 - 5.0) < 0.001);
 
-    const sum2 = vec2_add(v1, v2);
+    const sum2 = v1.add(v2);
     try std.testing.expect(sum2.x == 4.0 and sum2.y == 6.0);
 }
 

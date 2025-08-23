@@ -1,71 +1,28 @@
 const std = @import("std");
 const math = @import("../../math/mod.zig");
+const camera_mod = @import("../camera/camera.zig");
 
 const Vec2 = math.Vec2;
+const Camera = camera_mod.Camera;
 
 /// Generic targeting system for combat and interaction
 /// Provides patterns for mouse-to-world conversion and target selection
 pub const Targeting = struct {
-    /// Screen-to-world coordinate conversion configuration
-    pub const ScreenToWorldConfig = struct {
-        screen_width: f32,
-        screen_height: f32,
-        camera_pos: Vec2,
-        camera_scale: f32 = 1.0,
-        camera_offset: Vec2 = Vec2.ZERO,
-
-        pub fn init(screen_width: f32, screen_height: f32, camera_pos: Vec2) ScreenToWorldConfig {
-            return .{
-                .screen_width = screen_width,
-                .screen_height = screen_height,
-                .camera_pos = camera_pos,
-            };
-        }
-
-        pub fn withScale(self: ScreenToWorldConfig, scale: f32) ScreenToWorldConfig {
-            var result = self;
-            result.camera_scale = scale;
-            return result;
-        }
-
-        pub fn withOffset(self: ScreenToWorldConfig, offset: Vec2) ScreenToWorldConfig {
-            var result = self;
-            result.camera_offset = offset;
-            return result;
-        }
-    };
-
-    /// Convert screen coordinates to world coordinates
-    pub fn screenToWorld(screen_pos: Vec2, config: ScreenToWorldConfig) Vec2 {
-        // Convert screen coordinates to centered coordinates
-        const centered_x = screen_pos.x - (config.screen_width / 2.0);
-        const centered_y = screen_pos.y - (config.screen_height / 2.0);
-
-        // Apply camera scale and position
-        const world_x = (centered_x / config.camera_scale) + config.camera_pos.x + config.camera_offset.x;
-        const world_y = (centered_y / config.camera_scale) + config.camera_pos.y + config.camera_offset.y;
-
-        return Vec2{ .x = world_x, .y = world_y };
+    /// Convert screen coordinates to world coordinates using Camera
+    pub fn screenToWorld(screen_pos: Vec2, camera: *const Camera) Vec2 {
+        return camera.screenToWorldSafe(screen_pos);
     }
 
-    /// Convert world coordinates to screen coordinates
-    pub fn worldToScreen(world_pos: Vec2, config: ScreenToWorldConfig) Vec2 {
-        // Apply camera transformation
-        const relative_x = (world_pos.x - config.camera_pos.x - config.camera_offset.x) * config.camera_scale;
-        const relative_y = (world_pos.y - config.camera_pos.y - config.camera_offset.y) * config.camera_scale;
-
-        // Convert to screen coordinates
-        const screen_x = relative_x + (config.screen_width / 2.0);
-        const screen_y = relative_y + (config.screen_height / 2.0);
-
-        return Vec2{ .x = screen_x, .y = screen_y };
+    /// Convert world coordinates to screen coordinates using Camera
+    pub fn worldToScreen(world_pos: Vec2, camera: *const Camera) Vec2 {
+        return camera.worldToScreen(world_pos);
     }
 
-    /// Check if world position is visible on screen
-    pub fn isPositionOnScreen(world_pos: Vec2, config: ScreenToWorldConfig) bool {
-        const screen_pos = worldToScreen(world_pos, config);
-        return screen_pos.x >= 0 and screen_pos.x <= config.screen_width and
-            screen_pos.y >= 0 and screen_pos.y <= config.screen_height;
+    /// Check if world position is visible on screen using Camera
+    pub fn isPositionOnScreen(world_pos: Vec2, camera: *const Camera) bool {
+        const screen_pos = camera.worldToScreen(world_pos);
+        return screen_pos.x >= 0 and screen_pos.x <= camera.screen_width and
+            screen_pos.y >= 0 and screen_pos.y <= camera.screen_height;
     }
 };
 

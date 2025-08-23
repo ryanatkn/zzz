@@ -4,13 +4,13 @@ const math = @import("../../lib/math/mod.zig");
 const colors = @import("../../lib/core/colors.zig");
 const constants = @import("../../lib/core/constants.zig");
 const loggers = @import("../../lib/debug/loggers.zig");
-const lib_renderer = @import("../../lib/rendering/interface.zig");
+const lib_renderer = @import("../../lib/rendering/core/interface.zig");
 const game_renderer = @import("../game_renderer.zig");
 const page = @import("../../lib/browser/page.zig");
 const font_config = @import("../../lib/font/config.zig");
 const text_renderer = @import("../../lib/text/renderer.zig");
 const menu_text = @import("../../lib/ui/menu_text.zig");
-const drawing = @import("../../lib/rendering/drawing.zig");
+const drawing = @import("../../lib/rendering/ui/drawing.zig");
 const TerminalComponent = @import("../../lib/ui/terminal.zig").TerminalComponent;
 const font_grid_test_page = @import("../../roots/menu/font_grid_test/+page.zig");
 const ide_page = @import("../../roots/menu/ide/+page.zig");
@@ -230,7 +230,7 @@ pub const BrowserRenderer = struct {
 
             // Render the link text using menu text renderer directly
             const link_rect = drawing.Rectangle.init(link.bounds.position, link.bounds.size);
-            var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
+            var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration.text_renderer, self.base_renderer.font_manager);
 
             // Use left alignment for filesystem buttons (IDE file/directory listings)
             const is_filesystem_link = std.mem.startsWith(u8, link.path, "/ide?");
@@ -293,7 +293,7 @@ pub const BrowserRenderer = struct {
         self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = address_x, .y = bar_y + button_margin + button_size - 2 }, .{ .x = address_width, .y = 2 }, Color{ .r = 40, .g = 45, .b = 55, .a = 255 });
 
         // Queue the path text for rendering using shared utility with main game renderers
-        var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
+        var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration.text_renderer, self.base_renderer.font_manager);
         menu_text_renderer.queueNavigationText(current_path, .{ .x = address_x + 10, .y = bar_y + button_margin + 15 });
     }
 
@@ -686,7 +686,7 @@ pub const BrowserRenderer = struct {
         }
 
         // Use the same approach as working buttons - 16pt font renders reliably
-        var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, self.base_renderer.font_manager);
+        var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration.text_renderer, self.base_renderer.font_manager);
         menu_renderer.queueCustomText(text, position, ide_constants.TEXT.CONTENT_FONT_SIZE, text_color);
     }
 
@@ -714,7 +714,7 @@ pub const BrowserRenderer = struct {
         const aligned_position = text_alignment.applyAlignment(position, alignment, estimated_text_width);
 
         // Use the exact same approach as working navigation text
-        self.base_renderer.gpu.text_renderer.queuePersistentText(text, aligned_position, self.base_renderer.font_manager, .sans, font_size, text_color) catch |err| {
+        self.base_renderer.gpu.text_integration.text_renderer.queuePersistentText(text, aligned_position, self.base_renderer.font_manager, .sans, font_size, text_color) catch |err| {
             const ui_log = loggers.getUILog();
             ui_log.err("ide_text", "Failed to queue IDE text '{s}': {}", .{ text, err });
         };

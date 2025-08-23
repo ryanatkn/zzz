@@ -125,7 +125,7 @@ game.initAIControl(allocator);
 // From game code
 const types = @import("../lib/core/types.zig");
 const input = @import("../lib/platform/input.zig");
-const camera = @import("../lib/rendering/camera.zig");
+const camera = @import("../lib/game/camera/camera.zig");
 ```
 
 ### Barrel Imports

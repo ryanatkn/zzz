@@ -2,6 +2,7 @@ const std = @import("std");
 const loggers = @import("../lib/debug/loggers.zig");
 const log_config = @import("../lib/debug/config.zig");
 const c = @import("../lib/platform/sdl.zig");
+const platform = @import("../lib/platform/mod.zig");
 
 // Engine imports
 const colors = @import("../lib/core/colors.zig");
@@ -30,10 +31,9 @@ const persistent_text = @import("../lib/text/cache.zig");
 
 // Debug system imports (already imported above)
 
-const window_w = @as(u32, @intFromFloat(constants.SCREEN_WIDTH));
-const window_h = @as(u32, @intFromFloat(constants.SCREEN_HEIGHT));
 const Vec2 = math.Vec2;
 const Color = colors.Color;
+const WindowConfig = platform.WindowConfig;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const GameState = game_controller.GameState;
 const Hud = hud.Hud;
@@ -62,7 +62,7 @@ pub fn run(allocator: std.mem.Allocator) !void {
 }
 
 var fully_initialized = false;
-var window: *c.sdl.SDL_Window = undefined;
+var window: ?*c.sdl.SDL_Window = null;
 var game_renderer: ?*GameRenderer = null;
 var game_state: ?*GameState = null;
 var game_hud: ?*Hud = null;
@@ -80,11 +80,16 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
 
     try errify(c.sdl.SDL_Init(c.sdl.SDL_INIT_VIDEO));
 
-    // Create window hidden initially
-    window = c.sdl.SDL_CreateWindow("Hex GPU Game", window_w, window_h, c.sdl.SDL_WINDOW_RESIZABLE | c.sdl.SDL_WINDOW_HIDDEN) orelse {
-        return error.SdlError;
+    // Create window using platform utilities
+    const window_config = WindowConfig{
+        .title = constants.WINDOW_TITLE,
+        .width = @intCast(constants.WINDOW_WIDTH),
+        .height = @intCast(constants.WINDOW_HEIGHT),
+        .flags = c.sdl.SDL_WINDOW_RESIZABLE | c.sdl.SDL_WINDOW_HIDDEN,
     };
-    errdefer c.sdl.SDL_DestroyWindow(window);
+
+    window = try platform.window.createWindow(window_config);
+    errdefer if (window) |w| c.sdl.SDL_DestroyWindow(w);
 
     // Initialize reactive system
     try reactive_context.initContext(global_allocator);
@@ -107,7 +112,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     // Initialize renderer (heap allocated to avoid memory corruption)
     game_renderer = try global_allocator.create(GameRenderer);
     errdefer global_allocator.destroy(game_renderer.?);
-    game_renderer.?.* = try GameRenderer.init(global_allocator, window);
+    game_renderer.?.* = try GameRenderer.init(global_allocator, window.?);
 
     // Initialize persistent text system (needs GPU device from renderer)
     try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.?.gpu.device);
@@ -150,7 +155,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     };
 
     // Show window after initialization
-    _ = c.sdl.SDL_ShowWindow(window);
+    _ = c.sdl.SDL_ShowWindow(window.?);
 
     last_time = c.sdl.SDL_GetPerformanceCounter();
 
@@ -234,7 +239,10 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
             }
             loggers.deinitGlobalLoggers();
         }
-        c.sdl.SDL_DestroyWindow(window);
+        if (window) |w| {
+            c.sdl.SDL_DestroyWindow(w);
+            window = null;
+        }
         fully_initialized = false;
     }
 }
@@ -279,8 +287,8 @@ fn renderGame() !void {
     const zone = game_state.?.hex_game.getCurrentZone();
 
     // Begin GPU frame
-    const cmd_buffer = try game_renderer.?.beginFrame(window);
-    const render_pass = try game_renderer.?.beginRenderPass(cmd_buffer, window, zone.background_color);
+    const cmd_buffer = try game_renderer.?.beginFrame();
+    const render_pass = try game_renderer.?.beginRenderPass(cmd_buffer, zone.background_color);
 
     // Render all entities
     game_renderer.?.renderZone(cmd_buffer, render_pass, &game_state.?.hex_game);
@@ -295,6 +303,9 @@ fn renderGame() !void {
 
         // Draw AI mode indicator if enabled
         game_renderer.?.drawAIMode(game_state.?.ai_enabled);
+
+        // Draw debug info (player position and camera viewport)
+        game_renderer.?.drawDebugInfo(cmd_buffer, render_pass, &game_state.?.hex_game);
 
         // Draw spellbar
         game_renderer.?.drawSpellbar(cmd_buffer, render_pass, &game_state.?.spell_system, &game_state.?.spellbar_ui);

@@ -4,8 +4,7 @@ const c = @import("../lib/platform/sdl.zig");
 const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
 const game_controller = @import("game.zig");
-const coordinates = @import("../lib/core/coordinates.zig");
-const camera = @import("../lib/rendering/camera.zig");
+const camera = @import("../lib/game/camera/camera.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
@@ -31,18 +30,14 @@ fn extractGameAction(event: *const c.sdl.SDL_Event) GameAction {
     };
 }
 
-/// Create coordinate context from camera state
-fn createCoordinateContext(cam: *const camera.Camera) coordinates.CoordinateContext {
-    return coordinates.CoordinateContext.init(cam.screen_width, cam.screen_height)
-        .withCamera(math.Vec2.position(cam.view_x + cam.view_width / 2.0, cam.view_y + cam.view_height / 2.0), cam.scale);
-}
-
 pub fn handleSDLEvent(
     game_state: *GameState,
     game_renderer: *GameRenderer,
     game_hud: *Hud,
     event: *c.sdl.SDL_Event,
 ) !c.sdl.SDL_AppResult {
+    // Mouse wheel scroll detection via motion events
+    // Some systems deliver wheel data through mouse motion events instead of wheel events
     // Let HUD handle events first if it's open
     if (game_state.hud_system) |*hud_sys| {
         const handled = try hud_sys.handleEvent(event.*);
@@ -115,6 +110,13 @@ pub fn handleSDLEvent(
                         game_state.spell_system.setActiveSlot(slot);
                     }
                 },
+                // Camera zoom actions
+                .ZoomIn => {
+                    game_renderer.camera.zoomIn();
+                },
+                .ZoomOut => {
+                    game_renderer.camera.zoomOut();
+                },
                 else => {},
             }
         },
@@ -124,11 +126,14 @@ pub fn handleSDLEvent(
         c.sdl.SDL_EVENT_MOUSE_MOTION => {
             game_state.input_state.handleMouseMotion(event.motion.x, event.motion.y);
 
+            // Note: Mouse wheel events not working on this system - using keyboard zoom (- and = keys)
+
             // Update spellbar hover state
             const mouse_pos = game_state.input_state.getMousePos();
             game_state.spellbar_ui.updateHover(mouse_pos);
         },
         c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
+            std.log.info("MOUSE_BUTTON_DOWN: button={} (1=left, 2=middle, 3=right, 4/5=wheel?)", .{event.button.button});
             game_state.input_state.handleMouseButtonDown(event.button.button);
 
             // Don't handle game actions if HUD is open
@@ -179,10 +184,9 @@ pub fn handleSDLEvent(
                         // Left-click shooting for single shots (burst mode)
                         game_state.hex_game.logger.info("primary_attack", "Primary attack at mouse position: {any}", .{screen_mouse_pos});
 
-                        const coord_context = createCoordinateContext(&game_renderer.camera);
-                        const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
-                        const result = combat.fireBulletAtMouse(&game_state.hex_game, world_mouse_pos, &game_state.hex_game.bullet_pool);
-                        game_state.hex_game.logger.info("bullet_result", "fireBulletAtMouse result: {}", .{result});
+                        // Use unified bullet firing with proper coordinate conversion
+                        const result = combat.fireBulletAtScreenPos(&game_state.hex_game, screen_mouse_pos, &game_renderer.camera, &game_state.hex_game.bullet_pool);
+                        game_state.hex_game.logger.info("bullet_result", "fireBulletAtScreenPos result: {}", .{result});
                     }
                 },
                 .SecondaryAttack => {
@@ -204,8 +208,7 @@ pub fn handleSDLEvent(
                         // Check if this should be self-cast
                         const self_cast = input_modifiers.ModifierHelpers.isSelfCasting(&game_state.input_state);
 
-                        const coord_context = createCoordinateContext(&game_renderer.camera);
-                        const world_mouse_pos = coordinates.screenToWorld(screen_mouse_pos, coord_context);
+                        const world_mouse_pos = game_renderer.camera.screenToWorldSafe(screen_mouse_pos);
                         const zone = game_state.hex_game.getCurrentZoneConst();
 
                         _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, world_mouse_pos, &game_state.particle_system, self_cast);
@@ -218,17 +221,15 @@ pub fn handleSDLEvent(
             game_state.input_state.handleMouseButtonUp(event.button.button);
         },
         c.sdl.SDL_EVENT_MOUSE_WHEEL => {
-            const action = extractGameAction(event);
-            const current_zone = game_state.hex_game.getCurrentZone();
+            std.log.info("mouse_wheel event detected! y={d:.2} x={d:.2}", .{ event.wheel.y, event.wheel.x });
 
-            switch (action) {
-                .ZoomIn => {
-                    current_zone.camera_scale = @min(constants.MAX_ZOOM, current_zone.camera_scale * constants.ZOOM_FACTOR);
-                },
-                .ZoomOut => {
-                    current_zone.camera_scale = @max(constants.MIN_ZOOM, current_zone.camera_scale / constants.ZOOM_FACTOR);
-                },
-                else => {},
+            // Direct zoom based on wheel direction
+            if (event.wheel.y > 0) {
+                std.log.info("zoom_in_triggered calling camera.zoomIn()", .{});
+                game_renderer.camera.zoomIn();
+            } else if (event.wheel.y < 0) {
+                std.log.info("zoom_out_triggered calling camera.zoomOut()", .{});
+                game_renderer.camera.zoomOut();
             }
         },
         else => {},

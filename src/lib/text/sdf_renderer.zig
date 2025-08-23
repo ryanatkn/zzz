@@ -245,18 +245,18 @@ pub const SDFGenerator = struct {
     /// Calculate distance from point to line segment
     fn distanceToLine(self: *Self, point: Vec2, start: Vec2, end: Vec2) f32 {
         _ = self;
-        const line_vec = math.vec2_subtract(end, start);
-        const point_vec = math.vec2_subtract(point, start);
+        const line_vec = end.sub(start);
+        const point_vec = point.sub(start);
 
-        const line_len_sq = math.vec2_lengthSquared(line_vec);
+        const line_len_sq = line_vec.lengthSquared();
         if (line_len_sq == 0) {
-            return math.vec2_length(point_vec);
+            return point_vec.length();
         }
 
-        const t = scalar.clamp(math.vec2_dot(point_vec, line_vec) / line_len_sq, 0, 1);
-        const projection = math.vec2_add(start, math.vec2_multiply(line_vec, t));
+        const t = scalar.clamp(point_vec.dot(line_vec) / line_len_sq, 0, 1);
+        const projection = start.add(line_vec.scale(t));
 
-        return math.vec2_length(math.vec2_subtract(point, projection));
+        return point.sub(projection).length();
     }
 
     /// Calculate distance from point to quadratic bezier curve (approximated)

@@ -60,8 +60,8 @@ const c = @import("../lib/platform/sdl.zig");
 const input = @import("../lib/platform/input.zig");
 
 // Rendering capabilities
-const camera = @import("../lib/rendering/camera.zig");
-const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
+const camera = @import("../lib/game/camera/camera.zig");
+const simple_gpu_renderer = @import("../lib/rendering/core/gpu.zig");
 
 // Game system capabilities
 const game_systems = @import("../lib/game/mod.zig");

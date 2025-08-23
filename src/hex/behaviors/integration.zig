@@ -107,8 +107,8 @@ pub fn applyBehaviorResult(context: UnitUpdateContext, result: evaluators.Compos
 
     // Special case: Neutral units become alert (raised energy) when player is nearby
     if (context.unit.disposition == .neutral and context.player_alive) {
-        const distance_to_player = context.transform.pos.distance(context.player_pos);
-        const detection_range = context.unit.aggro_range; // Use aggro_range as detection range
+        const distance_to_player = context.transform.pos.distance(context.player_pos); // world space (meters)
+        const detection_range = context.unit.aggro_range; // world space detection range (meters)
 
         if (distance_to_player < detection_range) {
             context.unit.energy_level = .raised; // Alert but not aggressive

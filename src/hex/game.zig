@@ -9,14 +9,12 @@ const frame = @import("../lib/core/frame.zig");
 const c = @import("../lib/platform/sdl.zig");
 const input = @import("../lib/platform/input.zig");
 
-// Rendering capabilities
-const camera = @import("../lib/rendering/camera.zig");
-
 // Physics capabilities
-const collision = @import("../lib/physics/collision.zig");
+const collision = @import("../lib/physics/collision/mod.zig");
 
 // Game system capabilities
 const game_systems = @import("../lib/game/mod.zig");
+const camera = @import("../lib/game/camera/camera.zig");
 const GameParticleSystem = @import("../lib/particles/game_particles.zig").GameParticleSystem;
 
 // Debug capabilities
@@ -513,8 +511,9 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
     const can_shoot = world.hasLiveControlledEntity() and world.canFireBullet();
     if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and can_shoot) {
-        // Use context-aware bullet firing
-        _ = combat.fireBulletAtMouse(world, input_state.getMousePos(), &world.bullet_pool);
+        // Use unified bullet firing with proper coordinate conversion
+        const screen_mouse_pos = input_state.getMousePos();
+        _ = combat.fireBulletAtScreenPos(world, screen_mouse_pos, cam, &world.bullet_pool);
     }
 
     // Update bullet entities using ECS

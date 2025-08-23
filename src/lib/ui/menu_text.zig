@@ -3,7 +3,7 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const text_renderer = @import("../text/renderer.zig");
 const font_manager = @import("../font/manager.zig");
-const drawing = @import("../rendering/drawing.zig");
+const drawing = @import("../rendering/ui/drawing.zig");
 const font_config = @import("../font/config.zig");
 const loggers = @import("../debug/loggers.zig");
 

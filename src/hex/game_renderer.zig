@@ -8,10 +8,10 @@ const time_utils = @import("../lib/core/time.zig");
 
 // Platform capabilities
 const c = @import("../lib/platform/sdl.zig");
+const platform = @import("../lib/platform/mod.zig");
 
 // Rendering capabilities
-const simple_gpu_renderer = @import("../lib/rendering/gpu.zig");
-const camera = @import("../lib/rendering/camera.zig");
+const simple_gpu_renderer = @import("../lib/rendering/core/gpu.zig");
 
 // Font capabilities
 const font_manager = @import("../lib/font/manager.zig");
@@ -21,6 +21,7 @@ const font_config = @import("../lib/font/config.zig");
 const text_alignment = @import("../lib/text/alignment.zig");
 
 // Game system capabilities
+const camera = @import("../lib/game/camera/camera.zig");
 const GameParticleSystem = @import("../lib/particles/game_particles.zig").GameParticleSystem;
 
 // Reactive capabilities
@@ -43,23 +44,25 @@ const spells = @import("spells.zig");
 
 const Vec2 = math.Vec2;
 const Color = core_colors.Color;
-const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
+const GPURenderer = simple_gpu_renderer.GPURenderer;
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
 const ZoneData = hex_game_mod.HexGame.ZoneData;
 const GameState = game_controller.GameState;
 
 pub const GameRenderer = struct {
-    gpu: SimpleGPURenderer,
+    gpu: GPURenderer,
     camera: camera.Camera,
     font_manager: *font_manager.FontManager,
+    window: *c.sdl.SDL_Window,
     allocator: std.mem.Allocator,
 
     pub fn init(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) !GameRenderer {
         var renderer = GameRenderer{
-            .gpu = try SimpleGPURenderer.init(allocator, window),
+            .gpu = try GPURenderer.init(allocator, window),
             .camera = camera.Camera.init(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT),
             .font_manager = undefined,
+            .window = window,
             .allocator = allocator,
         };
 
@@ -80,17 +83,17 @@ pub const GameRenderer = struct {
     }
 
     // Begin a new frame
-    pub fn beginFrame(self: *GameRenderer, window: *c.sdl.SDL_Window) !*c.sdl.SDL_GPUCommandBuffer {
+    pub fn beginFrame(self: *GameRenderer) !*c.sdl.SDL_GPUCommandBuffer {
         // Start performance monitoring
         self.gpu.startFrameTiming();
-        return try self.gpu.beginFrame(window);
+        return try self.gpu.beginFrame(self.window);
     }
 
     // Begin render pass
-    pub fn beginRenderPass(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, window: *c.sdl.SDL_Window, bg_color: Color) !*c.sdl.SDL_GPURenderPass {
+    pub fn beginRenderPass(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, bg_color: Color) !*c.sdl.SDL_GPURenderPass {
         // Flush any pending text buffers before starting render pass
         // Text buffers now processed automatically in prepareTextBuffers
-        return try self.gpu.beginRenderPass(cmd_buffer, window, bg_color);
+        return try self.gpu.beginRenderPass(cmd_buffer, self.window, bg_color);
     }
 
     // End render pass
@@ -117,8 +120,16 @@ pub const GameRenderer = struct {
 
         const zone = game.getCurrentZoneConst();
         switch (zone.camera_mode) {
-            .fixed => self.camera.setupFixed(zone.camera_scale),
-            .follow => self.camera.setupFollow(game.getPlayerPos(), zone.camera_scale),
+            .fixed => {
+                // Show entire world bounds in viewport (zoom still applies)
+                self.camera.setViewportToFitWorld(zone.world_width, zone.world_height);
+            },
+            .follow => {
+                // Follow player with clean camera system zoom
+                const player_pos = game.getPlayerPos();
+                // Set base viewport size - zoom is applied internally by camera
+                self.camera.setViewport(player_pos, constants.FOLLOW_VIEWPORT_WIDTH, constants.FOLLOW_VIEWPORT_HEIGHT);
+            },
         }
     }
 
@@ -126,7 +137,7 @@ pub const GameRenderer = struct {
     //
     // Note: New rendering utilities available for future optimization:
     // - src/lib/rendering/entity_renderer.zig: Generic entity rendering with automatic batching/culling
-    // - src/lib/rendering/camera_utils.zig: Batch camera transformations and viewport culling
+    // - src/lib/game/camera/utils.zig: Batch camera transformations and viewport culling
     // These modules can replace the duplicate loops below for improved performance and code reuse
     pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
         const zone = game.getCurrentZoneConst();
@@ -303,10 +314,34 @@ pub const GameRenderer = struct {
         // Use persistent text rendering to eliminate flashing
 
         // Queue using persistent mode - texture will be cached and reused
-        self.gpu.text_renderer.queuePersistentText(fps_text, .{ .x = fps_x, .y = fps_y }, self.font_manager, .sans, font_config.getGlobalConfig().fpsFontSize(), WHITE) catch |err| {
+        self.gpu.text_integration.text_renderer.queuePersistentText(fps_text, .{ .x = fps_x, .y = fps_y }, self.font_manager, .sans, font_config.getGlobalConfig().fpsFontSize(), WHITE) catch |err| {
             loggers.getGameLog().err("fps_error", "Failed to queue persistent FPS text: {}", .{err});
             // Fall back to geometric rendering
             self.drawFPSGeometric(cmd_buffer, render_pass, fps);
+            return;
+        };
+    }
+
+    // Debug info rendering - player coordinates and camera viewport
+    pub fn drawDebugInfo(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
+        _ = cmd_buffer; // Currently unused - for future geometric fallback
+        _ = render_pass; // Currently unused - for future geometric fallback
+        const WHITE = core_colors.WHITE;
+
+        // Get player position
+        const player_pos = game.getPlayerPos();
+
+        // Format debug text with world coordinates, camera info, and zoom level
+        var debug_buf: [256]u8 = undefined;
+        const debug_text = std.fmt.bufPrintZ(&debug_buf, "Player: ({d:.1}, {d:.1})m\nCamera: {d:.1}x{d:.1}m\nZoom: {d:.2}x", .{ player_pos.x, player_pos.y, self.camera.viewport_width, self.camera.viewport_height, self.camera.zoom_level }) catch "Debug: Error";
+
+        // Position at bottom-left corner
+        const debug_x = 20.0; // Left margin
+        const debug_y = constants.SCREEN_HEIGHT - 120.0; // Bottom margin (increased for 3 lines)
+
+        // Use persistent text rendering
+        self.gpu.text_integration.text_renderer.queuePersistentText(debug_text, .{ .x = debug_x, .y = debug_y }, self.font_manager, .sans, font_config.getGlobalConfig().fpsFontSize(), WHITE) catch |err| {
+            loggers.getGameLog().err("debug_info_error", "Failed to queue debug info text: {}", .{err});
             return;
         };
     }
@@ -334,7 +369,7 @@ pub const GameRenderer = struct {
         const aligned_position = text_alignment.applyAlignment(base_position, .right, estimated_text_width);
 
         // Queue using persistent mode with proper alignment
-        self.gpu.text_renderer.queuePersistentText(ai_text, aligned_position, self.font_manager, .sans, font_size, AI_COLOR) catch {
+        self.gpu.text_integration.text_renderer.queuePersistentText(ai_text, aligned_position, self.font_manager, .sans, font_size, AI_COLOR) catch {
             // AI mode text failed - fallback to no display
         };
     }

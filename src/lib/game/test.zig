@@ -21,6 +21,9 @@ test {
     // Additional working modules
     _ = @import("behaviors/wander_behavior.zig"); // Working: No runtime failures detected
 
+    // Camera system tests
+    _ = @import("camera/test.zig"); // Camera coordinate transformation tests
+
     // TODO: Complex API design issues
     // _ = @import("storage/entity_storage.zig"); // Complex API design needs refactoring
 }

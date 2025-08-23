@@ -50,7 +50,7 @@ pub const QuadraticCurve = struct {
         while (i <= steps) : (i += 1) {
             const t = @as(f32, @floatFromInt(i)) / @as(f32, @floatFromInt(steps));
             const point = self.evaluate(t);
-            total_length += math.vec2_length(math.vec2_subtract(point, prev_point));
+            total_length += point.sub(prev_point).length();
             prev_point = point;
         }
 
@@ -133,11 +133,11 @@ pub const LineSegment = struct {
     end: Vec2,
 
     pub fn evaluate(self: LineSegment, t: f32) Vec2 {
-        return math.vec2_lerp(self.start, self.end, t);
+        return self.start.lerp(self.end, t);
     }
 
     pub fn length(self: LineSegment) f32 {
-        return math.vec2_length(math.vec2_subtract(self.end, self.start));
+        return self.end.sub(self.start).length();
     }
 };
 
@@ -185,7 +185,7 @@ pub const PathSegment = union(enum) {
                 while (i <= steps) : (i += 1) {
                     const t = @as(f32, @floatFromInt(i)) / @as(f32, @floatFromInt(steps));
                     const point = cubic.evaluate(t);
-                    total_length += math.vec2_length(math.vec2_subtract(point, prev_point));
+                    total_length += point.sub(prev_point).length();
                     prev_point = point;
                 }
 
@@ -342,19 +342,19 @@ pub const VectorPath = struct {
             for (contour.segments.items) |*segment| {
                 switch (segment.*) {
                     .line => |*line| {
-                        line.start = math.vec2_add(math.vec2_multiply(line.start, scale), offset);
-                        line.end = math.vec2_add(math.vec2_multiply(line.end, scale), offset);
+                        line.start = line.start.scale(scale).add(offset);
+                        line.end = line.end.scale(scale).add(offset);
                     },
                     .quadratic => |*quad| {
-                        quad.start = math.vec2_add(math.vec2_multiply(quad.start, scale), offset);
-                        quad.control = math.vec2_add(math.vec2_multiply(quad.control, scale), offset);
-                        quad.end = math.vec2_add(math.vec2_multiply(quad.end, scale), offset);
+                        quad.start = quad.start.scale(scale).add(offset);
+                        quad.control = quad.control.scale(scale).add(offset);
+                        quad.end = quad.end.scale(scale).add(offset);
                     },
                     .cubic => |*cubic| {
-                        cubic.start = math.vec2_add(math.vec2_multiply(cubic.start, scale), offset);
-                        cubic.control1 = math.vec2_add(math.vec2_multiply(cubic.control1, scale), offset);
-                        cubic.control2 = math.vec2_add(math.vec2_multiply(cubic.control2, scale), offset);
-                        cubic.end = math.vec2_add(math.vec2_multiply(cubic.end, scale), offset);
+                        cubic.start = cubic.start.scale(scale).add(offset);
+                        cubic.control1 = cubic.control1.scale(scale).add(offset);
+                        cubic.control2 = cubic.control2.scale(scale).add(offset);
+                        cubic.end = cubic.end.scale(scale).add(offset);
                     },
                 }
             }

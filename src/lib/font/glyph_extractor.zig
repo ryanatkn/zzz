@@ -4,6 +4,9 @@ const loggers = @import("../debug/loggers.zig");
 
 const log = std.log.scoped(.glyph_extractor);
 
+// Static empty contours slice for empty glyphs - prevents dangling pointer issues
+const EMPTY_CONTOURS: []Contour = @constCast(&[_]Contour{});
+
 /// Extracted glyph outline data
 pub const GlyphOutline = struct {
     contours: []Contour,
@@ -272,7 +275,7 @@ pub const GlyphExtractor = struct {
         const metrics = try self.parser.getGlyphMetrics(glyph_id);
 
         return GlyphOutline{
-            .contours = &[_]Contour{}, // Empty slice - no contours
+            .contours = EMPTY_CONTOURS, // Safe static empty slice - no dangling pointer
             .bounds = .{
                 .x_min = 0,
                 .y_min = 0,

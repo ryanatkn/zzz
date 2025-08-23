@@ -1,5 +1,5 @@
 // Disposition - Single Authoritative Entity Relationship System
-// 
+//
 // This enum determines all entity colors and behaviors in the game.
 // Currently uses a simple static approach with potential for future expansion:
 //
@@ -17,9 +17,9 @@
 
 /// Single authoritative disposition system - computed differently per context
 pub const Disposition = enum {
-    hostile,  // Attacks on sight, chases player (red)
-    fearful,  // Flees from player, avoids combat (yellow) 
-    neutral,  // Ignores player, returns home when far (gray)
+    hostile, // Attacks on sight, chases player (red)
+    fearful, // Flees from player, avoids combat (yellow)
+    neutral, // Ignores player, returns home when far (gray)
     friendly, // Never attacks, may follow player (teal)
-    allied,   // Actively helps player in combat (green)
+    allied, // Actively helps player in combat (green)
 };

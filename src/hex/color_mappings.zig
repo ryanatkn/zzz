@@ -13,11 +13,11 @@ const Color = colors.Color;
 /// Uses distinct colors that are easily distinguishable in gameplay
 pub inline fn dispositionToBaseColor(disposition: Disposition) BaseColor {
     return switch (disposition) {
-        .hostile => .red,    // Danger - attacks on sight
+        .hostile => .red, // Danger - attacks on sight
         .fearful => .yellow, // Caution - flees from player (distinct from orange)
-        .neutral => .brown,  // Passive - ignores player
-        .friendly => .teal,  // Safe - won't attack, may help
-        .allied => .green,   // Helpful - actively assists player
+        .neutral => .brown, // Passive - ignores player
+        .friendly => .teal, // Safe - won't attack, may help
+        .allied => .green, // Helpful - actively assists player
     };
 }
 

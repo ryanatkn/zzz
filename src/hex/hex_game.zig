@@ -204,9 +204,12 @@ pub const HexGame = struct {
         // Zone metadata
         zone_type: ZoneType,
         camera_mode: constants.CameraMode,
-        camera_scale: f32,
         spawn_pos: Vec2,
         background_color: Color,
+
+        // World bounds in meters
+        world_width: f32,
+        world_height: f32,
 
         // Entity count tracking
         entity_count: usize,
@@ -230,16 +233,12 @@ pub const HexGame = struct {
                 .lifestones = LifestoneStorage.init(),
                 .portals = PortalStorage.init(),
                 .zone_type = zone_type,
-                .camera_mode = switch (zone_type) {
-                    .overworld => .fixed,
-                    else => .follow,
-                },
-                .camera_scale = switch (zone_type) {
-                    .overworld => 1.0,
-                    else => 2.0,
-                },
-                .spawn_pos = Vec2.screenCenter(800, 600),
+                // Defaults for normal dungeons - overworld will override in ZON
+                .camera_mode = .follow, // Default: follow camera for tactical gameplay
+                .spawn_pos = Vec2{ .x = constants.DEFAULT_VIEWPORT_WIDTH / 2.0, .y = constants.DEFAULT_VIEWPORT_HEIGHT / 2.0 }, // Default: center of default viewport
                 .background_color = getZoneBackgroundColor(zone_type),
+                .world_width = constants.DEFAULT_VIEWPORT_WIDTH, // Default: 16 meters (tactical scale)
+                .world_height = constants.DEFAULT_VIEWPORT_HEIGHT, // Default: 9 meters (tactical scale)
                 .entity_count = 0,
             };
         }
@@ -499,7 +498,7 @@ pub const HexGame = struct {
         const entity = self.entity_allocator.create();
 
         // Create components directly
-        var transform = components.Transform.init(pos, 3.0); // Small bullet radius
+        var transform = components.Transform.init(pos, constants.BULLET_RADIUS); // 4cm bullet radius (world space)
         transform.vel = velocity;
         const visual = components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 }); // Yellow bullet
 
@@ -608,7 +607,7 @@ pub const HexGame = struct {
                 }
             }
         }
-        return constants.PLAYER_RADIUS;
+        return 0.7; // Default player radius (meters) - matches ZON data
     }
 
     pub fn getPlayerAlive(self: *const HexGame) bool {

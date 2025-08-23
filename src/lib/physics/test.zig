@@ -7,10 +7,9 @@ const std = @import("std");
 
 // Working physics modules
 test {
+    _ = @import("collision/test.zig");
+    _ = @import("queries.zig");
     _ = @import("shapes.zig");
-
-    // Recently fixed modules
-    _ = @import("queries.zig"); // Working: test logic errors resolved
 }
 
 // TODO: The following modules are excluded:

@@ -11,7 +11,6 @@ const EntityId = hex_game_mod.EntityId;
 const EntityFactions = factions.EntityFactions;
 const FactionRelation = factions.FactionRelation;
 
-
 /// Helper functions to integrate faction system with existing hex game code
 /// Get entity factions from player storage
 pub fn getPlayerFactions(game: *const HexGame, entity_id: EntityId) ?EntityFactions {
@@ -192,4 +191,3 @@ pub fn canEntityBeControlled(game: *const HexGame, entity_id: EntityId) bool {
     }
     return false;
 }
-

@@ -23,7 +23,7 @@ Successfully refactored the context system from `src/hex/contexts.zig` to `src/l
 ### Engine Integration
 - **Time System**: Integrated with `lib/core/time.zig` for high-precision timing
 - **Input System**: Bidirectional integration with `lib/platform/input.zig`
-- **Camera System**: Seamless integration with `lib/rendering/camera.zig`
+- **Camera System**: Seamless integration with `lib/game/camera.zig`
 - **Math Types**: Uses engine Vec2 throughout for consistency
 
 ### API Improvements

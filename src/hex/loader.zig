@@ -159,13 +159,17 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
     zone.camera_mode = data.camera_mode;
 
     // Set camera scale (default to 1.0 if not specified)
-    zone.camera_scale = data.camera_scale orelse 1.0;
+    // camera_scale removed - zoom handled by camera system directly
 
-    // Set spawn position (default to screen center if not specified)
+    // Set spawn position (default to world center if not specified)
     zone.spawn_pos = if (data.spawn_pos) |pos|
         Vec2.position(pos.x, pos.y)
     else
-        Vec2.screenCenter(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
+        Vec2{ .x = zone.world_width / 2.0, .y = zone.world_height / 2.0 };
+
+    // Set world bounds (use defaults if not specified in ZON)
+    zone.world_width = data.world_width orelse zone.world_width; // Keep init() default
+    zone.world_height = data.world_height orelse zone.world_height; // Keep init() default
 
     // Load obstacles
     if (data.obstacles) |obstacles| {
@@ -261,8 +265,10 @@ const ZoneData = struct {
     name: []const u8,
     background_color: struct { r: u8, g: u8, b: u8 },
     camera_mode: constants.CameraMode,
-    camera_scale: ?f32 = null, // Optional camera scale with default value
-    spawn_pos: ?struct { x: f32, y: f32 } = null, // Optional spawn position, defaults to screen center
+    // camera_scale removed - zoom handled by camera system directly
+    spawn_pos: ?struct { x: f32, y: f32 } = null, // Optional spawn position, defaults to center
+    world_width: ?f32 = null, // Optional world width in meters, defaults to 16.0
+    world_height: ?f32 = null, // Optional world height in meters, defaults to 9.0
     obstacles: ?[]const struct {
         position: struct { x: f32, y: f32 },
         size: struct { x: f32, y: f32 },

@@ -7,7 +7,6 @@ const loggers = @import("../debug/loggers.zig");
 /// Common error types for window operations
 pub const WindowError = error{
     WindowCreationFailed,
-    DeviceCreationFailed,
     OutOfMemory,
 };
 
@@ -27,49 +26,3 @@ pub fn createWindow(config: WindowConfig) WindowError!*c.sdl.SDL_Window {
         return WindowError.WindowCreationFailed;
     };
 }
-
-/// Create a GPU device
-pub fn createGPUDevice() WindowError!*c.sdl.SDL_GPUDevice {
-    return c.sdl.SDL_CreateGPUDevice(c.sdl.SDL_GPU_SHADERFORMAT_SPIRV, true, // debug mode
-        null // preferred backend (let SDL choose)
-    ) orelse {
-        const game_log = loggers.getGameLog();
-        game_log.err("window", "Failed to create GPU device", .{});
-        return WindowError.DeviceCreationFailed;
-    };
-}
-
-/// Claim a window for GPU rendering
-pub fn claimWindowForGPU(device: *c.sdl.SDL_GPUDevice, window: *c.sdl.SDL_Window) WindowError!void {
-    if (!c.sdl.SDL_ClaimWindowForGPUDevice(device, window)) {
-        const game_log = loggers.getGameLog();
-        game_log.err("window", "Failed to claim window for GPU device", .{});
-        return WindowError.DeviceCreationFailed;
-    }
-}
-
-/// Window and GPU device bundle
-pub const WindowGPU = struct {
-    window: *c.sdl.SDL_Window,
-    device: *c.sdl.SDL_GPUDevice,
-
-    pub fn init(config: WindowConfig) WindowError!WindowGPU {
-        const window = try createWindow(config);
-        errdefer c.sdl.SDL_DestroyWindow(window);
-
-        const device = try createGPUDevice();
-        errdefer c.sdl.SDL_DestroyGPUDevice(device);
-
-        try claimWindowForGPU(device, window);
-
-        return WindowGPU{
-            .window = window,
-            .device = device,
-        };
-    }
-
-    pub fn deinit(self: *WindowGPU) void {
-        c.sdl.SDL_DestroyGPUDevice(self.device);
-        c.sdl.SDL_DestroyWindow(self.window);
-    }
-};

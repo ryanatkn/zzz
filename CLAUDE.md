@@ -86,6 +86,7 @@ $ zig build --help       # Show all build options
 - **Movement:** WASD + Shift (walk) + Ctrl+mouse
 - **Combat:** Left-click shoot (burst/rhythm), Right-click cast spell  
 - **Spells:** 1-4, Q, E, R, F select slots (visual spellbar at bottom)
+- **Camera:** - zoom out, = zoom in (keyboard zoom controls)
 - **System:** Space pause, L respawn (lifestone), Y reset, ESC quit, G toggle AI control
 - **HUD:** ` (backtick) toggle transparent menu overlay
 
@@ -225,25 +226,6 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - Constants extracted for easy tuning and upgrades
 
 
-## Notes to LLMs
-
-- Update TODO_*.md docs in-place in the root cwd
-- It's useful to leave TODOs around! Especially for known future work. Use them as inline docs.
-- Prioritize procedural generation and performance over asset-based approaches
-- Focus on code-driven visuals and algorithmic generation
-- Avoid magic numbers, extract constants
-- Check frequently with `zig build test`, and to check runtime behavior, `zig build run`
-- Less is more - avoid over-engineering
-- `mod.zig` files should re-export and not contain impls themselves
-- Always update documentation, be concise but thorough 
-- Performance is a top priority - always optimize for the final best code
-- When working with shaders, follow the SDL3 GPU patterns documented here
-- Keep an eye towards extracting or reusing primitives in src/lib
-- The entity system is NOT an ECS - it's simple arrays with direct function calls
-- Prefer `rg` over `grep`/`find`/`cat`/`sed`
-- **Architecture principle:** Engine (lib/game) provides interfaces, games (hex) provide implementations
-- **When refactoring:** Move generic patterns to lib/game, keep game-specific logic in hex
-- **Goal:** Games should be extremely open-ended and customizable
 
 **Logging System Guidelines:**
 - **New Architecture**: Composable logging with compile-time configuration (see `src/lib/debug/logger.zig`)
@@ -293,7 +275,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
   ```zig
   const types = @import("../lib/core/types.zig");
   const input = @import("../lib/platform/input.zig");
-  const camera = @import("../lib/rendering/camera.zig");
+  const camera = @import("../lib/game/camera/camera.zig");
   const collision = @import("../lib/physics/collision.zig");
   const reactive = @import("../lib/reactive/mod.zig"); // Barrel import
   ```
@@ -351,3 +333,23 @@ DM Font Family (Sans, Mono, Serif Display, Serif Text) - geometric/transitional 
 
 _Remember: Performance is the top priority -- every cycle and byte count
 but context is everything and the big picture UX matters most._
+
+## Notes 
+
+- Update TODO_*.md docs in-place in the root cwd
+- It's useful to leave TODOs around! Especially for known future work. Use them as inline docs.
+- Prioritize procedural generation and performance over asset-based approaches
+- Focus on code-driven visuals and algorithmic generation
+- Avoid magic numbers, extract constants
+- Check frequently with `zig build test`, and to check runtime behavior, `zig build run`
+- Less is more - avoid over-engineering
+- `mod.zig` files should re-export and not contain impls themselves
+- Always update documentation, be concise but thorough 
+- Performance is a top priority - always optimize for the final best code
+- When working with shaders, follow the SDL3 GPU patterns documented here
+- Keep an eye towards extracting or reusing primitives in src/lib
+- The entity system is NOT an ECS - it's simple arrays with direct function calls
+- Prefer `rg` over `grep`/`find`/`cat`/`sed`
+- **Architecture principle:** Engine (lib/game) provides interfaces, games (hex) provide implementations
+- **When refactoring:** Move generic patterns to lib/game, keep game-specific logic in hex
+- **Goal:** Games should be extremely open-ended and customizable

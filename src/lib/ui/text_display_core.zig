@@ -2,7 +2,7 @@ const std = @import("std");
 const math = @import("../math/mod.zig");
 const reactive = @import("../reactive/mod.zig");
 const text_renderer = @import("../text/renderer.zig");
-const rendering_modes = @import("../rendering/modes.zig");
+const rendering_modes = @import("../rendering/optimization/modes.zig");
 const TextDisplayStyle = @import("text_display_style.zig").TextDisplayStyle;
 
 const Vec2 = math.Vec2;

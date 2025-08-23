@@ -141,6 +141,7 @@ pub const ReactiveHudData = struct {
                 // Don't open HUD if navigation fails
                 return;
             };
+            // Use a constant string literal for the home path - no duplication needed
             self.current_path.set("/");
         }
 
@@ -150,7 +151,13 @@ pub const ReactiveHudData = struct {
     pub fn navigateTo(self: *Self, path: []const u8) !void {
         try self.history.navigate(path);
         try self.router.navigate(path);
-        self.current_path.set(path);
+
+        // CRITICAL: Signal<[]const u8> stores the slice directly, not the string data.
+        // If we pass a temporary slice (from link.path or function parameters),
+        // it becomes a dangling pointer when the function returns, causing crashes.
+        // We must duplicate the string so the signal owns stable memory.
+        const owned_path = try self.link_arena.allocator().dupe(u8, path);
+        self.current_path.set(owned_path);
     }
 
     pub fn setHoveredLink(self: *Self, link_index: ?usize) void {
@@ -161,7 +168,11 @@ pub const ReactiveHudData = struct {
         if (self.history.back()) {
             const path = self.history.getCurrentPath();
             try self.router.navigate(path);
-            self.current_path.set(path);
+
+            // Even though SimpleHistory returns stable slices from fixed buffers,
+            // we still duplicate for consistency with navigateTo() memory model
+            const owned_path = try self.link_arena.allocator().dupe(u8, path);
+            self.current_path.set(owned_path);
             return true;
         }
         return false;
@@ -171,7 +182,11 @@ pub const ReactiveHudData = struct {
         if (self.history.forward()) {
             const path = self.history.getCurrentPath();
             try self.router.navigate(path);
-            self.current_path.set(path);
+
+            // Even though SimpleHistory returns stable slices from fixed buffers,
+            // we still duplicate for consistency with navigateTo() memory model
+            const owned_path = try self.link_arena.allocator().dupe(u8, path);
+            self.current_path.set(owned_path);
             return true;
         }
         return false;

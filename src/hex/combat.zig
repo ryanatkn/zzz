@@ -2,6 +2,7 @@ const std = @import("std");
 
 const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
+const camera = @import("../lib/game/camera/camera.zig");
 const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
 const combat = @import("../lib/game/combat/mod.zig");
 const physics = @import("physics.zig");
@@ -12,6 +13,7 @@ const hex_game_mod = @import("hex_game.zig");
 const game_controller = @import("game.zig");
 
 const Vec2 = math.Vec2;
+const Camera = camera.Camera;
 const HexGame = hex_game_mod.HexGame;
 const EntityId = hex_game_mod.EntityId;
 const GameState = game_controller.GameState;
@@ -75,6 +77,12 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
 
 pub fn fireBulletAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl) bool {
     return fireBullet(game, mouse_pos, pool);
+}
+
+/// Fire bullet with proper screen-to-world coordinate conversion
+pub fn fireBulletAtScreenPos(game: *HexGame, screen_pos: Vec2, cam: *const Camera, pool: *BulletPoolImpl) bool {
+    const world_pos = cam.screenToWorldSafe(screen_pos);
+    return fireBullet(game, world_pos, pool);
 }
 
 /// Convert hex lifestone to generic checkpoint data

@@ -5,16 +5,21 @@
 
 const std = @import("std");
 
-// Working rendering modules
+// Working rendering modules (SDL-free)
 test {
-    _ = @import("shapes.zig");
-    _ = @import("performance.zig"); // Fixed: Now uses optional logger access
+    _ = @import("primitives/shapes.zig");
+    _ = @import("primitives/vector_utils.zig");
+    _ = @import("optimization/performance.zig"); // Fixed: Now uses optional logger access
+    _ = @import("core/uniforms.zig"); // Pure data structures, no dependencies
 
     // TODO: Fix broken test modules
-    // _ = @import("modes.zig"); // Imports text/renderer.zig which depends on SDL - should be legitimate exclusion
+    // _ = @import("optimization/modes.zig"); // Imports text/renderer.zig which depends on SDL - should be legitimate exclusion
 }
 
 // Note: compute.zig and structured_buffers.zig were removed - they were unused GPU compute infrastructure
 
-// TODO: The following modules are excluded:
+// TODO: The following modules are excluded from tests due to SDL dependencies:
 // - modes.zig: Imports text/renderer.zig which depends on SDL (legitimate exclusion)
+// - All core/ modules except uniforms.zig: Depend on SDL GPU API
+// - All primitive renderers: Depend on SDL for GPU operations
+// - interface.zig: Uses SDL types in renderer interface

@@ -51,7 +51,6 @@ The foundation layer providing basic types and utilities:
 - `Rectangle`: Axis-aligned rectangle
 
 ### maths.zig
-- Vector operations (vec2_* prefixed functions)
 - Distance calculations (prefer squared for performance)
 - Transformations and interpolation
 
@@ -109,7 +108,7 @@ Complete graphics capabilities:
 - Implementation-agnostic API
 
 ### gpu.zig
-- `SimpleGPURenderer`: SDL3 GPU backend
+- `GPURenderer`: SDL3 GPU backend
 - Shader management
 - Buffer handling
 
@@ -197,7 +196,7 @@ Pure Zig font rendering:
 ```zig
 const types = @import("../lib/core/types.zig");
 const input = @import("../lib/platform/input.zig");
-const camera = @import("../lib/rendering/camera.zig");
+const camera = @import("../lib/game/camera/camera.zig");
 ```
 
 ### Barrel Imports for Subsystems

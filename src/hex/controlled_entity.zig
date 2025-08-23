@@ -4,7 +4,7 @@ const hex_game_mod = @import("hex_game.zig");
 const physics = @import("physics.zig");
 const input = @import("../lib/platform/input.zig");
 const math = @import("../lib/math/mod.zig");
-const camera = @import("../lib/rendering/camera.zig");
+const camera = @import("../lib/game/camera/camera.zig");
 const constants = @import("constants.zig");
 const frame = @import("../lib/core/frame.zig");
 const entity_queries = @import("entity_queries.zig");
@@ -42,8 +42,8 @@ pub fn updateControlledEntity(game: *HexGame, entity_id: EntityId, frame_ctx: Fr
         .y = current_pos.y + velocity.y * deltaTime,
     };
 
-    // Apply movement bounds based on zone camera mode
-    new_pos = entity_queries.applyMovementBounds(game, entity_id, new_pos, cam);
+    // Apply movement bounds based on zone world bounds
+    new_pos = entity_queries.applyMovementBounds(game, entity_id, new_pos);
 
     // Check collision with obstacles before moving
     if (physics.canEntityMoveTo(game, entity_id, new_pos)) {
@@ -75,7 +75,7 @@ fn calculateVelocityFromInput(game: *HexGame, entity_id: EntityId, input_state: 
 
     // Get current entity position for mouse movement
     const entity_pos = entity_queries.getEntityPos(game, entity_id) orelse return Vec2.ZERO;
-    const entity_radius = entity_queries.getEntityRadius(game, entity_id) orelse 20.0;
+    const entity_radius = entity_queries.getEntityRadius(game, entity_id) orelse 0.2; // 20cm default radius
 
     // Only allow mouse movement when Ctrl is held
     if (ctrl_held and input_state.isLeftMouseHeld()) {

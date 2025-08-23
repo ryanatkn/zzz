@@ -13,7 +13,7 @@ pub const HexUnit = struct {
 
     // Hex-specific disposition fields (temperament/personality)
     disposition: Disposition,
-    aggro_range: f32,
+    aggro_range: f32, // world space detection range (meters)
     aggro_factor: f32,
     entity_id: u32,
     energy_level: EnergyLevel,
@@ -23,9 +23,9 @@ pub const HexUnit = struct {
             .base = Unit.init(unit_type, home_pos),
             .disposition = disposition,
             .aggro_range = switch (unit_type) {
-                .enemy => 150.0,
-                .friendly => 100.0,
-                .neutral => 120.0, // Detection range for alertness
+                .enemy => 12.5, // 12.5m detection range (was 150px)
+                .friendly => 8.33, // 8.33m detection range (was 100px)
+                .neutral => 10.0, // 10.0m detection range (was 120px)
                 else => 0.0,
             },
             .aggro_factor = 1.0,

@@ -131,6 +131,10 @@ pub fn mapScancodeToAction(scancode: u32) GameAction {
         c.sdl.SDL_SCANCODE_R => .SelectSpell7,
         c.sdl.SDL_SCANCODE_F => .SelectSpell8,
 
+        // Camera controls
+        c.sdl.SDL_SCANCODE_EQUALS => .ZoomIn, // = key (easier than shift+= for +)
+        c.sdl.SDL_SCANCODE_MINUS => .ZoomOut, // - key
+
         // System
         c.sdl.SDL_SCANCODE_SPACE => .TogglePause,
         c.sdl.SDL_SCANCODE_GRAVE => .ToggleMenu, // Backtick
