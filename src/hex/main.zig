@@ -15,7 +15,7 @@ const constants = @import("constants.zig");
 const physics = @import("physics.zig");
 const loader = @import("loader.zig");
 const hud = @import("hud.zig");
-const game_controller = @import("game.zig");
+const game_loop_mod = @import("game_loop.zig");
 const combat = @import("combat.zig");
 const portals = @import("portals.zig");
 const controls = @import("controls.zig");
@@ -35,7 +35,7 @@ const Vec2 = math.Vec2;
 const Color = colors.Color;
 const WindowConfig = platform.WindowConfig;
 const GameRenderer = game_renderer_mod.GameRenderer;
-const GameState = game_controller.GameState;
+const GameState = game_loop_mod.GameState;
 const Hud = hud.Hud;
 
 pub fn main() !void {
@@ -277,7 +277,7 @@ fn runGameLoop() !void {
 
     // Update game state
     // Pass camera pointer directly from the heap-allocated GameRenderer
-    game_controller.updateGame(game_state.?, &game_renderer.?.camera, deltaTime);
+    game_loop_mod.updateGame(game_state.?, &game_renderer.?.camera, deltaTime);
 
     // Render
     try renderGame();

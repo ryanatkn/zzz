@@ -1,9 +1,9 @@
 const std = @import("std");
 
-const colors = @import("../lib/core/colors.zig");
-const animated_borders = @import("../lib/ui/animated_borders.zig");
-const time_utils = @import("../lib/core/time.zig");
-const constants = @import("constants.zig");
+const colors = @import("../../lib/core/colors.zig");
+const animated_borders = @import("../../lib/ui/animated_borders.zig");
+const time_utils = @import("../../lib/core/time.zig");
+const constants = @import("../constants.zig");
 
 const Color = colors.Color;
 

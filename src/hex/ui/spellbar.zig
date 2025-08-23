@@ -1,8 +1,8 @@
-const math = @import("../lib/math/mod.zig");
-const core_colors = @import("../lib/core/colors.zig");
-const hex_colors = @import("colors.zig");
-const constants = @import("constants.zig");
-const spells = @import("spells.zig");
+const math = @import("../../lib/math/mod.zig");
+const core_colors = @import("../../lib/core/colors.zig");
+const hex_colors = @import("../colors.zig");
+const constants = @import("../constants.zig");
+const spells = @import("../spells.zig");
 
 const Vec2 = math.Vec2;
 const Color = core_colors.Color;

@@ -9,14 +9,14 @@ const physics = @import("physics.zig");
 const constants = @import("constants.zig");
 const game_systems = @import("../lib/game/systems/mod.zig");
 const entity_queries = @import("entity_queries.zig");
-const hex_game_mod = @import("hex_game.zig");
-const game_controller = @import("game.zig");
+const world_state_mod = @import("world_state.zig");
+const game_loop_mod = @import("game_loop.zig");
 
 const Vec2 = math.Vec2;
 const Camera = camera.Camera;
-const HexGame = hex_game_mod.HexGame;
-const EntityId = hex_game_mod.EntityId;
-const GameState = game_controller.GameState;
+const HexGame = world_state_mod.HexGame;
+const EntityId = world_state_mod.EntityId;
+const GameState = game_loop_mod.GameState;
 
 // Re-export BulletPool from lib/game/projectiles for compatibility
 pub const BulletPool = BulletPoolImpl;

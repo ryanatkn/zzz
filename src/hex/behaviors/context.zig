@@ -3,8 +3,8 @@
 
 const Vec2 = @import("../../lib/math/mod.zig").Vec2;
 const Unit = @import("../unit_ext.zig").HexUnit;
-const Transform = @import("../hex_game.zig").Transform;
-const Visual = @import("../hex_game.zig").Visual;
+const Transform = @import("../world_state.zig").Transform;
+const Visual = @import("../world_state.zig").Visual;
 const FrameContext = @import("../../lib/core/frame.zig").FrameContext;
 
 /// Context for unit behavior updates - clean parameter passing

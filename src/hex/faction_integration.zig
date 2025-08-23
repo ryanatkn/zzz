@@ -3,11 +3,11 @@ const std = @import("std");
 const factions = @import("factions.zig");
 const faction_presets = @import("faction_presets.zig");
 const components = @import("../lib/game/components/mod.zig");
-const hex_game_mod = @import("hex_game.zig");
+const world_state_mod = @import("world_state.zig");
 const constants = @import("constants.zig");
 
-const HexGame = hex_game_mod.HexGame;
-const EntityId = hex_game_mod.EntityId;
+const HexGame = world_state_mod.HexGame;
+const EntityId = world_state_mod.EntityId;
 const EntityFactions = factions.EntityFactions;
 const FactionRelation = factions.FactionRelation;
 

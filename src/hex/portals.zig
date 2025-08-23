@@ -4,10 +4,10 @@ const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 const frame = @import("../lib/core/frame.zig");
-const hex_game_mod = @import("hex_game.zig");
+const world_state_mod = @import("world_state.zig");
 
 const FrameContext = frame.FrameContext;
-const HexGame = hex_game_mod.HexGame;
+const HexGame = world_state_mod.HexGame;
 
 /// Update portal system with frame context
 pub fn updatePortalCooldown(world: *HexGame, frame_ctx: FrameContext) void {

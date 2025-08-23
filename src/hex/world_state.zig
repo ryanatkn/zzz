@@ -43,9 +43,11 @@ const ModuleLogger = Logger(.{
     .filter = filters.Throttle,
 });
 
-// Simplified entity and component system
-pub const EntityId = u32;
-const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
+// Entity system - now using extracted modules
+const entities = @import("entities/mod.zig");
+pub const EntityId = entities.EntityId;
+const INVALID_ENTITY = entities.INVALID_ENTITY;
+const EntityAllocator = entities.EntityAllocator;
 
 // Use components from lib/game/components.zig
 pub const Transform = components.Transform;
@@ -157,16 +159,7 @@ const HexTravelInterface = struct {
     }
 };
 
-// Simple entity allocator
-const EntityAllocator = struct {
-    next_id: EntityId = 1, // Start from 1, 0 is invalid
-
-    pub fn create(self: *EntityAllocator) EntityId {
-        const id = self.next_id;
-        self.next_id += 1;
-        return id;
-    }
-};
+// Entity allocator now imported from entities module
 
 /// Simplified hex game structure using generic zone manager
 pub const HexGame = struct {
@@ -366,225 +359,41 @@ pub const HexGame = struct {
 
     // iteratePortalsInCurrentZone moved to use EntityIterator below
 
-    // Entity creation methods
+    // Entity creation methods - delegated to world.EntityManager (Phase 3)
     pub fn createLifestone(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, attuned: bool) !EntityId {
-        if (zone_index >= MAX_ZONES) return error.InvalidZone;
-
-        const zone = self.zone_manager.getZone(zone_index);
-        const entity = self.entity_allocator.create();
-
-        // Determine color based on attunement
-        const color = if (attuned)
-            constants.COLOR_LIFESTONE_ATTUNED
-        else
-            constants.COLOR_LIFESTONE_UNATTUNED;
-
-        // Create components directly
-        const transform = components.Transform.init(pos, radius);
-        const visual = components.Visual.init(color);
-        // Use floor terrain type - lifestones are identified by component composition, not terrain type
-        const terrain = components.Terrain.init(.floor, Vec2.init(radius * 2, radius * 2));
-        // Lifestone is identified by having an Interactable component with attunement capability
-        var interactable = components.Interactable.init(.deflectable);
-        interactable.state = .normal;
-        interactable.attuned = attuned; // This marks it as a lifestone checkpoint
-
-        try zone.lifestones.addEntity(entity, transform, visual, terrain, interactable);
-        zone.entity_count += 1;
-
-        self.logger.debug("lifestone_created", "Created lifestone in zone {} at {any}, attuned: {}", .{ zone_index, pos, attuned });
-
-        return entity;
+        const world_modules = @import("world/mod.zig");
+        return world_modules.EntityManager.createLifestone(self, zone_index, pos, radius, attuned);
     }
 
     pub fn createUnit(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, unit_disposition: Disposition) !EntityId {
-        if (zone_index >= MAX_ZONES) return error.InvalidZone;
-
-        const zone = self.zone_manager.getZone(zone_index);
-        const entity = self.entity_allocator.create();
-
-        // Create components directly
-        const transform = components.Transform.init(pos, radius);
-        const health = components.Health.init(50);
-        const visual = components.Visual.init(constants.COLOR_UNIT_DEFAULT);
-        const entity_id = self.entity_allocator.create();
-        const unit = Unit.init(.enemy, pos, unit_disposition, entity_id);
-
-        try zone.units.addEntity(entity, transform, health, unit, visual);
-        zone.entity_count += 1;
-
-        // Log faction system initialization for debugging
-        const unit_factions = faction_presets.getUnitFactions(unit_disposition, .enemy);
-        const unit_capabilities = faction_presets.getUnitCapabilities(unit_disposition);
-        self.logger.debug("unit_factions", "Unit created with disposition {s}, {} faction tags, attack capability: {}", .{ @tagName(unit_disposition), unit_factions.tags.count(), unit_capabilities.can_attack });
-
-        return entity;
+        const world_modules = @import("world/mod.zig");
+        return world_modules.EntityManager.createUnit(self, zone_index, pos, radius, unit_disposition);
     }
 
     pub fn createTerrain(self: *HexGame, zone_index: usize, pos: Vec2, size: Vec2, is_deadly: bool) !EntityId {
-        if (zone_index >= MAX_ZONES) return error.InvalidZone;
-
-        const zone = self.zone_manager.getZone(zone_index);
-        const entity = self.entity_allocator.create();
-
-        const color = if (is_deadly) constants.COLOR_OBSTACLE_DEADLY else constants.COLOR_OBSTACLE_BLOCKING;
-
-        // Use generic factory pattern for obstacle creation
-        // Create components directly
-        const radius = @max(size.x, size.y) / 2.0; // Convert size to radius
-        const transform = components.Transform.init(pos, radius);
-        const terrain_type: components.Terrain.TerrainType = if (is_deadly) .pit else .rock;
-        const terrain = components.Terrain.init(terrain_type, size);
-        const visual = components.Visual.init(color);
-
-        try zone.terrain.addEntity(entity, transform, terrain, visual);
-        zone.entity_count += 1;
-
-        return entity;
+        const world_modules = @import("world/mod.zig");
+        return world_modules.EntityManager.createTerrain(self, zone_index, pos, size, is_deadly);
     }
 
     pub fn createPortal(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, destination: usize) !EntityId {
-        if (zone_index >= MAX_ZONES) return error.InvalidZone;
-
-        const zone = self.zone_manager.getZone(zone_index);
-        const entity = self.entity_allocator.create();
-
-        // Use generic factory pattern for portal creation
-        // Create components directly
-        const transform = components.Transform.init(pos, radius);
-        const visual = components.Visual.init(constants.COLOR_PORTAL);
-        const terrain = components.Terrain.init(.floor, Vec2.init(radius * 2, radius * 2));
-        var interactable = components.Interactable.init(.deflectable);
-        interactable.destination_zone = destination;
-
-        try zone.portals.addEntity(entity, transform, visual, terrain, interactable);
-        zone.entity_count += 1;
-
-        return entity;
+        const world_modules = @import("world/mod.zig");
+        return world_modules.EntityManager.createPortal(self, zone_index, pos, radius, destination);
     }
 
     pub fn createPlayer(self: *HexGame, pos: Vec2, radius: f32) !EntityId {
-        const zone = self.getCurrentZone();
-        const entity = self.entity_allocator.create();
-
-        // Create components directly
-        const transform = components.Transform.init(pos, radius);
-        const health = components.Health.init(100);
-        const player_input = components.PlayerInput.init(0); // Controller ID 0
-        const visual = components.Visual.init(constants.COLOR_PLAYER_ALIVE);
-        const movement = components.Movement.init(constants.PLAYER_SPEED);
-
-        try zone.players.addEntity(entity, transform, health, player_input, visual, movement);
-        zone.entity_count += 1;
-
-        // Log faction system initialization for debugging
-        const player_factions = faction_presets.getPlayerFactions();
-        const player_capabilities = faction_presets.getPlayerCapabilities();
-        self.logger.debug("player_factions", "Player created with {} faction tags and attack capability: {}", .{ player_factions.tags.count(), player_capabilities.can_attack });
-
-        // Legacy player tracking (maintain backward compatibility during transition)
-        self.player_entity = entity;
-        self.player_zone = self.zone_manager.getCurrentZoneIndex();
-
-        // New controller system: possess the created player entity
-        _ = self.primary_controller.possess(self, entity);
-        self.player_start_pos = pos;
-
-        return entity;
+        const world_modules = @import("world/mod.zig");
+        return world_modules.EntityManager.createPlayer(self, pos, radius);
     }
 
-    pub fn createProjectile(self: *HexGame, zone_index: usize, pos: Vec2, _: f32, velocity: Vec2, lifetime: f32) !EntityId {
-        if (zone_index >= MAX_ZONES) return error.InvalidZone;
-
-        const zone = self.zone_manager.getZone(zone_index);
-        const entity = self.entity_allocator.create();
-
-        // Create components directly
-        var transform = components.Transform.init(pos, constants.PROJECTILE_RADIUS); // 20cm projectile radius (world space)
-        transform.vel = velocity;
-        const visual = components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 }); // Yellow projectile
-
-        // Create hex-specific projectile with damage
-        const projectile = Projectile.init(entity, lifetime, constants.PROJECTILE_DAMAGE);
-
-        try zone.projectiles.addEntity(entity, transform, projectile, visual);
-        zone.entity_count += 1;
-
-        return entity;
+    pub fn createProjectile(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32) !EntityId {
+        const world_modules = @import("world/mod.zig");
+        return world_modules.EntityManager.createProjectile(self, zone_index, pos, radius, velocity, lifetime);
     }
 
-    // Zone travel
+    // Zone travel - delegated to world.ZoneTransitions (Phase 3)
     pub fn travelToZone(self: *HexGame, zone_index: usize, spawn_pos: Vec2) !void {
-        if (zone_index >= MAX_ZONES) return;
-
-        // Clear projectiles in all zones (bullets should not persist across zone travel)
-        for (&self.zone_manager.zones) |*zone| {
-            zone.projectiles.clear();
-        }
-
-        // Move player if exists
-        if (self.player_entity) |player_entity| {
-            if (self.player_zone != zone_index) {
-                // Perform actual entity transfer between zones
-                try self.transferPlayerToZone(player_entity, self.player_zone, zone_index, spawn_pos);
-                self.player_zone = zone_index;
-
-                self.logger.info("player_travel", "Player traveled from zone {} to zone {}", .{ self.zone_manager.getCurrentZoneIndex(), zone_index });
-            }
-        }
-
-        self.setCurrentZone(zone_index);
-
-        // Reload portals from new zone into zone travel manager
-        self.loadPortalsIntoTravelManager() catch |err| {
-            self.logger.err("portal_reload_failed", "Failed to reload portals after zone travel: {}", .{err});
-        };
-
-        // Update player position in new zone if no transfer was needed
-        if (self.player_entity) |player| {
-            if (self.player_zone == zone_index) {
-                const zone = self.getCurrentZone();
-                if (zone.players.getComponentMut(player, .transform)) |transform| {
-                    transform.pos = spawn_pos;
-                    transform.vel = Vec2.ZERO;
-                }
-            }
-        }
-    }
-
-    // Helper method for proper entity transfer between zones
-    fn transferPlayerToZone(self: *HexGame, player_entity: EntityId, source_zone: usize, dest_zone: usize, new_pos: Vec2) !void {
-        if (source_zone >= MAX_ZONES or dest_zone >= MAX_ZONES) return;
-
-        const source = self.zone_manager.getZone(source_zone);
-        const dest = self.zone_manager.getZone(dest_zone);
-
-        // Extract player components from source zone
-        const transform = source.players.getComponent(player_entity, .transform);
-        const health = source.players.getComponent(player_entity, .health);
-        const visual = source.players.getComponent(player_entity, .visual); // We need mutable to copy
-
-        if (transform == null or health == null or visual == null) {
-            self.logger.err("transfer_failed", "transferPlayerToZone: Player entity missing required components", .{});
-            return;
-        }
-
-        // Create new player data with updated position
-        const new_transform = Transform.init(new_pos, transform.?.radius);
-        const new_health = health.?.*;
-        const player_input = PlayerInput.init(0); // Reset input state
-        const new_visual = visual.?.*;
-
-        // Remove from source zone
-        source.players.removeEntity(player_entity);
-        source.entity_count -%= 1;
-
-        // Add to destination zone
-        const movement = Movement.init(constants.PLAYER_SPEED);
-        try dest.players.addEntity(player_entity, new_transform, new_health, player_input, new_visual, movement);
-        dest.entity_count += 1;
-
-        self.logger.debug("player_transferred", "Player entity {} transferred from zone {} to zone {}", .{ player_entity, source_zone, dest_zone });
+        const world_modules = @import("world/mod.zig");
+        return world_modules.ZoneTransitions.travelToZone(self, zone_index, spawn_pos);
     }
 
     // Player accessors
@@ -866,47 +675,28 @@ pub const HexGame = struct {
         return self.getCurrentZone();
     }
 
-    /// Iterator for units in current zone
+    /// Iterator methods - now delegated to EntityQueries
     pub fn iterateUnitsInCurrentZone(self: *HexGame) EntityIterator {
-        return self.getCurrentZone().units.entityIterator();
+        return entities.EntityQueries.iterateUnitsInCurrentZone(self);
     }
 
-    /// Iterator for lifestones in current zone
     pub fn iterateLifestonesInCurrentZone(self: *HexGame) EntityIterator {
-        return self.getCurrentZone().lifestones.entityIterator();
+        return entities.EntityQueries.iterateLifestonesInCurrentZone(self);
     }
 
-    /// Iterator for portals in current zone
     pub fn iteratePortalsInCurrentZone(self: *HexGame) EntityIterator {
-        return self.getCurrentZone().portals.entityIterator();
+        return entities.EntityQueries.iteratePortalsInCurrentZone(self);
     }
 
-    /// Load portals from current zone into the zone travel manager
+    /// Load portals from current zone into the zone travel manager - delegated to ZoneTransitions (Phase 3)
     pub fn loadPortalsIntoTravelManager(self: *HexGame) !void {
-        self.zone_travel_manager.clear();
-
-        const zone = self.getCurrentZone();
-        var portal_iter = zone.portals.entityIterator();
-
-        while (portal_iter.next()) |portal_id| {
-            // Get components from hex storage
-            if (zone.portals.getComponent(portal_id, .transform)) |transform| {
-                if (zone.portals.getComponent(portal_id, .interactable)) |interactable| {
-                    if (interactable.destination_zone) |dest_zone| {
-                        // Add portal to zone travel manager
-                        try self.zone_travel_manager.addTeleporter(transform.pos, transform.radius, dest_zone, null // Use zone default spawn
-                        );
-                    }
-                }
-            }
-        }
-
-        self.logger.info("portals_loaded", "Loaded {} portals into zone travel manager for zone {}", .{ self.zone_travel_manager.getTeleporterCount(), self.zone_manager.getCurrentZoneIndex() });
+        const world_modules = @import("world/mod.zig");
+        return world_modules.ZoneTransitions.reloadPortals(self);
     }
 
     /// Iterator for terrain in current zone
     pub fn iterateTerrainInCurrentZone(self: *HexGame) EntityIterator {
-        return self.getCurrentZone().terrain.entityIterator();
+        return entities.EntityQueries.iterateTerrainInCurrentZone(self);
     }
 
     /// Context-aware projectile pool update function
@@ -915,36 +705,8 @@ pub const HexGame = struct {
         self.projectile_pool.update(deltaTime);
     }
 
-    // Debug helpers
+    // Debug helpers - now delegated to EntityQueries
     pub fn debugLogZoneEntities(self: *HexGame, zone_index: usize) void {
-        if (zone_index >= MAX_ZONES) return;
-
-        const zone = self.zone_manager.getZone(zone_index);
-        var count: usize = 0;
-
-        // Count lifestones
-        var lifestone_iter = zone.lifestones.entityIterator();
-        while (lifestone_iter.next()) |_| {
-            count += 1;
-        }
-        self.logger.debug("zone_lifestones", "Zone {}: {} lifestones", .{ zone_index, count });
-
-        // Count units
-        count = 0;
-        var unit_iter = zone.units.entityIterator();
-        while (unit_iter.next()) |_| {
-            count += 1;
-        }
-        self.logger.debug("zone_units", "Zone {}: {} units", .{ zone_index, count });
-
-        // Count portals
-        count = 0;
-        var portal_iter = zone.portals.entityIterator();
-        while (portal_iter.next()) |_| {
-            count += 1;
-        }
-        self.logger.debug("zone_portals", "Zone {}: {} portals", .{ zone_index, count });
-
-        self.logger.debug("zone_entities", "Zone {}: {} total entities", .{ zone_index, zone.entity_count });
+        entities.EntityQueries.debugLogZoneEntities(self, zone_index);
     }
 };

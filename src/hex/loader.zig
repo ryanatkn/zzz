@@ -1,5 +1,5 @@
 const std = @import("std");
-const hex_game_mod = @import("hex_game.zig");
+const world_state_mod = @import("world_state.zig");
 const math = @import("../lib/math/mod.zig");
 const colors = @import("../lib/core/colors.zig");
 const constants = @import("constants.zig");
@@ -63,7 +63,7 @@ pub fn getCurrentWorldDisplayName() []const u8 {
 }
 
 // Load game data from world file
-pub fn loadGameData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame) !void {
+pub fn loadGameData(allocator: std.mem.Allocator, game: *world_state_mod.HexGame) !void {
     return loadWorldData(allocator, game, DEFAULT_WORLD);
 }
 
@@ -88,7 +88,7 @@ pub fn isValidWorldPath(world_path: []const u8) bool {
 }
 
 // Load specific world file
-pub fn loadWorldData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame, world_path: []const u8) !void {
+pub fn loadWorldData(allocator: std.mem.Allocator, game: *world_state_mod.HexGame, world_path: []const u8) !void {
     // Update current world tracking
     current_world_path = world_path;
 
@@ -145,7 +145,7 @@ pub fn loadWorldData(allocator: std.mem.Allocator, game: *hex_game_mod.HexGame, 
 }
 
 // Load a single zone from ZON data
-fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_game_mod.HexGame, zone_index: usize) !void {
+fn loadZone(zone: *world_state_mod.HexGame.ZoneData, data: ZoneData, game: *world_state_mod.HexGame, zone_index: usize) !void {
     // Zone type is already set in HexWorld.init(), skip name setting
 
     zone.background_color = Color{
@@ -277,7 +277,7 @@ const ZoneData = struct {
     units: ?[]const struct {
         position: struct { x: f32, y: f32 },
         radius: f32,
-        disposition: hex_game_mod.Disposition = .neutral,
+        disposition: world_state_mod.Disposition = .neutral,
     },
     portals: ?[]const struct {
         position: struct { x: f32, y: f32 },

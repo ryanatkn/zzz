@@ -71,14 +71,14 @@ const GameParticleSystem = @import("../lib/particles/game_particles.zig").GamePa
 const loggers = @import("../lib/debug/loggers.zig");
 
 // Hex game modules (local)
-const hex_game_mod = @import("hex_game.zig");
+const world_state_mod = @import("world_state.zig");
 const constants = @import("constants.zig");
 const behaviors = @import("behaviors/mod.zig");
 
 // Type aliases after imports
 const Vec2 = math.Vec2;
 const FrameContext = frame.FrameContext;
-const HexGame = hex_game_mod.HexGame;
+const HexGame = world_state_mod.HexGame;
 ```
 
 **Rules:**

@@ -123,6 +123,9 @@ const IndexPage = struct {
         // Add IDE link
         try links.append(page.createLink("IDE", "/ide", nav_center_x - nav_width * 2 - nav_spacing, nav_y - nav_height - 20, nav_width, nav_height));
 
+        // Add layout demo link (between IDE and Font Test)
+        try links.append(page.createLink("Layout Demo", "/layout-demo", nav_center_x - nav_width - nav_spacing / 2.0, nav_y - nav_height - 20, nav_width, nav_height));
+
         // Add Reactive Test link
         try links.append(page.createLink("Reactive Test", "/reactive-test", nav_center_x + nav_width * 2 + nav_spacing, nav_y - nav_height - 20, nav_width, nav_height));
 

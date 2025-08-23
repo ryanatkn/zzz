@@ -1,17 +1,17 @@
 const std = @import("std");
 
-const hex_game_mod = @import("hex_game.zig");
+const world_state_mod = @import("world_state.zig");
 const faction_integration = @import("faction_integration.zig");
 const Vec2 = @import("../lib/math/mod.zig").Vec2;
 const Color = @import("../lib/core/colors.zig").Color;
 const components = @import("../lib/game/components/mod.zig");
 
-const HexGame = hex_game_mod.HexGame;
-const EntityId = hex_game_mod.EntityId;
-const Health = hex_game_mod.Health;
-const Transform = hex_game_mod.Transform;
-const Visual = hex_game_mod.Visual;
-const Movement = hex_game_mod.Movement;
+const HexGame = world_state_mod.HexGame;
+const EntityId = world_state_mod.EntityId;
+const Health = world_state_mod.Health;
+const Transform = world_state_mod.Transform;
+const Visual = world_state_mod.Visual;
+const Movement = world_state_mod.Movement;
 
 /// Generic entity queries to replace player-specific methods
 /// These work with any entity in the current zone

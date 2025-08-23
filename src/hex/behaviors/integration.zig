@@ -4,7 +4,7 @@
 const std = @import("std");
 const math = @import("../../lib/math/mod.zig");
 const frame = @import("../../lib/core/frame.zig");
-const hex_game_mod = @import("../hex_game.zig");
+const world_state_mod = @import("../world_state.zig");
 
 const BehaviorComposer = @import("composer.zig").BehaviorComposer;
 const Disposition = @import("../disposition.zig").Disposition;
@@ -12,9 +12,9 @@ const evaluators = @import("evaluators.zig");
 const UnitUpdateContext = @import("context.zig").UnitUpdateContext;
 
 const Vec2 = math.Vec2;
-const Unit = hex_game_mod.Unit;
-const Transform = hex_game_mod.Transform;
-const Visual = hex_game_mod.Visual;
+const Unit = world_state_mod.Unit;
+const Transform = world_state_mod.Transform;
+const Visual = world_state_mod.Visual;
 const FrameContext = frame.FrameContext;
 
 /// Behavior composer storage - hex-specific extension to generic Unit component

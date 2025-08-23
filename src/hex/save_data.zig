@@ -1,12 +1,12 @@
 const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
-const hex_game_mod = @import("hex_game.zig");
+const world_state_mod = @import("world_state.zig");
 const game_persistence = @import("../lib/game/persistence/mod.zig");
 
 const Vec2 = math.Vec2;
-const EntityId = hex_game_mod.EntityId;
-const HexGame = hex_game_mod.HexGame;
+const EntityId = world_state_mod.EntityId;
+const HexGame = world_state_mod.HexGame;
 
 /// ECS-based save data structure
 pub const HexSaveData = struct {

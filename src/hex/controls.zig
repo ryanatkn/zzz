@@ -3,7 +3,7 @@ const c = @import("../lib/platform/sdl.zig");
 
 const math = @import("../lib/math/mod.zig");
 const constants = @import("constants.zig");
-const game_controller = @import("game.zig");
+const game_loop_mod = @import("game_loop.zig");
 const camera = @import("../lib/game/camera/camera.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
@@ -15,7 +15,7 @@ const input_actions = game_input.actions;
 const input_modifiers = game_input.modifiers;
 
 const Vec2 = math.Vec2;
-const GameState = game_controller.GameState;
+const GameState = game_loop_mod.GameState;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const Hud = hud.Hud;
 const GameAction = input_actions.GameAction;
@@ -93,7 +93,7 @@ pub fn handleSDLEvent(
                     game_state.resetGame();
                 },
                 .Respawn => {
-                    game_controller.handleRespawn(game_state);
+                    game_loop_mod.handleRespawn(game_state);
                 },
                 .ToggleAI => {
                     game_state.toggleAIControl();
@@ -152,7 +152,7 @@ pub fn handleSDLEvent(
                     // Respawn actions
                     .PrimaryAttack, .Respawn => {
                         game_state.hex_game.logger.info("respawn_click", "Dead player action respawn triggered", .{});
-                        game_controller.handleRespawn(game_state);
+                        game_loop_mod.handleRespawn(game_state);
                         return c.sdl.SDL_APP_CONTINUE;
                     },
                     // System actions always allowed

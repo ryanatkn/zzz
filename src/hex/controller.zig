@@ -1,12 +1,12 @@
 const std = @import("std");
 
 const input = @import("../lib/platform/input.zig");
-const hex_game_mod = @import("hex_game.zig");
+const world_state_mod = @import("world_state.zig");
 const factions = @import("factions.zig");
 const faction_integration = @import("faction_integration.zig");
 
-const HexGame = hex_game_mod.HexGame;
-const EntityId = hex_game_mod.EntityId;
+const HexGame = world_state_mod.HexGame;
+const EntityId = world_state_mod.EntityId;
 const InputState = input.InputState;
 const EntityFactions = factions.EntityFactions;
 

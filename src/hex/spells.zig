@@ -3,7 +3,7 @@ const math = @import("../lib/math/mod.zig");
 const GameParticleSystem = @import("../lib/particles/game_particles.zig").GameParticleSystem;
 const constants = @import("constants.zig");
 const loggers = @import("../lib/debug/loggers.zig");
-const hex_game_mod = @import("hex_game.zig");
+const world_state_mod = @import("world_state.zig");
 const frame = @import("../lib/core/frame.zig");
 const game_abilities = @import("../lib/game/abilities/mod.zig");
 const effect_manager = game_abilities.effect_manager;
@@ -12,9 +12,9 @@ const combat = @import("combat.zig");
 const entity_queries = @import("entity_queries.zig");
 
 const Vec2 = math.Vec2;
-const ZoneData = hex_game_mod.HexGame.ZoneData;
-const HexGame = hex_game_mod.HexGame;
-const EntityId = hex_game_mod.EntityId;
+const ZoneData = world_state_mod.HexGame.ZoneData;
+const HexGame = world_state_mod.HexGame;
+const EntityId = world_state_mod.EntityId;
 const FrameContext = frame.FrameContext;
 
 pub const SpellType = enum {
@@ -269,7 +269,7 @@ pub const SpellSystem = struct {
         return self.slot_system.getActiveSlot();
     }
 
-    pub fn castActiveSpell(self: *SpellSystem, game: *HexGame, zone: *const hex_game_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem, self_cast: bool) bool {
+    pub fn castActiveSpell(self: *SpellSystem, game: *HexGame, zone: *const world_state_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem, self_cast: bool) bool {
         const slot = self.slot_system.getActiveSlotMut();
         if (!slot.canCast()) return false;
 
@@ -297,7 +297,7 @@ pub const SpellSystem = struct {
         return success;
     }
 
-    pub fn castSpell(self: *SpellSystem, spell: SpellType, game: *HexGame, zone: *const hex_game_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
+    pub fn castSpell(self: *SpellSystem, spell: SpellType, game: *HexGame, zone: *const world_state_mod.HexGame.ZoneData, target_pos: Vec2, effect_system: *GameParticleSystem) bool {
         switch (spell) {
             .None => return false,
 

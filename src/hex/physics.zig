@@ -2,8 +2,8 @@ const std = @import("std");
 const math = @import("../lib/math/mod.zig");
 const collision = @import("../lib/physics/collision/mod.zig");
 const queries = @import("../lib/physics/queries.zig");
-const hex_game_mod = @import("hex_game.zig");
-const HexGame = hex_game_mod.HexGame;
+const world_state_mod = @import("world_state.zig");
+const HexGame = world_state_mod.HexGame;
 const constants = @import("constants.zig");
 const components = @import("../lib/game/components/mod.zig");
 const faction_integration = @import("faction_integration.zig");
@@ -19,7 +19,7 @@ fn isDeadlyTerrain(terrain: *const components.Terrain) bool {
 }
 
 // Check if entity can move to position (obstacle collision) - generic version
-pub fn canEntityMoveTo(game: *HexGame, entity_id: hex_game_mod.EntityId, new_pos: math.Vec2) bool {
+pub fn canEntityMoveTo(game: *HexGame, entity_id: world_state_mod.EntityId, new_pos: math.Vec2) bool {
     const entity_radius = entity_queries.getEntityRadius(game, entity_id) orelse 0.2; // 20cm default radius
     return canEntityMoveToWithRadius(game, new_pos, entity_radius);
 }
@@ -61,7 +61,7 @@ fn canEntityMoveToWithRadius(game: *HexGame, new_pos: math.Vec2, entity_radius: 
 }
 
 // Player-unit collision check using faction-based relationships
-pub fn checkPlayerUnitCollision(world: *hex_game_mod.HexGame) bool {
+pub fn checkPlayerUnitCollision(world: *world_state_mod.HexGame) bool {
     const player_pos = world.getPlayerPos();
     const player_radius = world.getPlayerRadius();
     const zone_storage = world.getZoneStorage();
@@ -105,12 +105,12 @@ pub fn checkPlayerUnitCollision(world: *hex_game_mod.HexGame) bool {
 }
 
 // Portal collision check
-pub fn checkPlayerPortalCollision(player_pos: math.Vec2, player_radius: f32, portal_transform: *const hex_game_mod.Transform) bool {
+pub fn checkPlayerPortalCollision(player_pos: math.Vec2, player_radius: f32, portal_transform: *const world_state_mod.Transform) bool {
     return collision.checkCircleCollision(player_pos, player_radius, portal_transform.pos, portal_transform.radius);
 }
 
 // Unit-terrain collision check
-pub fn checkUnitTerrainCollision(world: *hex_game_mod.HexGame, unit_id: hex_game_mod.EntityId, unit_transform: *hex_game_mod.Transform, unit_health: *hex_game_mod.Health, old_pos: math.Vec2) bool {
+pub fn checkUnitTerrainCollision(world: *world_state_mod.HexGame, unit_id: world_state_mod.EntityId, unit_transform: *world_state_mod.Transform, unit_health: *world_state_mod.Health, old_pos: math.Vec2) bool {
     const zone_storage = world.getZoneStorage();
 
     // Use idiomatic Zig iterator pattern
@@ -142,7 +142,7 @@ pub fn checkUnitTerrainCollision(world: *hex_game_mod.HexGame, unit_id: hex_game
 }
 
 // Check if position collides with deadly obstacles
-pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_game_mod.HexGame) bool {
+pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *world_state_mod.HexGame) bool {
     const zone = world.getCurrentZone();
 
     // Convert zone terrain to query format (only deadly ones) using ECS iteration
@@ -186,12 +186,12 @@ pub fn findNearestAttunedLifestone(game: *HexGame) ?LifestoneResult {
     const player_pos = game.getPlayerPos();
 
     // Collect all attuned lifestones across zones
-    var lifestones: [hex_game_mod.MAX_ZONES * constants.MAX_LIFESTONES]queries.EntityData = undefined;
-    var zone_indices: [hex_game_mod.MAX_ZONES * constants.MAX_LIFESTONES]u32 = undefined;
+    var lifestones: [world_state_mod.MAX_ZONES * constants.MAX_LIFESTONES]queries.EntityData = undefined;
+    var zone_indices: [world_state_mod.MAX_ZONES * constants.MAX_LIFESTONES]u32 = undefined;
     var lifestone_count: usize = 0;
 
     // Search all zones for attuned lifestones
-    for (0..hex_game_mod.MAX_ZONES) |zone_index| {
+    for (0..world_state_mod.MAX_ZONES) |zone_index| {
         const zone = game.zone_manager.getZone(zone_index);
 
         // Check all lifestones in this zone

@@ -35,12 +35,14 @@ const animated_borders = @import("../lib/ui/animated_borders.zig");
 const loggers = @import("../lib/debug/loggers.zig");
 
 // Hex game modules
-const hex_game_mod = @import("hex_game.zig");
-const game_controller = @import("game.zig");
-const borders = @import("borders.zig");
+const world_state_mod = @import("world_state.zig");
+const game_loop_mod = @import("game_loop.zig");
 const constants = @import("constants.zig");
-const spellbar = @import("spellbar.zig");
+const ui = @import("ui/mod.zig");
 const spells = @import("spells.zig");
+
+// Hex rendering subsystems (extracted from this file)
+const rendering = @import("rendering/mod.zig");
 
 const Vec2 = math.Vec2;
 
@@ -51,14 +53,14 @@ const RectData = struct {
     color: core_colors.Color,
 };
 
-// TODO: PHASE 2 - Convert RectData to GeometryInstance for instanced rendering
+// TODO: Convert RectData to GeometryInstance for GPU instanced rendering
 const MAX_BATCHED_RECTS = constants.MAX_TERRAIN; // Terrain only
 const Color = core_colors.Color;
 const GPURenderer = simple_gpu_renderer.GPURenderer;
-const HexGame = hex_game_mod.HexGame;
-const EntityId = hex_game_mod.EntityId;
-const ZoneData = hex_game_mod.HexGame.ZoneData;
-const GameState = game_controller.GameState;
+const HexGame = world_state_mod.HexGame;
+const EntityId = world_state_mod.EntityId;
+const ZoneData = world_state_mod.HexGame.ZoneData;
+const GameState = game_loop_mod.GameState;
 
 pub const GameRenderer = struct {
     gpu: GPURenderer,
@@ -143,109 +145,19 @@ pub const GameRenderer = struct {
         }
     }
 
-    // Render all entities in current zone only with proper camera transforms
-    //
-    // Note: New rendering utilities available for future optimization:
-    // - src/lib/rendering/entity_renderer.zig: Generic entity rendering with automatic batching/culling
-    // - src/lib/game/camera/utils.zig: Batch camera transformations and viewport culling
-    // These modules can replace the duplicate loops below for improved performance and code reuse
+    // Render all entities in current zone - delegated to EntityBatchRenderer
     pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
-        const zone = game.getCurrentZoneConst();
-
-        // Batch terrain rectangles for optimal rendering
-        // TODO: PHASE 2 - Replace with single instanced draw call for all geometry
-        var rect_batch: [MAX_BATCHED_RECTS]RectData = undefined;
-        var rect_count: usize = 0;
-
-        // Add terrain rectangles to batch
-        for (0..zone.terrain.count) |i| {
-            const transform = &zone.terrain.transforms[i];
-            const visual = &zone.terrain.visuals[i];
-            const terrain = &zone.terrain.terrains[i];
-
-            rect_batch[rect_count] = RectData{
-                .pos = self.camera.worldToScreen(transform.pos),
-                .size = Vec2{
-                    .x = self.camera.worldSizeToScreen(terrain.size.x),
-                    .y = self.camera.worldSizeToScreen(terrain.size.y),
-                },
-                .color = visual.color,
-            };
-            rect_count += 1;
-        }
-
-        // Single batched draw call for terrain rectangles
-        for (rect_batch[0..rect_count]) |rect| {
-            self.gpu.drawRect(cmd_buffer, render_pass, rect.pos, rect.size, rect.color);
-        }
-
-        // Draw circles (units, lifestones, portals) with camera transforms
-        for (0..zone.units.count) |i| {
-            const transform = &zone.units.transforms[i];
-            const visual = &zone.units.visuals[i];
-            const screen_pos = self.camera.worldToScreen(transform.pos);
-            const screen_radius = self.camera.worldSizeToScreen(transform.radius);
-            self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
-        }
-
-        for (0..zone.lifestones.count) |i| {
-            const transform = &zone.lifestones.transforms[i];
-            const visual = &zone.lifestones.visuals[i];
-            const screen_pos = self.camera.worldToScreen(transform.pos);
-            const screen_radius = self.camera.worldSizeToScreen(transform.radius);
-            self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
-        }
-
-        for (0..zone.portals.count) |i| {
-            const transform = &zone.portals.transforms[i];
-            const visual = &zone.portals.visuals[i];
-            const screen_pos = self.camera.worldToScreen(transform.pos);
-            const screen_radius = self.camera.worldSizeToScreen(transform.radius);
-            self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
-        }
-
-        // Draw player (only if in current zone) with camera transforms
-        if (game.player_zone == game.zone_manager.getCurrentZoneIndex()) {
-            for (0..zone.players.count) |i| {
-                const transform = &zone.players.transforms[i];
-                const visual = &zone.players.visuals[i];
-                const screen_pos = self.camera.worldToScreen(transform.pos);
-                const screen_radius = self.camera.worldSizeToScreen(transform.radius);
-                self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
-            }
-        }
-
-        // Draw projectiles (bullets) with camera transforms
-        for (0..zone.projectiles.count) |i| {
-            const transform = &zone.projectiles.transforms[i];
-            const visual = &zone.projectiles.visuals[i];
-            if (visual.visible) {
-                const screen_pos = self.camera.worldToScreen(transform.pos);
-                const screen_radius = self.camera.worldSizeToScreen(transform.radius);
-                self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);
-            }
-        }
+        // Delegate to the extracted EntityBatchRenderer which uses lib/rendering utilities
+        rendering.EntityBatchRenderer.renderZone(&self.gpu, cmd_buffer, render_pass, &self.camera, game);
     }
 
     // Simplified rendering architecture completed
     // All rendering now handled by single efficient renderZone() function above
 
-    // Render visual effects
+    // Render visual effects - delegated to EffectsRenderer
     pub fn renderParticles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, particle_system: *const GameParticleSystem) void {
-        const active_particles = particle_system.getActiveParticles();
-
-        // Get current time for shader animations
-        const time_sec = time_utils.Time.getTimeSec();
-
-        for (active_particles) |particle| {
-            const screen_pos = self.camera.worldToScreen(particle.pos);
-            const current_radius = particle.getCurrentRadius(); // Use dynamic radius for ping growth
-            const screen_radius = self.camera.worldSizeToScreen(current_radius);
-            const color = particle.getColor();
-            const intensity = particle.getCurrentIntensity();
-
-            self.gpu.drawParticle(cmd_buffer, render_pass, screen_pos, screen_radius, color, intensity, time_sec);
-        }
+        // Delegate to the extracted EffectsRenderer
+        rendering.EffectsRenderer.renderParticles(&self.gpu, cmd_buffer, render_pass, &self.camera, particle_system);
     }
 
     // Draw border system with stacking support
@@ -314,204 +226,33 @@ pub const GameRenderer = struct {
 
     // Helper method for border system integration
     pub fn drawBorderWithOffset(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, color: Color, width: f32, offset: f32) void {
-        const rects = borders.calculateBorderRects(width, offset);
+        const rects = ui.borders.calculateBorderRects(width, offset);
         for (rects) |rect| {
             self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = rect.x, .y = rect.y }, Vec2{ .x = rect.w, .y = rect.h }, color);
         }
     }
 
-    // FPS rendering using PERSISTENT MODE to eliminate flashing
+    // FPS rendering - delegated to UIOverlayRenderer
     pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
-
-        // Use white color for FPS display
-        const WHITE = core_colors.WHITE;
-
-        // Position at top-left corner as requested (make it very visible)
-        const fps_x = constants.FPS_POSITION_X; // Left margin
-        const fps_y = constants.FPS_POSITION_Y; // Top margin
-
-        // Format FPS as string
-        var fps_buf: [32]u8 = undefined;
-        const fps_text = std.fmt.bufPrintZ(&fps_buf, "FPS: {d}", .{fps}) catch "FPS: ??";
-
-        // Use persistent text rendering to eliminate flashing
-
-        // Queue using persistent mode - texture will be cached and reused
-        self.gpu.text_integration.text_renderer.queuePersistentText(fps_text, .{ .x = fps_x, .y = fps_y }, self.font_manager, .sans, font_config.getGlobalConfig().fpsFontSize(), WHITE) catch |err| {
-            loggers.getGameLog().err("fps_error", "Failed to queue persistent FPS text: {}", .{err});
-            // Fall back to geometric rendering
-            self.drawFPSGeometric(cmd_buffer, render_pass, fps);
-            return;
-        };
+        // Delegate to the extracted UIOverlayRenderer
+        rendering.UIOverlayRenderer.drawFPS(&self.gpu, cmd_buffer, render_pass, fps);
     }
 
-    // Debug info rendering - player coordinates and camera viewport
+    // Debug info rendering - delegated to UIOverlayRenderer
     pub fn drawDebugInfo(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
-        _ = cmd_buffer; // Currently unused - for future geometric fallback
-        _ = render_pass; // Currently unused - for future geometric fallback
-        const WHITE = core_colors.WHITE;
-
-        // Get player position
-        const player_pos = game.getPlayerPos();
-
-        // Format debug text with world coordinates, camera info, and zoom level
-        var debug_buf: [256]u8 = undefined;
-        const debug_text = std.fmt.bufPrintZ(&debug_buf, "Player: ({d:.1}, {d:.1})m\nCamera: {d:.1}x{d:.1}m\nZoom: {d:.2}x", .{ player_pos.x, player_pos.y, self.camera.viewport_width, self.camera.viewport_height, self.camera.zoom_level }) catch "Debug: Error";
-
-        // Position at bottom-left corner
-        const debug_x = 20.0; // Left margin
-        const debug_y = constants.SCREEN_HEIGHT - 120.0; // Bottom margin (increased for 3 lines)
-
-        // Use persistent text rendering
-        self.gpu.text_integration.text_renderer.queuePersistentText(debug_text, .{ .x = debug_x, .y = debug_y }, self.font_manager, .sans, font_config.getGlobalConfig().fpsFontSize(), WHITE) catch |err| {
-            loggers.getGameLog().err("debug_info_error", "Failed to queue debug info text: {}", .{err});
-            return;
-        };
+        // Delegate to the extracted UIOverlayRenderer
+        rendering.UIOverlayRenderer.drawDebugInfo(&self.gpu, cmd_buffer, render_pass, game);
     }
 
+    // AI mode rendering - delegated to UIOverlayRenderer
     pub fn drawAIMode(self: *GameRenderer, ai_enabled: bool) void {
-        if (!ai_enabled) return;
-
-        // Use bright green color for AI mode indicator
-        const AI_COLOR = Color{ .r = 0, .g = 255, .b = 128, .a = 255 };
-
-        const ai_text = "AI MODE ACTIVE";
-        const font_size = font_config.getGlobalConfig().fpsFontSize();
-
-        // Calculate text width for right alignment (rough estimation)
-        const estimated_text_width = @as(f32, @floatFromInt(ai_text.len)) * font_size * 0.6;
-
-        // Position near bottom right, ensuring we have enough margin for the text
-        const margin = 40.0; // Increased margin to move text further left
-        const base_position = Vec2{
-            .x = constants.SCREEN_WIDTH - margin, // Right edge with more margin for text
-            .y = constants.SCREEN_HEIGHT - 50.0, // Above bottom edge
-        };
-
-        // Apply right alignment to position text correctly from the right edge
-        const aligned_position = text_alignment.applyAlignment(base_position, .right, estimated_text_width);
-
-        // Queue using persistent mode with proper alignment
-        self.gpu.text_integration.text_renderer.queuePersistentText(ai_text, aligned_position, self.font_manager, .sans, font_size, AI_COLOR) catch {
-            // AI mode text failed - fallback to no display
-        };
-    }
-
-    fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
-        const WHITE_LIGHT = Color{ .r = 230, .g = 230, .b = 230, .a = 255 }; // Slightly off-white
-        const fps_x = constants.FPS_FALLBACK_X;
-        const fps_y = constants.FPS_FALLBACK_Y;
-
-        // Simple 2-digit FPS display
-        const tens = (fps / 10) % 10;
-        const ones = fps % 10;
-
-        // Draw tens digit
-        if (tens > 0) {
-            self.drawDigit(cmd_buffer, render_pass, @intCast(tens), fps_x, fps_y, WHITE_LIGHT);
-        }
-
-        // Draw ones digit
-        self.drawDigit(cmd_buffer, render_pass, @intCast(ones), fps_x + constants.FPS_DIGIT_SPACING, fps_y, WHITE_LIGHT);
-    }
-
-    fn drawDigit(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, digit: u8, x: f32, y: f32, color: Color) void {
-        if (digit > 9) return;
-
-        const config = geometric_text.TextConfig{
-            .pixel_size = constants.FPS_DIGIT_PIXEL_SIZE,
-            .char_width = 3,
-            .char_height = 5,
-        };
-
-        const pattern = geometric_text.CharacterPatterns.getDigitPattern(digit) orelse return;
-
-        for (0..config.char_height) |row| {
-            for (0..config.char_width) |col| {
-                if (pattern[row * config.char_width + col]) {
-                    const px = x + @as(f32, @floatFromInt(col)) * config.pixel_size;
-                    const py = y + @as(f32, @floatFromInt(row)) * config.pixel_size;
-                    const pixel_size = Vec2.size(config.pixel_size, config.pixel_size);
-                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2.position(px, py), pixel_size, color);
-                }
-            }
-        }
+        // Delegate to the extracted UIOverlayRenderer
+        rendering.UIOverlayRenderer.drawAIMode(&self.gpu, ai_enabled);
     }
 
     /// Draw the spellbar at the bottom center of the screen
-    pub fn drawSpellbar(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, spell_system: *const spells.SpellSystem, spellbar_ui: *const spellbar.Spellbar) void {
-        for (0..8) |slot_index| {
-            const slot_rect = spellbar_ui.getSlotRect(slot_index);
-            const slot = spell_system.getSlot(slot_index);
-
-            // Determine slot state
-            const spell_type = if (slot) |s| s.spell_type else .None;
-            const is_active = spell_system.getActiveSlot().spell_type == spell_type and spell_type != .None;
-            const is_hovered = spellbar_ui.hovered_slot == slot_index;
-            const cooldown_progress = if (slot) |s| s.cooldown_timer.getProgress() else 0.0;
-
-            // Draw slot background
-            const slot_color = spellbar_ui.getSlotColor(spell_type, is_hovered);
-            self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y }, Vec2{ .x = slot_rect.width, .y = slot_rect.height }, slot_color);
-
-            // Draw cooldown overlay if spell is on cooldown
-            if (slot != null and cooldown_progress < 1.0) {
-                const overlay_height = slot_rect.height * (1.0 - cooldown_progress);
-                // Use dark spell color for cooldown overlay
-                const dark_color = spellbar.getDarkSpellColor(spell_type);
-                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y }, Vec2{ .x = slot_rect.width, .y = overlay_height }, dark_color);
-            }
-
-            // Draw border for active/hovered slots
-            const border_color = spellbar_ui.getBorderColor(slot_index, is_active, is_hovered);
-            if (border_color.a > 0) {
-                const border_width = spellbar_ui.config.border_width;
-
-                // Top border
-                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y }, Vec2{ .x = slot_rect.width, .y = border_width }, border_color);
-
-                // Bottom border
-                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y + slot_rect.height - border_width }, Vec2{ .x = slot_rect.width, .y = border_width }, border_color);
-
-                // Left border
-                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x, .y = slot_rect.y }, Vec2{ .x = border_width, .y = slot_rect.height }, border_color);
-
-                // Right border
-                self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = slot_rect.x + slot_rect.width - border_width, .y = slot_rect.y }, Vec2{ .x = border_width, .y = slot_rect.height }, border_color);
-            }
-
-            // Draw hotkey label
-            const label = spellbar.Spellbar.getHotkeyLabel(slot_index);
-            const label_x = slot_rect.x + slot_rect.width - 12.0; // Top right corner
-            const label_y = slot_rect.y + 2.0;
-
-            // Draw label using geometric text
-            self.drawHotkeyLabel(cmd_buffer, render_pass, label, label_x, label_y, core_colors.WHITE);
-        }
-    }
-
-    /// Draw a single character hotkey label
-    fn drawHotkeyLabel(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
-        if (text.len == 0) return;
-
-        const config = geometric_text.TextConfig{
-            .pixel_size = 1.5,
-            .char_width = 3,
-            .char_height = 5,
-        };
-
-        const char = text[0];
-        const pattern = geometric_text.CharacterPatterns.getCharPattern(char);
-
-        for (0..config.char_height) |row| {
-            for (0..config.char_width) |col| {
-                if (pattern[row * config.char_width + col]) {
-                    const px = x + @as(f32, @floatFromInt(col)) * config.pixel_size;
-                    const py = y + @as(f32, @floatFromInt(row)) * config.pixel_size;
-                    const pixel_size = Vec2.size(config.pixel_size, config.pixel_size);
-                    self.gpu.drawRect(cmd_buffer, render_pass, Vec2.position(px, py), pixel_size, color);
-                }
-            }
-        }
+    pub fn drawSpellbar(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, spell_system: *const spells.SpellSystem, spellbar_ui: *const ui.spellbar.Spellbar) void {
+        // Delegate to the extracted SpellbarRenderer
+        rendering.SpellbarRenderer.drawSpellbar(&self.gpu, cmd_buffer, render_pass, spell_system, spellbar_ui);
     }
 };

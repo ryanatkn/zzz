@@ -2,7 +2,7 @@ const std = @import("std");
 const page = @import("../../lib/browser/page.zig");
 const directory_scanner = @import("../../lib/platform/directory_scanner.zig");
 const math = @import("../../lib/math/mod.zig");
-const game_mod = @import("../game.zig");
+const game_loop_mod = @import("../game_loop.zig");
 const loggers = @import("../../lib/debug/loggers.zig");
 
 const root_page = @import("../../roots/menu/+page.zig");
@@ -14,13 +14,14 @@ const settings_fonts_page = @import("../../roots/menu/settings/fonts/+page.zig")
 const settings_fonts_save_page = @import("../../roots/menu/settings/fonts/save/+page.zig");
 const stats_page = @import("../../roots/menu/stats/+page.zig");
 const font_grid_test_page = @import("../../roots/menu/font_grid_test/+page.zig");
+const layout_demo_page = @import("../../roots/menu/layout_demo/+page.zig");
 const vector_test_page = @import("../../roots/menu/vector_test/+page.zig");
 const ide_page = @import("../../roots/menu/ide/+page.zig");
 const reactive_test_page = @import("../../roots/menu/reactive_test/+page.zig");
 
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const Vec2 = math.Vec2;
-const GameState = game_mod.GameState;
+const GameState = game_loop_mod.GameState;
 
 // Global reference to game state for world reloading (set from main)
 var global_game_state: ?*GameState = null;
@@ -189,6 +190,14 @@ pub const Router = struct {
 
             // Load font grid test page
             self.current_page = try font_grid_test_page.create(self.allocator);
+        } else if (std.mem.eql(u8, path, "/layout-demo")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+
+            // Load layout demo page
+            self.current_page = try layout_demo_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/vector-test")) {
             // Load root layout
             const layout = try root_layout.create(self.allocator);
