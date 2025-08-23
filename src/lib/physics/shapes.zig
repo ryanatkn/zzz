@@ -1,7 +1,7 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 
-// Re-export shapes from math module  
+// Re-export shapes from math module
 pub const Circle = math.Circle;
 pub const Rectangle = math.Rectangle;
 pub const Line = math.Line;

@@ -87,7 +87,7 @@ pub const GridCoordinates = struct {
     pub fn areAdjacent(grid_pos1: Vec2, grid_pos2: Vec2) bool {
         const dx = @abs(grid_pos1.x - grid_pos2.x);
         const dy = @abs(grid_pos1.y - grid_pos2.y);
-        
+
         return dx <= 1 and dy <= 1 and (dx != 0 or dy != 0);
     }
 
@@ -119,7 +119,7 @@ pub const SpatialHash = struct {
     pub fn init(allocator: std.mem.Allocator, world_width: f32, world_height: f32, cell_size: f32) !SpatialHash {
         const grid_width = @as(u32, @intFromFloat(@ceil(world_width / cell_size)));
         const grid_height = @as(u32, @intFromFloat(@ceil(world_height / cell_size)));
-        
+
         const cells = try allocator.alloc(std.ArrayList(u32), grid_width * grid_height);
         for (cells) |*cell| {
             cell.* = std.ArrayList(u32).init(allocator);
@@ -145,11 +145,11 @@ pub const SpatialHash = struct {
     fn worldToCell(self: SpatialHash, world_pos: Vec2) ?usize {
         const grid_x = @as(u32, @intFromFloat(@floor(world_pos.x / self.cell_size)));
         const grid_y = @as(u32, @intFromFloat(@floor(world_pos.y / self.cell_size)));
-        
+
         if (grid_x >= self.grid_width or grid_y >= self.grid_height) {
             return null;
         }
-        
+
         return grid_y * self.grid_width + grid_x;
     }
 
@@ -173,27 +173,27 @@ pub const SpatialHash = struct {
     /// Get all objects in radius around a position
     pub fn queryRadius(self: SpatialHash, center: Vec2, radius: f32, allocator: std.mem.Allocator) !std.ArrayList(u32) {
         var results = std.ArrayList(u32).init(allocator);
-        
+
         const cell_radius = @as(i32, @intFromFloat(@ceil(radius / self.cell_size)));
         const center_x = @as(i32, @intFromFloat(@floor(center.x / self.cell_size)));
         const center_y = @as(i32, @intFromFloat(@floor(center.y / self.cell_size)));
-        
+
         var y: i32 = center_y - cell_radius;
         while (y <= center_y + cell_radius) : (y += 1) {
             var x: i32 = center_x - cell_radius;
             while (x <= center_x + cell_radius) : (x += 1) {
-                if (x >= 0 and y >= 0 and 
-                    x < @as(i32, @intCast(self.grid_width)) and 
-                    y < @as(i32, @intCast(self.grid_height))) {
-                    
+                if (x >= 0 and y >= 0 and
+                    x < @as(i32, @intCast(self.grid_width)) and
+                    y < @as(i32, @intCast(self.grid_height)))
+                {
                     const cell_index = @as(usize, @intCast(y)) * self.grid_width + @as(usize, @intCast(x));
-                    
+
                     // Add all objects from this cell
                     try results.appendSlice(self.cells[cell_index].items);
                 }
             }
         }
-        
+
         return results;
     }
 
@@ -228,45 +228,45 @@ test "grid coordinate conversions" {
 test "grid distance calculations" {
     const pos1 = Vec2{ .x = 0.0, .y = 0.0 };
     const pos2 = Vec2{ .x = 3.0, .y = 4.0 };
-    
+
     // Test Manhattan distance
     const manhattan = GridCoordinates.manhattanDistance(pos1, pos2);
     try std.testing.expectApproxEqAbs(@as(f32, 7.0), manhattan, 0.01); // |3-0| + |4-0| = 7
-    
+
     // Test Chebyshev distance
     const chebyshev = GridCoordinates.chebyshevDistance(pos1, pos2);
     try std.testing.expectApproxEqAbs(@as(f32, 4.0), chebyshev, 0.01); // max(3, 4) = 4
-    
+
     // Test adjacency
     const adjacent_pos = Vec2{ .x = 1.0, .y = 1.0 };
     const non_adjacent_pos = Vec2{ .x = 2.0, .y = 2.0 };
-    
+
     try std.testing.expect(GridCoordinates.areAdjacent(pos1, adjacent_pos));
     try std.testing.expect(!GridCoordinates.areAdjacent(pos1, non_adjacent_pos));
 }
 
 test "spatial hash operations" {
     const allocator = std.testing.allocator;
-    
+
     var spatial_hash = try SpatialHash.init(allocator, 100.0, 100.0, 10.0);
     defer spatial_hash.deinit();
-    
+
     // Add some objects
     try spatial_hash.addObject(1, Vec2{ .x = 5.0, .y = 5.0 });
     try spatial_hash.addObject(2, Vec2{ .x = 15.0, .y = 15.0 });
     try spatial_hash.addObject(3, Vec2{ .x = 85.0, .y = 85.0 });
-    
+
     // Query radius around first object
     const results = try spatial_hash.queryRadius(Vec2{ .x = 5.0, .y = 5.0 }, 20.0, allocator);
     defer results.deinit();
-    
+
     // Should find objects 1 and 2 (both within ~20 unit radius considering grid cells)
     try std.testing.expect(results.items.len >= 1); // At least object 1 should be found
-    
+
     // Clear and verify
     spatial_hash.clear();
     const empty_results = try spatial_hash.queryRadius(Vec2{ .x = 5.0, .y = 5.0 }, 20.0, allocator);
     defer empty_results.deinit();
-    
+
     try std.testing.expect(empty_results.items.len == 0);
 }

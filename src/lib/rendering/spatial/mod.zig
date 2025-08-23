@@ -6,12 +6,12 @@
 /// ## Architecture
 /// - transforms.zig: Screen/world/NDC coordinate conversions
 /// - viewport.zig: Unified viewport using math.Bounds
-/// - visibility.zig: Culling and visibility queries  
+/// - visibility.zig: Culling and visibility queries
 /// - grid.zig: Spatial partitioning for optimization
 
 // Core spatial types and functions
 pub const transforms = @import("transforms.zig");
-pub const viewport = @import("viewport.zig");  
+pub const viewport = @import("viewport.zig");
 pub const visibility = @import("visibility.zig");
 pub const grid = @import("grid.zig");
 

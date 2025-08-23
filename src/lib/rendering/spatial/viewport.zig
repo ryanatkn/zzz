@@ -10,13 +10,13 @@ const Camera = camera_mod.Camera;
 const CoordinateContext = transforms.CoordinateContext;
 
 /// Unified viewport representing the visible world area
-/// 
+///
 /// Combines world bounds calculation with camera-based transformations
 /// to provide a complete spatial view of the rendering area.
 pub const Viewport = struct {
     /// World space bounds of the visible area
     bounds: Bounds,
-    
+
     /// Reference to the camera for coordinate transformations
     camera: *const Camera,
 
@@ -25,7 +25,7 @@ pub const Viewport = struct {
         // Calculate world bounds from camera viewport
         const half_width = camera.viewport_width / 2.0;
         const half_height = camera.viewport_height / 2.0;
-        
+
         const world_bounds = Bounds.init(
             camera.view_center.x - half_width,
             camera.view_center.y - half_height,
@@ -52,7 +52,7 @@ pub const Viewport = struct {
     pub fn fromContext(context: CoordinateContext, camera: *const Camera) Viewport {
         const world_width = context.screen_width / context.camera_zoom;
         const world_height = context.screen_height / context.camera_zoom;
-        
+
         return init(context.camera_position, world_width, world_height, camera);
     }
 
@@ -92,11 +92,11 @@ pub const Viewport = struct {
         return self.camera.screenToWorldSafe(screen_pos);
     }
 
-    /// Transform world coordinates to screen coordinates using camera  
+    /// Transform world coordinates to screen coordinates using camera
     pub fn worldToScreen(self: Viewport, world_pos: Vec2) Vec2 {
         const context = CoordinateContext.init(self.camera.screen_width, self.camera.screen_height)
             .withCamera(self.camera.view_center, self.camera.zoom_level);
-        
+
         return transforms.worldToScreen(world_pos, context);
     }
 
@@ -140,7 +140,7 @@ pub const Viewport = struct {
 test "viewport creation and basic operations" {
     // Mock camera for testing
     const camera = Camera.init(800.0, 600.0);
-    
+
     const viewport = Viewport.init(Vec2{ .x = 0.0, .y = 0.0 }, 100.0, 80.0, &camera);
 
     // Test bounds
@@ -159,7 +159,7 @@ test "viewport creation and basic operations" {
 
 test "viewport intersection tests" {
     const camera = Camera.init(800.0, 600.0);
-    
+
     const viewport1 = Viewport.init(Vec2{ .x = 0.0, .y = 0.0 }, 20.0, 20.0, &camera);
     const viewport2 = Viewport.init(Vec2{ .x = 10.0, .y = 10.0 }, 20.0, 20.0, &camera); // Overlapping
     const viewport3 = Viewport.init(Vec2{ .x = 50.0, .y = 50.0 }, 20.0, 20.0, &camera); // Non-overlapping
@@ -171,7 +171,7 @@ test "viewport intersection tests" {
     try std.testing.expect(viewport1.intersectsCircle(Vec2{ .x = 5.0, .y = 5.0 }, 3.0));
     try std.testing.expect(!viewport1.intersectsCircle(Vec2{ .x = 50.0, .y = 50.0 }, 3.0));
 
-    // Test rectangle intersection  
+    // Test rectangle intersection
     try std.testing.expect(viewport1.intersectsRect(Vec2{ .x = 5.0, .y = 5.0 }, Vec2{ .x = 10.0, .y = 10.0 }));
     try std.testing.expect(!viewport1.intersectsRect(Vec2{ .x = 50.0, .y = 50.0 }, Vec2{ .x = 10.0, .y = 10.0 }));
 }

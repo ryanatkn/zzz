@@ -71,7 +71,7 @@ pub fn worldToScreen(world_pos: Vec2, context: CoordinateContext) Vec2 {
     };
 }
 
-/// Transform screen coordinates to world coordinates  
+/// Transform screen coordinates to world coordinates
 pub fn screenToWorld(screen_pos: Vec2, context: CoordinateContext) Vec2 {
     // Convert from screen coordinates to camera-relative
     const camera_relative = Vec2{
@@ -144,7 +144,7 @@ pub fn aspectRatioAdjusted(pos: Vec2, context: CoordinateContext) Vec2 {
         const scale = context.screen_height / 1080.0;
         return pos.scale(scale);
     } else {
-        // Screen is taller - scale by width  
+        // Screen is taller - scale by width
         const scale = context.screen_width / 1920.0;
         return pos.scale(scale);
     }
@@ -192,11 +192,11 @@ pub fn lerp(a: Vec2, b: Vec2, t: f32) Vec2 {
 pub fn directionBetween(from: Vec2, to: Vec2) Vec2 {
     const diff = to.sub(from);
     const length = diff.length();
-    
+
     if (length == 0.0) {
         return Vec2{ .x = 0.0, .y = 0.0 };
     }
-    
+
     return diff.scale(1.0 / length);
 }
 

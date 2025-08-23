@@ -380,7 +380,6 @@ test "Circle operations" {
     try std.testing.expect(@abs(area - 78.54) < 0.1); // π * 5²
 }
 
-
 test "Spacing operations" {
     const spacing = Spacing.asymmetric(10.0, 20.0);
     try std.testing.expect(spacing.getVertical() == 20.0); // top + bottom

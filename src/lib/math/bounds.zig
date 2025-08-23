@@ -191,7 +191,7 @@ test "Vec2 compatibility methods" {
 
     const retrieved_min = bounds.getMin();
     const retrieved_max = bounds.getMax();
-    
+
     try std.testing.expect(retrieved_min.x == 0.0 and retrieved_min.y == 0.0);
     try std.testing.expect(retrieved_max.x == 10.0 and retrieved_max.y == 20.0);
 }
@@ -204,6 +204,6 @@ test "Bounds intersection and containment" {
     try std.testing.expect(bounds1.intersects(bounds2)); // Overlapping
     try std.testing.expect(!bounds1.intersects(bounds3)); // Non-overlapping
 
-    try std.testing.expect(bounds1.contains(Vec2.init(5.0, 5.0))); 
+    try std.testing.expect(bounds1.contains(Vec2.init(5.0, 5.0)));
     try std.testing.expect(!bounds1.contains(Vec2.init(15.0, 15.0)));
 }

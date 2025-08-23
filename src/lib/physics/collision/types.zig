@@ -66,4 +66,3 @@ test "vec2Cross calculation" {
     try std.testing.expect(vec2Cross(v1, v1) == 0.0);
     try std.testing.expect(vec2Cross(v2, v2) == 0.0);
 }
-
