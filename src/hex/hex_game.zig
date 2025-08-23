@@ -66,15 +66,19 @@ pub const Disposition = disposition.Disposition;
 // Use PlayerInput from lib components
 pub const PlayerInput = components.PlayerInput;
 
-// Hex-specific projectile with damage field
+// Hex-specific projectile with damage field and ricochet capability
 pub const HexProjectile = struct {
     base: components.Projectile,
     damage: f32,
+    ricochet_count: u8, // Bounces remaining
+    max_ricochets: u8, // Maximum bounces allowed
 
     pub fn init(owner: EntityId, max_lifetime: f32, damage: f32) HexProjectile {
         return .{
             .base = components.Projectile.init(owner, max_lifetime),
             .damage = damage,
+            .ricochet_count = 0,
+            .max_ricochets = 2, // Default 2 bounces before death
         };
     }
 
@@ -90,6 +94,20 @@ pub const HexProjectile = struct {
     pub fn pierce(self: *HexProjectile) void {
         self.base.pierce();
     }
+
+    // Ricochet methods
+    pub fn canRicochet(self: HexProjectile) bool {
+        return self.ricochet_count < self.max_ricochets;
+    }
+
+    pub fn ricochet(self: *HexProjectile) void {
+        self.ricochet_count += 1;
+    }
+
+    pub fn getRemainingRicochets(self: HexProjectile) u8 {
+        if (self.ricochet_count >= self.max_ricochets) return 0;
+        return self.max_ricochets - self.ricochet_count;
+    }
 };
 
 // For compatibility with existing code that expects direct field access
@@ -102,7 +120,7 @@ const UnitStorage = storage.UnitStorage(MAX_ENTITIES_PER_ARCHETYPE, Unit);
 
 const ProjectileStorage = storage.ProjectileStorage(MAX_ENTITIES_PER_ARCHETYPE, HexProjectile);
 
-const ObstacleStorage = storage.TerrainStorage(MAX_ENTITIES_PER_ARCHETYPE);
+const TerrainStorage = storage.TerrainStorage(MAX_ENTITIES_PER_ARCHETYPE);
 
 const LifestoneStorage = storage.InteractiveStorage(MAX_ENTITIES_PER_ARCHETYPE);
 
@@ -182,11 +200,12 @@ pub const HexGame = struct {
     primary_controller: controller_mod.Controller,
 
     // Game systems
-    bullet_pool: BulletPool,
+    projectile_pool: BulletPool,
     entity_allocator: EntityAllocator,
     allocator: std.mem.Allocator,
     logger: ModuleLogger,
     frame_pool: object_pools.FramePool,
+
     zone_travel_manager: world.ZoneTravelManager(HexGame, MAX_ENTITIES_PER_ARCHETYPE),
 
     // Optional effect system reference for travel effects
@@ -197,7 +216,7 @@ pub const HexGame = struct {
         players: PlayerStorage,
         units: UnitStorage,
         projectiles: ProjectileStorage,
-        obstacles: ObstacleStorage,
+        terrain: TerrainStorage,
         lifestones: LifestoneStorage,
         portals: PortalStorage,
 
@@ -229,7 +248,7 @@ pub const HexGame = struct {
                 .players = PlayerStorage.init(),
                 .units = UnitStorage.init(),
                 .projectiles = ProjectileStorage.init(),
-                .obstacles = ObstacleStorage.init(),
+                .terrain = TerrainStorage.init(),
                 .lifestones = LifestoneStorage.init(),
                 .portals = PortalStorage.init(),
                 .zone_type = zone_type,
@@ -254,7 +273,7 @@ pub const HexGame = struct {
             if (self.players.containsEntity(entity_id)) return true;
             if (self.units.containsEntity(entity_id)) return true;
             if (self.projectiles.containsEntity(entity_id)) return true;
-            if (self.obstacles.containsEntity(entity_id)) return true;
+            if (self.terrain.containsEntity(entity_id)) return true;
             if (self.lifestones.containsEntity(entity_id)) return true;
             if (self.portals.containsEntity(entity_id)) return true;
             return false;
@@ -280,11 +299,12 @@ pub const HexGame = struct {
             .player_zone = 0,
             .player_start_pos = Vec2.screenCenter(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT),
             .primary_controller = controller_mod.createPlayerController(),
-            .bullet_pool = BulletPool.init(),
+            .projectile_pool = BulletPool.init(),
             .entity_allocator = EntityAllocator{},
             .allocator = allocator,
             .logger = ModuleLogger.init(allocator),
             .frame_pool = object_pools.FramePool.init(allocator),
+
             .zone_travel_manager = world.ZoneTravelManager(HexGame, MAX_ENTITIES_PER_ARCHETYPE).init(1.0, // 1 second cooldown
                 world.zone_travel_manager.TravelInterfaceHelpers.createTravelInterface(
                     HexGame,
@@ -419,7 +439,7 @@ pub const HexGame = struct {
         return entity;
     }
 
-    pub fn createObstacle(self: *HexGame, zone_index: usize, pos: Vec2, size: Vec2, is_deadly: bool) !EntityId {
+    pub fn createTerrain(self: *HexGame, zone_index: usize, pos: Vec2, size: Vec2, is_deadly: bool) !EntityId {
         if (zone_index >= MAX_ZONES) return error.InvalidZone;
 
         const zone = self.zone_manager.getZone(zone_index);
@@ -431,11 +451,11 @@ pub const HexGame = struct {
         // Create components directly
         const radius = @max(size.x, size.y) / 2.0; // Convert size to radius
         const transform = components.Transform.init(pos, radius);
-        const terrain_type: components.Terrain.TerrainType = if (is_deadly) .pit else .wall;
+        const terrain_type: components.Terrain.TerrainType = if (is_deadly) .pit else .rock;
         const terrain = components.Terrain.init(terrain_type, size);
         const visual = components.Visual.init(color);
 
-        try zone.obstacles.addEntity(entity, transform, terrain, visual);
+        try zone.terrain.addEntity(entity, transform, terrain, visual);
         zone.entity_count += 1;
 
         return entity;
@@ -498,12 +518,12 @@ pub const HexGame = struct {
         const entity = self.entity_allocator.create();
 
         // Create components directly
-        var transform = components.Transform.init(pos, constants.BULLET_RADIUS); // 4cm bullet radius (world space)
+        var transform = components.Transform.init(pos, constants.PROJECTILE_RADIUS); // 20cm projectile radius (world space)
         transform.vel = velocity;
-        const visual = components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 }); // Yellow bullet
+        const visual = components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 }); // Yellow projectile
 
         // Create hex-specific projectile with damage
-        const projectile = Projectile.init(entity, lifetime, constants.BULLET_DAMAGE);
+        const projectile = Projectile.init(entity, lifetime, constants.PROJECTILE_DAMAGE);
 
         try zone.projectiles.addEntity(entity, transform, projectile, visual);
         zone.entity_count += 1;
@@ -730,8 +750,8 @@ pub const HexGame = struct {
         self.primary_controller.releaseAny(self);
     }
 
-    pub fn canFireBullet(self: *const HexGame) bool {
-        return self.bullet_pool.canFire();
+    pub fn canFireProjectile(self: *const HexGame) bool {
+        return self.projectile_pool.canFire();
     }
 
     /// Context-aware projectiles update function
@@ -766,6 +786,7 @@ pub const HexGame = struct {
                     }
 
                     // Check collision with units using ECS iteration
+                    var unit_hit = false;
                     var unit_iter = zone.units.entityIterator();
                     while (unit_iter.next()) |unit_id| {
                         if (zone.units.getComponentMut(unit_id, .transform)) |unit_transform| {
@@ -789,7 +810,66 @@ pub const HexGame = struct {
                                         projectiles_to_remove[remove_count] = projectile_id;
                                         remove_count += 1;
                                     }
+                                    unit_hit = true;
                                     break;
+                                }
+                            }
+                        }
+                    }
+
+                    // Skip terrain collision if unit was hit
+                    if (unit_hit) continue;
+
+                    // Check collision with terrain using ECS iteration
+                    var terrain_iter = zone.terrain.entityIterator();
+                    while (terrain_iter.next()) |terrain_id| {
+                        if (zone.terrain.getComponent(terrain_id, .terrain)) |terrain| {
+                            if (zone.terrain.getComponent(terrain_id, .transform)) |terrain_transform| {
+                                const collision_mod = @import("../lib/physics/collision/mod.zig");
+
+                                const projectile_circle = collision_mod.Shape{ .circle = .{ .center = transform.pos, .radius = transform.radius } };
+                                const terrain_rect = collision_mod.Shape{ .rectangle = .{ .position = terrain_transform.pos, .size = terrain.size } };
+
+                                if (collision_mod.checkCollision(projectile_circle, terrain_rect)) {
+                                    // Terrain hit - check if deadly (pits) or ricochetable (rocks)
+                                    if (terrain.deadly) {
+                                        // Pits destroy projectiles immediately - no ricochet
+                                        if (remove_count < projectiles_to_remove.len) {
+                                            projectiles_to_remove[remove_count] = projectile_id;
+                                            remove_count += 1;
+                                        }
+                                        break;
+                                    } else if (terrain.allows_ricochet and projectile.canRicochet()) {
+                                        // Calculate ricochet off solid terrain (rocks, doors)
+                                        const detailed_result = collision_mod.checkCollisionDetailed(projectile_circle, terrain_rect);
+
+                                        if (detailed_result.collided) {
+                                            // Reflect velocity using: new_vel = vel - 2 * dot(vel, normal) * normal
+                                            const dot_product = transform.vel.dot(detailed_result.normal);
+                                            const reflection = detailed_result.normal.scale(2.0 * dot_product);
+                                            transform.vel = transform.vel.sub(reflection);
+
+                                            // Optional: reduce speed slightly per ricochet (10% reduction)
+                                            transform.vel = transform.vel.scale(0.9);
+
+                                            // Move projectile slightly away from surface to prevent re-collision
+                                            const separation = detailed_result.normal.scale(detailed_result.penetration_depth + 0.01);
+                                            transform.pos = transform.pos.add(separation);
+
+                                            // Track ricochet
+                                            projectile.ricochet();
+
+                                            self.logger.info("projectile_ricochet", "Projectile {} ricocheted ({} bounces remaining)", .{ projectile_id, projectile.getRemainingRicochets() });
+                                        }
+                                        break;
+                                    } else {
+                                        // Solid terrain without ricochet capability - destroy projectile
+                                        if (remove_count < projectiles_to_remove.len) {
+                                            projectiles_to_remove[remove_count] = projectile_id;
+                                            remove_count += 1;
+                                        }
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -847,15 +927,15 @@ pub const HexGame = struct {
         self.logger.info("portals_loaded", "Loaded {} portals into zone travel manager for zone {}", .{ self.zone_travel_manager.getTeleporterCount(), self.zone_manager.getCurrentZoneIndex() });
     }
 
-    /// Iterator for obstacles in current zone
-    pub fn iterateObstaclesInCurrentZone(self: *HexGame) EntityIterator {
-        return self.getCurrentZone().obstacles.entityIterator();
+    /// Iterator for terrain in current zone
+    pub fn iterateTerrainInCurrentZone(self: *HexGame) EntityIterator {
+        return self.getCurrentZone().terrain.entityIterator();
     }
 
-    /// Context-aware bullet pool update function
-    pub fn updateBulletPool(self: *HexGame, frame_ctx: FrameContext) void {
+    /// Context-aware projectile pool update function
+    pub fn updateProjectilePool(self: *HexGame, frame_ctx: FrameContext) void {
         const deltaTime = frame_ctx.effectiveDelta();
-        self.bullet_pool.update(deltaTime);
+        self.projectile_pool.update(deltaTime);
     }
 
     // Debug helpers

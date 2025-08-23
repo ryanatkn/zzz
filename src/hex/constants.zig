@@ -23,8 +23,8 @@ pub const METERS_TO_PIXELS = 12.0;
 
 // Entity limits (moved from entities.zig)
 pub const MAX_UNITS = 12;
-pub const MAX_OBSTACLES = 50;
-pub const MAX_BULLETS = 20;
+pub const MAX_TERRAIN = 50;
+pub const MAX_PROJECTILES = 20;
 pub const MAX_PORTALS = 6;
 pub const MAX_LIFESTONES = 13;
 
@@ -39,10 +39,10 @@ pub const UNIT_HOME_TOLERANCE = 0.17; // 17cm tolerance (was 2 pixels ≈ 17cm)
 pub const UNIT_DETECTION_RADIUS = 16.7; // 16.7m detection (was 200 pixels ≈ 16.7m)
 pub const UNIT_CHASE_SPEED = UNIT_SPEED; // Same as normal speed
 pub const UNIT_CHASE_DURATION = 5.0; // Time values stay the same
-pub const BULLET_SPEED = 33.3; // 33.3 m/s (was 400 pixels/s ≈ 33.3 m/s)
-pub const BULLET_RADIUS = 0.2; // 20cm radius - visible but not huge (was 5 pixels ≈ 42cm)
-pub const BULLET_DAMAGE = 150.0; // Damage values stay the same
-pub const BULLET_LIFETIME = 4.0; // Time values stay the same
+pub const PROJECTILE_SPEED = 33.3; // 33.3 m/s (was 400 pixels/s ≈ 33.3 m/s)
+pub const PROJECTILE_RADIUS = 0.2; // 20cm radius - visible but not huge (was 5 pixels ≈ 42cm)
+pub const PROJECTILE_DAMAGE = 150.0; // Damage values stay the same
+pub const PROJECTILE_LIFETIME = 4.0; // Time values stay the same
 pub const PORTAL_SPAWN_OFFSET = 0.83; // 83cm offset (was 10 pixels ≈ 83cm)
 
 // Camera viewport constants (in meters)
@@ -166,10 +166,10 @@ pub const PortalShape = enum {
     triangle,
 };
 
-// Obstacle type for game data loading
-pub const ObstacleType = enum {
-    blocking,
-    deadly,
+// Terrain type for game data loading
+pub const TerrainType = enum {
+    rock,
+    pit,
 };
 
 // Patrol pattern types

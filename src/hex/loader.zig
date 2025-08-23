@@ -171,23 +171,23 @@ fn loadZone(zone: *hex_game_mod.HexGame.ZoneData, data: ZoneData, game: *hex_gam
     zone.world_width = data.world_width orelse zone.world_width; // Keep init() default
     zone.world_height = data.world_height orelse zone.world_height; // Keep init() default
 
-    // Load obstacles
-    if (data.obstacles) |obstacles| {
-        for (obstacles) |obstacle_data| {
-            const is_deadly = obstacle_data.type == .deadly;
+    // Load terrain
+    if (data.terrain) |terrain_features| {
+        for (terrain_features) |terrain_data| {
+            const is_deadly = terrain_data.type == .pit;
 
-            // Create obstacle entity
-            const obstacle_id = game.createObstacle(
+            // Create terrain entity
+            const terrain_id = game.createTerrain(
                 @intCast(zone_index),
-                Vec2.position(obstacle_data.position.x, obstacle_data.position.y),
-                Vec2.size(obstacle_data.size.x, obstacle_data.size.y),
+                Vec2.position(terrain_data.position.x, terrain_data.position.y),
+                Vec2.size(terrain_data.size.x, terrain_data.size.y),
                 is_deadly,
             ) catch |err| {
-                loggers.getGameLog().err("obstacle_create_fail", "Failed to create obstacle entity: {}", .{err});
+                loggers.getGameLog().err("terrain_create_fail", "Failed to create terrain entity: {}", .{err});
                 continue;
             };
 
-            _ = obstacle_id; // Obstacle created successfully
+            _ = terrain_id; // Terrain created successfully
         }
     }
 
@@ -269,10 +269,10 @@ const ZoneData = struct {
     spawn_pos: ?struct { x: f32, y: f32 } = null, // Optional spawn position, defaults to center
     world_width: ?f32 = null, // Optional world width in meters, defaults to 16.0
     world_height: ?f32 = null, // Optional world height in meters, defaults to 9.0
-    obstacles: ?[]const struct {
+    terrain: ?[]const struct {
         position: struct { x: f32, y: f32 },
         size: struct { x: f32, y: f32 },
-        type: constants.ObstacleType,
+        type: constants.TerrainType,
     },
     units: ?[]const struct {
         position: struct { x: f32, y: f32 },

@@ -5,7 +5,7 @@ pub const Vec2 = math.Vec2;
 /// Sparse storage - only terrain entities have this
 pub const Terrain = struct {
     pub const TerrainType = enum {
-        wall,
+        rock,
         floor,
         door,
         water,
@@ -15,17 +15,28 @@ pub const Terrain = struct {
 
     solid: bool,
     blocks_sight: bool,
+    deadly: bool,
+    allows_ricochet: bool,
     terrain_type: TerrainType,
     size: Vec2, // Original rectangular size for proper rendering
 
     pub fn init(terrain_type: TerrainType, size: Vec2) Terrain {
         return .{
             .solid = switch (terrain_type) {
-                .wall, .door => true,
+                .rock, .door => true,
                 else => false,
             },
             .blocks_sight = switch (terrain_type) {
-                .wall, .door => true,
+                .rock, .door => true,
+                else => false,
+            },
+            .deadly = switch (terrain_type) {
+                .pit => true,
+                else => false,
+            },
+            .allows_ricochet = switch (terrain_type) {
+                .rock, .door => true, // Solid surfaces ricochet
+                .pit => false, // Pits absorb projectiles
                 else => false,
             },
             .terrain_type = terrain_type,

@@ -184,9 +184,9 @@ pub fn handleSDLEvent(
                         // Left-click shooting for single shots (burst mode)
                         game_state.hex_game.logger.info("primary_attack", "Primary attack at mouse position: {any}", .{screen_mouse_pos});
 
-                        // Use unified bullet firing with proper coordinate conversion
-                        const result = combat.fireBulletAtScreenPos(&game_state.hex_game, screen_mouse_pos, &game_renderer.camera, &game_state.hex_game.bullet_pool);
-                        game_state.hex_game.logger.info("bullet_result", "fireBulletAtScreenPos result: {}", .{result});
+                        // Use unified projectile firing with proper coordinate conversion
+                        const result = combat.fireProjectileAtScreenPos(&game_state.hex_game, screen_mouse_pos, &game_renderer.camera, &game_state.hex_game.projectile_pool);
+                        game_state.hex_game.logger.info("projectile_result", "fireProjectileAtScreenPos result: {}", .{result});
                     }
                 },
                 .SecondaryAttack => {

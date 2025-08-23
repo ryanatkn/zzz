@@ -453,8 +453,8 @@ fn updateUnits(game_state: *GameState, frame_ctx: FrameContext) void {
                         visual.color = color_mappings.getDispositionEnergyColor(unit_comp.disposition, unit_comp.energy_level);
                     }
 
-                    // Check collision with obstacles
-                    if (physics.checkUnitObstacleCollision(world, unit_id, transform, health, old_pos)) {
+                    // Check collision with terrain
+                    if (physics.checkUnitTerrainCollision(world, unit_id, transform, health, old_pos)) {
                         // Collision was handled by the function
                         break;
                     }
@@ -509,14 +509,14 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
 
     // Handle continuous shooting on left-click hold (rhythm mode)
     // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
-    const can_shoot = world.hasLiveControlledEntity() and world.canFireBullet();
+    const can_shoot = world.hasLiveControlledEntity() and world.canFireProjectile();
     if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and can_shoot) {
         // Use unified bullet firing with proper coordinate conversion
         const screen_mouse_pos = input_state.getMousePos();
-        _ = combat.fireBulletAtScreenPos(world, screen_mouse_pos, cam, &world.bullet_pool);
+        _ = combat.fireProjectileAtScreenPos(world, screen_mouse_pos, cam, &world.projectile_pool);
     }
 
-    // Update bullet entities using ECS
+    // Update projectile entities using ECS
     world.updateProjectiles(frame_ctx);
 
     // Update units with context
@@ -531,7 +531,7 @@ pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: 
     game_state.spell_system.update(frame_ctx);
 
     // Update bullet pool with context
-    world.updateBulletPool(frame_ctx);
+    world.updateProjectilePool(frame_ctx);
 }
 
 pub fn checkCollisions(game_state: *GameState) void {

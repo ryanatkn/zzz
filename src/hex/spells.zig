@@ -556,12 +556,12 @@ pub const SpellSystem = struct {
             });
 
             // Use the hex_game's bullet pool for firing
-            if (game.canFireBullet()) {
-                const success = combat.fireBullet(game, bullet_target, &game.bullet_pool);
+            if (game.canFireProjectile()) {
+                const success = combat.fireProjectile(game, bullet_target, &game.projectile_pool);
                 if (success) {
                     bullets_fired += 1;
                 } else {
-                    // If we can't fire a bullet, stop trying (probably no pool space)
+                    // If we can't fire a projectile, stop trying (probably no pool space)
                     break;
                 }
             } else {

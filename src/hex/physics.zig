@@ -33,21 +33,25 @@ pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) b
 fn canEntityMoveToWithRadius(game: *HexGame, new_pos: math.Vec2, entity_radius: f32) bool {
     const zone = game.getCurrentZone();
 
-    // Convert zone obstacles to query format
-    var obstacles: [constants.MAX_OBSTACLES]queries.ObstacleData = undefined;
+    // Convert zone terrain to query format using ECS iteration
+    var obstacles: [constants.MAX_TERRAIN]queries.ObstacleData = undefined;
     var obstacle_count: usize = 0;
 
-    for (0..zone.obstacles.count) |i| {
-        const terrain = &zone.obstacles.terrains[i];
-        const transform = &zone.obstacles.transforms[i];
-
-        obstacles[obstacle_count] = queries.ObstacleData{
-            .position = transform.pos,
-            .size = terrain.size,
-            .is_solid = terrain.solid,
-            .is_deadly = isDeadlyTerrain(terrain),
-        };
-        obstacle_count += 1;
+    var terrain_iter = game.iterateTerrainInCurrentZone();
+    while (terrain_iter.next()) |terrain_id| {
+        if (zone.terrain.getComponent(terrain_id, .terrain)) |terrain| {
+            if (zone.terrain.getComponent(terrain_id, .transform)) |transform| {
+                if (obstacle_count < obstacles.len) {
+                    obstacles[obstacle_count] = queries.ObstacleData{
+                        .position = transform.pos,
+                        .size = terrain.size,
+                        .is_solid = terrain.solid,
+                        .is_deadly = terrain.deadly,
+                    };
+                    obstacle_count += 1;
+                }
+            }
+        }
     }
 
     const config = queries.ObstacleQueryConfig{ .check_solid_only = true };
@@ -105,15 +109,15 @@ pub fn checkPlayerPortalCollision(player_pos: math.Vec2, player_radius: f32, por
     return collision.checkCircleCollision(player_pos, player_radius, portal_transform.pos, portal_transform.radius);
 }
 
-// Unit-obstacle collision check
-pub fn checkUnitObstacleCollision(world: *hex_game_mod.HexGame, unit_id: hex_game_mod.EntityId, unit_transform: *hex_game_mod.Transform, unit_health: *hex_game_mod.Health, old_pos: math.Vec2) bool {
+// Unit-terrain collision check
+pub fn checkUnitTerrainCollision(world: *hex_game_mod.HexGame, unit_id: hex_game_mod.EntityId, unit_transform: *hex_game_mod.Transform, unit_health: *hex_game_mod.Health, old_pos: math.Vec2) bool {
     const zone_storage = world.getZoneStorage();
 
     // Use idiomatic Zig iterator pattern
-    var obstacle_iter = world.iterateObstaclesInCurrentZone();
-    while (obstacle_iter.next()) |entity_id| {
-        if (zone_storage.obstacles.getComponent(entity_id, .terrain)) |terrain| {
-            if (zone_storage.obstacles.getComponent(entity_id, .transform)) |transform| {
+    var terrain_iter = world.iterateTerrainInCurrentZone();
+    while (terrain_iter.next()) |entity_id| {
+        if (zone_storage.terrain.getComponent(entity_id, .terrain)) |terrain| {
+            if (zone_storage.terrain.getComponent(entity_id, .transform)) |transform| {
                 const circle = collision.Shape{ .circle = .{ .center = unit_transform.pos, .radius = unit_transform.radius } };
                 const rect = collision.Shape{ .rectangle = .{ .position = transform.pos, .size = terrain.size } };
 
@@ -141,23 +145,27 @@ pub fn checkUnitObstacleCollision(world: *hex_game_mod.HexGame, unit_id: hex_gam
 pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *hex_game_mod.HexGame) bool {
     const zone = world.getCurrentZone();
 
-    // Convert zone obstacles to query format (only deadly ones)
-    var obstacles: [constants.MAX_OBSTACLES]queries.ObstacleData = undefined;
+    // Convert zone terrain to query format (only deadly ones) using ECS iteration
+    var obstacles: [constants.MAX_TERRAIN]queries.ObstacleData = undefined;
     var obstacle_count: usize = 0;
 
-    for (0..zone.obstacles.count) |i| {
-        const terrain = &zone.obstacles.terrains[i];
-        const transform = &zone.obstacles.transforms[i];
-
-        // Only include deadly obstacles using component-based approach
-        if (isDeadlyTerrain(terrain)) {
-            obstacles[obstacle_count] = queries.ObstacleData{
-                .position = transform.pos,
-                .size = terrain.size,
-                .is_solid = terrain.solid,
-                .is_deadly = true,
-            };
-            obstacle_count += 1;
+    var terrain_iter = world.iterateTerrainInCurrentZone();
+    while (terrain_iter.next()) |terrain_id| {
+        if (zone.terrain.getComponent(terrain_id, .terrain)) |terrain| {
+            if (zone.terrain.getComponent(terrain_id, .transform)) |transform| {
+                // Only include deadly terrain using component-based approach
+                if (terrain.deadly) {
+                    if (obstacle_count < obstacles.len) {
+                        obstacles[obstacle_count] = queries.ObstacleData{
+                            .position = transform.pos,
+                            .size = terrain.size,
+                            .is_solid = terrain.solid,
+                            .is_deadly = true,
+                        };
+                        obstacle_count += 1;
+                    }
+                }
+            }
         }
     }
 

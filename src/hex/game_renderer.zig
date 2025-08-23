@@ -43,6 +43,16 @@ const spellbar = @import("spellbar.zig");
 const spells = @import("spells.zig");
 
 const Vec2 = math.Vec2;
+
+// Rectangle data for batched rendering - natural foundation for Phase 2 instancing
+const RectData = struct {
+    pos: Vec2,
+    size: Vec2,
+    color: core_colors.Color,
+};
+
+// TODO: PHASE 2 - Convert RectData to GeometryInstance for instanced rendering
+const MAX_BATCHED_RECTS = constants.MAX_TERRAIN; // Terrain only
 const Color = core_colors.Color;
 const GPURenderer = simple_gpu_renderer.GPURenderer;
 const HexGame = hex_game_mod.HexGame;
@@ -142,18 +152,31 @@ pub const GameRenderer = struct {
     pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
         const zone = game.getCurrentZoneConst();
 
-        // Draw rectangles (obstacles) with camera transforms
-        for (0..zone.obstacles.count) |i| {
-            const transform = &zone.obstacles.transforms[i];
-            const visual = &zone.obstacles.visuals[i];
-            const terrain = &zone.obstacles.terrains[i];
+        // Batch terrain rectangles for optimal rendering
+        // TODO: PHASE 2 - Replace with single instanced draw call for all geometry
+        var rect_batch: [MAX_BATCHED_RECTS]RectData = undefined;
+        var rect_count: usize = 0;
 
-            const screen_pos = self.camera.worldToScreen(transform.pos);
-            const screen_size = Vec2{
-                .x = self.camera.worldSizeToScreen(terrain.size.x),
-                .y = self.camera.worldSizeToScreen(terrain.size.y),
+        // Add terrain rectangles to batch
+        for (0..zone.terrain.count) |i| {
+            const transform = &zone.terrain.transforms[i];
+            const visual = &zone.terrain.visuals[i];
+            const terrain = &zone.terrain.terrains[i];
+
+            rect_batch[rect_count] = RectData{
+                .pos = self.camera.worldToScreen(transform.pos),
+                .size = Vec2{
+                    .x = self.camera.worldSizeToScreen(terrain.size.x),
+                    .y = self.camera.worldSizeToScreen(terrain.size.y),
+                },
+                .color = visual.color,
             };
-            self.gpu.drawRect(cmd_buffer, render_pass, screen_pos, screen_size, visual.color);
+            rect_count += 1;
+        }
+
+        // Single batched draw call for terrain rectangles
+        for (rect_batch[0..rect_count]) |rect| {
+            self.gpu.drawRect(cmd_buffer, render_pass, rect.pos, rect.size, rect.color);
         }
 
         // Draw circles (units, lifestones, portals) with camera transforms

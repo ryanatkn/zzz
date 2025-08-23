@@ -22,34 +22,34 @@
             .camera_mode = .fixed, // Fixed camera shows entire world, use zoom to navigate
             .world_width = 160.0, // 160 meters (exploration scale)
             .world_height = 90.0, // 90 meters (exploration scale)
-            .obstacles = .{
-                // Large blocking obstacles (converted to meters: pixels / 12)
-                .{ .position = .{ .x = 16.7, .y = 25.0 }, .size = .{ .x = 6.7, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 133.3, .y = 16.7 }, .size = .{ .x = 10.0, .y = 5.0 }, .type = .blocking },
-                .{ .position = .{ .x = 33.3, .y = 66.7 }, .size = .{ .x = 5.0, .y = 8.3 }, .type = .blocking },
-                .{ .position = .{ .x = 116.7, .y = 75.0 }, .size = .{ .x = 8.3, .y = 6.7 }, .type = .blocking },
-                // Medium blocking obstacles (~1/2 size)
-                .{ .position = .{ .x = 25.0, .y = 12.5 }, .size = .{ .x = 3.3, .y = 2.5 }, .type = .blocking },
-                .{ .position = .{ .x = 125.0, .y = 33.3 }, .size = .{ .x = 2.9, .y = 3.8 }, .type = .blocking },
-                .{ .position = .{ .x = 20.8, .y = 75.0 }, .size = .{ .x = 4.2, .y = 2.1 }, .type = .blocking },
-                .{ .position = .{ .x = 137.5, .y = 62.5 }, .size = .{ .x = 2.5, .y = 3.3 }, .type = .blocking },
-                .{ .position = .{ .x = 58.3, .y = 79.2 }, .size = .{ .x = 3.8, .y = 2.9 }, .type = .blocking },
-                // Small blocking obstacles (~1/4 size)
-                .{ .position = .{ .x = 41.7, .y = 20.8 }, .size = .{ .x = 1.7, .y = 1.7 }, .type = .blocking },
-                .{ .position = .{ .x = 108.3, .y = 12.5 }, .size = .{ .x = 2.1, .y = 1.3 }, .type = .blocking },
-                .{ .position = .{ .x = 12.5, .y = 58.3 }, .size = .{ .x = 1.3, .y = 2.1 }, .type = .blocking },
-                .{ .position = .{ .x = 145.8, .y = 25.0 }, .size = .{ .x = 1.7, .y = 1.5 }, .type = .blocking },
-                .{ .position = .{ .x = 50.0, .y = 8.3 }, .size = .{ .x = 1.5, .y = 1.8 }, .type = .blocking },
-                .{ .position = .{ .x = 91.7, .y = 79.2 }, .size = .{ .x = 1.8, .y = 1.7 }, .type = .blocking },
-                // Tiny blocking obstacles (~1/10 size)
-                .{ .position = .{ .x = 29.2, .y = 37.5 }, .size = .{ .x = 0.7, .y = 0.7 }, .type = .blocking },
-                .{ .position = .{ .x = 120.8, .y = 50.0 }, .size = .{ .x = 1.0, .y = 0.5 }, .type = .blocking },
-                .{ .position = .{ .x = 45.8, .y = 70.8 }, .size = .{ .x = 0.5, .y = 0.8 }, .type = .blocking },
-                .{ .position = .{ .x = 100.0, .y = 8.3 }, .size = .{ .x = 0.8, .y = 0.7 }, .type = .blocking },
-                .{ .position = .{ .x = 8.3, .y = 41.7 }, .size = .{ .x = 0.7, .y = 1.0 }, .type = .blocking },
-                .{ .position = .{ .x = 150.0, .y = 75.0 }, .size = .{ .x = 0.8, .y = 0.8 }, .type = .blocking },
-                .{ .position = .{ .x = 37.5, .y = 16.7 }, .size = .{ .x = 0.6, .y = 0.7 }, .type = .blocking },
-                // Overworld is now safe - no deadly hazards, only blocking obstacles for navigation challenge
+            .terrain = .{
+                // Large rock formations (converted to meters: pixels / 12)
+                .{ .position = .{ .x = 16.7, .y = 25.0 }, .size = .{ .x = 6.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 133.3, .y = 16.7 }, .size = .{ .x = 10.0, .y = 5.0 }, .type = .rock },
+                .{ .position = .{ .x = 33.3, .y = 66.7 }, .size = .{ .x = 5.0, .y = 8.3 }, .type = .rock },
+                .{ .position = .{ .x = 116.7, .y = 75.0 }, .size = .{ .x = 8.3, .y = 6.7 }, .type = .rock },
+                // Medium rock formations (~1/2 size)
+                .{ .position = .{ .x = 25.0, .y = 12.5 }, .size = .{ .x = 3.3, .y = 2.5 }, .type = .rock },
+                .{ .position = .{ .x = 125.0, .y = 33.3 }, .size = .{ .x = 2.9, .y = 3.8 }, .type = .rock },
+                .{ .position = .{ .x = 20.8, .y = 75.0 }, .size = .{ .x = 4.2, .y = 2.1 }, .type = .rock },
+                .{ .position = .{ .x = 137.5, .y = 62.5 }, .size = .{ .x = 2.5, .y = 3.3 }, .type = .rock },
+                .{ .position = .{ .x = 58.3, .y = 79.2 }, .size = .{ .x = 3.8, .y = 2.9 }, .type = .rock },
+                // Small rock formations (~1/4 size)
+                .{ .position = .{ .x = 41.7, .y = 20.8 }, .size = .{ .x = 1.7, .y = 1.7 }, .type = .rock },
+                .{ .position = .{ .x = 108.3, .y = 12.5 }, .size = .{ .x = 2.1, .y = 1.3 }, .type = .rock },
+                .{ .position = .{ .x = 12.5, .y = 58.3 }, .size = .{ .x = 1.3, .y = 2.1 }, .type = .rock },
+                .{ .position = .{ .x = 145.8, .y = 25.0 }, .size = .{ .x = 1.7, .y = 1.5 }, .type = .rock },
+                .{ .position = .{ .x = 50.0, .y = 8.3 }, .size = .{ .x = 1.5, .y = 1.8 }, .type = .rock },
+                .{ .position = .{ .x = 91.7, .y = 79.2 }, .size = .{ .x = 1.8, .y = 1.7 }, .type = .rock },
+                // Tiny rock formations (~1/10 size)
+                .{ .position = .{ .x = 29.2, .y = 37.5 }, .size = .{ .x = 0.7, .y = 0.7 }, .type = .rock },
+                .{ .position = .{ .x = 120.8, .y = 50.0 }, .size = .{ .x = 1.0, .y = 0.5 }, .type = .rock },
+                .{ .position = .{ .x = 45.8, .y = 70.8 }, .size = .{ .x = 0.5, .y = 0.8 }, .type = .rock },
+                .{ .position = .{ .x = 100.0, .y = 8.3 }, .size = .{ .x = 0.8, .y = 0.7 }, .type = .rock },
+                .{ .position = .{ .x = 8.3, .y = 41.7 }, .size = .{ .x = 0.7, .y = 1.0 }, .type = .rock },
+                .{ .position = .{ .x = 150.0, .y = 75.0 }, .size = .{ .x = 0.8, .y = 0.8 }, .type = .rock },
+                .{ .position = .{ .x = 37.5, .y = 16.7 }, .size = .{ .x = 0.6, .y = 0.7 }, .type = .rock },
+                // Overworld is now safe - no deadly hazards, only rock formations for navigation challenge and ricochet gameplay
             },
             .units = .{
                 // 12 overworld units with simplified behaviors for clear gameplay
@@ -119,13 +119,13 @@
             .name = "Southeast Dungeon",
             .background_color = .{ .r = 15, .g = 15, .b = 25 },
             .camera_mode = .follow, // Follow camera with zoom for tactical view
-            .obstacles = .{
+            .terrain = .{
                 // Circular chamber layout (converted from pixels to meters)
-                .{ .position = .{ .x = 50.0, .y = 8.3 }, .size = .{ .x = 16.7, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 33.3, .y = 33.3 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .blocking },
-                .{ .position = .{ .x = 116.7, .y = 33.3 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .blocking },
-                .{ .position = .{ .x = 66.7, .y = 58.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .deadly },
-                .{ .position = .{ .x = 93.3, .y = 58.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .deadly },
+                .{ .position = .{ .x = 50.0, .y = 8.3 }, .size = .{ .x = 16.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 33.3, .y = 33.3 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
+                .{ .position = .{ .x = 116.7, .y = 33.3 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
+                .{ .position = .{ .x = 66.7, .y = 58.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                .{ .position = .{ .x = 93.3, .y = 58.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
             },
             .units = .{
                 // Southeast Dungeon: 1 boss unit (largest size) - positioned off-center for better flow
@@ -150,13 +150,13 @@
             .name = "Southwest Dungeon",
             .background_color = .{ .r = 25, .g = 15, .b = 15 },
             .camera_mode = .follow,
-            .obstacles = .{
+            .terrain = .{
                 // Triangular chamber layout (converted from pixels to meters)
-                .{ .position = .{ .x = 66.7, .y = 12.5 }, .size = .{ .x = 26.7, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 33.3, .y = 50.0 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .blocking },
-                .{ .position = .{ .x = 113.3, .y = 50.0 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .blocking },
-                .{ .position = .{ .x = 100.0, .y = 66.7 }, .size = .{ .x = 2.5, .y = 2.5 }, .type = .deadly },
-                .{ .position = .{ .x = 58.3, .y = 33.3 }, .size = .{ .x = 2.9, .y = 2.9 }, .type = .deadly },
+                .{ .position = .{ .x = 66.7, .y = 12.5 }, .size = .{ .x = 26.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 33.3, .y = 50.0 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
+                .{ .position = .{ .x = 113.3, .y = 50.0 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
+                .{ .position = .{ .x = 100.0, .y = 66.7 }, .size = .{ .x = 2.5, .y = 2.5 }, .type = .pit },
+                .{ .position = .{ .x = 58.3, .y = 33.3 }, .size = .{ .x = 2.9, .y = 2.9 }, .type = .pit },
             },
             .units = .{
                 // Southwest Dungeon: 2 units (second largest size)
@@ -183,13 +183,13 @@
             .name = "West Dungeon",
             .background_color = .{ .r = 15, .g = 25, .b = 15 },
             .camera_mode = .follow,
-            .obstacles = .{
+            .terrain = .{
                 // Square chamber layout (converted from pixels to meters)
-                .{ .position = .{ .x = 25.0, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .blocking },
-                .{ .position = .{ .x = 126.7, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .blocking },
-                .{ .position = .{ .x = 58.3, .y = 12.5 }, .size = .{ .x = 43.3, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 58.3, .y = 68.3 }, .size = .{ .x = 43.3, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 93.3, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .deadly },
+                .{ .position = .{ .x = 25.0, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
+                .{ .position = .{ .x = 126.7, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
+                .{ .position = .{ .x = 58.3, .y = 12.5 }, .size = .{ .x = 43.3, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 58.3, .y = 68.3 }, .size = .{ .x = 43.3, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 93.3, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
             },
             .units = .{
                 // West Dungeon: 3 units (medium size) - square chamber combat
@@ -216,13 +216,13 @@
             .name = "Northwest Dungeon",
             .background_color = .{ .r = 25, .g = 25, .b = 15 },
             .camera_mode = .follow,
-            .obstacles = .{
+            .terrain = .{
                 // Circular chamber layout (variant, converted from pixels to meters)
-                .{ .position = .{ .x = 50.0, .y = 81.7 }, .size = .{ .x = 16.7, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 29.2, .y = 56.7 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .blocking },
-                .{ .position = .{ .x = 120.8, .y = 56.7 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .blocking },
-                .{ .position = .{ .x = 58.3, .y = 25.0 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .deadly },
-                .{ .position = .{ .x = 101.7, .y = 25.0 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .deadly },
+                .{ .position = .{ .x = 50.0, .y = 81.7 }, .size = .{ .x = 16.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 29.2, .y = 56.7 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
+                .{ .position = .{ .x = 120.8, .y = 56.7 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
+                .{ .position = .{ .x = 58.3, .y = 25.0 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                .{ .position = .{ .x = 101.7, .y = 25.0 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
             },
             .units = .{
                 // Northwest Dungeon: 4 units (smaller size) - coordinated pack
@@ -251,13 +251,13 @@
             .name = "Northeast Dungeon",
             .background_color = .{ .r = 25, .g = 15, .b = 25 },
             .camera_mode = .follow,
-            .obstacles = .{
+            .terrain = .{
                 // Triangular chamber layout (variant, converted from pixels to meters)
-                .{ .position = .{ .x = 66.7, .y = 70.8 }, .size = .{ .x = 26.7, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 29.2, .y = 26.7 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .blocking },
-                .{ .position = .{ .x = 117.5, .y = 26.7 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .blocking },
-                .{ .position = .{ .x = 100.0, .y = 12.5 }, .size = .{ .x = 2.5, .y = 2.5 }, .type = .deadly },
-                .{ .position = .{ .x = 101.7, .y = 50.0 }, .size = .{ .x = 2.9, .y = 2.9 }, .type = .deadly },
+                .{ .position = .{ .x = 66.7, .y = 70.8 }, .size = .{ .x = 26.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 29.2, .y = 26.7 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
+                .{ .position = .{ .x = 117.5, .y = 26.7 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
+                .{ .position = .{ .x = 100.0, .y = 12.5 }, .size = .{ .x = 2.5, .y = 2.5 }, .type = .pit },
+                .{ .position = .{ .x = 101.7, .y = 50.0 }, .size = .{ .x = 2.9, .y = 2.9 }, .type = .pit },
             },
             .units = .{
                 // Northeast Dungeon: 5 units (small size) - swarm tactics
@@ -286,14 +286,14 @@
             .name = "East Dungeon",
             .background_color = .{ .r = 15, .g = 20, .b = 25 },
             .camera_mode = .follow,
-            .obstacles = .{
+            .terrain = .{
                 // Square chamber layout (variant, converted from pixels to meters)
-                .{ .position = .{ .x = 16.7, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .blocking },
-                .{ .position = .{ .x = 135.0, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .blocking },
-                .{ .position = .{ .x = 50.0, .y = 70.8 }, .size = .{ .x = 60.0, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 50.0, .y = 12.5 }, .size = .{ .x = 60.0, .y = 6.7 }, .type = .blocking },
-                .{ .position = .{ .x = 58.3, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .deadly },
-                .{ .position = .{ .x = 101.7, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .deadly },
+                .{ .position = .{ .x = 16.7, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
+                .{ .position = .{ .x = 135.0, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
+                .{ .position = .{ .x = 50.0, .y = 70.8 }, .size = .{ .x = 60.0, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 50.0, .y = 12.5 }, .size = .{ .x = 60.0, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 58.3, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                .{ .position = .{ .x = 101.7, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
             },
             .units = .{
                 // East Dungeon: 6 units (smallest size) - overwhelming numbers

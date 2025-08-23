@@ -41,7 +41,7 @@ const HexCombatInterface = struct {
     }
 };
 
-pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool {
+pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool {
     // Check if there's a controlled entity that can shoot
     if (!HexCombatInterface.isShooterAlive(game)) return false;
 
@@ -52,10 +52,10 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
     const config = combat.CombatActions.ShootConfig.fromShooterToTarget(
         shooter_pos,
         target_pos,
-        constants.BULLET_SPEED,
-        constants.BULLET_RADIUS,
-        constants.BULLET_LIFETIME,
-        constants.BULLET_DAMAGE,
+        constants.PROJECTILE_SPEED,
+        constants.PROJECTILE_RADIUS,
+        constants.PROJECTILE_LIFETIME,
+        constants.PROJECTILE_DAMAGE,
     );
 
     // Check if shooting is possible using generic interface
@@ -71,18 +71,18 @@ pub fn fireBullet(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool 
     // Consume from bullet pool
     pool.fire();
 
-    game.logger.info("bullet_fired", "Bullet fired from controlled entity! ID: {}, pos: {any}, target: {any}", .{ bullet_id, config.shooter_pos, target_pos });
+    game.logger.info("projectile_fired", "Projectile fired from controlled entity! ID: {}, pos: {any}, target: {any}", .{ bullet_id, config.shooter_pos, target_pos });
     return true;
 }
 
-pub fn fireBulletAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl) bool {
-    return fireBullet(game, mouse_pos, pool);
+pub fn fireProjectileAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl) bool {
+    return fireProjectile(game, mouse_pos, pool);
 }
 
-/// Fire bullet with proper screen-to-world coordinate conversion
-pub fn fireBulletAtScreenPos(game: *HexGame, screen_pos: Vec2, cam: *const Camera, pool: *BulletPoolImpl) bool {
+/// Fire projectile with proper screen-to-world coordinate conversion
+pub fn fireProjectileAtScreenPos(game: *HexGame, screen_pos: Vec2, cam: *const Camera, pool: *BulletPoolImpl) bool {
     const world_pos = cam.screenToWorldSafe(screen_pos);
-    return fireBullet(game, world_pos, pool);
+    return fireProjectile(game, world_pos, pool);
 }
 
 /// Convert hex lifestone to generic checkpoint data
