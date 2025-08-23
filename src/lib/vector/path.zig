@@ -1,6 +1,8 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
 
+// TODO should this be at src/path/? src/vector/path/?
+
 const Vec2 = math.Vec2;
 
 /// A point on a vector path with control information
