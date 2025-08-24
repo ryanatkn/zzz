@@ -19,12 +19,7 @@ const Movement = world_state_mod.Movement;
 pub fn getEntityPos(world: *const HexGame, entity_id: EntityId) ?Vec2 {
     const zone = world.getCurrentZoneConst();
 
-    // Check player storage first
-    if (zone.players.getComponent(entity_id, .transform)) |transform| {
-        return transform.pos;
-    }
-
-    // Check unit storage
+    // Check unit storage (includes player)
     if (zone.units.getComponent(entity_id, .transform)) |transform| {
         return transform.pos;
     }
@@ -36,13 +31,7 @@ pub fn getEntityPos(world: *const HexGame, entity_id: EntityId) ?Vec2 {
 pub fn setEntityPos(world: *HexGame, entity_id: EntityId, pos: Vec2) void {
     const zone = world.getCurrentZone();
 
-    // Try player storage first
-    if (zone.players.getComponentMut(entity_id, .transform)) |transform| {
-        transform.pos = pos;
-        return;
-    }
-
-    // Try unit storage
+    // Update unit storage (includes player)
     if (zone.units.getComponentMut(entity_id, .transform)) |transform| {
         transform.pos = pos;
     }
@@ -52,12 +41,7 @@ pub fn setEntityPos(world: *HexGame, entity_id: EntityId, pos: Vec2) void {
 pub fn getEntityVelocity(world: *const HexGame, entity_id: EntityId) Vec2 {
     const zone = world.getCurrentZoneConst();
 
-    // Check player storage first (velocity stored in transform for players too)
-    if (zone.players.getComponent(entity_id, .transform)) |transform| {
-        return transform.vel;
-    }
-
-    // Check unit storage (has velocity in Transform)
+    // Check unit storage (includes player)
     if (zone.units.getComponent(entity_id, .transform)) |transform| {
         return transform.vel;
     }
@@ -69,13 +53,7 @@ pub fn getEntityVelocity(world: *const HexGame, entity_id: EntityId) Vec2 {
 pub fn setEntityVelocity(world: *HexGame, entity_id: EntityId, vel: Vec2) void {
     const zone = world.getCurrentZone();
 
-    // Try player storage first (velocity stored in transform for players too)
-    if (zone.players.getComponentMut(entity_id, .transform)) |transform| {
-        transform.vel = vel;
-        return;
-    }
-
-    // Try unit storage (has velocity in Transform)
+    // Update unit storage (includes player)
     if (zone.units.getComponentMut(entity_id, .transform)) |transform| {
         transform.vel = vel;
     }
@@ -85,12 +63,7 @@ pub fn setEntityVelocity(world: *HexGame, entity_id: EntityId, vel: Vec2) void {
 pub fn isEntityAlive(world: *const HexGame, entity_id: EntityId) bool {
     const zone = world.getCurrentZoneConst();
 
-    // Check player storage
-    if (zone.players.getComponent(entity_id, .health)) |health| {
-        return health.alive;
-    }
-
-    // Check unit storage
+    // Check unit storage (includes player)
     if (zone.units.getComponent(entity_id, .health)) |health| {
         return health.alive;
     }
@@ -102,13 +75,7 @@ pub fn isEntityAlive(world: *const HexGame, entity_id: EntityId) bool {
 pub fn setEntityAlive(world: *HexGame, entity_id: EntityId, alive: bool) void {
     const zone = world.getCurrentZone();
 
-    // Try player storage first
-    if (zone.players.getComponentMut(entity_id, .health)) |health| {
-        health.alive = alive;
-        return;
-    }
-
-    // Try unit storage
+    // Update unit storage (includes player)
     if (zone.units.getComponentMut(entity_id, .health)) |health| {
         health.alive = alive;
     }
@@ -118,12 +85,7 @@ pub fn setEntityAlive(world: *HexGame, entity_id: EntityId, alive: bool) void {
 pub fn getEntityRadius(world: *const HexGame, entity_id: EntityId) ?f32 {
     const zone = world.getCurrentZoneConst();
 
-    // Check player storage
-    if (zone.players.getComponent(entity_id, .transform)) |transform| {
-        return transform.radius;
-    }
-
-    // Check unit storage
+    // Check unit storage (includes player)
     if (zone.units.getComponent(entity_id, .transform)) |transform| {
         return transform.radius;
     }
@@ -135,13 +97,7 @@ pub fn getEntityRadius(world: *const HexGame, entity_id: EntityId) ?f32 {
 pub fn setEntityColor(world: *HexGame, entity_id: EntityId, color: Color) void {
     const zone = world.getCurrentZone();
 
-    // Try player storage first
-    if (zone.players.getComponentMut(entity_id, .visual)) |visual| {
-        visual.color = color;
-        return;
-    }
-
-    // Try unit storage
+    // Update unit storage (includes player)
     if (zone.units.getComponentMut(entity_id, .visual)) |visual| {
         visual.color = color;
     }
@@ -151,12 +107,7 @@ pub fn setEntityColor(world: *HexGame, entity_id: EntityId, color: Color) void {
 pub fn getEntityHealth(world: *const HexGame, entity_id: EntityId) ?*const Health {
     const zone = world.getCurrentZoneConst();
 
-    // Check player storage
-    if (zone.players.getComponent(entity_id, .health)) |health| {
-        return health;
-    }
-
-    // Check unit storage
+    // Check unit storage (includes player)
     if (zone.units.getComponent(entity_id, .health)) |health| {
         return health;
     }
@@ -168,12 +119,7 @@ pub fn getEntityHealth(world: *const HexGame, entity_id: EntityId) ?*const Healt
 pub fn getEntityTransform(world: *const HexGame, entity_id: EntityId) ?*const Transform {
     const zone = world.getCurrentZoneConst();
 
-    // Check player storage
-    if (zone.players.getComponent(entity_id, .transform)) |transform| {
-        return transform;
-    }
-
-    // Check unit storage
+    // Check unit storage (includes player)
     if (zone.units.getComponent(entity_id, .transform)) |transform| {
         return transform;
     }
@@ -185,12 +131,7 @@ pub fn getEntityTransform(world: *const HexGame, entity_id: EntityId) ?*const Tr
 pub fn getEntityTransformMutable(world: *HexGame, entity_id: EntityId) ?*Transform {
     const zone = world.getCurrentZone();
 
-    // Check player storage
-    if (zone.players.getComponent(entity_id, .transform)) |transform| {
-        return transform;
-    }
-
-    // Check unit storage
+    // Check unit storage (includes player)
     if (zone.units.getComponent(entity_id, .transform)) |transform| {
         return transform;
     }
@@ -203,18 +144,7 @@ pub fn findControllableEntities(world: *const HexGame, buffer: []EntityId) usize
     const zone = world.getCurrentZoneConst();
     var count: usize = 0;
 
-    // Check players (players are typically controllable)
-    var player_iter = zone.players.entityIterator();
-    while (player_iter.next()) |entity_id| {
-        if (count >= buffer.len) break;
-
-        if (faction_integration.canEntityBeControlled(world, entity_id)) {
-            buffer[count] = entity_id;
-            count += 1;
-        }
-    }
-
-    // Check units that can be controlled (rare but supported)
+    // Check all units (includes player) for controllability
     var unit_iter = zone.units.entityIterator();
     while (unit_iter.next()) |entity_id| {
         if (count >= buffer.len) break;
@@ -232,7 +162,7 @@ pub fn findControllableEntities(world: *const HexGame, buffer: []EntityId) usize
 pub fn entityExists(world: *const HexGame, entity_id: EntityId) bool {
     const zone = world.getCurrentZoneConst();
 
-    return zone.players.containsEntity(entity_id) or zone.units.containsEntity(entity_id);
+    return zone.units.containsEntity(entity_id);
 }
 
 /// Get entity type (player vs unit)
@@ -245,8 +175,14 @@ pub const EntityType = enum {
 pub fn getEntityType(world: *const HexGame, entity_id: EntityId) EntityType {
     const zone = world.getCurrentZoneConst();
 
-    if (zone.players.containsEntity(entity_id)) return .player;
-    if (zone.units.containsEntity(entity_id)) return .unit;
+    // Check if entity is in units storage
+    if (zone.units.containsEntity(entity_id)) {
+        // Check the unit type to determine if it's a player
+        if (zone.units.getComponent(entity_id, .unit)) |unit| {
+            if (unit.unitType() == .player) return .player;
+        }
+        return .unit;
+    }
     return .unknown;
 }
 
@@ -260,10 +196,14 @@ pub fn applyMovementBounds(world: *const HexGame, entity_id: EntityId, pos: Vec2
         const entity_radius = getEntityRadius(world, entity_id) orelse 0.2; // 20cm default radius
         const margin = entity_radius + 0.1; // 10cm boundary margin
 
-        if (new_pos.x < margin) new_pos.x = margin;
-        if (new_pos.y < margin) new_pos.y = margin;
-        if (new_pos.x > zone.world_width - margin) new_pos.x = zone.world_width - margin;
-        if (new_pos.y > zone.world_height - margin) new_pos.y = zone.world_height - margin;
+        // World bounds are now centered around origin: [-width/2, -height/2] to [+width/2, +height/2]
+        const half_width = zone.world_width / 2.0;
+        const half_height = zone.world_height / 2.0;
+
+        if (new_pos.x < -half_width + margin) new_pos.x = -half_width + margin;
+        if (new_pos.y < -half_height + margin) new_pos.y = -half_height + margin;
+        if (new_pos.x > half_width - margin) new_pos.x = half_width - margin;
+        if (new_pos.y > half_height - margin) new_pos.y = half_height - margin;
     }
 
     return new_pos;

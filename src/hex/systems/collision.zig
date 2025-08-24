@@ -28,7 +28,16 @@ pub const CollisionSystem = struct {
         const world = &game_state.hex_game;
 
         // Bullet-unit collision is handled in world.updateProjectiles()
-        if (!world.getPlayerAlive()) return;
+        // Check if controlled entity is alive before processing collisions
+        const controlled_entity_alive = if (world.getControlledEntity()) |controlled_entity| blk: {
+            const zone = world.getCurrentZoneConst();
+            if (zone.units.getComponent(controlled_entity, .health)) |health| {
+                break :blk health.alive;
+            }
+            break :blk false;
+        } else false;
+
+        if (!controlled_entity_alive) return;
 
         // Debug: Check if portal checking is being called
         game_state.logger.debug("game_loop", "Checking portal collisions in game loop", .{});
@@ -37,27 +46,8 @@ pub const CollisionSystem = struct {
             return;
         }
 
-        // Get player position and radius for collision checks
-        const player_pos = world.getPlayerPos();
-        const player_radius = world.getPlayerRadius();
-
-        // Check player-unit collisions (player dies on contact)
-        if (physics.checkPlayerUnitCollision(world)) {
-            // Player dies on unit contact
-            world.setPlayerAlive(false);
-            world.setPlayerColor(constants.COLOR_DEAD);
-            return;
-        }
-
-        // Check lifestone collisions - delegated to lifestone system
-        @import("lifestone.zig").LifestoneSystem.checkLifestoneCollisions(game_state, player_pos, player_radius);
-
-        // Check collision with deadly obstacles
-        if (physics.collidesWithDeadlyObstacle(player_pos, player_radius, world)) {
-            // Player dies on hazard contact
-            world.setPlayerAlive(false);
-            world.setPlayerColor(constants.COLOR_DEAD);
-        }
+        // Check lifestone collisions - delegated to lifestone system (uses controlled entity internally)
+        @import("lifestone.zig").LifestoneSystem.checkLifestoneCollisions(game_state);
     }
 
     /// Check collision between two circular entities

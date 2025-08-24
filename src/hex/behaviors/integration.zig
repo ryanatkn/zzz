@@ -78,8 +78,8 @@ pub fn evaluateUnitBehavior(context: UnitUpdateContext) evaluators.ComposedBehav
     const behavior_context = evaluators.BehaviorContext.init(
         context.transform.pos,
         context.unit.homePos(),
-        if (context.player_alive) context.player_pos else null,
-        context.player_alive,
+        context.controlled_entity_pos,
+        context.controlled_entity_alive,
         context.unit.aggro_factor,
         context.frame_ctx.effectiveDelta(),
     );
@@ -105,13 +105,15 @@ pub fn applyBehaviorResult(context: UnitUpdateContext, result: evaluators.Compos
         .idle => .lowered, // Resting/passive
     };
 
-    // Special case: Neutral units become alert (raised energy) when player is nearby
-    if (context.unit.disposition == .neutral and context.player_alive) {
-        const distance_to_player = context.transform.pos.distance(context.player_pos); // world space (meters)
-        const detection_range = context.unit.aggro_range; // world space detection range (meters)
+    // Special case: Neutral units become alert (raised energy) when controlled entity is nearby
+    if (context.unit.disposition == .neutral and context.controlled_entity_alive) {
+        if (context.controlled_entity_pos) |controlled_pos| {
+            const distance_to_controlled = context.transform.pos.distance(controlled_pos); // world space (meters)
+            const detection_range = context.unit.aggro_range; // world space detection range (meters)
 
-        if (distance_to_player < detection_range) {
-            context.unit.energy_level = .raised; // Alert but not aggressive
+            if (distance_to_controlled < detection_range) {
+                context.unit.energy_level = .raised; // Alert but not aggressive
+            }
         }
     }
 
@@ -123,11 +125,11 @@ pub fn updateUnitWithAggroMod(
     unit_comp: *Unit,
     transform: *Transform,
     visual: *Visual,
-    player_pos: Vec2,
-    player_alive: bool,
+    controlled_entity_pos: ?Vec2,
+    controlled_entity_alive: bool,
     aggro_multiplier: f32,
     frame_ctx: FrameContext,
 ) void {
     _ = aggro_multiplier; // Legacy parameter, now using unit's aggro_factor
-    updateUnit(UnitUpdateContext.init(unit_comp, transform, visual, player_pos, player_alive, frame_ctx));
+    updateUnit(UnitUpdateContext.init(unit_comp, transform, visual, controlled_entity_pos, controlled_entity_alive, frame_ctx));
 }

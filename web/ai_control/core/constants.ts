@@ -75,19 +75,6 @@ export const ZONES = {
   }
 };
 
-// Combat constants
-export const COMBAT = {
-  BULLET_SPEED: 300,  // Units per second
-  BULLET_LIFETIME: 4000,  // Milliseconds
-  BULLET_POOL_SIZE: 6,
-  BULLET_RECHARGE_RATE: 2,  // Per second
-  RHYTHM_INTERVAL: 150,  // Milliseconds between rhythm shots
-  ENEMY_AGGRO_RANGE: 200,
-  ENEMY_ATTACK_RANGE: 150,
-  PLAYER_SPEED: 100,  // Units per second
-  PLAYER_WALK_SPEED: 50,  // Units per second
-};
-
 // Spell information
 export const SPELLS = {
   SLOTS: {

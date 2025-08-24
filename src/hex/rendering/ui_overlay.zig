@@ -46,12 +46,18 @@ pub const UIOverlayRenderer = struct {
 
     /// Prepare debug info text texture BEFORE render pass
     pub fn prepareDebugInfo(gpu_renderer: anytype, game: *const HexGame, font_mgr: anytype) void {
-        // Get player position for debugging
-        const player_pos = game.getPlayerPos();
+        // Get controlled entity position for debugging
+        const controlled_pos = if (game.getControlledEntity()) |controlled_entity| blk: {
+            const zone = game.getCurrentZoneConst();
+            if (zone.units.getComponent(controlled_entity, .transform)) |transform| {
+                break :blk transform.pos;
+            }
+            break :blk Vec2.ZERO;
+        } else Vec2.ZERO;
 
         // Format coordinate text
         var coord_buffer: [64]u8 = undefined;
-        const coord_text = std.fmt.bufPrint(&coord_buffer, "Pos: ({d:.1}, {d:.1})", .{ player_pos.x, player_pos.y }) catch "Pos: ERR";
+        const coord_text = std.fmt.bufPrint(&coord_buffer, "Pos: ({d:.1}, {d:.1})", .{ controlled_pos.x, controlled_pos.y }) catch "Pos: ERR";
 
         // Position below FPS display
         const position = Vec2{ .x = 10.0, .y = 35.0 };

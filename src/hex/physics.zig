@@ -25,8 +25,11 @@ pub fn canEntityMoveTo(game: *HexGame, entity_id: world_state_mod.EntityId, new_
 }
 
 // Check if player can move to position (obstacle collision) - legacy compatibility
-pub fn canPlayerMoveTo(game: *HexGame, new_pos: math.Vec2, player_radius: f32) bool {
-    return canEntityMoveToWithRadius(game, new_pos, player_radius);
+pub fn canControlledEntityMoveTo(game: *HexGame, new_pos: math.Vec2) bool {
+    const controlled_entity = game.getControlledEntity() orelse return false;
+    const zone_storage = game.getZoneStorage();
+    const controlled_transform = zone_storage.units.getComponent(controlled_entity, .transform) orelse return false;
+    return canEntityMoveToWithRadius(game, new_pos, controlled_transform.radius);
 }
 
 // Internal helper for obstacle collision checking
@@ -60,34 +63,38 @@ fn canEntityMoveToWithRadius(game: *HexGame, new_pos: math.Vec2, entity_radius: 
     return !result.found;
 }
 
-// Player-unit collision check using faction-based relationships
-pub fn checkPlayerUnitCollision(world: *world_state_mod.HexGame) bool {
-    const player_pos = world.getPlayerPos();
-    const player_radius = world.getPlayerRadius();
+// Controlled entity-unit collision check using faction-based relationships
+pub fn checkControlledEntityUnitCollision(world: *world_state_mod.HexGame) bool {
+    const controlled_entity = world.getControlledEntity() orelse return false;
     const zone_storage = world.getZoneStorage();
 
-    // Get player entity ID for faction checking
-    const player_entity = world.getPlayer() orelse return false;
+    // Get controlled entity position and radius
+    const controlled_transform = zone_storage.units.getComponent(controlled_entity, .transform) orelse return false;
+    const controlled_pos = controlled_transform.pos;
+    const controlled_radius = controlled_transform.radius;
 
     // Use idiomatic Zig iterator pattern
     var unit_iter = world.iterateUnitsInCurrentZone();
     while (unit_iter.next()) |entity_id| {
+        // Skip self-collision
+        if (entity_id == controlled_entity) continue;
+
         if (zone_storage.units.getComponent(entity_id, .transform)) |transform| {
             if (zone_storage.units.getComponent(entity_id, .health)) |health| {
                 // Only check alive units
                 if (!health.alive) continue;
 
                 // Check physical collision first
-                if (collision.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
+                if (collision.checkCircleCollision(controlled_pos, controlled_radius, transform.pos, transform.radius)) {
                     // Check faction relationship to determine if this should cause damage
-                    if (faction_integration.getEntityRelation(world, entity_id, player_entity)) |relation| {
+                    if (faction_integration.getEntityRelation(world, entity_id, controlled_entity)) |relation| {
                         // Only hostile or suspicious entities with attack capability cause damage collision
                         if ((relation == .hostile or relation == .suspicious) and faction_integration.canEntityAttack(world, entity_id)) {
-                            faction_integration.logFactionRelation(world, entity_id, player_entity, relation);
+                            faction_integration.logFactionRelation(world, entity_id, controlled_entity, relation);
                             return true;
                         }
                         // Friendly/allied/neutral units don't cause damage collision
-                        faction_integration.logFactionRelation(world, entity_id, player_entity, relation);
+                        faction_integration.logFactionRelation(world, entity_id, controlled_entity, relation);
                     } else {
                         // Fallback to old behavior if faction data is missing
                         // TODO: Remove this fallback once all entities have faction data
@@ -141,40 +148,6 @@ pub fn checkUnitTerrainCollision(world: *world_state_mod.HexGame, unit_id: world
     return false;
 }
 
-// Check if position collides with deadly obstacles
-pub fn collidesWithDeadlyObstacle(pos: math.Vec2, radius: f32, world: *world_state_mod.HexGame) bool {
-    const zone = world.getCurrentZone();
-
-    // Convert zone terrain to query format (only deadly ones) using ECS iteration
-    var obstacles: [constants.MAX_TERRAIN]queries.ObstacleData = undefined;
-    var obstacle_count: usize = 0;
-
-    var terrain_iter = world.iterateTerrainInCurrentZone();
-    while (terrain_iter.next()) |terrain_id| {
-        if (zone.terrain.getComponent(terrain_id, .terrain)) |terrain| {
-            if (zone.terrain.getComponent(terrain_id, .transform)) |transform| {
-                // Only include deadly terrain using component-based approach
-                if (terrain.deadly) {
-                    if (obstacle_count < obstacles.len) {
-                        obstacles[obstacle_count] = queries.ObstacleData{
-                            .position = transform.pos,
-                            .size = terrain.size,
-                            .is_solid = terrain.solid,
-                            .is_deadly = true,
-                        };
-                        obstacle_count += 1;
-                    }
-                }
-            }
-        }
-    }
-
-    const config = queries.ObstacleQueryConfig{ .check_deadly_only = true };
-    const result = queries.PhysicsQueries.checkCircleObstacleCollision(pos, radius, obstacles[0..obstacle_count], config);
-
-    return result.found;
-}
-
 // Lifestone search result
 pub const LifestoneResult = struct {
     pos: math.Vec2,
@@ -183,7 +156,14 @@ pub const LifestoneResult = struct {
 
 // Find nearest attuned lifestone across all zones
 pub fn findNearestAttunedLifestone(game: *HexGame) ?LifestoneResult {
-    const player_pos = game.getPlayerPos();
+    // Get controlled entity position for lifestone search
+    const controlled_pos = if (game.getControlledEntity()) |controlled_entity| blk: {
+        const zone = game.getCurrentZoneConst();
+        if (zone.units.getComponent(controlled_entity, .transform)) |transform| {
+            break :blk transform.pos;
+        }
+        break :blk math.Vec2.ZERO;
+    } else math.Vec2.ZERO;
 
     // Collect all attuned lifestones across zones
     var lifestones: [world_state_mod.MAX_ZONES * constants.MAX_LIFESTONES]queries.EntityData = undefined;
@@ -214,7 +194,7 @@ pub fn findNearestAttunedLifestone(game: *HexGame) ?LifestoneResult {
 
     if (lifestone_count == 0) return null;
 
-    const result = queries.PhysicsQueries.findNearestEntity(player_pos, lifestones[0..lifestone_count], true);
+    const result = queries.PhysicsQueries.findNearestEntity(controlled_pos, lifestones[0..lifestone_count], true);
 
     if (!result.found) return null;
 

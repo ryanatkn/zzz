@@ -233,9 +233,19 @@ pub const GameState = struct {
     }
 
     pub fn resetGame(self: *Self) void {
-        // Reset player to starting position and state
-        self.hex_game.setPlayerPos(self.hex_game.player_start_pos);
-        self.hex_game.setPlayerAlive(true);
+        // Reset controlled entity to starting position and state - now uses zone spawn position
+        const overworld_zone = self.hex_game.zone_manager.getZoneConst(0);
+
+        if (self.hex_game.getControlledEntity()) |controlled_entity| {
+            const zone = self.hex_game.getCurrentZone();
+            if (zone.units.getComponentMut(controlled_entity, .transform)) |transform| {
+                transform.pos = overworld_zone.spawn_pos;
+            }
+            if (zone.units.getComponentMut(controlled_entity, .health)) |health| {
+                health.alive = true;
+                health.current = health.max;
+            }
+        }
 
         // Reset to starting zone
         if (self.hex_game.zone_manager.getCurrentZoneIndex() != 0) {

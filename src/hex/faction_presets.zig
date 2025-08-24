@@ -22,7 +22,15 @@ pub fn getPlayerFactions() EntityFactions {
 
 /// Get default capabilities for the player entity
 pub fn getPlayerCapabilities() Capabilities {
-    return Capabilities.initPlayer(constants.PLAYER_SPEED, constants.PLAYER_DAMAGE);
+    return .{
+        .can_move = true,
+        .can_be_controlled = true,
+        .can_attack = true,
+        .attack_damage = constants.UNIT_DAMAGE * 2.5,
+        .can_be_damaged = true,
+        .can_interact = true,
+        // NOTE: move_speed now comes from unit data, not capabilities
+    };
 }
 
 /// Map existing disposition system to faction tags
@@ -68,21 +76,49 @@ pub fn getUnitFactions(disposition: Disposition, unit_type: UnitType) EntityFact
 
 /// Map existing disposition system to capabilities
 /// This provides sensible defaults based on current behavior
+/// NOTE: Speed now comes from unit data, not capabilities
 pub fn getUnitCapabilities(disposition: Disposition) Capabilities {
     return switch (disposition) {
-        .friendly => Capabilities.initFriendlyUnit(constants.UNIT_SPEED),
-        .allied => Capabilities.initFriendlyUnit(constants.UNIT_SPEED * 1.1), // Slightly faster allies
-        .hostile => Capabilities.initHostileUnit(constants.UNIT_SPEED, constants.UNIT_DAMAGE),
+        .friendly => .{
+            .can_move = true,
+            .can_be_controlled = true,
+            .can_attack = false, // Friendly units don't attack
+            .attack_damage = 0.0,
+            .can_be_damaged = true,
+            .can_interact = true,
+        },
+        .allied => .{
+            .can_move = true,
+            .can_be_controlled = true,
+            .can_attack = false, // Allied units don't attack
+            .attack_damage = 0.0,
+            .can_be_damaged = true,
+            .can_interact = true,
+        },
+        .hostile => .{
+            .can_move = true,
+            .can_be_controlled = true,
+            .can_attack = true,
+            .attack_damage = constants.UNIT_DAMAGE,
+            .can_be_damaged = true,
+            .can_interact = false,
+        },
         .fearful => .{
             .can_move = true,
-            .move_speed = constants.UNIT_SPEED * 1.2, // Faster when fleeing
             .can_be_controlled = true,
             .can_attack = false, // Too scared to attack
             .attack_damage = 0.0,
             .can_be_damaged = true,
             .can_interact = false, // Too scared to interact
         },
-        .neutral => Capabilities.initNeutral(constants.UNIT_SPEED * 0.8), // Slower, more careful
+        .neutral => .{
+            .can_move = true,
+            .can_be_controlled = true,
+            .can_attack = false, // Neutral units don't attack
+            .attack_damage = 0.0,
+            .can_be_damaged = true,
+            .can_interact = true,
+        },
     };
 }
 

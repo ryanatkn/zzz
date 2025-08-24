@@ -57,9 +57,17 @@ pub fn handleSDLEvent(
             // Extract action from keypress
             const action = extractGameAction(event);
 
-            // Create action context
+            // Create action context - check if controlled entity is alive
+            const controlled_entity_alive = if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
+                const zone = game_state.hex_game.getCurrentZoneConst();
+                if (zone.units.getComponent(controlled_entity, .health)) |health| {
+                    break :blk health.alive;
+                }
+                break :blk false;
+            } else false;
+
             const action_context = input_actions.ActionContext.init()
-                .withPlayerState(game_state.hex_game.getPlayerAlive())
+                .withPlayerState(controlled_entity_alive)
                 .withMenuState(if (game_state.hud_system) |*hud_sys| hud_sys.is_open() else false)
                 .withPauseState(game_state.game_paused);
 
@@ -146,8 +154,16 @@ pub fn handleSDLEvent(
             // Extract action from mouse button
             const action = extractGameAction(event);
 
-            // Handle dead player actions - simplified inline logic
-            if (!game_state.hex_game.getPlayerAlive()) {
+            // Handle dead controlled entity actions - simplified inline logic
+            const controlled_entity_alive = if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
+                const zone = game_state.hex_game.getCurrentZoneConst();
+                if (zone.units.getComponent(controlled_entity, .health)) |health| {
+                    break :blk health.alive;
+                }
+                break :blk false;
+            } else false;
+
+            if (!controlled_entity_alive) {
                 switch (action) {
                     // Respawn actions
                     .PrimaryAttack, .Respawn => {
@@ -165,7 +181,16 @@ pub fn handleSDLEvent(
             // Process action for living player
             switch (action) {
                 .PrimaryAttack => {
-                    if (game_state.hex_game.getPlayerAlive()) {
+                    // Check if controlled entity is alive for primary attack
+                    const attack_entity_alive = if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
+                        const zone = game_state.hex_game.getCurrentZoneConst();
+                        if (zone.units.getComponent(controlled_entity, .health)) |health| {
+                            break :blk health.alive;
+                        }
+                        break :blk false;
+                    } else false;
+
+                    if (attack_entity_alive) {
                         const screen_mouse_pos = game_state.input_state.getMousePos();
 
                         // Check if click is on spellbar first
@@ -190,7 +215,16 @@ pub fn handleSDLEvent(
                     }
                 },
                 .SecondaryAttack => {
-                    if (game_state.hex_game.getPlayerAlive()) {
+                    // Check if controlled entity is alive for secondary attack
+                    const secondary_entity_alive = if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
+                        const zone = game_state.hex_game.getCurrentZoneConst();
+                        if (zone.units.getComponent(controlled_entity, .health)) |health| {
+                            break :blk health.alive;
+                        }
+                        break :blk false;
+                    } else false;
+
+                    if (secondary_entity_alive) {
                         const screen_mouse_pos = game_state.input_state.getMousePos();
 
                         // Check if right-click is on spellbar first
@@ -198,10 +232,10 @@ pub fn handleSDLEvent(
                             // Right-click on spellbar slot = select and cast immediately
                             game_state.spell_system.setActiveSlot(slot_index);
 
-                            // Cast the spell at mouse position (self-cast since clicked on slot)
+                            // Cast the spell at controlled entity position (self-cast since clicked on slot)
                             const zone = game_state.hex_game.getCurrentZoneConst();
-                            const player_pos = game_state.hex_game.getPlayerPos();
-                            _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, player_pos, &game_state.particle_system, true);
+                            // Spell system will handle getting controlled entity position internally
+                            _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, Vec2.ZERO, &game_state.particle_system, true);
                             return c.sdl.SDL_APP_CONTINUE;
                         }
 

@@ -24,7 +24,6 @@ pub const ZoneManager = struct {
     /// Zone data structure with entity storage and metadata
     pub const ZoneData = struct {
         // Direct fixed-size archetype storage - no dynamic allocation
-        players: storage.PlayerStorage(world_state_mod.MAX_ENTITIES_PER_ARCHETYPE),
         units: storage.UnitStorage(world_state_mod.MAX_ENTITIES_PER_ARCHETYPE, Unit),
         projectiles: storage.ProjectileStorage(world_state_mod.MAX_ENTITIES_PER_ARCHETYPE, world_state_mod.HexProjectile),
         terrain: storage.TerrainStorage(world_state_mod.MAX_ENTITIES_PER_ARCHETYPE),
@@ -56,7 +55,6 @@ pub const ZoneManager = struct {
 
         pub fn init(zone_type: ZoneType) ZoneData {
             return .{
-                .players = storage.PlayerStorage(world_state_mod.MAX_ENTITIES_PER_ARCHETYPE).init(),
                 .units = storage.UnitStorage(world_state_mod.MAX_ENTITIES_PER_ARCHETYPE, Unit).init(),
                 .projectiles = storage.ProjectileStorage(world_state_mod.MAX_ENTITIES_PER_ARCHETYPE, world_state_mod.HexProjectile).init(),
                 .terrain = storage.TerrainStorage(world_state_mod.MAX_ENTITIES_PER_ARCHETYPE).init(),
@@ -65,7 +63,7 @@ pub const ZoneManager = struct {
                 .zone_type = zone_type,
                 // Defaults for normal dungeons - overworld will override in ZON
                 .camera_mode = .follow, // Default: follow camera for tactical gameplay
-                .spawn_pos = Vec2{ .x = constants.DEFAULT_VIEWPORT_WIDTH / 2.0, .y = constants.DEFAULT_VIEWPORT_HEIGHT / 2.0 }, // Default: center of default viewport
+                .spawn_pos = Vec2{ .x = 0.0, .y = 0.0 }, // Default: origin spawn, arrange terrain around player
                 .background_color = getZoneBackgroundColorForType(zone_type),
                 .world_width = constants.DEFAULT_VIEWPORT_WIDTH, // Default: 16 meters (tactical scale)
                 .world_height = constants.DEFAULT_VIEWPORT_HEIGHT, // Default: 9 meters (tactical scale)
@@ -81,7 +79,6 @@ pub const ZoneManager = struct {
         /// Check if an entity is alive by searching through all storage types
         pub fn isAlive(self: *const ZoneData, entity_id: world_state_mod.EntityId) bool {
             // Check each storage type to see if entity exists and is alive
-            if (self.players.containsEntity(entity_id)) return true;
             if (self.units.containsEntity(entity_id)) return true;
             if (self.projectiles.containsEntity(entity_id)) return true;
             if (self.terrain.containsEntity(entity_id)) return true;

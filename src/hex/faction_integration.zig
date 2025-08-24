@@ -12,13 +12,14 @@ const EntityFactions = factions.EntityFactions;
 const FactionRelation = factions.FactionRelation;
 
 /// Helper functions to integrate faction system with existing hex game code
-/// Get entity factions from player storage
+/// Get entity factions from player unit (now in units storage)
 pub fn getPlayerFactions(game: *const HexGame, entity_id: EntityId) ?EntityFactions {
     const zone = game.getCurrentZoneConst();
-    // TODO: When we switch to extended storage, use zone.players.getFactions(entity_id)
-    // For now, return default player factions
-    if (zone.players.containsEntity(entity_id)) {
-        return faction_presets.getPlayerFactions();
+    // Check if entity is a player unit in units storage
+    if (zone.units.getComponent(entity_id, .unit)) |unit| {
+        if (unit.unitType() == .player) {
+            return faction_presets.getPlayerFactions();
+        }
     }
     return null;
 }
@@ -34,13 +35,14 @@ pub fn getUnitFactions(game: *const HexGame, entity_id: EntityId) ?EntityFaction
     return null;
 }
 
-/// Get entity capabilities from player storage
+/// Get entity capabilities from player unit (now in units storage)
 pub fn getPlayerCapabilities(game: *const HexGame, entity_id: EntityId) ?components.Capabilities {
     const zone = game.getCurrentZoneConst();
-    // TODO: When we switch to extended storage, use zone.players.getCapabilities(entity_id)
-    // For now, return default player capabilities
-    if (zone.players.containsEntity(entity_id)) {
-        return faction_presets.getPlayerCapabilities();
+    // Check if entity is a player unit in units storage
+    if (zone.units.getComponent(entity_id, .unit)) |unit| {
+        if (unit.unitType() == .player) {
+            return faction_presets.getPlayerCapabilities();
+        }
     }
     return null;
 }
@@ -49,8 +51,13 @@ pub fn getPlayerCapabilities(game: *const HexGame, entity_id: EntityId) ?compone
 pub fn getUnitCapabilities(game: *const HexGame, entity_id: EntityId) ?components.Capabilities {
     const zone = game.getCurrentZoneConst();
     // TODO: When we switch to extended storage, use zone.units.getCapabilities(entity_id)
-    // For now, extract from unit disposition and map to capabilities
+    // For now, extract from unit type and disposition and map to capabilities
     if (zone.units.getComponent(entity_id, .unit)) |unit| {
+        // Check if this is a player unit type
+        if (unit.base.unit_type == .player) {
+            return faction_presets.getPlayerCapabilities();
+        }
+        // Otherwise use regular unit capabilities based on disposition
         return faction_presets.getUnitCapabilities(unit.disposition);
     }
     return null;

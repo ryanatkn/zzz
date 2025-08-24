@@ -274,18 +274,23 @@ pub const SpellSystem = struct {
         if (!slot.canCast()) return false;
 
         const spell_type = slot.spell_type;
-        const player_pos = game.getPlayerPos();
+
+        // Get controlled entity position for spell casting
+        const controlled_entity = game.getControlledEntity() orelse return false;
+        const controlled_zone = game.getCurrentZone();
+        const controlled_transform = controlled_zone.units.getComponent(controlled_entity, .transform) orelse return false;
+        const controlled_pos = controlled_transform.pos;
 
         // Determine actual target based on spell targeting type and self-cast preference
         const targeting_type = SpellHelpers.getSpellTargetingType(spell_type);
         const actual_target = switch (targeting_type) {
-            .self => player_pos, // Always self-target
-            .area, .single => if (self_cast) player_pos else target_pos, // Allow both modes
-            else => if (self_cast) player_pos else target_pos,
+            .self => controlled_pos, // Always self-target
+            .area, .single => if (self_cast) controlled_pos else target_pos, // Allow both modes
+            else => if (self_cast) controlled_pos else target_pos,
         };
 
         // Validate targeting based on spell physicality
-        if (!SpellHelpers.validateSpellTarget(player_pos, actual_target, spell_type, zone)) {
+        if (!SpellHelpers.validateSpellTarget(controlled_pos, actual_target, spell_type, zone)) {
             loggers.getGameLog().info("spell_invalid_target", "Invalid target for spell {}", .{spell_type});
             return false;
         }
@@ -455,17 +460,24 @@ pub const SpellSystem = struct {
         // For now, just log the phase activation
         loggers.getGameLog().info("phase_applied", "Phase state applied to entity {} for {d}s", .{ controlled_entity, phase_duration });
 
+        // Get controlled entity radius for phase effect
+        const current_zone = game.getCurrentZoneConst();
+        const controlled_radius = if (current_zone.units.getComponent(controlled_entity, .transform)) |transform|
+            transform.radius
+        else
+            0.7; // Default radius
+
         // Add phase effect using effect manager
         _ = self.effect_manager.addAoEEffect(
             .phase_state,
             if (target_pos.x == 0 and target_pos.y == 0) player_pos else target_pos,
-            game.getPlayerRadius() * 2, // Phase aura around player
+            controlled_radius * 2, // Phase aura around controlled entity
             phase_duration,
             1.0, // Standard intensity
         );
 
-        // Visual effects - phase shimmer around player
-        effect_system.addUnitStatusAura(player_pos, game.getPlayerRadius(), phase_duration);
+        // Visual effects - phase shimmer around controlled entity
+        effect_system.addUnitStatusAura(player_pos, controlled_radius, phase_duration);
         loggers.getGameLog().info("phase_cast", "Phase activated for {d}s - can walk through walls", .{phase_duration});
         return true;
     }
@@ -518,13 +530,16 @@ pub const SpellSystem = struct {
 
     /// Cast Haste spell - boost movement speed
     fn castHasteSpell(_: *SpellSystem, game: *HexGame, _: *const ZoneData, _: Vec2, effect_system: *GameParticleSystem) bool {
+        // Get controlled entity for haste effect
+        const controlled_entity = game.getControlledEntity() orelse return false;
+        const controlled_zone = game.getCurrentZone();
+        const controlled_transform = controlled_zone.units.getComponent(controlled_entity, .transform) orelse return false;
+        const controlled_pos = controlled_transform.pos;
+        const controlled_radius = controlled_transform.radius;
 
-        // Apply haste to player
-        const player_pos = game.getPlayerPos();
-
-        // In a real implementation, we'd modify player's speed_mult
+        // In a real implementation, we'd modify controlled entity's speed_mult
         // For now, just add visual effect
-        effect_system.addUnitStatusAura(player_pos, game.getPlayerRadius(), constants.HASTE_DURATION);
+        effect_system.addUnitStatusAura(controlled_pos, controlled_radius, constants.HASTE_DURATION);
 
         loggers.getGameLog().info("haste_cast", "Speed boosted to {d}% for {d}s", .{ constants.HASTE_SPEED_MULT * 100, constants.HASTE_DURATION });
         return true;
@@ -532,8 +547,13 @@ pub const SpellSystem = struct {
 
     /// Cast Multishot spell - fire multiple projectiles
     fn castMultishotSpell(_: *SpellSystem, game: *HexGame, _: *const ZoneData, target_pos: Vec2, _: *GameParticleSystem) bool {
-        const player_pos = game.getPlayerPos();
-        const to_target = target_pos.sub(player_pos);
+        // Get controlled entity position for multishot origin
+        const controlled_entity = game.getControlledEntity() orelse return false;
+        const controlled_zone = game.getCurrentZone();
+        const controlled_transform = controlled_zone.units.getComponent(controlled_entity, .transform) orelse return false;
+        const controlled_pos = controlled_transform.pos;
+
+        const to_target = target_pos.sub(controlled_pos);
         const base_angle = std.math.atan2(to_target.y, to_target.x);
         const target_distance = to_target.length();
 
@@ -550,7 +570,7 @@ pub const SpellSystem = struct {
             const angle = base_angle + offset_angle;
 
             // Calculate target position for this bullet based on angle
-            const bullet_target = player_pos.add(Vec2{
+            const bullet_target = controlled_pos.add(Vec2{
                 .x = @cos(angle) * target_distance,
                 .y = @sin(angle) * target_distance,
             });

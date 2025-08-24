@@ -125,14 +125,20 @@ pub const GameRenderer = struct {
         const zone = game.getCurrentZoneConst();
         switch (zone.camera_mode) {
             .fixed => {
-                // Show entire world bounds in viewport (zoom still applies)
-                self.camera.setViewportToFitWorld(zone.world_width, zone.world_height);
+                // Show entire world bounds centered at origin (zoom still applies)
+                self.camera.setViewport(Vec2{ .x = 0.0, .y = 0.0 }, zone.world_width, zone.world_height);
             },
             .follow => {
-                // Follow player with clean camera system zoom
-                const player_pos = game.getPlayerPos();
+                // Follow controlled entity with clean camera system zoom
+                const controlled_pos = if (game.getControlledEntity()) |controlled_entity| blk: {
+                    if (zone.units.getComponent(controlled_entity, .transform)) |transform| {
+                        break :blk transform.pos;
+                    }
+                    break :blk Vec2.ZERO;
+                } else Vec2.ZERO;
+
                 // Set base viewport size - zoom is applied internally by camera
-                self.camera.setViewport(player_pos, constants.FOLLOW_VIEWPORT_WIDTH, constants.FOLLOW_VIEWPORT_HEIGHT);
+                self.camera.setViewport(controlled_pos, constants.FOLLOW_VIEWPORT_WIDTH, constants.FOLLOW_VIEWPORT_HEIGHT);
             },
         }
     }
@@ -195,7 +201,16 @@ pub const GameRenderer = struct {
             border_stack.pushAnimated(constants.PAUSED_BORDER_BASE_WIDTH, animated_borders.ColorPairs.GOLD_YELLOW, 1.5, constants.PAUSED_BORDER_PULSE_AMPLITUDE);
         }
 
-        if (!game_state.hex_game.getPlayerAlive()) {
+        // Check if controlled entity is dead for border rendering
+        const controlled_entity_dead = if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
+            const zone = game_state.hex_game.getCurrentZoneConst();
+            if (zone.units.getComponent(controlled_entity, .health)) |health| {
+                break :blk !health.alive;
+            }
+            break :blk true; // No health component = assume dead
+        } else true; // No controlled entity = assume dead
+
+        if (controlled_entity_dead) {
             // Animated dead border: base + pulse amplitude
             border_stack.pushAnimated(constants.DEAD_BORDER_BASE_WIDTH, animated_borders.ColorPairs.RED, 1.2, constants.DEAD_BORDER_PULSE_AMPLITUDE);
         }

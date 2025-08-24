@@ -185,14 +185,14 @@ pub const COMMON = struct {
     pub const NEUTRAL_FEARFUL = COLOR_PALETTES[@intFromEnum(BaseColor.brown)][8];
 
     // Friendly variations
-    pub const FRIENDLY_CALM = COLOR_PALETTES[@intFromEnum(BaseColor.teal)][3];
-    pub const FRIENDLY_NORMAL = COLOR_PALETTES[@intFromEnum(BaseColor.teal)][5];
-    pub const FRIENDLY_EXCITED = COLOR_PALETTES[@intFromEnum(BaseColor.teal)][8];
+    pub const FRIENDLY_CALM = COLOR_PALETTES[@intFromEnum(BaseColor.blue)][3];
+    pub const FRIENDLY_NORMAL = COLOR_PALETTES[@intFromEnum(BaseColor.blue)][5];
+    pub const FRIENDLY_EXCITED = COLOR_PALETTES[@intFromEnum(BaseColor.blue)][8];
 
     // Additional performance shortcuts for hot paths
     pub const DEFAULT_UNIT = NEUTRAL_NORMAL;
     pub const PLAYER_COLOR = COLOR_PALETTES[@intFromEnum(BaseColor.blue)][5];
-    pub const BULLET_COLOR = COLOR_PALETTES[@intFromEnum(BaseColor.yellow)][7];
+    pub const PROJECTILE_COLOR = COLOR_PALETTES[@intFromEnum(BaseColor.yellow)][7];
 };
 
 // SIMD operations for batch color processing (Anti-Pattern #5 fix)

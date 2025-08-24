@@ -9,7 +9,7 @@ pub const UNIT_AGGRO = Color{ .r = 0.784, .g = 0.118, .b = 0.118, .a = 1.0 }; //
 pub const UNIT_NON_AGGRO = Color{ .r = 0.471, .g = 0.235, .b = 0.235, .a = 1.0 }; // DIMMED RED (non-aggro)
 pub const OBSTACLE_DEADLY = Color{ .r = 0.784, .g = 0.392, .b = 0.0, .a = 1.0 }; // ORANGE (deadly)
 pub const OBSTACLE_BLOCKING = Color{ .r = 0.0, .g = 0.549, .b = 0.0, .a = 1.0 }; // GREEN (blocking)
-pub const BULLET = Color{ .r = 0.863, .g = 0.627, .b = 0.0, .a = 1.0 }; // YELLOW
+pub const PROJECTILE = Color{ .r = 0.863, .g = 0.627, .b = 0.0, .a = 1.0 }; // YELLOW
 pub const PORTAL = Color{ .r = 0.471, .g = 0.118, .b = 0.627, .a = 1.0 }; // PURPLE
 pub const LIFESTONE_ATTUNED = Color{ .r = 0.0, .g = 0.784, .b = 0.784, .a = 1.0 }; // CYAN (attuned)
 pub const LIFESTONE_UNATTUNED = Color{ .r = 0.0, .g = 0.392, .b = 0.392, .a = 1.0 }; // CYAN_FADED (unattuned)

@@ -14,9 +14,9 @@ pub const UnitUpdateContext = struct {
     transform: *Transform,
     visual: *Visual,
 
-    // World context
-    player_pos: Vec2,
-    player_alive: bool,
+    // World context - controlled entity position and state
+    controlled_entity_pos: ?Vec2,
+    controlled_entity_alive: bool,
 
     // Timing
     frame_ctx: FrameContext,
@@ -25,16 +25,16 @@ pub const UnitUpdateContext = struct {
         unit: *Unit,
         transform: *Transform,
         visual: *Visual,
-        player_pos: Vec2,
-        player_alive: bool,
+        controlled_entity_pos: ?Vec2,
+        controlled_entity_alive: bool,
         frame_ctx: FrameContext,
     ) UnitUpdateContext {
         return .{
             .unit = unit,
             .transform = transform,
             .visual = visual,
-            .player_pos = player_pos,
-            .player_alive = player_alive,
+            .controlled_entity_pos = controlled_entity_pos,
+            .controlled_entity_alive = controlled_entity_alive,
             .frame_ctx = frame_ctx,
         };
     }

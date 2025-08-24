@@ -50,7 +50,23 @@ pub const UpdateSystem = struct {
                             if (!is_controlled) {
                                 // Only apply AI behavior to uncontrolled units
                                 const aggro_mod: f32 = 1.0;
-                                behaviors.updateUnitWithAggroMod(unit_comp, transform, visual, world.getPlayerPos(), world.getPlayerAlive(), aggro_mod, frame_ctx);
+
+                                // Get controlled entity position and state for AI behavior
+                                const controlled_entity_pos = if (world.getControlledEntity()) |controlled_entity| blk: {
+                                    if (zone_storage.units.getComponent(controlled_entity, .transform)) |controlled_transform| {
+                                        break :blk controlled_transform.pos;
+                                    }
+                                    break :blk null;
+                                } else null;
+
+                                const controlled_entity_alive = if (world.getControlledEntity()) |controlled_entity| blk: {
+                                    if (zone_storage.units.getComponent(controlled_entity, .health)) |controlled_health| {
+                                        break :blk controlled_health.alive;
+                                    }
+                                    break :blk false;
+                                } else false;
+
+                                behaviors.updateUnitWithAggroMod(unit_comp, transform, visual, controlled_entity_pos, controlled_entity_alive, aggro_mod, frame_ctx);
                             }
 
                             // Apply disposition-based color with energy level for brightness

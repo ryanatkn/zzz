@@ -20,7 +20,7 @@ main.zig        - Game loop orchestration
 ```zig
 World
 ├── player: Player                    // Single player entity
-├── bullets: [MAX_BULLETS]Bullet      // Global bullet pool
+├── bullets: [MAX_PROJECTILES]Bullet      // Global bullet pool
 └── zones: [7]Zone                  // Zone array
     ├── enemies: [MAX_ENEMIES]Enemy
     ├── obstacles: [MAX_OBSTACLES]Obstacle

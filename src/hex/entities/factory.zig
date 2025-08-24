@@ -10,6 +10,7 @@ const components = @import("../../lib/game/components/mod.zig");
 // Hex game modules
 const constants = @import("../constants.zig");
 const faction_presets = @import("../faction_presets.zig");
+const faction_integration = @import("../faction_integration.zig");
 const disposition = @import("../disposition.zig");
 const unit_ext = @import("../unit_ext.zig");
 const world_state_mod = @import("../world_state.zig");
@@ -22,6 +23,7 @@ const Color = colors.Color;
 const EntityId = u32;
 const Unit = unit_ext.HexUnit;
 const Disposition = disposition.Disposition;
+const PlayerConfig = world_state_mod.PlayerConfig;
 
 /// Entity creation methods extracted from hex_game.zig
 pub const EntityFactory = struct {
@@ -68,7 +70,14 @@ pub const EntityFactory = struct {
         const health = components.Health.init(50);
         const visual = components.Visual.init(constants.COLOR_UNIT_DEFAULT);
         const entity_id = hex_game.entity_allocator.create();
-        const unit = Unit.init(.enemy, pos, unit_disposition, entity_id);
+        // Create regular unit with default speed and energy
+        const unit = Unit.init(.{
+            .unit_type = .enemy,
+            .home_pos = pos,
+            .disposition = unit_disposition,
+            .entity_id = entity_id,
+            // speed and energy use defaults from UnitConfig
+        });
 
         try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;
@@ -126,18 +135,25 @@ pub const EntityFactory = struct {
     }
 
     /// Create a player entity in the current zone
-    pub fn createPlayer(hex_game: anytype, pos: Vec2, radius: f32) !EntityId {
+    pub fn createPlayer(hex_game: anytype, config: PlayerConfig) !EntityId {
         const zone = hex_game.getCurrentZone();
         const entity = hex_game.entity_allocator.create();
 
-        // Create components directly
-        const transform = components.Transform.init(pos, radius);
-        const health = components.Health.init(100);
-        const player_input = components.PlayerInput.init(0); // Controller ID 0
+        // Create components for a player unit
+        const transform = components.Transform.init(config.position, config.radius);
+        const health = components.Health.init(100); // Player has more health than regular units
         const visual = components.Visual.init(constants.COLOR_PLAYER_ALIVE);
-        const movement = components.Movement.init(constants.PLAYER_SPEED);
 
-        try zone.players.addEntity(entity, transform, health, player_input, visual, movement);
+        // Create player unit using data-driven configuration
+        const unit = Unit.init(.{
+            .unit_type = .player,
+            .home_pos = config.position,
+            .disposition = config.disposition,
+            .entity_id = entity,
+            .speed = config.speed, // Speed from world data
+            .energy = config.energy, // Energy level from world data
+        });
+        try zone.units.addEntity(entity, transform, health, unit, visual);
         zone.entity_count += 1;
 
         // Log faction system initialization for debugging
@@ -145,19 +161,17 @@ pub const EntityFactory = struct {
         const player_capabilities = faction_presets.getPlayerCapabilities();
         hex_game.logger.debug("player_factions", "Player created with {} faction tags and attack capability: {}", .{ player_factions.tags.count(), player_capabilities.can_attack });
 
-        // Legacy player tracking (maintain backward compatibility during transition)
-        hex_game.player_entity = entity;
-        hex_game.player_zone = hex_game.zone_manager.getCurrentZoneIndex();
-
-        // New controller system: possess the created player entity
-        _ = hex_game.primary_controller.possess(hex_game, entity);
-        hex_game.player_start_pos = pos;
+        // Controller system: possess the created player entity
+        const possession_success = hex_game.primary_controller.possess(hex_game, entity);
+        if (possession_success) {
+            hex_game.logger.info("possession", "Controller 0 possessed entity {}", .{entity});
+        }
 
         return entity;
     }
 
     /// Create a projectile entity in the specified zone
-    pub fn createProjectile(hex_game: anytype, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32) !EntityId {
+    pub fn createProjectile(hex_game: anytype, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32, shooter_id: EntityId) !EntityId {
         _ = radius; // Currently unused, kept for API compatibility
         if (zone_index >= world_state_mod.MAX_ZONES) return error.InvalidZone;
 
@@ -169,8 +183,8 @@ pub const EntityFactory = struct {
         transform.vel = velocity;
         const visual = components.Visual.init(.{ .r = 255, .g = 255, .b = 0, .a = 255 }); // Yellow projectile
 
-        // Create hex-specific projectile with damage
-        const projectile = world_state_mod.Projectile.init(entity, lifetime, constants.PROJECTILE_DAMAGE);
+        // Create hex-specific projectile with damage - use shooter_id as owner
+        const projectile = world_state_mod.Projectile.init(shooter_id, lifetime, constants.PROJECTILE_DAMAGE);
 
         try zone.projectiles.addEntity(entity, transform, projectile, visual);
         zone.entity_count += 1;

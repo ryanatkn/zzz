@@ -38,17 +38,18 @@ pub const EntityBatchRenderer = struct {
     pub fn renderZone(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, camera: *const Camera, game: *const HexGame) void {
         const zone = game.getCurrentZoneConst();
 
-        // Create coordinate context for visibility culling
+        // Create coordinate context for visibility culling using camera's effective viewport
+        const effective_viewport = camera.getEffectiveViewportSize();
         const context = CoordinateContext{
             .camera_position = camera.view_center,
-            .camera_zoom = camera.zoom_level,
-            .screen_width = constants.SCREEN_WIDTH,
-            .screen_height = constants.SCREEN_HEIGHT,
+            .camera_zoom = 1.0, // Already applied in effective viewport, so use 1.0 here
+            .screen_width = effective_viewport.width,
+            .screen_height = effective_viewport.height,
             .ui_scale = 1.0, // Default UI scale
         };
 
-        // Render terrain using legacy batching (terrain uses rectangles, not circles)
-        renderTerrainBatched(gpu_renderer, cmd_buffer, render_pass, camera, zone);
+        // Render terrain using generic culling system
+        renderTerrainBatched(gpu_renderer, cmd_buffer, render_pass, camera, zone, context);
 
         // Use lib/rendering for circle entities with visibility culling
         renderCircleEntitiesWithCulling(gpu_renderer, cmd_buffer, render_pass, camera, &zone.units, @intCast(zone.units.count), context);
@@ -56,14 +57,11 @@ pub const EntityBatchRenderer = struct {
         renderCircleEntitiesWithCulling(gpu_renderer, cmd_buffer, render_pass, camera, &zone.portals, @intCast(zone.portals.count), context);
         renderCircleEntitiesWithCulling(gpu_renderer, cmd_buffer, render_pass, camera, &zone.projectiles, @intCast(zone.projectiles.count), context);
 
-        // Render player (only if in current zone)
-        if (game.player_zone == game.zone_manager.getCurrentZoneIndex()) {
-            renderCircleEntitiesWithCulling(gpu_renderer, cmd_buffer, render_pass, camera, &zone.players, @intCast(zone.players.count), context);
-        }
+        // Player is now included in units rendering above
     }
 
-    /// Render terrain using batched rectangles (terrain doesn't use the circle renderer)
-    fn renderTerrainBatched(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, camera: *const Camera, zone: *const ZoneData) void {
+    /// Render terrain using batched rectangles with generic culling system
+    fn renderTerrainBatched(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, camera: *const Camera, zone: *const ZoneData, context: CoordinateContext) void {
         // Batch terrain rectangles for optimal rendering
         var rect_batch: [MAX_BATCHED_RECTS]RectData = undefined;
         var rect_count: usize = 0;
@@ -74,18 +72,8 @@ pub const EntityBatchRenderer = struct {
             const visual = &zone.terrain.visuals[i];
             const terrain = &zone.terrain.terrains[i];
 
-            // Simple visibility check for terrain rectangles
-            const half_width = terrain.size.x / 2.0;
-            const half_height = terrain.size.y / 2.0;
-            const viewport_width = camera.viewport_width;
-            const viewport_height = camera.viewport_height;
-
-            // Check if terrain intersects camera viewport
-            if (transform.pos.x + half_width >= camera.view_center.x - viewport_width / 2.0 and
-                transform.pos.x - half_width <= camera.view_center.x + viewport_width / 2.0 and
-                transform.pos.y + half_height >= camera.view_center.y - viewport_height / 2.0 and
-                transform.pos.y - half_height <= camera.view_center.y + viewport_height / 2.0)
-            {
+            // Use generic culling system for terrain rectangles
+            if (culling.Culler.isRectVisible(transform.pos, terrain.size, context)) {
                 if (rect_count < MAX_BATCHED_RECTS) {
                     rect_batch[rect_count] = RectData{
                         .pos = camera.worldToScreen(transform.pos),

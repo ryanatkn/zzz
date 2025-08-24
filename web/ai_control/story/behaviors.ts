@@ -5,7 +5,7 @@
 
 import type { Vec2, ActionSequence } from '../core/types.js';
 import { Keys } from '../core/types.js';
-import { ZONES, COMBAT, PATTERNS, AI_BEHAVIOR } from '../core/constants.js';
+import { ZONES, PATTERNS, AI_BEHAVIOR } from '../core/constants.js';
 
 export class Behaviors {
   /**

@@ -10,8 +10,11 @@
     // Player starting position (overworld center)
     .player_start = .{
         .zone = 0,
-        .position = .{ .x = 80.0, .y = 45.0 }, // Center of 160x90 meter overworld
+        .position = .{ .x = 0.0, .y = 0.0 }, // Origin spawn - terrain arranged around player
         .radius = 0.7, // 70cm radius - matches constants.PLAYER_RADIUS
+        .speed = 26.8, // 4x unit speed (6.7 * 4) for enhanced mobility
+        .energy = .raised, // High energy level for visual distinction
+        .disposition = .friendly, // Blue color, friendly to other friendly units
     },
 
     .zones = .{
@@ -22,95 +25,96 @@
             .camera_mode = .fixed, // Fixed camera shows entire world, use zoom to navigate
             .world_width = 160.0, // 160 meters (exploration scale)
             .world_height = 90.0, // 90 meters (exploration scale)
+            .spawn_pos = .{ .x = 0.0, .y = 0.0 }, // Override default to origin
             .terrain = .{
-                // Large rock formations (converted to meters: pixels / 12)
-                .{ .position = .{ .x = 16.7, .y = 25.0 }, .size = .{ .x = 6.7, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 133.3, .y = 16.7 }, .size = .{ .x = 10.0, .y = 5.0 }, .type = .rock },
-                .{ .position = .{ .x = 33.3, .y = 66.7 }, .size = .{ .x = 5.0, .y = 8.3 }, .type = .rock },
-                .{ .position = .{ .x = 116.7, .y = 75.0 }, .size = .{ .x = 8.3, .y = 6.7 }, .type = .rock },
+                // Large rock formations (converted to meters: pixels / 12) - adjusted to origin spawn
+                .{ .position = .{ .x = -63.3, .y = -20.0 }, .size = .{ .x = 6.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 53.3, .y = -28.3 }, .size = .{ .x = 10.0, .y = 5.0 }, .type = .rock },
+                .{ .position = .{ .x = -46.7, .y = 21.7 }, .size = .{ .x = 5.0, .y = 8.3 }, .type = .rock },
+                .{ .position = .{ .x = 36.7, .y = 30.0 }, .size = .{ .x = 8.3, .y = 6.7 }, .type = .rock },
                 // Medium rock formations (~1/2 size)
-                .{ .position = .{ .x = 25.0, .y = 12.5 }, .size = .{ .x = 3.3, .y = 2.5 }, .type = .rock },
-                .{ .position = .{ .x = 125.0, .y = 33.3 }, .size = .{ .x = 2.9, .y = 3.8 }, .type = .rock },
-                .{ .position = .{ .x = 20.8, .y = 75.0 }, .size = .{ .x = 4.2, .y = 2.1 }, .type = .rock },
-                .{ .position = .{ .x = 137.5, .y = 62.5 }, .size = .{ .x = 2.5, .y = 3.3 }, .type = .rock },
-                .{ .position = .{ .x = 58.3, .y = 79.2 }, .size = .{ .x = 3.8, .y = 2.9 }, .type = .rock },
+                .{ .position = .{ .x = -55.0, .y = -32.5 }, .size = .{ .x = 3.3, .y = 2.5 }, .type = .rock },
+                .{ .position = .{ .x = 45.0, .y = -11.7 }, .size = .{ .x = 2.9, .y = 3.8 }, .type = .rock },
+                .{ .position = .{ .x = -59.2, .y = 30.0 }, .size = .{ .x = 4.2, .y = 2.1 }, .type = .rock },
+                .{ .position = .{ .x = 57.5, .y = 17.5 }, .size = .{ .x = 2.5, .y = 3.3 }, .type = .rock },
+                .{ .position = .{ .x = -21.7, .y = 34.2 }, .size = .{ .x = 3.8, .y = 2.9 }, .type = .rock },
                 // Small rock formations (~1/4 size)
-                .{ .position = .{ .x = 41.7, .y = 20.8 }, .size = .{ .x = 1.7, .y = 1.7 }, .type = .rock },
-                .{ .position = .{ .x = 108.3, .y = 12.5 }, .size = .{ .x = 2.1, .y = 1.3 }, .type = .rock },
-                .{ .position = .{ .x = 12.5, .y = 58.3 }, .size = .{ .x = 1.3, .y = 2.1 }, .type = .rock },
-                .{ .position = .{ .x = 145.8, .y = 25.0 }, .size = .{ .x = 1.7, .y = 1.5 }, .type = .rock },
-                .{ .position = .{ .x = 50.0, .y = 8.3 }, .size = .{ .x = 1.5, .y = 1.8 }, .type = .rock },
-                .{ .position = .{ .x = 91.7, .y = 79.2 }, .size = .{ .x = 1.8, .y = 1.7 }, .type = .rock },
+                .{ .position = .{ .x = -38.3, .y = -24.2 }, .size = .{ .x = 1.7, .y = 1.7 }, .type = .rock },
+                .{ .position = .{ .x = 28.3, .y = -32.5 }, .size = .{ .x = 2.1, .y = 1.3 }, .type = .rock },
+                .{ .position = .{ .x = -67.5, .y = 13.3 }, .size = .{ .x = 1.3, .y = 2.1 }, .type = .rock },
+                .{ .position = .{ .x = 65.8, .y = -20.0 }, .size = .{ .x = 1.7, .y = 1.5 }, .type = .rock },
+                .{ .position = .{ .x = -30.0, .y = -36.7 }, .size = .{ .x = 1.5, .y = 1.8 }, .type = .rock },
+                .{ .position = .{ .x = 11.7, .y = 34.2 }, .size = .{ .x = 1.8, .y = 1.7 }, .type = .rock },
                 // Tiny rock formations (~1/10 size)
-                .{ .position = .{ .x = 29.2, .y = 37.5 }, .size = .{ .x = 0.7, .y = 0.7 }, .type = .rock },
-                .{ .position = .{ .x = 120.8, .y = 50.0 }, .size = .{ .x = 1.0, .y = 0.5 }, .type = .rock },
-                .{ .position = .{ .x = 45.8, .y = 70.8 }, .size = .{ .x = 0.5, .y = 0.8 }, .type = .rock },
-                .{ .position = .{ .x = 100.0, .y = 8.3 }, .size = .{ .x = 0.8, .y = 0.7 }, .type = .rock },
-                .{ .position = .{ .x = 8.3, .y = 41.7 }, .size = .{ .x = 0.7, .y = 1.0 }, .type = .rock },
-                .{ .position = .{ .x = 150.0, .y = 75.0 }, .size = .{ .x = 0.8, .y = 0.8 }, .type = .rock },
-                .{ .position = .{ .x = 37.5, .y = 16.7 }, .size = .{ .x = 0.6, .y = 0.7 }, .type = .rock },
+                .{ .position = .{ .x = -50.8, .y = -7.5 }, .size = .{ .x = 0.7, .y = 0.7 }, .type = .rock },
+                .{ .position = .{ .x = 40.8, .y = 5.0 }, .size = .{ .x = 1.0, .y = 0.5 }, .type = .rock },
+                .{ .position = .{ .x = -34.2, .y = 25.8 }, .size = .{ .x = 0.5, .y = 0.8 }, .type = .rock },
+                .{ .position = .{ .x = 20.0, .y = -36.7 }, .size = .{ .x = 0.8, .y = 0.7 }, .type = .rock },
+                .{ .position = .{ .x = -71.7, .y = -3.3 }, .size = .{ .x = 0.7, .y = 1.0 }, .type = .rock },
+                .{ .position = .{ .x = 70.0, .y = 30.0 }, .size = .{ .x = 0.8, .y = 0.8 }, .type = .rock },
+                .{ .position = .{ .x = -42.5, .y = -28.3 }, .size = .{ .x = 0.6, .y = 0.7 }, .type = .rock },
                 // Overworld is now safe - no deadly hazards, only rock formations for navigation challenge and ricochet gameplay
             },
             .units = .{
                 // 12 overworld units with simplified behaviors for clear gameplay
-                // Player spawns at (80, 45) - keep units away from center
-                .{ .position = .{ .x = 70.8, .y = 12.5 }, .radius = 0.7, .disposition = .hostile }, // Always red - chases player
-                .{ .position = .{ .x = 112.5, .y = 25.0 }, .radius = 0.8, .disposition = .fearful }, // Always orange - flees from player
-                .{ .position = .{ .x = 29.2, .y = 29.2 }, .radius = 0.6, .disposition = .neutral }, // Brown - ignores player, returns home
-                .{ .position = .{ .x = 137.5, .y = 37.5 }, .radius = 0.7, .disposition = .friendly }, // Green/Blue - safe, may follow
-                .{ .position = .{ .x = 16.7, .y = 50.0 }, .radius = 0.8, .disposition = .hostile }, // Red - aggressive guardian
-                .{ .position = .{ .x = 120.8, .y = 54.2 }, .radius = 0.7, .disposition = .neutral }, // Brown - neutral behavior
-                .{ .position = .{ .x = 50.0, .y = 79.2 }, .radius = 0.6, .disposition = .fearful }, // Orange - flees when approached
-                .{ .position = .{ .x = 108.3, .y = 79.2 }, .radius = 0.8, .disposition = .friendly }, // Green/Blue - friendly unit
-                .{ .position = .{ .x = 12.5, .y = 20.8 }, .radius = 0.7, .disposition = .neutral }, // Brown - passive wanderer
-                .{ .position = .{ .x = 125.0, .y = 12.5 }, .radius = 0.6, .disposition = .hostile }, // Red - hostile guardian
-                .{ .position = .{ .x = 8.3, .y = 66.7 }, .radius = 0.7, .disposition = .fearful }, // Orange - fearful unit
-                .{ .position = .{ .x = 145.8, .y = 70.8 }, .radius = 0.8, .disposition = .neutral }, // Brown - neutral default
+                // Player spawns at (0, 0) - units positioned around origin
+                .{ .position = .{ .x = -9.2, .y = -32.5 }, .radius = 0.7, .disposition = .hostile }, // Always red - chases player
+                .{ .position = .{ .x = 32.5, .y = -20.0 }, .radius = 0.8, .disposition = .fearful }, // Always orange - flees from player
+                .{ .position = .{ .x = -50.8, .y = -15.8 }, .radius = 0.6, .disposition = .neutral }, // Brown - ignores player, returns home
+                .{ .position = .{ .x = 57.5, .y = -7.5 }, .radius = 0.7, .disposition = .friendly }, // Green/Blue - safe, may follow
+                .{ .position = .{ .x = -63.3, .y = 5.0 }, .radius = 0.8, .disposition = .hostile }, // Red - aggressive guardian
+                .{ .position = .{ .x = 40.8, .y = 9.2 }, .radius = 0.7, .disposition = .neutral }, // Brown - neutral behavior
+                .{ .position = .{ .x = -30.0, .y = 34.2 }, .radius = 0.6, .disposition = .fearful }, // Orange - flees when approached
+                .{ .position = .{ .x = 28.3, .y = 34.2 }, .radius = 0.8, .disposition = .friendly }, // Green/Blue - friendly unit
+                .{ .position = .{ .x = -67.5, .y = -24.2 }, .radius = 0.7, .disposition = .neutral }, // Brown - passive wanderer
+                .{ .position = .{ .x = 45.0, .y = -32.5 }, .radius = 0.6, .disposition = .hostile }, // Red - hostile guardian
+                .{ .position = .{ .x = -71.7, .y = 21.7 }, .radius = 0.7, .disposition = .fearful }, // Orange - fearful unit
+                .{ .position = .{ .x = 65.8, .y = 25.8 }, .radius = 0.8, .disposition = .neutral }, // Brown - neutral default
             },
             .portals = .{
-                // Portals to 6 dungeons arranged in regular hexagon (31.7m radius)
+                // Portals to 6 dungeons arranged in regular hexagon (31.7m radius) - centered on origin
                 // Northwest
-                .{ .position = .{ .x = 64.2, .y = 17.6 }, .radius = 2.1, .destination = 4, .shape = .square },
+                .{ .position = .{ .x = -15.8, .y = -27.4 }, .radius = 2.1, .destination = 4, .shape = .square },
                 // Northeast
-                .{ .position = .{ .x = 95.8, .y = 17.6 }, .radius = 2.1, .destination = 5, .shape = .triangle },
+                .{ .position = .{ .x = 15.8, .y = -27.4 }, .radius = 2.1, .destination = 5, .shape = .triangle },
                 // East
-                .{ .position = .{ .x = 111.7, .y = 45.0 }, .radius = 2.1, .destination = 6, .shape = .circle },
+                .{ .position = .{ .x = 31.7, .y = 0.0 }, .radius = 2.1, .destination = 6, .shape = .circle },
                 // Southeast
-                .{ .position = .{ .x = 95.8, .y = 72.4 }, .radius = 2.1, .destination = 1, .shape = .square },
+                .{ .position = .{ .x = 15.8, .y = 27.4 }, .radius = 2.1, .destination = 1, .shape = .square },
                 // Southwest
-                .{ .position = .{ .x = 64.2, .y = 72.4 }, .radius = 2.1, .destination = 2, .shape = .triangle },
+                .{ .position = .{ .x = -15.8, .y = 27.4 }, .radius = 2.1, .destination = 2, .shape = .triangle },
                 // West
-                .{ .position = .{ .x = 48.3, .y = 45.0 }, .radius = 2.1, .destination = 3, .shape = .circle },
+                .{ .position = .{ .x = -31.7, .y = 0.0 }, .radius = 2.1, .destination = 3, .shape = .circle },
             },
             .lifestones = .{
-                // Central spawn lifestone (player starts here) - matches player spawn
-                .{ .position = .{ .x = 80.0, .y = 45.0 }, .radius = 0.7 },
+                // Central spawn lifestone (player starts here) - matches origin spawn
+                .{ .position = .{ .x = 0.0, .y = 0.0 }, .radius = 0.7 },
                 // 6 lifestones near portals (slightly offset from portals)
                 // Northwest portal area
-                .{ .position = .{ .x = 60.0, .y = 20.8 }, .radius = 0.7 },
+                .{ .position = .{ .x = -20.0, .y = -24.2 }, .radius = 0.7 },
                 // Northeast portal area
-                .{ .position = .{ .x = 100.0, .y = 20.8 }, .radius = 0.7 },
+                .{ .position = .{ .x = 20.0, .y = -24.2 }, .radius = 0.7 },
                 // East portal area
-                .{ .position = .{ .x = 107.5, .y = 40.8 }, .radius = 0.7 },
+                .{ .position = .{ .x = 27.5, .y = -4.2 }, .radius = 0.7 },
                 // Southeast portal area
-                .{ .position = .{ .x = 100.0, .y = 69.2 }, .radius = 0.7 },
+                .{ .position = .{ .x = 20.0, .y = 24.2 }, .radius = 0.7 },
                 // Southwest portal area
-                .{ .position = .{ .x = 60.0, .y = 69.2 }, .radius = 0.7 },
+                .{ .position = .{ .x = -20.0, .y = 24.2 }, .radius = 0.7 },
                 // West portal area
-                .{ .position = .{ .x = 52.5, .y = 40.8 }, .radius = 0.7 },
+                .{ .position = .{ .x = -27.5, .y = -4.2 }, .radius = 0.7 },
                 // 6 wilderness lifestones scattered further out
                 // Far north
-                .{ .position = .{ .x = 80.0, .y = 6.7 }, .radius = 0.7 },
+                .{ .position = .{ .x = 0.0, .y = -38.3 }, .radius = 0.7 },
                 // Far northeast
-                .{ .position = .{ .x = 133.3, .y = 12.5 }, .radius = 0.7 },
+                .{ .position = .{ .x = 53.3, .y = -32.5 }, .radius = 0.7 },
                 // Far southeast
-                .{ .position = .{ .x = 141.7, .y = 66.7 }, .radius = 0.7 },
+                .{ .position = .{ .x = 61.7, .y = 21.7 }, .radius = 0.7 },
                 // Far south
-                .{ .position = .{ .x = 80.0, .y = 83.3 }, .radius = 0.7 },
+                .{ .position = .{ .x = 0.0, .y = 38.3 }, .radius = 0.7 },
                 // Far southwest
-                .{ .position = .{ .x = 26.7, .y = 66.7 }, .radius = 0.7 },
+                .{ .position = .{ .x = -53.3, .y = 21.7 }, .radius = 0.7 },
                 // Far northwest
-                .{ .position = .{ .x = 18.3, .y = 12.5 }, .radius = 0.7 },
+                .{ .position = .{ .x = -61.7, .y = -32.5 }, .radius = 0.7 },
             },
         },
 
@@ -120,28 +124,28 @@
             .background_color = .{ .r = 0.059, .g = 0.059, .b = 0.098 },
             .camera_mode = .follow, // Follow camera with zoom for tactical view
             .terrain = .{
-                // Circular chamber layout (converted from pixels to meters)
-                .{ .position = .{ .x = 50.0, .y = 8.3 }, .size = .{ .x = 16.7, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 33.3, .y = 33.3 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
-                .{ .position = .{ .x = 116.7, .y = 33.3 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
-                .{ .position = .{ .x = 66.7, .y = 58.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
-                .{ .position = .{ .x = 93.3, .y = 58.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                // Circular chamber layout - centered on origin spawn
+                .{ .position = .{ .x = -30.0, .y = -24.7 }, .size = .{ .x = 16.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = -46.7, .y = 0.3 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
+                .{ .position = .{ .x = 36.7, .y = 0.3 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
+                .{ .position = .{ .x = -13.3, .y = 25.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                .{ .position = .{ .x = 13.3, .y = 25.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
             },
             .units = .{
                 // Southeast Dungeon: 1 boss unit (largest size) - positioned off-center for better flow
-                .{ .position = .{ .x = 80.0, .y = 20.8 }, .radius = 2.5, .disposition = .hostile }, // Boss - always aggressive
+                .{ .position = .{ .x = 0.0, .y = -12.2 }, .radius = 2.5, .disposition = .hostile }, // Boss - always aggressive
             },
             .portals = .{
                 // Back to overworld (Southeast dungeon - portal positioned UP-LEFT toward overworld)
-                .{ .position = .{ .x = 80.0, .y = 55.0 }, .radius = 2.5, .destination = 0, .shape = .circle },
+                .{ .position = .{ .x = 0.0, .y = 22.0 }, .radius = 2.5, .destination = 0, .shape = .circle },
                 // To adjacent dungeons (clockwise)
-                .{ .position = .{ .x = 141.7, .y = 45.0 }, .radius = 2.1, .destination = 2, .shape = .triangle },
-                .{ .position = .{ .x = 18.3, .y = 45.0 }, .radius = 2.1, .destination = 6, .shape = .square },
+                .{ .position = .{ .x = 61.7, .y = 12.0 }, .radius = 2.1, .destination = 2, .shape = .triangle },
+                .{ .position = .{ .x = -61.7, .y = 12.0 }, .radius = 2.1, .destination = 6, .shape = .square },
             },
             .lifestones = .{
                 // 2 lifestones in Southeast Dungeon
-                .{ .position = .{ .x = 58.3, .y = 25.0 }, .radius = 1.0 },
-                .{ .position = .{ .x = 101.7, .y = 25.0 }, .radius = 1.0 },
+                .{ .position = .{ .x = -21.7, .y = -8.0 }, .radius = 1.0 },
+                .{ .position = .{ .x = 21.7, .y = -8.0 }, .radius = 1.0 },
             },
         },
 
@@ -151,30 +155,30 @@
             .background_color = .{ .r = 0.098, .g = 0.059, .b = 0.059 },
             .camera_mode = .follow,
             .terrain = .{
-                // Triangular chamber layout (converted from pixels to meters)
-                .{ .position = .{ .x = 66.7, .y = 12.5 }, .size = .{ .x = 26.7, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 33.3, .y = 50.0 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
-                .{ .position = .{ .x = 113.3, .y = 50.0 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
-                .{ .position = .{ .x = 100.0, .y = 66.7 }, .size = .{ .x = 2.5, .y = 2.5 }, .type = .pit },
-                .{ .position = .{ .x = 58.3, .y = 33.3 }, .size = .{ .x = 2.9, .y = 2.9 }, .type = .pit },
+                // Triangular chamber layout - centered on origin spawn
+                .{ .position = .{ .x = -11.3, .y = -27.5 }, .size = .{ .x = 26.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = -44.7, .y = 10.0 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
+                .{ .position = .{ .x = 35.3, .y = 10.0 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
+                .{ .position = .{ .x = 22.0, .y = 26.7 }, .size = .{ .x = 2.5, .y = 2.5 }, .type = .pit },
+                .{ .position = .{ .x = -19.7, .y = -6.7 }, .size = .{ .x = 2.9, .y = 2.9 }, .type = .pit },
             },
             .units = .{
                 // Southwest Dungeon: 2 units (second largest size)
-                .{ .position = .{ .x = 58.3, .y = 29.2 }, .radius = 2.1, .disposition = .neutral }, // Explores triangular layout
-                .{ .position = .{ .x = 101.7, .y = 54.2 }, .radius = 2.1 }, // No behavior = idle default
+                .{ .position = .{ .x = -19.7, .y = -10.8 }, .radius = 2.1, .disposition = .neutral }, // Explores triangular layout
+                .{ .position = .{ .x = 23.7, .y = 14.2 }, .radius = 2.1 }, // No behavior = idle default
             },
             .portals = .{
                 // Back to overworld (Southwest dungeon - portal positioned UP-RIGHT toward overworld)
-                .{ .position = .{ .x = 71.3, .y = 53.7 }, .radius = 2.5, .destination = 0, .shape = .circle },
+                .{ .position = .{ .x = -6.7, .y = 13.7 }, .radius = 2.5, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 137.5, .y = 66.7 }, .radius = 2.1, .destination = 3, .shape = .square },
-                .{ .position = .{ .x = 18.3, .y = 16.7 }, .radius = 2.1, .destination = 1, .shape = .circle },
+                .{ .position = .{ .x = 59.5, .y = 26.7 }, .radius = 2.1, .destination = 3, .shape = .square },
+                .{ .position = .{ .x = -59.7, .y = -23.3 }, .radius = 2.1, .destination = 1, .shape = .circle },
             },
             .lifestones = .{
                 // 3 lifestones in Southwest Dungeon
-                .{ .position = .{ .x = 80.0, .y = 25.0 }, .radius = 1.0 },
-                .{ .position = .{ .x = 50.0, .y = 41.7 }, .radius = 1.0 },
-                .{ .position = .{ .x = 110.0, .y = 41.7 }, .radius = 1.0 },
+                .{ .position = .{ .x = 2.0, .y = -15.0 }, .radius = 1.0 },
+                .{ .position = .{ .x = -28.0, .y = 1.7 }, .radius = 1.0 },
+                .{ .position = .{ .x = 32.0, .y = 1.7 }, .radius = 1.0 },
             },
         },
 
@@ -184,30 +188,30 @@
             .background_color = .{ .r = 0.059, .g = 0.098, .b = 0.059 },
             .camera_mode = .follow,
             .terrain = .{
-                // Square chamber layout (converted from pixels to meters)
-                .{ .position = .{ .x = 25.0, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
-                .{ .position = .{ .x = 126.7, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
-                .{ .position = .{ .x = 58.3, .y = 12.5 }, .size = .{ .x = 43.3, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 58.3, .y = 68.3 }, .size = .{ .x = 43.3, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 93.3, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                // Square chamber layout - centered on origin spawn
+                .{ .position = .{ .x = -47.0, .y = -22.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
+                .{ .position = .{ .x = 54.7, .y = -22.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
+                .{ .position = .{ .x = -13.7, .y = -34.5 }, .size = .{ .x = 43.3, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = -13.7, .y = 21.3 }, .size = .{ .x = 43.3, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = 21.3, .y = -5.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
             },
             .units = .{
                 // West Dungeon: 3 units (medium size) - square chamber combat
-                .{ .position = .{ .x = 50.0, .y = 25.0 }, .radius = 1.7, .disposition = .hostile }, // Charges across square
-                .{ .position = .{ .x = 110.0, .y = 33.3 }, .radius = 1.7, .disposition = .fearful }, // Retreats to corners
-                .{ .position = .{ .x = 80.0, .y = 58.3 }, .radius = 1.7, .disposition = .neutral }, // Patrols square perimeter
+                .{ .position = .{ .x = -22.0, .y = -22.0 }, .radius = 1.7, .disposition = .hostile }, // Charges across square
+                .{ .position = .{ .x = 38.0, .y = -13.7 }, .radius = 1.7, .disposition = .fearful }, // Retreats to corners
+                .{ .position = .{ .x = 8.0, .y = 11.3 }, .radius = 1.7, .disposition = .neutral }, // Patrols square perimeter
             },
             .portals = .{
                 // Back to overworld (West dungeon - portal positioned RIGHT toward overworld)
-                .{ .position = .{ .x = 71.3, .y = 36.3 }, .radius = 2.5, .destination = 0, .shape = .circle },
+                .{ .position = .{ .x = -0.7, .y = -10.7 }, .radius = 2.5, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 80.0, .y = 81.7 }, .radius = 2.1, .destination = 4, .shape = .circle },
-                .{ .position = .{ .x = 16.7, .y = 33.3 }, .radius = 2.1, .destination = 2, .shape = .triangle },
+                .{ .position = .{ .x = 8.0, .y = 34.7 }, .radius = 2.1, .destination = 4, .shape = .circle },
+                .{ .position = .{ .x = -55.3, .y = -13.7 }, .radius = 2.1, .destination = 2, .shape = .triangle },
             },
             .lifestones = .{
                 // 2 lifestones in West Dungeon
-                .{ .position = .{ .x = 41.7, .y = 50.0 }, .radius = 1.0 },
-                .{ .position = .{ .x = 118.3, .y = 50.0 }, .radius = 1.0 },
+                .{ .position = .{ .x = -30.3, .y = 3.0 }, .radius = 1.0 },
+                .{ .position = .{ .x = 46.3, .y = 3.0 }, .radius = 1.0 },
             },
         },
 
@@ -217,32 +221,32 @@
             .background_color = .{ .r = 0.098, .g = 0.098, .b = 0.059 },
             .camera_mode = .follow,
             .terrain = .{
-                // Circular chamber layout (variant, converted from pixels to meters)
-                .{ .position = .{ .x = 50.0, .y = 81.7 }, .size = .{ .x = 16.7, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 29.2, .y = 56.7 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
-                .{ .position = .{ .x = 120.8, .y = 56.7 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
-                .{ .position = .{ .x = 58.3, .y = 25.0 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
-                .{ .position = .{ .x = 101.7, .y = 25.0 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                // Circular chamber layout - centered on origin spawn
+                .{ .position = .{ .x = -30.0, .y = 28.7 }, .size = .{ .x = 16.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = -50.8, .y = 3.7 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
+                .{ .position = .{ .x = 40.8, .y = 3.7 }, .size = .{ .x = 10.0, .y = 10.0 }, .type = .rock },
+                .{ .position = .{ .x = -21.7, .y = -28.0 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                .{ .position = .{ .x = 21.7, .y = -28.0 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
             },
             .units = .{
                 // Northwest Dungeon: 4 units (smaller size) - coordinated pack
-                .{ .position = .{ .x = 41.7, .y = 33.3 }, .radius = 1.5 }, // wandering (scouts area)
-                .{ .position = .{ .x = 118.3, .y = 33.3 }, .radius = 1.5 }, // guardian (central defense)
-                .{ .position = .{ .x = 58.3, .y = 50.0 }, .radius = 1.5 }, // aggressive (flanks from side)
-                .{ .position = .{ .x = 101.7, .y = 50.0 }, .radius = 1.5 }, // defensive (supports others)
+                .{ .position = .{ .x = -38.3, .y = -19.7 }, .radius = 1.5 }, // wandering (scouts area)
+                .{ .position = .{ .x = 38.3, .y = -19.7 }, .radius = 1.5 }, // guardian (central defense)
+                .{ .position = .{ .x = -21.7, .y = -3.0 }, .radius = 1.5 }, // aggressive (flanks from side)
+                .{ .position = .{ .x = 21.7, .y = -3.0 }, .radius = 1.5 }, // defensive (supports others)
             },
             .portals = .{
                 // Back to overworld (Northwest dungeon - portal positioned DOWN-RIGHT toward overworld)
-                .{ .position = .{ .x = 80.0, .y = 35.0 }, .radius = 2.5, .destination = 0, .shape = .circle },
+                .{ .position = .{ .x = 0.0, .y = -18.0 }, .radius = 2.5, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 18.3, .y = 45.0 }, .radius = 2.1, .destination = 5, .shape = .triangle },
-                .{ .position = .{ .x = 141.7, .y = 45.0 }, .radius = 2.1, .destination = 3, .shape = .square },
+                .{ .position = .{ .x = -61.7, .y = -8.0 }, .radius = 2.1, .destination = 5, .shape = .triangle },
+                .{ .position = .{ .x = 61.7, .y = -8.0 }, .radius = 2.1, .destination = 3, .shape = .square },
             },
             .lifestones = .{
                 // 3 lifestones in Northwest Dungeon
-                .{ .position = .{ .x = 50.0, .y = 41.7 }, .radius = 1.0 },
-                .{ .position = .{ .x = 110.0, .y = 41.7 }, .radius = 1.0 },
-                .{ .position = .{ .x = 80.0, .y = 66.7 }, .radius = 1.0 },
+                .{ .position = .{ .x = -30.0, .y = -11.3 }, .radius = 1.0 },
+                .{ .position = .{ .x = 30.0, .y = -11.3 }, .radius = 1.0 },
+                .{ .position = .{ .x = 0.0, .y = 13.7 }, .radius = 1.0 },
             },
         },
 
@@ -252,32 +256,32 @@
             .background_color = .{ .r = 0.098, .g = 0.059, .b = 0.098 },
             .camera_mode = .follow,
             .terrain = .{
-                // Triangular chamber layout (variant, converted from pixels to meters)
-                .{ .position = .{ .x = 66.7, .y = 70.8 }, .size = .{ .x = 26.7, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 29.2, .y = 26.7 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
-                .{ .position = .{ .x = 117.5, .y = 26.7 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
-                .{ .position = .{ .x = 100.0, .y = 12.5 }, .size = .{ .x = 2.5, .y = 2.5 }, .type = .pit },
-                .{ .position = .{ .x = 101.7, .y = 50.0 }, .size = .{ .x = 2.9, .y = 2.9 }, .type = .pit },
+                // Triangular chamber layout - centered on origin spawn
+                .{ .position = .{ .x = -18.3, .y = 27.8 }, .size = .{ .x = 26.7, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = -55.8, .y = -16.3 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
+                .{ .position = .{ .x = 32.5, .y = -16.3 }, .size = .{ .x = 13.3, .y = 13.3 }, .type = .rock },
+                .{ .position = .{ .x = 15.0, .y = -30.5 }, .size = .{ .x = 2.5, .y = 2.5 }, .type = .pit },
+                .{ .position = .{ .x = 16.7, .y = 7.0 }, .size = .{ .x = 2.9, .y = 2.9 }, .type = .pit },
             },
             .units = .{
                 // Northeast Dungeon: 5 units (small size) - swarm tactics
-                .{ .position = .{ .x = 50.0, .y = 25.0 }, .radius = 1.3 }, // patrolling (forward patrol)
-                .{ .position = .{ .x = 110.0, .y = 25.0 }, .radius = 1.3 }, // wandering (roams widely)
-                .{ .position = .{ .x = 40.0, .y = 41.7 }, .radius = 1.3 }, // guardian (left guard)
-                .{ .position = .{ .x = 120.0, .y = 41.7 }, .radius = 1.3 }, // aggressive (right strike)
-                .{ .position = .{ .x = 80.0, .y = 58.3 }, .radius = 1.3 }, // defensive (rear support)
+                .{ .position = .{ .x = -35.0, .y = -18.0 }, .radius = 1.3 }, // patrolling (forward patrol)
+                .{ .position = .{ .x = 25.0, .y = -18.0 }, .radius = 1.3 }, // wandering (roams widely)
+                .{ .position = .{ .x = -45.0, .y = -1.3 }, .radius = 1.3 }, // guardian (left guard)
+                .{ .position = .{ .x = 35.0, .y = -1.3 }, .radius = 1.3 }, // aggressive (right strike)
+                .{ .position = .{ .x = -5.0, .y = 15.3 }, .radius = 1.3 }, // defensive (rear support)
             },
             .portals = .{
                 // Back to overworld (Northeast dungeon - portal positioned DOWN-LEFT toward overworld)
-                .{ .position = .{ .x = 88.7, .y = 36.3 }, .radius = 2.5, .destination = 0, .shape = .circle },
+                .{ .position = .{ .x = 3.7, .y = -6.7 }, .radius = 2.5, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 33.3, .y = 12.5 }, .radius = 2.1, .destination = 6, .shape = .square },
-                .{ .position = .{ .x = 141.7, .y = 73.3 }, .radius = 2.1, .destination = 4, .shape = .circle },
+                .{ .position = .{ .x = -51.7, .y = -30.5 }, .radius = 2.1, .destination = 6, .shape = .square },
+                .{ .position = .{ .x = 56.7, .y = 30.3 }, .radius = 2.1, .destination = 4, .shape = .circle },
             },
             .lifestones = .{
                 // 2 lifestones in Northeast Dungeon
-                .{ .position = .{ .x = 58.3, .y = 37.5 }, .radius = 1.0 },
-                .{ .position = .{ .x = 101.7, .y = 37.5 }, .radius = 1.0 },
+                .{ .position = .{ .x = -26.7, .y = -5.5 }, .radius = 1.0 },
+                .{ .position = .{ .x = 16.7, .y = -5.5 }, .radius = 1.0 },
             },
         },
 
@@ -287,35 +291,35 @@
             .background_color = .{ .r = 0.059, .g = 0.078, .b = 0.098 },
             .camera_mode = .follow,
             .terrain = .{
-                // Square chamber layout (variant, converted from pixels to meters)
-                .{ .position = .{ .x = 16.7, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
-                .{ .position = .{ .x = 135.0, .y = 25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
-                .{ .position = .{ .x = 50.0, .y = 70.8 }, .size = .{ .x = 60.0, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 50.0, .y = 12.5 }, .size = .{ .x = 60.0, .y = 6.7 }, .type = .rock },
-                .{ .position = .{ .x = 58.3, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
-                .{ .position = .{ .x = 101.7, .y = 41.7 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                // Square chamber layout - centered on origin spawn
+                .{ .position = .{ .x = -62.3, .y = -25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
+                .{ .position = .{ .x = 56.0, .y = -25.0 }, .size = .{ .x = 8.3, .y = 16.7 }, .type = .rock },
+                .{ .position = .{ .x = -29.0, .y = 20.8 }, .size = .{ .x = 60.0, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = -29.0, .y = -37.5 }, .size = .{ .x = 60.0, .y = 6.7 }, .type = .rock },
+                .{ .position = .{ .x = -20.7, .y = -8.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
+                .{ .position = .{ .x = 22.7, .y = -8.3 }, .size = .{ .x = 3.3, .y = 3.3 }, .type = .pit },
             },
             .units = .{
                 // East Dungeon: 6 units (smallest size) - overwhelming numbers
-                .{ .position = .{ .x = 37.5, .y = 23.3 }, .radius = 1.25 }, // patrolling (upper left circuit)
-                .{ .position = .{ .x = 122.5, .y = 23.3 }, .radius = 1.25 }, // wandering (upper right roam)
-                .{ .position = .{ .x = 37.5, .y = 62.5 }, .radius = 1.25 }, // guardian (lower left guard)
-                .{ .position = .{ .x = 122.5, .y = 62.5 }, .radius = 1.25 }, // aggressive (lower right rush)
-                .{ .position = .{ .x = 66.7, .y = 31.7 }, .radius = 1.25 }, // defensive (upper center support)
-                .{ .position = .{ .x = 93.3, .y = 52.5 }, .radius = 1.25 }, // patrolling (lower center circuit)
+                .{ .position = .{ .x = -41.5, .y = -26.7 }, .radius = 1.25 }, // patrolling (upper left circuit)
+                .{ .position = .{ .x = 43.5, .y = -26.7 }, .radius = 1.25 }, // wandering (upper right roam)
+                .{ .position = .{ .x = -41.5, .y = 12.5 }, .radius = 1.25 }, // guardian (lower left guard)
+                .{ .position = .{ .x = 43.5, .y = 12.5 }, .radius = 1.25 }, // aggressive (lower right rush)
+                .{ .position = .{ .x = -12.3, .y = -18.3 }, .radius = 1.25 }, // defensive (upper center support)
+                .{ .position = .{ .x = 14.3, .y = 2.5 }, .radius = 1.25 }, // patrolling (lower center circuit)
             },
             .portals = .{
                 // Back to overworld (East dungeon - portal positioned DOWN-LEFT toward overworld)
-                .{ .position = .{ .x = 88.7, .y = 62.0 }, .radius = 2.5, .destination = 0, .shape = .circle },
+                .{ .position = .{ .x = 9.7, .y = 12.0 }, .radius = 2.5, .destination = 0, .shape = .circle },
                 // To adjacent dungeons
-                .{ .position = .{ .x = 141.7, .y = 16.7 }, .radius = 2.1, .destination = 1, .shape = .circle },
-                .{ .position = .{ .x = 80.0, .y = 87.5 }, .radius = 2.1, .destination = 5, .shape = .triangle },
+                .{ .position = .{ .x = 62.7, .y = -33.3 }, .radius = 2.1, .destination = 1, .shape = .circle },
+                .{ .position = .{ .x = 1.0, .y = 37.5 }, .radius = 2.1, .destination = 5, .shape = .triangle },
             },
             .lifestones = .{
                 // 3 lifestones in East Dungeon
-                .{ .position = .{ .x = 50.0, .y = 33.3 }, .radius = 1.0 },
-                .{ .position = .{ .x = 110.0, .y = 33.3 }, .radius = 1.0 },
-                .{ .position = .{ .x = 80.0, .y = 58.3 }, .radius = 1.0 },
+                .{ .position = .{ .x = -29.0, .y = -16.7 }, .radius = 1.0 },
+                .{ .position = .{ .x = 31.0, .y = -16.7 }, .radius = 1.0 },
+                .{ .position = .{ .x = 1.0, .y = 8.3 }, .radius = 1.0 },
             },
         },
     },

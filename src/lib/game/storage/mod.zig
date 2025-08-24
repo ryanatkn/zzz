@@ -7,7 +7,6 @@ pub const MultiComponentStorage = entity_storage.MultiComponentStorage;
 pub const EntityIterator = entity_storage.EntityIterator;
 
 // Re-export archetype storages
-pub const PlayerStorage = generic_archetypes.PlayerStorage;
 pub const UnitStorage = generic_archetypes.UnitStorage;
 pub const ProjectileStorage = generic_archetypes.ProjectileStorage;
 pub const TerrainStorage = generic_archetypes.TerrainStorage;

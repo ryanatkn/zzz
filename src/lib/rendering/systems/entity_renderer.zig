@@ -214,31 +214,6 @@ pub fn renderZoneEntities(
     );
 }
 
-/// Player rendering with zone check
-pub fn renderPlayerInZone(
-    comptime ZoneType: type,
-    comptime GameType: type,
-    renderer: RendererInterface,
-    cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
-    render_pass: *c.sdl.SDL_GPURenderPass,
-    cam: *const Camera,
-    zone: *const ZoneType,
-    game: *const GameType,
-) void {
-    // Only render player if in current zone
-    if (game.player_zone == game.zone_manager.getCurrentZoneIndex()) {
-        renderCircleEntities(
-            @TypeOf(zone.players),
-            renderer,
-            cmd_buffer,
-            render_pass,
-            cam,
-            &zone.players,
-            zone.players.count,
-        );
-    }
-}
-
 /// Projectile rendering with visibility check
 pub fn renderProjectiles(
     comptime ZoneType: type,
@@ -272,19 +247,14 @@ pub fn renderProjectiles(
 /// This replaces the entire renderZone() function in game_renderer.zig
 pub fn renderCompleteZone(
     comptime ZoneType: type,
-    comptime GameType: type,
     renderer: RendererInterface,
     cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
     render_pass: *c.sdl.SDL_GPURenderPass,
     cam: *const Camera,
     zone: *const ZoneType,
-    game: *const GameType,
 ) void {
-    // Render all basic zone entities
+    // Render all basic zone entities (including player as part of units)
     renderZoneEntities(ZoneType, renderer, cmd_buffer, render_pass, cam, zone);
-
-    // Render player (with zone check)
-    renderPlayerInZone(ZoneType, GameType, renderer, cmd_buffer, render_pass, cam, zone, game);
 
     // Render projectiles (with visibility check)
     renderProjectiles(ZoneType, renderer, cmd_buffer, render_pass, cam, zone);

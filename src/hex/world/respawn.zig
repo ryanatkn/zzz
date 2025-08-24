@@ -17,10 +17,10 @@ const HexGame = world_state_mod.HexGame;
 /// This module provides a clean interface for respawn mechanics while
 /// delegating to the existing LifestoneSystem to avoid duplication
 pub const Respawn = struct {
-    /// Check lifestone collisions for player respawn/attunement
+    /// Check lifestone collisions for controlled entity respawn/attunement
     /// Delegates to the existing LifestoneSystem implementation
-    pub fn checkLifestoneCollisions(game_state: anytype, player_pos: Vec2, player_radius: f32) void {
-        lifestone_mod.LifestoneSystem.checkLifestoneCollisions(game_state, player_pos, player_radius);
+    pub fn checkLifestoneCollisions(game_state: anytype) void {
+        lifestone_mod.LifestoneSystem.checkLifestoneCollisions(game_state);
     }
 
     /// Check if all lifestones across all zones are attuned

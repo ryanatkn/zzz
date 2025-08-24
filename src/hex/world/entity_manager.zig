@@ -13,6 +13,7 @@ const disposition = @import("../disposition.zig");
 
 const Vec2 = math.Vec2;
 const EntityId = entities.EntityId;
+const PlayerConfig = world_state_mod.PlayerConfig;
 const HexGame = world_state_mod.HexGame;
 const Disposition = disposition.Disposition;
 
@@ -41,12 +42,12 @@ pub const EntityManager = struct {
     }
 
     /// Create a player entity in the current zone
-    pub fn createPlayer(game: *HexGame, pos: Vec2, radius: f32) !EntityId {
-        return entities.EntityFactory.createPlayer(game, pos, radius);
+    pub fn createPlayer(game: *HexGame, config: PlayerConfig) !EntityId {
+        return entities.EntityFactory.createPlayer(game, config);
     }
 
     /// Create a projectile entity in the specified zone
-    pub fn createProjectile(game: *HexGame, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32) !EntityId {
-        return entities.EntityFactory.createProjectile(game, zone_index, pos, radius, velocity, lifetime);
+    pub fn createProjectile(game: *HexGame, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32, shooter_id: EntityId) !EntityId {
+        return entities.EntityFactory.createProjectile(game, zone_index, pos, radius, velocity, lifetime, shooter_id);
     }
 };

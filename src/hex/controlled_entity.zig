@@ -26,12 +26,12 @@ pub fn updateControlledEntity(game: *HexGame, entity_id: EntityId, frame_ctx: Fr
     // Check if entity is alive
     if (!entity_queries.isEntityAlive(game, entity_id)) return;
 
-    // Get entity capabilities to determine movement parameters
-    const capabilities = faction_integration.getEntityCapabilities(game, entity_id) orelse return;
-    if (!capabilities.can_move) return;
+    // Get entity unit data to determine movement parameters
+    const zone_storage = game.getZoneStorage();
+    const unit = zone_storage.units.getComponent(entity_id, .unit) orelse return;
 
-    // Calculate velocity from input
-    const velocity = calculateVelocityFromInput(game, entity_id, input_state, cam, capabilities.move_speed);
+    // Calculate velocity from input using unit's speed
+    const velocity = calculateVelocityFromInput(game, entity_id, input_state, cam, unit.move_speed);
 
     // Get current position
     const current_pos = entity_queries.getEntityPos(game, entity_id) orelse return;
@@ -51,6 +51,7 @@ pub fn updateControlledEntity(game: *HexGame, entity_id: EntityId, frame_ctx: Fr
         entity_queries.setEntityPos(game, entity_id, new_pos);
     }
     // If collision detected, don't move (entity stays at current position)
+    // Note: Terrain collision (including deadly pits) is handled in the unit update loop
 
     entity_queries.setEntityVelocity(game, entity_id, velocity);
 }
@@ -111,8 +112,9 @@ pub fn canControlEntity(game: *const HexGame, entity_id: EntityId) bool {
 
 /// Get the speed of a controllable entity
 pub fn getEntitySpeed(game: *const HexGame, entity_id: EntityId) f32 {
-    if (faction_integration.getEntityCapabilities(game, entity_id)) |caps| {
-        return caps.move_speed;
+    const zone_storage = game.getZoneStorageConst();
+    if (zone_storage.units.getComponent(entity_id, .unit)) |unit| {
+        return unit.move_speed;
     }
-    return constants.PLAYER_SPEED; // Default fallback
+    return constants.UNIT_SPEED; // Default fallback if unit data missing
 }

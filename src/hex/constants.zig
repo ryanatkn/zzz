@@ -29,16 +29,12 @@ pub const MAX_PORTALS = 6;
 pub const MAX_LIFESTONES = 13;
 
 // Movement and gameplay constants (in meters)
-pub const PLAYER_SPEED = 50.0; // 50 m/s (was 600 pixels/s ≈ 50 m/s)
-// PLAYER_RADIUS removed - defined in ZON data since constants can't be imported
-pub const PLAYER_DAMAGE = 25.0; // Damage values stay the same
 pub const UNIT_SPEED = 6.7; // 6.7 m/s (was 80 pixels/s ≈ 6.7 m/s)
 pub const UNIT_DAMAGE = 10.0; // Damage values stay the same
 pub const UNIT_WALK_SPEED = UNIT_SPEED * 0.333; // Walk speed multiplier unchanged
 pub const UNIT_HOME_TOLERANCE = 0.17; // 17cm tolerance (was 2 pixels ≈ 17cm)
 pub const UNIT_DETECTION_RADIUS = 16.7; // 16.7m detection (was 200 pixels ≈ 16.7m)
 pub const UNIT_CHASE_SPEED = UNIT_SPEED; // Same as normal speed
-pub const UNIT_CHASE_DURATION = 5.0; // Time values stay the same
 pub const PROJECTILE_SPEED = 33.3; // 33.3 m/s (was 400 pixels/s ≈ 33.3 m/s)
 pub const PROJECTILE_RADIUS = 0.2; // 20cm radius - visible but not huge (was 5 pixels ≈ 42cm)
 pub const PROJECTILE_DAMAGE = 150.0; // Damage values stay the same
@@ -48,8 +44,8 @@ pub const PORTAL_SPAWN_OFFSET = 0.83; // 83cm offset (was 10 pixels ≈ 83cm)
 // Camera viewport constants (in meters)
 pub const DEFAULT_VIEWPORT_WIDTH = 16.0; // Default 16m wide viewport
 pub const DEFAULT_VIEWPORT_HEIGHT = 9.0; // Default 9m tall viewport (16:9 ratio)
-pub const FOLLOW_VIEWPORT_WIDTH = 32.0; // Follow camera wider view
-pub const FOLLOW_VIEWPORT_HEIGHT = 18.0; // Follow camera taller view (16:9 ratio)
+pub const FOLLOW_VIEWPORT_WIDTH = 96.0; // Follow camera wider view - increased for much better dungeon visibility
+pub const FOLLOW_VIEWPORT_HEIGHT = 54.0; // Follow camera taller view - increased for much better dungeon visibility (16:9 ratio)
 
 // Camera/zoom constants (game-specific limits)
 pub const ZOOM_FACTOR = constants.CAMERA.ZOOM_FACTOR;
@@ -189,7 +185,7 @@ pub const COLOR_UNIT_AGGRESSIVE = hex_colors.UNIT_AGGRO;
 pub const COLOR_UNIT_RETURNING = hex_colors.UNIT_NON_AGGRO;
 pub const COLOR_OBSTACLE_DEADLY = hex_colors.OBSTACLE_DEADLY;
 pub const COLOR_OBSTACLE_BLOCKING = hex_colors.OBSTACLE_BLOCKING;
-pub const COLOR_BULLET = hex_colors.BULLET;
+pub const COLOR_PROJECTILE = hex_colors.PROJECTILE;
 pub const COLOR_PORTAL = hex_colors.PORTAL;
 pub const COLOR_LIFESTONE_ATTUNED = hex_colors.LIFESTONE_ATTUNED;
 pub const COLOR_LIFESTONE_UNATTUNED = hex_colors.LIFESTONE_UNATTUNED;

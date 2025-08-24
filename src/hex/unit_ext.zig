@@ -4,7 +4,18 @@
 const Unit = @import("../lib/game/components/unit.zig").Unit;
 const Disposition = @import("disposition.zig").Disposition;
 const Vec2 = @import("../lib/math/mod.zig").Vec2;
-const EnergyLevel = @import("constants.zig").EnergyLevel;
+const constants = @import("constants.zig");
+const EnergyLevel = constants.EnergyLevel;
+
+/// Configuration for creating a HexUnit
+pub const UnitConfig = struct {
+    unit_type: Unit.UnitType,
+    home_pos: Vec2,
+    disposition: Disposition,
+    entity_id: u32,
+    speed: f32 = constants.UNIT_SPEED, // Default speed for regular units
+    energy: EnergyLevel = .normal, // Default energy level
+};
 
 /// Hex-specific unit extension with disposition and aggro
 pub const HexUnit = struct {
@@ -17,20 +28,22 @@ pub const HexUnit = struct {
     aggro_factor: f32,
     entity_id: u32,
     energy_level: EnergyLevel,
+    move_speed: f32, // Movement speed in meters/second
 
-    pub fn init(unit_type: Unit.UnitType, home_pos: Vec2, disposition: Disposition, entity_id: u32) HexUnit {
+    pub fn init(config: UnitConfig) HexUnit {
         return .{
-            .base = Unit.init(unit_type, home_pos),
-            .disposition = disposition,
-            .aggro_range = switch (unit_type) {
+            .base = Unit.init(config.unit_type, config.home_pos),
+            .disposition = config.disposition,
+            .aggro_range = switch (config.unit_type) {
                 .enemy => 12.5, // 12.5m detection range (was 150px)
                 .friendly => 8.33, // 8.33m detection range (was 100px)
                 .neutral => 10.0, // 10.0m detection range (was 120px)
-                else => 0.0,
+                .player => 0.0, // Player doesn't need aggro detection
             },
             .aggro_factor = 1.0,
-            .entity_id = entity_id,
-            .energy_level = .normal, // Start at normal energy
+            .entity_id = config.entity_id,
+            .energy_level = config.energy,
+            .move_speed = config.speed,
         };
     }
 

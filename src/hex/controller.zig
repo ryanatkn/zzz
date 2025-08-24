@@ -139,16 +139,7 @@ pub fn findNextControllableEntity(world: *const HexGame, current_entity: ?Entity
     var candidates: [64]EntityId = undefined;
     var count: usize = 0;
 
-    // Collect all controllable entities in current zone
-    var player_iter = zone.players.entityIterator();
-    while (player_iter.next()) |entity_id| {
-        if (count >= candidates.len) break;
-        if (faction_integration.canEntityBeControlled(world, entity_id)) {
-            candidates[count] = entity_id;
-            count += 1;
-        }
-    }
-
+    // Collect all controllable entities from units storage (includes player)
     var unit_iter = zone.units.entityIterator();
     while (unit_iter.next()) |entity_id| {
         if (count >= candidates.len) break;

@@ -82,70 +82,88 @@ pub const TravelSystem = struct {
             zone.projectiles.clear();
         }
 
-        // Move player if exists
-        if (game.player_entity) |player_entity| {
-            if (game.player_zone != zone_index) {
-                // Perform actual entity transfer between zones
-                try transferPlayerToZone(game, player_entity, game.player_zone, zone_index, spawn_pos);
-                game.player_zone = zone_index;
+        // Save player state from current zone before transfer
+        var player_stats: ?struct {
+            health_current: f32,
+            health_max: f32,
+            radius: f32,
+            speed: f32,
+            disposition: world_state_mod.Disposition,
+            energy: constants.EnergyLevel,
+        } = null;
 
-                game.logger.info("player_travel", "Player traveled from zone {} to zone {}", .{ game.zone_manager.getCurrentZoneIndex(), zone_index });
+        var old_entity_id: ?world_state_mod.EntityId = null;
+        const old_zone_index: usize = game.zone_manager.getCurrentZoneIndex();
+
+        // Extract player stats from current controlled entity
+        if (game.getControlledEntity()) |controlled_entity| {
+            const old_zone = game.getCurrentZone();
+            if (old_zone.units.getComponent(controlled_entity, .health)) |health| {
+                if (old_zone.units.getComponent(controlled_entity, .transform)) |transform| {
+                    if (old_zone.units.getComponent(controlled_entity, .unit)) |unit| {
+                        player_stats = .{
+                            .health_current = health.current,
+                            .health_max = health.max,
+                            .radius = transform.radius,
+                            .speed = unit.move_speed,
+                            .disposition = unit.disposition,
+                            .energy = unit.energy_level,
+                        };
+                        old_entity_id = controlled_entity;
+
+                        game.logger.debug("player_transfer_save", "Saved player stats: health={}/{}, radius={}, speed={}, disposition={s}, energy={s}", .{ health.current, health.max, transform.radius, unit.move_speed, @tagName(unit.disposition), @tagName(unit.energy_level) });
+                    }
+                }
             }
         }
 
+        // Switch to the new zone
         game.setCurrentZone(zone_index);
+
+        // Create new player entity in the destination zone with preserved stats
+        if (player_stats) |stats| {
+            const player_config = world_state_mod.PlayerConfig{
+                .position = spawn_pos,
+                .radius = stats.radius,
+                .speed = stats.speed,
+                .energy = stats.energy,
+                .disposition = stats.disposition,
+            };
+
+            const new_player_id = try game.createPlayer(player_config);
+
+            // Restore health
+            const new_zone = game.getCurrentZone();
+            if (new_zone.units.getComponentMut(new_player_id, .health)) |health| {
+                health.current = stats.health_current;
+                health.max = stats.health_max;
+                health.alive = true;
+            }
+
+            // Entity tracking is now handled by the controller system
+
+            // Transfer control to the new entity
+            _ = game.primary_controller.possess(game, new_player_id);
+
+            game.logger.info("player_transfer_complete", "Player transferred from zone {} to zone {}, entity {} -> {}", .{ old_zone_index, zone_index, old_entity_id orelse 0, new_player_id });
+
+            // Clean up old entity from old zone
+            if (old_entity_id) |old_id| {
+                const old_zone = game.zone_manager.getZone(old_zone_index);
+                _ = old_zone.units.removeEntity(old_id);
+                game.logger.debug("player_cleanup", "Cleaned up old player entity {} from zone {}", .{ old_id, old_zone_index });
+            }
+        } else {
+            game.logger.warn("player_transfer_failed", "No controlled entity found to transfer", .{});
+        }
 
         // Reload portals from new zone into zone travel manager
         loadPortalsIntoTravelManager(game) catch |err| {
             game.logger.err("portal_reload_failed", "Failed to reload portals after zone travel: {}", .{err});
         };
-
-        // Update player position in new zone if no transfer was needed
-        if (game.player_entity) |player| {
-            if (game.player_zone == zone_index) {
-                const zone = game.getCurrentZone();
-                if (zone.players.getComponentMut(player, .transform)) |transform| {
-                    transform.pos = spawn_pos;
-                    transform.vel = Vec2.ZERO;
-                }
-            }
-        }
     }
 
-    /// Helper method for proper entity transfer between zones
-    fn transferPlayerToZone(game: *world_state_mod.HexGame, player_entity: world_state_mod.EntityId, source_zone: usize, dest_zone: usize, new_pos: Vec2) !void {
-        if (source_zone >= world_state_mod.MAX_ZONES or dest_zone >= world_state_mod.MAX_ZONES) return;
-
-        const source = game.zone_manager.getZone(source_zone);
-        const dest = game.zone_manager.getZone(dest_zone);
-
-        // Extract player components from source zone
-        const transform = source.players.getComponent(player_entity, .transform);
-        const health = source.players.getComponent(player_entity, .health);
-        const visual = source.players.getComponent(player_entity, .visual); // We need mutable to copy
-
-        if (transform == null or health == null or visual == null) {
-            game.logger.err("transfer_failed", "transferPlayerToZone: Player entity missing required components", .{});
-            return;
-        }
-
-        // Create new player data with updated position
-        const new_transform = world_state_mod.Transform.init(new_pos, transform.?.radius);
-        const new_health = health.?.*;
-        const player_input = world_state_mod.PlayerInput.init(0); // Reset input state
-        const new_visual = visual.?.*;
-
-        // Remove from source zone
-        source.players.removeEntity(player_entity);
-        source.entity_count -%= 1;
-
-        // Add to destination zone
-        const movement = world_state_mod.Movement.init(constants.PLAYER_SPEED);
-        try dest.players.addEntity(player_entity, new_transform, new_health, player_input, new_visual, movement);
-        dest.entity_count += 1;
-
-        game.logger.debug("player_transferred", "Player entity {} transferred from zone {} to zone {}", .{ player_entity, source_zone, dest_zone });
-    }
+    // Player is now fully transferred via the unified entity system above
 
     /// Load portals from current zone into the zone travel manager
     fn loadPortalsIntoTravelManager(game: *world_state_mod.HexGame) !void {

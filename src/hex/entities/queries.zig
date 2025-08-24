@@ -27,9 +27,6 @@ pub const EntityQueries = struct {
         const zone = game.getCurrentZoneConst();
 
         // Check each storage type for the entity
-        if (zone.players.getComponent(entity_id, .transform)) |transform| {
-            return transform.pos;
-        }
         if (zone.units.getComponent(entity_id, .transform)) |transform| {
             return transform.pos;
         }
@@ -54,9 +51,6 @@ pub const EntityQueries = struct {
         const zone = game.getCurrentZoneConst();
 
         // Check each storage type for the entity
-        if (zone.players.getComponent(entity_id, .transform)) |transform| {
-            return transform.radius;
-        }
         if (zone.units.getComponent(entity_id, .transform)) |transform| {
             return transform.radius;
         }
@@ -84,17 +78,7 @@ pub const EntityQueries = struct {
 
         const radius_squared = radius * radius;
 
-        // Check all entity types
-        var player_iter = zone.players.entityIterator();
-        while (player_iter.next()) |entity_id| {
-            if (zone.players.getComponent(entity_id, .transform)) |transform| {
-                const dist_sq = center.sub(transform.pos).lengthSquared();
-                if (dist_sq <= radius_squared) {
-                    try found_entities.append(entity_id);
-                }
-            }
-        }
-
+        // Check all unit entities (includes player)
         var unit_iter = zone.units.entityIterator();
         while (unit_iter.next()) |entity_id| {
             if (zone.units.getComponent(entity_id, .transform)) |transform| {
@@ -115,7 +99,17 @@ pub const EntityQueries = struct {
         const zone = game.getCurrentZoneConst();
 
         return switch (entity_type) {
-            .player => zone.players.count,
+            .player => blk: {
+                // Count units with player type
+                var count: usize = 0;
+                var unit_iter = zone.units.entityIterator();
+                while (unit_iter.next()) |entity_id| {
+                    if (zone.units.getComponent(entity_id, .unit)) |unit| {
+                        if (unit.unitType() == .player) count += 1;
+                    }
+                }
+                break :blk count;
+            },
             .unit => zone.units.count,
             .projectile => zone.projectiles.count,
             .terrain => zone.terrain.count,

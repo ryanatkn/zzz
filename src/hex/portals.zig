@@ -17,15 +17,21 @@ pub fn updatePortalCooldown(world: *HexGame, frame_ctx: FrameContext) void {
 
 /// Check portal collisions using generic system (replaces 80+ lines of manual collision detection)
 pub fn checkPortalCollisions(world: *HexGame) bool {
-    if (!world.getPlayerAlive()) {
+    // Get controlled entity for portal collision
+    const controlled_entity = world.getControlledEntity() orelse return false;
+    const zone = world.getCurrentZoneConst();
+    const controlled_transform = zone.units.getComponent(controlled_entity, .transform) orelse return false;
+    const controlled_health = zone.units.getComponent(controlled_entity, .health) orelse return false;
+
+    if (!controlled_health.alive) {
         return false;
     }
 
-    const player_pos = world.getPlayerPos();
-    const player_radius = world.getPlayerRadius();
+    const controlled_pos = controlled_transform.pos;
+    const controlled_radius = controlled_transform.radius;
 
     // Check for portal collisions and execute travel directly
-    if (world.zone_travel_manager.checkTeleporterCollisions(world, player_pos, player_radius)) |result| {
+    if (world.zone_travel_manager.checkTeleporterCollisions(world, controlled_pos, controlled_radius)) |result| {
         if (result.success) {
             loggers.getGameLog().info("portal_travel_success", "Portal travel completed successfully", .{});
             return true;

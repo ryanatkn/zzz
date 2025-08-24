@@ -37,7 +37,9 @@ const HexCombatInterface = struct {
     }
 
     pub fn createProjectileFromCombat(game: *HexGame, pos: Vec2, velocity: Vec2, radius: f32, lifetime: f32, _: f32) anyerror!u32 {
-        return game.createProjectile(game.zone_manager.getCurrentZoneIndex(), pos, radius, velocity, lifetime);
+        // Get the shooter entity ID to properly set projectile ownership
+        const shooter_id = game.getControlledEntity() orelse return error.NoShooter;
+        return game.createProjectile(game.zone_manager.getCurrentZoneIndex(), pos, radius, velocity, lifetime, shooter_id);
     }
 };
 
@@ -143,12 +145,30 @@ pub fn respawnPlayer(game_state: *GameState) void {
     }
 
     // Common respawn logic - create respawn effects
-    const respawn_effect = game_systems.respawn.RespawnVisuals.RespawnVisualData.init(respawn_pos, world.getPlayerRadius());
+    const controlled_radius = if (world.getControlledEntity()) |controlled_entity| blk: {
+        const zone = world.getCurrentZoneConst();
+        if (zone.units.getComponent(controlled_entity, .transform)) |transform| {
+            break :blk transform.radius;
+        }
+        break :blk 0.7; // Default radius
+    } else 0.7;
 
-    // Set player position and alive status using ECS
-    world.setPlayerPos(respawn_pos);
-    world.setPlayerAlive(true);
-    world.setPlayerColor(constants.COLOR_PLAYER_ALIVE);
+    const respawn_effect = game_systems.respawn.RespawnVisuals.RespawnVisualData.init(respawn_pos, controlled_radius);
+
+    // Set controlled entity position and alive status using ECS
+    if (world.getControlledEntity()) |controlled_entity| {
+        const zone = world.getCurrentZone();
+        if (zone.units.getComponentMut(controlled_entity, .transform)) |transform| {
+            transform.pos = respawn_pos;
+        }
+        if (zone.units.getComponentMut(controlled_entity, .health)) |health| {
+            health.alive = true;
+            health.current = health.max;
+        }
+        if (zone.units.getComponentMut(controlled_entity, .visual)) |visual| {
+            visual.color = constants.COLOR_PLAYER_ALIVE;
+        }
+    }
     particle_system.addPlayerSpawnParticle(respawn_effect.position, respawn_effect.radius);
     loggers.getGameLog().info("player_respawn", "Player respawned at checkpoint!", .{});
 }

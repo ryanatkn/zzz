@@ -16,11 +16,15 @@ const HexGame = world_state_mod.HexGame;
 /// Lifestone mechanics system extracted from game.zig
 pub const LifestoneSystem = struct {
     /// Check lifestone collisions - extracted from game.zig checkLifestoneCollisions()
-    pub fn checkLifestoneCollisions(game_state: anytype, player_pos: Vec2, player_radius: f32) void {
+    pub fn checkLifestoneCollisions(game_state: anytype) void {
         const world = &game_state.hex_game;
 
-        // Use the same approach as physics.zig for consistency
+        // Get controlled entity position and radius
+        const controlled_entity = world.getControlledEntity() orelse return;
         const zone = world.getCurrentZone();
+        const controlled_transform = zone.units.getComponent(controlled_entity, .transform) orelse return;
+        const controlled_pos = controlled_transform.pos;
+        const controlled_radius = controlled_transform.radius;
 
         // Check all lifestones in this zone using direct array access like physics.zig does
         for (0..zone.lifestones.count) |i| {
@@ -34,7 +38,7 @@ pub const LifestoneSystem = struct {
             // This is more flexible than checking terrain type
 
             // Check collision first (allows re-attunement when overlapping)
-            if (collision.checkCircleCollision(player_pos, player_radius, transform.pos, transform.radius)) {
+            if (collision.checkCircleCollision(controlled_pos, controlled_radius, transform.pos, transform.radius)) {
                 const was_attuned = interactable.attuned;
 
                 // Attune the lifestone

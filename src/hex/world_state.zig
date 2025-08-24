@@ -33,6 +33,15 @@ const BulletPool = combat.BulletPool;
 const FrameContext = frame.FrameContext;
 const EntityIterator = storage.EntityIterator;
 
+// Player creation configuration
+pub const PlayerConfig = struct {
+    position: Vec2,
+    radius: f32,
+    speed: f32,
+    energy: constants.EnergyLevel,
+    disposition: disposition.Disposition,
+};
+
 // Logging setup
 const Logger = @import("../lib/debug/logger.zig").Logger;
 const outputs = @import("../lib/debug/outputs.zig");
@@ -98,8 +107,6 @@ pub const HexProjectile = struct {
 pub const Projectile = HexProjectile;
 
 // Use generic archetype storages from lib/game/storage
-const PlayerStorage = storage.PlayerStorage(MAX_ENTITIES_PER_ARCHETYPE);
-
 const UnitStorage = storage.UnitStorage(MAX_ENTITIES_PER_ARCHETYPE, Unit);
 
 const ProjectileStorage = storage.ProjectileStorage(MAX_ENTITIES_PER_ARCHETYPE, HexProjectile);
@@ -166,12 +173,7 @@ pub const HexGame = struct {
     // Generic zone management from lib
     zone_manager: zones.ZoneManager(ZoneData, MAX_ZONES),
 
-    // Player tracking (legacy - to be removed)
-    player_entity: ?EntityId,
-    player_zone: usize,
-    player_start_pos: Vec2,
-
-    // Controller system (new architecture)
+    // Controller system (unified entity management)
     primary_controller: controller_mod.Controller,
 
     // Game systems
@@ -188,7 +190,6 @@ pub const HexGame = struct {
 
     pub const ZoneData = struct {
         // Direct fixed-size archetype storage - no dynamic allocation
-        players: PlayerStorage,
         units: UnitStorage,
         projectiles: ProjectileStorage,
         terrain: TerrainStorage,
@@ -220,7 +221,6 @@ pub const HexGame = struct {
 
         pub fn init(zone_type: ZoneType) ZoneData {
             return .{
-                .players = PlayerStorage.init(),
                 .units = UnitStorage.init(),
                 .projectiles = ProjectileStorage.init(),
                 .terrain = TerrainStorage.init(),
@@ -245,7 +245,6 @@ pub const HexGame = struct {
         /// Check if an entity is alive by searching through all storage types
         pub fn isAlive(self: *const ZoneData, entity_id: EntityId) bool {
             // Check each storage type to see if entity exists and is alive
-            if (self.players.containsEntity(entity_id)) return true;
             if (self.units.containsEntity(entity_id)) return true;
             if (self.projectiles.containsEntity(entity_id)) return true;
             if (self.terrain.containsEntity(entity_id)) return true;
@@ -270,9 +269,6 @@ pub const HexGame = struct {
     pub fn init(allocator: std.mem.Allocator) HexGame {
         var game = HexGame{
             .zone_manager = zones.ZoneManager(ZoneData, MAX_ZONES).init(),
-            .player_entity = null,
-            .player_zone = 0,
-            .player_start_pos = Vec2.screenCenter(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT),
             .primary_controller = controller_mod.createPlayerController(),
             .projectile_pool = BulletPool.init(),
             .entity_allocator = EntityAllocator{},
@@ -380,14 +376,14 @@ pub const HexGame = struct {
         return world_modules.EntityManager.createPortal(self, zone_index, pos, radius, destination);
     }
 
-    pub fn createPlayer(self: *HexGame, pos: Vec2, radius: f32) !EntityId {
+    pub fn createPlayer(self: *HexGame, config: PlayerConfig) !EntityId {
         const world_modules = @import("world/mod.zig");
-        return world_modules.EntityManager.createPlayer(self, pos, radius);
+        return world_modules.EntityManager.createPlayer(self, config);
     }
 
-    pub fn createProjectile(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32) !EntityId {
+    pub fn createProjectile(self: *HexGame, zone_index: usize, pos: Vec2, radius: f32, velocity: Vec2, lifetime: f32, shooter_id: EntityId) !EntityId {
         const world_modules = @import("world/mod.zig");
-        return world_modules.EntityManager.createProjectile(self, zone_index, pos, radius, velocity, lifetime);
+        return world_modules.EntityManager.createProjectile(self, zone_index, pos, radius, velocity, lifetime, shooter_id);
     }
 
     // Zone travel - delegated to world.ZoneTransitions (Phase 3)
@@ -396,116 +392,7 @@ pub const HexGame = struct {
         return world_modules.ZoneTransitions.travelToZone(self, zone_index, spawn_pos);
     }
 
-    // Player accessors
-    pub fn getPlayerPos(self: *const HexGame) Vec2 {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                const zone = self.getCurrentZoneConst();
-                if (zone.players.getComponent(player, .transform)) |transform| {
-                    return transform.pos;
-                }
-            }
-        }
-        return Vec2.ZERO;
-    }
-
-    pub fn getPlayerRadius(self: *const HexGame) f32 {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                const zone = self.getCurrentZoneConst();
-                if (zone.players.getComponent(player, .transform)) |transform| {
-                    return transform.radius;
-                }
-            }
-        }
-        return 0.7; // Default player radius (meters) - matches ZON data
-    }
-
-    pub fn getPlayerAlive(self: *const HexGame) bool {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                const zone = self.getCurrentZoneConst();
-                if (zone.players.getComponent(player, .health)) |health| {
-                    return health.alive;
-                }
-            }
-        }
-        return false;
-    }
-
-    pub fn getPlayer(self: *const HexGame) ?EntityId {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                return player;
-            }
-        }
-        return null;
-    }
-
-    pub fn setPlayerPos(self: *HexGame, pos: Vec2) void {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                const zone = self.getCurrentZone();
-                if (zone.players.getComponentMut(player, .transform)) |transform| {
-                    transform.pos = pos;
-                }
-            }
-        }
-    }
-
-    pub fn setPlayerVel(self: *HexGame, vel: Vec2) void {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                const zone = self.getCurrentZone();
-                if (zone.players.getComponentMut(player, .transform)) |transform| {
-                    transform.vel = vel;
-                }
-            }
-        }
-    }
-
-    pub fn getPlayerVelConst(self: *const HexGame) Vec2 {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                const zone = self.zone_manager.getCurrentZone();
-                if (zone.players.getTransformConst(player)) |transform| {
-                    return transform.vel;
-                }
-            }
-        }
-        return Vec2.ZERO;
-    }
-
-    pub fn setPlayerAlive(self: *HexGame, alive: bool) void {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                const zone = self.getCurrentZone();
-                if (zone.players.getComponentMut(player, .health)) |health| {
-                    health.alive = alive;
-                    if (alive) {
-                        health.current = health.max;
-                    }
-                }
-                if (zone.players.getComponentMut(player, .visual)) |visual| {
-                    visual.color = if (alive)
-                        constants.COLOR_PLAYER_ALIVE
-                    else
-                        constants.COLOR_DEAD;
-                }
-            }
-        }
-    }
-
-    pub fn setPlayerColor(self: *HexGame, color: Color) void {
-        if (self.player_entity) |player| {
-            if (self.player_zone == self.zone_manager.getCurrentZoneIndex()) {
-                const zone = self.getCurrentZone();
-                if (zone.players.getComponentMut(player, .visual)) |visual| {
-                    visual.color = color;
-                }
-            }
-        }
-    }
+    // Legacy player compatibility functions removed - use controlled entity methods instead
 
     // Controller-based methods (new architecture)
 
@@ -584,6 +471,9 @@ pub const HexGame = struct {
                             if (zone.units.getComponentMut(unit_id, .health)) |unit_health| {
                                 if (!unit_health.alive) continue;
 
+                                // Skip collision with the entity that fired this projectile
+                                if (unit_id == projectile.base.owner) continue;
+
                                 const dist_sq = transform.pos.sub(unit_transform.pos).lengthSquared();
                                 const collision_dist = transform.radius + unit_transform.radius;
 
@@ -622,14 +512,10 @@ pub const HexGame = struct {
                                 const terrain_rect = collision_mod.Shape{ .rectangle = .{ .position = terrain_transform.pos, .size = terrain.size } };
 
                                 if (collision_mod.checkCollision(projectile_circle, terrain_rect)) {
-                                    // Terrain hit - check if deadly (pits) or ricochetable (rocks)
-                                    if (terrain.deadly) {
-                                        // Pits destroy projectiles immediately - no ricochet
-                                        if (remove_count < projectiles_to_remove.len) {
-                                            projectiles_to_remove[remove_count] = projectile_id;
-                                            remove_count += 1;
-                                        }
-                                        break;
+                                    // Terrain hit - check terrain type for collision behavior
+                                    if (terrain.terrain_type == .pit) {
+                                        // Pits allow projectiles to pass through unimpeded
+                                        continue;
                                     } else if (terrain.allows_ricochet) {
                                         // Calculate ricochet off solid terrain (rocks, doors)
                                         const detailed_result = collision_mod.checkCollisionDetailed(projectile_circle, terrain_rect);

@@ -40,26 +40,26 @@ pub const ComposedBehaviorResult = struct {
 pub const BehaviorContext = struct {
     unit_pos: Vec2, // world space (meters)
     home_pos: Vec2, // world space (meters)
-    player_pos: ?Vec2, // world space (meters)
-    player_alive: bool,
+    controlled_entity_pos: ?Vec2, // world space (meters)
+    controlled_entity_alive: bool,
     aggro_multiplier: f32,
     dt: f32,
-    distance_to_player: f32, // world space distance (meters)
+    distance_to_controlled_entity: f32, // world space distance (meters)
     distance_from_home_sq: f32, // world space distance squared (meters²)
 
-    pub fn init(unit_pos: Vec2, home_pos: Vec2, player_pos: ?Vec2, player_alive: bool, aggro_multiplier: f32, dt: f32) BehaviorContext {
-        const distance_to_player = if (player_pos) |pp| unit_pos.sub(pp).length() else std.math.inf(f32);
+    pub fn init(unit_pos: Vec2, home_pos: Vec2, controlled_entity_pos: ?Vec2, controlled_entity_alive: bool, aggro_multiplier: f32, dt: f32) BehaviorContext {
+        const distance_to_controlled_entity = if (controlled_entity_pos) |cep| unit_pos.sub(cep).length() else std.math.inf(f32);
         const home_offset = unit_pos.sub(home_pos);
         const distance_from_home_sq = home_offset.lengthSquared();
 
         return .{
             .unit_pos = unit_pos,
             .home_pos = home_pos,
-            .player_pos = player_pos,
-            .player_alive = player_alive,
+            .controlled_entity_pos = controlled_entity_pos,
+            .controlled_entity_alive = controlled_entity_alive,
             .aggro_multiplier = aggro_multiplier,
             .dt = dt,
-            .distance_to_player = distance_to_player,
+            .distance_to_controlled_entity = distance_to_controlled_entity,
             .distance_from_home_sq = distance_from_home_sq,
         };
     }
@@ -84,11 +84,11 @@ fn evaluateHostileBehavior(composer: *BehaviorComposer, context: BehaviorContext
     };
 
     // Try chase behavior first
-    if (context.player_alive and context.player_pos != null) {
+    if (context.controlled_entity_alive and context.controlled_entity_pos != null) {
         const chase_result = chase_behavior.evaluateChase(
             context.unit_pos,
-            context.player_pos.?,
-            context.player_alive,
+            context.controlled_entity_pos.?,
+            context.controlled_entity_alive,
             &composer.chase_state,
             ProfileConfigs.hostile.chase,
             context.aggro_multiplier,
@@ -134,11 +134,11 @@ fn evaluateFearfulBehavior(composer: *BehaviorComposer, context: BehaviorContext
     };
 
     // Try flee behavior first
-    if (context.player_alive and context.player_pos != null) {
+    if (context.controlled_entity_alive and context.controlled_entity_pos != null) {
         const flee_result = flee_behavior.evaluateFlee(
             context.unit_pos,
-            context.player_pos.?,
-            context.player_alive,
+            context.controlled_entity_pos.?,
+            context.controlled_entity_alive,
             &composer.flee_state,
             ProfileConfigs.fearful.flee,
             context.aggro_multiplier,
@@ -219,11 +219,11 @@ fn evaluateFriendlyBehavior(composer: *BehaviorComposer, context: BehaviorContex
     };
 
     // Try gentle following behavior
-    if (context.player_alive and context.player_pos != null) {
+    if (context.controlled_entity_alive and context.controlled_entity_pos != null) {
         const chase_result = chase_behavior.evaluateChase(
             context.unit_pos,
-            context.player_pos.?,
-            context.player_alive,
+            context.controlled_entity_pos.?,
+            context.controlled_entity_alive,
             &composer.chase_state,
             ProfileConfigs.friendly.chase,
             context.aggro_multiplier,

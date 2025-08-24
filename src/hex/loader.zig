@@ -8,6 +8,9 @@ const loggers = @import("../lib/debug/loggers.zig");
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 
+// Import player config from world state module
+const PlayerConfig = world_state_mod.PlayerConfig;
+
 // Global arena for ZON data that persists for game lifetime
 var game_data_arena: ?std.heap.ArenaAllocator = null;
 
@@ -110,25 +113,40 @@ pub fn loadWorldData(allocator: std.mem.Allocator, game: *world_state_mod.HexGam
     };
 
     // Set player start position
-    // Create the player entity if it doesn't exist
-    loggers.getGameLog().info("player_check", "Checking if player exists: {}", .{game.getPlayer() != null});
-    if (game.getPlayer() == null) {
-        loggers.getGameLog().info("player_create", "Creating player at position ({}, {})", .{ game_data.player_start.position.x, game_data.player_start.position.y });
-        const player_id = try game.createPlayer(Vec2{
+    // Create the controlled entity if none exists yet
+    loggers.getGameLog().info("controlled_entity_check", "Checking if controlled entity exists: {}", .{game.getControlledEntity() != null});
+    if (game.getControlledEntity() == null) {
+        const player_pos = Vec2{
             .x = game_data.player_start.position.x,
             .y = game_data.player_start.position.y,
-        }, game_data.player_start.radius);
+        };
+
+        // Create player config from ZON data
+        const player_config = PlayerConfig{
+            .position = player_pos,
+            .radius = game_data.player_start.radius,
+            .speed = game_data.player_start.speed,
+            .energy = game_data.player_start.energy,
+            .disposition = game_data.player_start.disposition,
+        };
+
+        loggers.getGameLog().info("player_create", "Creating player at position ({}, {}) with speed {} and energy {s}", .{ player_pos.x, player_pos.y, player_config.speed, @tagName(player_config.energy) });
+        const player_id = try game.createPlayer(player_config);
         loggers.getGameLog().info("player_created", "Player created with ID: {}", .{player_id});
     } else {
-        // Update existing player position
-        game.setPlayerPos(Vec2{
-            .x = game_data.player_start.position.x,
-            .y = game_data.player_start.position.y,
-        });
-        // Note: Player radius update requires recreating entity, which isn't supported yet
+        // Update existing controlled entity position
+        if (game.getControlledEntity()) |controlled_entity| {
+            const zone = game.getCurrentZone();
+            if (zone.units.getComponentMut(controlled_entity, .transform)) |transform| {
+                transform.pos = Vec2{
+                    .x = game_data.player_start.position.x,
+                    .y = game_data.player_start.position.y,
+                };
+            }
+        }
+        // Note: Entity radius update requires recreating entity, which isn't supported yet
     }
-    // Store original spawn position for full reset
-    game.player_start_pos = game.getPlayerPos();
+    // Original spawn position is now managed via lifestone attunement system
 
     // Load each zone
     for (game_data.zones, 0..) |zone_data, i| {
@@ -161,11 +179,11 @@ fn loadZone(zone: *world_state_mod.HexGame.ZoneData, data: ZoneData, game: *worl
     // Set camera scale (default to 1.0 if not specified)
     // camera_scale removed - zoom handled by camera system directly
 
-    // Set spawn position (default to world center if not specified)
+    // Set spawn position (default to origin if not specified)
     zone.spawn_pos = if (data.spawn_pos) |pos|
         Vec2.position(pos.x, pos.y)
     else
-        Vec2{ .x = zone.world_width / 2.0, .y = zone.world_height / 2.0 };
+        Vec2{ .x = 0.0, .y = 0.0 }; // Default to origin spawn, consistent with zones.zig
 
     // Set world bounds (use defaults if not specified in ZON)
     zone.world_width = data.world_width orelse zone.world_width; // Keep init() default
@@ -257,6 +275,9 @@ const GameData = struct {
         zone: u8,
         position: struct { x: f32, y: f32 },
         radius: f32,
+        speed: f32 = 200.0, // Default to 4x unit speed (50.0 * 4)
+        energy: constants.EnergyLevel = .raised, // Default to raised energy
+        disposition: world_state_mod.Disposition = .friendly, // Default to friendly
     },
     zones: []const ZoneData,
 };
