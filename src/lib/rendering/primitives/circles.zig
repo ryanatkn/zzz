@@ -73,10 +73,10 @@ pub const CircleRenderer = struct {
             .screen_size = [2]f32{ screen_width, screen_height },
             .circle_center = [2]f32{ pos.x, pos.y },
             .circle_size = [2]f32{ radius, 0.0 },
-            .circle_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
-            .circle_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
-            .circle_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
-            .circle_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            .circle_color_r = color.r,
+            .circle_color_g = color.g,
+            .circle_color_b = color.b,
+            .circle_color_a = color.a,
             ._padding = 0.0,
         };
 
@@ -93,12 +93,7 @@ pub const CircleRenderer = struct {
         const instance = CircleInstance{
             .center = [2]f32{ pos.x, pos.y },
             .radius = radius,
-            .color = [4]f32{
-                @as(f32, @floatFromInt(color.r)) / 255.0,
-                @as(f32, @floatFromInt(color.g)) / 255.0,
-                @as(f32, @floatFromInt(color.b)) / 255.0,
-                @as(f32, @floatFromInt(color.a)) / 255.0,
-            },
+            .color = [4]f32{ color.r, color.g, color.b, color.a },
         };
         self.instances.append(instance) catch {
             loggers.getRenderLog().warn("circle_batch_full", "Circle instance buffer full, skipping", .{});

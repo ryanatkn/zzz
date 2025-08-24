@@ -164,8 +164,8 @@ pub const Panel = struct {
 
 /// Configuration for panel styling
 pub const PanelConfig = struct {
-    background_color: Color = Color{ .r = 40, .g = 40, .b = 40, .a = 255 },
-    border_color: Color = Color{ .r = 80, .g = 80, .b = 80, .a = 255 },
+    background_color: Color = colors.DARK_GRAY_40,
+    border_color: Color = colors.GRAY_80,
     border_width: f32 = 1.0,
     padding: f32 = 8.0,
 };
@@ -299,9 +299,9 @@ pub const InputField = struct {
 
         // Draw border (focused = thicker)
         const border_color = if (is_focused)
-            Color{ .r = 100, .g = 150, .b = 200, .a = 255 }
+            colors.FOCUS_BORDER
         else
-            Color{ .r = 80, .g = 80, .b = 80, .a = 255 };
+            colors.GRAY_80;
         const border_width: f32 = if (is_focused) 2.0 else 1.0;
 
         Panel.drawBorder(renderer, bounds, border_color, border_width);
@@ -335,8 +335,8 @@ pub const InputField = struct {
 pub const InputFieldConfig = struct {
     initial_text: []const u8 = "",
     font_size: f32 = styles.FontSizes.normal,
-    text_color: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
-    background_color: Color = Color{ .r = 30, .g = 30, .b = 30, .a = 255 },
+    text_color: Color = colors.WHITE,
+    background_color: Color = colors.DARK_GRAY_30,
 };
 
 /// Button component with hover/press states
@@ -432,7 +432,7 @@ pub const Button = struct {
         }
 
         // Draw border
-        Panel.drawBorder(renderer, bounds, Color{ .r = 100, .g = 100, .b = 100, .a = 255 }, 1.0);
+        Panel.drawBorder(renderer, bounds, colors.GRAY_100, 1.0);
 
         // Draw text (centered)
         if (text.len > 0) {
@@ -452,11 +452,11 @@ pub const Button = struct {
 /// Configuration for button styling
 pub const ButtonConfig = struct {
     font_size: f32 = styles.FontSizes.normal,
-    normal_color: Color = Color{ .r = 60, .g = 60, .b = 60, .a = 255 },
-    hover_color: Color = Color{ .r = 80, .g = 80, .b = 80, .a = 255 },
-    pressed_color: Color = Color{ .r = 40, .g = 40, .b = 40, .a = 255 },
-    disabled_color: Color = Color{ .r = 30, .g = 30, .b = 30, .a = 128 },
-    text_color: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+    normal_color: Color = colors.GRAY_60,
+    hover_color: Color = colors.GRAY_80,
+    pressed_color: Color = colors.DARK_GRAY_40,
+    disabled_color: Color = colors.DARK_GRAY_30,
+    text_color: Color = colors.WHITE,
 };
 
 // Tests

@@ -122,10 +122,10 @@ fn hsvToColorComptime(comptime h: f32, comptime s: f32, comptime v: f32) Color {
         }
 
         return Color{
-            .r = @intFromFloat((r + m) * 255.0),
-            .g = @intFromFloat((g + m) * 255.0),
-            .b = @intFromFloat((b + m) * 255.0),
-            .a = 255,
+            .r = r + m,
+            .g = g + m,
+            .b = b + m,
+            .a = 1.0,
         };
     }
 }
@@ -224,26 +224,26 @@ pub const PackedColorData = packed struct {
 
 /// Process multiple colors at once using SIMD
 pub inline fn applyBrightnessToColors(colors_array: []Color, brightness_factor: f32) void {
-    const clamped_factor = @max(0.0, @min(1.0, brightness_factor));
+    const clamped_factor = @max(0.0, brightness_factor); // Allow values > 1.0 for brightening
 
     // Process each color's RGBA components with SIMD
     for (colors_array) |*color| {
         // Load color components into vector
         const vec = @Vector(4, f32){
-            @floatFromInt(color.r),
-            @floatFromInt(color.g),
-            @floatFromInt(color.b),
-            @floatFromInt(color.a),
+            color.r,
+            color.g,
+            color.b,
+            color.a,
         };
 
         // SIMD multiply and clamp
         const result = vec * @as(@Vector(4, f32), @splat(clamped_factor));
 
         // Store back with saturation
-        color.r = @intFromFloat(@min(255.0, result[0]));
-        color.g = @intFromFloat(@min(255.0, result[1]));
-        color.b = @intFromFloat(@min(255.0, result[2]));
-        color.a = @intFromFloat(@min(255.0, result[3]));
+        color.r = @min(1.0, result[0]);
+        color.g = @min(1.0, result[1]);
+        color.b = @min(1.0, result[2]);
+        color.a = @min(1.0, result[3]);
     }
 }
 
@@ -309,25 +309,28 @@ test "variant selection" {
 
 test "SIMD brightness operations" {
     var test_colors = [_]Color{
-        Color{ .r = 100, .g = 150, .b = 200, .a = 255 },
-        Color{ .r = 50, .g = 75, .b = 100, .a = 255 },
+        Color.fromFloat(100.0 / 255.0, 150.0 / 255.0, 200.0 / 255.0, 1.0),
+        Color.fromFloat(50.0 / 255.0, 75.0 / 255.0, 100.0 / 255.0, 1.0),
     };
 
     // Apply 50% brightness
     applyBrightnessToColors(&test_colors, 0.5);
 
-    // Check results are approximately half
-    try std.testing.expect(test_colors[0].r == 50);
-    try std.testing.expect(test_colors[0].g == 75);
-    try std.testing.expect(test_colors[0].b == 100);
+    // Check results are approximately half (in float 0.0-1.0 range)
+    const epsilon = 0.01;
+    try std.testing.expect(@abs(test_colors[0].r - (100.0 / 255.0 * 0.5)) < epsilon);
+    try std.testing.expect(@abs(test_colors[0].g - (150.0 / 255.0 * 0.5)) < epsilon);
+    try std.testing.expect(@abs(test_colors[0].b - (200.0 / 255.0 * 0.5)) < epsilon);
 
     // Test clamping at max
-    test_colors[0] = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
+    test_colors[0] = Color.fromFloat(200.0 / 255.0, 200.0 / 255.0, 200.0 / 255.0, 1.0);
     applyBrightnessToColors(&test_colors, 2.0); // Should clamp to 1.0
 
-    try std.testing.expect(test_colors[0].r == 200);
-    try std.testing.expect(test_colors[0].g == 200);
-    try std.testing.expect(test_colors[0].b == 200);
+    // After clamping, should be 1.0 (max float value)
+    const epsilon2 = 0.01;
+    try std.testing.expect(@abs(test_colors[0].r - 1.0) < epsilon2);
+    try std.testing.expect(@abs(test_colors[0].g - 1.0) < epsilon2);
+    try std.testing.expect(@abs(test_colors[0].b - 1.0) < epsilon2);
 }
 
 test "packed color data" {

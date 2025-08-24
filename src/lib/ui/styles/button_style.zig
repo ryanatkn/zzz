@@ -62,8 +62,8 @@ pub const Presets = struct {
 
     pub const primary = ButtonStyle{
         .normal_color = BaseStyle.Colors.border_focus, // Blue
-        .hover_color = Color{ .r = 90, .g = 150, .b = 200, .a = 255 },
-        .pressed_color = Color{ .r = 50, .g = 110, .b = 160, .a = 255 },
+        .hover_color = BaseStyle.Colors.input_focus, // Lighter blue
+        .pressed_color = BaseStyle.Colors.border_focus, // Same blue (rely on visual feedback)
     };
 
     pub const secondary = ButtonStyle{
@@ -73,9 +73,9 @@ pub const Presets = struct {
     };
 
     pub const danger = ButtonStyle{
-        .normal_color = BaseStyle.Colors.text_error,
-        .hover_color = Color{ .r = 255, .g = 120, .b = 120, .a = 255 },
-        .pressed_color = Color{ .r = 200, .g = 80, .b = 80, .a = 255 },
+        .normal_color = BaseStyle.Colors.text_error, // Light red
+        .hover_color = BaseStyle.Colors.text_error, // Same red (use border for feedback)
+        .pressed_color = BaseStyle.Colors.text_error, // Same red (use shadow for feedback)
     };
 
     pub const large = ButtonStyle{

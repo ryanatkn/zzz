@@ -53,20 +53,20 @@ pub const PanelStyle = struct {
     };
 
     pub const navigation = PanelStyle{
-        .background = Color{ .r = 20, .g = 25, .b = 35, .a = 255 },
-        .border = Color{ .r = 40, .g = 45, .b = 55, .a = 255 },
+        .background = colors.NAV_BACKGROUND,
+        .border = colors.NAV_BORDER,
         .border_width = 1.0,
     };
 
     pub const button = PanelStyle{
-        .background = Color{ .r = 60, .g = 70, .b = 90, .a = 255 },
-        .border = Color{ .r = 80, .g = 90, .b = 110, .a = 255 },
+        .background = colors.BUTTON_NORMAL,
+        .border = colors.BUTTON_BORDER,
         .border_width = 1.0,
     };
 
     pub const button_disabled = PanelStyle{
-        .background = Color{ .r = 30, .g = 35, .b = 45, .a = 128 },
-        .border = Color{ .r = 50, .g = 55, .b = 65, .a = 128 },
+        .background = colors.BUTTON_DISABLED,
+        .border = colors.DARK_GRAY_50,
         .border_width = 1.0,
     };
 };

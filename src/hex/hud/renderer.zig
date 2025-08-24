@@ -113,8 +113,8 @@ pub const BrowserRenderer = struct {
             .side_margin = 10,
             .input_padding = 6,
             .line_spacing_multiplier = 1.3,
-            .input_bg_focused = Color{ .r = 40, .g = 40, .b = 40, .a = 255 },
-            .input_bg_unfocused = Color{ .r = 25, .g = 25, .b = 25, .a = 255 },
+            .input_bg_focused = colors.DARK_GRAY_40,
+            .input_bg_unfocused = colors.DARK_GRAY_25,
             .input_border = ide_constants.COLORS.TEXT_NORMAL,
             .text_color = ide_constants.COLORS.TEXT_NORMAL,
         };
@@ -160,7 +160,7 @@ pub const BrowserRenderer = struct {
         // Render semi-transparent background using rectangles
         // Draw a dark overlay by rendering multiple dark rectangles
         const screen_size = self.getScreenSize();
-        const overlay_color = Color{ .r = 10, .g = 10, .b = 15, .a = 120 };
+        const overlay_color = colors.DARK_OVERLAY;
 
         // Use drawBlendedRect for transparent overlay
         self.base_renderer.gpu.drawBlendedRect(cmd_buffer, render_pass, .{ .x = 0, .y = 0 }, screen_size, overlay_color);
@@ -222,9 +222,9 @@ pub const BrowserRenderer = struct {
 
             // Render link background as rectangle
             const link_color = if (is_hovered)
-                Color{ .r = 60, .g = 80, .b = 120, .a = 255 }
+                colors.LINK_HOVERED
             else
-                Color{ .r = 40, .g = 50, .b = 80, .a = 255 };
+                colors.LINK_NORMAL;
 
             self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, link.bounds.position, link.bounds.size, link_color);
 
@@ -252,45 +252,45 @@ pub const BrowserRenderer = struct {
         const bar_x = (screen_width - bar_width) / 2.0;
 
         // Navigation bar background
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = bar_x, .y = bar_y }, .{ .x = bar_width, .y = bar_height }, Color{ .r = 20, .g = 25, .b = 35, .a = 255 });
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = bar_x, .y = bar_y }, .{ .x = bar_width, .y = bar_height }, colors.NAV_BACKGROUND);
 
         // Back button
         const button_size = 40.0;
         const button_margin = 5.0;
         const back_color = if (can_go_back)
-            Color{ .r = 60, .g = 70, .b = 90, .a = 255 }
+            colors.BUTTON_NORMAL
         else
-            Color{ .r = 30, .g = 35, .b = 45, .a = 128 };
+            colors.BUTTON_DISABLED;
 
         self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = bar_x + button_margin, .y = bar_y + button_margin }, .{ .x = button_size, .y = button_size }, back_color);
 
         // Draw back arrow indicator
         if (can_go_back) {
-            self.drawArrow(cmd_buffer, render_pass, bar_x + button_margin + button_size / 2.0, bar_y + button_margin + button_size / 2.0, 10.0, .Left, Color{ .r = 200, .g = 200, .b = 220, .a = 255 });
+            self.drawArrow(cmd_buffer, render_pass, bar_x + button_margin + button_size / 2.0, bar_y + button_margin + button_size / 2.0, 10.0, .Left, colors.LIGHT_GRAY_220);
         }
 
         // Forward button
         const forward_color = if (can_go_forward)
-            Color{ .r = 60, .g = 70, .b = 90, .a = 255 }
+            colors.BUTTON_NORMAL
         else
-            Color{ .r = 30, .g = 35, .b = 45, .a = 128 };
+            colors.BUTTON_DISABLED;
 
         self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = bar_x + button_margin * 2 + button_size, .y = bar_y + button_margin }, .{ .x = button_size, .y = button_size }, forward_color);
 
         // Draw forward arrow indicator
         if (can_go_forward) {
-            self.drawArrow(cmd_buffer, render_pass, bar_x + button_margin * 2 + button_size + button_size / 2.0, bar_y + button_margin + button_size / 2.0, 10.0, .Right, Color{ .r = 200, .g = 200, .b = 220, .a = 255 });
+            self.drawArrow(cmd_buffer, render_pass, bar_x + button_margin * 2 + button_size + button_size / 2.0, bar_y + button_margin + button_size / 2.0, 10.0, .Right, colors.LIGHT_GRAY_220);
         }
 
         // Address bar background
         const address_x = bar_x + button_margin * 3 + button_size * 2;
         const address_width = bar_width - (button_margin * 4 + button_size * 2);
 
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = address_x, .y = bar_y + button_margin }, .{ .x = address_width, .y = button_size }, Color{ .r = 15, .g = 18, .b = 25, .a = 255 });
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = address_x, .y = bar_y + button_margin }, .{ .x = address_width, .y = button_size }, colors.ADDRESS_BAR_BG);
 
         // Address bar border (to make it look like an input field)
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = address_x, .y = bar_y + button_margin }, .{ .x = address_width, .y = 2 }, Color{ .r = 40, .g = 45, .b = 55, .a = 255 });
-        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = address_x, .y = bar_y + button_margin + button_size - 2 }, .{ .x = address_width, .y = 2 }, Color{ .r = 40, .g = 45, .b = 55, .a = 255 });
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = address_x, .y = bar_y + button_margin }, .{ .x = address_width, .y = 2 }, colors.NAV_BORDER);
+        self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = address_x, .y = bar_y + button_margin + button_size - 2 }, .{ .x = address_width, .y = 2 }, colors.NAV_BORDER);
 
         // Queue the path text for rendering using shared utility with main game renderers
         var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration, self.base_renderer.font_manager);
@@ -672,7 +672,7 @@ pub const BrowserRenderer = struct {
     /// Draw simple text using proper font rendering
     fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2) void {
         _ = render_pass;
-        const text_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
+        const text_color = colors.LIGHT_GRAY_200;
         self.drawTextWithColor(cmd_buffer, text, position, text_color);
     }
 

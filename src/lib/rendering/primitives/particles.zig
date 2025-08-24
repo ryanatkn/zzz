@@ -75,10 +75,10 @@ pub const ParticleRenderer = struct {
             .screen_size = [2]f32{ screen_width, screen_height },
             .center = [2]f32{ pos.x, pos.y },
             .radius = radius,
-            .color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
-            .color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
-            .color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
-            .color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            .color_r = color.r,
+            .color_g = color.g,
+            .color_b = color.b,
+            .color_a = color.a,
             .intensity = intensity,
             .time = time,
             ._padding = [3]f32{ 0.0, 0.0, 0.0 },
@@ -98,10 +98,10 @@ pub const ParticleRenderer = struct {
             .center = [2]f32{ pos.x, pos.y },
             .radius = radius * intensity, // Scale radius by intensity
             .color = [4]f32{
-                @as(f32, @floatFromInt(color.r)) / 255.0,
-                @as(f32, @floatFromInt(color.g)) / 255.0,
-                @as(f32, @floatFromInt(color.b)) / 255.0,
-                (@as(f32, @floatFromInt(color.a)) / 255.0) * intensity, // Apply intensity to alpha
+                color.r,
+                color.g,
+                color.b,
+                color.a * intensity, // Apply intensity to alpha
             },
         };
         self.instances.append(instance) catch {

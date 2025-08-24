@@ -16,7 +16,7 @@ pub const BasicWriter = struct {
 
     // Terminal state
     scrollback: core.RingBuffer(core.Line, 1000),
-    current_color: colors.Color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+    current_color: colors.Color = colors.ANSI_BRIGHT_WHITE,
     current_bold: bool = false,
 
     // Terminal dimensions for line wrapping
@@ -35,7 +35,7 @@ pub const BasicWriter = struct {
             .event_bus = null,
             .allocator = allocator,
             .scrollback = core.RingBuffer(core.Line, 1000).init(),
-            .current_color = colors.Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+            .current_color = colors.ANSI_BRIGHT_WHITE,
             .current_bold = false,
             .terminal_width = 80,
             .wrap_lines = true,

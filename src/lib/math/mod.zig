@@ -41,9 +41,6 @@ pub const GlyphBounds = shapes.GlyphBounds;
 pub const Spacing = shapes.Spacing;
 
 // Re-export color utilities
-pub const Color = color.Color;
-pub const ColorF32 = color.ColorF32;
-pub const ColorPair = color.ColorPair;
 pub const ColorMath = color.ColorMath;
 
 // Re-export wave utilities

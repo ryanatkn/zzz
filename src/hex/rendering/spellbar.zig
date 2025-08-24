@@ -53,7 +53,7 @@ pub const SpellbarRenderer = struct {
                 const border_width = spellbar_ui.config.border_width;
 
                 // REUSE: lib/rendering/ui/drawing.drawBorderedRect for consistent UI styling
-                ui_drawing.drawBorderedRect(gpu_renderer, cmd_buffer, render_pass, slot_pos, slot_size, Color{ .r = 0, .g = 0, .b = 0, .a = 0 }, // Transparent fill (slot already drawn)
+                ui_drawing.drawBorderedRect(gpu_renderer, cmd_buffer, render_pass, slot_pos, slot_size, core_colors.TRANSPARENT, // Transparent fill (slot already drawn)
                     border_color, border_width);
             }
 

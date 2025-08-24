@@ -24,22 +24,22 @@ pub const AnsiColor = enum(u8) {
 
     pub fn toColor(self: AnsiColor) Color {
         return switch (self) {
-            .black => Color{ .r = 0, .g = 0, .b = 0, .a = 255 },
-            .red => Color{ .r = 205, .g = 49, .b = 49, .a = 255 },
-            .green => Color{ .r = 13, .g = 188, .b = 121, .a = 255 },
-            .yellow => Color{ .r = 229, .g = 229, .b = 16, .a = 255 },
-            .blue => Color{ .r = 36, .g = 114, .b = 200, .a = 255 },
-            .magenta => Color{ .r = 188, .g = 63, .b = 188, .a = 255 },
-            .cyan => Color{ .r = 17, .g = 168, .b = 205, .a = 255 },
-            .white => Color{ .r = 229, .g = 229, .b = 229, .a = 255 },
-            .bright_black => Color{ .r = 102, .g = 102, .b = 102, .a = 255 },
-            .bright_red => Color{ .r = 241, .g = 76, .b = 76, .a = 255 },
-            .bright_green => Color{ .r = 35, .g = 209, .b = 139, .a = 255 },
-            .bright_yellow => Color{ .r = 245, .g = 245, .b = 67, .a = 255 },
-            .bright_blue => Color{ .r = 59, .g = 142, .b = 234, .a = 255 },
-            .bright_magenta => Color{ .r = 214, .g = 112, .b = 214, .a = 255 },
-            .bright_cyan => Color{ .r = 41, .g = 184, .b = 219, .a = 255 },
-            .bright_white => Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+            .black => colors.ANSI_BLACK,
+            .red => colors.ANSI_RED,
+            .green => colors.ANSI_GREEN,
+            .yellow => colors.ANSI_YELLOW,
+            .blue => colors.ANSI_BLUE,
+            .magenta => colors.ANSI_MAGENTA,
+            .cyan => colors.ANSI_CYAN,
+            .white => colors.ANSI_WHITE,
+            .bright_black => colors.ANSI_BRIGHT_BLACK,
+            .bright_red => colors.ANSI_BRIGHT_RED,
+            .bright_green => colors.ANSI_BRIGHT_GREEN,
+            .bright_yellow => colors.ANSI_BRIGHT_YELLOW,
+            .bright_blue => colors.ANSI_BRIGHT_BLUE,
+            .bright_magenta => colors.ANSI_BRIGHT_MAGENTA,
+            .bright_cyan => colors.ANSI_BRIGHT_CYAN,
+            .bright_white => colors.ANSI_BRIGHT_WHITE,
         };
     }
 };

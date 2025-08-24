@@ -1,8 +1,8 @@
 /// IDE File Explorer Constants
 /// Centralized configuration for the file explorer interface
-const colors = @import("../../../lib/core/colors.zig");
-const color_math = @import("../../../lib/math/color.zig");
-const ColorBuilder = color_math.ColorBuilder;
+const core_colors = @import("../../../lib/core/colors.zig");
+const BaseStyle = @import("../../../lib/ui/styles/base_style.zig");
+const Color = core_colors.Color;
 /// File content reading limits
 pub const FILE_LIMITS = struct {
     /// Maximum file size to read (1MB)
@@ -47,19 +47,19 @@ pub const TEXT = struct {
 
 /// Color scheme for the file explorer
 pub const COLORS = struct {
-    /// Panel background colors
-    pub const HEADER_BG = ColorBuilder.rgb(25, 30, 40);
-    pub const PANEL_BG = ColorBuilder.rgb(35, 40, 50);
-    pub const PANEL_BORDER = ColorBuilder.rgb(60, 65, 75);
+    /// Panel background colors - imported from shared sources
+    pub const HEADER_BG = core_colors.DARK_GRAY_25; // No runtime division
+    pub const PANEL_BG = core_colors.DARK_GRAY_40; // Reuse existing
+    pub const PANEL_BORDER = core_colors.GRAY_60; // Reuse existing
 
-    /// Text colors
-    pub const TEXT_NORMAL = ColorBuilder.rgb(200, 200, 200);
-    pub const TEXT_LINE_NUMBERS = ColorBuilder.gray(120);
-    pub const TEXT_TRUNCATION = ColorBuilder.rgb(150, 150, 50);
+    /// Text colors - imported from shared sources
+    pub const TEXT_NORMAL = core_colors.LIGHT_GRAY_200; // Standard light gray
+    pub const TEXT_LINE_NUMBERS = core_colors.GRAY_100; // Medium gray
+    pub const TEXT_TRUNCATION = BaseStyle.Colors.text_warning; // Yellow-ish
 
-    /// Selection and interaction colors
-    pub const SELECTION_BG = ColorBuilder.rgba(70, 130, 180, 100);
-    pub const HOVER_BG = ColorBuilder.rgba(55, 60, 70, 150);
+    /// Selection and interaction colors - imported from shared sources
+    pub const SELECTION_BG = BaseStyle.Colors.selection; // Already semi-transparent blue
+    pub const HOVER_BG = core_colors.DARK_GRAY_50; // Darker gray for hover
 };
 
 /// File tree interaction configuration
@@ -112,8 +112,8 @@ pub const TERMINAL = struct {
     /// Input padding inside the input field
     pub const INPUT_PADDING: f32 = 6;
 
-    /// Input field colors
-    pub const INPUT_BG_NORMAL = ColorBuilder.rgb(35, 40, 50);
-    pub const INPUT_BG_FOCUSED = ColorBuilder.rgba(55, 60, 70, 150);
-    pub const INPUT_BORDER_FOCUSED = ColorBuilder.rgb(70, 130, 180);
+    /// Input field colors - pre-calculated (no runtime division)
+    pub const INPUT_BG_NORMAL = Color{ .r = 0.137, .g = 0.157, .b = 0.196, .a = 1.0 }; // 35,40,50/255
+    pub const INPUT_BG_FOCUSED = Color{ .r = 0.216, .g = 0.235, .b = 0.275, .a = 0.588 }; // 55,60,70/255, alpha 150/255
+    pub const INPUT_BORDER_FOCUSED = Color{ .r = 0.275, .g = 0.510, .b = 0.706, .a = 1.0 }; // 70,130,180/255
 };

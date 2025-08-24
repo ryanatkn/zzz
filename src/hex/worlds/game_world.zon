@@ -18,7 +18,7 @@
         // Zone 0: Overworld
         .{
             .name = "Overworld",
-            .background_color = .{ .r = 10, .g = 10, .b = 15 },
+            .background_color = .{ .r = 0.039, .g = 0.039, .b = 0.059 },
             .camera_mode = .fixed, // Fixed camera shows entire world, use zoom to navigate
             .world_width = 160.0, // 160 meters (exploration scale)
             .world_height = 90.0, // 90 meters (exploration scale)
@@ -117,7 +117,7 @@
         // Zone 1: Southeast Dungeon (Circle theme)
         .{
             .name = "Southeast Dungeon",
-            .background_color = .{ .r = 15, .g = 15, .b = 25 },
+            .background_color = .{ .r = 0.059, .g = 0.059, .b = 0.098 },
             .camera_mode = .follow, // Follow camera with zoom for tactical view
             .terrain = .{
                 // Circular chamber layout (converted from pixels to meters)
@@ -148,7 +148,7 @@
         // Zone 2: Southwest Dungeon (Triangle theme)
         .{
             .name = "Southwest Dungeon",
-            .background_color = .{ .r = 25, .g = 15, .b = 15 },
+            .background_color = .{ .r = 0.098, .g = 0.059, .b = 0.059 },
             .camera_mode = .follow,
             .terrain = .{
                 // Triangular chamber layout (converted from pixels to meters)
@@ -181,7 +181,7 @@
         // Zone 3: West Dungeon (Square theme)
         .{
             .name = "West Dungeon",
-            .background_color = .{ .r = 15, .g = 25, .b = 15 },
+            .background_color = .{ .r = 0.059, .g = 0.098, .b = 0.059 },
             .camera_mode = .follow,
             .terrain = .{
                 // Square chamber layout (converted from pixels to meters)
@@ -214,7 +214,7 @@
         // Zone 4: Northwest Dungeon (Circle theme)
         .{
             .name = "Northwest Dungeon",
-            .background_color = .{ .r = 25, .g = 25, .b = 15 },
+            .background_color = .{ .r = 0.098, .g = 0.098, .b = 0.059 },
             .camera_mode = .follow,
             .terrain = .{
                 // Circular chamber layout (variant, converted from pixels to meters)
@@ -249,7 +249,7 @@
         // Zone 5: Northeast Dungeon (Triangle theme)
         .{
             .name = "Northeast Dungeon",
-            .background_color = .{ .r = 25, .g = 15, .b = 25 },
+            .background_color = .{ .r = 0.098, .g = 0.059, .b = 0.098 },
             .camera_mode = .follow,
             .terrain = .{
                 // Triangular chamber layout (variant, converted from pixels to meters)
@@ -284,7 +284,7 @@
         // Zone 6: East Dungeon (Square theme)
         .{
             .name = "East Dungeon",
-            .background_color = .{ .r = 15, .g = 20, .b = 25 },
+            .background_color = .{ .r = 0.059, .g = 0.078, .b = 0.098 },
             .camera_mode = .follow,
             .terrain = .{
                 // Square chamber layout (variant, converted from pixels to meters)

@@ -23,10 +23,10 @@ pub const TerminalLayoutConfig = struct {
     max_lines_buffer: usize = 200, // Maximum lines to buffer for rendering (increased from hardcoded 100)
 
     // Colors
-    input_bg_focused: Color = Color{ .r = 30, .g = 35, .b = 40, .a = 255 },
-    input_bg_unfocused: Color = Color{ .r = 15, .g = 20, .b = 25, .a = 255 },
-    input_border: Color = Color{ .r = 70, .g = 130, .b = 180, .a = 255 },
-    text_color: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+    input_bg_focused: Color = colors.DARK_GRAY_30,
+    input_bg_unfocused: Color = colors.DARK_GRAY_15,
+    input_border: Color = colors.FOCUS_BORDER,
+    text_color: Color = colors.ANSI_BRIGHT_WHITE,
 
     // Layout
     show_cursor: bool = true,

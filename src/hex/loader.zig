@@ -152,7 +152,7 @@ fn loadZone(zone: *world_state_mod.HexGame.ZoneData, data: ZoneData, game: *worl
         .r = data.background_color.r,
         .g = data.background_color.g,
         .b = data.background_color.b,
-        .a = 255,
+        .a = 1.0,
     };
 
     // Set camera mode for this zone
@@ -263,7 +263,7 @@ const GameData = struct {
 
 const ZoneData = struct {
     name: []const u8,
-    background_color: struct { r: u8, g: u8, b: u8 },
+    background_color: struct { r: f32, g: f32, b: f32 },
     camera_mode: constants.CameraMode,
     // camera_scale removed - zoom handled by camera system directly
     spawn_pos: ?struct { x: f32, y: f32 } = null, // Optional spawn position, defaults to center

@@ -19,7 +19,7 @@ pub const SpellbarConfig = struct {
     // Colors
     active_border_color: Color = core_colors.WHITE,
     hover_border_color: Color = hex_colors.BACKGROUND_LIGHT,
-    cooldown_overlay_color: Color = Color{ .r = 60, .g = 60, .b = 60, .a = 150 },
+    cooldown_overlay_color: Color = core_colors.COOLDOWN_OVERLAY,
     empty_slot_color: Color = hex_colors.BACKGROUND_DARK,
 };
 

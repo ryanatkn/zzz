@@ -17,7 +17,7 @@
         // Zone 0: Test Hub - Portal cluster and faction test units
         .{
             .name = "Test Hub",
-            .background_color = .{ .r = 15, .g = 10, .b = 20 }, // Dark purple for test env
+            .background_color = .{ .r = 0.059, .g = 0.039, .b = 0.078 }, // Dark purple for test env
             .camera_mode = .fixed,
             // Minimal obstacles - just boundary markers
             .obstacles = .{
@@ -60,7 +60,7 @@
         // Zone 1: Simple test zone
         .{
             .name = "Test Zone 1",
-            .background_color = .{ .r = 20, .g = 10, .b = 10 }, // Dark red
+            .background_color = .{ .r = 0.078, .g = 0.039, .b = 0.039 }, // Dark red
             .camera_mode = .follow,
             .obstacles = .{
                 .{ .position = .{ .x = 960.0, .y = 300.0 }, .size = .{ .x = 100.0, .y = 20.0 }, .type = .blocking },
@@ -80,7 +80,7 @@
         // Zone 2: Another test zone
         .{
             .name = "Test Zone 2",
-            .background_color = .{ .r = 10, .g = 20, .b = 10 }, // Dark green
+            .background_color = .{ .r = 0.039, .g = 0.078, .b = 0.039 }, // Dark green
             .camera_mode = .follow,
             .obstacles = .{
                 .{ .position = .{ .x = 960.0, .y = 700.0 }, .size = .{ .x = 200.0, .y = 20.0 }, .type = .blocking },

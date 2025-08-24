@@ -8,6 +8,8 @@ const colors = @import("../core/colors.zig");
 const Vec2 = math.Vec2;
 const Color = colors.Color;
 
+// TODO these are broken
+
 pub const MAX_PARTICLES = 256; // Increased pool for multiple simultaneous particles
 
 pub const ParticleType = enum {
@@ -200,92 +202,89 @@ pub const Particle = struct {
         }
     }
 
+    /// Select discrete color based on intensity level
+    /// TODO: optimize - Use lookup tables instead of if-chains for color selection.
+    /// Could pre-compute intensity buckets and use array indexing: lut[@as(usize, intensity * lut.len)]
+    fn selectBlueByIntensity(intensity: f32) Color {
+        const intensity_percent = @as(u32, @intFromFloat(@max(0.0, @min(1.0, intensity)) * 100));
+        if (intensity_percent >= 80) return colors.BLUE_80;
+        if (intensity_percent >= 60) return colors.BLUE_60;
+        if (intensity_percent >= 40) return colors.BLUE_40;
+        return colors.BLUE_20;
+    }
+
+    fn selectPurpleByIntensity(intensity: f32) Color {
+        const intensity_percent = @as(u32, @intFromFloat(@max(0.0, @min(1.0, intensity)) * 100));
+        if (intensity_percent >= 80) return colors.PURPLE_100;
+        if (intensity_percent >= 60) return colors.PURPLE_80;
+        if (intensity_percent >= 40) return colors.PURPLE_60;
+        if (intensity_percent >= 20) return colors.PURPLE_40;
+        return colors.PURPLE_20;
+    }
+
+    /// TODO: optimize - Move hardcoded cyan/yellow-green colors to core/colors.zig as discrete color families
+    /// (CYAN_20/40/60/80, YELLOW_GREEN_20/40/60/80) for consistency with other color palettes.
+    fn selectCyanByIntensity(intensity: f32) Color {
+        const intensity_percent = @as(u32, @intFromFloat(@max(0.0, @min(1.0, intensity)) * 100));
+        if (intensity_percent >= 80) return colors.CYAN;
+        if (intensity_percent >= 60) return Color{ .r = 0.0, .g = 0.627, .b = 0.627, .a = 1.0 }; // 80% cyan
+        if (intensity_percent >= 40) return Color{ .r = 0.0, .g = 0.470, .b = 0.470, .a = 1.0 }; // 60% cyan
+        return Color{ .r = 0.0, .g = 0.314, .b = 0.314, .a = 1.0 }; // 40% cyan
+    }
+
+    fn selectYellowGreenByIntensity(intensity: f32) Color {
+        const intensity_percent = @as(u32, @intFromFloat(@max(0.0, @min(1.0, intensity)) * 100));
+        if (intensity_percent >= 80) return Color{ .r = 0.863, .g = 1.0, .b = 0.471, .a = 1.0 }; // Bright yellow-green
+        if (intensity_percent >= 60) return Color{ .r = 0.706, .g = 0.863, .b = 0.392, .a = 1.0 }; // Medium yellow-green
+        if (intensity_percent >= 40) return Color{ .r = 0.549, .g = 0.706, .b = 0.314, .a = 1.0 }; // Dim yellow-green
+        return Color{ .r = 0.392, .g = 0.549, .b = 0.235, .a = 1.0 }; // Very dim yellow-green
+    }
+
+    /// TODO: optimize - Consider SIMD-friendly alpha operations using @Vector(4, f32) for better performance
+    fn applyIntensityAlpha(color: Color, intensity: f32) Color {
+        return Color{ .r = color.r, .g = color.g, .b = color.b, .a = intensity };
+    }
+
     pub fn getColor(self: *const Particle) Color {
         const intensity = self.getCurrentIntensity();
 
         switch (self.particle_type) {
             .player_spawn => {
-                // Bright blue/white for dramatic effect
-                return Color{
-                    .r = @min(255, @as(u8, @intFromFloat(100.0 + intensity * 155.0))),
-                    .g = @min(255, @as(u8, @intFromFloat(150.0 + intensity * 105.0))),
-                    .b = 255,
-                    .a = @as(u8, @intFromFloat(@min(255.0, 255.0 * intensity))),
-                };
+                // Bright blue/white for dramatic effect - use discrete blue levels
+                return applyIntensityAlpha(selectBlueByIntensity(intensity), intensity);
             },
             .portal_travel => {
-                // Different colors for first vs second ping
-                if (self.intensity > 0.8) {
-                    // First ping: bright blue-white (fast and bright)
-                    return Color{
-                        .r = @min(255, @as(u8, @intFromFloat(120.0 + intensity * 135.0))),
-                        .g = @min(255, @as(u8, @intFromFloat(160.0 + intensity * 95.0))),
-                        .b = 255,
-                        .a = @as(u8, @intFromFloat(@min(255.0, 200.0 * intensity))),
-                    };
-                } else {
-                    // Second ping: softer blue-cyan (slower and larger)
-                    return Color{
-                        .r = @as(u8, @intFromFloat(@min(255.0, 80.0 + intensity * 120.0))),
-                        .g = @as(u8, @intFromFloat(@min(255.0, 180.0 + intensity * 75.0))),
-                        .b = 255,
-                        .a = @as(u8, @intFromFloat(@min(255.0, 160.0 * intensity))),
-                    };
-                }
+                // Different intensity levels for first vs second ping
+                const base_color = if (self.intensity > 0.8)
+                    selectBlueByIntensity(intensity) // First ping: brighter blue
+                else
+                    selectBlueByIntensity(intensity * 0.8); // Second ping: softer blue
+
+                return applyIntensityAlpha(base_color, intensity * 0.8); // Slightly transparent
             },
             .portal_ripple => {
-                // Bright portal purple for visibility
-                return Color{
-                    .r = 255,
-                    .g = @as(u8, @intFromFloat(@min(255.0, 50.0 + intensity * 100.0))),
-                    .b = 255,
-                    .a = @as(u8, @intFromFloat(@min(255.0, 200.0 * intensity))),
-                };
+                // Bright portal purple for visibility - use discrete purple levels
+                return applyIntensityAlpha(selectPurpleByIntensity(intensity), intensity * 0.8);
             },
             .portal_ambient => {
                 // Brighter purple for better visibility at low alpha
-                return Color{
-                    .r = 255,
-                    .g = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
-                    .b = 255,
-                    .a = @as(u8, @intFromFloat(@min(255.0, 255.0 * intensity))),
-                };
+                return applyIntensityAlpha(selectPurpleByIntensity(intensity * 1.2), intensity);
             },
             .lifestone_glow => {
                 // Cyan for lifestones
-                return Color{
-                    .r = @as(u8, @intFromFloat(@min(255.0, 50.0 * intensity))),
-                    .g = @as(u8, @intFromFloat(@min(255.0, 220.0 * intensity))),
-                    .b = @as(u8, @intFromFloat(@min(255.0, 220.0 * intensity))),
-                    .a = @as(u8, @intFromFloat(@min(255.0, 150.0 * intensity))),
-                };
+                return applyIntensityAlpha(selectCyanByIntensity(intensity), intensity * 0.6);
             },
             .lifestone_inner => {
                 // Brighter cyan/white for inner lifestone aura
-                return Color{
-                    .r = @as(u8, @intFromFloat(@min(255.0, 80.0 * intensity))),
-                    .g = @as(u8, @intFromFloat(@min(255.0, 240.0 * intensity))),
-                    .b = @as(u8, @intFromFloat(@min(255.0, 255.0 * intensity))),
-                    .a = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
-                };
+                return applyIntensityAlpha(selectCyanByIntensity(intensity * 1.5), intensity * 0.7);
             },
             .lull_area => {
                 // Brighter purple/blue for better visibility
-                return Color{
-                    .r = @as(u8, @intFromFloat(@min(255.0, 140.0 * intensity))),
-                    .g = @as(u8, @intFromFloat(@min(255.0, 100.0 * intensity))),
-                    .b = @as(u8, @intFromFloat(@min(255.0, 240.0 * intensity))),
-                    .a = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
-                };
+                return applyIntensityAlpha(selectPurpleByIntensity(intensity * 1.2), intensity * 0.7);
             },
             .unit_status_aura => {
                 // Soft green/yellow aura for units under beneficial effects
-                return Color{
-                    .r = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
-                    .g = @as(u8, @intFromFloat(@min(255.0, 220.0 * intensity))),
-                    .b = @as(u8, @intFromFloat(@min(255.0, 120.0 * intensity))),
-                    .a = @as(u8, @intFromFloat(@min(255.0, 180.0 * intensity))),
-                };
+                return applyIntensityAlpha(selectYellowGreenByIntensity(intensity), intensity * 0.7);
             },
         }
     }

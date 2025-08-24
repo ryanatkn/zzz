@@ -290,7 +290,7 @@ pub const GPURenderer = struct {
         const loggers = @import("../../debug/loggers.zig");
         const render_log = loggers.getRenderLog();
         render_log.info("gpu_vertex_draw_start", "=== VERTEX DRAW START: {} vertices at ({d}, {d}) ===", .{ vertex_count, pos.x, pos.y });
-        render_log.info("gpu_vertex_draw_color", "Text color: RGBA({}, {}, {}, {}) -> normalized({d}, {d}, {d}, {d})", .{ color.r, color.g, color.b, color.a, @as(f32, @floatFromInt(color.r)) / 255.0, @as(f32, @floatFromInt(color.g)) / 255.0, @as(f32, @floatFromInt(color.b)) / 255.0, @as(f32, @floatFromInt(color.a)) / 255.0 });
+        render_log.info("gpu_vertex_draw_color", "Text color: RGBA({d}, {d}, {d}, {d}) -> normalized({d}, {d}, {d}, {d})", .{ color.r, color.g, color.b, color.a, color.r, color.g, color.b, color.a });
 
         const uniforms_mod = @import("uniforms.zig");
 
@@ -301,10 +301,10 @@ pub const GPURenderer = struct {
             .screen_size = [2]f32{ self.screen_width, self.screen_height },
             .glyph_position = [2]f32{ pos.x, pos.y },
             .glyph_size = [2]f32{ 0.0, 0.0 }, // Not used for vertex rendering
-            .text_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
-            .text_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
-            .text_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
-            .text_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            .text_color_r = color.r,
+            .text_color_g = color.g,
+            .text_color_b = color.b,
+            .text_color_a = color.a,
             ._padding = [2]f32{ 0.0, 0.0 },
         };
 

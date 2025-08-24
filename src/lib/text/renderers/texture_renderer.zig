@@ -433,10 +433,10 @@ pub const TextureTextRenderer = struct {
             .screen_size = [2]f32{ gpu_renderer.screen_width, gpu_renderer.screen_height },
             .glyph_position = [2]f32{ glyph_pos.x, glyph_pos.y },
             .glyph_size = [2]f32{ glyph_size.x, glyph_size.y },
-            .text_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
-            .text_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
-            .text_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
-            .text_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            .text_color_r = color.r,
+            .text_color_g = color.g,
+            .text_color_b = color.b,
+            .text_color_a = color.a,
             ._padding = [2]f32{ 0.0, 0.0 },
         };
 

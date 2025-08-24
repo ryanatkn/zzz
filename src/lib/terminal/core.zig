@@ -233,9 +233,9 @@ pub const Terminal = struct {
     history_index: ?usize = null,
 
     // Styling
-    current_color: Color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 },
+    current_color: Color = colors.ANSI_BRIGHT_WHITE,
     current_bold: bool = false,
-    background_color: Color = Color{ .r = 0, .g = 0, .b = 0, .a = 255 },
+    background_color: Color = colors.ANSI_BLACK,
 
     // Working directory
     working_directory: std.ArrayList(u8),

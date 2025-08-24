@@ -151,11 +151,11 @@ test "interpolation functions" {
     try std.testing.expectApproxEqAbs(@as(f32, 5.0), lerpVec2(Vec2{ .x = 0.0, .y = 0.0 }, Vec2{ .x = 10.0, .y = 10.0 }, 0.5).x, 0.001);
 
     // Test color interpolation
-    const red = Color{ .r = 255, .g = 0, .b = 0, .a = 255 };
-    const blue = Color{ .r = 0, .g = 0, .b = 255, .a = 255 };
+    const red = Color{ .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
+    const blue = Color{ .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
     const purple = lerpColor(red, blue, 0.5);
-    try std.testing.expect(purple.r == 127 or purple.r == 128); // Allow for rounding
-    try std.testing.expect(purple.b == 127 or purple.b == 128);
+    try std.testing.expectApproxEqAbs(@as(f32, 0.5), purple.r, 0.01); // Should be 0.5
+    try std.testing.expectApproxEqAbs(@as(f32, 0.5), purple.b, 0.01); // Should be 0.5
 
     // Test smoothstep
     const smooth_mid = smoothstep(0.0, 10.0, 0.5);

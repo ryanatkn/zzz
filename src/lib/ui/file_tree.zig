@@ -3,10 +3,10 @@ const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
 const color_math = @import("../math/color.zig");
 const directory_scanner = @import("../platform/directory_scanner.zig");
+const BaseStyle = @import("styles/base_style.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
-const ColorBuilder = color_math.ColorBuilder;
 const DirectoryEntry = directory_scanner.DirectoryEntry;
 const FileType = directory_scanner.FileType;
 
@@ -64,13 +64,13 @@ pub const FileIcon = enum {
     /// Get color for icon
     pub fn getColor(self: FileIcon) Color {
         return switch (self) {
-            .folder_closed, .folder_open => ColorBuilder.rgb(100, 149, 237), // Blue
-            .file_zig => ColorBuilder.rgb(255, 140, 0), // Orange
-            .file_markdown => ColorBuilder.rgb(50, 205, 50), // Green
-            .file_shader => ColorBuilder.rgb(255, 20, 147), // Pink
-            .file_config => ColorBuilder.rgb(255, 215, 0), // Gold
-            .file_text => ColorBuilder.rgb(169, 169, 169), // Gray
-            .file_unknown => ColorBuilder.gray(128), // Dark Gray
+            .folder_closed, .folder_open => BaseStyle.Colors.file_folder,
+            .file_zig => BaseStyle.Colors.file_zig,
+            .file_markdown => BaseStyle.Colors.file_markdown,
+            .file_shader => BaseStyle.Colors.file_shader,
+            .file_config => BaseStyle.Colors.file_config,
+            .file_text => BaseStyle.Colors.file_text,
+            .file_unknown => BaseStyle.Colors.file_unknown,
         };
     }
 };

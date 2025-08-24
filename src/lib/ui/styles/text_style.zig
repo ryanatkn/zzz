@@ -4,6 +4,9 @@ const Vec2 = @import("../../math/mod.zig").Vec2;
 const Color = @import("../../core/colors.zig").Color;
 const BaseStyle = @import("base_style.zig");
 
+// Pre-calculated hover brightness increase (30/255 ≈ 0.118)
+const HOVER_BRIGHTNESS_ADD = Color{ .r = 0.118, .g = 0.118, .b = 0.118, .a = 0.0 };
+
 /// Text alignment options
 pub const TextAlignment = enum {
     left,
@@ -27,9 +30,9 @@ pub const TextStyle = struct {
         if (hovered) {
             // Slightly brighter version of the base color
             return Color{
-                .r = @min(255, @as(u16, self.color.r) + 30),
-                .g = @min(255, @as(u16, self.color.g) + 30),
-                .b = @min(255, @as(u16, self.color.b) + 30),
+                .r = @min(1.0, self.color.r + HOVER_BRIGHTNESS_ADD.r),
+                .g = @min(1.0, self.color.g + HOVER_BRIGHTNESS_ADD.g),
+                .b = @min(1.0, self.color.b + HOVER_BRIGHTNESS_ADD.b),
                 .a = self.color.a,
             };
         }

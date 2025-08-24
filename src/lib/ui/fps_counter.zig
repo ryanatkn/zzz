@@ -261,7 +261,7 @@ pub const FPSCounterPresets = struct {
     pub const default_white = struct {
         pub const position = Vec2{ .x = 100.0, .y = 100.0 };
         pub const font_size = styles.FontSizes.header;
-        pub const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+        pub const color = colors.WHITE;
         pub const update_interval_ms = 500; // Update twice per second
         pub const alignment = text_alignment.TextAlign.left;
         pub const screen_width = 1920.0;
@@ -270,7 +270,7 @@ pub const FPSCounterPresets = struct {
     pub const debug_overlay = struct {
         pub const position = Vec2{ .x = 1910.0, .y = 1060.0 }; // Right edge with margin
         pub const font_size = styles.FontSizes.title;
-        pub const color = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
+        pub const color = colors.LIGHT_GRAY_230;
         pub const update_interval_ms = 1000; // Update once per second
         pub const alignment = text_alignment.TextAlign.right; // Right-aligned
         pub const screen_width = 1920.0;
@@ -279,7 +279,7 @@ pub const FPSCounterPresets = struct {
     pub const small_corner = struct {
         pub const position = Vec2{ .x = 10.0, .y = 10.0 };
         pub const font_size = styles.FontSizes.large;
-        pub const color = Color{ .r = 200, .g = 200, .b = 200, .a = 180 };
+        pub const color = colors.LIGHT_GRAY_200;
         pub const update_interval_ms = 1000; // Update once per second
         pub const alignment = text_alignment.TextAlign.left;
         pub const screen_width = 1920.0;
@@ -289,7 +289,7 @@ pub const FPSCounterPresets = struct {
     pub const top_right_corner = struct {
         pub const position = Vec2{ .x = 1910.0, .y = 10.0 }; // Top-right with margin
         pub const font_size = styles.FontSizes.large;
-        pub const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+        pub const color = colors.WHITE;
         pub const update_interval_ms = 1000; // Update once per second
         pub const alignment = text_alignment.TextAlign.right; // Right-aligned
         pub const screen_width = 1920.0;
@@ -405,7 +405,7 @@ test "fps counter initialization" {
 
     const position = Vec2{ .x = 10, .y = 10 };
     const font_size = styles.FontSizes.medium;
-    const color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+    const color = colors.WHITE;
     const update_interval = 100;
     const alignment = text_alignment.TextAlign.left;
     const screen_width = 1920.0;
@@ -435,7 +435,7 @@ test "fps counter visibility toggle" {
     try reactive.init(allocator);
     defer reactive.deinit(allocator);
 
-    var counter = try FPSCounterData.init(allocator, Vec2.ZERO, 16.0, Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, 100, text_alignment.TextAlign.left, 1920.0);
+    var counter = try FPSCounterData.init(allocator, Vec2.ZERO, 16.0, colors.WHITE, 100, text_alignment.TextAlign.left, 1920.0);
     defer counter.deinit(allocator);
 
     // Test initial visibility
@@ -459,7 +459,7 @@ test "fps counter value updates" {
     try reactive.init(allocator);
     defer reactive.deinit(allocator);
 
-    var counter = try FPSCounterData.init(allocator, Vec2.ZERO, 16.0, Color{ .r = 255, .g = 255, .b = 255, .a = 255 }, 100, text_alignment.TextAlign.left, 1920.0);
+    var counter = try FPSCounterData.init(allocator, Vec2.ZERO, 16.0, colors.WHITE, 100, text_alignment.TextAlign.left, 1920.0);
     defer counter.deinit(allocator);
 
     // Test initial FPS

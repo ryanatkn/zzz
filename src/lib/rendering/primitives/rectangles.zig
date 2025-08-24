@@ -77,10 +77,10 @@ pub const RectangleRenderer = struct {
             .screen_size = [2]f32{ screen_width, screen_height },
             .rect_position = [2]f32{ pos.x, pos.y },
             .rect_size = [2]f32{ size.x, size.y },
-            .rect_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
-            .rect_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
-            .rect_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
-            .rect_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            .rect_color_r = color.r,
+            .rect_color_g = color.g,
+            .rect_color_b = color.b,
+            .rect_color_a = color.a,
             ._padding = 0.0,
         };
 
@@ -108,10 +108,10 @@ pub const RectangleRenderer = struct {
             .screen_size = [2]f32{ screen_width, screen_height },
             .circle_center = [2]f32{ pos.x + size.x / 2.0, pos.y + size.y / 2.0 }, // Center of rectangle
             .circle_size = [2]f32{ @max(size.x, size.y) * 2.0, 0.0 }, // Very large radius to cover the rectangle
-            .circle_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
-            .circle_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
-            .circle_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
-            .circle_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            .circle_color_r = color.r,
+            .circle_color_g = color.g,
+            .circle_color_b = color.b,
+            .circle_color_a = color.a,
             ._padding = 0.0,
         };
 
@@ -128,12 +128,7 @@ pub const RectangleRenderer = struct {
         const instance = RectInstance{
             .position = [2]f32{ pos.x, pos.y },
             .size = [2]f32{ size.x, size.y },
-            .color = [4]f32{
-                @as(f32, @floatFromInt(color.r)) / 255.0,
-                @as(f32, @floatFromInt(color.g)) / 255.0,
-                @as(f32, @floatFromInt(color.b)) / 255.0,
-                @as(f32, @floatFromInt(color.a)) / 255.0,
-            },
+            .color = [4]f32{ color.r, color.g, color.b, color.a },
         };
         self.instances.append(instance) catch {
             loggers.getRenderLog().warn("rect_batch_full", "Rectangle instance buffer full, skipping", .{});

@@ -75,10 +75,10 @@ pub const TextRenderer = struct {
             .screen_size = [2]f32{ screen_width, screen_height },
             .glyph_position = [2]f32{ pos.x, pos.y },
             .glyph_size = [2]f32{ size.x, size.y },
-            .text_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
-            .text_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
-            .text_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
-            .text_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            .text_color_r = color.r,
+            .text_color_g = color.g,
+            .text_color_b = color.b,
+            .text_color_a = color.a,
             ._padding = [2]f32{ 0.0, 0.0 },
         };
 
@@ -95,12 +95,7 @@ pub const TextRenderer = struct {
         const instance = TextInstance{
             .screen_pos = [2]f32{ pos.x, pos.y },
             .size = [2]f32{ size.x, size.y },
-            .color = [4]f32{
-                @as(f32, @floatFromInt(color.r)) / 255.0,
-                @as(f32, @floatFromInt(color.g)) / 255.0,
-                @as(f32, @floatFromInt(color.b)) / 255.0,
-                @as(f32, @floatFromInt(color.a)) / 255.0,
-            },
+            .color = [4]f32{ color.r, color.g, color.b, color.a },
             .coverage_params = [4]f32{ 1.0, 1.0, 0.0, 0.0 }, // Default coverage parameters
         };
         self.instances.append(instance) catch {

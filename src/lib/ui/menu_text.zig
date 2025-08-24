@@ -18,8 +18,8 @@ pub const MenuTextStyles = struct {
         pub fn font_size() f32 {
             return font_config.getGlobalConfig().buttonFontSize();
         }
-        pub const normal_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
-        pub const hovered_color = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+        pub const normal_color = colors.LIGHT_GRAY_200;
+        pub const hovered_color = colors.WHITE;
         pub fn char_width() f32 {
             return font_config.getGlobalConfig().buttonCharWidth();
         }
@@ -29,7 +29,7 @@ pub const MenuTextStyles = struct {
         pub fn font_size() f32 {
             return font_config.getGlobalConfig().navigationFontSize();
         }
-        pub const color = Color{ .r = 180, .g = 190, .b = 200, .a = 255 };
+        pub const color = colors.LIGHT_GRAY_180;
         pub fn char_width() f32 {
             return font_config.getGlobalConfig().navigationCharWidth();
         }
@@ -39,7 +39,7 @@ pub const MenuTextStyles = struct {
         pub fn font_size() f32 {
             return font_config.getGlobalConfig().headerFontSize();
         }
-        pub const color = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
+        pub const color = colors.LIGHT_GRAY_230;
         pub fn char_width() f32 {
             return font_config.getGlobalConfig().headerCharWidth();
         }

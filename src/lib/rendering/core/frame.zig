@@ -35,7 +35,7 @@ pub fn beginRenderPass(cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, window: *c.sdl.S
     if (swapchain_texture) |texture| {
         const color_target_info = c.sdl.SDL_GPUColorTargetInfo{
             .texture = texture,
-            .clear_color = .{ .r = @as(f32, @floatFromInt(bg_color.r)) / 255.0, .g = @as(f32, @floatFromInt(bg_color.g)) / 255.0, .b = @as(f32, @floatFromInt(bg_color.b)) / 255.0, .a = 1.0 },
+            .clear_color = .{ .r = bg_color.r, .g = bg_color.g, .b = bg_color.b, .a = bg_color.a },
             .load_op = c.sdl.SDL_GPU_LOADOP_CLEAR,
             .store_op = c.sdl.SDL_GPU_STOREOP_STORE,
             .cycle = false,

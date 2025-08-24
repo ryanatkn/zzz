@@ -1,6 +1,7 @@
 const std = @import("std");
 const math_mod = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
+const hex_colors = @import("../../hex/colors.zig");
 const easing = @import("../math/easing.zig");
 
 const Color = colors.Color;
@@ -22,28 +23,28 @@ pub const BorderColorPair = struct {
 /// Pre-defined color pairs for common border themes
 pub const ColorPairs = struct {
     pub const GOLD_YELLOW = BorderColorPair{
-        .dark = .{ .r = 200.0, .g = 150.0, .b = 10.0 },
-        .bright = .{ .r = 255.0, .g = 240.0, .b = 0.0 },
+        .dark = .{ .r = colors.GOLD_DARK.r, .g = colors.GOLD_DARK.g, .b = colors.GOLD_DARK.b },
+        .bright = .{ .r = colors.GOLD.r, .g = colors.GOLD.g, .b = colors.GOLD.b },
     };
 
     pub const RED = BorderColorPair{
-        .dark = .{ .r = 180.0, .g = 40.0, .b = 40.0 },
-        .bright = .{ .r = 255.0, .g = 30.0, .b = 30.0 },
+        .dark = .{ .r = hex_colors.UNIT_AGGRO.r, .g = hex_colors.UNIT_AGGRO.g, .b = hex_colors.UNIT_AGGRO.b },
+        .bright = .{ .r = hex_colors.RED_BRIGHT.r, .g = hex_colors.RED_BRIGHT.g, .b = hex_colors.RED_BRIGHT.b },
     };
 
     pub const GREEN = BorderColorPair{
-        .dark = .{ .r = 20.0, .g = 160.0, .b = 20.0 },
-        .bright = .{ .r = 50.0, .g = 220.0, .b = 80.0 },
+        .dark = .{ .r = hex_colors.OBSTACLE_BLOCKING.r, .g = hex_colors.OBSTACLE_BLOCKING.g, .b = hex_colors.OBSTACLE_BLOCKING.b },
+        .bright = .{ .r = hex_colors.GREEN_BRIGHT.r, .g = hex_colors.GREEN_BRIGHT.g, .b = hex_colors.GREEN_BRIGHT.b },
     };
 
     pub const BLUE = BorderColorPair{
-        .dark = .{ .r = 0.0, .g = 60.0, .b = 120.0 },
-        .bright = .{ .r = 0.0, .g = 100.0, .b = 200.0 },
+        .dark = .{ .r = hex_colors.PLAYER_ALIVE.r, .g = hex_colors.PLAYER_ALIVE.g, .b = hex_colors.PLAYER_ALIVE.b },
+        .bright = .{ .r = hex_colors.BLUE_BRIGHT.r, .g = hex_colors.BLUE_BRIGHT.g, .b = hex_colors.BLUE_BRIGHT.b },
     };
 
     pub const PURPLE = BorderColorPair{
-        .dark = .{ .r = 120.0, .g = 40.0, .b = 120.0 },
-        .bright = .{ .r = 200.0, .g = 80.0, .b = 200.0 },
+        .dark = .{ .r = colors.PURPLE.r, .g = colors.PURPLE.g, .b = colors.PURPLE.b },
+        .bright = .{ .r = hex_colors.PURPLE_BRIGHT.r, .g = hex_colors.PURPLE_BRIGHT.g, .b = hex_colors.PURPLE_BRIGHT.b },
     };
 };
 
@@ -65,10 +66,10 @@ pub const BorderAnimation = struct {
         const clamped_intensity = @max(0.0, @min(1.0, intensity));
 
         return Color{
-            .r = @intFromFloat((color_pair.dark.r + (color_pair.bright.r - color_pair.dark.r) * clamped_t) * clamped_intensity),
-            .g = @intFromFloat((color_pair.dark.g + (color_pair.bright.g - color_pair.dark.g) * clamped_t) * clamped_intensity),
-            .b = @intFromFloat((color_pair.dark.b + (color_pair.bright.b - color_pair.dark.b) * clamped_t) * clamped_intensity),
-            .a = 255,
+            .r = (color_pair.dark.r + (color_pair.bright.r - color_pair.dark.r) * clamped_t) * clamped_intensity,
+            .g = (color_pair.dark.g + (color_pair.bright.g - color_pair.dark.g) * clamped_t) * clamped_intensity,
+            .b = (color_pair.dark.b + (color_pair.bright.b - color_pair.dark.b) * clamped_t) * clamped_intensity,
+            .a = 1.0,
         };
     }
 
@@ -125,10 +126,10 @@ pub const BorderSpec = struct {
     /// Create animated border spec
     pub fn animated(base_width: f32, color_pair: BorderColorPair, pulse_freq: f32, pulse_amplitude: f32) BorderSpec {
         const base_color = Color{
-            .r = @intFromFloat(color_pair.dark.r),
-            .g = @intFromFloat(color_pair.dark.g),
-            .b = @intFromFloat(color_pair.dark.b),
-            .a = 255,
+            .r = color_pair.dark.r,
+            .g = color_pair.dark.g,
+            .b = color_pair.dark.b,
+            .a = 1.0,
         };
 
         return BorderSpec{
@@ -267,7 +268,7 @@ test "border animation" {
     // Test color interpolation
     const color_pair = ColorPairs.RED;
     const color = BorderAnimation.interpolateColor(color_pair, 0.5, 1.0);
-    try std.testing.expect(color.a == 255);
+    try std.testing.expectApproxEqAbs(@as(f32, 1.0), color.a, 0.01);
 }
 
 test "border stack" {

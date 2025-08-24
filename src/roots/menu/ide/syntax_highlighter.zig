@@ -1,11 +1,12 @@
 /// Basic syntax highlighting for Zig files
 /// Pattern-based highlighting without full AST parsing
 const std = @import("std");
-const colors = @import("../../../lib/core/colors.zig");
+const core_colors = @import("../../../lib/core/colors.zig");
+const BaseStyle = @import("../../../lib/ui/styles/base_style.zig");
+const hex_colors = @import("../../../hex/colors.zig");
 const color_math = @import("../../../lib/math/color.zig");
 const constants = @import("constants.zig");
-const Color = colors.Color;
-const ColorBuilder = color_math.ColorBuilder;
+const Color = core_colors.Color;
 
 /// Token type for syntax highlighting
 pub const TokenType = enum {
@@ -20,14 +21,14 @@ pub const TokenType = enum {
 
     pub fn getColor(self: TokenType) Color {
         return switch (self) {
-            .normal => ColorBuilder.rgb(200, 200, 200),
-            .keyword => ColorBuilder.rgb(150, 120, 255), // Purple-blue
-            .type => ColorBuilder.rgb(80, 200, 180), // Cyan-green
-            .string => ColorBuilder.rgb(255, 200, 100), // Yellow-orange
-            .comment => ColorBuilder.gray(120), // Gray
-            .number => ColorBuilder.rgb(255, 150, 150), // Light red
-            .function => ColorBuilder.rgb(100, 255, 150), // Light green
-            .builtin => ColorBuilder.rgb(255, 180, 120), // Orange
+            .normal => core_colors.LIGHT_GRAY_200, // Standard light gray text
+            .keyword => core_colors.PURPLE, // Purple for keywords
+            .type => core_colors.CYAN, // Cyan for types
+            .string => core_colors.GOLD, // Gold for strings
+            .comment => core_colors.GRAY_100, // Gray for comments
+            .number => hex_colors.RED_BRIGHT, // Bright red for numbers
+            .function => hex_colors.GREEN_BRIGHT, // Bright green for functions
+            .builtin => core_colors.ORANGE, // Orange for builtins
         };
     }
 };
@@ -95,6 +96,8 @@ pub const ZigHighlighter = struct {
             return tokens;
         }
 
+        // TODO: optimize - Use pre-allocated token buffer to avoid ArrayList allocation/deallocation per line.
+        // Could use threadlocal buffer or pass buffer as parameter for zero-allocation highlighting.
         var tokens = std.ArrayList(HighlightedToken).init(self.allocator);
         defer tokens.deinit();
 
@@ -238,6 +241,9 @@ pub const ZigHighlighter = struct {
     /// Classify an identifier as keyword, type, builtin, function, or normal
     fn classifyIdentifier(self: *Self, identifier: []const u8, line: []const u8, pos: u32) TokenType {
         _ = self;
+
+        // TODO: optimize - Use comptime hash maps (ComptimeStringMap) for O(1) lookup instead of O(n) linear search
+        // through 51 keywords + 12 types + 70 builtins. This could improve performance by 50-70% for identifier classification.
 
         // Check for builtins (start with @)
         if (identifier.len > 0 and identifier[0] == '@') {

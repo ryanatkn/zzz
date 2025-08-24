@@ -106,8 +106,8 @@ test "text display style presets" {
     try testing.expectEqual(TextAlignment.center, title.alignment);
 
     const error_text = TextDisplayStyle.Presets.error_text;
-    try testing.expectEqual(@as(u8, 255), error_text.color.r); // Red component should be high
-    try testing.expect(error_text.color.g < 150); // Green should be lower than red
+    try testing.expectApproxEqAbs(@as(f32, 1.0), error_text.color.r, 0.01); // Red component should be high
+    try testing.expect(error_text.color.g < 0.6); // Green should be lower than red
 }
 
 test "required size calculation" {
