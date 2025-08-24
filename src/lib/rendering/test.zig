@@ -11,7 +11,7 @@ test {
     _ = @import("primitives/vector_utils.zig");
     _ = @import("optimization/performance.zig"); // Fixed: Now uses optional logger access
     _ = @import("core/uniforms.zig"); // Pure data structures, no dependencies
-    _ = @import("texture_formats.zig"); // Texture format utilities and pixel operations
+    _ = @import("core/texture_formats.zig"); // Texture format utilities and pixel operations
 
     // Spatial coordinate and transformation system
     _ = @import("spatial/transforms.zig");

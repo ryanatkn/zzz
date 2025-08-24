@@ -41,11 +41,14 @@ pub const Viewport = spatial.Viewport;
 pub const CoordinateContext = spatial.CoordinateContext;
 
 // Texture and format utilities
-pub const texture_formats = @import("texture_formats.zig");
+pub const texture_formats = @import("core/texture_formats.zig");
 pub const TextureFormat = texture_formats.TextureFormat;
 pub const RGBAPixel = texture_formats.RGBAPixel;
 pub const TextureTransfer = texture_formats.TextureTransfer;
 pub const TextureCreation = texture_formats.TextureCreation;
+
+// Buffer utilities
+pub const InstanceBuffers = core.InstanceBuffers;
 
 // For backward compatibility during transition
 pub const gpu = core.gpu;

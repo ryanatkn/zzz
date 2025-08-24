@@ -5,41 +5,35 @@ const std = @import("std");
 const c = @import("../../platform/sdl.zig");
 const uniforms_mod = @import("uniforms.zig");
 const loggers = @import("../../debug/loggers.zig");
+const buffers = @import("buffers.zig");
 
 pub const BatchingError = error{
     BufferCreationFailed,
 };
 
-/// Creates instance buffers for batched rendering
+/// Creates instance buffers for batched rendering using shared utilities
 pub fn createInstanceBuffers(device: *c.sdl.SDL_GPUDevice) BatchingError!InstanceBuffers {
     loggers.getRenderLog().info("instance_buffer_create", "Creating instance buffers for batching", .{});
 
-    const buffer_create_info = c.sdl.SDL_GPUBufferCreateInfo{
-        .usage = c.sdl.SDL_GPU_BUFFERUSAGE_VERTEX,
-        .size = uniforms_mod.MAX_INSTANCES_PER_BATCH * @sizeOf(uniforms_mod.CircleInstance),
+    const circle_instance_buffer = buffers.InstanceBuffers.createCircleInstanceBuffer(device) catch |err| {
+        return switch (err) {
+            error.BufferCreationFailed => BatchingError.BufferCreationFailed,
+        };
     };
 
-    const circle_instance_buffer = c.sdl.SDL_CreateGPUBuffer(device, &buffer_create_info) orelse {
-        loggers.getRenderLog().err("circle_buffer_fail", "Failed to create circle instance buffer", .{});
-        return BatchingError.BufferCreationFailed;
-    };
-
-    const rect_buffer_create_info = c.sdl.SDL_GPUBufferCreateInfo{
-        .usage = c.sdl.SDL_GPU_BUFFERUSAGE_VERTEX,
-        .size = uniforms_mod.MAX_INSTANCES_PER_BATCH * @sizeOf(uniforms_mod.RectInstance),
-    };
-
-    const rect_instance_buffer = c.sdl.SDL_CreateGPUBuffer(device, &rect_buffer_create_info) orelse {
-        loggers.getRenderLog().err("rect_buffer_fail", "Failed to create rectangle instance buffer", .{});
+    const rect_instance_buffer = buffers.InstanceBuffers.createRectInstanceBuffer(device) catch |err| {
         c.sdl.SDL_ReleaseGPUBuffer(device, circle_instance_buffer);
-        return BatchingError.BufferCreationFailed;
+        return switch (err) {
+            error.BufferCreationFailed => BatchingError.BufferCreationFailed,
+        };
     };
 
-    const effect_instance_buffer = c.sdl.SDL_CreateGPUBuffer(device, &buffer_create_info) orelse {
-        loggers.getRenderLog().err("effect_buffer_fail", "Failed to create effect instance buffer", .{});
+    const effect_instance_buffer = buffers.InstanceBuffers.createCircleInstanceBuffer(device) catch |err| {
         c.sdl.SDL_ReleaseGPUBuffer(device, circle_instance_buffer);
         c.sdl.SDL_ReleaseGPUBuffer(device, rect_instance_buffer);
-        return BatchingError.BufferCreationFailed;
+        return switch (err) {
+            error.BufferCreationFailed => BatchingError.BufferCreationFailed,
+        };
     };
 
     loggers.getRenderLog().info("instance_buffer_success", "Instance buffers created successfully", .{});

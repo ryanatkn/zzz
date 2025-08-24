@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("../platform/sdl.zig");
+const c = @import("../../platform/sdl.zig");
 
 /// Texture format enumeration with utility methods
 pub const TextureFormat = enum {
@@ -76,81 +76,11 @@ pub const RGBAPixel = struct {
     }
 };
 
-/// GPU texture transfer utilities
-pub const TextureTransfer = struct {
-    /// Create and map a transfer buffer for texture upload
-    pub fn createTransferBuffer(
-        gpu_device: *c.sdl.SDL_GPUDevice,
-        size_bytes: u32,
-    ) !struct { buffer: *c.sdl.SDL_GPUTransferBuffer, mapped_ptr: *anyopaque } {
-        const transfer_buffer_info = c.sdl.SDL_GPUTransferBufferCreateInfo{
-            .usage = c.sdl.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-            .size = size_bytes,
-        };
+// Import texture upload utilities for backward compatibility
+const texture_upload = @import("texture_upload.zig");
 
-        const transfer_buffer = c.sdl.SDL_CreateGPUTransferBuffer(gpu_device, &transfer_buffer_info) orelse {
-            return error.TransferBufferCreationFailed;
-        };
-
-        const mapped_ptr = c.sdl.SDL_MapGPUTransferBuffer(gpu_device, transfer_buffer, false) orelse {
-            c.sdl.SDL_ReleaseGPUTransferBuffer(gpu_device, transfer_buffer);
-            return error.TransferBufferMapFailed;
-        };
-
-        return .{ .buffer = transfer_buffer, .mapped_ptr = mapped_ptr };
-    }
-
-    /// Upload data to GPU texture using transfer buffer
-    pub fn uploadToTexture(
-        gpu_device: *c.sdl.SDL_GPUDevice,
-        texture: *c.sdl.SDL_GPUTexture,
-        data: []const u8,
-        width: u32,
-        height: u32,
-        x: u32,
-        y: u32,
-    ) !void {
-        const transfer = try createTransferBuffer(gpu_device, @intCast(data.len));
-        defer {
-            c.sdl.SDL_UnmapGPUTransferBuffer(gpu_device, transfer.buffer);
-            c.sdl.SDL_ReleaseGPUTransferBuffer(gpu_device, transfer.buffer);
-        }
-
-        // Copy data to transfer buffer
-        @memcpy(@as([*]u8, @ptrCast(transfer.mapped_ptr))[0..data.len], data);
-
-        // Create command buffer and copy pass
-        const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(gpu_device) orelse {
-            return error.CommandBufferFailed;
-        };
-
-        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer);
-
-        const texture_transfer_info = c.sdl.SDL_GPUTextureTransferInfo{
-            .transfer_buffer = transfer.buffer,
-            .offset = 0,
-            .pixels_per_row = width,
-            .rows_per_layer = height,
-        };
-
-        const texture_region = c.sdl.SDL_GPUTextureRegion{
-            .texture = texture,
-            .mip_level = 0,
-            .layer = 0,
-            .x = x,
-            .y = y,
-            .z = 0,
-            .w = width,
-            .h = height,
-            .d = 1,
-        };
-
-        c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
-        c.sdl.SDL_EndGPUCopyPass(copy_pass);
-
-        _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
-    }
-};
+/// Backward compatibility - re-export TextureTransfer from texture_upload
+pub const TextureTransfer = texture_upload.TextureTransfer;
 
 /// Calculate buffer size for texture data
 pub fn calculateTextureSize(width: u32, height: u32, format: TextureFormat) u32 {

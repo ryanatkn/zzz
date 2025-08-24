@@ -6,8 +6,10 @@ const c = @import("../../platform/sdl.zig");
 const math = @import("../../math/mod.zig");
 const colors = @import("../../core/colors.zig");
 const uniforms_mod = @import("../core/uniforms.zig");
+const rendering_core = @import("../core/mod.zig");
 const performance = @import("../optimization/performance.zig");
 const loggers = @import("../../debug/loggers.zig");
+const buffers = @import("../core/buffers.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -35,15 +37,9 @@ pub const RectangleRenderer = struct {
     ) !Self {
         const instances = std.ArrayList(RectInstance).init(allocator);
 
-        // Create instance buffer for batching
-        const buffer_create_info = c.sdl.SDL_GPUBufferCreateInfo{
-            .usage = c.sdl.SDL_GPU_BUFFERUSAGE_VERTEX,
-            .size = uniforms_mod.MAX_INSTANCES_PER_BATCH * @sizeOf(RectInstance),
-        };
-
-        const instance_buffer = c.sdl.SDL_CreateGPUBuffer(device, &buffer_create_info) orelse {
-            loggers.getRenderLog().err("rect_buffer_fail", "Failed to create rectangle instance buffer", .{});
-            return error.BufferCreationFailed;
+        // Create instance buffer for batching using shared utility
+        const instance_buffer = buffers.InstanceBuffers.createRectInstanceBuffer(device) catch |err| {
+            return err;
         };
 
         return Self{
@@ -89,7 +85,7 @@ pub const RectangleRenderer = struct {
         };
 
         // Push uniform data BEFORE binding pipeline (critical for SDL3 GPU)
-        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(RectUniforms));
+        rendering_core.UniformPush.pushRectUniforms(cmd_buffer, uniform_data);
 
         // Bind pipeline and draw
         c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.pipeline);
@@ -119,8 +115,8 @@ pub const RectangleRenderer = struct {
             ._padding = 0.0,
         };
 
-        // Push uniform data BEFORE binding pipeline
-        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(CircleUniforms));
+        // Push uniform data BEFORE binding pipeline using shared helper
+        rendering_core.UniformPush.pushCircleUniforms(cmd_buffer, uniform_data);
 
         // Use circle pipeline which has alpha blending enabled
         c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.circle_pipeline);
@@ -174,8 +170,8 @@ pub const RectangleRenderer = struct {
                 ._padding = 0.0,
             };
 
-            // Push uniform data BEFORE binding pipeline
-            c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(RectUniforms));
+            // Push uniform data BEFORE binding pipeline using shared helper
+            rendering_core.UniformPush.pushRectUniforms(cmd_buffer, uniform_data);
 
             // Bind pipeline and draw
             c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.pipeline);

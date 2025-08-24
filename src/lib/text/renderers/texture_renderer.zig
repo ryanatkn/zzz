@@ -8,7 +8,8 @@ const font_manager = @import("../../font/manager.zig");
 const strategy_interface = @import("../../font/strategies/interface.zig");
 const bitmap_strategy = @import("../../font/strategies/bitmap/mod.zig");
 const sdf_strategy = @import("../../font/strategies/sdf/mod.zig");
-const texture_formats = @import("../../rendering/texture_formats.zig");
+const texture_formats = @import("../../rendering/core/texture_formats.zig");
+const rendering_core = @import("../../rendering/core/mod.zig");
 const loggers = @import("../../debug/loggers.zig");
 
 // Import GPU renderer type for texture rendering
@@ -389,59 +390,11 @@ pub const TextureTextRenderer = struct {
         return texture;
     }
 
-    /// Upload bitmap data to a GPU texture
+    /// Upload bitmap data to a GPU texture using shared upload utilities
     fn uploadBitmapToTexture(self: *TextureTextRenderer, texture: *c.sdl.SDL_GPUTexture, bitmap: []const u8, width: u32, height: u32, gpu_device: *c.sdl.SDL_GPUDevice) !void {
         _ = self;
-
-        const transfer_size = width * height;
-
-        const transfer_buffer_info = c.sdl.SDL_GPUTransferBufferCreateInfo{
-            .usage = c.sdl.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-            .size = transfer_size,
-        };
-
-        const transfer_buffer = c.sdl.SDL_CreateGPUTransferBuffer(gpu_device, &transfer_buffer_info) orelse {
-            return error.TransferBufferCreationFailed;
-        };
-        defer c.sdl.SDL_ReleaseGPUTransferBuffer(gpu_device, transfer_buffer);
-
-        const mapped_ptr = c.sdl.SDL_MapGPUTransferBuffer(gpu_device, transfer_buffer, false) orelse {
-            return error.TransferBufferMapFailed;
-        };
-
-        @memcpy(@as([*]u8, @ptrCast(mapped_ptr))[0..transfer_size], bitmap);
-
-        c.sdl.SDL_UnmapGPUTransferBuffer(gpu_device, transfer_buffer);
-
-        const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(gpu_device) orelse {
-            return error.CommandBufferFailed;
-        };
-
-        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer);
-
-        const texture_transfer_info = c.sdl.SDL_GPUTextureTransferInfo{
-            .transfer_buffer = transfer_buffer,
-            .offset = 0,
-            .pixels_per_row = width,
-            .rows_per_layer = height,
-        };
-
-        const texture_region = c.sdl.SDL_GPUTextureRegion{
-            .texture = texture,
-            .mip_level = 0,
-            .layer = 0,
-            .x = 0,
-            .y = 0,
-            .z = 0,
-            .w = width,
-            .h = height,
-            .d = 1,
-        };
-
-        c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
-        c.sdl.SDL_EndGPUCopyPass(copy_pass);
-
-        _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
+        // Use shared grayscale upload utility (R8_UNORM format)
+        try rendering_core.TextureUpload.uploadGrayscale(gpu_device, texture, bitmap, width, height, 0, 0);
     }
 
     /// Render a textured quad for a glyph
@@ -487,26 +440,14 @@ pub const TextureTextRenderer = struct {
             ._padding = [2]f32{ 0.0, 0.0 },
         };
 
-        const font_log = loggers.getFontLog();
-        font_log.warn("texture_quad_uniforms", "Rendering glyph: pos=({:.1},{:.1}), size=({:.1},{:.1}), UV=({:.3},{:.3}) to ({:.3},{:.3})", .{ glyph_pos.x, glyph_pos.y, glyph_size.x, glyph_size.y, texture_glyph.uv_min.x, texture_glyph.uv_min.y, texture_glyph.uv_max.x, texture_glyph.uv_max.y });
-
         // Push uniform data BEFORE binding pipeline
-        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(uniforms_mod.TextUniforms));
+        rendering_core.UniformPush.pushTextUniforms(cmd_buffer, uniform_data);
 
         // Bind text pipeline for texture rendering (not text_vertex_pipeline)
         c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, gpu_renderer.pipelines.text_pipeline);
 
         // Create sampler for texture filtering
-        const sampler_create_info = c.sdl.SDL_GPUSamplerCreateInfo{
-            .min_filter = c.sdl.SDL_GPU_FILTER_LINEAR,
-            .mag_filter = c.sdl.SDL_GPU_FILTER_LINEAR,
-            .mipmap_mode = c.sdl.SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
-            .address_mode_u = c.sdl.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-            .address_mode_v = c.sdl.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-            .address_mode_w = c.sdl.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-        };
-
-        const sampler = c.sdl.SDL_CreateGPUSampler(gpu_renderer.device, &sampler_create_info);
+        const sampler = try rendering_core.Samplers.createTextSampler(gpu_renderer.device);
         defer c.sdl.SDL_ReleaseGPUSampler(gpu_renderer.device, sampler);
 
         // Bind texture and sampler

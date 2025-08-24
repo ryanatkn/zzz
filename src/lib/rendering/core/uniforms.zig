@@ -89,3 +89,34 @@ pub const TextInstance = extern struct {
 
 // Maximum instances per batch
 pub const MAX_INSTANCES_PER_BATCH = 1024;
+
+/// Uniform push helpers - eliminate SDL_PushGPUVertexUniformData boilerplate
+/// These provide type safety and consistent slot management
+const c = @import("../../platform/sdl.zig");
+
+pub const UniformPush = struct {
+    /// Push circle uniforms to vertex shader (slot 0)
+    pub fn pushCircleUniforms(cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, uniforms: CircleUniforms) void {
+        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniforms, @sizeOf(CircleUniforms));
+    }
+
+    /// Push rectangle uniforms to vertex shader (slot 0)
+    pub fn pushRectUniforms(cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, uniforms: RectUniforms) void {
+        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniforms, @sizeOf(RectUniforms));
+    }
+
+    /// Push particle uniforms to vertex shader (slot 0)
+    pub fn pushParticleUniforms(cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, uniforms: ParticleUniforms) void {
+        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniforms, @sizeOf(ParticleUniforms));
+    }
+
+    /// Push frame uniforms to vertex shader (slot 0)
+    pub fn pushFrameUniforms(cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, uniforms: FrameUniforms) void {
+        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniforms, @sizeOf(FrameUniforms));
+    }
+
+    /// Push text uniforms to vertex shader (slot 0)
+    pub fn pushTextUniforms(cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, uniforms: TextUniforms) void {
+        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniforms, @sizeOf(TextUniforms));
+    }
+};

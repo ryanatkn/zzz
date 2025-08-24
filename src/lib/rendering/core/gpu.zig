@@ -310,8 +310,9 @@ pub const GPURenderer = struct {
 
         render_log.info("gpu_vertex_uniforms", "Screen size: ({d}, {d}), Glyph position: ({d}, {d})", .{ uniform_data.screen_size[0], uniform_data.screen_size[1], uniform_data.glyph_position[0], uniform_data.glyph_position[1] });
 
-        // Push uniform data BEFORE binding pipeline
-        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(uniforms_mod.TextUniforms));
+        // Push uniform data BEFORE binding pipeline using shared helper
+        const uniforms_helper = @import("uniforms.zig");
+        uniforms_helper.UniformPush.pushTextUniforms(cmd_buffer, uniform_data);
         render_log.info("gpu_vertex_uniforms_pushed", "Uniforms pushed: {} bytes", .{@sizeOf(uniforms_mod.TextUniforms)});
 
         // Bind vertex text pipeline (uses vertex input instead of procedural generation)

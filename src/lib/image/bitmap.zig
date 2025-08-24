@@ -1,5 +1,5 @@
 const std = @import("std");
-const texture_formats = @import("../rendering/texture_formats.zig");
+const texture_formats = @import("../rendering/core/texture_formats.zig");
 
 /// A bitmap representation for image processing and font rendering
 pub const Bitmap = struct {

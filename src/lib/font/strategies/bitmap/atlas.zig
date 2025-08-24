@@ -3,7 +3,8 @@ const c = @import("../../../platform/sdl.zig");
 const rasterizer_core = @import("rasterizer.zig");
 const vector_path = @import("../../../vector/path.zig");
 const loggers = @import("../../../debug/loggers.zig");
-const texture_formats = @import("../../../rendering/texture_formats.zig");
+const texture_formats = @import("../../../rendering/core/texture_formats.zig");
+const rendering_core = @import("../../../rendering/core/mod.zig");
 
 const log = std.log.scoped(.font_atlas);
 
@@ -70,26 +71,7 @@ pub const FontAtlas = struct {
 
     /// Create a shared sampler for all atlas textures
     fn createSampler(self: *FontAtlas) !void {
-        const sampler_info = c.sdl.SDL_GPUSamplerCreateInfo{
-            .min_filter = c.sdl.SDL_GPU_FILTER_LINEAR,
-            .mag_filter = c.sdl.SDL_GPU_FILTER_LINEAR,
-            .mipmap_mode = c.sdl.SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
-            .address_mode_u = c.sdl.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-            .address_mode_v = c.sdl.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-            .address_mode_w = c.sdl.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-            .mip_lod_bias = 0.0,
-            .max_anisotropy = 1.0,
-            .compare_op = c.sdl.SDL_GPU_COMPAREOP_NEVER,
-            .min_lod = 0.0,
-            .max_lod = 1000.0,
-            .enable_anisotropy = false,
-            .enable_compare = false,
-        };
-
-        self.sampler = c.sdl.SDL_CreateGPUSampler(self.gpu_device, &sampler_info);
-        if (self.sampler == null) {
-            return error.SamplerCreationFailed;
-        }
+        self.sampler = try rendering_core.Samplers.createLinearSampler(self.gpu_device);
     }
 
     // SDF functionality moved to SDF strategy - bitmap atlas only handles bitmap rendering
