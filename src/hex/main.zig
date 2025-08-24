@@ -28,6 +28,7 @@ const reactive_batch = @import("../lib/reactive/batch.zig");
 const reactive_time = @import("../lib/reactive/time.zig");
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 const persistent_text = @import("../lib/text/cache.zig");
+// const texture_utils = @import("../lib/image/texture.zig"); // Removed - no more textures
 
 // Debug system imports (already imported above)
 
@@ -113,6 +114,9 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     game_renderer = try global_allocator.create(GameRenderer);
     errdefer global_allocator.destroy(game_renderer.?);
     game_renderer.?.* = try GameRenderer.init(global_allocator, window.?);
+
+    // Initialize deferred texture upload system - removed (no more textures)
+    // texture_utils.initDeferredUploads(global_allocator);
 
     // Initialize persistent text system (needs GPU device from renderer)
     try persistent_text.initGlobalPersistentTextSystem(global_allocator, game_renderer.?.gpu.device);
@@ -216,6 +220,9 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
             // This ensures GPU textures are released before the GPU device is destroyed
             persistent_text.deinitGlobalPersistentTextSystem(global_allocator);
 
+            // Clean up deferred texture upload system - removed (no more textures)
+            // texture_utils.deinitDeferredUploads();
+
             // Now safe to deinitialize the renderer and GPU device
             game_renderer.?.deinit();
             // Clean up ZON data arena allocator
@@ -288,6 +295,24 @@ fn renderGame() !void {
 
     // Begin GPU frame
     const cmd_buffer = try game_renderer.?.beginFrame();
+
+    // CRITICAL: Create all text textures BEFORE render pass begins
+    // This avoids "Cannot begin copy pass during another pass" errors
+    if (game_hud.?.visible) {
+        const fps = reactive_time.getFPS();
+        game_renderer.?.prepareFPS(fps);
+
+        // Prepare AI mode indicator if enabled
+        game_renderer.?.prepareAIMode(game_state.?.ai_enabled);
+
+        // Prepare debug info (player position and camera viewport)
+        game_renderer.?.prepareDebugInfo(&game_state.?.hex_game);
+    }
+
+    // CRITICAL: Ensure all GPU operations complete before beginning render pass
+    // This ensures textures are fully uploaded and ready for use
+    _ = c.sdl.SDL_WaitForGPUIdle(game_renderer.?.gpu.device);
+
     const render_pass = try game_renderer.?.beginRenderPass(cmd_buffer, zone.background_color);
 
     // Render all entities
@@ -296,16 +321,11 @@ fn renderGame() !void {
     // Render visual particles
     game_renderer.?.renderParticles(cmd_buffer, render_pass, &game_state.?.particle_system);
 
-    // Draw HUD
+    // Draw HUD (now just queues already-created textures)
     if (game_hud.?.visible) {
-        const fps = reactive_time.getFPS();
-        game_renderer.?.drawFPS(cmd_buffer, render_pass, fps);
-
-        // Draw AI mode indicator if enabled
-        game_renderer.?.drawAIMode(game_state.?.ai_enabled);
-
-        // Draw debug info (player position and camera viewport)
-        game_renderer.?.drawDebugInfo(cmd_buffer, render_pass, &game_state.?.hex_game);
+        game_renderer.?.drawFPS(cmd_buffer, render_pass);
+        game_renderer.?.drawAIMode(cmd_buffer, render_pass);
+        game_renderer.?.drawDebugInfo(cmd_buffer, render_pass);
 
         // Draw spellbar
         game_renderer.?.drawSpellbar(cmd_buffer, render_pass, &game_state.?.spell_system, &game_state.?.spellbar_ui);
@@ -318,7 +338,14 @@ fn renderGame() !void {
 
     // Draw all queued text (TTF text that was queued during frame)
     // IMPORTANT: This must come AFTER HUD rendering so text queued by HUD is drawn
-    game_renderer.?.gpu.drawQueuedText(cmd_buffer, render_pass);
+    // Draw all queued text using buffer-based rendering
+    const main_render_log = loggers.getRenderLog();
+    main_render_log.info("main_draw_queued", "About to draw queued text from main loop", .{});
+    game_renderer.?.gpu.text_integration.drawQueuedText(&game_renderer.?.gpu, cmd_buffer, render_pass) catch |err| {
+        const render_error_log = loggers.getRenderLog();
+        render_error_log.err("text_render_fail", "Failed to draw queued text: {}", .{err});
+    };
+    main_render_log.info("main_draw_complete", "Completed drawing queued text from main loop", .{});
 
     // Draw state borders with stacking support and iris wipe effect - LAST for proper visual effect
     game_renderer.?.drawBorders(cmd_buffer, render_pass, game_state.?);

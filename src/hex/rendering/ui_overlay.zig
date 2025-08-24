@@ -2,63 +2,114 @@ const std = @import("std");
 const c = @import("../../lib/platform/sdl.zig");
 const math = @import("../../lib/math/mod.zig");
 const core_colors = @import("../../lib/core/colors.zig");
-const time_utils = @import("../../lib/core/time.zig");
-
-// Reuse lib/rendering UI utilities
-const ui_drawing = @import("../../lib/rendering/ui/drawing.zig");
-const shapes = @import("../../lib/rendering/primitives/shapes.zig");
-
-// Font capabilities
-const font_manager = @import("../../lib/font/manager.zig");
-const font_config = @import("../../lib/font/config.zig");
-
-// Text capabilities
-const text_alignment = @import("../../lib/text/alignment.zig");
-
-// UI capabilities
-const geometric_text = @import("../../lib/ui/geometric_text.zig");
-
-// Debug capabilities
+const hex_colors = @import("../colors.zig");
 const loggers = @import("../../lib/debug/loggers.zig");
-
-// Hex game modules
 const world_state_mod = @import("../world_state.zig");
-const constants = @import("../constants.zig");
 
 const Vec2 = math.Vec2;
-const Color = core_colors.Color;
 const HexGame = world_state_mod.HexGame;
 
-/// UI overlay rendering system extracted from game_renderer.zig
-/// Handles FPS counter, debug info, and AI mode indicator using lib/rendering/ui patterns
+/// UI overlay rendering system for debug displays
+/// Handles FPS counter, debug info, and AI mode indicator with optimized text rendering
 pub const UIOverlayRenderer = struct {
-    /// FPS rendering using geometric approach
-    /// Extracted from game_renderer.zig lines 324-346
-    pub fn drawFPS(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
-        // TODO: Implement FPS display with geometric text rendering
-        _ = gpu_renderer;
-        _ = cmd_buffer;
-        _ = render_pass;
-        _ = fps;
+    /// Prepare FPS text texture BEFORE render pass (avoids copy pass conflicts)
+    pub fn prepareFPS(gpu_renderer: anytype, fps: u32, font_mgr: anytype) void {
+        // Format FPS text
+        var fps_buffer: [32]u8 = undefined;
+        const fps_text = std.fmt.bufPrint(&fps_buffer, "FPS: {}", .{fps}) catch "FPS: ERR";
+        const position = Vec2{ .x = 10.0, .y = 10.0 };
+
+        // Queue FPS text for buffer-based rendering
+        gpu_renderer.text_integration.queuePersistentText(fps_text, position, font_mgr, .sans, 14.0, core_colors.WHITE) catch |err| {
+            const fps_error_log = loggers.getRenderLog();
+            fps_error_log.err("fps_display", "Failed to queue FPS text: {}", .{err});
+            return;
+        };
+
+        // DEBUG: Add test text with visible characters to verify vertex rendering
+        const test_position = Vec2{ .x = 10.0, .y = 35.0 };
+        gpu_renderer.text_integration.queuePersistentText("ABC", test_position, font_mgr, .sans, 24.0, hex_colors.RED_BRIGHT) catch |err| {
+            const test_log = loggers.getRenderLog();
+            test_log.err("test_text", "Failed to queue test ABC text: {}", .{err});
+            return;
+        };
     }
 
-    /// Debug info rendering - player coordinates and camera viewport
-    /// Extracted from game_renderer.zig lines 349-370
-    pub fn drawDebugInfo(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
-        // Simplified debug info - just show coordinates for now
-        // TODO: Use geometric text rendering like FPS if debug display is needed
-        _ = gpu_renderer;
+    /// Draw FPS text (assumes texture was already created in prepareFPS)
+    pub fn drawFPS(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        _ = gpu_renderer; // Textures already prepared
         _ = cmd_buffer;
         _ = render_pass;
-        _ = game;
+        // Text textures were already created and queued in prepareFPS
+        // They will be drawn in the main text rendering pass
     }
 
-    /// AI mode indicator with proper alignment
-    /// Extracted from game_renderer.zig lines 372-398
-    pub fn drawAIMode(gpu_renderer: anytype, ai_enabled: bool) void {
-        // Simplified AI mode - just skip for now
-        // TODO: Use geometric text rendering if AI mode display is needed
+    /// Prepare debug info text texture BEFORE render pass
+    pub fn prepareDebugInfo(gpu_renderer: anytype, game: *const HexGame, font_mgr: anytype) void {
+        // Get player position for debugging
+        const player_pos = game.getPlayerPos();
+
+        // Format coordinate text
+        var coord_buffer: [64]u8 = undefined;
+        const coord_text = std.fmt.bufPrint(&coord_buffer, "Pos: ({d:.1}, {d:.1})", .{ player_pos.x, player_pos.y }) catch "Pos: ERR";
+
+        // Position below FPS display
+        const position = Vec2{ .x = 10.0, .y = 35.0 };
+
+        // TEMPORARY: Disable text rendering due to SDL3 device->debug_mode crash
         _ = gpu_renderer;
-        _ = ai_enabled;
+        _ = font_mgr;
+        _ = coord_text;
+        _ = position;
+
+        // TODO: Re-enable once SDL3 issue is resolved
+        // gpu_renderer.text_integration.queuePersistentText(coord_text, position, font_mgr, .sans, 12.0, hex_colors.YELLOW_BRIGHT) catch |err| {
+        //     const render_log = loggers.getRenderLog();
+        //     render_log.err("debug_info", "Failed to queue debug info: {}", .{err});
+        //     return;
+        // };
+    }
+
+    /// Draw debug info (assumes texture was already created in prepareDebugInfo)
+    pub fn drawDebugInfo(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        _ = gpu_renderer; // Textures already prepared
+        _ = cmd_buffer; // Not used in current implementation
+        _ = render_pass; // Not used in current implementation
+        // Text textures were already created and queued in prepareDebugInfo
+    }
+
+    /// Prepare AI mode text texture BEFORE render pass
+    pub fn prepareAIMode(gpu_renderer: anytype, ai_enabled: bool, font_mgr: anytype) void {
+        // Only show indicator when AI is enabled
+        if (ai_enabled) {
+            const ai_text = "AI CONTROL";
+
+            // Get screen width from GPU renderer - simplified approach for now
+            const screen_width = 1920.0; // TODO: Get actual screen width
+
+            // Position in top-right corner for visibility
+            const position = Vec2{ .x = screen_width - 120.0, .y = 10.0 };
+
+            // TEMPORARY: Disable text rendering due to SDL3 device->debug_mode crash
+            _ = gpu_renderer;
+            _ = font_mgr;
+            _ = ai_text;
+            _ = position;
+
+            // TODO: Re-enable once SDL3 issue is resolved
+            // gpu_renderer.text_integration.queuePersistentText(ai_text, position, font_mgr, .sans, 14.0, hex_colors.RED_BRIGHT) catch |err| {
+            //     const render_log = loggers.getRenderLog();
+            //     render_log.err("ai_indicator", "Failed to queue AI mode text: {}", .{err});
+            //     return;
+            // };
+        }
+    }
+
+    /// Draw AI mode indicator (assumes texture was already created in prepareAIMode)
+    pub fn drawAIMode(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        _ = gpu_renderer; // Textures already prepared
+        _ = cmd_buffer;
+        _ = render_pass;
+        // Text textures were already created and queued in prepareAIMode
     }
 };

@@ -9,7 +9,6 @@ const std = @import("std");
 test {
     _ = @import("animated_borders.zig");
     _ = @import("component.zig");
-    _ = @import("geometric_text.zig");
 
     // Fixed test modules (re-enabled after fixing issues)
     _ = @import("primitives.zig"); // Fixed const qualifier mismatches

@@ -21,16 +21,20 @@ const device = @import("device.zig");
 const shaders_mod = @import("shaders.zig");
 const pipelines_mod = @import("pipelines.zig");
 const frame_mod = @import("frame.zig");
-const text_integration = @import("text_integration.zig");
 
 // Primitive renderer modules
 const circles = @import("../primitives/circles.zig");
 const rectangles = @import("../primitives/rectangles.zig");
 const particles = @import("../primitives/particles.zig");
+const text_primitives = @import("../primitives/text.zig");
 
-// Platform and text renderer
+// Text integration
+const text_integration = @import("text_integration.zig");
+const font_manager = @import("../../font/manager.zig");
+const font_config = @import("../../font/config.zig");
+
+// Platform
 const c = @import("../../platform/sdl.zig");
-const TextRenderer = @import("../../text/renderer.zig").TextRenderer;
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
@@ -40,12 +44,10 @@ const Color = colors.Color;
 /// Manages the complete GPU rendering pipeline through specialized components:
 /// - Device management and initialization
 /// - Shader loading and pipeline creation
-/// - Primitive rendering (circles, rectangles, particles)
-/// - Text rendering integration
+/// - Primitive rendering (circles, rectangles, particles, text)
 /// - Performance monitoring and batching
 ///
-/// Maintains full API compatibility with the original monolithic implementation
-/// while providing better maintainability and extensibility.
+/// Now uses pure buffer-based rendering with NO texture dependencies.
 pub const GPURenderer = struct {
     allocator: std.mem.Allocator,
     device: *c.sdl.SDL_GPUDevice,
@@ -54,12 +56,16 @@ pub const GPURenderer = struct {
     // Component systems
     shaders: shaders_mod.ShaderSet,
     pipelines: pipelines_mod.PipelineSet,
-    text_integration: text_integration.TextIntegration, // Public for direct access to text rendering
 
-    // Primitive renderers
+    // Primitive renderers (all buffer-based)
     circle_renderer: circles.CircleRenderer,
     rect_renderer: rectangles.RectangleRenderer,
     particle_renderer: particles.ParticleRenderer,
+    text_renderer: text_primitives.TextRenderer,
+
+    // Text integration system (buffer-based)
+    text_integration: text_integration.TextIntegration,
+    font_manager: *font_manager.FontManager,
 
     // Current frame data
     screen_width: f32,
@@ -81,12 +87,6 @@ pub const GPURenderer = struct {
         // Initialize pipelines
         var pipeline_set = try pipelines_mod.PipelineSet.init(gpu_device, window, &shader_set);
         errdefer pipeline_set.deinit(gpu_device);
-
-        // Initialize text integration
-        const initial_width = constants.SCREEN.BASE_WIDTH;
-        const initial_height = constants.SCREEN.BASE_HEIGHT;
-        var text_int = try text_integration.TextIntegration.init(gpu_device, allocator, initial_width, initial_height);
-        errdefer text_int.deinit();
 
         // Initialize performance monitor
         var perf_monitor = performance.PerformanceMonitor.init(performance.Config.DEFAULT_LOGGING_FREQUENCY);
@@ -117,23 +117,52 @@ pub const GPURenderer = struct {
         );
         errdefer particle_renderer.deinit(gpu_device);
 
+        var text_renderer = try text_primitives.TextRenderer.init(
+            allocator,
+            gpu_device,
+            pipeline_set.text_pipeline,
+            &perf_monitor,
+        );
+        errdefer text_renderer.deinit(gpu_device);
+
+        // Initialize font manager on heap (to avoid struct copy corruption)
+        const font_mgr = try allocator.create(font_manager.FontManager);
+        errdefer allocator.destroy(font_mgr);
+
+        font_mgr.* = try font_manager.FontManager.init(allocator);
+        errdefer font_mgr.deinit();
+
+        // CRITICAL: Set GPU device on FontManager BEFORE creating TextIntegration
+        font_mgr.setGPUDevice(gpu_device);
+
         // Show window now that GPU is set up
         _ = c.sdl.SDL_ShowWindow(window);
 
-        return Self{
+        const initial_width = constants.SCREEN.BASE_WIDTH;
+        const initial_height = constants.SCREEN.BASE_HEIGHT;
+
+        // Create GPURenderer (now texture-free!)
+        var renderer = Self{
             .allocator = allocator,
             .device = gpu_device,
             .window = window,
             .shaders = shader_set,
             .pipelines = pipeline_set,
-            .text_integration = text_int,
             .circle_renderer = circle_renderer,
             .rect_renderer = rect_renderer,
             .particle_renderer = particle_renderer,
+            .text_renderer = text_renderer,
+            .text_integration = undefined, // Will be initialized next
+            .font_manager = font_mgr,
             .screen_width = initial_width,
             .screen_height = initial_height,
             .perf_monitor = perf_monitor,
         };
+
+        // Initialize text integration with font manager pointer
+        renderer.text_integration = text_integration.TextIntegration.init(allocator, renderer.font_manager);
+
+        return renderer;
     }
 
     pub fn deinit(self: *Self) void {
@@ -141,9 +170,14 @@ pub const GPURenderer = struct {
         self.circle_renderer.deinit(self.device);
         self.rect_renderer.deinit(self.device);
         self.particle_renderer.deinit(self.device);
+        self.text_renderer.deinit(self.device);
+
+        // Clean up text system
+        self.text_integration.deinit();
+        self.font_manager.deinit();
+        self.allocator.destroy(self.font_manager);
 
         // Clean up component systems
-        self.text_integration.deinit();
         self.pipelines.deinit(self.device);
         self.shaders.deinit(self.device);
 
@@ -157,9 +191,6 @@ pub const GPURenderer = struct {
         const screen_size = frame_mod.updateScreenSize(window);
         self.screen_width = screen_size.width;
         self.screen_height = screen_size.height;
-
-        // Update text renderer screen size
-        self.text_integration.updateScreenSize(self.screen_width, self.screen_height);
 
         // Acquire command buffer
         return frame_mod.beginFrame(self.device, window);
@@ -224,6 +255,11 @@ pub const GPURenderer = struct {
         self.particle_renderer.addEffectToTrace(pos, radius, color, intensity);
     }
 
+    // Add a text glyph to the current batch
+    pub fn addGlyphToTrace(self: *Self, pos: Vec2, size: Vec2, color: Color) void {
+        self.text_renderer.addGlyphToTrace(pos, size, color);
+    }
+
     // Render all batched circles
     pub fn flushCircles(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
         self.circle_renderer.flushCircles(cmd_buffer, render_pass, self.screen_width, self.screen_height);
@@ -239,6 +275,62 @@ pub const GPURenderer = struct {
         self.particle_renderer.flushEffects(cmd_buffer, render_pass, time, self.screen_width, self.screen_height);
     }
 
+    // Render all batched text glyphs
+    pub fn flushGlyphs(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        self.text_renderer.flushGlyphs(cmd_buffer, render_pass, self.screen_width, self.screen_height);
+    }
+
+    // Draw a single text glyph immediately
+    pub fn drawGlyph(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, size: Vec2, color: Color) void {
+        self.text_renderer.drawGlyph(cmd_buffer, render_pass, pos, size, color, self.screen_width, self.screen_height);
+    }
+
+    // Draw a text glyph using vertex buffer (triangulated geometry)
+    pub fn drawGlyphVertexBuffer(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, vertex_buffer: *c.sdl.SDL_GPUBuffer, vertex_count: u32, pos: Vec2, color: Color) !void {
+        const loggers = @import("../../debug/loggers.zig");
+        const render_log = loggers.getRenderLog();
+        render_log.info("gpu_vertex_draw_start", "=== VERTEX DRAW START: {} vertices at ({d}, {d}) ===", .{ vertex_count, pos.x, pos.y });
+        render_log.info("gpu_vertex_draw_color", "Text color: RGBA({}, {}, {}, {}) -> normalized({d}, {d}, {d}, {d})", .{ color.r, color.g, color.b, color.a, @as(f32, @floatFromInt(color.r)) / 255.0, @as(f32, @floatFromInt(color.g)) / 255.0, @as(f32, @floatFromInt(color.b)) / 255.0, @as(f32, @floatFromInt(color.a)) / 255.0 });
+
+        const uniforms_mod = @import("uniforms.zig");
+
+        // Prepare uniform data (similar to regular text rendering)
+        const uniform_data = uniforms_mod.TextUniforms{
+            .uv_min = [2]f32{ 0.0, 0.0 }, // Not used for vertex rendering
+            .uv_max = [2]f32{ 1.0, 1.0 }, // Not used for vertex rendering
+            .screen_size = [2]f32{ self.screen_width, self.screen_height },
+            .glyph_position = [2]f32{ pos.x, pos.y },
+            .glyph_size = [2]f32{ 0.0, 0.0 }, // Not used for vertex rendering
+            .text_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
+            .text_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
+            .text_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
+            .text_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            ._padding = [2]f32{ 0.0, 0.0 },
+        };
+
+        render_log.info("gpu_vertex_uniforms", "Screen size: ({d}, {d}), Glyph position: ({d}, {d})", .{ uniform_data.screen_size[0], uniform_data.screen_size[1], uniform_data.glyph_position[0], uniform_data.glyph_position[1] });
+
+        // Push uniform data BEFORE binding pipeline
+        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(uniforms_mod.TextUniforms));
+        render_log.info("gpu_vertex_uniforms_pushed", "Uniforms pushed: {} bytes", .{@sizeOf(uniforms_mod.TextUniforms)});
+
+        // Bind vertex text pipeline (uses vertex input instead of procedural generation)
+        c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.pipelines.text_vertex_pipeline);
+        render_log.info("gpu_vertex_pipeline_bound", "Text vertex pipeline bound successfully", .{});
+
+        // Bind vertex buffer
+        const buffer_binding = c.sdl.SDL_GPUBufferBinding{
+            .buffer = vertex_buffer,
+            .offset = 0,
+        };
+        c.sdl.SDL_BindGPUVertexBuffers(render_pass, 0, &buffer_binding, 1);
+        render_log.info("gpu_vertex_buffer_bound", "Vertex buffer bound with {} vertices", .{vertex_count});
+
+        // Draw triangulated vertices
+        c.sdl.SDL_DrawGPUPrimitives(render_pass, vertex_count, 1, 0, 0);
+        render_log.info("gpu_vertex_draw_complete", "=== VERTEX DRAW COMPLETE: SDL_DrawGPUPrimitives called ===", .{});
+    }
+
     // === FRAME MANAGEMENT API ===
 
     // End render pass
@@ -249,25 +341,21 @@ pub const GPURenderer = struct {
 
     // End frame and submit
     pub fn endFrame(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer) void {
-        _ = self; // TODO: Could be made static, but kept for API consistency
+        _ = self; // No cleanup needed for texture-free rendering
         frame_mod.endFrame(cmd_buffer);
     }
 
-    // === TEXT RENDERING API ===
+    // === BUFFER-BASED TEXT RENDERING API ===
+    // All text rendering now uses GPU buffers instead of textures
 
-    // Queue a texture-based text for drawing
-    pub fn queueTextTexture(self: *Self, texture: *c.sdl.SDL_GPUTexture, position: Vec2, width: u32, height: u32, color: Color) void {
-        self.text_integration.queueTextTexture(texture, position, width, height, color);
+    /// Render all queued text from text integration system
+    pub fn drawQueuedText(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
+        try self.text_integration.drawQueuedText(self, cmd_buffer, render_pass);
     }
 
-    // Draw all queued text (call during render pass)
-    pub fn drawQueuedText(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
-        self.text_integration.drawQueuedText(cmd_buffer, render_pass);
-    }
-
-    // Debug function to test texture pipeline
-    pub fn debugTestTexturePipeline(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
-        try self.text_integration.debugTestTexturePipeline(cmd_buffer, render_pass);
+    /// Queue text for rendering (persistent mode - compatible with menu system)
+    pub fn queuePersistentText(self: *Self, text: []const u8, position: Vec2, font_category: font_config.FontCategory, font_size: f32, color: Color) !void {
+        try self.text_integration.queuePersistentText(text, position, &self.font_manager, font_category, font_size, color);
     }
 
     // === COMPATIBILITY/UTILITY API ===

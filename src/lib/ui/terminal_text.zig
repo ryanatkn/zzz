@@ -5,7 +5,7 @@ const colors = @import("../core/colors.zig");
 const reactive = @import("../reactive/mod.zig");
 const terminal_core = @import("../terminal/core.zig");
 const text_baseline = @import("../layout/text_baseline.zig");
-const font_metrics = @import("../font/font_metrics.zig");
+const font_metrics = @import("../font/core/metrics.zig");
 const styles = @import("styles/mod.zig");
 
 const Vec2 = math.Vec2;

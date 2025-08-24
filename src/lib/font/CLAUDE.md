@@ -1,10 +1,41 @@
-# Font System - AI Assistant Guide
+# Font System Domain - AI Assistant Guide
 
-## Quick Reference
+## Domain Definition
 
-Pure Zig TTF renderer with SDL3 GPU integration. Zero external dependencies.
+**Font System Domain:** CPU-only font data operations and individual glyph processing.
 
-## Key Concepts
+### Core Responsibilities
+- **TTF Parsing:** Load and parse TrueType font files
+- **Glyph Extraction:** Extract individual character contours and metrics
+- **Rasterization:** Convert vector glyphs to bitmap data (CPU-only)
+- **Font Atlas:** Pack individual glyphs into texture atlases
+- **Font Management:** Load fonts, manage font instances, provide glyph access
+- **Font Metrics:** Line height, baseline, ascent, descent, kerning data
+
+### Domain Boundaries
+
+**✅ What font/ SHOULD do:**
+- Load and parse TTF files
+- Extract individual glyph data
+- Rasterize single characters to bitmaps
+- Provide font metrics (baseline, kerning, etc.)
+- Manage font loading and caching
+- CPU-only operations
+
+**❌ What font/ should NOT do:**
+- Text layout or multi-character strings
+- GPU operations or texture rendering  
+- UI-specific text formatting
+- Screen positioning or alignment
+- Text caching or optimization
+
+**📡 Interface with text/ domain:**
+```
+font/ produces → individual rasterized glyphs
+text/ consumes → glyphs to create rendered strings
+```
+
+## Key Technical Concepts
 
 ### Coordinate Systems
 - **TTF Space:** Y=0 at baseline, positive up
@@ -22,6 +53,19 @@ const baseline_from_bottom = font_descender + 1.0;
 - `bitmap_width/height` (u32) - For array indexing
 - `width/height` (f32) - For positioning calculations
 - `bearing_y` - Distance from baseline to bitmap top
+
+## Domain Violation Prevention
+
+### Common Violations to Avoid
+1. **Importing from text/ domain** - Font should not depend on text rendering
+2. **GPU operations** - Font should be CPU-only, platform-agnostic
+3. **Text layout** - Multi-character operations belong in text/ domain
+4. **UI formatting** - Screen positioning belongs in text/ domain
+
+### Migration Notes
+- `renderTextToTexture()` method moved to text/ domain (violates separation)
+- Layout engine removed from FontManager (violates CPU-only rule)
+- Any GPU texture operations should be in text/ domain
 
 ## Common Tasks
 
@@ -51,10 +95,12 @@ ls -la .zz/test-font/full/alphabet_*.ppm
 
 ## Critical Files
 
-- `rasterizer_core.zig:336-345` - RasterizedGlyph creation
-- `rasterizer_core.zig:186-196` - RasterizedGlyph struct
-- `test_visualization.zig:188-195` - Baseline guide rendering
-- `coordinate_transform.zig:97-118` - NDC transformations
+- `manager.zig` - Font loading and management (CPU-only)
+- `rasterizer_core.zig` - Glyph rasterization (individual characters)
+- `ttf_parser.zig` - Font file parsing
+- `font_atlas.zig` - Glyph packing and atlas management
+- `font_metrics.zig` - Typographic metrics
+- `coordinate_transform.zig` - Space transformations
 
 ## Testing Checklist
 
@@ -65,6 +111,8 @@ When modifying font system:
 - [ ] alphabet_screen.ppm shows readable text
 - [ ] alphabet_ndc.ppm shows Y-flipped text
 - [ ] No bitmap indexing errors
+- [ ] No imports from text/ domain
+- [ ] No GPU operations
 
 ## Common Pitfalls
 
@@ -72,13 +120,15 @@ When modifying font system:
 - **Don't** calculate bearing_y from bounds.y_max
 - **Don't** forget padding in bitmap allocation
 - **Don't** use float dimensions for array indexing
+- **Don't** import from text/ domain (creates circular dependency)
+- **Don't** add GPU operations (breaks CPU-only rule)
 
 ## Performance Notes
 
 - Pre-tessellate contours before rasterization
-- Cache frequently used glyphs
+- Cache frequently used glyphs in font atlas
 - Use fixed-size pools for bitmaps
-- Batch GPU texture uploads
+- Keep operations CPU-only for testability
 
 ## Debug Output
 

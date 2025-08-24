@@ -1,11 +1,11 @@
 const std = @import("std");
 const testing = std.testing;
-const font_types = @import("font_types.zig");
-const bitmap_utils = @import("../image/bitmap.zig");
+const font_types = @import("../core/types.zig");
+const bitmap_utils = @import("../../image/bitmap.zig");
 
 const BitmapVisualizer = bitmap_utils.Visualizer;
 const TestPatterns = bitmap_utils.TestPatterns;
-const font_helpers = @import("../test_utils/font_helpers.zig");
+const font_helpers = @import("../../test_utils/font_helpers.zig");
 
 /// Test data generators for font testing (using shared utilities)
 const TestData = struct {
@@ -57,14 +57,14 @@ test "point in polygon - rectangle" {
     defer @constCast(&outline).deinit(allocator);
 
     // Test points inside
-    try testing.expect(isPointInside(.{ .x = 50, .y = 50 }, outline.contours)); // Center
-    try testing.expect(isPointInside(.{ .x = 20, .y = 20 }, outline.contours)); // Near corner
-    try testing.expect(isPointInside(.{ .x = 80, .y = 80 }, outline.contours)); // Near opposite corner
+    try testing.expect(isPointInside(.{ .x = 50, .y = 50, .on_curve = true }, outline.contours)); // Center
+    try testing.expect(isPointInside(.{ .x = 20, .y = 20, .on_curve = true }, outline.contours)); // Near corner
+    try testing.expect(isPointInside(.{ .x = 80, .y = 80, .on_curve = true }, outline.contours)); // Near opposite corner
 
     // Test points outside
-    try testing.expect(!isPointInside(.{ .x = 5, .y = 5 }, outline.contours)); // Before rectangle
-    try testing.expect(!isPointInside(.{ .x = 100, .y = 100 }, outline.contours)); // After rectangle
-    try testing.expect(!isPointInside(.{ .x = 50, .y = 5 }, outline.contours)); // Above rectangle
+    try testing.expect(!isPointInside(.{ .x = 5, .y = 5, .on_curve = true }, outline.contours)); // Before rectangle
+    try testing.expect(!isPointInside(.{ .x = 100, .y = 100, .on_curve = true }, outline.contours)); // After rectangle
+    try testing.expect(!isPointInside(.{ .x = 50, .y = 5, .on_curve = true }, outline.contours)); // Above rectangle
 
     std.debug.print("\nPoint-in-polygon test passed for rectangle\n", .{});
 }
@@ -92,6 +92,7 @@ test "simple rasterization - rectangle" {
             const point = font_types.Point{
                 .x = @as(f32, @floatFromInt(x)) / scale,
                 .y = @as(f32, @floatFromInt(y)) / scale,
+                .on_curve = true,
             };
 
             if (isPointInside(point, outline.contours)) {
@@ -125,36 +126,28 @@ test "winding rule - overlapping rectangles" {
     // Create two overlapping rectangles to test winding rule
     const points1 = try allocator.alloc(font_types.Point, 4);
     defer allocator.free(points1);
-    points1[0] = .{ .x = 10, .y = 10 };
-    points1[1] = .{ .x = 10, .y = 50 };
-    points1[2] = .{ .x = 50, .y = 50 };
-    points1[3] = .{ .x = 50, .y = 10 };
-
-    const on_curve1 = try allocator.alloc(bool, 4);
-    defer allocator.free(on_curve1);
-    @memset(on_curve1, true);
+    points1[0] = .{ .x = 10, .y = 10, .on_curve = true };
+    points1[1] = .{ .x = 10, .y = 50, .on_curve = true };
+    points1[2] = .{ .x = 50, .y = 50, .on_curve = true };
+    points1[3] = .{ .x = 50, .y = 10, .on_curve = true };
 
     const points2 = try allocator.alloc(font_types.Point, 4);
     defer allocator.free(points2);
-    points2[0] = .{ .x = 30, .y = 30 };
-    points2[1] = .{ .x = 30, .y = 70 };
-    points2[2] = .{ .x = 70, .y = 70 };
-    points2[3] = .{ .x = 70, .y = 30 };
-
-    const on_curve2 = try allocator.alloc(bool, 4);
-    defer allocator.free(on_curve2);
-    @memset(on_curve2, true);
+    points2[0] = .{ .x = 30, .y = 30, .on_curve = true };
+    points2[1] = .{ .x = 30, .y = 70, .on_curve = true };
+    points2[2] = .{ .x = 70, .y = 70, .on_curve = true };
+    points2[3] = .{ .x = 70, .y = 30, .on_curve = true };
 
     const contours = try allocator.alloc(font_types.Contour, 2);
     defer allocator.free(contours);
-    contours[0] = .{ .points = points1, .on_curve = on_curve1 };
-    contours[1] = .{ .points = points2, .on_curve = on_curve2 };
+    contours[0] = .{ .points = points1, .closed = true };
+    contours[1] = .{ .points = points2, .closed = true };
 
     // Test points in different regions
-    const inside_first_only = isPointInside(.{ .x = 20, .y = 20 }, contours);
-    const inside_overlap = isPointInside(.{ .x = 40, .y = 40 }, contours);
-    const inside_second_only = isPointInside(.{ .x = 60, .y = 60 }, contours);
-    const outside_both = isPointInside(.{ .x = 5, .y = 5 }, contours);
+    const inside_first_only = isPointInside(.{ .x = 20, .y = 20, .on_curve = true }, contours);
+    const inside_overlap = isPointInside(.{ .x = 40, .y = 40, .on_curve = true }, contours);
+    const inside_second_only = isPointInside(.{ .x = 60, .y = 60, .on_curve = true }, contours);
+    const outside_both = isPointInside(.{ .x = 5, .y = 5, .on_curve = true }, contours);
 
     std.debug.print("\nWinding rule test with overlapping rectangles:\n", .{});
     std.debug.print("  Point (20,20) inside first only: {}\n", .{inside_first_only});

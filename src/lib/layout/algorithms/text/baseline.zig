@@ -1,6 +1,6 @@
 const std = @import("std");
 const math = @import("../../../math/mod.zig");
-const font_metrics = @import("../../../font/font_metrics.zig");
+const font_metrics = @import("../../../font/core/metrics.zig");
 
 const Vec2 = math.Vec2;
 const FontMetrics = font_metrics.FontMetrics;

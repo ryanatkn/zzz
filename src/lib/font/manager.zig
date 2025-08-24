@@ -1,64 +1,95 @@
 const std = @import("std");
 const c = @import("../platform/sdl.zig");
 const colors = @import("../core/colors.zig");
-const ttf_parser = @import("ttf_parser.zig");
-const rasterizer_core = @import("rasterizer_core.zig");
-const font_atlas = @import("font_atlas.zig");
-const text_layout = @import("../text/layout.zig");
+const ttf_parser = @import("core/ttf_parser.zig");
 const font_config = @import("config.zig");
 const loggers = @import("../debug/loggers.zig");
+const strategy_interface = @import("strategies/interface.zig");
+const core_types = @import("core/types.zig");
 
+// Re-export strategy interfaces for backward compatibility
+pub const RenderingStrategy = strategy_interface.RenderingStrategy;
+pub const SelectionCriteria = strategy_interface.SelectionCriteria;
+pub const StrategyCapabilities = strategy_interface.StrategyCapabilities;
+
+// Re-export strategy components for direct access
+pub const vertex_strategy = @import("strategies/vertex/mod.zig");
+pub const bitmap_strategy = @import("strategies/bitmap/mod.zig");
+pub const sdf_strategy = @import("strategies/sdf/mod.zig");
+
+// Legacy re-exports for moved components (backward compatibility)
+pub const GlyphTriangulator = vertex_strategy.GlyphTriangulator;
+pub const GlyphVertexBuilder = vertex_strategy.GlyphVertexBuilder;
+pub const FontAtlas = bitmap_strategy.FontAtlas;
+pub const RasterizedGlyph = bitmap_strategy.RasterizedGlyph;
+
+/// Enhanced loaded font structure supporting both buffer and bitmap rendering
 pub const LoadedFont = struct {
     id: u32,
     path: []const u8,
     data: []u8,
     parser: *ttf_parser.TTFParser,
-    rasterizers: std.AutoHashMap(u32, *rasterizer_core.RasterizerCore),
+
+    // Bitmap strategy components (initialized on demand)
+    bitmap_atlas: ?*bitmap_strategy.FontAtlas,
+    bitmap_rasterizer: ?*bitmap_strategy.rasterizer.RasterizerCore,
 };
 
+/// Enhanced Font Manager - TTF parsing with bitmap strategy support
 pub const FontManager = struct {
     allocator: std.mem.Allocator,
-    gpu_device: *c.sdl.SDL_GPUDevice,
     settings: font_config.FontSettings,
     loaded_fonts: std.ArrayList(LoadedFont),
-    atlas: font_atlas.FontAtlas,
-    layout_engine: ?text_layout.TextLayoutEngine,
     next_font_id: u32,
+    gpu_device: ?*c.sdl.SDL_GPUDevice, // For bitmap atlas creation
 
-    pub fn init(allocator: std.mem.Allocator, gpu_device: *c.sdl.SDL_GPUDevice) !FontManager {
+    pub fn init(allocator: std.mem.Allocator) !FontManager {
         return FontManager{
             .allocator = allocator,
-            .gpu_device = gpu_device,
             .settings = font_config.FontSettings{},
             .loaded_fonts = std.ArrayList(LoadedFont).init(allocator),
-            .atlas = try font_atlas.FontAtlas.init(allocator, gpu_device, 1024),
-            .layout_engine = null,
             .next_font_id = 1,
+            .gpu_device = null,
         };
+    }
+
+    /// Set GPU device for bitmap atlas creation (optional)
+    pub fn setGPUDevice(self: *FontManager, device: *c.sdl.SDL_GPUDevice) void {
+        self.gpu_device = device;
     }
 
     pub fn deinit(self: *FontManager) void {
         for (self.loaded_fonts.items) |*font| {
-            var iter = font.rasterizers.iterator();
-            while (iter.next()) |entry| {
-                self.allocator.destroy(entry.value_ptr.*);
+            // Clean up bitmap strategy components if they exist
+            if (font.bitmap_atlas) |atlas| {
+                atlas.deinit();
+                self.allocator.destroy(atlas);
             }
-            font.rasterizers.deinit();
+            if (font.bitmap_rasterizer) |rasterizer| {
+                // RasterizerCore doesn't have a deinit method - just free the allocation
+                self.allocator.destroy(rasterizer);
+            }
+
             font.parser.deinit();
             self.allocator.destroy(font.parser);
             self.allocator.free(font.data);
         }
         self.loaded_fonts.deinit();
-        self.atlas.deinit();
     }
 
+    /// Load a font for buffer-based rendering (no rasterization, size parameter ignored)
     pub fn loadFont(self: *FontManager, category: font_config.FontCategory, size: f32) !u32 {
+        const font_log = loggers.getFontLog();
+        font_log.info("load_font", "Loading font for category: {} size: {d}", .{ category, size });
+
         const family_name = switch (category) {
             .mono => self.settings.mono_family,
             .sans => self.settings.sans_family,
             .serif_display => self.settings.serif_display_family,
             .serif_text => self.settings.serif_text_family,
         };
+
+        font_log.info("load_font", "Looking for font family: {s}", .{family_name});
 
         const weight = switch (category) {
             .mono => self.settings.mono_weight,
@@ -83,8 +114,8 @@ pub const FontManager = struct {
         }
 
         if (font_family == null) {
-            const font_log = loggers.getFontLog();
-            font_log.err("pure_font_manager", "Font family not found: {s}", .{family_name});
+            const error_log = loggers.getFontLog();
+            error_log.err("buffer_font_manager", "Font family not found: {s}", .{family_name});
             return error.FontFamilyNotFound;
         }
 
@@ -106,26 +137,17 @@ pub const FontManager = struct {
             return error.FontVariantNotFound;
         }
 
-        for (self.loaded_fonts.items) |*font| {
+        // Check if font is already loaded (no size-based variants needed)
+        for (self.loaded_fonts.items) |font| {
             if (std.mem.eql(u8, font.path, best_variant.?.path)) {
-                const size_key = @as(u32, @intFromFloat(size * 100));
-
-                if (font.rasterizers.get(size_key)) |_| {
-                    return font.id;
-                }
-
-                const rasterizer = try self.allocator.create(rasterizer_core.RasterizerCore);
-                rasterizer.* = rasterizer_core.RasterizerCore.init(self.allocator, font.parser, size, 96);
-                //rasterizer.setDebugMode(true);  // Enable debug mode - disabled for now
-                try font.rasterizers.put(size_key, rasterizer);
-
                 return font.id;
             }
         }
 
+        // Load new font file
         const file = std.fs.cwd().openFile(best_variant.?.path, .{}) catch |err| {
-            const font_log = loggers.getFontLog();
-            font_log.err("pure_font_manager", "Failed to open font file {s}: {}", .{ best_variant.?.path, err });
+            const file_log = loggers.getFontLog();
+            file_log.err("buffer_font_manager", "Failed to open font file {s}: {}", .{ best_variant.?.path, err });
             return error.FontLoadFailed;
         };
         defer file.close();
@@ -137,13 +159,6 @@ pub const FontManager = struct {
         const parser_ptr = try self.allocator.create(ttf_parser.TTFParser);
         parser_ptr.* = try ttf_parser.TTFParser.init(self.allocator, data);
 
-        var rasterizers = std.AutoHashMap(u32, *rasterizer_core.RasterizerCore).init(self.allocator);
-        const size_key = @as(u32, @intFromFloat(size * 100));
-        const rasterizer = try self.allocator.create(rasterizer_core.RasterizerCore);
-        rasterizer.* = rasterizer_core.RasterizerCore.init(self.allocator, parser_ptr, size, 96);
-        //rasterizer.setDebugMode(true);  // Enable debug mode - disabled for now
-        try rasterizers.put(size_key, rasterizer);
-
         const font_id = self.next_font_id;
         self.next_font_id += 1;
 
@@ -152,217 +167,167 @@ pub const FontManager = struct {
             .path = best_variant.?.path,
             .data = data,
             .parser = parser_ptr,
-            .rasterizers = rasterizers,
+            .bitmap_atlas = null,
+            .bitmap_rasterizer = null,
         });
 
-        const loaded_font = &self.loaded_fonts.items[self.loaded_fonts.items.len - 1];
-        const actual_rasterizer = loaded_font.rasterizers.get(size_key).?;
-
-        if (self.layout_engine == null) {
-            self.layout_engine = text_layout.TextLayoutEngine.init(self.allocator, &self.atlas, actual_rasterizer);
-        }
-
-        const font_log = loggers.getFontLog();
-        font_log.info("pure_font_manager", "Loaded font: {s} (id: {}, size: {d})", .{ best_variant.?.path, font_id, size });
+        const success_log = loggers.getFontLog();
+        success_log.info("buffer_font_manager", "Loaded font for buffer rendering: {s} (id: {})", .{ best_variant.?.path, font_id });
 
         return font_id;
     }
 
-    pub fn renderTextToTexture(
-        self: *FontManager,
-        text: []const u8,
-        category: font_config.FontCategory,
-        size: f32,
-        color: colors.Color,
-    ) !struct {
-        texture: *c.sdl.SDL_GPUTexture,
-        width: u32,
-        height: u32,
-    } {
-        const font_id = try self.loadFont(category, size);
+    /// Get font parser for direct access (buffer-based rendering)
+    pub fn getParser(self: *FontManager, font_id: u32) ?*ttf_parser.TTFParser {
+        for (self.loaded_fonts.items) |font| {
+            if (font.id == font_id) {
+                return font.parser;
+            }
+        }
+        return null;
+    }
 
-        var font_obj: ?*LoadedFont = null;
+    /// Basic glyph metrics structure for layout calculations
+    // Use the standard GlyphMetrics from core types
+    pub const GlyphMetrics = core_types.GlyphMetrics;
+
+    /// Get basic glyph metrics without rasterization (for layout calculations)
+    pub fn getBasicGlyphMetrics(self: *FontManager, font_id: u32, codepoint: u32) ?GlyphMetrics {
+        if (self.getParser(font_id)) |parser| {
+            const glyph_id = parser.getGlyphIndex(codepoint) catch return null;
+            const metrics = parser.getGlyphMetrics(glyph_id) catch return null;
+            return GlyphMetrics{
+                .advance_width = @floatFromInt(metrics.advance_width),
+                .left_side_bearing = @floatFromInt(metrics.left_side_bearing),
+            };
+        }
+        return null;
+    }
+
+    /// Get kerning adjustment between two characters
+    pub fn getKerning(self: *FontManager, font_id: u32, left_codepoint: u32, right_codepoint: u32, scale: f32) f32 {
+        if (self.getParser(font_id)) |parser| {
+            const left_glyph = parser.getGlyphIndex(left_codepoint) catch return 0.0;
+            const right_glyph = parser.getGlyphIndex(right_codepoint) catch return 0.0;
+            const kern_value = parser.getKerning(@intCast(left_glyph), @intCast(right_glyph));
+            return @as(f32, @floatFromInt(kern_value)) * scale;
+        }
+        return 0.0;
+    }
+
+    // Strategy Selection Methods
+
+    /// Select the optimal rendering strategy for given font size and text type
+    pub fn selectRenderingStrategy(self: *FontManager, font_size: f32, text_type: strategy_interface.SelectionCriteria.TextType) strategy_interface.RenderingStrategy {
+        _ = self; // FontManager doesn't affect strategy selection currently
+
+        const criteria = strategy_interface.SelectionCriteria{
+            .font_size = font_size,
+            .text_type = text_type,
+            .performance_priority = .balanced,
+            .effects_needed = false,
+        };
+
+        return strategy_interface.selectStrategy(criteria);
+    }
+
+    /// Select rendering strategy with custom criteria
+    pub fn selectRenderingStrategyWithCriteria(self: *FontManager, criteria: strategy_interface.SelectionCriteria) strategy_interface.RenderingStrategy {
+        _ = self;
+        return strategy_interface.selectStrategy(criteria);
+    }
+
+    /// Check if a strategy is suitable for given requirements
+    pub fn isStrategySuitable(self: *FontManager, strategy: strategy_interface.RenderingStrategy, font_size: f32, text_type: strategy_interface.SelectionCriteria.TextType) bool {
+        _ = self;
+
+        const criteria = strategy_interface.SelectionCriteria{
+            .font_size = font_size,
+            .text_type = text_type,
+        };
+
+        return strategy_interface.isStrategySuitable(strategy, criteria);
+    }
+
+    /// Get strategy capabilities
+    pub fn getStrategyCapabilities(self: *FontManager, strategy: strategy_interface.RenderingStrategy) strategy_interface.StrategyCapabilities {
+        _ = self;
+        return strategy_interface.getCapabilities(strategy);
+    }
+
+    /// Get fallback strategy chain
+    pub fn getFallbackStrategies(self: *FontManager, primary_strategy: strategy_interface.RenderingStrategy) []const strategy_interface.RenderingStrategy {
+        _ = self;
+        return strategy_interface.getFallbackChain(primary_strategy);
+    }
+
+    // Additional Methods for Text Integration
+
+    /// Get glyph advance width scaled to font size
+    pub fn getGlyphAdvance(self: *FontManager, font_id: u32, codepoint: u32, font_size: f32) !f32 {
+        if (self.getBasicGlyphMetrics(font_id, codepoint)) |metrics| {
+            // Get parser to calculate scale
+            if (self.getParser(font_id)) |parser| {
+                const units_per_em = if (parser.head) |head| @as(f32, @floatFromInt(head.units_per_em)) else 1000.0;
+                const scale = font_size / units_per_em;
+                return @as(f32, @floatFromInt(metrics.advance_width)) * scale;
+            }
+        }
+        return error.FontNotFound;
+    }
+
+    /// Get font metrics for the given font
+    pub fn getFontMetrics(self: *FontManager, font_id: u32) !struct {
+        ascender: i16,
+        descender: i16,
+        line_gap: i16,
+    } {
+        if (self.getParser(font_id)) |parser| {
+            if (parser.hhea) |hhea| {
+                return .{
+                    .ascender = hhea.ascender,
+                    .descender = hhea.descender,
+                    .line_gap = hhea.line_gap,
+                };
+            }
+        }
+        return error.FontNotFound;
+    }
+
+    /// Get or create bitmap atlas for the font
+    pub fn getBitmapAtlas(self: *FontManager, font_id: u32) !*bitmap_strategy.FontAtlas {
         for (self.loaded_fonts.items) |*font| {
             if (font.id == font_id) {
-                font_obj = font;
-                break;
-            }
-        }
-
-        if (font_obj == null) return error.FontNotFound;
-
-        const size_key = @as(u32, @intFromFloat(size * 100));
-        const rasterizer = font_obj.?.rasterizers.get(size_key) orelse return error.RasterizerNotFound;
-
-        if (self.layout_engine == null) {
-            self.layout_engine = text_layout.TextLayoutEngine.init(self.allocator, &self.atlas, rasterizer);
-        }
-
-        const layout_options = text_layout.LayoutOptions{
-            .alignment = .left,
-            .baseline = .alphabetic,
-        };
-
-        const layout = try self.layout_engine.?.layoutText(text, font_id, @intFromFloat(size), layout_options);
-        defer self.layout_engine.?.freeLayout(layout);
-
-        if (layout.lines.len == 0) {
-            return error.EmptyText;
-        }
-
-        const width = @as(u32, @intFromFloat(@ceil(layout.total_width)));
-        const height = @as(u32, @intFromFloat(@ceil(layout.total_height)));
-
-        if (width == 0 or height == 0) {
-            return error.EmptyLayout;
-        }
-
-        var bitmap = try self.allocator.alloc(u8, width * height * 4);
-        defer self.allocator.free(bitmap);
-        @memset(bitmap, 0);
-
-        for (layout.lines) |line| {
-            for (line.glyphs) |glyph| {
-                const glyph_info = try self.atlas.getOrRasterizeGlyph(rasterizer, glyph.codepoint, font_id, @intFromFloat(size));
-
-                if (glyph_info.width == 0 or glyph_info.height == 0) continue;
-
-                const glyph_x = @as(i32, @intFromFloat(@round(glyph.position.x)));
-                const glyph_y = @as(i32, @intFromFloat(@round(glyph.position.y)));
-
-                // Get the bitmap from the atlas cache instead of re-rasterizing
-                const cached_bitmap = self.atlas.getCachedBitmap(glyph_info) orelse {
-                    // Fallback: only rasterize if not in cache (shouldn't happen)
-                    const font_log = loggers.getFontLog();
-                    font_log.warn("pure_font_manager", "Glyph not in cache, falling back to rasterization for codepoint {}", .{glyph.codepoint});
-                    const rasterized = try rasterizer.rasterizeGlyph(glyph.codepoint, 0, 0);
-                    defer rasterizer.allocator.free(rasterized.bitmap);
-
-                    // Still use the rasterized data but log this shouldn't happen
-                    const height_u32 = @as(u32, @intFromFloat(@ceil(glyph_info.height)));
-                    const width_u32 = @as(u32, @intFromFloat(@ceil(glyph_info.width)));
-                    var py: u32 = 0;
-                    while (py < height_u32) : (py += 1) {
-                        var px: u32 = 0;
-                        while (px < width_u32) : (px += 1) {
-                            const dst_x = glyph_x + @as(i32, @intCast(px));
-                            const dst_y = glyph_y + @as(i32, @intCast(py));
-
-                            if (dst_x >= 0 and dst_x < width and dst_y >= 0 and dst_y < height) {
-                                const src_idx = py * width_u32 + px;
-                                const dst_idx = (@as(usize, @intCast(dst_y)) * width + @as(usize, @intCast(dst_x))) * 4;
-
-                                if (src_idx < rasterized.bitmap.len) {
-                                    const alpha = rasterized.bitmap[src_idx];
-                                    bitmap[dst_idx + 0] = color.r;
-                                    bitmap[dst_idx + 1] = color.g;
-                                    bitmap[dst_idx + 2] = color.b;
-                                    bitmap[dst_idx + 3] = alpha;
-                                }
-                            }
-                        }
-                    }
-                    continue;
-                };
-
-                // Use the cached bitmap directly
-                const height_u32_cached = @as(u32, @intFromFloat(@ceil(glyph_info.height)));
-                const width_u32_cached = @as(u32, @intFromFloat(@ceil(glyph_info.width)));
-                var py: u32 = 0;
-                while (py < height_u32_cached) : (py += 1) {
-                    var px: u32 = 0;
-                    while (px < width_u32_cached) : (px += 1) {
-                        const dst_x = glyph_x + @as(i32, @intCast(px));
-                        const dst_y = glyph_y + @as(i32, @intCast(py));
-
-                        if (dst_x >= 0 and dst_x < width and dst_y >= 0 and dst_y < height) {
-                            const src_idx = py * width_u32_cached + px;
-                            const dst_idx = (@as(usize, @intCast(dst_y)) * width + @as(usize, @intCast(dst_x))) * 4;
-
-                            if (src_idx < cached_bitmap.len) {
-                                const alpha = cached_bitmap[src_idx];
-                                bitmap[dst_idx + 0] = color.r;
-                                bitmap[dst_idx + 1] = color.g;
-                                bitmap[dst_idx + 2] = color.b;
-                                bitmap[dst_idx + 3] = alpha;
-                            }
-                        }
+                if (font.bitmap_atlas == null) {
+                    if (self.gpu_device) |device| {
+                        const atlas_ptr = try self.allocator.create(bitmap_strategy.FontAtlas);
+                        atlas_ptr.* = try bitmap_strategy.FontAtlas.init(self.allocator, device, 2048);
+                        font.bitmap_atlas = atlas_ptr;
+                    } else {
+                        return error.GPUDeviceNotSet;
                     }
                 }
+                return font.bitmap_atlas.?;
             }
         }
+        return error.FontNotFound;
+    }
 
-        const texture_info = c.sdl.SDL_GPUTextureCreateInfo{
-            .type = c.sdl.SDL_GPU_TEXTURETYPE_2D,
-            .format = c.sdl.SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
-            .usage = c.sdl.SDL_GPU_TEXTUREUSAGE_SAMPLER,
-            .width = width,
-            .height = height,
-            .layer_count_or_depth = 1,
-            .num_levels = 1,
-            .sample_count = c.sdl.SDL_GPU_SAMPLECOUNT_1,
-            .props = 0,
-        };
-
-        const texture = c.sdl.SDL_CreateGPUTexture(self.gpu_device, &texture_info) orelse {
-            return error.TextureCreationFailed;
-        };
-
-        const transfer_size = width * height * 4;
-        const transfer_buffer_info = c.sdl.SDL_GPUTransferBufferCreateInfo{
-            .usage = c.sdl.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-            .size = transfer_size,
-        };
-
-        const transfer_buffer = c.sdl.SDL_CreateGPUTransferBuffer(self.gpu_device, &transfer_buffer_info) orelse {
-            c.sdl.SDL_ReleaseGPUTexture(self.gpu_device, texture);
-            return error.TransferBufferCreationFailed;
-        };
-        defer c.sdl.SDL_ReleaseGPUTransferBuffer(self.gpu_device, transfer_buffer);
-
-        const mapped_ptr = c.sdl.SDL_MapGPUTransferBuffer(self.gpu_device, transfer_buffer, false) orelse {
-            c.sdl.SDL_ReleaseGPUTexture(self.gpu_device, texture);
-            return error.TransferBufferMapFailed;
-        };
-
-        @memcpy(@as([*]u8, @ptrCast(mapped_ptr))[0..transfer_size], bitmap);
-        c.sdl.SDL_UnmapGPUTransferBuffer(self.gpu_device, transfer_buffer);
-
-        const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(self.gpu_device) orelse {
-            c.sdl.SDL_ReleaseGPUTexture(self.gpu_device, texture);
-            return error.CommandBufferFailed;
-        };
-
-        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer);
-
-        const texture_transfer_info = c.sdl.SDL_GPUTextureTransferInfo{
-            .transfer_buffer = transfer_buffer,
-            .offset = 0,
-            .pixels_per_row = width,
-            .rows_per_layer = height,
-        };
-
-        const texture_region = c.sdl.SDL_GPUTextureRegion{
-            .texture = texture,
-            .mip_level = 0,
-            .layer = 0,
-            .x = 0,
-            .y = 0,
-            .z = 0,
-            .w = width,
-            .h = height,
-            .d = 1,
-        };
-
-        c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
-        c.sdl.SDL_EndGPUCopyPass(copy_pass);
-
-        _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
-
-        return .{
-            .texture = texture,
-            .width = width,
-            .height = height,
-        };
+    /// Get or create bitmap rasterizer for the font
+    pub fn getBitmapRasterizer(self: *FontManager, font_id: u32) !*bitmap_strategy.rasterizer.RasterizerCore {
+        for (self.loaded_fonts.items) |*font| {
+            if (font.id == font_id) {
+                if (font.bitmap_rasterizer == null) {
+                    const rasterizer_ptr = try self.allocator.create(bitmap_strategy.rasterizer.RasterizerCore);
+                    // RasterizerCore.init needs: allocator, parser, point_size, dpi
+                    const default_point_size = 16.0; // Default size for initialization
+                    const default_dpi = 96.0; // Standard DPI
+                    rasterizer_ptr.* = bitmap_strategy.rasterizer.RasterizerCore.init(self.allocator, font.parser, default_point_size, default_dpi);
+                    font.bitmap_rasterizer = rasterizer_ptr;
+                }
+                return font.bitmap_rasterizer.?;
+            }
+        }
+        return error.FontNotFound;
     }
 };

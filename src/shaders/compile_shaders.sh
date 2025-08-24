@@ -46,7 +46,13 @@ FAILED_SHADERS=()
 SUCCESS_COUNT=0
 TOTAL_COUNT=0
 
-for shader in triangle triangle_uniforms simple_circle debug_circle circle rectangle particle simple_rectangle text text_sdf test_compute layout_constraints layout_spring_physics; do
+# Discover all shader files in source directory
+for shader_file in source/*.hlsl; do
+    # Skip if no files match the pattern
+    [ ! -f "$shader_file" ] && continue
+    
+    # Extract shader name (filename without path and extension)
+    shader=$(basename "$shader_file" .hlsl)
     echo "Compiling $shader..."
     
     # Check if source file exists

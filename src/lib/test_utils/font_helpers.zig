@@ -1,5 +1,5 @@
 const std = @import("std");
-const font_types = @import("../font/font_types.zig");
+const font_types = @import("../font/core/types.zig");
 
 /// Shared test data generators for font testing
 /// Extracted from duplicated code in test files
@@ -8,31 +8,28 @@ pub fn createRectangleOutline(allocator: std.mem.Allocator, x: i32, y: i32, widt
     const points = try allocator.alloc(font_types.Point, 4);
 
     // Counter-clockwise winding
-    points[0] = .{ .x = @floatFromInt(x), .y = @floatFromInt(y) };
-    points[1] = .{ .x = @floatFromInt(x), .y = @floatFromInt(y + height) };
-    points[2] = .{ .x = @floatFromInt(x + width), .y = @floatFromInt(y + height) };
-    points[3] = .{ .x = @floatFromInt(x + width), .y = @floatFromInt(y) };
-
-    const on_curve = try allocator.alloc(bool, 4);
-    @memset(on_curve, true);
+    points[0] = .{ .x = @floatFromInt(x), .y = @floatFromInt(y), .on_curve = true };
+    points[1] = .{ .x = @floatFromInt(x), .y = @floatFromInt(y + height), .on_curve = true };
+    points[2] = .{ .x = @floatFromInt(x + width), .y = @floatFromInt(y + height), .on_curve = true };
+    points[3] = .{ .x = @floatFromInt(x + width), .y = @floatFromInt(y), .on_curve = true };
 
     const contours = try allocator.alloc(font_types.Contour, 1);
     contours[0] = .{
         .points = points,
-        .on_curve = on_curve,
+        .closed = true,
     };
 
     return font_types.GlyphOutline{
         .contours = contours,
         .bounds = .{
-            .x_min = @intCast(x),
-            .y_min = @intCast(y),
-            .x_max = @intCast(x + width),
-            .y_max = @intCast(y + height),
+            .x_min = @floatFromInt(x),
+            .y_min = @floatFromInt(y),
+            .x_max = @floatFromInt(x + width),
+            .y_max = @floatFromInt(y + height),
         },
         .metrics = .{
-            .advance_width = @intCast(width + 10),
-            .left_side_bearing = @intCast(x),
+            .advance_width = @floatFromInt(width + 10),
+            .left_side_bearing = @floatFromInt(x),
         },
     };
 }

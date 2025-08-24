@@ -20,15 +20,17 @@ struct VertexOutput {
 
 // Text rendering uniforms (vertex shader only - colors passed through VertexOutput)
 cbuffer TextUniforms : register(b0, space1) {
+    float2 uv_min;           // Atlas UV coordinates - top-left
+    float2 uv_max;           // Atlas UV coordinates - bottom-right
     float2 screen_size;      // Screen dimensions for NDC conversion
-    float2 text_position;    // Text position in screen coordinates
-    float2 text_size;        // Text size in pixels
+    float2 glyph_position;   // Glyph position in screen coordinates (matches Zig TextUniforms)
+    float2 glyph_size;       // Glyph size in pixels (matches Zig TextUniforms)
     float text_color_r;      // Color components split to avoid
     float text_color_g;      // HLSL array packing issues
     float text_color_b;      
     float text_color_a;      // Alpha channel
-    float time;              // Animation time
-    float _padding0, _padding1, _padding2; // Pad to 16-byte alignment
+    float2 _padding;         // Padding for 64-byte alignment
+    // Total: 64 bytes (16-byte aligned, proper HLSL cbuffer size)
 };
 
 // Generate textured quad vertices procedurally
@@ -54,7 +56,7 @@ VertexOutput vs_main(VertexInput input) {
     }
     
     // Calculate screen position: position + corner * size
-    float2 screen_pos = text_position + quad_corner * text_size;
+    float2 screen_pos = glyph_position + quad_corner * glyph_size;
     
     // Convert to NDC coordinates
     float2 ndc_pos = float2(
@@ -63,7 +65,10 @@ VertexOutput vs_main(VertexInput input) {
     );
     
     output.position = float4(ndc_pos, 0.0, 1.0);
-    output.texcoord = tex_corner; // Use texture coordinates 0-1 for full texture
+    
+    // Interpolate texture coordinates between uv_min and uv_max based on quad corner
+    output.texcoord = uv_min + tex_corner * (uv_max - uv_min);
+    
     output.color = float4(text_color_r, text_color_g, text_color_b, text_color_a);
     
     return output;
@@ -73,7 +78,7 @@ float4 ps_main(VertexOutput input) : SV_Target {
     // Sample the font atlas texture
     float4 atlas_sample = font_atlas.Sample(atlas_sampler, input.texcoord);
     
-    // Individual text textures use R8G8B8A8_UNORM format with coverage in alpha channel
+    // STANDARD: Use alpha channel for coverage (industry standard approach)
     float coverage = atlas_sample.a;
     
     // Apply text color with coverage

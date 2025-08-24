@@ -1,6 +1,8 @@
 const std = @import("std");
-const rasterizer_core = @import("rasterizer_core.zig");
+// const rasterizer_core = @import("rasterizer_core.zig"); // Removed - using vertex approach
 const coordinate_transform = @import("coordinate_transform.zig");
+const glyph_triangulator = @import("strategies/vertex/triangulator.zig");
+const glyph_extractor = @import("core/glyph_extractor.zig");
 
 const debug_config = @import("../debug/config.zig");
 const ENABLE_DEBUG_OUTPUT = debug_config.font_test_debug.enable_file_output;
@@ -22,10 +24,11 @@ pub const FontTestVisualization = struct {
         };
     }
 
-    /// Create a composite bitmap showing all characters aligned on a common baseline
-    pub fn createCompositeBitmap(
+    /// Create a composite visualization showing all character triangulations
+    pub fn createCompositeVisualization(
         self: *FontTestVisualization,
-        rasterizer: *rasterizer_core.RasterizerCore,
+        extractor: *glyph_extractor.GlyphExtractor,
+        triangulator: *glyph_triangulator.GlyphTriangulator,
         test_chars: []const u8,
         output_path: []const u8,
     ) !void {

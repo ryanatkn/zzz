@@ -8,6 +8,8 @@
 /// - Geometric shapes (Rectangle, Circle, Line, Bounds)
 /// - Distance calculations and transformations
 /// - Coordinate system conversions
+/// - Bézier curve mathematics and tessellation
+/// - Signed distance field generation and utilities
 pub const Vec2 = @import("vec2.zig").Vec2;
 pub const scalar = @import("scalar.zig");
 pub const shapes = @import("shapes.zig");
@@ -17,6 +19,8 @@ pub const color = @import("color.zig");
 pub const waves = @import("waves.zig");
 pub const geometry = @import("geometry.zig");
 pub const smoothing = @import("smoothing.zig");
+pub const curves = @import("curves.zig");
+pub const distance_fields = @import("distance_fields.zig");
 
 // Re-export scalar utilities
 pub const lerp = scalar.lerp;

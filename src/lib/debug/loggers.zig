@@ -117,3 +117,9 @@ pub fn getUILogOptional() ?*UILogger {
 pub fn getGameLogOptional() ?*GameLogger {
     return if (game_log) |*log| log else null;
 }
+
+/// Test-safe helper that returns null if font logger not initialized
+/// Use this in tests to avoid initialization requirements
+pub fn getFontLogOptional() ?*FontLogger {
+    return if (font_log) |*log| log else null;
+}

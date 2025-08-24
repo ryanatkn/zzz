@@ -12,6 +12,7 @@ const platform = @import("../lib/platform/mod.zig");
 
 // Rendering capabilities
 const simple_gpu_renderer = @import("../lib/rendering/core/gpu.zig");
+const batching = @import("../lib/rendering/primitives/batching.zig");
 
 // Font capabilities
 const font_manager = @import("../lib/font/manager.zig");
@@ -28,7 +29,6 @@ const GameParticleSystem = @import("../lib/particles/game_particles.zig").GamePa
 const reactive_text_cache = @import("../lib/reactive/text_cache.zig");
 
 // UI capabilities
-const geometric_text = @import("../lib/ui/geometric_text.zig");
 const animated_borders = @import("../lib/ui/animated_borders.zig");
 
 // Debug capabilities
@@ -46,14 +46,8 @@ const rendering = @import("rendering/mod.zig");
 
 const Vec2 = math.Vec2;
 
-// Rectangle data for batched rendering - natural foundation for Phase 2 instancing
-const RectData = struct {
-    pos: Vec2,
-    size: Vec2,
-    color: core_colors.Color,
-};
-
-// TODO: Convert RectData to GeometryInstance for GPU instanced rendering
+// Use generic batching utilities from lib/rendering
+const RectData = batching.RectData;
 const MAX_BATCHED_RECTS = constants.MAX_TERRAIN; // Terrain only
 const Color = core_colors.Color;
 const GPURenderer = simple_gpu_renderer.GPURenderer;
@@ -78,10 +72,9 @@ pub const GameRenderer = struct {
             .allocator = allocator,
         };
 
-        // Initialize Pure Zig font manager
-        loggers.getGameLog().info("init_font", "Initializing Pure Zig font backend", .{});
-        renderer.font_manager = try allocator.create(font_manager.FontManager);
-        renderer.font_manager.* = try font_manager.FontManager.init(allocator, renderer.gpu.device);
+        // Use FontManager from GPURenderer (already has GPU device set)
+        loggers.getGameLog().info("init_font", "Using FontManager from GPURenderer (GPU device already set)", .{});
+        renderer.font_manager = renderer.gpu.font_manager;
 
         loggers.getGameLog().info("init_complete", "GameRenderer initialized with Pure Zig font backend", .{});
 
@@ -89,8 +82,7 @@ pub const GameRenderer = struct {
     }
 
     pub fn deinit(self: *GameRenderer) void {
-        self.font_manager.deinit();
-        self.allocator.destroy(self.font_manager);
+        // Font manager is owned by GPURenderer, so don't deinit it here
         self.gpu.deinit();
     }
 
@@ -232,22 +224,37 @@ pub const GameRenderer = struct {
         }
     }
 
-    // FPS rendering - delegated to UIOverlayRenderer
-    pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
-        // Delegate to the extracted UIOverlayRenderer
-        rendering.UIOverlayRenderer.drawFPS(&self.gpu, cmd_buffer, render_pass, fps);
+    /// Prepare FPS text texture BEFORE render pass (avoids copy pass conflicts)
+    pub fn prepareFPS(self: *GameRenderer, fps: u32) void {
+        rendering.UIOverlayRenderer.prepareFPS(&self.gpu, fps, self.font_manager);
     }
 
-    // Debug info rendering - delegated to UIOverlayRenderer
-    pub fn drawDebugInfo(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game: *const HexGame) void {
-        // Delegate to the extracted UIOverlayRenderer
-        rendering.UIOverlayRenderer.drawDebugInfo(&self.gpu, cmd_buffer, render_pass, game);
+    /// Prepare debug info text texture BEFORE render pass
+    pub fn prepareDebugInfo(self: *GameRenderer, game: *const HexGame) void {
+        rendering.UIOverlayRenderer.prepareDebugInfo(&self.gpu, game, self.font_manager);
     }
 
-    // AI mode rendering - delegated to UIOverlayRenderer
-    pub fn drawAIMode(self: *GameRenderer, ai_enabled: bool) void {
-        // Delegate to the extracted UIOverlayRenderer
-        rendering.UIOverlayRenderer.drawAIMode(&self.gpu, ai_enabled);
+    /// Prepare AI mode text texture BEFORE render pass
+    pub fn prepareAIMode(self: *GameRenderer, ai_enabled: bool) void {
+        rendering.UIOverlayRenderer.prepareAIMode(&self.gpu, ai_enabled, self.font_manager);
+    }
+
+    // FPS rendering - delegated to UIOverlayRenderer (textures already prepared)
+    pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        // Textures already prepared in prepareFPS
+        rendering.UIOverlayRenderer.drawFPS(&self.gpu, cmd_buffer, render_pass);
+    }
+
+    // Debug info rendering - delegated to UIOverlayRenderer (textures already prepared)
+    pub fn drawDebugInfo(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        // Textures already prepared in prepareDebugInfo
+        rendering.UIOverlayRenderer.drawDebugInfo(&self.gpu, cmd_buffer, render_pass);
+    }
+
+    // AI mode rendering - delegated to UIOverlayRenderer (textures already prepared)
+    pub fn drawAIMode(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+        // Textures already prepared in prepareAIMode
+        rendering.UIOverlayRenderer.drawAIMode(&self.gpu, cmd_buffer, render_pass);
     }
 
     /// Draw the spellbar at the bottom center of the screen

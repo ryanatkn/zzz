@@ -7,7 +7,7 @@ const component = @import("component.zig");
 const styles = @import("styles/mod.zig");
 const text_baseline = @import("../layout/text_baseline.zig");
 const box_model = @import("../layout/box_model.zig");
-const font_metrics = @import("../font/font_metrics.zig");
+const font_metrics = @import("../font/core/metrics.zig");
 
 const Vec2 = math.Vec2;
 const Rectangle = math.Rectangle;

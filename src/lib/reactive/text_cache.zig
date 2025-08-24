@@ -2,6 +2,7 @@ const std = @import("std");
 const signal = @import("signal.zig");
 const derived = @import("derived.zig");
 const effect = @import("effect.zig");
+const hash = @import("../core/hash.zig");
 
 /// Reactive text cache to avoid re-rendering identical text content
 /// Caches rendered text textures and only re-renders when content changes
@@ -76,9 +77,9 @@ pub const ReactiveTextCache = struct {
 
     /// Check if text content is cached and valid
     pub fn isCached(self: *Self, text: []const u8) bool {
-        const hash = self.hashText(text);
+        const text_hash = self.hashText(text);
 
-        if (self.cache.get(hash)) |cached| {
+        if (self.cache.get(text_hash)) |cached| {
             if (cached.is_valid) {
                 // Cache hit - update statistics
                 const hits = self.hit_count.peek() + 1;
@@ -87,7 +88,7 @@ pub const ReactiveTextCache = struct {
                 // Update last used time
                 var updated_cache = cached;
                 updated_cache.last_used = @as(u64, @intCast(std.time.milliTimestamp()));
-                self.cache.put(hash, updated_cache) catch {}; // Best effort
+                self.cache.put(text_hash, updated_cache) catch {}; // Best effort
 
                 return true;
             }
@@ -102,17 +103,17 @@ pub const ReactiveTextCache = struct {
 
     /// Cache text content with its rendered dimensions
     pub fn cacheText(self: *Self, text: []const u8, width: u32, height: u32) !void {
-        const hash = self.hashText(text);
+        const text_hash = self.hashText(text);
 
         const cached = CachedText{
-            .content_hash = hash,
+            .content_hash = text_hash,
             .last_used = @as(u64, @intCast(std.time.milliTimestamp())),
             .texture_width = width,
             .texture_height = height,
             .is_valid = true,
         };
 
-        try self.cache.put(hash, cached);
+        try self.cache.put(text_hash, cached);
 
         // Update cache size signal
         self.cache_size.set(self.cache.count());
@@ -120,9 +121,9 @@ pub const ReactiveTextCache = struct {
 
     /// Get cached text dimensions if available
     pub fn getCachedDimensions(self: *Self, text: []const u8) ?struct { width: u32, height: u32 } {
-        const hash = self.hashText(text);
+        const text_hash = self.hashText(text);
 
-        if (self.cache.get(hash)) |cached| {
+        if (self.cache.get(text_hash)) |cached| {
             if (cached.is_valid) {
                 return .{
                     .width = cached.texture_width,
@@ -136,8 +137,8 @@ pub const ReactiveTextCache = struct {
 
     /// Invalidate cache entry (call when text changes)
     pub fn invalidateText(self: *Self, text: []const u8) void {
-        const hash = self.hashText(text);
-        _ = self.cache.remove(hash);
+        const text_hash = self.hashText(text);
+        _ = self.cache.remove(text_hash);
         self.cache_size.set(self.cache.count());
     }
 
@@ -178,8 +179,8 @@ pub const ReactiveTextCache = struct {
             }
         }
 
-        for (to_remove.items) |hash| {
-            _ = self.cache.remove(hash);
+        for (to_remove.items) |item_hash| {
+            _ = self.cache.remove(item_hash);
         }
 
         if (to_remove.items.len > 0) {
@@ -189,10 +190,7 @@ pub const ReactiveTextCache = struct {
 
     fn hashText(self: *Self, text: []const u8) u64 {
         _ = self;
-        // Simple hash function for text content
-        var hasher = std.hash.Fnv1a_64.init();
-        hasher.update(text);
-        return hasher.final();
+        return hash.hashText(text);
     }
 
     pub fn deinit(self: *Self) void {

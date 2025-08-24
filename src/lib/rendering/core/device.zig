@@ -32,7 +32,7 @@ pub fn createDevice(window: *c.sdl.SDL_Window) DeviceCreationError!*c.sdl.SDL_GP
 
         device = c.sdl.SDL_CreateGPUDevice(
             c.sdl.SDL_GPU_SHADERFORMAT_SPIRV | c.sdl.SDL_GPU_SHADERFORMAT_DXIL,
-            true, // Enable debug mode for better error reporting
+            false, // CRITICAL FIX: Disable debug mode to avoid device->debug_mode crash
             backend_name,
         );
 

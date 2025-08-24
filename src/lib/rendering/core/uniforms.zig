@@ -64,5 +64,28 @@ pub const RectInstance = extern struct {
     color: [4]f32, // r, g, b, a
 };
 
+// Text uniform buffer for buffer-based text rendering (individual glyph)
+pub const TextUniforms = extern struct {
+    uv_min: [2]f32, // 8 bytes (atlas UV coordinates - top-left)
+    uv_max: [2]f32, // 8 bytes (atlas UV coordinates - bottom-right)
+    screen_size: [2]f32, // 8 bytes
+    glyph_position: [2]f32, // 8 bytes (screen position)
+    glyph_size: [2]f32, // 8 bytes (glyph size in pixels)
+    text_color_r: f32, // 4 bytes
+    text_color_g: f32, // 4 bytes
+    text_color_b: f32, // 4 bytes
+    text_color_a: f32, // 4 bytes
+    _padding: [2]f32, // 8 bytes padding for 64-byte alignment
+    // Total: 64 bytes (16-byte aligned, proper HLSL cbuffer size)
+};
+
+// Instance data for text glyph batching
+pub const TextInstance = extern struct {
+    screen_pos: [2]f32, // Screen position in pixels
+    size: [2]f32, // Glyph size in pixels
+    color: [4]f32, // r, g, b, a
+    coverage_params: [4]f32, // Coverage sampling parameters (future use)
+};
+
 // Maximum instances per batch
 pub const MAX_INSTANCES_PER_BATCH = 1024;

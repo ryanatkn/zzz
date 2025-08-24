@@ -1,7 +1,11 @@
 const std = @import("std");
-const FontMetrics = @import("../font_metrics.zig").FontMetrics;
-const GlyphOutline = @import("../glyph_extractor.zig").GlyphOutline;
-const RasterizedGlyph = @import("../rasterizer_core.zig").RasterizedGlyph;
+const font_metrics = @import("../core/metrics.zig");
+const font_types = @import("../core/types.zig");
+const bitmap_strategy = @import("../strategies/bitmap/mod.zig");
+
+const FontMetrics = font_metrics.FontMetrics;
+const GlyphOutline = font_types.GlyphOutline;
+const RasterizedGlyph = bitmap_strategy.RasterizedGlyph;
 
 pub const TestGlyph = struct {
     char: u8,

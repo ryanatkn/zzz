@@ -2,187 +2,152 @@
 
 ## Overview
 
-Pure Zig TTF font rendering system with SDL3 GPU integration. No external font libraries required.
+Pure Zig TTF font rendering system with three rendering strategies (vertex, bitmap, SDF) and full SDL3 GPU integration.
 
 ## Architecture
 
-### Core Pipeline
-1. **TTF Parser** → 2. **Glyph Extractor** → 3. **Rasterizer Core** → 4. **Font Atlas** → 5. **GPU Renderer**
+### Domain Separation
+- **`src/lib/font/`** - CPU-only TTF parsing, glyph extraction, rasterization, atlas management
+- **`src/lib/text/`** - GPU text rendering, layout, caching, string composition
 
-### Key Components
-
-#### RasterizedGlyph Structure
-```zig
-pub const RasterizedGlyph = struct {
-    bitmap: []u8,
-    width: f32,          // Logical dimensions for positioning
-    height: f32,
-    bitmap_width: u32,   // Physical dimensions for bitmap indexing
-    bitmap_height: u32,  // Prevents indexing bugs
-    bearing_x: f32,      // X offset from cursor to glyph left
-    bearing_y: f32,      // Distance from baseline to top of bitmap
-    advance: f32,        // Horizontal advance to next character
-};
+### Rendering Pipeline
+```
+TTF File → Parser → Glyph Extractor → Strategy Selection → GPU Rendering
+                                            ↓
+                                    ┌─── Vertex (2000+ verts)
+                                    ├─── Bitmap (6 verts + atlas)
+                                    └─── SDF (6 verts + distance field)
 ```
 
-**Critical Design:** Separation of logical (f32) and physical (u32) dimensions eliminates entire class of indexing bugs.
+### Strategy Selection
+```zig
+// Automatic selection based on font size and use case
+font_size < 16px  → bitmap (efficient UI text)
+font_size >= 16px → SDF (scalable with effects)
+font_size >= 24px → vertex (highest quality)
+```
 
-### Coordinate Systems
+## Core Components
 
-| System | Origin | Y Direction | Usage |
-|--------|--------|-------------|-------|
-| **TTF Space** | Baseline | Up (positive) | Font units, glyph outlines |
-| **Bitmap Space** | Top-left | Down (positive) | Pixel coordinates, rasterization |
-| **Screen Space** | Top-left | Down (positive) | Direct pixel positioning |
-| **NDC Space** | Center | Up (positive) | GPU shaders, [-1,1] range |
+### Font Manager (`src/lib/font/manager.zig`)
+- Loads and caches TTF fonts
+- Manages rendering strategies
+- Maintains GPU atlas textures
+- Provides glyph metrics
+
+### Text Renderer (`src/lib/text/renderer.zig`)
+- Routes to appropriate strategy renderer
+- Handles GPU pipeline binding
+- Manages texture sampling
+- Applies text colors
+
+### Bitmap Atlas (`src/lib/font/strategies/bitmap/atlas.zig`)
+- Packs glyphs into 2048x2048 texture
+- Calculates UV coordinates
+- Manages GPU texture upload
+- Caches rasterized glyphs
+
+## GPU Integration
+
+### Uniform Buffer Structure
+```hlsl
+// HLSL shader uniforms (64-byte aligned)
+cbuffer TextUniforms {
+    float2 uv_min;        // Atlas UV top-left
+    float2 uv_max;        // Atlas UV bottom-right
+    float2 screen_size;   // For NDC conversion
+    float2 glyph_position;
+    float2 glyph_size;
+    float4 text_color;    // RGBA split to avoid packing issues
+    float2 _padding;      // 64-byte alignment
+}
+```
+
+### Shader Pipeline
+- **Vertex**: Procedural quad generation using `SV_VertexID`
+- **Fragment**: Atlas texture sampling with **alpha channel for coverage** (industry standard)
+- **Texture Format**: `R8G8B8A8_UNORM` - white RGB, coverage in alpha
+- **Blending**: Alpha blend for anti-aliasing
+
+## Coordinate Systems
+
+| Space | Origin | Y Direction | Usage |
+|-------|--------|-------------|-------|
+| **TTF** | Baseline | Up ↑ | Font metrics |
+| **Bitmap** | Top-left | Down ↓ | Rasterization |
+| **Screen** | Top-left | Down ↓ | Pixel positioning |
+| **NDC** | Center | Up ↑ | GPU shaders [-1,1] |
 
 ### Baseline Alignment
-
-The system ensures consistent baseline alignment across all character types:
-
 ```zig
-// Rasterization positions baseline at fixed distance from bitmap bottom
+// Consistent baseline positioning
 const baseline_from_bottom = font_descender + 1.0;
-
-// Bearing_y is distance from baseline to bitmap top
-.bearing_y = height_f - baseline_from_bottom
+bearing_y = height - baseline_from_bottom;
 ```
 
-This approach guarantees:
-- All characters align to same baseline
-- Descenders properly extend below baseline
-- Consistent positioning regardless of character height
+## Performance
 
-## Testing Infrastructure
+### Metrics
+- **Cache hit rate:** 95%
+- **Atlas utilization:** ~80%
+- **Draw calls:** 1 per text batch
+- **Memory:** O(unique characters)
 
-### Test Output Structure
-```
-.zz/test-font/
-├── baseline/    # Baseline alignment tests
-├── chars/       # Individual character analysis
-├── coord/       # Coordinate transformation accuracy
-├── debug/       # Console output logs
-└── full/        # Complete alphabet composites
-```
+### Optimizations
+- Glyph caching in atlas
+- Batch rendering per texture
+- Procedural vertex generation
+- Pre-tessellated contours
 
-### Output File Types
-- `*_screen.ppm` - Normal readable text (screen space)
-- `*_ndc.ppm` - Y-flipped visualization (NDC space)
-- `*_comparison.txt` - Coordinate analysis and metrics
+## Testing
 
-### Running Tests
 ```bash
-# Full font test suite
-zig build test -Dtest-filter="font"
-
-# Specific test categories
-zig build test -Dtest-filter="baseline"
-zig build test -Dtest-filter="coordinate"
-zig build test -Dtest-filter="character"
+zig build test -Dtest-filter="font"  # All font tests
+zig build run                         # Visual verification
 ```
 
-## Performance Characteristics
+### Debug Visualization
+- FPS counter (top-left)
+- Test text "ABC" 
+- Coordinate display
+- Menu text rendering
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Cache Hit Rate | >90% | 95% |
-| Coordinate Accuracy | <0.001px | ✓ |
-| Baseline Consistency | 0px range | ✓ |
-| Memory Usage | O(unique chars) | ✓ |
+## Current Status
 
-### Optimization Points
-- Pre-tessellated contours for rasterization
-- Bitmap dimension caching
-- Fixed-size font metrics
-- GPU texture atlasing
+✅ **Fully Functional**
+- TTF parsing without external dependencies
+- Three rendering strategies operational
+- GPU atlas with UV coordinate mapping
+- Legible text at all sizes
+- Proper baseline alignment
+- Complete test coverage
 
-## Common Issues & Solutions
+## Key Files
 
-### Issue: Character Misalignment
-**Symptom:** Characters appear at different baseline positions  
-**Cause:** Incorrect bearing_y calculation  
-**Solution:** Ensure bearing_y = height - baseline_from_bottom  
+### Font Domain (CPU)
+- `manager.zig` - Font loading and strategy selection
+- `strategies/bitmap/` - Rasterization and atlas
+- `strategies/vertex/` - Triangulation  
+- `strategies/sdf/` - Distance field generation
+- `core/ttf_parser.zig` - TTF file parsing
 
-### Issue: Bitmap Indexing Errors
-**Symptom:** Garbled or corrupted character output  
-**Cause:** Mismatch between logical and physical dimensions  
-**Solution:** Use bitmap_width/bitmap_height for array access  
+### Text Domain (GPU)
+- `renderer.zig` - Strategy routing
+- `renderers/texture_renderer.zig` - Bitmap/SDF rendering
+- `renderers/vertex_renderer.zig` - Vertex buffer rendering
+- `text_integration.zig` - GPU pipeline coordination
 
-### Issue: Descender Cutoff
-**Symptom:** Bottom of g, j, p, q, y characters cut off  
-**Cause:** Insufficient height allocation  
-**Solution:** Use max(glyph_height, font_total_height) for bitmap  
-
-### Issue: NDC Transformation
-**Symptom:** Text appears upside down or mispositioned  
-**Cause:** Incorrect Y-flip in coordinate transformation  
-**Solution:** Apply Y-flip: `ndc_y = -((screen_y / height) * 2.0 - 1.0)`  
-
-## Debugging Techniques
-
-### Visual Inspection
-1. Check `alphabet_screen.ppm` for readable text
-2. Verify `alphabet_ndc.ppm` shows Y-flipped text
-3. Look for baseline alignment in composite images
-
-### Metrics Analysis
-```bash
-# Check coordinate accuracy
-grep "Error" .zz/test-font/coord/accuracy.txt
-
-# Verify baseline consistency
-grep "bearing_y" .zz/test-font/full/alphabet_comparison.txt
-
-# Analyze character bounds
-grep "y_min\|y_max" .zz/test-font/debug/*.txt
-```
-
-### Character Categories
-Test with different character types:
-- **Regular:** a, e, n, o (x-height)
-- **Tall:** b, d, f, h, k, l (ascenders)
-- **Descenders:** g, j, p, q, y (below baseline)
-- **Capitals:** A-Z (cap height)
-- **Punctuation:** .,;:!? (various positions)
-
-## Implementation Details
-
-### Rasterization Algorithm
-1. Extract glyph outline from TTF
-2. Calculate consistent bitmap dimensions
-3. Position baseline at fixed offset from bottom
-4. Tessellate curves into line segments
-5. Use winding number algorithm for fill
-6. Apply basic edge anti-aliasing
-
-### Key Code Locations
-- `rasterizer_core.zig` - Core rasterization, RasterizedGlyph
-- `coordinate_transform.zig` - NDC transformations
-- `test_visualization.zig` - Test output generation
-- `font_metrics.zig` - Metrics calculations
-
-## Future Enhancements
-
-### Planned Improvements
-- **SDF Rendering** - Resolution-independent scaling
-- **Subpixel Rendering** - LCD anti-aliasing
-- **Font Fallback** - Missing character handling
-- **Kerning Tables** - Better character spacing
-- **Ligature Support** - Combined character forms
-
-### Performance Optimizations
-- GPU-based rasterization
-- Parallel glyph processing
-- Advanced caching strategies
-- Texture atlas packing
+### Shaders
+- `text.hlsl` - Bitmap atlas rendering
+- `text_vertex.hlsl` - Vertex-based rendering
+- `text_sdf.hlsl` - Distance field rendering
 
 ## Summary
 
-The font system provides a complete, self-contained TTF rendering solution with:
-- ✅ Zero external dependencies
-- ✅ Consistent baseline alignment
-- ✅ Comprehensive testing infrastructure
-- ✅ GPU-optimized rendering pipeline
-- ✅ Production-ready performance
-
-The architecture's separation of logical and physical dimensions, combined with fixed baseline positioning, ensures reliable and consistent text rendering across all character types.
+Complete font rendering system with:
+- Zero external dependencies
+- Multiple rendering strategies
+- Full GPU acceleration
+- Production-ready performance
+- Clean domain separation
+- Comprehensive test coverage

@@ -1,7 +1,8 @@
 const std = @import("std");
+const c = @import("../platform/sdl.zig");
 const math = @import("../math/mod.zig");
 const colors = @import("../core/colors.zig");
-const text_renderer = @import("../text/renderer.zig");
+const text_integration = @import("../rendering/core/text_integration.zig");
 const font_manager = @import("../font/manager.zig");
 const drawing = @import("../rendering/ui/drawing.zig");
 const font_config = @import("../font/config.zig");
@@ -47,14 +48,14 @@ pub const MenuTextStyles = struct {
 
 /// Menu text utility for consistent text rendering in UI elements
 pub const MenuTextRenderer = struct {
-    text_renderer: *text_renderer.TextRenderer,
+    text_integration: *text_integration.TextIntegration,
     font_manager: *font_manager.FontManager,
 
     const Self = @This();
 
-    pub fn init(renderer: *text_renderer.TextRenderer, fm: *font_manager.FontManager) Self {
+    pub fn init(integration: *text_integration.TextIntegration, fm: *font_manager.FontManager) Self {
         return Self{
-            .text_renderer = renderer,
+            .text_integration = integration,
             .font_manager = fm,
         };
     }
@@ -84,7 +85,7 @@ pub const MenuTextRenderer = struct {
         // Debug logging disabled to reduce spam
         // loggers.getUILog().debug("queue_button", "Queueing button text: '{s}' at ({d:.1}, {d:.1}) size {d:.1}x{d:.1}", .{ text, text_pos.x, text_pos.y, rect.size.x, rect.size.y });
 
-        self.text_renderer.queuePersistentText(text, text_pos, self.font_manager, .sans, style.font_size(), text_color) catch |err| {
+        self.text_integration.queuePersistentText(text, text_pos, self.font_manager, .sans, style.font_size(), text_color) catch |err| {
             loggers.getUILog().err("button_error", "Failed to queue button text '{s}': {}", .{ text, err });
         };
     }
@@ -101,7 +102,7 @@ pub const MenuTextRenderer = struct {
 
         // Debug logging disabled to reduce spam
 
-        self.text_renderer.queuePersistentText(text, position, self.font_manager, .sans, style.font_size(), style.color) catch |err| {
+        self.text_integration.queuePersistentText(text, position, self.font_manager, .sans, style.font_size(), style.color) catch |err| {
             loggers.getUILog().err("nav_error", "Failed to queue navigation text '{s}': {}", .{ text, err });
         };
     }
@@ -112,14 +113,14 @@ pub const MenuTextRenderer = struct {
 
         const text_pos = drawing.getCenteredTextPos(rect, text, style.char_width(), style.font_size());
 
-        self.text_renderer.queuePersistentText(text, text_pos, self.font_manager, .sans, style.font_size(), style.color) catch |err| {
+        self.text_integration.queuePersistentText(text, text_pos, self.font_manager, .sans, style.font_size(), style.color) catch |err| {
             loggers.getUILog().err("header_error", "Failed to queue header text '{s}': {}", .{ text, err });
         };
     }
 
     /// Queue text at a specific position with custom style
     pub fn queueCustomText(self: *Self, text: []const u8, position: Vec2, font_size: f32, color: Color) void {
-        self.text_renderer.queuePersistentText(text, position, self.font_manager, .sans, font_size, color) catch |err| {
+        self.text_integration.queuePersistentText(text, position, self.font_manager, .sans, font_size, color) catch |err| {
             loggers.getUILog().err("custom_error", "Failed to queue custom text '{s}': {}", .{ text, err });
         };
     }

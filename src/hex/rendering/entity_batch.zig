@@ -8,6 +8,8 @@ const entity_renderer = @import("../../lib/rendering/systems/entity_renderer.zig
 const viewport_mod = @import("../../lib/rendering/spatial/viewport.zig");
 const visibility = @import("../../lib/rendering/spatial/visibility.zig");
 const transforms_mod = @import("../../lib/rendering/spatial/transforms.zig");
+const batching = @import("../../lib/rendering/primitives/batching.zig");
+const culling = @import("../../lib/rendering/spatial/culling.zig");
 
 // Game system capabilities
 const camera_mod = @import("../../lib/game/camera/camera.zig");
@@ -24,12 +26,8 @@ const ZoneData = world_state_mod.HexGame.ZoneData;
 const Viewport = viewport_mod.Viewport;
 const CoordinateContext = transforms_mod.CoordinateContext;
 
-// Rectangle data for batched terrain rendering (legacy support)
-const RectData = struct {
-    pos: Vec2,
-    size: Vec2,
-    color: Color,
-};
+// Use generic batching utilities from lib/rendering
+const RectData = batching.RectData;
 
 const MAX_BATCHED_RECTS = constants.MAX_TERRAIN;
 
@@ -102,10 +100,8 @@ pub const EntityBatchRenderer = struct {
             }
         }
 
-        // Single batched draw call for visible terrain rectangles
-        for (rect_batch[0..rect_count]) |rect| {
-            gpu_renderer.drawRect(cmd_buffer, render_pass, rect.pos, rect.size, rect.color);
-        }
+        // Use generic batched renderer for terrain rectangles
+        batching.BatchedRenderer.renderRectBatch(gpu_renderer, cmd_buffer, render_pass, rect_batch[0..rect_count]);
     }
 
     /// Render circle entities with visibility culling using lib/rendering utilities
@@ -122,8 +118,8 @@ pub const EntityBatchRenderer = struct {
             // Skip if not visible
             if (@hasField(@TypeOf(visual.*), "visible") and !visual.visible) continue;
 
-            // Use lib/rendering visibility culling
-            if (visibility.isCircleVisible(transform.pos, transform.radius, context)) {
+            // Use generic culling utility
+            if (culling.Culler.isCircleVisible(transform.pos, transform.radius, context)) {
                 const screen_pos = camera.worldToScreen(transform.pos);
                 const screen_radius = camera.worldSizeToScreen(transform.radius);
                 gpu_renderer.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, visual.color);

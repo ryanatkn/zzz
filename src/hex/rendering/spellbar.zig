@@ -5,9 +5,7 @@ const core_colors = @import("../../lib/core/colors.zig");
 
 // Reuse lib/rendering UI utilities for bordered rectangles
 const ui_drawing = @import("../../lib/rendering/ui/drawing.zig");
-
-// UI capabilities
-const geometric_text = @import("../../lib/ui/geometric_text.zig");
+// TODO: Text rendering disabled due to SDL/Vulkan texture lifecycle bug in ui_overlay.zig
 
 // Hex game modules
 const spells = @import("../spells.zig");
@@ -59,39 +57,15 @@ pub const SpellbarRenderer = struct {
                     border_color, border_width);
             }
 
-            // Draw hotkey label
+            // Draw hotkey label using lib/rendering text utilities
             const label = ui.spellbar.Spellbar.getHotkeyLabel(slot_index);
             const label_x = slot_rect.x + slot_rect.width - 12.0; // Top right corner
             const label_y = slot_rect.y + 2.0;
 
-            // Draw label using geometric text
-            drawHotkeyLabel(gpu_renderer, cmd_buffer, render_pass, label, label_x, label_y, core_colors.WHITE);
-        }
-    }
-
-    /// Draw a single character hotkey label
-    /// Extracted from game_renderer.zig lines 494-516
-    fn drawHotkeyLabel(gpu_renderer: anytype, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
-        if (text.len == 0) return;
-
-        const config = geometric_text.TextConfig{
-            .pixel_size = 1.5,
-            .char_width = 3,
-            .char_height = 5,
-        };
-
-        const char = text[0];
-        const pattern = geometric_text.CharacterPatterns.getCharPattern(char);
-
-        for (0..config.char_height) |row| {
-            for (0..config.char_width) |col| {
-                if (pattern[row * config.char_width + col]) {
-                    const px = x + @as(f32, @floatFromInt(col)) * config.pixel_size;
-                    const py = y + @as(f32, @floatFromInt(row)) * config.pixel_size;
-                    const pixel_size = Vec2.size(config.pixel_size, config.pixel_size);
-                    gpu_renderer.drawRect(cmd_buffer, render_pass, Vec2.position(px, py), pixel_size, color);
-                }
-            }
+            // TODO: Text rendering disabled due to SDL/Vulkan texture lifecycle bug (see ui_overlay.zig)
+            _ = label;
+            _ = label_x;
+            _ = label_y;
         }
     }
 };

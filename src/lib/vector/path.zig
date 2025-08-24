@@ -1,5 +1,6 @@
 const std = @import("std");
 const math = @import("../math/mod.zig");
+const curves = @import("../math/curves.zig");
 
 // TODO should this be at src/path/? src/vector/path/?
 
@@ -18,16 +19,9 @@ pub const QuadraticCurve = struct {
     end: Vec2,
 
     /// Evaluate the curve at parameter t (0.0 to 1.0)
-    pub fn evaluate(self: QuadraticCurve, t: f32) Vec2 {
-        const one_minus_t = 1.0 - t;
-        return Vec2{
-            .x = one_minus_t * one_minus_t * self.start.x +
-                2.0 * one_minus_t * t * self.control.x +
-                t * t * self.end.x,
-            .y = one_minus_t * one_minus_t * self.start.y +
-                2.0 * one_minus_t * t * self.control.y +
-                t * t * self.end.y,
-        };
+    pub inline fn evaluate(self: QuadraticCurve, t: f32) Vec2 {
+        const result = curves.evaluateQuadraticBezierVec2(self.start.x, self.start.y, self.control.x, self.control.y, self.end.x, self.end.y, t);
+        return Vec2{ .x = result.x, .y = result.y };
     }
 
     /// Get the derivative (tangent) at parameter t
@@ -109,23 +103,9 @@ pub const CubicCurve = struct {
     end: Vec2,
 
     /// Evaluate the curve at parameter t (0.0 to 1.0)
-    pub fn evaluate(self: CubicCurve, t: f32) Vec2 {
-        const one_minus_t = 1.0 - t;
-        const one_minus_t_sq = one_minus_t * one_minus_t;
-        const one_minus_t_cb = one_minus_t_sq * one_minus_t;
-        const t_sq = t * t;
-        const t_cb = t_sq * t;
-
-        return Vec2{
-            .x = one_minus_t_cb * self.start.x +
-                3.0 * one_minus_t_sq * t * self.control1.x +
-                3.0 * one_minus_t * t_sq * self.control2.x +
-                t_cb * self.end.x,
-            .y = one_minus_t_cb * self.start.y +
-                3.0 * one_minus_t_sq * t * self.control1.y +
-                3.0 * one_minus_t * t_sq * self.control2.y +
-                t_cb * self.end.y,
-        };
+    pub inline fn evaluate(self: CubicCurve, t: f32) Vec2 {
+        const result = curves.evaluateCubicBezierVec2(self.start.x, self.start.y, self.control1.x, self.control1.y, self.control2.x, self.control2.y, self.end.x, self.end.y, t);
+        return Vec2{ .x = result.x, .y = result.y };
     }
 };
 

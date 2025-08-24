@@ -17,7 +17,7 @@ const ide_page = @import("../../roots/menu/ide/+page.zig");
 const ide_constants = @import("../../roots/menu/ide/constants.zig");
 const directory_scanner = @import("../../lib/platform/directory_scanner.zig");
 const syntax_highlighter = @import("../../roots/menu/ide/syntax_highlighter.zig");
-const bitmap_simple = @import("../../lib/font/renderers/bitmap_simple.zig");
+const bitmap_strategy = @import("../../lib/font/strategies/bitmap/mod.zig");
 const text_alignment = @import("../../lib/text/alignment.zig");
 const file_tree_mod = @import("../../lib/ui/file_tree.zig");
 const ui = @import("../../lib/ui.zig");
@@ -230,7 +230,7 @@ pub const BrowserRenderer = struct {
 
             // Render the link text using menu text renderer directly
             const link_rect = drawing.Rectangle.init(link.bounds.position, link.bounds.size);
-            var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration.text_renderer, self.base_renderer.font_manager);
+            var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration, self.base_renderer.font_manager);
 
             // Use left alignment for filesystem buttons (IDE file/directory listings)
             const is_filesystem_link = std.mem.startsWith(u8, link.path, "/ide?");
@@ -293,7 +293,7 @@ pub const BrowserRenderer = struct {
         self.base_renderer.gpu.drawRect(cmd_buffer, render_pass, .{ .x = address_x, .y = bar_y + button_margin + button_size - 2 }, .{ .x = address_width, .y = 2 }, Color{ .r = 40, .g = 45, .b = 55, .a = 255 });
 
         // Queue the path text for rendering using shared utility with main game renderers
-        var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration.text_renderer, self.base_renderer.font_manager);
+        var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration, self.base_renderer.font_manager);
         menu_text_renderer.queueNavigationText(current_path, .{ .x = address_x + 10, .y = bar_y + button_margin + 15 });
     }
 
@@ -557,7 +557,6 @@ pub const BrowserRenderer = struct {
 
     /// Render file content with syntax highlighting support
     fn renderFileContentWithHighlighting(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, content: []const u8, panel_rect: math.Rectangle, ide_page_impl: *const ide_page.IDEPage) !void {
-        _ = cmd_buffer;
         _ = render_pass;
         const line_height = ide_constants.TEXT.LINE_HEIGHT;
         const char_width = ide_constants.TEXT.CHAR_WIDTH;
@@ -590,15 +589,15 @@ pub const BrowserRenderer = struct {
             const line_num_text = std.fmt.bufPrint(&line_num_buf, "{d}:", .{line_num + 1}) catch "?:";
 
             // Line numbers in darker color
-            self.drawTextWithColor(line_num_text, Vec2{ .x = panel_rect.position.x + 10, .y = y_pos }, ide_constants.COLORS.TEXT_LINE_NUMBERS);
+            self.drawTextWithColor(cmd_buffer, line_num_text, Vec2{ .x = panel_rect.position.x + 10, .y = y_pos }, ide_constants.COLORS.TEXT_LINE_NUMBERS);
 
             // Render line content with or without syntax highlighting
             const line_start_x = panel_rect.position.x + ide_constants.TEXT.LINE_NUMBER_OFFSET;
             if (enable_highlighting and display_line.len <= ide_constants.SYNTAX.MAX_HIGHLIGHT_LINE_LENGTH) {
-                try self.renderLineWithHighlighting(display_line, Vec2{ .x = line_start_x, .y = y_pos }, ide_page_impl);
+                try self.renderLineWithHighlighting(cmd_buffer, display_line, Vec2{ .x = line_start_x, .y = y_pos }, ide_page_impl);
             } else {
                 // Fallback to normal rendering
-                self.drawTextWithColor(display_line, Vec2{ .x = line_start_x, .y = y_pos }, ide_constants.COLORS.TEXT_NORMAL);
+                self.drawTextWithColor(cmd_buffer, display_line, Vec2{ .x = line_start_x, .y = y_pos }, ide_constants.COLORS.TEXT_NORMAL);
             }
 
             line_num += 1;
@@ -607,12 +606,12 @@ pub const BrowserRenderer = struct {
         // Show truncation message if content is too long
         if (line_num >= max_lines) {
             const truncate_msg = "... (file truncated for display)";
-            self.drawTextWithColor(truncate_msg, Vec2{ .x = panel_rect.position.x + 10, .y = start_y + @as(f32, @floatFromInt(max_lines)) * line_height }, ide_constants.COLORS.TEXT_TRUNCATION);
+            self.drawTextWithColor(cmd_buffer, truncate_msg, Vec2{ .x = panel_rect.position.x + 10, .y = start_y + @as(f32, @floatFromInt(max_lines)) * line_height }, ide_constants.COLORS.TEXT_TRUNCATION);
         }
     }
 
     /// Render a single line with syntax highlighting
-    fn renderLineWithHighlighting(self: *BrowserRenderer, line: []const u8, position: Vec2, ide_page_impl: *const ide_page.IDEPage) !void {
+    fn renderLineWithHighlighting(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, line: []const u8, position: Vec2, ide_page_impl: *const ide_page.IDEPage) !void {
         // Get mutable access to the syntax highlighter
         const ide_page_mut = @constCast(ide_page_impl);
         var highlighter = ide_page_mut.*.getSyntaxHighlighter();
@@ -621,7 +620,7 @@ pub const BrowserRenderer = struct {
         const start_time = std.time.milliTimestamp();
         const tokens = highlighter.highlightLine(line) catch {
             // Fallback to normal rendering on error
-            self.drawTextWithColor(line, position, ide_constants.COLORS.TEXT_NORMAL);
+            self.drawTextWithColor(cmd_buffer, line, position, ide_constants.COLORS.TEXT_NORMAL);
             return;
         };
         const end_time = std.time.milliTimestamp();
@@ -647,14 +646,14 @@ pub const BrowserRenderer = struct {
             if (token.start_pos > last_pos) {
                 const gap_text = line[last_pos..token.start_pos];
                 if (gap_text.len > 0) {
-                    self.drawTextWithColor(gap_text, Vec2{ .x = current_x, .y = position.y }, ide_constants.COLORS.TEXT_NORMAL);
+                    self.drawTextWithColor(cmd_buffer, gap_text, Vec2{ .x = current_x, .y = position.y }, ide_constants.COLORS.TEXT_NORMAL);
                     current_x += @as(f32, @floatFromInt(gap_text.len)) * char_width;
                 }
             }
 
             // Render the token with its color
             if (token.text.len > 0) {
-                self.drawTextWithColor(token.text, Vec2{ .x = current_x, .y = position.y }, token.token_type.getColor());
+                self.drawTextWithColor(cmd_buffer, token.text, Vec2{ .x = current_x, .y = position.y }, token.token_type.getColor());
                 current_x += @as(f32, @floatFromInt(token.text.len)) * char_width;
             }
 
@@ -665,28 +664,28 @@ pub const BrowserRenderer = struct {
         if (last_pos < line.len) {
             const remaining_text = line[last_pos..];
             if (remaining_text.len > 0) {
-                self.drawTextWithColor(remaining_text, Vec2{ .x = current_x, .y = position.y }, ide_constants.COLORS.TEXT_NORMAL);
+                self.drawTextWithColor(cmd_buffer, remaining_text, Vec2{ .x = current_x, .y = position.y }, ide_constants.COLORS.TEXT_NORMAL);
             }
         }
     }
 
     /// Draw simple text using proper font rendering
     fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2) void {
-        _ = cmd_buffer;
         _ = render_pass;
         const text_color = Color{ .r = 200, .g = 200, .b = 200, .a = 255 };
-        self.drawTextWithColor(text, position, text_color);
+        self.drawTextWithColor(cmd_buffer, text, position, text_color);
     }
 
     /// Draw text with specified color using MenuTextRenderer (16pt font for compatibility)
-    fn drawTextWithColor(self: *BrowserRenderer, text: []const u8, position: Vec2, text_color: Color) void {
+    fn drawTextWithColor(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, text: []const u8, position: Vec2, text_color: Color) void {
+        _ = cmd_buffer; // TODO: Remove when text integration is complete
         // Skip rendering empty or whitespace-only text to avoid texture creation failures
         if (text.len == 0 or std.mem.trim(u8, text, " \t\r\n").len == 0) {
             return;
         }
 
         // Use the same approach as working buttons - 16pt font renders reliably
-        var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration.text_renderer, self.base_renderer.font_manager);
+        var menu_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_integration, self.base_renderer.font_manager);
         menu_renderer.queueCustomText(text, position, ide_constants.TEXT.CONTENT_FONT_SIZE, text_color);
     }
 
@@ -697,8 +696,8 @@ pub const BrowserRenderer = struct {
 
     /// Queue text for rendering with specified alignment
     fn queueAlignedTextForRender(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, position: Vec2, text_color: Color, alignment: text_alignment.TextAlign) void {
-        _ = cmd_buffer;
-        _ = render_pass;
+        _ = render_pass; // Not used in current implementation
+        _ = cmd_buffer; // TODO: Remove when text integration is complete
 
         // Skip rendering empty or whitespace-only text to avoid texture creation failures
         if (text.len == 0 or std.mem.trim(u8, text, " \t\r\n").len == 0) {
@@ -714,7 +713,7 @@ pub const BrowserRenderer = struct {
         const aligned_position = text_alignment.applyAlignment(position, alignment, estimated_text_width);
 
         // Use the exact same approach as working navigation text
-        self.base_renderer.gpu.text_integration.text_renderer.queuePersistentText(text, aligned_position, self.base_renderer.font_manager, .sans, font_size, text_color) catch |err| {
+        self.base_renderer.gpu.text_integration.queuePersistentText(text, aligned_position, self.base_renderer.font_manager, .sans, font_size, text_color) catch |err| {
             const ui_log = loggers.getUILog();
             ui_log.err("ide_text", "Failed to queue IDE text '{s}': {}", .{ text, err });
         };

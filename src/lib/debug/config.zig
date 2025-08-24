@@ -22,14 +22,14 @@ pub const ui_log = .{
 
 // Render logger configuration (performance critical)
 pub const render_log = .{
-    .min_level = .warn, // Only warnings and errors
+    .min_level = .warn, // Changed back from .info to reduce spam
 };
 
 // Font/text logger configuration (console only)
 pub const font_log = .{
     .throttle_interval_ms = 5000, // Moderate throttling
     .first_time_delay_ms = 1000,
-    .min_level = .info,
+    .min_level = .warn, // Changed from .info to reduce spam
 };
 
 // Debug logger configuration (verbose, unthrottled)

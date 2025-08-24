@@ -3,6 +3,8 @@ const c = @import("../platform/sdl.zig");
 const colors = @import("../core/colors.zig");
 const reactive_text_cache = @import("../reactive/text_cache.zig");
 const loggers = @import("../debug/loggers.zig");
+const text_primitives = @import("primitives.zig");
+const hash = @import("../core/hash.zig");
 
 /// Persistent text texture system that maintains texture handles across frames
 /// Unlike the immediate mode text renderer, this system keeps textures alive
@@ -69,7 +71,9 @@ pub const PersistentTextSystem = struct {
 
     /// Get or create a persistent texture for the given text content
     /// Returns existing texture if content hasn't changed, or creates new one
-    pub fn getOrCreateTexture(self: *Self, text: []const u8, font_manager: anytype, font_category: anytype, font_size: f32, color: colors.Color) !?PersistentTextureHandle {
+    /// REQUIRES: command buffer from the current frame - critical for texture lifecycle
+    pub fn getOrCreateTexture(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, text: []const u8, font_manager: anytype, font_category: anytype, font_size: f32, color: colors.Color) !?PersistentTextureHandle {
+        _ = font_category; // TODO: Use font_category to select appropriate font (currently defaults to .sans)
         // Validate UTF-8 before processing
         if (!std.unicode.utf8ValidateSlice(text)) {
             loggers.getFontLog().err("invalid_utf8_skip", "Skipping invalid UTF-8 text (length {})", .{text.len});
@@ -118,7 +122,10 @@ pub const PersistentTextSystem = struct {
         // Create new texture (only log first few times to avoid spam)
         loggers.getFontLog().debug("create_texture", "Creating new persistent texture for '{s}'", .{text});
 
-        const text_result = font_manager.renderTextToTexture(text, font_category, font_size, color) catch |err| {
+        // Use text primitives to create texture (proper domain separation)
+        // Create bitmap text directly to avoid circular dependency with .cached mode
+        var primitives = text_primitives.TextPrimitives.init(self.allocator, self.device, font_manager);
+        const text_result = primitives.createBitmapText(cmd_buffer, text, font_size, color) catch |err| {
             loggers.getFontLog().err("texture_error", "Failed to create persistent texture for text: {}", .{err});
             self.recent_failures += 1;
             return null;
@@ -182,8 +189,8 @@ pub const PersistentTextSystem = struct {
             }
         }
 
-        for (to_remove.items) |hash| {
-            _ = self.textures.remove(hash);
+        for (to_remove.items) |item_hash| {
+            _ = self.textures.remove(item_hash);
         }
 
         if (to_remove.items.len > 0) {
@@ -213,9 +220,7 @@ pub const PersistentTextSystem = struct {
 
     fn hashText(self: *Self, text: []const u8) u64 {
         _ = self;
-        var hasher = std.hash.Fnv1a_64.init();
-        hasher.update(text);
-        return hasher.final();
+        return hash.hashText(text);
     }
 
     fn createSampler(self: *Self) !void {

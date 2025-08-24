@@ -5,6 +5,7 @@ const std = @import("std");
 const c = @import("../../platform/sdl.zig");
 const loggers = @import("../../debug/loggers.zig");
 const shaders_mod = @import("shaders.zig");
+const glyph_triangulator = @import("../../font/strategies/vertex/triangulator.zig");
 
 const ShaderSet = shaders_mod.ShaderSet;
 
@@ -17,6 +18,8 @@ pub const PipelineSet = struct {
     circle_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
     rect_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
     particle_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
+    text_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
+    text_vertex_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
 
     /// Creates all required pipelines for the GPU renderer
     pub fn init(device: *c.sdl.SDL_GPUDevice, window: *c.sdl.SDL_Window, shaders: *const ShaderSet) PipelineCreationError!PipelineSet {
@@ -110,12 +113,63 @@ pub const PipelineSet = struct {
             return PipelineCreationError.PipelineCreationFailed;
         };
 
+        // Create text pipeline (uses alpha blending like circles)
+        const text_target_info = c.sdl.SDL_GPUGraphicsPipelineTargetInfo{
+            .color_target_descriptions = &alpha_blend_state,
+            .num_color_targets = 1,
+            .depth_stencil_format = c.sdl.SDL_GPU_TEXTUREFORMAT_INVALID,
+            .has_depth_stencil_target = false,
+        };
+
+        const text_create_info = c.sdl.SDL_GPUGraphicsPipelineCreateInfo{
+            .vertex_shader = shaders.text_vs,
+            .fragment_shader = shaders.text_ps,
+            .vertex_input_state = vertex_input_state,
+            .primitive_type = c.sdl.SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+            .rasterizer_state = rasterizer_state,
+            .multisample_state = multisample_state,
+            .target_info = text_target_info,
+        };
+
+        const text_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(device, &text_create_info) orelse {
+            loggers.getRenderLog().err("text_pipeline_fail", "Failed to create text graphics pipeline", .{});
+            loggers.getRenderLog().err("text_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
+            c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, circle_pipeline);
+            c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, rect_pipeline);
+            c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, particle_pipeline);
+            return PipelineCreationError.PipelineCreationFailed;
+        };
+
+        // Create vertex-based text pipeline (uses actual vertex buffers)
+        const text_vertex_input_state = getTextVertexInputState();
+        const text_vertex_create_info = c.sdl.SDL_GPUGraphicsPipelineCreateInfo{
+            .vertex_shader = shaders.text_vertex_vs,
+            .fragment_shader = shaders.text_vertex_ps,
+            .vertex_input_state = text_vertex_input_state,
+            .primitive_type = c.sdl.SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+            .rasterizer_state = rasterizer_state,
+            .multisample_state = multisample_state,
+            .target_info = text_target_info, // Same target info as regular text
+        };
+
+        const text_vertex_pipeline = c.sdl.SDL_CreateGPUGraphicsPipeline(device, &text_vertex_create_info) orelse {
+            loggers.getRenderLog().err("text_vertex_pipeline_fail", "Failed to create vertex text graphics pipeline", .{});
+            loggers.getRenderLog().err("text_vertex_pipeline_sdl_err", "SDL Error: {s}", .{c.sdl.SDL_GetError()});
+            c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, circle_pipeline);
+            c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, rect_pipeline);
+            c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, particle_pipeline);
+            c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, text_pipeline);
+            return PipelineCreationError.PipelineCreationFailed;
+        };
+
         loggers.getRenderLog().info("pipeline_create_success", "Simple graphics pipelines created successfully", .{});
 
         return PipelineSet{
             .circle_pipeline = circle_pipeline,
             .rect_pipeline = rect_pipeline,
             .particle_pipeline = particle_pipeline,
+            .text_pipeline = text_pipeline,
+            .text_vertex_pipeline = text_vertex_pipeline,
         };
     }
 
@@ -124,10 +178,44 @@ pub const PipelineSet = struct {
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, self.circle_pipeline);
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, self.rect_pipeline);
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, self.particle_pipeline);
+        c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, self.text_pipeline);
+        c.sdl.SDL_ReleaseGPUGraphicsPipeline(device, self.text_vertex_pipeline);
     }
 };
 
 // Pipeline state helpers
+
+// Static storage for vertex descriptions and attributes (needed for C interop)
+var static_vertex_desc: c.sdl.SDL_GPUVertexBufferDescription = undefined;
+var static_vertex_attrib: c.sdl.SDL_GPUVertexAttribute = undefined;
+var vertex_state_initialized: bool = false;
+
+fn getTextVertexInputState() c.sdl.SDL_GPUVertexInputState {
+    if (!vertex_state_initialized) {
+        static_vertex_desc = c.sdl.SDL_GPUVertexBufferDescription{
+            .slot = 0, // Binding slot 0
+            .pitch = @sizeOf(glyph_triangulator.GlyphVertex), // Size of actual GlyphVertex struct
+            .input_rate = c.sdl.SDL_GPU_VERTEXINPUTRATE_VERTEX,
+            .instance_step_rate = 0,
+        };
+
+        static_vertex_attrib = c.sdl.SDL_GPUVertexAttribute{
+            .location = 0, // POSITION attribute
+            .buffer_slot = 0,
+            .format = c.sdl.SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2, // [2]f32 position
+            .offset = 0,
+        };
+
+        vertex_state_initialized = true;
+    }
+
+    return c.sdl.SDL_GPUVertexInputState{
+        .vertex_buffer_descriptions = &static_vertex_desc,
+        .num_vertex_buffers = 1,
+        .vertex_attributes = &static_vertex_attrib,
+        .num_vertex_attributes = 1,
+    };
+}
 
 fn getVertexInputState() c.sdl.SDL_GPUVertexInputState {
     // No vertex input - completely procedural like test cases

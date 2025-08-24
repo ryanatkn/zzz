@@ -2,32 +2,17 @@ const std = @import("std");
 const math = @import("../math/mod.zig");
 const scalar = @import("../math/scalar.zig");
 const vector_path = @import("../vector/path.zig");
-const font_metrics = @import("../font/font_metrics.zig");
+const font_metrics = @import("../font/core/metrics.zig");
+const distance_fields = @import("../math/distance_fields.zig");
 
 const Vec2 = math.Vec2;
 const VectorPath = vector_path.VectorPath;
 const Contour = vector_path.Contour;
 
-/// Configuration for SDF generation
-pub const SDFConfig = struct {
-    /// Resolution of the SDF texture (typically 64x64 or 128x128)
-    texture_size: u32 = 64,
+// TODO: @many font rendering with quads
 
-    /// Range of the distance field in texture units
-    range: f32 = 4.0,
-
-    /// Whether to use high-precision calculation
-    high_precision: bool = true,
-
-    /// Number of samples for anti-aliasing (0 = no AA, 4+ recommended)
-    sample_count: u32 = 8,
-
-    /// Whether to generate multi-channel SDF (MSDF)
-    multi_channel: bool = false,
-
-    /// Scale factor for oversampling
-    oversample: u32 = 1,
-};
+// Re-export shared SDF configuration
+pub const SDFConfig = distance_fields.SDFConfig;
 
 /// A signed distance field texture
 pub const SDFTexture = struct {

@@ -1,4 +1,4 @@
-// Resource management for rendering - shaders, textures, materials
+// Resource management for rendering - shaders only (buffer-based rendering)
 
 pub const shaders = @import("shaders.zig");
 

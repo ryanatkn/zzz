@@ -248,7 +248,6 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - **Use ReactiveComponent base class** - for UI components with automatic lifecycle
 - **Choose the right primitive:**
   - `signal()` for reactive state that triggers effects ($state)
-  - `signalRaw()` for non-reactive state optimization ($state.raw)  
   - `derived()` for computed values with automatic tracking ($derived)
   - `snapshot()` for static copies to external APIs ($state.snapshot)
 - **Effect control:**
