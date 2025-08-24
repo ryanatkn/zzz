@@ -5,6 +5,7 @@ const reactive_text_cache = @import("../reactive/text_cache.zig");
 const loggers = @import("../debug/loggers.zig");
 const text_primitives = @import("primitives.zig");
 const hash = @import("../core/hash.zig");
+const texture_formats = @import("../rendering/texture_formats.zig");
 
 /// Persistent text texture system that maintains texture handles across frames
 /// Unlike the immediate mode text renderer, this system keeps textures alive
@@ -207,8 +208,9 @@ pub const PersistentTextSystem = struct {
         while (iterator.next()) |entry| {
             if (entry.value_ptr.is_valid) {
                 valid_count += 1;
-                // Rough estimate: RGBA8 = 4 bytes per pixel
-                total_memory += @as(u64, entry.value_ptr.width) * entry.value_ptr.height * 4;
+                // Use shared utilities for memory calculation
+                const texture_size = texture_formats.calculateTextureSize(entry.value_ptr.width, entry.value_ptr.height, .r8g8b8a8_unorm);
+                total_memory += @as(u64, texture_size);
             }
         }
 

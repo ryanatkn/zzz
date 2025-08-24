@@ -4,7 +4,6 @@ const glyph_extractor = @import("../../core/glyph_extractor.zig");
 const font_metrics = @import("../../core/metrics.zig");
 const curve_utils = @import("../../core/curve_utils.zig");
 const bitmap_utils = @import("../../../image/bitmap.zig");
-const interpolation = @import("../../../math/interpolation.zig");
 // Deleted modules: edge_builder, scanline_renderer, font_debug, curve_tessellation
 
 const log = std.log.scoped(.rasterizer_core);
@@ -213,10 +212,9 @@ pub const RasterizerCore = struct {
             };
         }
 
-        // Allocate RGBA bitmap (4 bytes per pixel)
-        const bitmap = try self.allocator.alloc(u8, width * height * 4);
+        // Allocate RGBA bitmap using shared utilities
+        const bitmap = try bitmap_utils.Convert.createRGBABitmap(self.allocator, width, height);
         errdefer self.allocator.free(bitmap);
-        @memset(bitmap, 0);
 
         // Pre-tessellate all contours once to avoid repeated tessellation
         var tessellated_contours = std.ArrayList([]glyph_extractor.Point).init(self.allocator);
@@ -258,18 +256,12 @@ pub const RasterizerCore = struct {
                 // Test if point is inside glyph using pre-tessellated contours
                 const inside = isPointInsideGlyphFast(pixel_x, pixel_y, tessellated_contours.items);
 
-                // Write RGBA pixel: white text with alpha coverage
-                const bitmap_idx = (y * width + x) * 4;
+                // Write RGBA pixel using shared utilities
+                const pixel_index = y * width + x;
                 if (inside) {
-                    bitmap[bitmap_idx + 0] = 255; // R - white
-                    bitmap[bitmap_idx + 1] = 255; // G - white
-                    bitmap[bitmap_idx + 2] = 255; // B - white
-                    bitmap[bitmap_idx + 3] = 255; // A - full coverage
+                    bitmap_utils.Convert.setRGBAPixel(bitmap, pixel_index, 255, 255, 255, 255);
                 } else {
-                    bitmap[bitmap_idx + 0] = 255; // R - white (background)
-                    bitmap[bitmap_idx + 1] = 255; // G - white (background)
-                    bitmap[bitmap_idx + 2] = 255; // B - white (background)
-                    bitmap[bitmap_idx + 3] = 0; // A - no coverage
+                    bitmap_utils.Convert.setRGBAPixel(bitmap, pixel_index, 255, 255, 255, 0);
                 }
             }
         }

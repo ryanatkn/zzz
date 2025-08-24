@@ -8,6 +8,7 @@ const font_manager = @import("../../font/manager.zig");
 const strategy_interface = @import("../../font/strategies/interface.zig");
 const bitmap_strategy = @import("../../font/strategies/bitmap/mod.zig");
 const sdf_strategy = @import("../../font/strategies/sdf/mod.zig");
+const texture_formats = @import("../../rendering/texture_formats.zig");
 const loggers = @import("../../debug/loggers.zig");
 
 // Import GPU renderer type for texture rendering
@@ -380,23 +381,7 @@ pub const TextureTextRenderer = struct {
 
     /// Create a single-glyph GPU texture (for non-atlas use cases)
     fn createSingleGlyphTexture(self: *TextureTextRenderer, bitmap: []const u8, width: u32, height: u32, gpu_device: *c.sdl.SDL_GPUDevice) !*c.sdl.SDL_GPUTexture {
-
-        // Create texture
-        const texture_info = c.sdl.SDL_GPUTextureCreateInfo{
-            .type = c.sdl.SDL_GPU_TEXTURETYPE_2D,
-            .format = c.sdl.SDL_GPU_TEXTUREFORMAT_R8_UNORM,
-            .usage = c.sdl.SDL_GPU_TEXTUREUSAGE_SAMPLER,
-            .width = width,
-            .height = height,
-            .layer_count_or_depth = 1,
-            .num_levels = 1,
-            .sample_count = c.sdl.SDL_GPU_SAMPLECOUNT_1,
-            .props = 0,
-        };
-
-        const texture = c.sdl.SDL_CreateGPUTexture(gpu_device, &texture_info) orelse {
-            return error.TextureCreationFailed;
-        };
+        const texture = try texture_formats.TextureCreation.createFontAtlasTexture(gpu_device, width, height);
 
         // Upload bitmap data to texture
         try self.uploadBitmapToTexture(texture, bitmap, width, height, gpu_device);

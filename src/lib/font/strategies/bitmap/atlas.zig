@@ -3,6 +3,7 @@ const c = @import("../../../platform/sdl.zig");
 const rasterizer_core = @import("rasterizer.zig");
 const vector_path = @import("../../../vector/path.zig");
 const loggers = @import("../../../debug/loggers.zig");
+const texture_formats = @import("../../../rendering/texture_formats.zig");
 
 const log = std.log.scoped(.font_atlas);
 
@@ -47,7 +48,7 @@ pub const FontAtlas = struct {
     lru_order: std.ArrayList(u64), // Track access order for LRU eviction
 
     pub fn init(allocator: std.mem.Allocator, gpu_device: *c.sdl.SDL_GPUDevice, atlas_size: u32) !FontAtlas {
-        const max_memory = atlas_size * atlas_size * 4; // 4 atlases max by default
+        const max_memory = texture_formats.calculateTextureSize(atlas_size, atlas_size, .r8g8b8a8_unorm) * 4; // 4 atlases max by default
         var atlas = FontAtlas{
             .allocator = allocator,
             .gpu_device = gpu_device,
@@ -122,21 +123,11 @@ pub const FontAtlas = struct {
     }
 
     fn createNewAtlas(self: *FontAtlas) !*AtlasTexture {
-        const texture_info = c.sdl.SDL_GPUTextureCreateInfo{
-            .type = c.sdl.SDL_GPU_TEXTURETYPE_2D,
-            .format = c.sdl.SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
-            .usage = c.sdl.SDL_GPU_TEXTUREUSAGE_SAMPLER,
-            .width = self.atlas_size,
-            .height = self.atlas_size,
-            .layer_count_or_depth = 1,
-            .num_levels = 1,
-            .sample_count = c.sdl.SDL_GPU_SAMPLECOUNT_1,
-            .props = 0,
-        };
-
-        const texture = c.sdl.SDL_CreateGPUTexture(self.gpu_device, &texture_info) orelse {
-            return error.TextureCreationFailed;
-        };
+        const texture = try texture_formats.TextureCreation.createFontAtlasTexture(
+            self.gpu_device,
+            self.atlas_size,
+            self.atlas_size,
+        );
 
         const atlas = AtlasTexture{
             .texture = texture,
@@ -239,55 +230,16 @@ pub const FontAtlas = struct {
     }
 
     fn uploadGlyphToAtlas(self: *FontAtlas, texture: *c.sdl.SDL_GPUTexture, bitmap: []const u8, width: u32, height: u32, x: u32, y: u32) !void {
-        const transfer_size = width * height * 4; // RGBA format: 4 bytes per pixel
-
-        const transfer_buffer_info = c.sdl.SDL_GPUTransferBufferCreateInfo{
-            .usage = c.sdl.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-            .size = transfer_size,
-        };
-
-        const transfer_buffer = c.sdl.SDL_CreateGPUTransferBuffer(self.gpu_device, &transfer_buffer_info) orelse {
-            return error.TransferBufferCreationFailed;
-        };
-        defer c.sdl.SDL_ReleaseGPUTransferBuffer(self.gpu_device, transfer_buffer);
-
-        const mapped_ptr = c.sdl.SDL_MapGPUTransferBuffer(self.gpu_device, transfer_buffer, false) orelse {
-            return error.TransferBufferMapFailed;
-        };
-
-        @memcpy(@as([*]u8, @ptrCast(mapped_ptr))[0..transfer_size], bitmap);
-
-        c.sdl.SDL_UnmapGPUTransferBuffer(self.gpu_device, transfer_buffer);
-
-        const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(self.gpu_device) orelse {
-            return error.CommandBufferFailed;
-        };
-
-        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(cmd_buffer);
-
-        const texture_transfer_info = c.sdl.SDL_GPUTextureTransferInfo{
-            .transfer_buffer = transfer_buffer,
-            .offset = 0,
-            .pixels_per_row = width, // Width in pixels, not bytes
-            .rows_per_layer = height,
-        };
-
-        const texture_region = c.sdl.SDL_GPUTextureRegion{
-            .texture = texture,
-            .mip_level = 0,
-            .layer = 0,
-            .x = x,
-            .y = y,
-            .z = 0,
-            .w = width,
-            .h = height,
-            .d = 1,
-        };
-
-        c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
-        c.sdl.SDL_EndGPUCopyPass(copy_pass);
-
-        _ = c.sdl.SDL_SubmitGPUCommandBuffer(cmd_buffer);
+        // Use shared texture upload utilities
+        try texture_formats.TextureTransfer.uploadToTexture(
+            self.gpu_device,
+            texture,
+            bitmap,
+            width,
+            height,
+            x,
+            y,
+        );
     }
 
     pub fn getAtlasTexture(self: *FontAtlas, atlas_index: u32) ?*c.sdl.SDL_GPUTexture {

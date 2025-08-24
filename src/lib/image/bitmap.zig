@@ -1,4 +1,5 @@
 const std = @import("std");
+const texture_formats = @import("../rendering/texture_formats.zig");
 
 /// A bitmap representation for image processing and font rendering
 pub const Bitmap = struct {
@@ -133,7 +134,8 @@ pub const Visualizer = struct {
 pub const Convert = struct {
     /// Convert grayscale bitmap to RGBA format for GPU textures
     pub fn grayscaleToRGBA(allocator: std.mem.Allocator, grayscale_data: []const u8, width: u32, height: u32) ![]u8 {
-        const rgba_data = try allocator.alloc(u8, width * height * 4);
+        const rgba_size = texture_formats.calculateTextureSize(width, height, .r8g8b8a8_unorm);
+        const rgba_data = try allocator.alloc(u8, rgba_size);
 
         // DEBUG: Check what grayscale values we're getting
         var min_val: u8 = 255;
@@ -147,12 +149,8 @@ pub const Convert = struct {
         }
 
         for (grayscale_data, 0..) |gray_value, i| {
-            const rgba_idx = i * 4;
-            // Convert grayscale to RGBA format for GPU texture
-            rgba_data[rgba_idx + 0] = 255; // R - white
-            rgba_data[rgba_idx + 1] = 255; // G - white
-            rgba_data[rgba_idx + 2] = 255; // B - white
-            rgba_data[rgba_idx + 3] = gray_value; // A - use grayscale as alpha
+            // Use shared utilities for RGBA pixel creation
+            texture_formats.RGBAPixel.setInBuffer(rgba_data, i, 255, 255, 255, gray_value);
         }
 
         return rgba_data;
@@ -170,6 +168,27 @@ pub const Convert = struct {
         const data = try allocator.alloc(u8, source_data.len);
         @memcpy(data, source_data);
         return data;
+    }
+
+    /// Create RGBA bitmap from dimensions (allocates RGBA buffer)
+    pub fn createRGBABitmap(allocator: std.mem.Allocator, width: u32, height: u32) ![]u8 {
+        const size = texture_formats.calculateTextureSize(width, height, .r8g8b8a8_unorm);
+        const data = try allocator.alloc(u8, size);
+        @memset(data, 0);
+        return data;
+    }
+
+    /// Fill RGBA bitmap with white pixels and specified coverage
+    pub fn fillWithWhiteCoverage(rgba_data: []u8, width: u32, height: u32, coverage: u8) void {
+        const pixel_count = width * height;
+        for (0..pixel_count) |i| {
+            texture_formats.RGBAPixel.setWhiteCoverageInBuffer(rgba_data, i, coverage);
+        }
+    }
+
+    /// Set individual RGBA pixel using shared utilities
+    pub fn setRGBAPixel(rgba_data: []u8, pixel_index: usize, r: u8, g: u8, b: u8, a: u8) void {
+        texture_formats.RGBAPixel.setInBuffer(rgba_data, pixel_index, r, g, b, a);
     }
 };
 
