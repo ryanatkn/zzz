@@ -253,9 +253,7 @@ pub fn handleSDLEvent(
         },
         c.sdl.SDL_EVENT_MOUSE_WHEEL => {
             // TODO I'm not receiving this event on Linux
-            // Maybe related:
-            // https://github.com/libsdl-org/SDL/pull/13453
-            // https://github.com/libsdl-org/SDL/pull/13453/files
+            // Maybe related: https://github.com/libsdl-org/SDL/pull/13453
             std.log.info("mouse_wheel event detected! y={d:.2} x={d:.2}", .{ event.wheel.y, event.wheel.x });
 
             // Direct zoom based on wheel direction
