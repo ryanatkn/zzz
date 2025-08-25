@@ -9,9 +9,6 @@ const std = @import("std");
 test {
     _ = @import("alignment.zig");
 
-    // TODO: Fix broken test modules
-    // _ = @import("sdf_renderer.zig"); // May have external dependencies
+    // SDF renderer module tests:
+    _ = @import("sdf_renderer.zig");
 }
-
-// TODO: The following modules are excluded:
-// - sdf_renderer.zig: May have external dependencies (needs investigation)

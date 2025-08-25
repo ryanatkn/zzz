@@ -18,31 +18,14 @@ comptime {
     _ = @import("strategies/vertex/triangulator.zig");
     _ = @import("core/glyph_extractor.zig");
 
-    // Test directory modules
-    // _ = @import("test/simple_font_test.zig"); // TODO: Update for vertex approach
-    _ = @import("test/metrics_debug.zig"); // Fixed imports
-    // _ = @import("test/test_baseline.zig"); // Will be consolidated into character_analysis.zig
-    // _ = @import("test/test_descenders.zig"); // Will be consolidated into character_analysis.zig
-    // _ = @import("test/test_texture_bounds.zig"); // Will be consolidated into character_analysis.zig
+    // Test directory modules (existing files only)
+    _ = @import("test/metrics_debug.zig");
+    _ = @import("test/bearing_analysis.zig");
+    _ = @import("test/basic_rendering.zig");
+    _ = @import("test/font_rendering.zig"); // Strategy validation tests enabled
 
-    // Consolidated character analysis (replaces 5 overlapping tests)
-    // _ = @import("test/character_analysis.zig"); // TODO: Update for vertex approach
-
-    // Pipeline debugging tests (moved to test/)
-    // _ = @import("test/pipeline_debug.zig"); // TODO: Update for vertex approach
-    _ = @import("test/bearing_analysis.zig"); // Fixed - no imports needed
-
-    // Advanced analysis tests (moved to test/)
-    // _ = @import("test/pixel_analysis.zig"); // TODO: Update for vertex approach
-    _ = @import("test/basic_rendering.zig"); // Fixed missing dependencies
-    _ = @import("test/font_rendering.zig"); // Tests disabled but structure OK
-    // _ = @import("test/font_debug.zig"); // TODO: Update for vertex approach
-
-    // Coordinate transformation tests (new)
-    // _ = @import("test/coordinate_transform_test.zig"); // TODO: Update for vertex approach
-
-    // Comparison tests
-    // _ = @import("atlas_comparison.zig"); // Removed - no longer using atlas approach
+    // Test visualization utilities (disabled until updated for vertex approach)
+    // _ = test_visualization;
 }
 
 const debug_config = @import("../debug/config.zig");
@@ -86,15 +69,10 @@ pub const test_modules = [_][]const u8{
     "coordinate_transform",
     "glyph_triangulator", // Vertex-based triangulation tests
     "glyph_extractor", // TTF extraction tests
-    // Commented out - need updating for vertex approach:
-    // "test/simple_font_test",
-    // "test/metrics_debug",
-    // "test/character_analysis",
-    // "test/pipeline_debug",
-    // "test/bearing_analysis",
-    // "test/pixel_analysis",
-    // "test/font_debug",
-    // "test/coordinate_transform_test",
+    "test/metrics_debug", // Font metrics debugging
+    "test/bearing_analysis", // Glyph bearing analysis
+    "test/basic_rendering", // Basic rendering tests
+    "test/font_rendering", // Strategy validation tests
 };
 
 test "comprehensive character rendering - vertex triangulation" {

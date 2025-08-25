@@ -23,13 +23,10 @@ test {
 
     // Working button component (renamed from simple_button.zig)
     _ = @import("button.zig");
-
-    // TODO: Still broken test modules - these need further investigation
-    // _ = @import("fps_counter.zig"); // SDL dependencies + reactive issues - has 'reactive' undefined
 }
 
-// TODO: The following modules are excluded:
-// - fps_counter.zig: SDL dependencies + reactive issues (legitimate exclusion)
+// The following modules are excluded:
+// - fps_counter.zig: SDL dependencies (uses text/renderer.zig which requires SDL GPU API)
 // - terminal_layout_renderer.zig: SDL text rendering dependencies (legitimate exclusion)
 //
 // Recently cleaned up:

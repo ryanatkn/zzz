@@ -19,8 +19,8 @@ test {
     _ = @import("spatial/visibility.zig");
     _ = @import("spatial/grid.zig");
 
-    // TODO: Fix broken test modules
-    // _ = @import("optimization/modes.zig"); // Imports text/renderer.zig which depends on SDL - should be legitimate exclusion
+    // Excluded due to SDL dependencies (legitimate exclusions):
+    // _ = @import("optimization/modes.zig"); // Uses text/renderer.zig which requires SDL GPU API
 }
 
 // Note: compute.zig and structured_buffers.zig were removed - they were unused GPU compute infrastructure

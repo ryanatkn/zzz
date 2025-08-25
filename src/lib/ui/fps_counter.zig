@@ -4,6 +4,7 @@ const colors = @import("../core/colors.zig");
 const text_renderer = @import("../text/renderer.zig");
 const persistent_text = @import("../text/cache.zig");
 const rendering_modes = @import("../rendering/optimization/modes.zig");
+const reactive = @import("../reactive/mod.zig");
 const reactive_time = @import("../reactive/time.zig");
 const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../reactive/component.zig").createComponent;
