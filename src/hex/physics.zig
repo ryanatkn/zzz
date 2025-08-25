@@ -10,6 +10,8 @@ const faction_integration = @import("faction_integration.zig");
 const factions = @import("factions.zig");
 const entity_queries = @import("entity_queries.zig");
 
+// TODO heavily refactor for performance
+
 /// Component-based approach to identify deadly terrain
 /// This centralizes the logic and makes it easier to extend with Hazard components later
 fn isDeadlyTerrain(terrain: *const components.Terrain) bool {
@@ -146,6 +148,65 @@ pub fn checkUnitTerrainCollision(world: *world_state_mod.HexGame, unit_id: world
         }
     }
     return false;
+}
+
+// Check hostile-friendly unit collisions - hostiles die when touching friendlies
+pub fn checkHostileFriendlyUnitCollision(world: *world_state_mod.HexGame) bool {
+    const zone_storage = world.getZoneStorage();
+    var collision_occurred = false;
+
+    // Use idiomatic Zig iterator pattern for outer loop (potential hostiles)
+    var hostile_iter = world.iterateUnitsInCurrentZone();
+    while (hostile_iter.next()) |hostile_id| {
+        if (zone_storage.units.getComponent(hostile_id, .transform)) |hostile_transform| {
+            if (zone_storage.units.getComponentMut(hostile_id, .health)) |hostile_health| {
+                if (!hostile_health.alive) continue;
+
+                if (zone_storage.units.getComponent(hostile_id, .unit)) |hostile_unit| {
+                    // Only check hostile units
+                    if (hostile_unit.disposition != .hostile) continue;
+
+                    // Check collision with all other units
+                    var friendly_iter = world.iterateUnitsInCurrentZone();
+                    while (friendly_iter.next()) |friendly_id| {
+                        // Skip self-collision
+                        if (hostile_id == friendly_id) continue;
+
+                        if (zone_storage.units.getComponent(friendly_id, .transform)) |friendly_transform| {
+                            if (zone_storage.units.getComponent(friendly_id, .health)) |friendly_health| {
+                                // Only check alive units
+                                if (!friendly_health.alive) continue;
+
+                                if (zone_storage.units.getComponent(friendly_id, .unit)) |friendly_unit| {
+                                    // Only check friendly units
+                                    if (friendly_unit.disposition != .friendly) continue;
+
+                                    // Check physical collision
+                                    if (collision.checkCircleCollision(hostile_transform.pos, hostile_transform.radius, friendly_transform.pos, friendly_transform.radius)) {
+                                        // Kill the hostile unit
+                                        hostile_health.alive = false;
+                                        collision_occurred = true;
+
+                                        // Set visual to dead color
+                                        if (zone_storage.units.getComponentMut(hostile_id, .visual)) |hostile_visual| {
+                                            hostile_visual.color = constants.COLOR_DEAD;
+                                        }
+
+                                        // Log the collision
+                                        world.logger.info("hostile_death", "Hostile unit {} killed by friendly collision with {}", .{ hostile_id, friendly_id });
+
+                                        break; // Exit inner loop once hostile is dead
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return collision_occurred;
 }
 
 // Lifestone search result

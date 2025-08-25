@@ -46,6 +46,26 @@ pub const CollisionSystem = struct {
             return;
         }
 
+        // Check hostile unit collisions - kill player if hostile touches them
+        if (physics.checkControlledEntityUnitCollision(world)) {
+            if (world.getControlledEntity()) |controlled_entity| {
+                const zone = world.getCurrentZone();
+                if (zone.units.getComponentMut(controlled_entity, .health)) |health| {
+                    health.alive = false;
+                    game_state.logger.info("player_death", "Player killed by hostile collision", .{});
+
+                    // Set visual to dead color
+                    if (zone.units.getComponentMut(controlled_entity, .visual)) |visual| {
+                        visual.color = constants.COLOR_DEAD;
+                    }
+                }
+            }
+            return; // Exit collision checking once player dies
+        }
+
+        // Check hostile-friendly unit collisions - kill hostiles when they touch friendlies
+        _ = physics.checkHostileFriendlyUnitCollision(world);
+
         // Check lifestone collisions - delegated to lifestone system (uses controlled entity internally)
         @import("lifestone.zig").LifestoneSystem.checkLifestoneCollisions(game_state);
     }

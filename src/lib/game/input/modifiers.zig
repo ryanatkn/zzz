@@ -194,8 +194,8 @@ pub const ActionModifiers = struct {
     /// Extract mouse click with modifiers from input state
     pub fn getMouseClickModifiers(input_state: *const InputState) MouseClickModifiers {
         return MouseClickModifiers{
-            .left_click = input_state.isLeftMouseHeld(),
-            .right_click = input_state.isRightMouseHeld(),
+            .left_click = input_state.left_mouse_held,
+            .right_click = input_state.right_mouse_held,
             .middle_click = false, // Not implemented in base InputState
             .modifiers = getCurrentModifiers(input_state),
         };
@@ -206,7 +206,7 @@ pub const ActionModifiers = struct {
 pub const ModifierProcessor = struct {
     /// Process left mouse click based on modifiers
     pub fn processLeftClick(input_state: *const InputState) enum { Normal, MoveToClick, Precision, None } {
-        if (!input_state.isLeftMouseHeld()) return .None;
+        if (!input_state.left_mouse_held) return .None;
 
         const mods = getCurrentModifiers(input_state);
         if (ModifierPatterns.isMoveToClickModifier(mods)) return .MoveToClick;
@@ -216,7 +216,7 @@ pub const ModifierProcessor = struct {
 
     /// Process right click based on modifiers
     pub fn processRightClick(input_state: *const InputState) enum { Normal, SelfCast, Alternate, None } {
-        if (!input_state.isRightMouseHeld()) return .None;
+        if (!input_state.right_mouse_held) return .None;
 
         const mods = getCurrentModifiers(input_state);
         if (ModifierPatterns.isSelfCastModifier(mods)) return .SelfCast;

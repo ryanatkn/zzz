@@ -18,6 +18,7 @@ pub const InputState = struct {
     mouse_pos: Vec2,
     left_mouse_held: bool,
     right_mouse_held: bool,
+    left_mouse_just_pressed: bool,
 
     const Self = @This();
 
@@ -27,6 +28,7 @@ pub const InputState = struct {
             .mouse_pos = Vec2.ZERO,
             .left_mouse_held = false,
             .right_mouse_held = false,
+            .left_mouse_just_pressed = false,
         };
     }
 
@@ -45,7 +47,12 @@ pub const InputState = struct {
 
     pub fn handleMouseButtonDown(self: *Self, button: u8) void {
         switch (button) {
-            c.sdl.SDL_BUTTON_LEFT => self.left_mouse_held = true,
+            c.sdl.SDL_BUTTON_LEFT => {
+                if (!self.left_mouse_held) {
+                    self.left_mouse_just_pressed = true;
+                }
+                self.left_mouse_held = true;
+            },
             c.sdl.SDL_BUTTON_RIGHT => self.right_mouse_held = true,
             else => {},
         }
@@ -61,18 +68,6 @@ pub const InputState = struct {
 
     pub fn isKeyDown(self: *const Self, scancode: c_uint) bool {
         return self.keys_down.isSet(@intCast(scancode));
-    }
-
-    pub fn isLeftMouseHeld(self: *const Self) bool {
-        return self.left_mouse_held;
-    }
-
-    pub fn isRightMouseHeld(self: *const Self) bool {
-        return self.right_mouse_held;
-    }
-
-    pub fn getMousePos(self: *const Self) Vec2 {
-        return self.mouse_pos;
     }
 
     pub fn getWorldMousePos(self: *const Self, camera: *const camera_mod.Camera) Vec2 {
@@ -135,11 +130,18 @@ pub const InputState = struct {
         self.keys_down = std.StaticBitSet(512).initEmpty();
         self.left_mouse_held = false;
         self.right_mouse_held = false;
+        self.left_mouse_just_pressed = false;
         self.mouse_pos = Vec2.ZERO;
     }
 
     pub fn clearMouseHold(self: *Self) void {
         self.left_mouse_held = false;
         self.right_mouse_held = false;
+        self.left_mouse_just_pressed = false;
+    }
+
+    /// Clear per-frame state (should be called at end of frame)
+    pub fn endFrame(self: *Self) void {
+        self.left_mouse_just_pressed = false;
     }
 };

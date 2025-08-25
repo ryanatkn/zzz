@@ -166,7 +166,7 @@ pub const MouseMovement = struct {
 
     /// Check if mouse click should move player (Ctrl+click pattern)
     pub fn shouldMoveToMouse(input_state: *const InputState) bool {
-        return input_state.isCtrlHeld() and input_state.isLeftMouseHeld();
+        return input_state.isCtrlHeld() and input_state.left_mouse_held;
     }
 };
 

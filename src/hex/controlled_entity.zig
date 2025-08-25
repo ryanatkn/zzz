@@ -79,8 +79,8 @@ fn calculateVelocityFromInput(game: *HexGame, entity_id: EntityId, input_state: 
     const entity_radius = entity_queries.getEntityRadius(game, entity_id) orelse 0.2; // 20cm default radius
 
     // Only allow mouse movement when Ctrl is held
-    if (ctrl_held and input_state.isLeftMouseHeld()) {
-        const screen_mouse_pos = input_state.getMousePos();
+    if (ctrl_held and input_state.left_mouse_held) {
+        const screen_mouse_pos = input_state.mouse_pos;
         const world_mouse_pos = cam.screenToWorldSafe(screen_mouse_pos);
         const to_mouse = world_mouse_pos.sub(entity_pos);
         const distance_sq = to_mouse.lengthSquared();
@@ -93,7 +93,7 @@ fn calculateVelocityFromInput(game: *HexGame, entity_id: EntityId, input_state: 
     }
 
     // Prefer mouse movement when active
-    if (ctrl_held and input_state.isLeftMouseHeld() and (mouse_velocity.x != 0 or mouse_velocity.y != 0)) {
+    if (ctrl_held and input_state.left_mouse_held and (mouse_velocity.x != 0 or mouse_velocity.y != 0)) {
         return mouse_velocity;
     } else {
         return keyboard_velocity;

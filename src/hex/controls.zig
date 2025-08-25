@@ -135,7 +135,7 @@ pub fn handleSDLEvent(
             // Note: Mouse wheel events not working on this system - using keyboard zoom (- and = keys)
 
             // Update spellbar hover state
-            const mouse_pos = game_state.input_state.getMousePos();
+            const mouse_pos = game_state.input_state.mouse_pos;
             game_state.spellbar_ui.updateHover(mouse_pos);
         },
         c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
@@ -189,7 +189,7 @@ pub fn handleSDLEvent(
                     } else false;
 
                     if (attack_entity_alive) {
-                        const screen_mouse_pos = game_state.input_state.getMousePos();
+                        const screen_mouse_pos = game_state.input_state.mouse_pos;
 
                         // Check if click is on spellbar first
                         if (game_state.spellbar_ui.getSlotAtPosition(screen_mouse_pos)) |slot_index| {
@@ -222,7 +222,7 @@ pub fn handleSDLEvent(
                     } else false;
 
                     if (secondary_entity_alive) {
-                        const screen_mouse_pos = game_state.input_state.getMousePos();
+                        const screen_mouse_pos = game_state.input_state.mouse_pos;
 
                         // Check if right-click is on spellbar first
                         if (game_state.spellbar_ui.getSlotAtPosition(screen_mouse_pos)) |slot_index| {

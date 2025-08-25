@@ -70,8 +70,9 @@ pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *ProjectilePoolImp
     if (bypass_cooldown) {
         // Skill-based: only check projectile count
         if (pool.getCurrentCount() == 0) return false;
-        // Manually consume projectile without cooldown
+        // Manually consume projectile and set cooldown to prevent rhythm double-shot
         pool.current_projectiles -= 1;
+        pool.cooldown_remaining = pool.fire_cooldown;
         game.logger.info("projectile_fired", "Projectile fired immediate (skill-based)! ID pending, pos: {any}, target: {any}", .{ config.shooter_pos, target_pos });
     } else {
         // Rhythm: check both projectile count and cooldown timing

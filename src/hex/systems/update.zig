@@ -129,8 +129,9 @@ pub const UpdateSystem = struct {
         // Note: Controller always possesses an entity at startup, so no fallback needed
 
         // Handle hold shooting with 150ms rhythm timing (respects projectile pool cooldown)
-        if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and world.hasLiveControlledEntity()) {
-            const screen_mouse_pos = input_state.getMousePos();
+        // Exclude first frame of mouse press to avoid double-shooting
+        if (!input_state.isCtrlHeld() and input_state.left_mouse_held and !input_state.left_mouse_just_pressed and world.hasLiveControlledEntity()) {
+            const screen_mouse_pos = input_state.mouse_pos;
             _ = combat.fireProjectileAtScreenPos(world, screen_mouse_pos, cam, &world.projectile_pool, false);
         }
 
@@ -151,5 +152,8 @@ pub const UpdateSystem = struct {
 
         // Update projectile pool with context
         world.updateProjectilePool(frame_ctx);
+
+        // Clear per-frame input state at end of frame
+        input_state.endFrame();
     }
 };

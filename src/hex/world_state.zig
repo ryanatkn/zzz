@@ -480,10 +480,13 @@ pub const HexGame = struct {
                                 if (dist_sq <= collision_dist * collision_dist) {
                                     // Check if projectile should damage this unit (friendly fire protection)
                                     var should_damage = true;
+                                    var should_destroy_projectile = true;
+
                                     if (zone.units.getComponent(unit_id, .unit)) |unit_comp| {
-                                        // Friendly units should not be damaged by player projectiles
+                                        // Friendly units should not be damaged and projectiles pass through them
                                         if (unit_comp.disposition == .friendly) {
                                             should_damage = false;
+                                            should_destroy_projectile = false;
                                         }
                                     }
 
@@ -497,13 +500,15 @@ pub const HexGame = struct {
                                         }
                                     }
 
-                                    // Always remove projectile on contact (even if no damage dealt)
-                                    if (remove_count < projectiles_to_remove.len) {
-                                        projectiles_to_remove[remove_count] = projectile_id;
-                                        remove_count += 1;
+                                    // Only remove projectile if it should be destroyed (not for friendlies)
+                                    if (should_destroy_projectile) {
+                                        if (remove_count < projectiles_to_remove.len) {
+                                            projectiles_to_remove[remove_count] = projectile_id;
+                                            remove_count += 1;
+                                        }
+                                        unit_hit = true;
+                                        break;
                                     }
-                                    unit_hit = true;
-                                    break;
                                 }
                             }
                         }
