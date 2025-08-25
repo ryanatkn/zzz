@@ -19,7 +19,6 @@
 pub const Disposition = enum {
     hostile, // Attacks on sight, chases player (red)
     fearful, // Flees from player, avoids combat (yellow)
-    neutral, // Ignores player, returns home when far (gray)
+    neutral, // Ignores player, returns home when far (brown)
     friendly, // Never attacks, may follow player (blue)
-    allied, // Actively helps player in combat (green)
 };

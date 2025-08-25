@@ -212,7 +212,7 @@ pub fn ObjectPool(comptime T: type, comptime max_objects: u32) type {
 }
 
 // Common pool configurations
-pub const BulletPoolConfig = PoolConfig{
+pub const ProjectilePoolConfig = PoolConfig{
     .max_size = 6,
     .recharge_rate = 2.0,
     .fire_cooldown = 0.15,
@@ -231,7 +231,7 @@ pub const StaminaPoolConfig = PoolConfig{
 };
 
 // Convenience aliases
-pub const BulletPool = ResourcePool(BulletPoolConfig);
+pub const ProjectilePool = ResourcePool(ProjectilePoolConfig);
 pub const ManaPool = ResourcePool(ManaPoolConfig);
 pub const StaminaPool = ResourcePool(StaminaPoolConfig);
 

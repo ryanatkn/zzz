@@ -24,7 +24,7 @@ This directory contains reusable game systems and utilities designed to be extre
 - `control/direct_input.zig` - Memory-mapped input for external AI
 
 ### Projectiles
-- `projectiles/bullet_pool.zig` - Rate-limited bullet pool system
+- `projectiles/projectile_pool.zig` - Rate-limited projectile pool system
 
 ### Persistence (Planned)
 - `persistence/save_system.zig` - Generic save/load interfaces
@@ -76,7 +76,7 @@ We deleted over-engineered systems including:
 ```zig
 // Import generic systems
 const timer_patterns = @import("lib/game/timer_patterns.zig");
-const bullet_pool = @import("lib/game/projectiles/bullet_pool.zig");
+const projectile_pool = @import("lib/game/projectiles/projectile_pool.zig");
 const spell_slots = @import("lib/game/abilities/spell_slots.zig");
 const FrameContext = @import("lib/core/frame.zig").FrameContext;
 
@@ -98,7 +98,7 @@ pub fn updateMySystem(frame_ctx: FrameContext, input_state: InputState) void {
 ### How Hex Game Uses These Systems
 
 The hex game demonstrates proper usage:
-- Uses `bullet_pool.zig` for combat system
+- Uses `projectile_pool.zig` for combat system
 - Uses `timer_patterns.zig` for spell cooldowns  
 - Uses `control/` for AI integration
 - Uses `abilities/` for spell casting and effect management

@@ -78,7 +78,7 @@ const IndexPage = struct {
         try links.append(page.createTextElement("PLAYER STATS", center_x, 350, stat_width, 40));
         try links.append(page.createTextElement("Health: Full (100/100)", center_x, 400, stat_width, stat_height));
         try links.append(page.createTextElement("Speed: Normal (200 u/s)", center_x, 450, stat_width, stat_height));
-        try links.append(page.createTextElement("Bullets: 6 max", center_x, 500, stat_width, stat_height));
+        try links.append(page.createTextElement("Projectiles: 6 max", center_x, 500, stat_width, stat_height));
         try links.append(page.createTextElement("Recharge: 2/sec", center_x, 550, stat_width, stat_height));
         try links.append(page.createTextElement("Damage: Normal", center_x, 600, stat_width, stat_height));
 
@@ -88,7 +88,7 @@ const IndexPage = struct {
         const upgrade_height = 35.0;
 
         try links.append(page.createTextElement("UPGRADES", right_x, 350, upgrade_width, 40));
-        try links.append(page.createTextElement("Bullet Range", right_x, 400, upgrade_width, upgrade_height));
+        try links.append(page.createTextElement("Projectile Range", right_x, 400, upgrade_width, upgrade_height));
         try links.append(page.createTextElement("Multi-shot", right_x, 450, upgrade_width, upgrade_height));
         try links.append(page.createTextElement("Recharge Rate", right_x, 500, upgrade_width, upgrade_height));
         try links.append(page.createTextElement("Damage Boost", right_x, 550, upgrade_width, upgrade_height));
@@ -104,7 +104,7 @@ const IndexPage = struct {
         try links.append(page.createTextElement("Click LMB: Rhythm mode", far_right_x, 450, combat_width, combat_height));
         try links.append(page.createTextElement("RMB: Cast spell", far_right_x, 500, combat_width, combat_height));
         try links.append(page.createTextElement("Ctrl+RMB: Self-cast", far_right_x, 550, combat_width, combat_height));
-        try links.append(page.createTextElement("Bullet lifetime: 4s", far_right_x, 600, combat_width, combat_height));
+        try links.append(page.createTextElement("Projectile lifetime: 4s", far_right_x, 600, combat_width, combat_height));
 
         // Bottom navigation
         const nav_y = screen_height * 0.79; // 850/1080 ≈ 0.79

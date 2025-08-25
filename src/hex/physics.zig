@@ -93,7 +93,7 @@ pub fn checkControlledEntityUnitCollision(world: *world_state_mod.HexGame) bool 
                             faction_integration.logFactionRelation(world, entity_id, controlled_entity, relation);
                             return true;
                         }
-                        // Friendly/allied/neutral units don't cause damage collision
+                        // Friendly/neutral units don't cause damage collision
                         faction_integration.logFactionRelation(world, entity_id, controlled_entity, relation);
                     } else {
                         // Fallback to old behavior if faction data is missing

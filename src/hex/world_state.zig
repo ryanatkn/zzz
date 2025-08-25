@@ -29,7 +29,7 @@ const factions = @import("factions.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
-const BulletPool = combat.BulletPool;
+const ProjectilePool = combat.ProjectilePool;
 const FrameContext = frame.FrameContext;
 const EntityIterator = storage.EntityIterator;
 
@@ -177,7 +177,7 @@ pub const HexGame = struct {
     primary_controller: controller_mod.Controller,
 
     // Game systems
-    projectile_pool: BulletPool,
+    projectile_pool: ProjectilePool,
     entity_allocator: EntityAllocator,
     allocator: std.mem.Allocator,
     logger: ModuleLogger,
@@ -270,7 +270,7 @@ pub const HexGame = struct {
         var game = HexGame{
             .zone_manager = zones.ZoneManager(ZoneData, MAX_ZONES).init(),
             .primary_controller = controller_mod.createPlayerController(),
-            .projectile_pool = BulletPool.init(),
+            .projectile_pool = ProjectilePool.init(),
             .entity_allocator = EntityAllocator{},
             .allocator = allocator,
             .logger = ModuleLogger.init(allocator),
@@ -478,15 +478,26 @@ pub const HexGame = struct {
                                 const collision_dist = transform.radius + unit_transform.radius;
 
                                 if (dist_sq <= collision_dist * collision_dist) {
-                                    // Unit hit by bullet
-                                    unit_health.alive = false;
-
-                                    // Update unit visual color
-                                    if (zone.units.getComponentMut(unit_id, .visual)) |unit_visual| {
-                                        unit_visual.color = constants.COLOR_DEAD;
+                                    // Check if projectile should damage this unit (friendly fire protection)
+                                    var should_damage = true;
+                                    if (zone.units.getComponent(unit_id, .unit)) |unit_comp| {
+                                        // Friendly units should not be damaged by player projectiles
+                                        if (unit_comp.disposition == .friendly) {
+                                            should_damage = false;
+                                        }
                                     }
 
-                                    // Remove projectile
+                                    if (should_damage) {
+                                        // Unit hit by projectile - deal damage
+                                        unit_health.alive = false;
+
+                                        // Update unit visual color
+                                        if (zone.units.getComponentMut(unit_id, .visual)) |unit_visual| {
+                                            unit_visual.color = constants.COLOR_DEAD;
+                                        }
+                                    }
+
+                                    // Always remove projectile on contact (even if no damage dealt)
                                     if (remove_count < projectiles_to_remove.len) {
                                         projectiles_to_remove[remove_count] = projectile_id;
                                         remove_count += 1;

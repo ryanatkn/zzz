@@ -51,10 +51,10 @@ For technical architecture details, see [CLAUDE.md](./CLAUDE.md)
 - **Ctrl + Left-click**: move to mouse position
 
 ### Combat
-- **Left-click**: fire bullets (burst/rhythm mode)
+- **Left-click**: fire projectiles (burst/rhythm mode)
   - hold for automatic rhythm shooting
   - click for burst shots
-  - 6-bullet pool with 2/sec recharge
+  - 6-projectile pool with 2/sec recharge
 - **Right-click**: cast active spell at target
 - **Ctrl + Right-click**: self-cast active spell
 

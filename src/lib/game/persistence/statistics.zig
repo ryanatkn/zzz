@@ -36,7 +36,7 @@ pub const StatisticsInterface = struct {
 /// Games should define their own with relevant fields
 pub const ExampleStatistics = struct {
     total_deaths: usize = 0,
-    total_bullets_fired: usize = 0,
+    total_projectiles_fired: usize = 0,
     total_spells_cast: usize = 0,
     play_time_ms: u64 = 0,
 

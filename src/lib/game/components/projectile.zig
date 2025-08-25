@@ -1,6 +1,6 @@
 const EntityId = u32;
 
-/// Projectile - for moving projectile entities (bullets, spells, etc.)
+/// Projectile - for moving projectile entities (projectiles, spells, etc.)
 /// Sparse storage - only projectiles have this
 pub const Projectile = struct {
     owner: EntityId,

@@ -72,7 +72,6 @@ pub fn evaluateBehaviorForProfile(composer: *BehaviorComposer, context: Behavior
         .fearful => evaluateFearfulBehavior(composer, context),
         .neutral => evaluateNeutralBehavior(composer, context),
         .friendly => evaluateFriendlyBehavior(composer, context),
-        .allied => evaluateFriendlyBehavior(composer, context), // Allied uses same behavior as friendly
     };
 }
 

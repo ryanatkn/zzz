@@ -128,7 +128,7 @@ pub const UpdateSystem = struct {
         }
         // Note: Controller always possesses an entity at startup, so no fallback needed
 
-        // Handle hold shooting with 150ms rhythm timing (respects bullet pool cooldown)
+        // Handle hold shooting with 150ms rhythm timing (respects projectile pool cooldown)
         if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and world.hasLiveControlledEntity()) {
             const screen_mouse_pos = input_state.getMousePos();
             _ = combat.fireProjectileAtScreenPos(world, screen_mouse_pos, cam, &world.projectile_pool, false);
@@ -149,7 +149,7 @@ pub const UpdateSystem = struct {
         // Update spell system with context
         game_state.spell_system.update(frame_ctx);
 
-        // Update bullet pool with context
+        // Update projectile pool with context
         world.updateProjectilePool(frame_ctx);
     }
 };

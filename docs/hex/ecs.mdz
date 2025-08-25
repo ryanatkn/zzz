@@ -7,7 +7,7 @@ Simple entity pool architecture with explicit types and direct function calls. N
 
 ```
 entities.zig    - Entity storage (explicit pools per type)
-behaviors.zig   - Update functions (player, enemy, bullet movement)
+behaviors.zig   - Update functions (player, enemy, projectile movement)
 physics.zig     - Collision detection (circle-circle, circle-rect)
 renderer.zig    - GPU rendering wrapper
 loader.zig      - ZON data loading
@@ -20,7 +20,7 @@ main.zig        - Game loop orchestration
 ```zig
 World
 ├── player: Player                    // Single player entity
-├── bullets: [MAX_PROJECTILES]Bullet      // Global bullet pool
+├── projectiles: [MAX_PROJECTILES]Projectile  // Global projectile pool
 └── zones: [7]Zone                  // Zone array
     ├── enemies: [MAX_ENEMIES]Enemy
     ├── obstacles: [MAX_OBSTACLES]Obstacle
@@ -40,7 +40,7 @@ World
 // Direct function calls, no systems
 updatePlayer(&world.player, velocity, dt);
 updateEnemy(&enemy, player_pos, player_alive, dt);
-updateBullet(&bullet, dt);
+updateProjectile(&projectile, dt);
 ```
 
 ## Collision Detection
@@ -56,7 +56,7 @@ checkCircleRectCollision(circle_pos, radius, rect_pos, size);
 ```zig
 // Batch by shape for GPU efficiency
 renderObstacles();  // All rectangles
-renderCircles();    // All circles (player, enemies, bullets)
+renderCircles();    // All circles (player, enemies, projectiles)
 ```
 
 ## Data Loading

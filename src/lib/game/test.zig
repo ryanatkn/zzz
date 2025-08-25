@@ -9,7 +9,7 @@ const std = @import("std");
 test {
     _ = @import("behaviors/chase_behavior.zig");
     _ = @import("behaviors/flee_behavior.zig");
-    _ = @import("projectiles/bullet_pool.zig");
+    _ = @import("projectiles/projectile_pool.zig");
     _ = @import("zones/zone_manager.zig");
 
     // Recently fixed modules

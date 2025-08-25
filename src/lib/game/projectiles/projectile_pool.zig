@@ -1,16 +1,16 @@
 const std = @import("std");
 
-/// BulletPool - Rate-limited bullet firing system
+/// ProjectilePool - Rate-limited projectile firing system
 ///
-/// Provides a pool of bullets with:
-/// - Rate limiting (bullets per second)
+/// Provides a pool of projectiles with:
+/// - Rate limiting (projectiles per second)
 /// - Fire cooldown (minimum time between shots)
 /// - Automatic recharge system
 /// - Upgrade support for capacity and recharge rate
-pub const BulletPool = struct {
-    max_bullets: u8,
-    current_bullets: u8,
-    recharge_rate: f32, // Bullets per second
+pub const ProjectilePool = struct {
+    max_projectiles: u8,
+    current_projectiles: u8,
+    recharge_rate: f32, // Projectiles per second
     recharge_accumulator: f32,
     fire_cooldown: f32, // Min time between shots
     cooldown_remaining: f32,
@@ -19,20 +19,20 @@ pub const BulletPool = struct {
     /// Default configuration for balanced gameplay
     pub const DEFAULT_CONFIG = struct {
         pub const SIZE = 6; // Even number for rhythm mode
-        pub const RECHARGE_RATE = 2.0; // Bullets per second (full recharge in 3s)
+        pub const RECHARGE_RATE = 2.0; // Projectiles per second (full recharge in 3s)
         pub const FIRE_COOLDOWN = 2.0 / 6.0; // TODO needs to be computed from `recharge_rate / size`
     };
 
     /// Initialize with default configuration
-    pub fn init() BulletPool {
+    pub fn init() ProjectilePool {
         return initWithConfig(DEFAULT_CONFIG.SIZE, DEFAULT_CONFIG.RECHARGE_RATE, DEFAULT_CONFIG.FIRE_COOLDOWN);
     }
 
     /// Initialize with custom configuration
-    pub fn initWithConfig(max_bullets: u8, recharge_rate: f32, fire_cooldown: f32) BulletPool {
+    pub fn initWithConfig(max_projectiles: u8, recharge_rate: f32, fire_cooldown: f32) ProjectilePool {
         return .{
-            .max_bullets = max_bullets,
-            .current_bullets = max_bullets,
+            .max_projectiles = max_projectiles,
+            .current_projectiles = max_projectiles,
             .recharge_rate = recharge_rate,
             .recharge_accumulator = 0,
             .fire_cooldown = fire_cooldown,
@@ -41,31 +41,31 @@ pub const BulletPool = struct {
         };
     }
 
-    /// Check if we can fire (have bullets and not on cooldown)
-    pub fn canFire(self: *const BulletPool) bool {
-        return self.current_bullets > 0 and self.cooldown_remaining <= 0;
+    /// Check if we can fire (have projectiles and not on cooldown)
+    pub fn canFire(self: *const ProjectilePool) bool {
+        return self.current_projectiles > 0 and self.cooldown_remaining <= 0;
     }
 
-    /// Consume a bullet and apply cooldown
-    pub fn fire(self: *BulletPool) void {
+    /// Consume a projectile and apply cooldown
+    pub fn fire(self: *ProjectilePool) void {
         if (self.canFire()) {
-            self.current_bullets -= 1;
+            self.current_projectiles -= 1;
             self.cooldown_remaining = self.fire_cooldown;
         }
     }
 
     /// Update the pool (should be called each frame)
-    pub fn update(self: *BulletPool, deltaTime: f32) void {
+    pub fn update(self: *ProjectilePool, deltaTime: f32) void {
         // Update cooldown
         if (self.cooldown_remaining > 0) {
             self.cooldown_remaining -= deltaTime;
         }
 
-        // Recharge bullets
-        if (self.current_bullets < self.max_bullets) {
+        // Recharge projectiles
+        if (self.current_projectiles < self.max_projectiles) {
             self.recharge_accumulator += self.recharge_rate * deltaTime;
-            while (self.recharge_accumulator >= 1.0 and self.current_bullets < self.max_bullets) {
-                self.current_bullets += 1;
+            while (self.recharge_accumulator >= 1.0 and self.current_projectiles < self.max_projectiles) {
+                self.current_projectiles += 1;
                 self.recharge_accumulator -= 1.0;
             }
         } else {
@@ -73,74 +73,74 @@ pub const BulletPool = struct {
         }
     }
 
-    /// Get current bullet count
-    pub fn getCurrentCount(self: *const BulletPool) u8 {
-        return self.current_bullets;
+    /// Get current projectile count
+    pub fn getCurrentCount(self: *const ProjectilePool) u8 {
+        return self.current_projectiles;
     }
 
-    /// Get maximum bullet capacity
-    pub fn getMaxCount(self: *const BulletPool) u8 {
-        return self.max_bullets;
+    /// Get maximum projectile capacity
+    pub fn getMaxCount(self: *const ProjectilePool) u8 {
+        return self.max_projectiles;
     }
 
     /// Get current recharge rate
-    pub fn getRechargeRate(self: *const BulletPool) f32 {
+    pub fn getRechargeRate(self: *const ProjectilePool) f32 {
         return self.recharge_rate;
     }
 
     /// Check if pool is full
-    pub fn isFull(self: *const BulletPool) bool {
-        return self.current_bullets >= self.max_bullets;
+    pub fn isFull(self: *const ProjectilePool) bool {
+        return self.current_projectiles >= self.max_projectiles;
     }
 
     /// Check if pool is empty
-    pub fn isEmpty(self: *const BulletPool) bool {
-        return self.current_bullets == 0;
+    pub fn isEmpty(self: *const ProjectilePool) bool {
+        return self.current_projectiles == 0;
     }
 
-    /// Get time remaining until next bullet recharge
-    pub fn getTimeToNextRecharge(self: *const BulletPool) f32 {
+    /// Get time remaining until next projectile recharge
+    pub fn getTimeToNextRecharge(self: *const ProjectilePool) f32 {
         if (self.isFull()) return 0.0;
-        const time_per_bullet = 1.0 / self.recharge_rate;
-        return time_per_bullet - self.recharge_accumulator * time_per_bullet;
+        const time_per_projectile = 1.0 / self.recharge_rate;
+        return time_per_projectile - self.recharge_accumulator * time_per_projectile;
     }
 
     // === Upgrade System ===
 
-    /// Upgrade bullet capacity by amount
-    pub fn upgradeCapacity(self: *BulletPool, amount: u8) void {
-        self.max_bullets += amount;
-        self.current_bullets = @min(self.current_bullets + amount, self.max_bullets);
+    /// Upgrade projectile capacity by amount
+    pub fn upgradeCapacity(self: *ProjectilePool, amount: u8) void {
+        self.max_projectiles += amount;
+        self.current_projectiles = @min(self.current_projectiles + amount, self.max_projectiles);
     }
 
     /// Upgrade recharge rate by multiplier
-    pub fn upgradeRechargeRate(self: *BulletPool, multiplier: f32) void {
+    pub fn upgradeRechargeRate(self: *ProjectilePool, multiplier: f32) void {
         self.recharge_rate *= multiplier;
     }
 
     /// Set fire cooldown (for upgrade system)
-    pub fn setFireCooldown(self: *BulletPool, cooldown: f32) void {
+    pub fn setFireCooldown(self: *ProjectilePool, cooldown: f32) void {
         self.fire_cooldown = cooldown;
     }
 
     // === Future Features ===
 
-    /// Get bullets per shot (for multi-shot upgrades)
-    pub fn getBulletsPerShot(self: *const BulletPool) u8 {
+    /// Get projectiles per shot (for multi-shot upgrades)
+    pub fn getProjectilesPerShot(self: *const ProjectilePool) u8 {
         _ = self;
         return 1; // Future: Can be upgraded to 2+ for multi-shot
     }
 
     // === Debug/Testing ===
 
-    /// Force set bullet count (for testing)
-    pub fn setBulletCount(self: *BulletPool, count: u8) void {
-        self.current_bullets = @min(count, self.max_bullets);
+    /// Force set projectile count (for testing)
+    pub fn setProjectileCount(self: *ProjectilePool, count: u8) void {
+        self.current_projectiles = @min(count, self.max_projectiles);
     }
 
     /// Reset to full capacity
-    pub fn reset(self: *BulletPool) void {
-        self.current_bullets = self.max_bullets;
+    pub fn reset(self: *ProjectilePool) void {
+        self.current_projectiles = self.max_projectiles;
         self.recharge_accumulator = 0;
         self.cooldown_remaining = 0;
     }
@@ -149,15 +149,15 @@ pub const BulletPool = struct {
 // Tests
 const testing = std.testing;
 
-test "BulletPool basic functionality" {
-    var pool = BulletPool.init();
+test "ProjectilePool basic functionality" {
+    var pool = ProjectilePool.init();
 
     // Should start full
     try testing.expect(pool.isFull());
     try testing.expectEqual(@as(u8, 6), pool.getCurrentCount());
     try testing.expect(pool.canFire());
 
-    // Fire a bullet
+    // Fire a projectile
     pool.fire();
     try testing.expectEqual(@as(u8, 5), pool.getCurrentCount());
     try testing.expect(!pool.isFull());
@@ -166,22 +166,22 @@ test "BulletPool basic functionality" {
     try testing.expect(!pool.canFire()); // Due to fire cooldown
 
     // Wait for cooldown to pass
-    pool.update(0.2); // More than 0.15s cooldown
+    pool.update(0.4); // More than 0.33s cooldown
     try testing.expect(pool.canFire());
 }
 
-test "BulletPool recharge system" {
-    var pool = BulletPool.init();
+test "ProjectilePool recharge system" {
+    var pool = ProjectilePool.init();
 
     // Empty the pool
     while (pool.canFire()) {
         pool.fire();
-        pool.update(0.2); // Clear cooldown
+        pool.update(0.4); // Clear cooldown (more than 0.33s)
     }
     try testing.expect(pool.isEmpty());
 
     // Should recharge over time
-    // At 2 bullets/second, should take 0.5s for first bullet
+    // At 2 projectiles/second, should take 0.5s for first projectile
     pool.update(0.5);
     try testing.expectEqual(@as(u8, 1), pool.getCurrentCount());
 
@@ -191,13 +191,13 @@ test "BulletPool recharge system" {
     try testing.expect(pool.isFull());
 }
 
-test "BulletPool upgrade system" {
-    var pool = BulletPool.init();
+test "ProjectilePool upgrade system" {
+    var pool = ProjectilePool.init();
 
     // Upgrade capacity
     pool.upgradeCapacity(2);
     try testing.expectEqual(@as(u8, 8), pool.getMaxCount());
-    try testing.expectEqual(@as(u8, 8), pool.getCurrentCount()); // Should get instant bullets
+    try testing.expectEqual(@as(u8, 8), pool.getCurrentCount()); // Should get instant projectiles
 
     // Upgrade recharge rate
     const old_rate = pool.getRechargeRate();
@@ -205,8 +205,8 @@ test "BulletPool upgrade system" {
     try testing.expectEqual(old_rate * 2.0, pool.getRechargeRate());
 }
 
-test "BulletPool custom configuration" {
-    var pool = BulletPool.initWithConfig(10, 5.0, 0.1);
+test "ProjectilePool custom configuration" {
+    var pool = ProjectilePool.initWithConfig(10, 5.0, 0.1);
 
     try testing.expectEqual(@as(u8, 10), pool.getMaxCount());
     try testing.expectEqual(@as(f32, 5.0), pool.getRechargeRate());

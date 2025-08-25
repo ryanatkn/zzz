@@ -25,7 +25,7 @@ pub const SpellType = enum {
     Charm, // Control units
     Lethargy, // Slow enemy movement speed
     Haste, // Movement speed boost
-    Multishot, // Fire multiple bullets
+    Multishot, // Fire multiple projectiles
     Dazzle, // Area confusion/slow
 };
 
@@ -557,10 +557,10 @@ pub const SpellSystem = struct {
         const base_angle = std.math.atan2(to_target.y, to_target.x);
         const target_distance = to_target.length();
 
-        // Need access to bullet pool - check if enough bullets available
-        var bullets_fired: u32 = 0;
+        // Need access to projectile pool - check if enough projectiles available
+        var projectiles_fired: u32 = 0;
 
-        // Fire multiple bullets in a spread pattern
+        // Fire multiple projectiles in a spread pattern
         for (0..constants.MULTISHOT_COUNT) |i| {
             const offset_angle = if (constants.MULTISHOT_COUNT > 1)
                 (@as(f32, @floatFromInt(i)) - @as(f32, @floatFromInt(constants.MULTISHOT_COUNT - 1)) / 2.0) * constants.MULTISHOT_SPREAD_ANGLE
@@ -569,29 +569,29 @@ pub const SpellSystem = struct {
 
             const angle = base_angle + offset_angle;
 
-            // Calculate target position for this bullet based on angle
-            const bullet_target = controlled_pos.add(Vec2{
+            // Calculate target position for this projectile based on angle
+            const projectile_target = controlled_pos.add(Vec2{
                 .x = @cos(angle) * target_distance,
                 .y = @sin(angle) * target_distance,
             });
 
-            // Use the hex_game's bullet pool for firing
+            // Use the hex_game's projectile pool for firing
             if (game.canFireProjectile()) {
-                const success = combat.fireProjectile(game, bullet_target, &game.projectile_pool, false);
+                const success = combat.fireProjectile(game, projectile_target, &game.projectile_pool, false);
                 if (success) {
-                    bullets_fired += 1;
+                    projectiles_fired += 1;
                 } else {
                     // If we can't fire a projectile, stop trying (probably no pool space)
                     break;
                 }
             } else {
-                // No more bullets available in pool
+                // No more projectiles available in pool
                 break;
             }
         }
 
-        loggers.getGameLog().info("multishot_cast", "Fired {}/{} bullets in spread pattern", .{ bullets_fired, constants.MULTISHOT_COUNT });
-        return bullets_fired > 0; // Success if we fired at least one bullet
+        loggers.getGameLog().info("multishot_cast", "Fired {}/{} projectiles in spread pattern", .{ projectiles_fired, constants.MULTISHOT_COUNT });
+        return projectiles_fired > 0; // Success if we fired at least one projectile
     }
 
     /// Cast Dazzle spell - confuse/slow enemies in area

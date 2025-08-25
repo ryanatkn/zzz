@@ -81,7 +81,6 @@ pub const EntityFactions = struct {
 
 /// Relationship between two entities based on their faction tags
 pub const FactionRelation = enum {
-    allied, // Will help in combat, share resources
     friendly, // Won't attack, may interact positively
     neutral, // Ignores unless provoked
     suspicious, // May attack if approached too closely
@@ -94,7 +93,7 @@ pub fn calculateRelation(from: EntityFactions, to: EntityFactions) FactionRelati
 
     // 1. Charmed entities are friendly to their charmer's faction
     if (from.hasTag(.charmed) and sharesCharmerFaction(from, to)) {
-        return .allied;
+        return .friendly;
     }
 
     // 2. Undead are hostile to all living things (unless same cult)
@@ -105,9 +104,9 @@ pub fn calculateRelation(from: EntityFactions, to: EntityFactions) FactionRelati
         if (!sharesCult(from, to)) return .hostile;
     }
 
-    // 3. Pack hunters are allied with their pack
+    // 3. Pack hunters are friendly with their pack
     if (from.hasTag(.pack_hunter) and to.hasTag(.pack_hunter)) {
-        if (sharesRace(from, to)) return .allied;
+        if (sharesRace(from, to)) return .friendly;
     }
 
     // 4. Guards vs bandits are always hostile
@@ -210,7 +209,7 @@ test "pack behavior" {
     const wolf2 = EntityFactions.initWithTags(&.{ .beast, .pack_hunter, .living });
     const lone_bear = EntityFactions.initWithTags(&.{ .beast, .solitary, .living });
 
-    try std_test.expect(calculateRelation(wolf1, wolf2) == .allied);
+    try std_test.expect(calculateRelation(wolf1, wolf2) == .friendly);
     // Both are beasts and living (2 shared tags) = friendly relationship
     try std_test.expect(calculateRelation(wolf1, lone_bear) == .friendly);
 }

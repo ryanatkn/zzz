@@ -77,7 +77,7 @@ pub const TravelSystem = struct {
     pub fn travelToZone(game: *world_state_mod.HexGame, zone_index: usize, spawn_pos: Vec2) !void {
         if (zone_index >= world_state_mod.MAX_ZONES) return;
 
-        // Clear projectiles in all zones (bullets should not persist across zone travel)
+        // Clear projectiles in all zones (projectiles should not persist across zone travel)
         for (&game.zone_manager.zones) |*zone| {
             zone.projectiles.clear();
         }

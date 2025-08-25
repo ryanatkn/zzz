@@ -21,9 +21,9 @@ Successfully completed the full integration of the context system across the ent
 ### ✅ Phase 3: Updated Hex Game Systems
 - **behaviors.zig**: Added `updateUnitWithAggroModContext()`
 - **player.zig**: Added `updatePlayerWithContext()`
-- **combat.zig**: Added `fireBulletWithContext()` and `fireBulletAtMouseWithContext()`
+- **combat.zig**: Added `fireProjectileWithContext()` and `fireProjectileAtMouseWithContext()`
 - **spells.zig**: Added `updateWithContext()`
-- **hex_game.zig**: Added `updateProjectilesWithContext()` and `updateBulletPoolWithContext()`
+- **hex_game.zig**: Added `updateProjectilesWithContext()` and `updateProjectilePoolWithContext()`
 
 ### ✅ Phase 4: Main Game Loop Integration
 - **Context Creation**: Creates unified `HexGameContext` with all subsystem contexts
@@ -103,10 +103,10 @@ game_state.spell_system.updateWithContext(hex_ctx);
 ## Verified Working Features
 
 **✅ Player Movement**: Context-aware player controller with input and camera integration  
-**✅ Combat System**: Context-aware bullet firing with mouse position and game state  
+**✅ Combat System**: Context-aware projectile firing with mouse position and game state  
 **✅ AI Behaviors**: All unit behaviors use context for timing and state management  
 **✅ Spell System**: Spell cooldowns and effects use context timing  
-**✅ Projectiles**: Bullet physics and collision use context delta time  
+**✅ Projectiles**: Projectile physics and collision use context delta time  
 **✅ Portal Travel**: Zone switching and travel mechanics unchanged  
 **✅ Visual Effects**: Effect system continues working with context timing  
 

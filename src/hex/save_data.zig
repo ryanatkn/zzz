@@ -20,7 +20,7 @@ pub const HexSaveData = struct {
 
     // Statistics
     total_deaths: usize,
-    total_bullets_fired: usize,
+    total_projectiles_fired: usize,
     total_spells_cast: usize,
     total_portals_used: usize,
     play_time_ms: u64,
@@ -64,7 +64,7 @@ pub const HexSaveData = struct {
             .player_alive = world.getPlayerAliveConst(),
             .zones = undefined,
             .total_deaths = stats.total_deaths,
-            .total_bullets_fired = stats.total_bullets_fired,
+            .total_projectiles_fired = stats.total_projectiles_fired,
             .total_spells_cast = stats.total_spells_cast,
             .total_portals_used = stats.total_portals_used,
             .play_time_ms = stats.play_time_ms,
@@ -200,7 +200,7 @@ pub const HexSaveData = struct {
 
         // Restore statistics
         stats.total_deaths = self.total_deaths;
-        stats.total_bullets_fired = self.total_bullets_fired;
+        stats.total_projectiles_fired = self.total_projectiles_fired;
         stats.total_spells_cast = self.total_spells_cast;
         stats.total_portals_used = self.total_portals_used;
         stats.play_time_ms = self.play_time_ms;
@@ -211,7 +211,7 @@ pub const HexSaveData = struct {
 /// Uses generic StatisticsInterface for common operations
 pub const GameStatistics = struct {
     total_deaths: usize = 0,
-    total_bullets_fired: usize = 0,
+    total_projectiles_fired: usize = 0,
     total_spells_cast: usize = 0,
     total_portals_used: usize = 0,
     play_time_ms: u64 = 0,
@@ -226,8 +226,8 @@ pub const GameStatistics = struct {
         self.increment("total_deaths");
     }
 
-    pub fn incrementBullet(self: *GameStatistics) void {
-        self.increment("total_bullets_fired");
+    pub fn incrementProjectile(self: *GameStatistics) void {
+        self.increment("total_projectiles_fired");
     }
 
     pub fn incrementSpell(self: *GameStatistics) void {

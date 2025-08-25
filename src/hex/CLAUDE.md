@@ -29,7 +29,7 @@ hex/
 ├── game_renderer.zig  # Rendering implementation
 ├── entities.zig       # Zone-based entity system
 ├── player.zig         # Player controller
-├── combat.zig         # Bullet pool and combat
+├── combat.zig         # Projectile pool and combat
 ├── spells.zig         # 8-slot spell system
 ├── behaviors.zig      # Entity AI behaviors
 ├── physics.zig        # Collision detection
@@ -98,7 +98,7 @@ const HexGame = world_state_mod.HexGame;
 - **Game Constants:** Damage values, speeds, sizes, colors
 
 ### What Hex Uses from lib/game (Generic Systems)
-- **Bullet Pool:** Rate-limited projectile management (`lib/game/projectiles/`)
+- **Projectile Pool:** Rate-limited projectile management (`lib/game/projectiles/`)
 - **Cooldowns:** Timer management for abilities (`lib/game/cooldowns.zig`)
 - **AI Control:** External input injection (`lib/game/control/`)
 - **Basic Components:** Transform, Health, Visual (`lib/game/components.zig`)
@@ -106,11 +106,11 @@ const HexGame = world_state_mod.HexGame;
 
 ### Example Integration
 ```zig
-// Hex uses generic bullet pool
-const BulletPool = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
+// Hex uses generic projectile pool
+const ProjectilePool = @import("../lib/game/projectiles/projectile_pool.zig").ProjectilePool;
 
 // But implements hex-specific combat logic
-pub fn fireBullet(game: *HexGame, target: Vec2, pool: *BulletPool) bool {
+pub fn fireProjectile(game: *HexGame, target: Vec2, pool: *ProjectilePool) bool {
     // Hex-specific: player alive check, zone-based projectiles
     if (!game.getPlayerAlive()) return false;
     if (!pool.canFire()) return false;
@@ -141,7 +141,7 @@ pub fn fireBullet(game: *HexGame, target: Vec2, pool: *BulletPool) bool {
 
 ### Modifying Combat
 1. Adjust constants in `constants.zig`
-2. Bullet pool size in `combat.zig`
+2. Projectile pool size in `combat.zig`
 3. Damage values in collision handling
 4. Recharge rates and timers
 
@@ -151,7 +151,7 @@ When modifying game code:
 - Keep entity counts reasonable (<1000 per zone)
 - Use squared distances for comparisons
 - Batch similar entities in rendering
-- Pool effects and bullets
+- Pool effects and projectiles
 - Avoid allocations in update loops
 
 ## Game Data Format (ZON)

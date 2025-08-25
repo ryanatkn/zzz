@@ -4,7 +4,7 @@ const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
 const time = @import("../lib/core/time.zig");
 const camera = @import("../lib/game/camera/camera.zig");
-const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
+const ProjectilePoolImpl = @import("../lib/game/projectiles/projectile_pool.zig").ProjectilePool;
 const combat = @import("../lib/game/combat/mod.zig");
 const physics = @import("physics.zig");
 const constants = @import("constants.zig");
@@ -19,8 +19,8 @@ const HexGame = world_state_mod.HexGame;
 const EntityId = world_state_mod.EntityId;
 const GameState = game_loop_mod.GameState;
 
-// Re-export BulletPool from lib/game/projectiles for compatibility
-pub const BulletPool = BulletPoolImpl;
+// Re-export ProjectilePool from lib/game/projectiles for compatibility
+pub const ProjectilePool = ProjectilePoolImpl;
 
 // Hex-specific interface implementations for generic combat system
 const HexCombatInterface = struct {
@@ -44,7 +44,7 @@ const HexCombatInterface = struct {
     }
 };
 
-pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl, bypass_cooldown: bool) bool {
+pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *ProjectilePoolImpl, bypass_cooldown: bool) bool {
     // Check if there's a controlled entity that can shoot
     if (!HexCombatInterface.isShooterAlive(game)) return false;
 
@@ -68,13 +68,13 @@ pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl, b
     const current_time_ms = @as(u64, @intFromFloat(time.Time.getTimeMs()));
 
     if (bypass_cooldown) {
-        // Skill-based: only check bullet count
+        // Skill-based: only check projectile count
         if (pool.getCurrentCount() == 0) return false;
-        // Manually consume bullet without cooldown
-        pool.current_bullets -= 1;
+        // Manually consume projectile without cooldown
+        pool.current_projectiles -= 1;
         game.logger.info("projectile_fired", "Projectile fired immediate (skill-based)! ID pending, pos: {any}, target: {any}", .{ config.shooter_pos, target_pos });
     } else {
-        // Rhythm: check both bullet count and cooldown timing
+        // Rhythm: check both projectile count and cooldown timing
         if (!pool.canFire()) return false;
         // Use normal fire which applies cooldown
         pool.fire();
@@ -87,19 +87,19 @@ pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl, b
     // Calculate velocity using generic system
     const velocity = combat.CombatActions.calculateProjectileVelocity(config);
 
-    // Create bullet entity using hex-specific implementation
-    const bullet_id = HexCombatInterface.createProjectileFromCombat(game, config.shooter_pos, velocity, config.projectile_radius, config.projectile_lifetime, config.damage) catch return false;
+    // Create projectile entity using hex-specific implementation
+    const projectile_id = HexCombatInterface.createProjectileFromCombat(game, config.shooter_pos, velocity, config.projectile_radius, config.projectile_lifetime, config.damage) catch return false;
 
-    game.logger.info("projectile_confirmed", "Projectile created with ID: {}", .{bullet_id});
+    game.logger.info("projectile_confirmed", "Projectile created with ID: {}", .{projectile_id});
     return true;
 }
 
-pub fn fireProjectileAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl, bypass_cooldown: bool) bool {
+pub fn fireProjectileAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *ProjectilePoolImpl, bypass_cooldown: bool) bool {
     return fireProjectile(game, mouse_pos, pool, bypass_cooldown);
 }
 
 /// Fire projectile with proper screen-to-world coordinate conversion
-pub fn fireProjectileAtScreenPos(game: *HexGame, screen_pos: Vec2, cam: *const Camera, pool: *BulletPoolImpl, bypass_cooldown: bool) bool {
+pub fn fireProjectileAtScreenPos(game: *HexGame, screen_pos: Vec2, cam: *const Camera, pool: *ProjectilePoolImpl, bypass_cooldown: bool) bool {
     const world_pos = cam.screenToWorldSafe(screen_pos);
     return fireProjectile(game, world_pos, pool, bypass_cooldown);
 }

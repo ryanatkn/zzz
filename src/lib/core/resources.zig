@@ -1,7 +1,7 @@
 const std = @import("std");
 const timer = @import("timer.zig");
 
-/// Generic resource pool for bullets, mana, stamina, etc.
+/// Generic resource pool for projectiles, mana, stamina, etc.
 /// Provides rate-limited resource management with automatic regeneration
 pub fn ResourcePool(comptime ResourceType: type) type {
     return struct {
@@ -108,8 +108,8 @@ pub fn ResourcePool(comptime ResourceType: type) type {
 }
 
 /// Specialized resource pools for common game resources
-/// Bullet pool for weapons/combat
-pub const BulletPool = ResourcePool(u32);
+/// Projectile pool for weapons/combat
+pub const ProjectilePool = ResourcePool(u32);
 
 /// Mana pool for magic systems
 pub const ManaPool = ResourcePool(u32);
@@ -208,11 +208,11 @@ pub const RPGResources = struct {
     health: HealthPool,
     mana: ManaPool,
     stamina: StaminaPool,
-    bullets: BulletPool,
+    projectiles: ProjectilePool,
 };
 
 test "ResourcePool basic functionality" {
-    var pool = BulletPool.init(6, 2.0); // 6 max bullets, 2/sec recharge
+    var pool = ProjectilePool.init(6, 2.0); // 6 max projectiles, 2/sec recharge
 
     // Initial state
     try std.testing.expectEqual(@as(u32, 6), pool.getCurrent());
@@ -228,11 +228,11 @@ test "ResourcePool basic functionality" {
     try std.testing.expect(!pool.tryConsume(5));
     try std.testing.expectEqual(@as(u32, 3), pool.getCurrent()); // Should be unchanged
 
-    // Update for regeneration (0.5 seconds = 1 bullet)
+    // Update for regeneration (0.5 seconds = 1 projectile)
     pool.update(0.5);
     try std.testing.expectEqual(@as(u32, 4), pool.getCurrent());
 
-    // Update for full regeneration (1.0 second = 2 bullets)
+    // Update for full regeneration (1.0 second = 2 projectiles)
     pool.update(1.0);
     try std.testing.expectEqual(@as(u32, 6), pool.getCurrent());
     try std.testing.expect(pool.isFull());
@@ -264,29 +264,29 @@ test "HealthPool functionality" {
 
 test "MultiResourceManager functionality" {
     const TestResources = struct {
-        bullets: BulletPool,
+        projectiles: ProjectilePool,
         mana: ManaPool,
     };
 
     var manager = MultiResourceManager(TestResources).init(.{
-        .bullets = BulletPool.init(6, 2.0),
+        .projectiles = ProjectilePool.init(6, 2.0),
         .mana = ManaPool.init(100, 10.0),
     });
 
     // Access individual resources
-    var bullets = manager.getResource("bullets");
+    var projectiles = manager.getResource("projectiles");
     var mana = manager.getResource("mana");
 
-    try std.testing.expect(bullets.tryConsume(3));
+    try std.testing.expect(projectiles.tryConsume(3));
     try std.testing.expect(mana.tryConsume(50));
 
-    try std.testing.expectEqual(@as(u32, 3), bullets.getCurrent());
+    try std.testing.expectEqual(@as(u32, 3), projectiles.getCurrent());
     try std.testing.expectEqual(@as(u32, 50), mana.getCurrent());
 
     // Update all resources
     manager.updateAll(0.5);
 
     // Should have regenerated
-    try std.testing.expectEqual(@as(u32, 4), bullets.getCurrent()); // +1 bullet
+    try std.testing.expectEqual(@as(u32, 4), projectiles.getCurrent()); // +1 projectile
     try std.testing.expectEqual(@as(u32, 55), mana.getCurrent()); // +5 mana
 }

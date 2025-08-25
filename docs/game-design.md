@@ -23,25 +23,25 @@ Zones are data-driven via ZON files (`game_data.zon`):
 
 ## Combat System
 
-### Bullet Mechanics
-- **Bullet Pool:** 6 bullets maximum, shared resource
-- **Recharge Rate:** 2 bullets per second automatic recharge
+### Projectile Mechanics
+- **Projectile Pool:** 6 projectiles maximum, shared resource
+- **Recharge Rate:** 2 projectiles per second automatic recharge
 - **Shooting Modes:**
   - **Rhythm Mode:** Hold button for 150ms interval shots
   - **Burst Mode:** Click for immediate shots
-- **Bullet Lifetime:** 4-second maximum travel time
-- **Damage:** 1 damage per bullet (upgradeable)
+- **Projectile Lifetime:** 4-second maximum travel time
+- **Damage:** 1 damage per projectile (upgradeable)
 
 ### Combat Strategy
 - Resource management: Balance burst damage vs sustained fire
-- Positioning: Account for bullet travel time
+- Positioning: Account for projectile travel time
 - Crowd control: Use spells to manage multiple enemies
 
 ### Future Upgrades
 - Multi-shot patterns
 - Damage increases
 - Range extensions
-- Piercing bullets
+- Piercing projectiles
 - Elemental effects
 
 ## Spell System
@@ -83,7 +83,7 @@ Zones are data-driven via ZON files (`game_data.zon`):
 - **Particle Pool:** 256 simultaneous effects maximum
 - **Effect Types:**
   - Area of effect circles (spells)
-  - Impact particles (bullets)
+  - Impact particles (projectiles)
   - Ambient effects (portals, lifestones)
 - **Performance:** Additive blending for GPU efficiency
 - **Lifecycle:** Automatic cleanup after duration
@@ -135,7 +135,7 @@ Zones are data-driven via ZON files (`game_data.zon`):
 ### Character Development
 - **Health:** Base 3 HP (upgradeable)
 - **Movement Speed:** Variable with modifiers
-- **Combat Stats:** Damage, fire rate, bullet speed
+- **Combat Stats:** Damage, fire rate, projectile speed
 
 ### Upgrade Paths (Planned)
 - **Offensive:** Damage, multi-shot, piercing

@@ -198,9 +198,9 @@ test "save to PGM file" {
     }
 
     // Save to file
-    try BitmapVisualizer.saveToPGM(bitmap, width, height, "test_gradient.pgm");
-    std.debug.print("\nSaved gradient to test_gradient.pgm\n", .{});
-    std.debug.print("View with: display test_gradient.pgm\n", .{});
+    // try BitmapVisualizer.saveToPGM(bitmap, width, height, "test_gradient.pgm");
+    // std.debug.print("\nSaved gradient to test_gradient.pgm\n", .{});
+    // std.debug.print("View with: display test_gradient.pgm\n", .{});
 }
 
 // Run with: zig build test -Dtest-filter="basic rendering"

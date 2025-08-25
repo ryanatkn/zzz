@@ -91,7 +91,7 @@ $ zig build --help       # Show all build options
 - **HUD:** ` (backtick) toggle transparent menu overlay
 
 **Key Features:**
-- **Combat System:** 6-bullet pool with 2/sec recharge, burst & rhythm modes
+- **Combat System:** 6-projectile pool with 2/sec recharge, burst & rhythm modes
 - **Spell System:** 8 slots, targeted/self-cast, visual AoE indicators
 - **Effects:** GPU-accelerated particles with gameplay integration
 - **World:** Zone-based travel with persistent lifestone checkpoints
@@ -149,9 +149,9 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 - Persistent lifestone attunement across sessions
 
 **Combat System:**
-- **Bullet Pool:** 6 bullets max, 2/sec recharge rate
+- **Projectile Pool:** 6 projectiles max, 2/sec recharge rate
 - **Shooting Modes:** Hold for rhythm (150ms intervals), click for burst
-- **Bullet Lifetime:** 4-second travel limit (upgradeable)
+- **Projectile Lifetime:** 4-second travel limit (upgradeable)
 - **Future:** Multi-shot, damage, range upgrades
 
 **Spell System:**
@@ -179,7 +179,7 @@ For GPU performance strategy and optimization guidelines, see [docs/gpu-performa
 **System Architecture:**
 - **Input System:** Unified helpers for modifiers (Ctrl, Shift)
 - **Spell System:** Modular with per-spell cooldowns and effects
-- **Combat System:** Bullet pool with recharge mechanics
+- **Combat System:** Projectile pool with recharge mechanics
 - **Effect System:** 256 simultaneous effects with lifecycle management
 - **Browser System:** SvelteKit-style routing for UI pages
 - **Reactive System:** Complete Svelte 5 implementation with full rune support ✅

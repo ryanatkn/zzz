@@ -15,7 +15,7 @@ pub const combat = @import("combat/mod.zig");
 pub const control = @import("control/mod.zig");
 
 // Projectiles
-pub const projectiles = @import("projectiles/bullet_pool.zig");
+pub const projectiles = @import("projectiles/projectile_pool.zig");
 
 // New generic systems
 pub const persistence = @import("persistence/mod.zig");
@@ -30,6 +30,3 @@ pub const world = @import("world/mod.zig");
 const std = @import("std");
 pub const EntityId = u32;
 pub const INVALID_ENTITY: EntityId = std.math.maxInt(u32);
-
-// Backwards compatibility
-pub const bullet_pool = projectiles;

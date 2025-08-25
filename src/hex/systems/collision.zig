@@ -27,7 +27,7 @@ pub const CollisionSystem = struct {
     pub fn checkAllCollisions(game_state: anytype) void {
         const world = &game_state.hex_game;
 
-        // Bullet-unit collision is handled in world.updateProjectiles()
+        // Projectile-unit collision is handled in world.updateProjectiles()
         // Check if controlled entity is alive before processing collisions
         const controlled_entity_alive = if (world.getControlledEntity()) |controlled_entity| blk: {
             const zone = world.getCurrentZoneConst();

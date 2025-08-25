@@ -42,12 +42,6 @@ pub fn getUnitFactions(disposition: Disposition, unit_type: UnitType) EntityFact
             .living,
             .kingdom_guard, // Friendly units serve the kingdom
         }),
-        .allied => EntityFactions.initWithTags(&.{
-            .halfling, // Allied units are same race as player
-            .living,
-            .kingdom_guard, // Strong alliance with the kingdom
-            .guardian, // Actively protects player
-        }),
         .hostile => switch (unit_type) {
             .enemy => EntityFactions.initWithTags(&.{
                 .goblin, // Default hostile race
@@ -76,21 +70,12 @@ pub fn getUnitFactions(disposition: Disposition, unit_type: UnitType) EntityFact
 
 /// Map existing disposition system to capabilities
 /// This provides sensible defaults based on current behavior
-/// NOTE: Speed now comes from unit data, not capabilities
 pub fn getUnitCapabilities(disposition: Disposition) Capabilities {
     return switch (disposition) {
         .friendly => .{
             .can_move = true,
             .can_be_controlled = true,
             .can_attack = false, // Friendly units don't attack
-            .attack_damage = 0.0,
-            .can_be_damaged = true,
-            .can_interact = true,
-        },
-        .allied => .{
-            .can_move = true,
-            .can_be_controlled = true,
-            .can_attack = false, // Allied units don't attack
             .attack_damage = 0.0,
             .can_be_damaged = true,
             .can_interact = true,

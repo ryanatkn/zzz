@@ -165,30 +165,30 @@ pub fn shareAllegiance(game: *const HexGame, entity_a: EntityId, entity_b: Entit
 }
 
 /// Get friendly entities near a position (for AI assistance, etc.)
-pub fn getFriendlyEntitiesNear(game: *const HexGame, center_entity: EntityId, _: f32, allies: []EntityId) usize {
+pub fn getFriendlyEntitiesNear(game: *const HexGame, center_entity: EntityId, _: f32, friendlies: []EntityId) usize {
     const zone = game.getCurrentZoneConst();
     const center_factions = getEntityFactions(game, center_entity) orelse return 0;
 
-    var ally_count: usize = 0;
+    var friendly_count: usize = 0;
 
     // Check units in current zone
     var unit_iter = zone.units.entityIterator();
     while (unit_iter.next()) |unit_id| {
         if (unit_id == center_entity) continue; // Skip self
-        if (ally_count >= allies.len) break;
+        if (friendly_count >= friendlies.len) break;
 
         const unit_factions = getUnitFactions(game, unit_id) orelse continue;
         const relation = factions.calculateRelation(center_factions, unit_factions);
 
-        // Only consider friendly or allied entities
-        if (relation == .friendly or relation == .allied) {
+        // Only consider friendly entities
+        if (relation == .friendly) {
             // TODO: Add distance check when we have position data
-            allies[ally_count] = unit_id;
-            ally_count += 1;
+            friendlies[friendly_count] = unit_id;
+            friendly_count += 1;
         }
     }
 
-    return ally_count;
+    return friendly_count;
 }
 
 /// Check if an entity can be controlled (for possession mechanics)

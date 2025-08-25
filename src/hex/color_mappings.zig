@@ -17,7 +17,6 @@ pub inline fn dispositionToBaseColor(disposition: Disposition) BaseColor {
         .fearful => .yellow, // Caution - flees from player (distinct from orange)
         .neutral => .brown, // Passive - ignores player
         .friendly => .blue, // Safe - won't attack, may help
-        .allied => .green, // Helpful - actively assists player
     };
 }
 

@@ -118,8 +118,8 @@ pub const HASTE_COOLDOWN = 12.0; // Haste spell cooldown (unchanged)
 pub const HASTE_SPEED_MULT = 1.5; // 50% speed increase (unchanged)
 
 pub const MULTISHOT_COOLDOWN = 8.0; // Multishot spell cooldown
-pub const MULTISHOT_COUNT = 3; // Number of bullets in spread
-pub const MULTISHOT_SPREAD_ANGLE = 0.3; // Radians between bullets
+pub const MULTISHOT_COUNT = 3; // Number of projectiles in spread
+pub const MULTISHOT_SPREAD_ANGLE = 0.3; // Radians between projectiles
 
 pub const DAZZLE_RADIUS = 10.0; // 10m Dazzle AoE radius (was 120 pixels ≈ 10m)
 pub const DAZZLE_DURATION = 5.0; // Dazzle effect duration
