@@ -362,11 +362,6 @@ pub fn checkCollisions(game_state: *GameState) void {
     systems.CollisionSystem.checkAllCollisions(game_state);
 }
 
-pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void {
-    // Delegate to UpdateSystem
-    systems.UpdateSystem.handleFireBullet(game_state, cam);
-}
-
 // Lifestone collision checking now handled by LifestoneSystem
 
 pub fn handleRespawn(game_state: *GameState) void {

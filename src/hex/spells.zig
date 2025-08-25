@@ -577,7 +577,7 @@ pub const SpellSystem = struct {
 
             // Use the hex_game's bullet pool for firing
             if (game.canFireProjectile()) {
-                const success = combat.fireProjectile(game, bullet_target, &game.projectile_pool);
+                const success = combat.fireProjectile(game, bullet_target, &game.projectile_pool, false);
                 if (success) {
                     bullets_fired += 1;
                 } else {

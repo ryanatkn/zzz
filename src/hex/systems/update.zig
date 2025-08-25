@@ -128,13 +128,10 @@ pub const UpdateSystem = struct {
         }
         // Note: Controller always possesses an entity at startup, so no fallback needed
 
-        // Handle continuous shooting on left-click hold (rhythm mode)
-        // Only shoot if Ctrl is NOT held (Ctrl enables mouse movement instead)
-        const can_shoot = world.hasLiveControlledEntity() and world.canFireProjectile();
-        if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and can_shoot) {
-            // Use unified bullet firing with proper coordinate conversion
+        // Handle hold shooting with 150ms rhythm timing (respects bullet pool cooldown)
+        if (!input_state.isCtrlHeld() and input_state.isLeftMouseHeld() and world.hasLiveControlledEntity()) {
             const screen_mouse_pos = input_state.getMousePos();
-            _ = combat.fireProjectileAtScreenPos(world, screen_mouse_pos, cam, &world.projectile_pool);
+            _ = combat.fireProjectileAtScreenPos(world, screen_mouse_pos, cam, &world.projectile_pool, false);
         }
 
         // Update projectile entities using ECS
@@ -154,14 +151,5 @@ pub const UpdateSystem = struct {
 
         // Update bullet pool with context
         world.updateProjectilePool(frame_ctx);
-    }
-
-    /// Handle fire bullet action - extracted from game.zig
-    pub fn handleFireBullet(game_state: anytype, cam: *const camera.Camera) void {
-        if (game_state.hex_game.getPlayerAlive() and !game_state.game_paused and game_state.hex_game.canFireBullet()) {
-            const screen_mouse_pos = game_state.input_state.getMousePos();
-            const world_mouse_pos = cam.screenToWorldSafe(screen_mouse_pos);
-            _ = combat.fireBulletAtMouse(&game_state.hex_game, world_mouse_pos, &game_state.hex_game.bullet_pool);
-        }
     }
 };

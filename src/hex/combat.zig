@@ -2,6 +2,7 @@ const std = @import("std");
 
 const loggers = @import("../lib/debug/loggers.zig");
 const math = @import("../lib/math/mod.zig");
+const time = @import("../lib/core/time.zig");
 const camera = @import("../lib/game/camera/camera.zig");
 const BulletPoolImpl = @import("../lib/game/projectiles/bullet_pool.zig").BulletPool;
 const combat = @import("../lib/game/combat/mod.zig");
@@ -43,7 +44,7 @@ const HexCombatInterface = struct {
     }
 };
 
-pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) bool {
+pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl, bypass_cooldown: bool) bool {
     // Check if there's a controlled entity that can shoot
     if (!HexCombatInterface.isShooterAlive(game)) return false;
 
@@ -62,7 +63,26 @@ pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) b
 
     // Check if shooting is possible using generic interface
     if (!combat.CombatActions.canShoot(config)) return false;
-    if (!pool.canFire()) return false;
+
+    // Handle timing based on bypass_cooldown flag
+    const current_time_ms = @as(u64, @intFromFloat(time.Time.getTimeMs()));
+
+    if (bypass_cooldown) {
+        // Skill-based: only check bullet count
+        if (pool.getCurrentCount() == 0) return false;
+        // Manually consume bullet without cooldown
+        pool.current_bullets -= 1;
+        game.logger.info("projectile_fired", "Projectile fired immediate (skill-based)! ID pending, pos: {any}, target: {any}", .{ config.shooter_pos, target_pos });
+    } else {
+        // Rhythm: check both bullet count and cooldown timing
+        if (!pool.canFire()) return false;
+        // Use normal fire which applies cooldown
+        pool.fire();
+        game.logger.info("projectile_fired", "Projectile fired rhythm! ID pending, pos: {any}, target: {any}", .{ config.shooter_pos, target_pos });
+    }
+
+    // Track shot time for both modes (shared timing reference)
+    pool.last_fire_time_ms = current_time_ms;
 
     // Calculate velocity using generic system
     const velocity = combat.CombatActions.calculateProjectileVelocity(config);
@@ -70,21 +90,18 @@ pub fn fireProjectile(game: *HexGame, target_pos: Vec2, pool: *BulletPoolImpl) b
     // Create bullet entity using hex-specific implementation
     const bullet_id = HexCombatInterface.createProjectileFromCombat(game, config.shooter_pos, velocity, config.projectile_radius, config.projectile_lifetime, config.damage) catch return false;
 
-    // Consume from bullet pool
-    pool.fire();
-
-    game.logger.info("projectile_fired", "Projectile fired from controlled entity! ID: {}, pos: {any}, target: {any}", .{ bullet_id, config.shooter_pos, target_pos });
+    game.logger.info("projectile_confirmed", "Projectile created with ID: {}", .{bullet_id});
     return true;
 }
 
-pub fn fireProjectileAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl) bool {
-    return fireProjectile(game, mouse_pos, pool);
+pub fn fireProjectileAtMouse(game: *HexGame, mouse_pos: Vec2, pool: *BulletPoolImpl, bypass_cooldown: bool) bool {
+    return fireProjectile(game, mouse_pos, pool, bypass_cooldown);
 }
 
 /// Fire projectile with proper screen-to-world coordinate conversion
-pub fn fireProjectileAtScreenPos(game: *HexGame, screen_pos: Vec2, cam: *const Camera, pool: *BulletPoolImpl) bool {
+pub fn fireProjectileAtScreenPos(game: *HexGame, screen_pos: Vec2, cam: *const Camera, pool: *BulletPoolImpl, bypass_cooldown: bool) bool {
     const world_pos = cam.screenToWorldSafe(screen_pos);
-    return fireProjectile(game, world_pos, pool);
+    return fireProjectile(game, world_pos, pool, bypass_cooldown);
 }
 
 /// Convert hex lifestone to generic checkpoint data

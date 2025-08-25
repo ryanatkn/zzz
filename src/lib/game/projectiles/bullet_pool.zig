@@ -14,12 +14,13 @@ pub const BulletPool = struct {
     recharge_accumulator: f32,
     fire_cooldown: f32, // Min time between shots
     cooldown_remaining: f32,
+    last_fire_time_ms: u64, // Track when any shot was fired
 
     /// Default configuration for balanced gameplay
     pub const DEFAULT_CONFIG = struct {
         pub const SIZE = 6; // Even number for rhythm mode
         pub const RECHARGE_RATE = 2.0; // Bullets per second (full recharge in 3s)
-        pub const FIRE_COOLDOWN = 0.15; // 150ms between shots for rhythm
+        pub const FIRE_COOLDOWN = 2.0 / 6.0; // TODO needs to be computed from `recharge_rate / size`
     };
 
     /// Initialize with default configuration
@@ -36,6 +37,7 @@ pub const BulletPool = struct {
             .recharge_accumulator = 0,
             .fire_cooldown = fire_cooldown,
             .cooldown_remaining = 0,
+            .last_fire_time_ms = 0,
         };
     }
 

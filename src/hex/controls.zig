@@ -44,8 +44,6 @@ pub fn handleSDLEvent(
         if (handled) return c.sdl.SDL_APP_CONTINUE;
     }
 
-    // Legacy game HUD doesn't block events - it's just a display overlay
-
     switch (event.type) {
         c.sdl.SDL_EVENT_QUIT => {
             game_state.requestQuit();
@@ -206,12 +204,11 @@ pub fn handleSDLEvent(
                             return c.sdl.SDL_APP_CONTINUE;
                         }
 
-                        // Left-click shooting for single shots (burst mode)
-                        game_state.hex_game.logger.info("primary_attack", "Primary attack at mouse position: {any}", .{screen_mouse_pos});
-
-                        // Use unified projectile firing with proper coordinate conversion
-                        const result = combat.fireProjectileAtScreenPos(&game_state.hex_game, screen_mouse_pos, &game_renderer.camera, &game_state.hex_game.projectile_pool);
-                        game_state.hex_game.logger.info("projectile_result", "fireProjectileAtScreenPos result: {}", .{result});
+                        // Single-click shooting - immediate firing (skill-based, bypasses 150ms cooldown)
+                        const result = combat.fireProjectileAtScreenPos(&game_state.hex_game, screen_mouse_pos, &game_renderer.camera, &game_state.hex_game.projectile_pool, true);
+                        if (result) {
+                            game_state.hex_game.logger.info("single_click_shot", "Single-click shot fired (skill-based)", .{});
+                        }
                     }
                 },
                 .SecondaryAttack => {
@@ -255,6 +252,10 @@ pub fn handleSDLEvent(
             game_state.input_state.handleMouseButtonUp(event.button.button);
         },
         c.sdl.SDL_EVENT_MOUSE_WHEEL => {
+            // TODO I'm not receiving this event on Linux
+            // Maybe related:
+            // https://github.com/libsdl-org/SDL/pull/13453
+            // https://github.com/libsdl-org/SDL/pull/13453/files
             std.log.info("mouse_wheel event detected! y={d:.2} x={d:.2}", .{ event.wheel.y, event.wheel.x });
 
             // Direct zoom based on wheel direction
