@@ -13,7 +13,7 @@ const physics = @import("../physics.zig");
 const color_mappings = @import("../color_mappings.zig");
 const portals = @import("../portals.zig");
 const controlled_entity_mod = @import("../controlled_entity.zig");
-const combat = @import("../combat.zig");
+const combat = @import("../combat/mod.zig");
 const CollisionSystem = @import("collision.zig").CollisionSystem;
 
 // HUD control
@@ -132,7 +132,7 @@ pub const UpdateSystem = struct {
         // Exclude first frame of mouse press to avoid double-shooting
         if (!input_state.isCtrlHeld() and input_state.left_mouse_held and !input_state.left_mouse_just_pressed and world.hasLiveControlledEntity()) {
             const screen_mouse_pos = input_state.mouse_pos;
-            _ = combat.fireProjectileAtScreenPos(world, screen_mouse_pos, cam, &world.projectile_pool, false);
+            _ = combat.projectiles.fireProjectileAtScreenPos(world, screen_mouse_pos, cam, &world.projectile_pool, false);
         }
 
         // Update projectile entities using ECS

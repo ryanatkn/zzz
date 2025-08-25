@@ -3,6 +3,7 @@ const c = @import("../../lib/platform/sdl.zig");
 const math = @import("../../lib/math/mod.zig");
 const core_colors = @import("../../lib/core/colors.zig");
 const hex_colors = @import("../colors.zig");
+const constants = @import("../constants.zig");
 const loggers = @import("../../lib/debug/loggers.zig");
 const world_state_mod = @import("../world_state.zig");
 
@@ -90,8 +91,8 @@ pub const UIOverlayRenderer = struct {
         if (ai_enabled) {
             const ai_text = "AI CONTROL";
 
-            // Get screen width from GPU renderer - simplified approach for now
-            const screen_width = 1920.0; // TODO: Get actual screen width
+            // Use hex game constants for screen width
+            const screen_width = constants.SCREEN_WIDTH;
 
             // Position in top-right corner for visibility
             const position = Vec2{ .x = screen_width - 120.0, .y = 10.0 };

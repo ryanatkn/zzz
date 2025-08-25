@@ -18,6 +18,7 @@ test {
     _ = @import("systems/mod.zig"); // May have tests but systems likely use SDL
     _ = @import("world/mod.zig"); // Zone/world logic shouldn't need SDL
     _ = @import("abilities/mod.zig"); // Ability type definitions and helpers
+    _ = @import("combat/mod.zig"); // Combat system module
 
     // Skip modules that definitely use SDL:
     // - controllers/mod.zig (uses input system)

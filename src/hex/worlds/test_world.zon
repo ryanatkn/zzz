@@ -1,11 +1,8 @@
 // Test World - Simple Testing Environment
 // Designed for development and testing of game mechanics
+// Note: Screen dimensions are defined in engine constants, not world data
 
 .{
-    // Screen dimensions
-    .screen_width = 1920.0,
-    .screen_height = 1080.0,
-
     // Player starting position (test hub center-left)
     .player_start = .{
         .zone = 0,

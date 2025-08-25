@@ -5,7 +5,7 @@ pub const LifestoneSystem = @import("lifestone.zig").LifestoneSystem;
 pub const UpdateSystem = @import("update.zig").UpdateSystem;
 
 // Re-export combat and abilities systems (existing)
-pub const combat = @import("../combat.zig");
+pub const combat = @import("../combat/mod.zig");
 pub const abilities = @import("../ability_system.zig");
 pub const portal = @import("../portals.zig");
 

@@ -8,9 +8,6 @@ pub const timer_patterns = @import("timer_patterns.zig");
 // Behaviors
 pub const behaviors = @import("behaviors/mod.zig");
 
-// Combat systems
-pub const combat = @import("combat/mod.zig");
-
 // Control systems
 pub const control = @import("control/mod.zig");
 

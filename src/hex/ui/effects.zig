@@ -17,8 +17,8 @@ pub const EffectsSystem = struct {
         game_state.iris_wipe_active = true;
         game_state.iris_wipe_start_time = time_utils.Time.now();
 
-        const combat = @import("../combat.zig");
-        combat.respawnPlayer(game_state);
+        const combat = @import("../combat/mod.zig");
+        combat.death.respawnPlayer(game_state);
     }
 
     /// Update iris wipe effect

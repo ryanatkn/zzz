@@ -67,11 +67,40 @@ pub fn distanceToSegment(point: Point2D, segment_start: Point2D, segment_end: Po
     return point.distance(closest);
 }
 
+/// Test if a point lies exactly on an edge of a polygon
+/// Returns true if point is on any edge, false otherwise
+fn isPointOnPolygonEdge(point: Point2D, polygon: []const Point2D) bool {
+    if (polygon.len < 2) return false;
+
+    const epsilon = 1e-6;
+
+    for (0..polygon.len) |i| {
+        const p1 = polygon[i];
+        const p2 = polygon[(i + 1) % polygon.len];
+
+        // Calculate distance from point to this edge
+        const edge_distance = distanceToSegment(point, p1, p2);
+
+        // If distance is essentially zero, point is on the edge
+        if (edge_distance < epsilon) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /// Test if a point is inside a polygon using ray casting algorithm
 /// Returns true if point is inside, false if outside
+/// Points on edges are considered outside for consistent behavior
 /// Works with both clockwise and counter-clockwise winding
 pub fn isPointInsidePolygon(point: Point2D, polygon: []const Point2D) bool {
     if (polygon.len < 3) return false;
+
+    // Points exactly on edges are considered outside
+    if (isPointOnPolygonEdge(point, polygon)) {
+        return false;
+    }
 
     var intersections: u32 = 0;
 

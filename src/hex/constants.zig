@@ -39,6 +39,7 @@ pub const PROJECTILE_SPEED = 33.3; // 33.3 m/s (was 400 pixels/s ≈ 33.3 m/s)
 pub const PROJECTILE_RADIUS = 0.2; // 20cm radius - visible but not huge (was 5 pixels ≈ 42cm)
 pub const PROJECTILE_DAMAGE = 150.0; // Damage values stay the same
 pub const PROJECTILE_LIFETIME = 4.0; // Time values stay the same
+pub const COLLISION_DAMAGE = 999.0; // Fatal contact damage (unit-to-unit collision)
 pub const PORTAL_SPAWN_OFFSET = 0.83; // 83cm offset (was 10 pixels ≈ 83cm)
 
 // Camera viewport constants (in meters)

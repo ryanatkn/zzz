@@ -7,7 +7,7 @@ const game_loop_mod = @import("game_loop.zig");
 const camera = @import("../lib/game/camera/camera.zig");
 const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
-const combat = @import("combat.zig");
+const combat = @import("combat/mod.zig");
 
 // Import new input system modules
 const game_input = @import("../lib/game/input/mod.zig");
@@ -205,7 +205,7 @@ pub fn handleSDLEvent(
                         }
 
                         // Single-click shooting - immediate firing (skill-based, bypasses 150ms cooldown)
-                        const result = combat.fireProjectileAtScreenPos(&game_state.hex_game, screen_mouse_pos, &game_renderer.camera, &game_state.hex_game.projectile_pool, true);
+                        const result = combat.projectiles.fireProjectileAtScreenPos(&game_state.hex_game, screen_mouse_pos, &game_renderer.camera, &game_state.hex_game.projectile_pool, true);
                         if (result) {
                             game_state.hex_game.logger.info("single_click_shot", "Single-click shot fired (skill-based)", .{});
                         }

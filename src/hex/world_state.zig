@@ -19,7 +19,7 @@ const loggers = @import("../lib/debug/loggers.zig");
 
 // Hex game modules
 const constants = @import("constants.zig");
-const combat = @import("combat.zig");
+const combat = @import("combat/mod.zig");
 const faction_presets = @import("faction_presets.zig");
 const faction_integration = @import("faction_integration.zig");
 const controller_mod = @import("controller.zig");
@@ -30,7 +30,7 @@ const factions = @import("factions.zig");
 
 const Vec2 = math.Vec2;
 const Color = colors.Color;
-const ProjectilePool = combat.ProjectilePool;
+const ProjectilePool = combat.projectiles.ProjectilePool;
 const FrameContext = frame.FrameContext;
 const EntityIterator = storage.EntityIterator;
 

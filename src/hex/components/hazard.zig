@@ -1,3 +1,5 @@
+const constants = @import("../constants.zig");
+
 /// Hazard - marks entities that cause damage/death on contact
 /// Sparse storage - only dangerous entities have this
 pub const Hazard = struct {
@@ -35,7 +37,7 @@ pub const Hazard = struct {
     pub fn createDeadlyPit() Hazard {
         return .{
             .hazard_type = .pit,
-            .damage = 999.0, // High damage, but deadly=true makes this irrelevant
+            .damage = constants.COLLISION_DAMAGE, // Fatal damage (consistent with combat system)
             .deadly = true,
             .damage_over_time = false,
             .damage_interval = 0.0,
