@@ -19,7 +19,7 @@ pub const Phaseable = struct {
 
     pub fn startPhase(self: *Phaseable, duration: f32) void {
         self.phased = true;
-        self.phase_duration = @min(duration, self.max_phase_duration);
+        self.phase_duration = if (duration < self.max_phase_duration) duration else self.max_phase_duration;
     }
 
     pub fn endPhase(self: *Phaseable) void {

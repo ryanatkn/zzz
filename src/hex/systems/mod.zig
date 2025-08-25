@@ -4,9 +4,9 @@ pub const CollisionSystem = @import("collision.zig").CollisionSystem;
 pub const LifestoneSystem = @import("lifestone.zig").LifestoneSystem;
 pub const UpdateSystem = @import("update.zig").UpdateSystem;
 
-// Re-export combat and spells systems (existing)
+// Re-export combat and abilities systems (existing)
 pub const combat = @import("../combat.zig");
-pub const spells = @import("../spells.zig");
+pub const abilities = @import("../ability_system.zig");
 pub const portal = @import("../portals.zig");
 
 // Re-export for convenience

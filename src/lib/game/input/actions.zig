@@ -13,16 +13,16 @@ pub const GameAction = enum {
     PrimaryAttack, // Usually left-click
     SecondaryAttack, // Usually right-click
 
-    // Spell/ability actions
-    CastSpell,
-    SelectSpell1,
-    SelectSpell2,
-    SelectSpell3,
-    SelectSpell4,
-    SelectSpell5,
-    SelectSpell6,
-    SelectSpell7,
-    SelectSpell8,
+    // Ability actions
+    UseAbility,
+    SelectAbility1,
+    SelectAbility2,
+    SelectAbility3,
+    SelectAbility4,
+    SelectAbility5,
+    SelectAbility6,
+    SelectAbility7,
+    SelectAbility8,
 
     // System actions
     TogglePause,
@@ -121,15 +121,8 @@ pub fn mapScancodeToAction(scancode: u32) GameAction {
         c.sdl.SDL_SCANCODE_A => .MoveLeft,
         c.sdl.SDL_SCANCODE_D => .MoveRight,
 
-        // Spells (1-4, Q, E, R, F pattern)
-        c.sdl.SDL_SCANCODE_1 => .SelectSpell1,
-        c.sdl.SDL_SCANCODE_2 => .SelectSpell2,
-        c.sdl.SDL_SCANCODE_3 => .SelectSpell3,
-        c.sdl.SDL_SCANCODE_4 => .SelectSpell4,
-        c.sdl.SDL_SCANCODE_Q => .SelectSpell5,
-        c.sdl.SDL_SCANCODE_E => .SelectSpell6,
-        c.sdl.SDL_SCANCODE_R => .SelectSpell7,
-        c.sdl.SDL_SCANCODE_F => .SelectSpell8,
+        // Ability mappings are game-specific - games implement their own key bindings
+        // Example: c.sdl.SDL_SCANCODE_1 => .SelectAbility1,
 
         // Camera controls
         c.sdl.SDL_SCANCODE_EQUALS => .ZoomIn, // = key (easier than shift+= for +)
@@ -173,8 +166,8 @@ pub fn getActionPriority(action: GameAction) ActionPriority {
     return switch (action) {
         .Quit, .ToggleMenu, .TogglePause => .System,
         .Respawn => .Respawn,
-        .PrimaryAttack, .SecondaryAttack, .CastSpell => .Combat,
-        .SelectSpell1, .SelectSpell2, .SelectSpell3, .SelectSpell4, .SelectSpell5, .SelectSpell6, .SelectSpell7, .SelectSpell8 => .Combat,
+        .PrimaryAttack, .SecondaryAttack, .UseAbility => .Combat,
+        .SelectAbility1, .SelectAbility2, .SelectAbility3, .SelectAbility4, .SelectAbility5, .SelectAbility6, .SelectAbility7, .SelectAbility8 => .Combat,
         .MoveUp, .MoveDown, .MoveLeft, .MoveRight => .Movement,
         .ZoomIn, .ZoomOut => .UI,
         .ToggleHUD => .UI,
@@ -192,25 +185,25 @@ pub fn isMovementAction(action: GameAction) bool {
     };
 }
 
-/// Check if action is a spell selection action
-pub fn isSpellSelectionAction(action: GameAction) bool {
+/// Check if action is an ability selection action
+pub fn isAbilitySelectionAction(action: GameAction) bool {
     return switch (action) {
-        .SelectSpell1, .SelectSpell2, .SelectSpell3, .SelectSpell4, .SelectSpell5, .SelectSpell6, .SelectSpell7, .SelectSpell8 => true,
+        .SelectAbility1, .SelectAbility2, .SelectAbility3, .SelectAbility4, .SelectAbility5, .SelectAbility6, .SelectAbility7, .SelectAbility8 => true,
         else => false,
     };
 }
 
-/// Get spell slot number from spell selection action (0-7)
-pub fn getSpellSlotFromAction(action: GameAction) ?u8 {
+/// Get ability slot number from ability selection action (0-7)
+pub fn getAbilitySlotFromAction(action: GameAction) ?u8 {
     return switch (action) {
-        .SelectSpell1 => 0,
-        .SelectSpell2 => 1,
-        .SelectSpell3 => 2,
-        .SelectSpell4 => 3,
-        .SelectSpell5 => 4,
-        .SelectSpell6 => 5,
-        .SelectSpell7 => 6,
-        .SelectSpell8 => 7,
+        .SelectAbility1 => 0,
+        .SelectAbility2 => 1,
+        .SelectAbility3 => 2,
+        .SelectAbility4 => 3,
+        .SelectAbility5 => 4,
+        .SelectAbility6 => 5,
+        .SelectAbility7 => 6,
+        .SelectAbility8 => 7,
         else => null,
     };
 }

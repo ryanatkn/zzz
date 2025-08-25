@@ -3,25 +3,26 @@ pub const Vec2 = math.Vec2;
 
 const EntityId = u32;
 
-/// Unit - core gameplay entity component
-/// Generic unit with basic properties - games add behavior specifics
-pub const Unit = struct {
-    pub const UnitType = enum {
-        player,
-        enemy,
-        friendly,
-        neutral,
+/// Generic Unit component - games define their own UnitType enum
+/// Example: const MyUnit = Unit(MyUnitType);
+pub fn Unit(comptime UnitType: type) type {
+    return struct {
+        const Self = @This();
+
+        unit_type: UnitType,
+        home_pos: Vec2,
+        target: ?EntityId,
+
+        pub fn init(unit_type: UnitType, home_pos: Vec2) Self {
+            return .{
+                .unit_type = unit_type,
+                .home_pos = home_pos,
+                .target = null,
+            };
+        }
     };
+}
 
-    unit_type: UnitType,
-    home_pos: Vec2,
-    target: ?EntityId,
-
-    pub fn init(unit_type: UnitType, home_pos: Vec2) Unit {
-        return .{
-            .unit_type = unit_type,
-            .home_pos = home_pos,
-            .target = null,
-        };
-    }
-};
+// Generic Unit component is ready for use by games
+// Games should create their own Unit instances with game-specific UnitType enums
+// Example: const MyUnit = Unit(MyUnitType);

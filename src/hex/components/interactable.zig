@@ -1,9 +1,8 @@
-const math = @import("../../math/mod.zig");
+const math = @import("../../lib/math/mod.zig");
 pub const Vec2 = math.Vec2;
 
-// Import Unit for transform data
-const unit_mod = @import("unit.zig");
-pub const Unit = unit_mod.Unit;
+const unit_ext = @import("../unit_ext.zig");
+const HexUnitType = unit_ext.HexUnitType;
 const EntityId = u32;
 
 /// Interactable - enables entity interactions (deflection, telekinesis, etc.)
@@ -41,7 +40,7 @@ pub const Interactable = struct {
             controller: EntityId,
         },
         transform: struct {
-            target_type: Unit.UnitType,
+            target_type: HexUnitType,
             progress: f32,
         },
         none: void,

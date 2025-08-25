@@ -148,7 +148,7 @@ pub const UpdateSystem = struct {
         game_state.particle_system.update();
 
         // Update spell system with context
-        game_state.spell_system.update(frame_ctx);
+        game_state.ability_system.update(frame_ctx);
 
         // Update projectile pool with context
         world.updateProjectilePool(frame_ctx);

@@ -33,7 +33,7 @@ const physics = @import("physics.zig");
 const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const color_mappings = @import("color_mappings.zig");
-const spells = @import("spells.zig");
+const abilities = @import("ability_system.zig");
 
 // Extracted modules for clean architecture
 const input_modules = @import("input/mod.zig");
@@ -59,10 +59,10 @@ pub const GameState = struct {
     particle_system: GameParticleSystem,
 
     // Spell system
-    spell_system: spells.SpellSystem,
+    ability_system: abilities.AbilitySystem,
 
-    // Spellbar UI
-    spellbar_ui: ui.spellbar.Spellbar,
+    // Ability bar UI
+    ability_bar_ui: ui.ability_bar.AbilityBar,
 
     // Allocator for ECS world cleanup
     allocator: std.mem.Allocator,
@@ -105,8 +105,8 @@ pub const GameState = struct {
             .quit_requested = false,
             .particle_system = GameParticleSystem.init(),
             .logger = ModuleLogger.init(allocator),
-            .spell_system = spells.SpellSystem.init(),
-            .spellbar_ui = ui.spellbar.Spellbar.init(),
+            .ability_system = abilities.AbilitySystem.init(),
+            .ability_bar_ui = ui.ability_bar.AbilityBar.init(),
             .allocator = allocator,
             .hud_system = null,
             .renderer = null,

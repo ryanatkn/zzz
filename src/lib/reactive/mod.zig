@@ -134,7 +134,10 @@ pub const createEffectRoot = convenience_mod.createEffectRoot;
 pub const isTracking = convenience_mod.isTracking;
 pub const createEffectWithCleanup = convenience_mod.createEffectWithCleanup;
 pub const watchSignal = convenience_mod.watchSignal;
-pub const batch = convenience_mod.batch;
+pub const batchFn = convenience_mod.batch; // Function for batching updates
 pub const snapshot = convenience_mod.snapshot;
 pub const createEffectRef = convenience_mod.createEffectRef;
 pub const createDerivedRef = convenience_mod.createDerivedRef;
+
+// Re-export modules for direct access to their functions
+pub const batch = batch_mod; // Module with getGlobalBatcher etc

@@ -28,7 +28,8 @@ pub const Charmable = struct {
         self.charmed = true;
         self.original_controller = caster;
         // Apply resistance factor
-        self.charm_duration = @min(duration * self.charm_strength, self.max_charm_duration);
+        const effective_duration = duration * self.charm_strength;
+        self.charm_duration = if (effective_duration < self.max_charm_duration) effective_duration else self.max_charm_duration;
         return true;
     }
 

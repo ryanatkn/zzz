@@ -18,6 +18,18 @@ const Vec2 = math.Vec2;
 const GameState = game_loop_mod.GameState;
 const GameRenderer = game_renderer_mod.GameRenderer;
 const Hud = hud.Hud;
+
+/// Helper function to check if controlled entity is alive
+/// Consolidates the duplicate dead-check pattern found in multiple places
+fn isControlledEntityAlive(game_state: *const GameState) bool {
+    return if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
+        const zone = game_state.hex_game.getCurrentZoneConst();
+        if (zone.units.getComponent(controlled_entity, .health)) |health| {
+            break :blk health.alive;
+        }
+        break :blk false;
+    } else false;
+}
 const GameAction = input_actions.GameAction;
 
 /// Extract game action from SDL event
@@ -110,10 +122,10 @@ pub fn handleSDLEvent(
                 .ReleaseControl => {
                     game_state.releaseControl();
                 },
-                // Spell selection actions
-                .SelectSpell1, .SelectSpell2, .SelectSpell3, .SelectSpell4, .SelectSpell5, .SelectSpell6, .SelectSpell7, .SelectSpell8 => {
-                    if (input_actions.getSpellSlotFromAction(action)) |slot| {
-                        game_state.spell_system.setActiveSlot(slot);
+                // Ability selection actions
+                .SelectAbility1, .SelectAbility2, .SelectAbility3, .SelectAbility4, .SelectAbility5, .SelectAbility6, .SelectAbility7, .SelectAbility8 => {
+                    if (input_actions.getAbilitySlotFromAction(action)) |slot| {
+                        game_state.ability_system.setActiveSlot(slot);
                     }
                 },
                 // Camera zoom actions
@@ -134,9 +146,9 @@ pub fn handleSDLEvent(
 
             // Note: Mouse wheel events not working on this system - using keyboard zoom (- and = keys)
 
-            // Update spellbar hover state
+            // Update ability bar hover state
             const mouse_pos = game_state.input_state.mouse_pos;
-            game_state.spellbar_ui.updateHover(mouse_pos);
+            game_state.ability_bar_ui.updateHover(mouse_pos);
         },
         c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
             std.log.info("MOUSE_BUTTON_DOWN: button={} (1=left, 2=middle, 3=right, 4/5=wheel?)", .{event.button.button});
@@ -153,13 +165,7 @@ pub fn handleSDLEvent(
             const action = extractGameAction(event);
 
             // Handle dead controlled entity actions - simplified inline logic
-            const controlled_entity_alive = if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
-                const zone = game_state.hex_game.getCurrentZoneConst();
-                if (zone.units.getComponent(controlled_entity, .health)) |health| {
-                    break :blk health.alive;
-                }
-                break :blk false;
-            } else false;
+            const controlled_entity_alive = isControlledEntityAlive(game_state);
 
             if (!controlled_entity_alive) {
                 switch (action) {
@@ -180,21 +186,15 @@ pub fn handleSDLEvent(
             switch (action) {
                 .PrimaryAttack => {
                     // Check if controlled entity is alive for primary attack
-                    const attack_entity_alive = if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
-                        const zone = game_state.hex_game.getCurrentZoneConst();
-                        if (zone.units.getComponent(controlled_entity, .health)) |health| {
-                            break :blk health.alive;
-                        }
-                        break :blk false;
-                    } else false;
+                    const attack_entity_alive = isControlledEntityAlive(game_state);
 
                     if (attack_entity_alive) {
                         const screen_mouse_pos = game_state.input_state.mouse_pos;
 
-                        // Check if click is on spellbar first
-                        if (game_state.spellbar_ui.getSlotAtPosition(screen_mouse_pos)) |slot_index| {
-                            // Left-click on spellbar slot = select spell
-                            game_state.spell_system.setActiveSlot(slot_index);
+                        // Check if click is on ability bar first
+                        if (game_state.ability_bar_ui.getSlotAtPosition(screen_mouse_pos)) |slot_index| {
+                            // Left-click on ability bar slot = select ability
+                            game_state.ability_system.setActiveSlot(slot_index);
                             return c.sdl.SDL_APP_CONTINUE;
                         }
 
@@ -213,26 +213,19 @@ pub fn handleSDLEvent(
                 },
                 .SecondaryAttack => {
                     // Check if controlled entity is alive for secondary attack
-                    const secondary_entity_alive = if (game_state.hex_game.getControlledEntity()) |controlled_entity| blk: {
-                        const zone = game_state.hex_game.getCurrentZoneConst();
-                        if (zone.units.getComponent(controlled_entity, .health)) |health| {
-                            break :blk health.alive;
-                        }
-                        break :blk false;
-                    } else false;
+                    const secondary_entity_alive = isControlledEntityAlive(game_state);
 
                     if (secondary_entity_alive) {
                         const screen_mouse_pos = game_state.input_state.mouse_pos;
 
-                        // Check if right-click is on spellbar first
-                        if (game_state.spellbar_ui.getSlotAtPosition(screen_mouse_pos)) |slot_index| {
-                            // Right-click on spellbar slot = select and cast immediately
-                            game_state.spell_system.setActiveSlot(slot_index);
+                        // Check if right-click is on ability bar first
+                        if (game_state.ability_bar_ui.getSlotAtPosition(screen_mouse_pos)) |slot_index| {
+                            // Right-click on ability bar slot = select and cast immediately
+                            game_state.ability_system.setActiveSlot(slot_index);
 
-                            // Cast the spell at controlled entity position (self-cast since clicked on slot)
-                            const zone = game_state.hex_game.getCurrentZoneConst();
-                            // Spell system will handle getting controlled entity position internally
-                            _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, Vec2.ZERO, &game_state.particle_system, true);
+                            // Cast the ability at controlled entity position (self-cast since clicked on slot)
+                            // Ability system will handle getting controlled entity position internally
+                            _ = game_state.ability_system.useActiveAbility(&game_state.hex_game, Vec2.ZERO, &game_state.particle_system, true);
                             return c.sdl.SDL_APP_CONTINUE;
                         }
 
@@ -240,9 +233,7 @@ pub fn handleSDLEvent(
                         const self_cast = input_modifiers.ModifierHelpers.isSelfCasting(&game_state.input_state);
 
                         const world_mouse_pos = game_renderer.camera.screenToWorldSafe(screen_mouse_pos);
-                        const zone = game_state.hex_game.getCurrentZoneConst();
-
-                        _ = game_state.spell_system.castActiveSpell(&game_state.hex_game, zone, world_mouse_pos, &game_state.particle_system, self_cast);
+                        _ = game_state.ability_system.useActiveAbility(&game_state.hex_game, world_mouse_pos, &game_state.particle_system, self_cast);
                     }
                 },
                 else => {},

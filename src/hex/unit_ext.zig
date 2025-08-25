@@ -1,15 +1,26 @@
 // Extended Unit Component - Hex-specific unit with disposition
 // Extends the generic lib/game Unit with hex-specific fields
 
-const Unit = @import("../lib/game/components/unit.zig").Unit;
+const unit_mod = @import("../lib/game/components/unit.zig");
 const Disposition = @import("disposition.zig").Disposition;
 const Vec2 = @import("../lib/math/mod.zig").Vec2;
 const constants = @import("constants.zig");
 const EnergyLevel = constants.EnergyLevel;
 
+/// Hex-specific unit types
+pub const HexUnitType = enum {
+    player,
+    enemy,
+    friendly,
+    neutral,
+};
+
+/// Base Unit component specialized for hex game
+const Unit = unit_mod.Unit(HexUnitType);
+
 /// Configuration for creating a HexUnit
 pub const UnitConfig = struct {
-    unit_type: Unit.UnitType,
+    unit_type: HexUnitType,
     home_pos: Vec2,
     disposition: Disposition,
     entity_id: u32,
@@ -48,7 +59,7 @@ pub const HexUnit = struct {
     }
 
     // Convenience accessors for base unit fields
-    pub fn unitType(self: *const HexUnit) Unit.UnitType {
+    pub fn unitType(self: *const HexUnit) HexUnitType {
         return self.base.unit_type;
     }
 

@@ -329,8 +329,8 @@ pub fn TerrainStorage(comptime max_entities: usize) type {
     };
 }
 
-/// Interactive storage for portals and lifestones
-pub fn InteractiveStorage(comptime max_entities: usize) type {
+/// Interactive storage for portals and lifestones - generic with game-defined interactable type
+pub fn InteractiveStorage(comptime max_entities: usize, comptime InteractableType: type) type {
     return struct {
         const Self = @This();
 
@@ -338,7 +338,7 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
         transforms: [max_entities]components.Transform,
         visuals: [max_entities]components.Visual,
         terrains: [max_entities]components.Terrain,
-        interactables: [max_entities]components.Interactable,
+        interactables: [max_entities]InteractableType,
         count: usize,
 
         pub fn init() Self {
@@ -352,7 +352,7 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
             };
         }
 
-        pub fn addEntity(self: *Self, entity: EntityId, transform: components.Transform, visual: components.Visual, terrain: components.Terrain, interactable: components.Interactable) !void {
+        pub fn addEntity(self: *Self, entity: EntityId, transform: components.Transform, visual: components.Visual, terrain: components.Terrain, interactable: InteractableType) !void {
             if (self.count >= max_entities) return error.StorageFull;
             const index = self.count;
             self.entities[index] = entity;
@@ -382,7 +382,7 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
             .transform => components.Transform,
             .visual => components.Visual,
             .terrain => components.Terrain,
-            .interactable => components.Interactable,
+            .interactable => InteractableType,
         }) {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity_id) {
@@ -401,7 +401,7 @@ pub fn InteractiveStorage(comptime max_entities: usize) type {
             .transform => components.Transform,
             .visual => components.Visual,
             .terrain => components.Terrain,
-            .interactable => components.Interactable,
+            .interactable => InteractableType,
         }) {
             for (0..self.count) |i| {
                 if (self.entities[i] == entity_id) {

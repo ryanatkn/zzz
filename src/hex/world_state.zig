@@ -8,6 +8,7 @@ const object_pools = @import("../lib/core/object_pools.zig");
 
 // Game system capabilities
 const components = @import("../lib/game/components/mod.zig");
+const hex_components = @import("components/mod.zig");
 const zones = @import("../lib/game/zones/mod.zig");
 const storage = @import("../lib/game/storage/mod.zig");
 const world = @import("../lib/game/world/mod.zig");
@@ -67,7 +68,7 @@ pub const Combat = components.Combat;
 pub const Statuses = components.Statuses;
 // Remove duplicate - using HexProjectile as Projectile alias below
 pub const Terrain = components.Terrain;
-pub const Interactable = components.Interactable;
+pub const Interactable = hex_components.Interactable;
 
 // Use extended Unit with hex-specific fields
 pub const Unit = unit_ext.HexUnit;
@@ -113,9 +114,9 @@ const ProjectileStorage = storage.ProjectileStorage(MAX_ENTITIES_PER_ARCHETYPE, 
 
 const TerrainStorage = storage.TerrainStorage(MAX_ENTITIES_PER_ARCHETYPE);
 
-const LifestoneStorage = storage.InteractiveStorage(MAX_ENTITIES_PER_ARCHETYPE);
+const LifestoneStorage = storage.InteractiveStorage(MAX_ENTITIES_PER_ARCHETYPE, hex_components.Interactable);
 
-const PortalStorage = storage.InteractiveStorage(MAX_ENTITIES_PER_ARCHETYPE);
+const PortalStorage = storage.InteractiveStorage(MAX_ENTITIES_PER_ARCHETYPE, hex_components.Interactable);
 
 // EntityIterator is now provided by storage module
 

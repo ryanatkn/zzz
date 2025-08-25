@@ -39,7 +39,7 @@ const world_state_mod = @import("world_state.zig");
 const game_loop_mod = @import("game_loop.zig");
 const constants = @import("constants.zig");
 const ui = @import("ui/mod.zig");
-const spells = @import("spells.zig");
+const abilities = @import("ability_system.zig");
 
 // Hex rendering subsystems (extracted from this file)
 const rendering = @import("rendering/mod.zig");
@@ -272,9 +272,9 @@ pub const GameRenderer = struct {
         rendering.UIOverlayRenderer.drawAIMode(&self.gpu, cmd_buffer, render_pass);
     }
 
-    /// Draw the spellbar at the bottom center of the screen
-    pub fn drawSpellbar(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, spell_system: *const spells.SpellSystem, spellbar_ui: *const ui.spellbar.Spellbar) void {
-        // Delegate to the extracted SpellbarRenderer
-        rendering.SpellbarRenderer.drawSpellbar(&self.gpu, cmd_buffer, render_pass, spell_system, spellbar_ui);
+    /// Draw the ability bar at the bottom center of the screen
+    pub fn drawAbilityBar(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, ability_system: *const abilities.AbilitySystem, ability_bar_ui: *const ui.ability_bar.AbilityBar) void {
+        // Delegate to the extracted AbilityBarRenderer
+        rendering.AbilityBarRenderer.drawAbilityBar(&self.gpu, cmd_buffer, render_pass, ability_system, ability_bar_ui);
     }
 };

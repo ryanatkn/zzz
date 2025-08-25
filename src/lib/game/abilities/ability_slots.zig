@@ -1,13 +1,13 @@
 const std = @import("std");
 const timer = @import("../../core/timer.zig");
 
-/// Generic spell slot management system
-/// Games define their own spell types and implement casting logic
-pub fn SpellSlotSystem(comptime SpellType: type, comptime slot_count: usize) type {
+/// Generic ability slot management system
+/// Games define their own ability types and implement activation logic
+pub fn AbilitySlotSystem(comptime AbilityType: type, comptime slot_count: usize) type {
     return struct {
         const Self = @This();
 
-        slots: [slot_count]SpellSlot(SpellType),
+        slots: [slot_count]AbilitySlot(AbilityType),
         active_slot: usize,
 
         pub fn init() Self {
@@ -18,15 +18,15 @@ pub fn SpellSlotSystem(comptime SpellType: type, comptime slot_count: usize) typ
 
             // Initialize all slots
             for (&system.slots) |*slot| {
-                slot.* = SpellSlot(SpellType).init(@as(SpellType, @enumFromInt(0))); // Default to first enum value
+                slot.* = AbilitySlot(AbilityType).init(@as(AbilityType, @enumFromInt(0))); // Default to first enum value
             }
 
             return system;
         }
 
-        pub fn setSpell(self: *Self, slot_index: usize, spell_type: SpellType, cooldown_duration: f32) void {
+        pub fn setAbility(self: *Self, slot_index: usize, ability_type: AbilityType, cooldown_duration: f32) void {
             if (slot_index >= slot_count) return;
-            self.slots[slot_index] = SpellSlot(SpellType).initWithCooldown(spell_type, cooldown_duration);
+            self.slots[slot_index] = AbilitySlot(AbilityType).initWithCooldown(ability_type, cooldown_duration);
         }
 
         pub fn setActiveSlot(self: *Self, slot_index: usize) void {
@@ -35,20 +35,20 @@ pub fn SpellSlotSystem(comptime SpellType: type, comptime slot_count: usize) typ
             }
         }
 
-        pub fn getActiveSlot(self: *const Self) *const SpellSlot(SpellType) {
+        pub fn getActiveSlot(self: *const Self) *const AbilitySlot(AbilityType) {
             return &self.slots[self.active_slot];
         }
 
-        pub fn getActiveSlotMut(self: *Self) *SpellSlot(SpellType) {
+        pub fn getActiveSlotMut(self: *Self) *AbilitySlot(AbilityType) {
             return &self.slots[self.active_slot];
         }
 
-        pub fn getSlot(self: *const Self, slot_index: usize) ?*const SpellSlot(SpellType) {
+        pub fn getSlot(self: *const Self, slot_index: usize) ?*const AbilitySlot(AbilityType) {
             if (slot_index >= slot_count) return null;
             return &self.slots[slot_index];
         }
 
-        pub fn getSlotMut(self: *Self, slot_index: usize) ?*SpellSlot(SpellType) {
+        pub fn getSlotMut(self: *Self, slot_index: usize) ?*AbilitySlot(AbilityType) {
             if (slot_index >= slot_count) return null;
             return &self.slots[slot_index];
         }
@@ -77,23 +77,23 @@ pub fn SpellSlotSystem(comptime SpellType: type, comptime slot_count: usize) typ
 }
 
 /// Generic spell slot with cooldown management
-pub fn SpellSlot(comptime SpellType: type) type {
+pub fn AbilitySlot(comptime AbilityType: type) type {
     return struct {
         const Self = @This();
 
-        spell_type: SpellType,
+        ability_type: AbilityType,
         cooldown_timer: timer.Cooldown,
 
-        pub fn init(spell_type: SpellType) Self {
+        pub fn init(ability_type: AbilityType) Self {
             return .{
-                .spell_type = spell_type,
+                .ability_type = ability_type,
                 .cooldown_timer = timer.Cooldown.init(0.0), // No cooldown by default
             };
         }
 
-        pub fn initWithCooldown(spell_type: SpellType, cooldown_duration: f32) Self {
+        pub fn initWithCooldown(ability_type: AbilityType, cooldown_duration: f32) Self {
             return .{
-                .spell_type = spell_type,
+                .ability_type = ability_type,
                 .cooldown_timer = timer.Cooldown.init(cooldown_duration),
             };
         }
@@ -124,13 +124,6 @@ pub fn SpellSlot(comptime SpellType: type) type {
     };
 }
 
-/// Example spell type for reference
-pub const ExampleSpellType = enum {
-    None,
-    Fireball,
-    Heal,
-    Teleport,
-};
-
-/// Example 8-slot system for RPG-style games
-pub const Example8SlotSystem = SpellSlotSystem(ExampleSpellType, 8);
+// Generic spell slot system is complete
+// Games define their own AbilityType enums and create AbilitySlotSystem instances
+// Example: const MySpellSystem = AbilitySlotSystem(MyAbilityType, 8);

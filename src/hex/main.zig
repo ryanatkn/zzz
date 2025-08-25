@@ -166,7 +166,7 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     fully_initialized = true;
     if (logger) |*log| {
         log.info("game_init_success", "Hex GPU game initialized successfully", .{});
-        log.info("controls_info", "Controls: WASD move, left-click shoot, right-click cast spell, 1-4/Q/E/R/F select spells (see spellbar), L respawn, Space pause, ESC quit", .{});
+        log.info("controls_info", "Controls: WASD move, left-click shoot, right-click cast ability, 1-4/Q/E/R/F select abilities (see ability bar), L respawn, Space pause, ESC quit", .{});
         log.info("portal_info", "Portal interaction: Walk into portals to travel between zones", .{});
         log.info("ai_control_info", "Press G to toggle AI control mode", .{});
     }
@@ -327,8 +327,8 @@ fn renderGame() !void {
         game_renderer.?.drawAIMode(cmd_buffer, render_pass);
         game_renderer.?.drawDebugInfo(cmd_buffer, render_pass);
 
-        // Draw spellbar
-        game_renderer.?.drawSpellbar(cmd_buffer, render_pass, &game_state.?.spell_system, &game_state.?.spellbar_ui);
+        // Draw ability bar
+        game_renderer.?.drawAbilityBar(cmd_buffer, render_pass, &game_state.?.ability_system, &game_state.?.ability_bar_ui);
     }
 
     // Render HUD overlay if open

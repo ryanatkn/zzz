@@ -2,9 +2,9 @@ const std = @import("std");
 const math = @import("../../math/mod.zig");
 const Vec2 = math.Vec2;
 
-/// Generic spell casting patterns and interfaces
-/// Games implement specific spell logic using these patterns
-/// Spell targeting types
+/// Generic ability casting patterns and interfaces
+/// Games implement specific ability logic using these patterns
+/// Ability targeting types
 pub const TargetType = enum {
     none, // No target required
     position, // Target a position on the ground
@@ -15,7 +15,7 @@ pub const TargetType = enum {
     line, // Line from caster in a direction
 };
 
-/// Spell targeting configuration
+/// Ability targeting configuration
 pub const TargetConfig = struct {
     target_type: TargetType,
     max_range: f32 = 1000.0,
@@ -24,27 +24,40 @@ pub const TargetConfig = struct {
     can_target_self: bool = true,
     can_target_allies: bool = true,
     can_target_enemies: bool = true,
-    area_radius: f32 = 0.0, // For AoE spells
+    area_radius: f32 = 0.0, // For AoE abilities
 };
 
-/// Spell casting restrictions
-pub const CastingRestrictions = struct {
-    requires_alive_caster: bool = true,
-    requires_mana: f32 = 0.0,
-    requires_zone_type: ?ZoneTypeFilter = null,
-    blocked_by_silence: bool = true,
-    blocked_by_stun: bool = true,
-    requires_weapon: bool = false,
-    requires_clear_path: bool = false,
+/// Generic ability casting restrictions - games define their own ZoneTypeFilter
+/// Example: const MyRestrictions = CastingRestrictions(MyZoneType);
+pub fn CastingRestrictions(comptime ZoneTypeFilter: type) type {
+    return struct {
+        const Self = @This();
 
-    pub const ZoneTypeFilter = enum {
-        overworld_only,
-        dungeon_only,
-        any,
+        requires_alive_caster: bool = true,
+        requires_mana: f32 = 0.0,
+        requires_zone_type: ?ZoneTypeFilter = null,
+        blocked_by_silence: bool = true,
+        blocked_by_stun: bool = true,
+        requires_weapon: bool = false,
+        requires_clear_path: bool = false,
+
+        pub fn init() Self {
+            return .{};
+        }
+
+        pub fn withZoneRestriction(self: Self, zone_filter: ZoneTypeFilter) Self {
+            var result = self;
+            result.requires_zone_type = zone_filter;
+            return result;
+        }
     };
-};
+}
 
-/// Spell validation result
+// Generic CastingRestrictions is ready for use by games
+// Games should create their own CastingRestrictions with game-specific ZoneTypeFilter enums
+// Example: const MyRestrictions = CastingRestrictions(MyZoneTypeFilter);
+
+/// Ability validation result
 pub const ValidationResult = union(enum) {
     valid,
     invalid_range: struct { actual: f32, max: f32 },
@@ -59,9 +72,9 @@ pub const ValidationResult = union(enum) {
     target_immune,
 };
 
-/// Spell targeting patterns
-pub const SpellTargeting = struct {
-    /// Validate a spell cast attempt
+/// Ability targeting patterns
+pub const AbilityTargeting = struct {
+    /// Validate an ability cast attempt
     pub fn validateCast(
         caster_pos: Vec2,
         target_pos: Vec2,
@@ -120,18 +133,18 @@ pub const SpellTargeting = struct {
         return target_filter.getTargetsInArea(center, radius, context);
     }
 
-    /// Calculate spell trajectory for projectile spells
+    /// Calculate ability trajectory for projectile abilities
     pub fn calculateTrajectory(
         start_pos: Vec2,
         target_pos: Vec2,
         projectile_speed: f32,
         gravity: f32,
-    ) SpellTrajectory {
+    ) AbilityTrajectory {
         const direction = target_pos.sub(start_pos).normalize();
         const distance = start_pos.distance(target_pos);
         const travel_time = distance / projectile_speed;
 
-        return SpellTrajectory{
+        return AbilityTrajectory{
             .start_pos = start_pos,
             .direction = direction,
             .speed = projectile_speed,
@@ -141,8 +154,8 @@ pub const SpellTargeting = struct {
     }
 };
 
-/// Spell trajectory data for projectile spells
-pub const SpellTrajectory = struct {
+/// Ability trajectory data for projectile abilities
+pub const AbilityTrajectory = struct {
     start_pos: Vec2,
     direction: Vec2,
     speed: f32,
@@ -150,15 +163,15 @@ pub const SpellTrajectory = struct {
     travel_time: f32,
 
     /// Get position along trajectory at time t
-    pub fn getPositionAtTime(self: SpellTrajectory, time: f32) Vec2 {
+    pub fn getPositionAtTime(self: AbilityTrajectory, time: f32) Vec2 {
         const linear_pos = self.start_pos.add(self.direction.scale(self.speed * time));
         const gravity_offset = Vec2.init(0, -0.5 * self.gravity * time * time);
         return linear_pos.add(gravity_offset);
     }
 };
 
-/// Spell impact patterns
-pub const SpellImpacts = struct {
+/// Ability impact patterns
+pub const AbilityImpacts = struct {
     /// Apply instant damage/healing
     pub fn applyInstantImpact(
         target_pos: Vec2,
@@ -195,50 +208,50 @@ pub const SpellImpacts = struct {
     };
 };
 
-/// Spell casting interface for games to implement
-pub const SpellCastingInterface = struct {
-    /// Function signature for spell validation
-    pub const ValidateFn = *const fn (caster: anytype, target: anytype, spell_id: anytype) ValidationResult;
+/// Ability casting interface for games to implement
+pub const AbilityCastingInterface = struct {
+    /// Function signature for ability validation
+    pub const ValidateFn = *const fn (caster: anytype, target: anytype, ability_id: anytype) ValidationResult;
 
-    /// Function signature for spell execution
-    pub const ExecuteFn = *const fn (caster: anytype, target: anytype, spell_id: anytype) bool;
+    /// Function signature for ability execution
+    pub const ExecuteFn = *const fn (caster: anytype, target: anytype, ability_id: anytype) bool;
 
-    /// Function signature for spell effect application
+    /// Function signature for ability effect application
     pub const ApplyEffectFn = *const fn (targets: anytype, effect: anytype) void;
 };
 
-/// Example spell implementation pattern
-pub fn ExampleSpellImplementation(comptime GameType: type, comptime SpellId: type) type {
+/// Example ability implementation pattern
+pub fn ExampleAbilityImplementation(comptime GameType: type, comptime AbilityId: type) type {
     return struct {
         const Self = @This();
 
-        /// Validate if a spell can be cast
-        pub fn validateSpell(
+        /// Validate if an ability can be used
+        pub fn validateAbility(
             game: *GameType,
             caster_pos: Vec2,
             target_pos: Vec2,
-            spell_id: SpellId,
+            ability_id: AbilityId,
         ) ValidationResult {
-            // Game-specific spell validation logic
+            // Game-specific ability validation logic
             _ = game;
             _ = caster_pos;
             _ = target_pos;
-            _ = spell_id;
+            _ = ability_id;
             return ValidationResult.valid;
         }
 
-        /// Execute spell cast
-        pub fn castSpell(
+        /// Execute ability activation
+        pub fn activateAbility(
             game: *GameType,
             caster_pos: Vec2,
             target_pos: Vec2,
-            spell_id: SpellId,
+            ability_id: AbilityId,
         ) bool {
-            // Game-specific spell casting logic
+            // Game-specific ability activation logic
             _ = game;
             _ = caster_pos;
             _ = target_pos;
-            _ = spell_id;
+            _ = ability_id;
             return true;
         }
     };

@@ -3,7 +3,7 @@
 pub const EffectsSystem = @import("effects.zig").EffectsSystem;
 
 // Re-export moved UI modules
-pub const spellbar = @import("spellbar.zig");
+pub const ability_bar = @import("ability_bar.zig");
 pub const borders = @import("borders.zig");
 
 // Re-export for convenience

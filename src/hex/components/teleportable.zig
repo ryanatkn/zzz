@@ -1,4 +1,4 @@
-const math = @import("../../math/mod.zig");
+const math = @import("../../lib/math/mod.zig");
 pub const Vec2 = math.Vec2;
 
 /// Teleportable - can be teleported via blink spell

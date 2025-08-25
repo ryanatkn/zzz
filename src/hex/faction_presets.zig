@@ -4,7 +4,8 @@ const factions = @import("factions.zig");
 const components = @import("../lib/game/components/mod.zig");
 const constants = @import("constants.zig");
 const Disposition = @import("disposition.zig").Disposition;
-const UnitType = components.Unit.UnitType;
+const unit_ext = @import("unit_ext.zig");
+const UnitType = unit_ext.HexUnitType;
 
 // Re-export faction types for convenience
 pub const EntityFactions = factions.EntityFactions;

@@ -9,14 +9,8 @@ const math = @import("../../lib/math/mod.zig");
 const loggers = @import("../../lib/debug/loggers.zig");
 
 // Reactive system imports
-const ReactiveComponent = @import("../../lib/reactive/component.zig").ReactiveComponent;
-const createComponent = @import("../../lib/reactive/component.zig").createComponent;
-const getComponentData = @import("../../lib/reactive/component.zig").getComponentData;
-const castComponentState = @import("../../lib/reactive/component.zig").castComponentState;
-const signal = @import("../../lib/reactive/signal.zig");
-const derived = @import("../../lib/reactive/derived.zig");
-const effect = @import("../../lib/reactive/effect.zig");
-const batch = @import("../../lib/reactive/batch.zig");
+const reactive = @import("../../lib/reactive/mod.zig");
+const component = @import("../../lib/reactive/component.zig");
 const ide_page = @import("../../roots/menu/ide/+page.zig");
 
 /// Reactive HUD component data
@@ -30,14 +24,14 @@ pub const ReactiveHudData = struct {
     link_arena: std.heap.ArenaAllocator,
 
     // Reactive state
-    is_open: *signal.Signal(bool),
-    current_path: *signal.Signal([]const u8),
-    hovered_link: *signal.Signal(?usize),
-    needs_rerender: *signal.Signal(bool),
+    is_open: *reactive.Signal(bool),
+    current_path: *reactive.Signal([]const u8),
+    hovered_link: *reactive.Signal(?usize),
+    needs_rerender: *reactive.Signal(bool),
 
     // Derived values
-    can_go_back: *derived.Derived(bool),
-    can_go_forward: *derived.Derived(bool),
+    can_go_back: *reactive.Derived(bool),
+    can_go_forward: *reactive.Derived(bool),
 
     // Cache for last rendered frame to avoid unnecessary work
     last_link_count: u32,
@@ -50,17 +44,17 @@ pub const ReactiveHudData = struct {
 
     pub fn initWithOptions(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Self {
         // Create reactive signals
-        const is_open_signal = try allocator.create(signal.Signal(bool));
-        is_open_signal.* = try signal.Signal(bool).init(allocator, false);
+        const is_open_signal = try allocator.create(reactive.Signal(bool));
+        is_open_signal.* = try reactive.Signal(bool).init(allocator, false);
 
-        const current_path_signal = try allocator.create(signal.Signal([]const u8));
-        current_path_signal.* = try signal.Signal([]const u8).init(allocator, "/");
+        const current_path_signal = try allocator.create(reactive.Signal([]const u8));
+        current_path_signal.* = try reactive.Signal([]const u8).init(allocator, "/");
 
-        const hovered_link_signal = try allocator.create(signal.Signal(?usize));
-        hovered_link_signal.* = try signal.Signal(?usize).init(allocator, null);
+        const hovered_link_signal = try allocator.create(reactive.Signal(?usize));
+        hovered_link_signal.* = try reactive.Signal(?usize).init(allocator, null);
 
-        const needs_rerender_signal = try allocator.create(signal.Signal(bool));
-        needs_rerender_signal.* = try signal.Signal(bool).init(allocator, true);
+        const needs_rerender_signal = try allocator.create(reactive.Signal(bool));
+        needs_rerender_signal.* = try reactive.Signal(bool).init(allocator, true);
 
         var router = router_mod.Router.init(allocator);
         router.setGameRenderer(base_renderer);
@@ -97,13 +91,13 @@ pub const ReactiveHudData = struct {
         return self;
     }
 
-    fn createCanGoBackDerived(self: *Self) !*derived.Derived(bool) {
+    fn createCanGoBackDerived(self: *Self) !*reactive.Derived(bool) {
         const SelfRef = struct {
             var hud_ref: *ReactiveHudData = undefined;
         };
         SelfRef.hud_ref = self;
 
-        return try derived.derived(self.allocator, bool, struct {
+        return try reactive.derived(self.allocator, bool, struct {
             fn compute() bool {
                 const hud = SelfRef.hud_ref;
                 // Track dependency on current_path to recompute when navigation changes
@@ -113,13 +107,13 @@ pub const ReactiveHudData = struct {
         }.compute);
     }
 
-    fn createCanGoForwardDerived(self: *Self) !*derived.Derived(bool) {
+    fn createCanGoForwardDerived(self: *Self) !*reactive.Derived(bool) {
         const SelfRef = struct {
             var hud_ref: *ReactiveHudData = undefined;
         };
         SelfRef.hud_ref = self;
 
-        return try derived.derived(self.allocator, bool, struct {
+        return try reactive.derived(self.allocator, bool, struct {
             fn compute() bool {
                 const hud = SelfRef.hud_ref;
                 // Track dependency on current_path to recompute when navigation changes
@@ -238,7 +232,7 @@ pub const ReactiveHudData = struct {
     }
 
     fn onRender(state: *anyopaque) !void {
-        const self = castComponentState(ReactiveHudData, state);
+        const self = component.castComponentState(ReactiveHudData, state);
 
         // This is called automatically when reactive dependencies change
         // Mark that we need to re-render
@@ -249,7 +243,7 @@ pub const ReactiveHudData = struct {
     }
 
     fn shouldRender(state: *anyopaque) bool {
-        const self = castComponentState(ReactiveHudData, state);
+        const self = component.castComponentState(ReactiveHudData, state);
 
         // Only render if HUD is open and something has changed
         const should_render = self.is_open.peek() and self.needs_rerender.peek();
@@ -265,12 +259,12 @@ pub const ReactiveHudData = struct {
     }
 
     fn destroy(state: *anyopaque, allocator: std.mem.Allocator) void {
-        const self = castComponentState(ReactiveHudData, state);
+        const self = component.castComponentState(ReactiveHudData, state);
         self.deinit();
         allocator.destroy(self);
     }
 
-    pub const vtable = ReactiveComponent.ComponentVTable{
+    pub const vtable = component.ReactiveComponent.ComponentVTable{
         .onMount = ReactiveHudData.onMount,
         .onUnmount = ReactiveHudData.onUnmount,
         .onRender = ReactiveHudData.onRender,
@@ -281,7 +275,7 @@ pub const ReactiveHudData = struct {
 
 /// Main reactive HUD system
 pub const ReactiveHud = struct {
-    component: *ReactiveComponent,
+    component: *component.ReactiveComponent,
     allocator: std.mem.Allocator,
 
     const Self = @This();
@@ -293,13 +287,13 @@ pub const ReactiveHud = struct {
     pub fn initWithOptions(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Self {
         const hud_data = try ReactiveHudData.initWithOptions(allocator, base_renderer);
 
-        const component = try createComponent(ReactiveHudData, allocator, hud_data, ReactiveHudData.vtable);
+        const reactive_component = try component.createComponent(ReactiveHudData, allocator, hud_data, ReactiveHudData.vtable);
 
         // Mount the component to start reactive lifecycle
-        try component.mount();
+        try reactive_component.mount();
 
         return Self{
-            .component = component,
+            .component = reactive_component,
             .allocator = allocator,
         };
     }
@@ -309,7 +303,7 @@ pub const ReactiveHud = struct {
     }
 
     pub fn getHudData(self: *Self) *ReactiveHudData {
-        return getComponentData(ReactiveHudData, self.component);
+        return component.getComponentData(ReactiveHudData, self.component);
     }
 
     // Convenience methods that delegate to HUD data
@@ -448,7 +442,7 @@ pub const ReactiveHud = struct {
         if (!hud_data.is_open.peek()) return;
 
         // Use batching for rendering operations
-        const batcher = batch.getGlobalBatcher() orelse return;
+        const batcher = reactive.batch.getGlobalBatcher() orelse return;
         batcher.startBatch();
         defer batcher.endBatch();
 

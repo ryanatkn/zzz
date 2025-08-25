@@ -20,7 +20,7 @@ pub const reactive_hud = @import("hud/reactive_hud.zig");
 
 // Game-specific modules
 pub const combat = @import("combat.zig");
-pub const spells = @import("spells.zig");
+pub const abilities = @import("ability_system.zig");
 pub const constants = @import("constants.zig");
 pub const physics = @import("physics.zig");
 pub const controls = @import("controls.zig");
