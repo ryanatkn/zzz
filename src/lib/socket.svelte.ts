@@ -26,7 +26,7 @@ export const Socket_Json = Cell_Json.extend({
 	reconnect_delay: z.number().int().positive().default(DEFAULT_RECONNECT_DELAY),
 	reconnect_delay_max: z.number().int().positive().default(DEFAULT_RECONNECT_DELAY_MAX),
 	auto_reconnect: z.boolean().default(DEFAULT_AUTO_RECONNECT),
-});
+}).meta({cell_class_name: 'Socket'});
 export type Socket_Json = z.infer<typeof Socket_Json>;
 export type Socket_Json_Input = z.input<typeof Socket_Json>;
 
@@ -86,9 +86,9 @@ export class Socket extends Cell<typeof Socket_Json> {
 	message_queue: Array<Queued_Message> = $state([]);
 	failed_messages: SvelteMap<string, Failed_Message> = new SvelteMap();
 
-	// Event handlers - can be assigned by consumers
-	onmessage: Socket_Action_Handler | null = $state(null);
-	onerror: Socket_Error_Handler | null = $state(null);
+	// Event handlers
+	#message_handlers: Set<Socket_Action_Handler> = new Set();
+	#error_handlers: Set<Socket_Error_Handler> = new Set();
 
 	// Derived properties
 	readonly connected: boolean = $derived(this.open && this.status === 'success');
@@ -183,7 +183,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 		}
 
 		if (!this.url) {
-			console.error('Cannot connect: no URL provided');
+			console.error('[socket] cannot connect: no URL provided');
 			return;
 		}
 
@@ -197,7 +197,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 			ws.addEventListener('error', this.#handle_error);
 			ws.addEventListener('message', this.#handle_message);
 		} catch (error) {
-			console.error('failed to create WebSocket:', error);
+			console.error('[socket] failed to create WebSocket:', error);
 			this.ws = null;
 			this.open = false;
 			this.status = 'failure';
@@ -224,7 +224,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 				try {
 					this.ws.close(code);
 				} catch (error) {
-					console.error('Error closing WebSocket:', error);
+					console.error('[socket] error closing WebSocket:', error);
 				}
 			}
 
@@ -247,7 +247,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 				this.last_send_time = Date.now();
 				return true;
 			} catch (error) {
-				console.error('error sending message:', error);
+				console.error('[socket] error sending message:', error);
 				this.#queue_message(data);
 				return false;
 			}
@@ -278,6 +278,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 * Sends a ping message for heartbeat purposes
 	 */
 	async send_heartbeat(): Promise<void> {
+		// Heartbeat ping - handlers update connection state, result not needed here
 		await this.app.api.ping(); // TODO @api need to force websocket transport, second arg?
 	}
 
@@ -399,7 +400,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 		}, this.current_reconnect_delay);
 	}
 
-	// Public method that delegates to private implementation
 	maybe_reconnect(): void {
 		this.#maybe_reconnect();
 	}
@@ -409,6 +409,26 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 */
 	cancel_reconnect(): void {
 		this.#cancel_reconnect();
+	}
+
+	/**
+	 * Add a message handler and return a function to remove it.
+	 * @param handler The message handler to add
+	 * @returns A function that removes the handler when called
+	 */
+	add_message_handler(handler: Socket_Action_Handler): () => void {
+		this.#message_handlers.add(handler);
+		return () => this.#message_handlers.delete(handler);
+	}
+
+	/**
+	 * Add an error handler and return a function to remove it.
+	 * @param handler The error handler to add
+	 * @returns A function that removes the handler when called
+	 */
+	add_error_handler(handler: Socket_Error_Handler): () => void {
+		this.#error_handlers.add(handler);
+		return () => this.#error_handlers.delete(handler);
 	}
 
 	#cancel_reconnect(): void {
@@ -428,7 +448,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 		this.#start_heartbeat();
 		this.last_connect_time = Date.now();
 
-		// Try to send any queued messages
 		if (this.has_queued_messages) {
 			this.retry_queued_messages();
 		}
@@ -437,7 +456,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 	#handle_close = (_: CloseEvent): void => {
 		this.open = false;
 
-		// Only change status and try to reconnect if this wasn't initiated by the client
 		if (this.status === 'success' || this.status === 'pending') {
 			this.status = 'failure';
 			this.#maybe_reconnect();
@@ -445,23 +463,27 @@ export class Socket extends Cell<typeof Socket_Json> {
 	};
 
 	#handle_error = (event: Event): void => {
-		this.onerror?.(event);
+		for (const handler of this.#error_handlers) {
+			handler(event);
+		}
 
-		console.error('websocket error occurred:', event);
+		console.error('[socket] websocket error occurred:', event);
 		this.status = 'failure';
 
 		// The WebSocket will close after an error, but we need to make sure
-		// the socket state is updated now in case close doesn't fire for some reason
+		// the socket state is updated now in case close doesn't fire for some reason.
 		this.open = false;
 
-		// Some errors might not trigger the close event, so we force a reconnection attempt
-		// This ensures we don't get stuck when errors occur
+		// Some errors might not trigger the close event, so we force a reconnection attempt.
+		// This ensures we don't get stuck when errors occur.
 		this.#maybe_reconnect();
 	};
 
 	#handle_message = (event: MessageEvent): void => {
 		this.last_receive_time = Date.now();
 
-		this.onmessage?.(event);
+		for (const handler of this.#message_handlers) {
+			handler(event);
+		}
 	};
 }

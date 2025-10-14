@@ -6,18 +6,19 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {GLYPH_DOWNLOAD} from '$lib/glyphs.js';
 	import {format_gigabytes} from '$lib/format_helpers.js';
 
-	interface Props {
+	const {
+		model,
+		omit_provider,
+		attrs,
+	}: {
 		model: Model;
 		omit_provider?: boolean | undefined;
 		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
-
-	const {model, omit_provider, attrs}: Props = $props();
-
-	const provider = $derived(model.app.providers.find_by_name(model.provider_name));
+	} = $props();
 
 	// TODO maybe rename to Model_Listitem, particularly if we add a `Model_List` for the parent usage
 </script>
@@ -25,16 +26,21 @@
 <Model_Contextmenu {model}>
 	<div {...attrs} class="panel p_lg {attrs?.class}">
 		<div class="font_size_xl mb_lg">
-			<Model_Link {model} icon />
+			<Model_Link {model} icon class="row">
+				<div class="flex_shrink_0">
+					<Provider_Logo name={model.provider_name} />
+				</div>
+				<span class="pl_sm">{model.name}</span>
+			</Model_Link>
 		</div>
 		{#if !omit_provider}
 			<div class="mb_lg">
-				<Provider_Link {provider} icon="glyph" show_name />
+				<Provider_Link provider={model.provider} icon="glyph" show_name />
 			</div>
 		{/if}
 
 		{#if model.tags.length}
-			<ul class="unstyled display_flex flex_wrap gap_xs mb_md mt_sm">
+			<ul class="unstyled display_flex flex_wrap_wrap gap_xs mb_md mt_sm">
 				{#each model.tags as tag (tag)}
 					<small class="chip font_weight_400">{tag}</small>
 				{/each}
@@ -44,7 +50,7 @@
 		{#if model.downloaded === false}
 			{#if model.provider_name === 'ollama' && !model.downloaded}
 				<button type="button" class="plain compact" onclick={() => model.navigate_to_download()}>
-					<Glyph glyph={GLYPH_DOWNLOAD} attrs={{class: 'mr_xs2'}} /> download
+					<Glyph glyph={GLYPH_DOWNLOAD} />&nbsp; download
 				</button>
 			{/if}
 		{/if}

@@ -7,25 +7,15 @@ import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {
-	Browser_Tab,
-	Browser_Tab_Json,
-	Browser_Tab_Schema,
-} from '$routes/tabs/browser_tab.svelte.js';
-import {cell_array, HANDLED} from '$lib/cell_helpers.js';
+import {Browser_Tab, Browser_Tab_Json} from '$routes/tabs/browser_tab.svelte.js';
+import {HANDLED} from '$lib/cell_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {fake_sites} from '$routes/tabs/sample_tabs.js';
 
 export const Browser_Tabs_Json = Cell_Json.extend({
-	tabs: cell_array(
-		z.array(Browser_Tab_Json).default(() => []),
-		'Browser_Tab',
-	),
-	recently_closed_tabs: cell_array(
-		z.array(Browser_Tab_Json).default(() => []),
-		'Browser_Tab',
-	),
-});
+	tabs: z.array(Browser_Tab_Json).default(() => []),
+	recently_closed_tabs: z.array(Browser_Tab_Json).default(() => []),
+}).meta({cell_class_name: 'Browser_Tabs'});
 export type Browser_Tabs_Json_Input = z.input<typeof Browser_Tabs_Json>;
 
 export type Browser_Tabs_Options = Cell_Options<typeof Browser_Tabs_Json>;
@@ -37,12 +27,10 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 				key: 'url',
 				extractor: (tab) => tab.url,
 				query_schema: z.string(),
-				result_schema: Browser_Tab_Schema,
 			}),
 			create_derived_index({
 				key: 'manual_order',
 				compute: (collection) => collection.values,
-				result_schema: z.array(Browser_Tab_Schema),
 			}),
 		],
 	});
@@ -52,9 +40,11 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 
 	recently_closed_tabs: Array<Browser_Tab> = $state([]);
 
-	selected_tab: Browser_Tab | undefined = $derived(this.ordered_tabs.find((t) => t.selected));
+	readonly selected_tab: Browser_Tab | undefined = $derived(
+		this.ordered_tabs.find((t) => t.selected),
+	);
 
-	selected_url: string = $derived(this.selected_tab?.url || '');
+	readonly selected_url: string = $derived(this.selected_tab?.url || '');
 
 	constructor(options: Browser_Tabs_Options) {
 		super(Browser_Tabs_Json, options);
@@ -114,7 +104,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 			id: create_uuid(),
 			title: 'new tab',
 			selected: true,
-			url: '~newtab',
+			url: '/newtab',
 			type: 'embedded_html',
 			content: fake_sites.new_tab.content,
 			refresh_counter: 0,
@@ -172,6 +162,12 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 		const selected_tab = this.selected_tab;
 		if (selected_tab) {
 			selected_tab.url = url;
+
+			// If navigating to a real URL from a new tab, change type to external_url
+			if (selected_tab.type === 'embedded_html' && url !== '~newtab' && url !== '/newtab') {
+				selected_tab.type = 'external_url';
+				selected_tab.content = undefined; // Clear embedded content
+			}
 
 			// If it's an external URL tab, force a refresh
 			if (selected_tab.type === 'external_url') {

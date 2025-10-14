@@ -52,9 +52,7 @@ const create_item = (
 });
 
 // Define test schemas
-const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
-const items_array_schema = z.array(item_schema);
-const email_schema = z.string().email();
+const email_schema = z.email();
 const range_schema = z.number().int().gte(10).lte(100);
 const str_schema = z.string().min(1);
 
@@ -67,7 +65,6 @@ describe('Indexed_Collection - Schema Validation', () => {
 					key: 'by_string_b',
 					extractor: (item) => item.string_b,
 					query_schema: email_schema,
-					result_schema: z.map(z.string().email(), item_schema),
 				}),
 				create_single_index({
 					key: 'by_string_a',
@@ -161,7 +158,6 @@ describe('Indexed_Collection - Schema Validation', () => {
 					},
 					matches: (item) => item.flag && item.number >= 18,
 					query_schema: z.void(),
-					result_schema: items_array_schema,
 				}),
 			],
 			validate: true,
@@ -194,8 +190,6 @@ describe('Indexed_Collection - Schema Validation', () => {
 
 		type Item_Query = z.infer<typeof query_schema>;
 
-		const result_schema = z.function().args(query_schema).returns(items_array_schema);
-
 		// Create a dynamic index with complex query parameters
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
@@ -224,7 +218,6 @@ describe('Indexed_Collection - Schema Validation', () => {
 						};
 					},
 					query_schema,
-					result_schema,
 				}),
 			],
 			validate: true,

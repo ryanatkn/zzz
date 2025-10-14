@@ -2,16 +2,16 @@
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 	import {onNavigate} from '$app/navigation';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		disabled,
+	}: {
 		disabled?: boolean | undefined;
-	}
-
-	const {disabled}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
@@ -29,7 +29,7 @@
 				</section>
 				<section class="box pb_xl3">
 					<footer>
-						<a class="row p_md" href="{base}/about">
+						<a class="row p_md" href={resolve('/about')}>
 							<span class="font_size_lg mr_md">about</span>
 							<Svg data={zzz_logo} size="var(--icon_size_md)" />
 						</a>

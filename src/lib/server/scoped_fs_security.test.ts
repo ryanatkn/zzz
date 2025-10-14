@@ -50,7 +50,6 @@ const DIR_PATHS = {
 	GRANDPARENT_SYMLINK_DIR: '/allowed/path/normal-dir/symlink-parent/subdir',
 };
 
-// Helper to create test instance
 const create_test_instance = () => new Scoped_Fs(TEST_ALLOWED_PATHS);
 
 // Setup/cleanup for each test
@@ -290,8 +289,8 @@ describe('Scoped_Fs - Symlink Security', () => {
 				if (p === symlink_at) {
 					return {
 						isSymbolicLink: () => true,
-						isDirectory: () => p.toString().endsWith('dir'),
-						isFile: () => !p.toString().endsWith('dir'),
+						isDirectory: () => p.endsWith('dir'),
+						isFile: () => !p.endsWith('dir'),
 					} as any;
 				}
 				return {

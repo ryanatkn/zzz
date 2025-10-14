@@ -6,12 +6,13 @@
 	import {format_gigabytes} from '$lib/format_helpers.js';
 	import type {Model} from '$lib/model.svelte.js';
 
-	interface Props {
+	const {
+		model,
+		onclick = () => ollama.select(model),
+	}: {
 		model: Model;
 		onclick?: () => void;
-	}
-
-	const {model, onclick = () => ollama.select(model)}: Props = $props();
+	} = $props();
 
 	const {ollama} = $derived(model.app);
 
@@ -33,7 +34,7 @@
 		class:selected
 		{onclick}
 	>
-		<div class="display_flex flex_column gap_xs w_100">
+		<div class="display_flex flex_direction_column gap_xs width_100">
 			<div class="display_flex justify_content_space_between align_items_center">
 				<div class="ellipsis font_size_lg">
 					{model.name}

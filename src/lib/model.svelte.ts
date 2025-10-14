@@ -1,19 +1,20 @@
 import {z} from 'zod';
-import {base} from '$app/paths';
+import {resolve} from '$app/paths';
 
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Ollama_Show_Response, Ollama_List_Response_Item} from '$lib/ollama_helpers.js';
 import {goto_unless_current} from '$lib/navigation_helpers.js';
+import type {Provider} from '$lib/provider.svelte.js';
 
-export const Model_Name = z.string();
+export const Model_Name = z.string().trim();
 export type Model_Name = z.infer<typeof Model_Name>;
 
 export const Model_Json = Cell_Json.extend({
 	// TODO consider whether we should support one model with multiple providers,
 	// or individual models per provider, currently we expect
-	// `name` to be unique across providers and this should be changed,
+	// `name` to be unique across providers and this needs to change,
 	// I think it's like chats/prompts/etc, names should not be unique,
 	// unless we think they're more like file paths? `provider_name/model_name` seems good for `path`?
 	// that would make model/provider name like filenames, makes sense
@@ -39,7 +40,7 @@ export const Model_Json = Cell_Json.extend({
 	ollama_show_response_loaded: z.boolean().default(false),
 	ollama_show_response_loading: z.boolean().default(false),
 	ollama_show_response_error: z.string().optional(),
-});
+}).meta({cell_class_name: 'Model'});
 export type Model_Json = z.infer<typeof Model_Json>;
 export type Model_Json_Input = z.input<typeof Model_Json>;
 
@@ -76,6 +77,13 @@ export class Model extends Cell<typeof Model_Json> {
 		this.provider_name === 'ollama' ? !!this.ollama_list_response_item : undefined,
 	);
 
+	/**
+	 * Lookup the provider for this model.
+	 */
+	readonly provider: Provider | undefined = $derived(
+		this.app.providers.find_by_name(this.provider_name),
+	);
+
 	readonly context_window_formatted: string | null = $derived(
 		this.context_window ? (this.context_window / 1000).toFixed(0) + 'k' : null,
 	);
@@ -102,6 +110,14 @@ export class Model extends Cell<typeof Model_Json> {
 			!this.ollama_show_response_error,
 	);
 
+	/**
+	 * Check if this model is currently loaded/running.
+	 * For Ollama models, this checks if the model is in the running models set.
+	 */
+	readonly loaded: boolean = $derived(
+		this.provider_name === 'ollama' ? this.app.ollama.running_model_names.has(this.name) : false,
+	);
+
 	constructor(options: Model_Options) {
 		super(Model_Json, options);
 		this.init();
@@ -124,7 +140,7 @@ export class Model extends Cell<typeof Model_Json> {
 		// Set the model name on the Ollama instance and navigate to the providers page
 		this.app.ollama.pull_model_name = this.name;
 		this.app.ollama.set_manager_view('pull');
-		await goto_unless_current(`${base}/providers/ollama`);
+		await goto_unless_current(resolve('/providers/ollama'));
 	}
 
 	/**
@@ -141,7 +157,7 @@ export class Model extends Cell<typeof Model_Json> {
 			// synchronously select the model but we don't care about
 			// waiting for its details to load, currently part of `select`
 			this.app.ollama.select(this),
-			goto_unless_current(`${base}/providers/ollama`),
+			goto_unless_current(resolve('/providers/ollama')),
 		]);
 	}
 }

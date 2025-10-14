@@ -2,10 +2,11 @@
 
 import {z} from 'zod';
 import {goto} from '$app/navigation';
-import {base} from '$app/paths';
+import {resolve} from '$app/paths';
 
 import {create_uuid, get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
-import {Repo, type Repo_Checkout} from '$routes/projects/repo.svelte.js';
+import {Repo} from '$routes/projects/repo.svelte.js';
+import type {Repo_Checkout} from '$routes/projects/projects_schema.js';
 import type {Projects} from '$routes/projects/projects.svelte.js';
 
 export interface Repo_Viewmodel_Options {
@@ -27,7 +28,7 @@ export class Repo_Viewmodel {
 	checkouts: Array<Repo_Checkout> = $state([]);
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.repo === null ||
 			this.git_url !== this.repo.git_url ||
@@ -119,7 +120,7 @@ export class Repo_Viewmodel {
 			this.projects.add_repo(this.project_id, repo);
 		}
 
-		void goto(`${base}/projects/${this.project_id}/repos`);
+		void goto(resolve(`/projects/${this.project_id}/repos`));
 	}
 
 	/**
@@ -131,7 +132,7 @@ export class Repo_Viewmodel {
 		// eslint-disable-next-line no-alert
 		if (confirm('Are you sure you want to remove this repo? This action cannot be undone.')) {
 			this.projects.delete_repo(this.project_id, this.repo_id);
-			void goto(`${base}/projects/${this.project_id}/repos`);
+			void goto(resolve(`/projects/${this.project_id}/repos`));
 		}
 	}
 }

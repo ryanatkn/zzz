@@ -6,8 +6,8 @@ import {Action_Inputs, type Action_Outputs} from '$lib/action_collections.js';
 
 // TODO @db refactor
 export const save_completion_response_to_disk = async (
-	input: Action_Inputs['create_completion'],
-	output: Action_Outputs['create_completion'],
+	input: Action_Inputs['completion_create'],
+	output: Action_Outputs['completion_create'],
 	dir: string,
 	scoped_fs: Scoped_Fs,
 ): Promise<void> => {

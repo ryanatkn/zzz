@@ -8,11 +8,11 @@
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		children,
+	}: {
 		children?: Snippet | undefined;
-	}
-
-	const {children}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {capabilities} = app;
@@ -25,7 +25,7 @@
 	// TODO consider multiple buttons for each transport, so we can compare latency
 </script>
 
-<div class="column align_items_start gap_sm">
+<form class="column align_items_start gap_sm">
 	<div>
 		<button type="button" title="ping the server" onclick={() => app.api.ping()} class="flex_1">
 			{#if children}{@render children()}{:else}⚞{/if}
@@ -34,7 +34,7 @@
 	</div>
 
 	<ul
-		class="unstyled overflow_auto scrollbar_width_thin column panel p_md pb_0 mb_0 shadow_inset_top_xs"
+		class="unstyled column panel p_md pb_0 mb_0 shadow_inset_top_xs"
 		style:height="150px"
 		style:min-height="150px"
 	>
@@ -60,18 +60,19 @@
 			</li>
 		{/each}
 	</ul>
-</div>
+</form>
 
 {#snippet ping_item(ping: Ping_Data)}
-	<Glyph
-		glyph={GLYPH_ACTION_TYPE_REQUEST_RESPONSE}
-		attrs={{class: ping.completed ? '' : 'opacity_40'}}
-	/>
+	<Glyph glyph={GLYPH_ACTION_TYPE_REQUEST_RESPONSE} class={ping.completed ? '' : 'opacity_40'} />
 	{#if !ping.completed}
 		<span class="font_family_mono">
 			<Pending_Animation inline />
 		</span>
+	{:else if ping.round_trip_time === null}
+		<span class="font_family_mono color_c_5"
+			>✗ {ping.received_time ? Math.round(ping.received_time - ping.sent_time) : 0}ms</span
+		>
 	{:else}
-		<span class="font_family_mono">{Math.round(ping.round_trip_time ?? 0)}ms</span>
+		<span class="font_family_mono">{Math.round(ping.round_trip_time)}ms</span>
 	{/if}
 {/snippet}

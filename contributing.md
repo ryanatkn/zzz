@@ -13,7 +13,7 @@ or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 ## Developers
 
 Zzz isn't published to npm but it will be soon.
-If you're looking for that, I'd accept a PR that replaces this line with a link to a new issue requesting it. Until there's that bit of demand or until I get further along, Zzz will remain unpublished to reduce churn.
+If you're looking for that, I'd accept a PR that replaces this line with a link to a new issue requesting it. Until there's that part of demand or until I get further along, Zzz will remain unpublished to reduce churn.
 
 I'm open to PRs when they fit the project's design goals, which can be subtle and arbitrary
 and ill-communicated (:(), but I generally want to make the software as useful as possible

@@ -48,17 +48,6 @@ const has_item_with_id = (items: Iterable<Test_Item>, item: Test_Item): boolean 
 	return false;
 };
 
-// Define common schemas for testing
-const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
-const item_array_schema = z.array(item_schema);
-const dynamic_function_schema = z.function().args(z.string()).returns(z.array(item_schema));
-
-const stats_schema = z.object({
-	count: z.number(),
-	average: z.number(),
-	unique_values: z.custom<Set<string>>((val) => val instanceof Set),
-});
-
 describe('Indexed_Collection - Base Functionality', () => {
 	test('basic operations with no indexes', () => {
 		// Create a collection with no indexes
@@ -188,7 +177,6 @@ describe('Indexed_Collection - Index Types', () => {
 					matches: (item) => item.number > 5,
 					sort: (a, b) => b.number - a.number,
 					query_schema: z.void(),
-					result_schema: item_array_schema,
 				}),
 			],
 		});
@@ -257,7 +245,6 @@ describe('Indexed_Collection - Index Types', () => {
 						};
 					},
 					query_schema: z.string(),
-					result_schema: dynamic_function_schema,
 				}),
 			],
 		});
@@ -318,7 +305,6 @@ describe('Indexed_Collection - Advanced Features', () => {
 					matches: (item) => item.number >= 8,
 					sort: (a, b) => b.date.getTime() - a.date.getTime(),
 					query_schema: z.void(),
-					result_schema: item_array_schema,
 				}),
 			],
 		});
@@ -361,7 +347,6 @@ describe('Indexed_Collection - Advanced Features', () => {
 				};
 			},
 			query_schema: z.void(),
-			result_schema: stats_schema,
 			onadd: (stats: any, item: any) => {
 				stats.count++;
 				stats.average = (stats.average * (stats.count - 1) + item.number) / stats.count;

@@ -28,11 +28,11 @@
 
 	const pid = $props.id();
 
-	interface Props {
+	const {
+		socket: socket_prop,
+	}: {
 		socket?: Socket | undefined;
-	}
-
-	const {socket: socket_prop}: Props = $props();
+	} = $props();
 
 	// Get socket from props or context
 	const app = frontend_context.get();
@@ -73,15 +73,15 @@
 </script>
 
 <!-- Main control section with flex layout for wide screens -->
-<div class="display_flex flex_wrap gap_xl mb_md">
+<form class="display_flex flex_wrap_wrap gap_xl mb_md">
 	<!-- Left column: Connection status and controls -->
-	<div class="flex_1 min_width_sm">
+	<div class="flex_1 width_atleast_sm">
 		<!-- Status display -->
 
 		<!-- URL input and connect/disconnect -->
-		<div class="display_flex flex_column gap_sm mb_sm">
+		<div class="display_flex flex_direction_column gap_sm mb_sm">
 			<div
-				class="chip plain flex_1 font_size_xl px_xl flex_column"
+				class="chip plain flex_1 font_size_xl px_xl flex_direction_column"
 				style:display="display_flex !important"
 				style:align-items="flex-start !important"
 				style:font-weight="400 !important"
@@ -128,7 +128,7 @@
 						}}
 					>
 						<div class:flip_x={has_undo_state}>
-							<Glyph glyph={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
+							<Glyph glyph={GLYPH_RESET} />
 						</div>
 					</button>
 				</div>
@@ -184,32 +184,29 @@
 				</div>
 			</fieldset>
 
-			<div>
-				<div class="column align_items_start">
-					<label class="display_flex gap_xs align_items_center">
-						<input
-							type="checkbox"
-							class="compact font_size_sm"
-							bind:checked={
-								() => socket.auto_reconnect,
-								(v) => {
-									// If turning off auto-reconnect, cancel any pending reconnects
-									if (!v && socket.reconnect_timeout !== null) {
-										socket.cancel_reconnect();
-									} else if (v && !socket.connected && socket.status !== 'pending') {
-										// If turning on auto-reconnect and we're disconnected, try to connect immediately
-										socket.connect();
-									}
-									socket.auto_reconnect = v;
+			<div class="display_flex">
+				<label class="display_flex gap_xs align_items_center my_sm">
+					<input
+						type="checkbox"
+						class="compact font_size_sm"
+						bind:checked={
+							() => socket.auto_reconnect,
+							(v) => {
+								// If turning off auto-reconnect, cancel any pending reconnects
+								if (!v && socket.reconnect_timeout !== null) {
+									socket.cancel_reconnect();
+								} else if (v && !socket.connected && socket.status !== 'pending') {
+									// If turning on auto-reconnect and we're disconnected, try to connect immediately
+									socket.connect();
 								}
+								socket.auto_reconnect = v;
 							}
-						/>
-						<small>auto-reconnect</small>
-					</label>
-				</div>
-
+						}
+					/>
+					<small>auto-reconnect</small>
+				</label>
 				{#if socket.status === 'failure' && socket.reconnect_timeout !== null}
-					<div class="row mt_sm gap_xs" transition:slide>
+					<div class="row flex_1 gap_xs" transition:slide>
 						<button
 							type="button"
 							class="color_d font_size_xl icon_button plain"
@@ -221,18 +218,18 @@
 							<Glyph glyph={GLYPH_CANCEL} />
 						</button>
 						<div
-							class="w_100 border_radius_xs position_relative overflow_hidden bg_d_1"
+							class="bg_d_5 width_100 border_radius_xs position_relative overflow_hidden font_weight_600"
 							style:height="24px"
 						>
 							<div
-								class="position_absolute w_100 h_100 row px_lg font_family_mono"
+								class="position_absolute width_100 height_100 row px_lg font_family_mono"
 								style:z-index="2"
 							>
 								reconnecting in...
 							</div>
 							{#key socket.reconnect_attempt}
 								<div
-									class="progress_fill bg_d_2"
+									class="progress_fill bg_d_6"
 									style:animation-duration="{socket.current_reconnect_delay}ms"
 								></div>
 							{/key}
@@ -244,8 +241,8 @@
 	</div>
 
 	<!-- Right column: Config sliders -->
-	<div class="flex_1 min_width_sm p_sm border_radius_xs">
-		<div class="display_flex flex_column gap_sm">
+	<div class="flex_1 width_atleast_sm p_sm border_radius_xs">
+		<fieldset class="display_flex flex_direction_column gap_sm">
 			<div class="row">
 				<label
 					for="heartbeat_interval_{pid}"
@@ -333,33 +330,33 @@
 			<div class="display_flex justify_content_end">
 				<Confirm_Button
 					onconfirm={reset_to_defaults}
-					attrs={{class: 'plain font_size_sm compact font_weight_600'}}
+					class="plain font_size_sm compact font_weight_600"
 				>
 					reset to defaults
 
 					{#snippet popover_content(popover)}
 						<button
 							type="button"
-							class="color_c icon_button bg_c_1"
+							class="color_c icon_button"
 							title="confirm reset settings"
 							onclick={() => {
 								reset_to_defaults();
 								popover.hide();
 							}}
 						>
-							<Glyph glyph={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
+							<Glyph glyph={GLYPH_RESET} />
 						</button>
 					{/snippet}
 				</Confirm_Button>
 			</div>
-		</div>
+		</fieldset>
 	</div>
-</div>
+</form>
 
 <div class="display_flex gap_xl5">
 	<!-- Connection Stats with retries included -->
-	<div class="width_xs mt_md border_top pt_md">
-		<div class="display_flex flex_column gap_sm mb_sm">
+	<div class="width_upto_xs mt_md border_top pt_md">
+		<div class="display_flex flex_direction_column gap_sm mb_sm">
 			{#if socket.reconnect_count > 0}
 				<div class="display_flex justify_content_space_between" transition:slide>
 					<small>reconnection attempts:</small>
@@ -402,7 +399,7 @@
 	<div class="mt_md border_top pt_md" transition:slide>
 		<h4 class="mt_0 mb_sm">message queue</h4>
 
-		<div class="display_flex flex_column gap_md mb_sm">
+		<div class="display_flex flex_direction_column gap_md mb_sm">
 			{#if socket.queued_message_count > 0}
 				<Socket_Message_Queue {socket} type="queued" />
 			{/if}

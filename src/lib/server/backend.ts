@@ -1,16 +1,19 @@
-import {Filer, type Cleanup_Watch, type Source_File} from '@ryanatkn/gro/filer.js';
+import {Filer} from '@ryanatkn/gro/filer.js';
+import type {Disknode} from '@ryanatkn/gro/disknode.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
-import {ensure_end} from '@ryanatkn/belt/string.js';
+import type {Backend_Provider_Ollama} from '$lib/server/backend_provider_ollama.js';
+import type {Backend_Provider_Gemini} from '$lib/server/backend_provider_gemini.js';
+import type {Backend_Provider_Chatgpt} from '$lib/server/backend_provider_chatgpt.js';
+import type {Backend_Provider_Claude} from '$lib/server/backend_provider_claude.js';
 
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
-import {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
+import {Diskfile_Directory_Path} from '$lib/diskfile_types.js';
 import {Scoped_Fs} from '$lib/server/scoped_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
-import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
+import {ZZZ_CACHE_DIR} from '$lib/constants.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
 import type {Action_Event_Phase, Action_Event_Environment} from '$lib/action_event_types.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
@@ -24,12 +27,20 @@ import type {Action_Executor} from '$lib/action_types.js';
 import type {Backend_Provider} from '$lib/server/backend_provider.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
+// TODO refactor for extensibility
+interface Backend_Providers {
+	ollama: Backend_Provider_Ollama;
+	gemini: Backend_Provider_Gemini;
+	chatgpt: Backend_Provider_Chatgpt;
+	claude: Backend_Provider_Claude;
+}
+
 /**
  * Function type for handling file system changes.
  */
 export type Filer_Change_Handler = (
 	change: Watcher_Change,
-	source_file: Source_File,
+	disknode: Disknode,
 	backend: Backend,
 	dir: string,
 ) => void;
@@ -39,21 +50,14 @@ export type Filer_Change_Handler = (
  */
 export interface Filer_Instance {
 	filer: Filer;
-	cleanup_promise: Promise<Cleanup_Watch>;
+	cleanup_promise: Promise<() => void>;
 }
 
 export interface Backend_Options {
 	/**
-	 * Directories that Zzz is allowed to read from and write to.
+	 * Directory path for the Zzz cache.
 	 */
-	zzz_dir: string;
-	/**
-	 * Directory name for the Zzz cache.
-	 *
-	 * @relative
-	 * @no_trailing_slash
-	 */
-	zzz_cache_dirname?: string; // TODO @many move this info to path schemas
+	zzz_cache_dir?: string; // TODO @many move this info to path schemas
 	/**
 	 * Configuration for the backend and AI providers.
 	 */
@@ -66,10 +70,6 @@ export interface Backend_Options {
 	 * Handler function for processing client messages.
 	 */
 	action_handlers: Backend_Action_Handlers;
-	/**
-	 * Available AI providers.
-	 */
-	providers?: Array<Backend_Provider>;
 	/**
 	 * Handler function for file system changes.
 	 */
@@ -87,21 +87,18 @@ export interface Backend_Options {
 export class Backend implements Action_Event_Environment {
 	readonly executor: Action_Executor = 'backend';
 
-	/** The root Zzz directory on the backend's filesystem. */
-	readonly zzz_dir: Zzz_Dir;
-	/** The Zzz cache directory name, defaults to `.zzz`. */
-	readonly zzz_cache_dirname: string;
 	/** The full path to the Zzz cache directory. */
-	readonly zzz_cache_dir: Diskfile_Path;
+	readonly zzz_cache_dir: Diskfile_Directory_Path;
 
 	readonly config: Zzz_Config;
 
-	readonly peer: Action_Peer;
+	// TODO @many make transports an option?
+	readonly peer: Action_Peer = new Action_Peer({environment: this});
 
 	/**
 	 * API for backend-initiated actions.
 	 */
-	readonly api: Backend_Actions_Api;
+	readonly api: Backend_Actions_Api = create_backend_actions_api(this);
 
 	/**
 	 * Scoped filesystem interface that restricts operations to allowed directories.
@@ -125,27 +122,20 @@ export class Backend implements Action_Event_Environment {
 
 	// TODO wrapper class?
 	/** Available AI providers. */
-	readonly providers: Array<Backend_Provider>;
+	readonly providers: Array<Backend_Provider> = [];
 
 	readonly #handle_filer_change: Filer_Change_Handler;
 
 	constructor(options: Backend_Options) {
-		// Parse the allowed filesystem directories
-		this.zzz_dir = Zzz_Dir.parse(ensure_end(resolve(options.zzz_dir), '/')); // TODO @many if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
-		this.zzz_cache_dirname = options.zzz_cache_dirname ?? ZZZ_CACHE_DIRNAME;
-		this.zzz_cache_dir = to_zzz_cache_dir(this.zzz_dir, this.zzz_cache_dirname); // TODO @many if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
+		this.zzz_cache_dir = Diskfile_Directory_Path.parse(
+			resolve(options.zzz_cache_dir || ZZZ_CACHE_DIR),
+		);
 
 		this.config = options.config;
 
-		// TODO @many make transports an option?
-		this.peer = new Action_Peer({environment: this});
-
 		this.action_registry = new Action_Registry(options.action_specs);
 		this.#action_handlers = options.action_handlers;
-		this.providers = options.providers ?? [];
 		this.#handle_filer_change = options.handle_filer_change;
-
-		this.api = create_backend_actions_api(this);
 
 		this.scoped_fs = new Scoped_Fs([this.zzz_cache_dir]); // TODO pass filter through on options
 
@@ -154,8 +144,8 @@ export class Backend implements Action_Event_Environment {
 		// TODO maybe do this in an `init` method
 		// Set up the filer watcher for the zzz_cache_dir
 		const filer = new Filer({watch_dir_options: {dir: this.zzz_cache_dir}}); // TODO maybe filter out the db directory at this level? think about this when db is added
-		const cleanup_promise = filer.watch((change, source_file) => {
-			this.#handle_filer_change(change, source_file, this, this.zzz_cache_dir);
+		const cleanup_promise = filer.watch((change, disknode) => {
+			this.#handle_filer_change(change, disknode, this, this.zzz_cache_dir);
 		});
 		this.filers.set(this.zzz_cache_dir, {filer, cleanup_promise});
 	}
@@ -174,13 +164,12 @@ export class Backend implements Action_Event_Environment {
 		return this.action_registry.spec_by_method.get(method);
 	}
 
-	// TODO probably extract a `Backend_Providers` or `Backend_Provider_Registry` class that caches a map by name
-	lookup_provider(provider_name: string): Backend_Provider {
+	lookup_provider<T extends keyof Backend_Providers>(provider_name: T): Backend_Providers[T] {
 		const provider = this.providers.find((p) => p.name === provider_name);
 		if (!provider) {
 			throw jsonrpc_errors.invalid_params(`unsupported provider: ${provider_name}`);
 		}
-		return provider;
+		return provider as Backend_Providers[T];
 	}
 
 	/**
@@ -225,5 +214,13 @@ export class Backend implements Action_Event_Environment {
 		}
 
 		await Promise.all(cleanup_promises);
+	}
+
+	add_provider(provider: Backend_Provider): void {
+		if (this.providers.some((p) => p.name === provider.name)) {
+			throw new Error(`provider with name ${provider.name} already exists`);
+		}
+		this.providers.push(provider);
+		this.log?.info(`added provider: ${provider.name}`);
 	}
 }

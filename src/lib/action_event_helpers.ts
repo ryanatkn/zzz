@@ -13,15 +13,13 @@ import type {
 	Action_Event_Remote_Notification_Data,
 	Action_Event_Local_Call_Data,
 } from '$lib/action_event_data.js';
-import {
-	JSONRPC_INVALID_PARAMS,
-	JSONRPC_INTERNAL_ERROR,
-	type Jsonrpc_Error_Json,
-} from '$lib/jsonrpc.js';
+import type {Result} from '@ryanatkn/belt/result.js';
+
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Inputs} from '$lib/action_collections.js';
 import type {Action_Executor, Action_Initiator, Action_Kind} from '$lib/action_types.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+import type {Action_Event} from '$lib/action_event.js';
+import type {Jsonrpc_Error_Json} from '$lib/jsonrpc.js';
 
 // Type guards for action kinds
 export const is_request_response = (
@@ -136,16 +134,13 @@ export const validate_phase_transition = (
 	}
 };
 
-// Get initial phase for action initiation
 export const get_initial_phase = (
 	kind: Action_Kind,
 	initiator: Action_Initiator,
 	executor: Action_Executor,
 ): Action_Event_Phase | null => {
-	// Check if executor can initiate
 	if (initiator !== 'both' && initiator !== executor) return null;
 
-	// Return the first phase for the kind
 	switch (kind) {
 		case 'request_response':
 			return 'send_request';
@@ -156,35 +151,10 @@ export const get_initial_phase = (
 	}
 };
 
-// Check if output should be validated for a phase
-export const should_validate_output = (kind: Action_Kind, phase: Action_Event_Phase): boolean => {
-	return (
-		(kind === 'request_response' &&
-			(phase === 'receive_request' || phase === 'receive_response')) ||
-		(kind === 'local_call' && phase === 'execute')
-	);
-};
+export const should_validate_output = (kind: Action_Kind, phase: Action_Event_Phase): boolean =>
+	(kind === 'request_response' && (phase === 'receive_request' || phase === 'receive_response')) ||
+	(kind === 'local_call' && phase === 'execute');
 
-// Error creation helpers
-export const create_parse_error = (error: unknown): Jsonrpc_Error_Json => ({
-	code: JSONRPC_INVALID_PARAMS,
-	message: `failed to parse input: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
-	data: {error: String(error)},
-});
-
-export const create_validation_error = (field: string, error: unknown): Jsonrpc_Error_Json => ({
-	code: JSONRPC_INVALID_PARAMS,
-	message: `failed to validate ${field}: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
-	data: {field, error: String(error)},
-});
-
-export const create_handler_error = (error: unknown): Jsonrpc_Error_Json => ({
-	code: JSONRPC_INTERNAL_ERROR,
-	message: `handler error: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
-	data: {error: String(error)},
-});
-
-// Check if action is complete
 export const is_action_complete = (data: Action_Event_Data): boolean => {
 	if (data.step === 'failed') return true;
 	if (data.step !== 'handled') return false;
@@ -194,7 +164,6 @@ export const is_action_complete = (data: Action_Event_Data): boolean => {
 	return next_phase === null;
 };
 
-// Create initial data for action
 export const create_initial_data = (
 	kind: Action_Kind,
 	phase: Action_Event_Phase,
@@ -215,3 +184,20 @@ export const create_initial_data = (
 	response: null,
 	notification: null,
 });
+
+export const extract_action_result = (
+	event: Action_Event,
+): Result<{value: Action_Event_Data['output']}, {error: Jsonrpc_Error_Json}> => {
+	const {data} = event;
+
+	if (data.step === 'handled') {
+		return {ok: true, value: data.output};
+	}
+
+	if (data.step === 'failed') {
+		return {ok: false, error: data.error};
+	}
+
+	// Programming error - event not in terminal state
+	throw new Error(`cannot extract result: event in non-terminal state (step: ${data.step})`);
+};

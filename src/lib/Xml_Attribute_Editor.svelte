@@ -6,14 +6,17 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		attribute,
+		dormant: dormant_prop,
+		onupdate,
+		onremove,
+	}: {
 		attribute: Xml_Attribute_With_Defaults;
 		dormant?: boolean | undefined;
 		onupdate: (updates: Partial<Omit_Strict<Xml_Attribute_With_Defaults, 'id'>>) => void;
 		onremove: () => void;
-	}
-
-	const {attribute, dormant: dormant_prop, onupdate, onremove}: Props = $props();
+	} = $props();
 
 	const dormant = $derived(dormant_prop || !attribute.key);
 </script>
@@ -35,7 +38,8 @@
 	/>
 	<Confirm_Button
 		onconfirm={onremove}
-		attrs={{title: `remove attribute ${attribute.key || ''}`, class: 'plain compact'}}
+		title="remove attribute {attribute.key || ''}"
+		class="plain compact"
 	>
 		<Glyph glyph={GLYPH_REMOVE} />
 	</Confirm_Button>

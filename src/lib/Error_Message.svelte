@@ -2,9 +2,7 @@
 	import type {ComponentProps} from 'svelte';
 	import Alert from '@ryanatkn/fuz/Alert.svelte';
 
-	type Props = ComponentProps<typeof Alert>;
-
-	const props: Props = $props();
+	const props: ComponentProps<typeof Alert> = $props();
 </script>
 
 <Alert status="error" {...props} />

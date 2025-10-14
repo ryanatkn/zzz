@@ -111,7 +111,7 @@ export class Sortable<T> {
  * Create a text sorter with optional direction.
  * Falls back to cell's cid for equal values.
  */
-export const sort_by_text = <T extends Cell>(
+export const sort_by_text = <T extends Cell<any>>(
 	key: string,
 	label: string,
 	field: keyof T,
@@ -134,7 +134,7 @@ export const sort_by_text = <T extends Cell>(
  * Create a numeric sorter with optional direction.
  * Falls back to cell's cid for equal values.
  */
-export const sort_by_numeric = <T extends Cell>(
+export const sort_by_numeric = <T extends Cell<any>>(
 	key: string,
 	label: string,
 	field: keyof T,
@@ -143,13 +143,13 @@ export const sort_by_numeric = <T extends Cell>(
 	return {
 		key,
 		label,
-		fn: (cell_a: T, cell_b: T) => {
-			const a = cell_a[field];
-			const b = cell_b[field];
+		fn: (item_a: T, item_b: T) => {
+			const a = item_a[field];
+			const b = item_b[field];
 			const result =
 				direction === 'asc' ? (a < b ? -1 : a > b ? 1 : 0) : a > b ? -1 : a < b ? 1 : 0;
 			// If values are equal, sort by cid for stable ordering
-			return result !== 0 ? result : cell_b.cid - cell_a.cid;
+			return result !== 0 ? result : item_b.cid - item_a.cid;
 		},
 	};
 };

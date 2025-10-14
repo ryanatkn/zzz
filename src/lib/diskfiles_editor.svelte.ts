@@ -9,7 +9,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 
 export const Diskfiles_Editor_Json = Cell_Json.extend({
 	show_sort_controls: z.boolean().default(false),
-});
+}).meta({cell_class_name: 'Diskfiles_Editor'});
 export type Diskfiles_Editor_Json = z.infer<typeof Diskfiles_Editor_Json>;
 export type Diskfiles_Editor_Json_Input = z.input<typeof Diskfiles_Editor_Json>;
 

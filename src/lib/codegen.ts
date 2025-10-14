@@ -220,12 +220,27 @@ export const get_executor_phases = (
 
 			switch (executor) {
 				case 'frontend':
-					if (can_send) phases.push('send_request', 'receive_response');
+					if (can_send) {
+						phases.push('send_request', 'receive_response');
+						// Add error phases for send/receive
+						phases.push('send_error', 'receive_error');
+					}
 					if (can_receive) phases.push('receive_request', 'send_response');
 					break;
 				case 'backend':
-					if (can_send) phases.push('send_request', 'receive_response');
-					if (can_receive) phases.push('receive_request', 'send_response');
+					if (can_send) {
+						phases.push('send_request', 'receive_response');
+						// Add error phases for send/receive
+						phases.push('send_error', 'receive_error');
+					}
+					if (can_receive) {
+						phases.push('receive_request', 'send_response');
+						// Add send_error phase for backend when it receives requests
+						// TODO @cleanup This adds send_error redundantly when initiator:'both'
+						// (already added above at line 234). Deduplication at line 268 handles it,
+						// but the logic could be clearer. Consider consolidating error phase logic.
+						phases.push('send_error');
+					}
 					break;
 				default:
 					throw new Unreachable_Error(executor);
@@ -252,7 +267,8 @@ export const get_executor_phases = (
 			throw new Unreachable_Error(kind);
 	}
 
-	return phases;
+	// Deduplicate phases (e.g., send_error added twice for initiator:'both' backend actions)
+	return Array.from(new Set(phases));
 };
 
 /**

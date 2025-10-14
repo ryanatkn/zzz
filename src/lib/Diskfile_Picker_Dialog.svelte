@@ -10,15 +10,6 @@
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
 
-	interface Props {
-		onpick: (diskfile: Diskfile | undefined) => boolean | void;
-		show?: boolean | undefined;
-		filter?: ((diskfile: Diskfile) => boolean) | undefined;
-		exclude_ids?: Array<Uuid> | undefined;
-		selected_ids?: Array<Uuid> | undefined;
-		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
-	}
-
 	let {
 		show = $bindable(false),
 		onpick,
@@ -26,7 +17,14 @@
 		exclude_ids,
 		selected_ids,
 		dialog_props,
-	}: Props = $props();
+	}: {
+		onpick: (diskfile: Diskfile | undefined) => boolean | void;
+		show?: boolean | undefined;
+		filter?: ((diskfile: Diskfile) => boolean) | undefined;
+		exclude_ids?: Array<Uuid> | undefined;
+		selected_ids?: Array<Uuid> | undefined;
+		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
+	} = $props();
 
 	const app = frontend_context.get();
 	const {diskfiles} = app;

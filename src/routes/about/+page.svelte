@@ -3,23 +3,24 @@
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import {resolve} from '$app/paths';
+	import Details from '@ryanatkn/fuz/Details.svelte';
+	import {DEV} from 'esm-env';
 
 	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
-	import Footer from '$lib/Footer.svelte';
+	import Page_Footer from '$routes/Page_Footer.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	const pkg = pkg_context.get();
 	const app = frontend_context.get();
 
 	// TODO probably link to a blog post that's more approachable and less technical
-
-	// TODO rewrite prose
 </script>
 
-<div class="width_md p_lg">
+<div class="width_upto_md p_lg">
 	<section>
-		<header style:--font_size="var(--font_size_xl)">
+		<header class="mb_xl5" style:--font_size="var(--font_size_xl)">
 			<h1 class="row">
 				<Svg
 					data={zzz_logo}
@@ -29,220 +30,139 @@
 				/> about
 			</h1>
 		</header>
-		<aside class="mt_xl5">
+		<blockquote>nice web things for the tired 💤</blockquote>
+		<p>
+			Zzz, pronounced "zees" like bees, is a fullstack app and toolkit for power users and
+			developers. The idea is to make an integrated cross-platform environment that adapts to your
+			needs and intent while remaining fully open, aligned, and in your control. It's both a
+			customizable local-first web UI for power users, and a flexible library for crafting
+			UX-maximizing websites with a streamlined developer experience.
+		</p>
+		<aside>
 			⚠️ This is an early pre-release, see the
 			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
 			and
-			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
+			or find me on <External_Link href="https://bsky.app/profile/ryanatkn.com"
+				>Bluesky</External_Link
+			> 💤
 		</aside>
-		<p>
-			Zzz, pronounced "zees" like bees, is a fullstack web toolkit with a focus on user power and
-			experimentation. The idea is to make a cross-platform software environment that adapts to your
-			needs and intent while remaining fully open, aligned, and in your control. It's a flexible
-			toolkit for crafting experiences and tools with maximal UX and DX, like developing web
-			software for creating and consuming content.
-		</p>
-		<p>
-			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
-				href="https://wikipedia.org/wiki/Enshittification">enshittification</External_Link
-			> is a widely-understood phenomenon among the very-online, Zzz asks:
-		</p>
-		<blockquote>
-			"How can composable computing environments transform user agency in the age of AI?"
-		</blockquote>
-		<p>or with less true-believer energy and more detail:</p>
-		<blockquote>
-			"What becomes possible when web users move from exploitative service-controlled spaces to
-			user-controlled environments that are open, extensible, and well-designed, with unrestricted
-			access to local and remote capabilities?"
-		</blockquote>
-		<p>
-			The software I imagine answering these questions is cross-platform so it runs everywhere, and
-			for that we have the web with HTML, CSS, and JS. We want to solve problems once and have
-			supported features work consistently across operating systems and devices. For all its flaws
-			and quirks, the web is the turf of our digital commons, and I believe it's capable of
-			delivering a great UX when developers use it with care.
-		</p>
-		<p>
-			When thinking about the web UX I want, my starting point is the user interface, because we're
-			all users interfacing with machines. UX has primacy; the design serves it first. We want no
-			compromises when it comes to control over our UI runtime, so this means we're using JS
-			(thankfully, TypeScript). Zzz uses JS to glue software and machines together precisely the way
-			you want, maximizing its utility on any device across the full stack. It can run locally on
-			your machine using any of your available and granted capabilities, or it can deploy anywhere
-			JS runs to play whatever role you need.
-		</p>
-		<p>
-			Zzz is based on many kinds of software, borrowing features to provide end-users and devs an
-			integrated and extensible system:
-		</p>
-		<ul>
-			<li>
-				LLM UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
-					>AnythingLLM</External_Link
-				>, <External_Link href="https://github.com/danny-avila/LibreChat">LibreChat</External_Link>,
-				and <External_Link href="https://github.com/oobabooga/text-generation-webui"
-					>Text generation web UI</External_Link
-				>, like LM Studio but FOSS and designed as a toolkit
-			</li>
-			<li>
-				IDEs like <External_Link href="https://code.visualstudio.com/">VSCode</External_Link> for open-ended
-				tooling and system access
-			</li>
-			<li>
-				web browsers, planned with Chromium via Electron, ideally with swappable browser engines
-				(webview-based toolkits like Tauri do not provide the web-integrated affordances I'm after,
-				I think, but you can use Zzz with Tauri where it supports JS)
-			</li>
-			<li>
-				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
-					>content management systems</External_Link
-				>, so you can make and manage websites, see this <External_Link
-					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
-				>
-			</li>
-			<li>
-				code libraries and web metaframeworks using TypeScript and <External_Link
-					href="https://svelte.dev/">Svelte</External_Link
-				> -- Zzz extends SvelteKit and <External_Link href="https://vite.dev/">Vite</External_Link> without
-				wrapping them, enabling devs to use all or parts of Zzz as a library with existing workflows
-			</li>
-		</ul>
-		<p>
-			Putting it all together, we have a fullstack, fully capable, user-editable, and extensible
-			system-and-toolkit that bridges dev workflows to end-user experiences, without prescribing
-			changes to current behaviors and expectations.
-		</p>
-		<p>
-			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
-			now on the best foundations I can assemble. I think the most successful version of Zzz is
-			where it's used to build other systems, and it fades into the background as just another tool
-			with a particular take on a part of the stack. From a personal POV, it's my flagship project
-			and primary+priority user of my other software, and I plan to make various websites and tools
-			with it. Many of the initial systems have been designed with some thought towards this bigger
-			picture, and I plan to continue building incrementally on a quality base with some
-			lower-quality experiments and stubbed future features mixed in.
-		</p>
-		<p>
-			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
-			cater to every case for every person -- however, thanks to the magic of standards-based
-			interoperability, Zzz works with all websites like you'd expect from a browser, and anything
-			you make with Zzz works with other browsers and web technologies. It's one of infinite ways to
-			use the web, and it's designed to help you level up your technical knowledge and abilities, if
-			you're so inclined.
-		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
 			<li>
-				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
-				locally -- more local LLM backends will be supported starting with <External_Link
-					href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link
-				> which Ollama is based on -- Ollama prioritizes ease of use, so although you have to install
-				it yourself separately, they make it about as easy as possible
+				<External_Link href="https://hono.dev/">Hono</External_Link> is the backend web server that provides
+				local system access. It's uses web standards and supports all JS server runtimes.
 			</li>
 			<li>
-				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,
+				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> is the frontend framework.
+				Hono integrates with its Node adapter, and it uses <External_Link href="https://vite.dev/"
+					>Vite</External_Link
+				> in development.
+			</li>
+			<li>
+				AI providers with <External_Link href="https://github.com/openai/openai-node"
+					>ChatGPT</External_Link
+				>,
 				<External_Link href="https://github.com/anthropics/anthropic-sdk-typescript"
 					>Claude</External_Link
 				>, and <External_Link href="https://github.com/google-gemini/generative-ai-js"
 					>Gemini</External_Link
-				> -- requires you to bring your own API keys
+				> -- bring your own API keys
 			</li>
 			<li>
-				<External_Link href="https://hono.dev/">Hono</External_Link> as the web server with
-				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
-					href="https://vite.dev/">Vite</External_Link
-				>, plays a key coordinating role -- Hono bases itself on web standards and supports all JS
-				server runtimes
+				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
+				locally with easy installation and onboarding. I plan to support more local LLM backends like
+				<External_Link href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link> which Ollama
+				is based on.
+			</li>
+		</ul>
+		<p>Planned integrations:</p>
+		<ul>
+			<li>
+				<!-- TODO @db -->
+				<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link>
+				and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when desired,
+				using <External_Link href="https://github.com/porsager/postgres">Postgres.js</External_Link>
+				and probably <External_Link href="https://github.com/drizzle-team/drizzle-orm"
+					>Drizzle</External_Link
+				>, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
+					>issue #7</External_Link
+				>
 			</li>
 			<li>
-				planned:
+				<External_Link href="https://modelcontextprotocol.io/">Model Context Protocol</External_Link
+				>, maybe others like <External_Link href="https://github.com/google/A2A"
+					>Agent2Agent (A2A) protocol</External_Link
+				>
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
+					href="https://wikipedia.org/wiki/Atom_(web_standard)">Atom</External_Link
+				> and <External_Link href="https://wikipedia.org/wiki/JSON_Feed">JSON Feed</External_Link>
+			</li>
+			<li>git!</li>
+			<li>
+				I think it makes sense to prioritize a few high-utility integrations for manipulating media
+				files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
+				<External_Link href="https://ffmpeg.org/">ffmpeg</External_Link>, and <External_Link
+					href="https://imagemagick.org/">ImageMagick</External_Link
+				>
+			</li>
+			<li>
+				when I regain an appetite for social, <External_Link href="https://atproto.com/"
+					>AT Protocol</External_Link
+				> and <External_Link href="https://activitypub.rocks/">ActivityPub</External_Link> -- probably
+				both but they're not immediate prioritie (I have an initial <External_Link
+					href="https://github.com/ryanatkn/fuz_mastodon">Mastodon integration</External_Link
+				> with readonly embedded posts)
+			</li>
+			<li>
+				more, input welcome
 				<ul>
 					<li>
-						<!-- TODO @db -->
-						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link>
-						and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
-						desired, using <External_Link href="https://github.com/drizzle-team/drizzle-orm"
-							>Drizzle</External_Link
-						> or maybe <External_Link href="https://github.com/porsager/postgres"
-							>postgres</External_Link
-						>, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
-							>issue #7</External_Link
-						>
+						the system is being designed for extensibility, so your use cases are helpful for
+						shaping it
 					</li>
 					<li>
-						<External_Link href="https://modelcontextprotocol.io/"
-							>Model Context Protocol</External_Link
-						>, maybe others like <External_Link href="https://github.com/google/A2A"
-							>Agent2Agent (A2A) protocol</External_Link
-						>
+						devs can extend Zzz without artifcial restriction in their own projects, but Zzz should
+						provide a complete system with useful defaults and optional high-quality first-party
+						integrations
 					</li>
 					<li>
-						<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
-							href="https://wikipedia.org/wiki/Atom_(web_standard)">Atom</External_Link
-						> and <External_Link href="https://wikipedia.org/wiki/JSON_Feed"
-							>JSON Feed</External_Link
-						>
+						some decisions like Postgres, TypeScript, and Svelte limit user choice -- you can always
+						bring other databases and frontend frameworks, but don't expect full integration or
+						reasonable performance; for example there is a serious mismatch with sqlite
 					</li>
-					<li>
-						<External_Link href="https://activitypub.rocks/">ActivityPub</External_Link>
-						and
-						<External_Link href="https://atproto.com/">AT Protocol</External_Link>
-					</li>
-					<li>
-						I think it makes sense to prioritize a few high-utility integrations for manipulating
-						media files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
-						<External_Link href="https://ffmpeg.org/">ffmpeg</External_Link>, and <External_Link
-							href="https://imagemagick.org/">ImageMagick</External_Link
-						>
-					</li>
-					<li>more, please send thoughts</li>
 				</ul>
 			</li>
 		</ul>
 		<p>
-			Zzz is one implementation of an increasingly common idea that combines web tech and AI with
-			powerful open clients. Some related projects call themselves web UIs or even operating
-			systems. I currently like word "environment" to describe the device+software UX, and "adaptive
-			web environments" to get the bigger picture. Whatever the name, this class of app is something
-			that I've been wanting for a long time, and I appear to be sticking with this iteration.
-		</p>
-		<p>
-			If this sounds interesting and you would like to test out some broken pre-release software,
-			feedback is appreciated to help make it work for you -- see the <External_Link
-				href="https://github.com/ryanatkn/zzz">code</External_Link
-			>,
-			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
-			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
-			and find me on my website or
-			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
+			If this sounds interesting and you would like to test out some rickety pre-release software,
+			feedback is appreciated to help make it work for you -- see the
+			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link> and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>.
 		</p>
 	</section>
 	<hr />
 	<section>
 		<h2 class="mb_lg">More details</h2>
 		<ul>
-			<li>Zzz is open source and permissively licensed, and forking is encouraged</li>
+			<li>Zzz is free and open source and permissively licensed</li>
 			<li>it's a noncommercial project and its only official domain is zzz.software</li>
 			<li>
-				the Zzz name/logos/IP are community property, just don't falsely represent the official Zzz
-				project or zzz.software
-			</li>
-			<li>
-				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
-				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit, and
-				I'm open to employment that sponsors at least part-time work on Zzz and its dependencies (without
-				changing the independence I have over my repos)
+				I'm looking for <External_Link href="https://www.ryanatkn.com/funding"
+					>funding</External_Link
+				> to sustain my continued work on it
 			</li>
 		</ul>
 	</section>
 	<hr />
 	<section>
-		<h2 class="mb_lg">Peek into the future</h2>
+		<h2 class="mb_lg">Peek a possible future</h2>
 		<p class="mb_md">
-			This project has a big scope and it's early in development. What you're seeing is a small part
-			of the idea -- especially if you're viewing this on the website not natively via Node -- so
-			here's a button for previewing some of what's planned:
+			This project has a big speculative scope and it's early in development. What you're seeing is
+			a small part of the idea -- especially if you're viewing this on the website not natively via
+			Node -- so here's a button for previewing some of what's planned:
 		</p>
 		<button
 			type="button"
@@ -278,13 +198,134 @@
 		</button>
 	</section>
 	<hr />
-	<Community_Links_Panel />
 	<section>
-		<div class="panel p_md width_md">
-			<Package_Detail {pkg} />
-		</div>
+		<h2 class="mb_lg">Security</h2>
+		<p>
+			Zzz is a powerful and extensible system, and that means it carries significant security risks.
+			Although it can be used to build simple and secure websites, the Zzz backend is capable like
+			an IDE and can do bad things when bidden.
+		</p>
+		<p>
+			Zzz puts the user in control, so if you insist on installing obvious_malware, Zzz will abide.
+			This basic tension between power and safety leads me to think that UX design should be a
+			primary mechanism of influence to protect users -- instead of restricting power from user
+			control, we'll design for its safe usage, including clear visibility into your delegation
+			situation. Maybe you'll have to click through an annoying UI and 2FA, obviously breaking the
+			seal, to install the malware. Every person and situation may have a different threat model, so
+			we want to make it easy to make good choices, where lazy is secure.
+		</p>
+		<aside>
+			⚠️ I am not a security professional and Zzz has not been audited; it may be <strong
+				class="color_c_5">dangerous</strong
+			> to run and there is no auth yet
+		</aside>
+		<p>
+			My current plan is to extract <External_Link href="https://github.com/ryanatkn/fuz"
+				>a reusable framework</External_Link
+			> out of Zzz that prioritizes security from the first commit. More on that soon. For now Zzz is
+			insecure and should definitely not be run in production, and it should be used with caution in
+			development.
+		</p>
+		<p>More thoughts about security:</p>
+		<ul>
+			<li>
+				Zzz's Node server can do things like:
+				<ul>
+					<li>
+						read and write to the configured filesystem directory, defaults to <code>./.zzz</code>
+						in the <code>PUBLIC_ZZZ_CACHE_DIR</code> (which defaults to <code>./</code>), and is
+						securely scoped (does not follow symlinks) -- this opens a significant surface area for
+						both you and attackers to use, and writing untrusted data to it could lead to arbitrary
+						code execution if, for example, you're running a hot reloading dev server in that
+						directory (Zzz does not do this by default)
+					</li>
+					<li>
+						use your API keys for calls to Claude, ChatGPT, and Gemini, and write them to <code
+							>./.env.{DEV ? 'development' : 'production'}</code
+						>
+					</li>
+					<li>call Ollama's API if available -- low risk</li>
+					<li>
+						<strong class="color_c_5">there is no authentication yet</strong>, only an origin check,
+						so do not use this in production
+					</li>
+					<li>
+						soon, more integrations including terminal access assuming Bash, but nothing that
+						powerful before auth
+					</li>
+				</ul>
+			</li>
+			<li>
+				The frontend <External_Link
+					href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_Security_Policy"
+					>CSP</External_Link
+				> is fairly locked down, including blocking all unknown network connections. For details, see
+				the CSP config in <External_Link
+					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
+					>svelte.config.js</External_Link
+				> and the <External_Link href="https://www.fuz.dev/docs/csp">Fuz CSP docs</External_Link>.
+				Configuration will be needed for many usecases, unlocking shenanigans good and bad, so we'll
+				tread carefully.
+			</li>
+			<li>
+				There are no mechanisms for end-users to load executable code or dangerous config. Of
+				course, developers have full control to shoot their own feet, and Node is currently the only
+				supported way to use Zzz. Deno is planned.
+				<ul>
+					<li>
+						we'll develop a plugin API so people can make reusable integrations, and distribution
+						will be through npm/jsr, decentralized like a typical open source web ecosystem project
+						so the risks assumed by developers are unchanged and I gatekeep nothing -- I plan to
+						publish a number of <code>@ryanatkn/zzz_*</code> packages, and if people think it's worth
+						their time to make Zzz things, they can publish according to their taste and devs can vet
+						their code
+					</li>
+					<li>
+						any modules you install from npm/jsr, or any code you add to the src directory, carry
+						the normal elevated risks associated with development and code execution -- I try to
+						practice good <External_Link href="https://github.com/ryanatkn/fuz_template/issues/1"
+							>dependency hygiene</External_Link
+						>
+					</li>
+				</ul>
+			</li>
+			<li>
+				In 2025, LLMs have serious vulnerabilities to attacks like <External_Link
+					href="https://wikipedia.org/wiki/Prompt_injection">prompt injection</External_Link
+				>, where they are unable to reliably discern instructions intended by the prompter from
+				adversarial instructions in the data. It's unclear if this is fixable but people are
+				definitely building sensitive systems with probabilistic components, and I don't want to see
+				Zzz, an AI UI, make dumb predictable errors with LLMs or be designed to encourage us to make
+				them. MCP's utility is high, but it can be used in <External_Link
+					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+					title="Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication"
+					>insecure ways</External_Link
+				> that I want to account for before integrating. Zzz will integrate LLMs into its own functionality
+				slowly and carefully -- currently the only in-app LLM integration is using a local model to name
+				new chats. There will be more, and we'll make sure you always have visibility into and control
+				over this behavior. (for example see the
+				<a href={resolve('/providers/ollama')}>Ollama controls</a>)
+			</li>
+			<li>
+				Security and privacy should be the expected default, so for example Zzz won't make calls to
+				external providers without explicit configuration. No other third party services are used.
+			</li>
+			<li>
+				I prioritize security but it's not my expertise and I will make mistakes, help is always
+				appreciated.
+			</li>
+		</ul>
 	</section>
-	<section class="mb_xl7">
-		<Footer />
+	<hr />
+	<Community_Links_Panel />
+	<hr />
+	<section>
+		<Details>
+			{#snippet summary()}package details{/snippet}
+			<div class="panel p_md width_upto_md">
+				<Package_Detail {pkg} />
+			</div>
+		</Details>
 	</section>
+	<Page_Footer />
 </div>

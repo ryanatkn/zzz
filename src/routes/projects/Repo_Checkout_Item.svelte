@@ -3,17 +3,21 @@
 
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import type {Repo_Checkout} from '$routes/projects/repo.svelte.js';
+	import type {Repo_Checkout} from '$routes/projects/projects_schema.js';
 
-	interface Props {
+	const {
+		checkout,
+		index,
+		on_remove,
+		on_add_tag,
+		on_remove_tag,
+	}: {
 		checkout: Repo_Checkout;
 		index: number;
 		on_remove: (index: number) => void;
 		on_add_tag: (index: number, tag: string) => void;
 		on_remove_tag: (index: number, tag_index: number) => void;
-	}
-
-	const {checkout, index, on_remove, on_add_tag, on_remove_tag}: Props = $props();
+	} = $props();
 
 	let tag_input = $state('');
 	let tag_el: HTMLInputElement | undefined = $state();
@@ -26,7 +30,7 @@
 			<input
 				type="text"
 				bind:value={checkout.path}
-				class="w_100"
+				class="width_100"
 				placeholder="./path/to/repo/checkout"
 			/>
 		</label>
@@ -38,7 +42,7 @@
 			<input
 				type="text"
 				bind:value={checkout.label}
-				class="w_100"
+				class="width_100"
 				placeholder="description (e.g. 'development', 'some-feature-branch', 'some-bug-repro')"
 			/>
 		</label>
@@ -46,7 +50,7 @@
 
 	<div class="mb_sm">
 		<span class="display_block mb_xs">Tags</span>
-		<div class="display_flex flex_wrap gap_xs mb_xs">
+		<div class="display_flex flex_wrap_wrap gap_xs mb_xs">
 			{#each checkout.tags as tag, tag_index (tag_index)}
 				<span class="chip color_e display_flex align_items_center">
 					{tag}
@@ -54,7 +58,7 @@
 						type="button"
 						class="icon_button plain font_size_xs ml_xs"
 						title="Remove tag"
-						onclick={() => on_remove_tag(index, tag_index)}>{GLYPH_DELETE}</button
+						onclick={() => on_remove_tag(index, tag_index)}><Glyph glyph={GLYPH_DELETE} /></button
 					>
 				</span>
 			{/each}
@@ -85,7 +89,7 @@
 
 	<div class="display_flex justify_content_end">
 		<button type="button" class="color_c" onclick={() => on_remove(index)}>
-			<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete checkout
+			<Glyph glyph={GLYPH_DELETE} />&nbsp; delete checkout
 		</button>
 	</div>
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 	import type {Snippet} from 'svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 	import {page} from '$app/state';
@@ -16,11 +16,11 @@
 
 	// TODO dashboard should be mounted with Markdown
 
-	interface Props {
+	const {
+		children,
+	}: {
 		children: Snippet;
-	}
-
-	const {children}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
@@ -51,13 +51,17 @@
 			// Add tabs to main group
 			const main_group = nav_items.find((l) => l.group === 'main');
 			if (main_group) {
-				main_group.items.unshift({label: 'tabs', href: `${base}/tabs`, icon: GLYPH_TAB});
+				main_group.items.unshift({label: 'tabs', href: resolve('/tabs'), icon: GLYPH_TAB});
 			}
 
 			// Add projects to main group
 			const main_section = nav_items.find((section) => section.group === 'main');
 			if (main_section) {
-				main_section.items.push({label: 'projects', href: `${base}/projects`, icon: GLYPH_PROJECT});
+				main_section.items.push({
+					label: 'projects',
+					href: resolve('/projects'),
+					icon: GLYPH_PROJECT,
+				});
 			}
 		}
 
@@ -67,6 +71,8 @@
 	const sidebar_button_title = $derived(
 		(app.ui.show_sidebar ? 'hide sidebar' : 'show sidebar') + ' [backtick `]',
 	);
+
+	// TODO consider the
 </script>
 
 <svelte:window
@@ -80,11 +86,14 @@
 
 <!-- TODO drive with data -->
 <div class="dashboard" style:--sidebar_width="{sidebar_width}px">
-	<div class="h_100 w_100 position_fixed t_0 l_0" style:padding-left="var(--sidebar_width)">
+	<div
+		class="height_100 width_100 position_fixed top_0 left_0"
+		style:padding-left="var(--sidebar_width)"
+	>
 		{@render children()}
 	</div>
 	<div
-		class="h_100 position_fixed t_0 l_0 overflow_auto scrollbar_width_thin"
+		class="height_100 position_fixed top_0 left_0 overflow_auto scrollbar_width_thin"
 		style:width="var(--sidebar_width)"
 	>
 		<!-- TODO refactor -->
@@ -95,24 +104,22 @@
 					{#if section.group === 'main'}
 						<div class="display_flex p_sm mb_sm">
 							<Nav_Link
-								href="{base}/"
-								attrs={{
-									title: app.futuremode ? 'futuremode' : 'home',
-									class: 'click_effect_scale',
-									onclick: () => {
-										if (futureclicks_activated) {
-											// If already activated once, toggle immediately when on root
-											if (page.url.pathname === base + '/') {
-												app.futuremode = !app.futuremode;
-											}
-										} else {
-											futureclicks++;
-											if (futureclicks >= FUTURECLICKS) {
-												app.futuremode = !app.futuremode;
-												futureclicks_activated = true;
-											}
+								href={resolve('/')}
+								title={app.futuremode ? 'futuremode' : 'home'}
+								class="click_effect_scale"
+								onclick={() => {
+									if (futureclicks_activated) {
+										// If already activated once, toggle immediately when on root
+										if (page.url.pathname === resolve('/')) {
+											app.futuremode = !app.futuremode;
 										}
-									},
+									} else {
+										futureclicks++;
+										if (futureclicks >= FUTURECLICKS) {
+											app.futuremode = !app.futuremode;
+											futureclicks_activated = true;
+										}
+									}
 								}}
 							>
 								<Svg
@@ -134,10 +141,10 @@
 
 					{#each section.items as link (link.label)}
 						<div transition:slide>
-							<Nav_Link href={to_nav_link_href(app, link)}>
+							<Nav_Link href={to_nav_link_href(app, link.label, link.href)}>
 								{#snippet children(selected)}
 									{#if typeof link.icon === 'string'}
-										<Glyph glyph={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
+										<Glyph glyph={link.icon} class="icon_xs" /> {link.label}
 									{:else}
 										<span class="icon_xs">
 											<Svg
@@ -157,12 +164,10 @@
 		</div>
 	</div>
 
-	<!-- Sidebar toggle button -->
+	<!-- sidebar toggle button -->
 	<button
 		type="button"
-		class="position_fixed b_0 l_0 icon_button plain border_radius_xs2"
-		style:border-bottom-left-radius="0"
-		style:border-top-right-radius="var(--border_radius_lg)"
+		class="position_fixed bottom_0 left_0 icon_button plain border_radius_0"
 		aria-label={sidebar_button_title}
 		title={sidebar_button_title}
 		onclick={() => app.ui.toggle_sidebar()}

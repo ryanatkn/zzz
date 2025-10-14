@@ -7,21 +7,16 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Model} from '$lib/model.svelte.js';
-	import {
-		GLYPH_MODEL,
-		GLYPH_REFRESH,
-		GLYPH_PROVIDER,
-		GLYPH_CHECKMARK,
-		GLYPH_CHAT,
-	} from '$lib/glyphs.js';
+	import {GLYPH_MODEL, GLYPH_CHAT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		model,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		model: Model;
-	}
-
-	const {model, ...rest}: Props = $props();
+	} = $props();
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -39,7 +34,7 @@
 
 			<Contextmenu_Entry_Copy_To_Clipboard content={model.name} label="copy name" />
 
-			<Contextmenu_Entry run={() => model.app.chats.add(undefined, true).add_tape(model)}>
+			<Contextmenu_Entry run={() => model.app.chats.add(undefined, true).add_thread(model)}>
 				{#snippet icon()}<Glyph glyph={GLYPH_CHAT} />{/snippet}
 				<span>create new chat</span>
 			</Contextmenu_Entry>
@@ -53,21 +48,10 @@
 					{#snippet icon()}<Glyph glyph={GLYPH_MODEL} />{/snippet}
 					<span>manage Ollama model</span>
 				</Contextmenu_Entry>
-				<!-- TODO I think we want `disabled` to be supported on Contextmenu_Entry here for loading states -->
-				<Contextmenu_Entry
-					run={async () => {
-						await model.app.api.ollama_show({model: model.name});
-					}}
-				>
-					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
-					<span
-						>{#if model.ollama_show_response_loaded}re{/if}load Ollama details</span
-					>
-				</Contextmenu_Entry>
 			{/if}
 
-			<!-- TODO probably want an "edit model" form but this will do for now -->
-			<Contextmenu_Submenu>
+			<!-- TODO probably want an "edit model" form, this is confusing as-is -->
+			<!-- <Contextmenu_Submenu>
 				{#snippet icon()}<Glyph glyph={GLYPH_PROVIDER} />{/snippet}
 				set provider
 
@@ -85,7 +69,7 @@
 						</Contextmenu_Entry>
 					{/each}
 				{/snippet}
-			</Contextmenu_Submenu>
+			</Contextmenu_Submenu> -->
 		{/snippet}
 	</Contextmenu_Submenu>
 {/snippet}

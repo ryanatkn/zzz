@@ -12,10 +12,10 @@ import {
 } from '$lib/codegen.js';
 import {
 	ping_action_spec,
-	load_session_action_spec,
+	session_load_action_spec,
 	filer_change_action_spec,
 	toggle_main_menu_action_spec,
-	create_completion_action_spec,
+	completion_create_action_spec,
 } from '$lib/action_specs.js';
 
 describe('Import_Builder', () => {
@@ -372,38 +372,48 @@ describe('get_executor_phases', () => {
 			expect(get_executor_phases(ping_action_spec, 'frontend')).toEqual([
 				'send_request',
 				'receive_response',
+				'send_error',
+				'receive_error',
 				'receive_request',
 				'send_response',
 			]);
 			expect(get_executor_phases(ping_action_spec, 'backend')).toEqual([
 				'send_request',
 				'receive_response',
+				'send_error',
+				'receive_error',
 				'receive_request',
 				'send_response',
 			]);
 		});
 
-		test('frontend initiator - load_session spec', () => {
+		test('frontend initiator - session_load spec', () => {
 			// load_session has initiator: 'frontend'
-			expect(get_executor_phases(load_session_action_spec, 'frontend')).toEqual([
+			expect(get_executor_phases(session_load_action_spec, 'frontend')).toEqual([
 				'send_request',
 				'receive_response',
+				'send_error',
+				'receive_error',
 			]);
-			expect(get_executor_phases(load_session_action_spec, 'backend')).toEqual([
+			expect(get_executor_phases(session_load_action_spec, 'backend')).toEqual([
 				'receive_request',
 				'send_response',
+				'send_error',
 			]);
 		});
 
-		test('frontend initiator - create_completion spec', () => {
+		test('frontend initiator - completion_create spec', () => {
 			// create_completion has initiator: 'frontend'
-			expect(get_executor_phases(create_completion_action_spec, 'frontend')).toEqual([
+			expect(get_executor_phases(completion_create_action_spec, 'frontend')).toEqual([
 				'send_request',
 				'receive_response',
+				'send_error',
+				'receive_error',
 			]);
-			expect(get_executor_phases(create_completion_action_spec, 'backend')).toEqual([
+			expect(get_executor_phases(completion_create_action_spec, 'backend')).toEqual([
 				'receive_request',
 				'send_response',
+				'send_error',
 			]);
 		});
 	});
@@ -461,13 +471,13 @@ describe('get_handler_return_type', () => {
 		test('other phases return void and do not add imports', () => {
 			const imports = new Import_Builder();
 
-			expect(get_handler_return_type(load_session_action_spec, 'send_request', imports)).toBe(
+			expect(get_handler_return_type(session_load_action_spec, 'send_request', imports)).toBe(
 				'void | Promise<void>',
 			);
-			expect(get_handler_return_type(load_session_action_spec, 'send_response', imports)).toBe(
+			expect(get_handler_return_type(session_load_action_spec, 'send_response', imports)).toBe(
 				'void | Promise<void>',
 			);
-			expect(get_handler_return_type(load_session_action_spec, 'receive_response', imports)).toBe(
+			expect(get_handler_return_type(session_load_action_spec, 'receive_response', imports)).toBe(
 				'void | Promise<void>',
 			);
 
@@ -529,7 +539,7 @@ describe('get_handler_return_type', () => {
 			expect(imports.import_count).toBe(1);
 
 			// Second call doesn't add duplicate
-			get_handler_return_type(load_session_action_spec, 'receive_request', imports);
+			get_handler_return_type(session_load_action_spec, 'receive_request', imports);
 			expect(imports.import_count).toBe(1);
 
 			// Void return doesn't add import
@@ -551,9 +561,9 @@ describe('generate_phase_handlers', () => {
 
 	test('generates handlers for request_response action', () => {
 		const imports = new Import_Builder();
-		const result = generate_phase_handlers(load_session_action_spec, 'frontend', imports);
+		const result = generate_phase_handlers(session_load_action_spec, 'frontend', imports);
 
-		expect(result).toContain('load_session?: {');
+		expect(result).toContain('session_load?: {');
 		expect(result).toContain('send_request?:');
 		expect(result).toContain('receive_response?:');
 		expect(result).not.toContain('receive_request');
@@ -595,7 +605,7 @@ describe('generate_phase_handlers', () => {
 
 	test('uses type-only imports when appropriate', () => {
 		const imports = new Import_Builder();
-		generate_phase_handlers(create_completion_action_spec, 'backend', imports);
+		generate_phase_handlers(completion_create_action_spec, 'backend', imports);
 
 		const import_str = imports.build();
 		// All imports should be type-only
@@ -665,7 +675,7 @@ describe('generate_phase_handlers', () => {
 
 		// Generate handlers for multiple specs
 		generate_phase_handlers(ping_action_spec, 'frontend', imports);
-		generate_phase_handlers(load_session_action_spec, 'frontend', imports);
+		generate_phase_handlers(session_load_action_spec, 'frontend', imports);
 		generate_phase_handlers(toggle_main_menu_action_spec, 'frontend', imports);
 
 		const import_str = imports.build();

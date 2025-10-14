@@ -10,8 +10,7 @@ node_modules
 /.zzz
 
 # Env
-.env
-.env.*
+.env*
 !.env.example
 !.env.*.example
 !.env.test
@@ -32,8 +31,3 @@ ignore
 # Os
 .DS_Store
 Thumbs.db
-
-# AI
-.github/copilot-instructions.md
-CLAUDE.md
-**/.claude/settings.local.json

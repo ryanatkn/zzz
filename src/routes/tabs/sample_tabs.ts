@@ -12,9 +12,9 @@ export const fake_sites = {
 					<h1>Zzz in the future</h1>
 				</header>
 				<section style="width: 300px">
-					<p>I'm trying to see if Zzz has legs. Maybe it remains a portfolio item that helps me get a job building similar things. I hope it gets enough traction with users to justify my continued work on it.</p>
-					<p>I can say for certain I won't raise VC or change it from being a permissively licensed open source project. I'm sympathetic to copyleft but I feel this is the better way, for me with this project, to make better software that's useful to more people. If I change my mind and want to use a copyleft license, it will have to be with a new project.</p>
-					<p>In terms of roadmap, I plan to work on the browser functionality sometime after the sites proof of concept with basic IDE/CMS features, so it'll be a while.</p>
+					<p>I'm trying to see if Zzz has legs. Maybe it remains a portfolio item that helps me get a job building similar things, ideally with the same base tech. I hope it gets enough traction with users to justify my continued work on it. I'm currently working on it and its deps full-time and feeling motivated, but the social environment is a poor one.</p>
+					<p>I can say for certain I won't take investment/VC for Zzz or its dependencies or change them from being permissively licensed open source. I'm sympathetic to copyleft but I feel this is the better way, for me with this project, to make better software that's useful to more people. If I change my mind and want to use a copyleft license, or want to raise money from investors, it will have to be with a new project.</p>
+					<p>In terms of roadmap, I plan to work on the browser functionality sometime after the sites proof of concept with basic IDE/CMS features, so it'll be a while. If you were looking for a roadmap let me know and I can start one.</p>
 					<p>You can participate! See the <a href="https://github.com/ryanatkn/zzz" target="_blank" rel="noopener">repo</a>.</p>
 				</section>
 			</article>
@@ -22,7 +22,7 @@ export const fake_sites = {
 	},
 	new_tab: {
 		title: 'new tab',
-		url: 'about:newtab',
+		url: '/newtab',
 		content: `
 			<div style="padding: 20px; font-family: system-ui;">
 				<h1>new tab</h1>

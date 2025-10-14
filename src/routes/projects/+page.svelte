@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import {GLYPH_PROJECT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
@@ -27,13 +27,18 @@
 {#snippet content()}
 	<h1><Glyph glyph={GLYPH_PROJECT} /> projects</h1>
 
-	<section class="width_md">
+	<section class="width_upto_md">
 		<p>
-			When it's ready, Zzz will let you both <a href="{base}/tabs">browse websites</a> and also create
-			them. Websites are just one kind of thing that you can make in a project, a project could be a
-			simple collection of documents, with a UX no more complex than a folder. This makes Zzz both a
-			browser and an editor for the read-write web, and it can be used as a desktop app to deploy and
-			manage sites, content, and other data and systems.
+			When it's ready, Zzz will let you both <a href={resolve('/tabs')}>browse websites</a> and also
+			create them. The goal of this "projects" design is a streamlined extensible UX with one take on
+			building for the web, with integrated CMS and IDE features. This abstraction makes rough sense
+			for my workflows, but it's going to change as it develops.
+		</p>
+		<p>
+			Websites are just one kind of thing that you can make in a project. A project could be a
+			simple collection of documents on the filesystem, with a UX no more complex than a folder. A
+			project can also have many git repos, and other things like user data, and a repo can be
+			referenced by many projects.
 		</p>
 		<p>
 			Zzz tries to give us the maximum of the web's capabilities on all of our devices with minimal
@@ -41,13 +46,7 @@
 			and easy, because owning your web presence should be a cinch.
 		</p>
 		<p>
-			The goal of this "projects" design sketch is to provide a streamlined extensible UX with one
-			take on building for the web, with integrated CMS and IDE features. This abstraction makes
-			rough sense for my workflows. A project can have many repos, and other things like files and
-			user data, and a repo can be referenced by many projects.
-		</p>
-		<p>
-			Try as it might to be flexible, Zzz can't be everything to everybody. But we have open
+			Try as it might to be flexible, Zzz can't be everything to everybody. But in come the open
 			standardized protocols! Because it's the web, anything you make in Zzz can be used by other
 			browsers and tools, and vice versa, like magic.
 		</p>
@@ -64,6 +63,6 @@
 			For developers, Zzz is also an npm library for TypeScript/Svelte/SvelteKit/Vite that can be
 			used to make websites and servers with your current workflows.
 		</p>
-		<p>More <a href="{base}/about">about</a> Zzz.</p>
+		<p>More <a href={resolve('/about')}>about</a> Zzz.</p>
 	</section>
 {/snippet}

@@ -39,7 +39,7 @@ describe('Ollama', () => {
 		// Add a pending action
 		app.actions.add_from_json({
 			method: 'ollama_pull',
-			action_event: {
+			action_event_data: {
 				kind: 'local_call',
 				phase: 'execute',
 				step: 'handling',
@@ -61,7 +61,7 @@ describe('Ollama', () => {
 		// Add a completed action
 		app.actions.add_from_json({
 			method: 'ollama_list',
-			action_event: {
+			action_event_data: {
 				kind: 'local_call',
 				phase: 'execute',
 				step: 'handled',
@@ -236,7 +236,7 @@ describe('Ollama', () => {
 		// Add various actions
 		app.actions.add_from_json({
 			method: 'ollama_pull',
-			action_event: {
+			action_event_data: {
 				kind: 'local_call',
 				phase: 'execute',
 				step: 'handled',
@@ -254,7 +254,7 @@ describe('Ollama', () => {
 
 		app.actions.add_from_json({
 			method: 'ollama_list',
-			action_event: {
+			action_event_data: {
 				kind: 'local_call',
 				phase: 'execute',
 				step: 'handled',
@@ -271,12 +271,12 @@ describe('Ollama', () => {
 		});
 
 		app.actions.add_from_json({
-			method: 'create_completion',
-			action_event: {
+			method: 'completion_create',
+			action_event_data: {
 				kind: 'request_response',
 				phase: 'send_request',
 				step: 'handled',
-				method: 'create_completion',
+				method: 'completion_create',
 				executor: 'frontend',
 				input: {},
 				output: null,
@@ -291,7 +291,7 @@ describe('Ollama', () => {
 		expect(ollama.actions).toHaveLength(2);
 		expect(ollama.actions.map((a) => a.method)).toContain('ollama_pull');
 		expect(ollama.actions.map((a) => a.method)).toContain('ollama_list');
-		expect(ollama.actions.map((a) => a.method)).not.toContain('create_completion');
+		expect(ollama.actions.map((a) => a.method)).not.toContain('completion_create');
 	});
 
 	test('should filter read operations when show_read_actions is false', () => {
@@ -301,7 +301,7 @@ describe('Ollama', () => {
 		// Add read and write operations
 		app.actions.add_from_json({
 			method: 'ollama_pull',
-			action_event: {
+			action_event_data: {
 				kind: 'local_call',
 				phase: 'execute',
 				step: 'handled',
@@ -319,7 +319,7 @@ describe('Ollama', () => {
 
 		app.actions.add_from_json({
 			method: 'ollama_list',
-			action_event: {
+			action_event_data: {
 				kind: 'local_call',
 				phase: 'execute',
 				step: 'handled',
@@ -352,7 +352,7 @@ describe('Ollama', () => {
 		// Create an action with an initial action event that has progress
 		const action = app.actions.add_from_json({
 			method: 'ollama_pull',
-			action_event: {
+			action_event_data: {
 				kind: 'local_call',
 				phase: 'execute',
 				step: 'handling',
@@ -369,7 +369,7 @@ describe('Ollama', () => {
 		});
 
 		expect(ollama.pending_actions).toHaveLength(1);
-		expect(ollama.pending_actions[0].action_event?.progress).toEqual({
+		expect(ollama.pending_actions[0].action_event_data?.progress).toEqual({
 			status: 'downloading',
 			completed: 50,
 			total: 100,
@@ -394,12 +394,12 @@ describe('Ollama', () => {
 		// Update progress through the action event
 		action_event.update_progress({status: 'downloading', completed: 75, total: 100});
 
-		expect(action.action_event?.progress).toEqual({
+		expect(action.action_event_data?.progress).toEqual({
 			status: 'downloading',
 			completed: 75,
 			total: 100,
 		});
-		expect(ollama.pending_actions[0].action_event?.progress).toEqual({
+		expect(ollama.pending_actions[0].action_event_data?.progress).toEqual({
 			status: 'downloading',
 			completed: 75,
 			total: 100,
@@ -422,7 +422,7 @@ describe('Ollama', () => {
 
 		app.actions.add_from_json({
 			method: 'ollama_pull',
-			action_event: {
+			action_event_data: {
 				kind: 'local_call',
 				phase: 'execute',
 				step: 'failed',
@@ -440,7 +440,7 @@ describe('Ollama', () => {
 
 		expect(ollama.pending_actions).toHaveLength(0);
 		expect(ollama.completed_actions).toHaveLength(1);
-		expect(ollama.completed_actions[0].action_event?.step).toBe('failed');
+		expect(ollama.completed_actions[0].action_event_data?.step).toBe('failed');
 	});
 
 	test('should only include ollama provider models', () => {

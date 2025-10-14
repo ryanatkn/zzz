@@ -10,13 +10,15 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Popover_Button from '$lib/Popover_Button.svelte';
 	import {format_timestamp} from '$lib/time_helpers.js';
+	import {DURATION_SM} from '$lib/helpers.js';
 
-	interface Props {
+	const {
+		socket,
+		type,
+	}: {
 		socket: Socket;
 		type: 'queued' | 'failed';
-	}
-
-	const {socket, type}: Props = $props();
+	} = $props();
 
 	// TODO show "ping the server" for both http and websocket transports
 
@@ -144,8 +146,9 @@
 
 					<Confirm_Button
 						onconfirm={remove_selected}
-						popover_button_attrs={{class: 'icon_button color_c bg_c_1 font_size_sm'}}
-						attrs={{class: 'icon_button plain', title: 'remove selected messages'}}
+						popover_button_attrs={{class: 'icon_button color_c font_size_sm'}}
+						class="icon_button plain"
+						title="remove selected messages"
 					>
 						<Glyph glyph={GLYPH_REMOVE} />
 					</Confirm_Button>
@@ -179,7 +182,7 @@
 						: ''}"
 				>
 					<!-- Message header with metadata and actions -->
-					<div class="display_flex gap_xs align_items_center flex_wrap">
+					<div class="display_flex gap_xs align_items_center flex_wrap_wrap">
 						<input
 							type="checkbox"
 							class="m_0 plain compact font_size_md"
@@ -188,7 +191,9 @@
 						/>
 
 						<!-- Message type information -->
-						<div class="font_family_mono flex_1 display_flex flex_wrap align_items_center gap_xs">
+						<div
+							class="font_family_mono flex_1 display_flex flex_wrap_wrap align_items_center gap_xs"
+						>
 							<small class="chip">{message_type}</small>
 
 							<Copy_To_Clipboard
@@ -204,7 +209,7 @@
 									{#if copied}
 										<div><small class="font_size_xs">{message.id}</small></div>
 									{:else}
-										<div in:slide={{duration: 200}}>
+										<div in:slide={{duration: DURATION_SM}}>
 											<small class="font_size_xs">{message.id}</small>
 										</div>
 									{/if}
@@ -224,7 +229,7 @@
 									{#if copied}
 										<div><small class="font_size_xs">{message.data.id}</small></div>
 									{:else}
-										<div in:slide={{duration: 200}}>
+										<div in:slide={{duration: DURATION_SM}}>
 											<small class="font_size_xs">{message.data.id}</small>
 										</div>
 									{/if}
@@ -238,7 +243,8 @@
 							<!-- Message details in popover -->
 							<Popover_Button
 								position="left"
-								attrs={{class: 'icon_button plain font_size_sm', title: 'view message details'}}
+								class="icon_button plain font_size_sm"
+								title="view message details"
 							>
 								<Glyph glyph={GLYPH_INFO} size="var(--font_size_lg)" />
 								{#snippet popover_content(popover)}
@@ -283,8 +289,9 @@
 							<Confirm_Button
 								onconfirm={() => remove_message(message.id)}
 								position="center"
-								popover_button_attrs={{class: 'icon_button color_c bg_c_1 font_size_sm'}}
-								attrs={{class: 'icon_button plain font_size_sm', title: 'remove message'}}
+								popover_button_attrs={{class: 'icon_button color_c font_size_sm'}}
+								class="icon_button plain font_size_sm"
+								title="remove message"
 							>
 								<Glyph glyph={GLYPH_REMOVE} />
 							</Confirm_Button>
@@ -294,7 +301,7 @@
 					<!-- Failed message details -->
 					{#if type === 'failed'}
 						{@const failed_message = message as Failed_Message}
-						<div class="display_flex flex_column font_size_xs mt_xs">
+						<div class="display_flex flex_direction_column font_size_xs mt_xs">
 							<div class="display_flex justify_content_space_between mb_xs">
 								<span>Failed at:</span>
 								<span class="font_family_mono">{format(failed_message.failed, 'HH:mm:ss')}</span>

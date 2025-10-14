@@ -2,7 +2,7 @@
 
 import {z} from 'zod';
 import {goto} from '$app/navigation';
-import {base} from '$app/paths';
+import {resolve} from '$app/paths';
 
 import {get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
 import {Domain} from '$routes/projects/domain.svelte.js';
@@ -28,7 +28,7 @@ export class Domain_Viewmodel {
 	ssl_enabled: boolean = $state()!;
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.domain === null ||
 			this.domain_name !== this.domain.name ||
@@ -103,7 +103,7 @@ export class Domain_Viewmodel {
 			this.projects.add_domain(this.project_id, domain);
 		}
 
-		void goto(`${base}/projects/${this.project_id}/domains`);
+		void goto(resolve(`/projects/${this.project_id}/domains`));
 	}
 
 	/**
@@ -115,7 +115,7 @@ export class Domain_Viewmodel {
 		// eslint-disable-next-line no-alert
 		if (confirm('Are you sure you want to remove this domain? This action cannot be undone.')) {
 			this.projects.delete_domain(this.project_id, this.domain_id);
-			void goto(`${base}/projects/${this.project_id}/domains`);
+			void goto(resolve(`/projects/${this.project_id}/domains`));
 		}
 	}
 }

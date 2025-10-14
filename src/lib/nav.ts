@@ -1,5 +1,5 @@
 import type {Svg_Data} from '@ryanatkn/fuz/Svg.svelte';
-import {base} from '$app/paths';
+import {resolve} from '$app/paths';
 import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 import {page} from '$app/state';
 
@@ -32,46 +32,47 @@ export interface Nav_Item {
 // if any, when not on the route directly.
 // See also the `onNavigate` fix in the root layout for nulling out the value
 // when navigating directly to the base route.
-export const to_nav_link_href = (app: Frontend, link: Nav_Link_Item): string => {
+export const to_nav_link_href = (app: Frontend, label: string, href: string): string => {
 	if (
-		link.label === 'chats' &&
+		label === 'chats' &&
 		app.chats.selected_id_last_non_null &&
-		!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
+		!(page.url.pathname === href || page.url.pathname.startsWith(href + '/'))
 	) {
-		return link.href + '/' + app.chats.selected_id_last_non_null;
+		return href + '/' + app.chats.selected_id_last_non_null;
 	} else if (
-		link.label === 'prompts' &&
+		label === 'prompts' &&
 		app.prompts.selected_id_last_non_null &&
-		!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
+		!(page.url.pathname === href || page.url.pathname.startsWith(href + '/'))
 	) {
-		return link.href + '/' + app.prompts.selected_id_last_non_null;
+		return href + '/' + app.prompts.selected_id_last_non_null;
 	}
-	return link.href;
+	return href;
 };
 
+// TODO make this configurable
 export const main_nav_items_default: Array<Nav_Item> = [
 	{
 		group: 'main',
 		items: [
-			{label: 'chats', href: `${base}/chats`, icon: GLYPH_CHAT},
-			{label: 'prompts', href: `${base}/prompts`, icon: GLYPH_PROMPT},
-			{label: 'files', href: `${base}/files`, icon: GLYPH_FILE},
+			{label: 'chats', href: resolve('/chats'), icon: GLYPH_CHAT},
+			{label: 'prompts', href: resolve('/prompts'), icon: GLYPH_PROMPT},
+			{label: 'files', href: resolve('/files'), icon: GLYPH_FILE},
 		],
 	},
 	{
 		group: 'llms',
 		items: [
-			{label: 'models', href: `${base}/models`, icon: GLYPH_MODEL},
-			{label: 'providers', href: `${base}/providers`, icon: GLYPH_PROVIDER},
+			{label: 'models', href: resolve('/models'), icon: GLYPH_MODEL},
+			{label: 'providers', href: resolve('/providers'), icon: GLYPH_PROVIDER},
 		],
 	},
 	{
 		group: 'system',
 		items: [
-			{label: 'about', href: `${base}/about`, icon: zzz_logo},
-			{label: 'capabilities', href: `${base}/capabilities`, icon: GLYPH_CAPABILITY},
-			{label: 'log', href: `${base}/log`, icon: GLYPH_LOG},
-			{label: 'settings', href: `${base}/settings`, icon: GLYPH_SETTINGS},
+			{label: 'about', href: resolve('/about'), icon: zzz_logo},
+			{label: 'capabilities', href: resolve('/capabilities'), icon: GLYPH_CAPABILITY},
+			{label: 'actions', href: resolve('/actions'), icon: GLYPH_LOG},
+			{label: 'settings', href: resolve('/settings'), icon: GLYPH_SETTINGS},
 		],
 	},
 ];

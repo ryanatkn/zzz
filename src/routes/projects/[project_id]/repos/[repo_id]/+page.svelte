@@ -50,7 +50,7 @@
 			<div class="p_lg">
 				<h1 class="mb_lg">edit repo</h1>
 
-				<div class="panel p_md width_md">
+				<div class="panel p_md width_upto_md">
 					<form
 						onsubmit={(e) => {
 							swallow(e);
@@ -60,7 +60,7 @@
 						<div class="mb_lg">
 							<label>
 								<h3 class="mt_0 mb_sm">Git url</h3>
-								<input type="text" bind:value={repos_viewmodel.git_url} class="w_100" />
+								<input type="text" bind:value={repos_viewmodel.git_url} class="width_100" />
 							</label>
 							<p>
 								enter the git URL, e.g. https://github.com/username/repo or
@@ -99,12 +99,12 @@
 									class="color_b"
 									onclick={() => repos_viewmodel.add_checkout_dir()}
 								>
-									<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add checkout
+									<Glyph glyph={GLYPH_ADD} />&nbsp; add checkout
 								</button>
 							</div>
 						</div>
 
-						<div class="w_100 display_flex justify_content_space_between gap_sm">
+						<div class="width_100 display_flex justify_content_space_between gap_sm">
 							<div>
 								<button
 									type="submit"
@@ -117,7 +117,7 @@
 
 							{#if repos_viewmodel.repo}
 								<button type="button" class="color_c" onclick={() => repos_viewmodel.remove_repo()}>
-									<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete repo
+									<Glyph glyph={GLYPH_DELETE} />&nbsp; delete repo
 								</button>
 							{/if}
 						</div>

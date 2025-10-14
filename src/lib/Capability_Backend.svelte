@@ -19,10 +19,10 @@
 	});
 </script>
 
-<div class="display_flex flex_column">
+<div class="display_flex flex_direction_column">
 	<div class="display_flex">
 		<div
-			class="chip px_xl plain font_weight_400 width_sm"
+			class="chip px_xl plain font_weight_400 width_upto_sm"
 			style:padding="0 var(--space_xl) !important"
 			style:font-weight="400 !important"
 			class:color_b={capabilities.backend.status === 'success'}

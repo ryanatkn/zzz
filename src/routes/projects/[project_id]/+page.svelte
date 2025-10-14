@@ -1,7 +1,7 @@
 <script lang="ts">
 	// @slop Claude Opus 4
 
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
@@ -54,23 +54,26 @@
 				</div>
 
 				{#if project_viewmodel.editing_project}
-					<div class="panel p_md width_md mb_lg">
+					<div class="panel p_md width_upto_md mb_lg">
 						<div class="mb_md">
 							<label>
 								project name
-								<input type="text" bind:value={project_viewmodel.edited_name} class="w_100" />
+								<input type="text" bind:value={project_viewmodel.edited_name} class="width_100" />
 							</label>
 						</div>
 						<div>
 							<label>
 								description
-								<textarea bind:value={project_viewmodel.edited_description} class="w_100" rows="3"
+								<textarea
+									bind:value={project_viewmodel.edited_description}
+									class="width_100"
+									rows="3"
 								></textarea>
 							</label>
 						</div>
 					</div>
 				{:else if project.description}
-					<p class="mb_lg width_md">{project.description}</p>
+					<p class="mb_lg width_upto_md">{project.description}</p>
 				{/if}
 
 				<div class="display_flex gap_md mb_lg">
@@ -93,7 +96,7 @@
 				<div class="projects_grid">
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project.id}/pages">pages</a>
+							<a href={resolve(`/projects/${project.id}/pages`)}>pages</a>
 						</h2>
 						{#if project.pages.length === 0}
 							<p class="text_color_5">no pages created yet</p>
@@ -101,7 +104,7 @@
 							<ul class="pages_list">
 								{#each project.pages as page (page.id)}
 									<li>
-										<a href="{base}/projects/{project.id}/pages/{page.id}">{page.title}</a>
+										<a href={resolve(`/projects/${project.id}/pages/${page.id}`)}>{page.title}</a>
 										<span class="text_color_5">{page.path}</span>
 									</li>
 								{/each}
@@ -118,7 +121,7 @@
 
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project.id}/domains">domains</a>
+							<a href={resolve(`/projects/${project.id}/domains`)}>domains</a>
 						</h2>
 						{#if project.domains.length === 0}
 							<p class="text_color_5">no domains configured yet</p>
@@ -126,7 +129,7 @@
 							<ul class="domains_list">
 								{#each project.domains as domain (domain.id)}
 									<li>
-										<a href="{base}/projects/{project.id}/domains/{domain.id}">
+										<a href={resolve(`/projects/${project.id}/domains/${domain.id}`)}>
 											<span class="domain_name">{domain.name}</span>
 										</a>
 										<div class="domain_details">
@@ -158,7 +161,7 @@
 
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project.id}/repos">repos</a>
+							<a href={resolve(`/projects/${project.id}/repos`)}>repos</a>
 						</h2>
 						{#if project.repos.length === 0}
 							<p class="text_color_5">no repos configured yet</p>
@@ -166,7 +169,7 @@
 							<ul class="repos_list">
 								{#each project.repos as repo (repo.id)}
 									<li>
-										<a href="{base}/projects/{project.id}/repos/{repo.id}">
+										<a href={resolve(`/projects/${project.id}/repos/${repo.id}`)}>
 											<span class="repo_url">{repo.git_url || '[new repo]'}</span>
 										</a>
 										<div class="repo_details">

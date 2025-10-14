@@ -36,10 +36,6 @@ const create_item = (
 	number,
 });
 
-// Define test schemas
-const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
-const dynamic_function_schema = z.function().args(z.string()).returns(z.array(item_schema));
-
 describe('Indexed_Collection - Optimization Tests', () => {
 	test('indexes are computed only once during initialization', () => {
 		// Create spy functions to count compute calls
@@ -56,7 +52,6 @@ describe('Indexed_Collection - Optimization Tests', () => {
 				{
 					key: 'test_index',
 					compute: compute_spy,
-					result_schema: z.map(z.string(), item_schema),
 				},
 			],
 			initial_items: [create_item('string_a1', 'string_b1'), create_item('string_a2', 'string_b2')],
@@ -146,7 +141,6 @@ describe('Indexed_Collection - Optimization Tests', () => {
 						return map;
 					},
 					query_schema: z.string(),
-					result_schema: z.map(z.string(), z.array(item_schema)),
 					onadd: onadd_spy,
 				},
 			],
@@ -211,7 +205,6 @@ describe('Indexed_Collection - Optimization Tests', () => {
 						};
 					},
 					query_schema: z.string(),
-					result_schema: dynamic_function_schema,
 				}),
 			],
 		});
@@ -240,7 +233,6 @@ describe('Indexed_Collection - Optimization Tests', () => {
 		const by_string_b_index = create_multi_index<Test_Item, string>({
 			key: 'by_string_b',
 			extractor: (item) => item.string_b,
-			result_schema: z.map(z.string(), z.array(item_schema)),
 			query_schema: z.string(),
 		});
 

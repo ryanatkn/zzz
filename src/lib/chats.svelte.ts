@@ -2,9 +2,9 @@ import {z} from 'zod';
 import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Chat, Chat_Json, Chat_Schema, type Chat_Json_Input} from '$lib/chat.svelte.js';
+import {Chat, Chat_Json, type Chat_Json_Input} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
-import {cell_array, HANDLED} from '$lib/cell_helpers.js';
+import {HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
@@ -16,15 +16,11 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {goto_unless_current} from '$lib/navigation_helpers.js';
 
 export const Chats_Json = Cell_Json.extend({
-	// First create the array, then apply default, then attach metadata
-	items: cell_array(
-		z.array(Chat_Json).default(() => []),
-		'Chat',
-	),
+	items: z.array(Chat_Json).default(() => []),
 	selected_id: z.string().nullable().default(null),
 	selected_id_last_non_null: z.string().nullable().default(null),
 	show_sort_controls: z.boolean().default(false),
-});
+}).meta({cell_class_name: 'Chats'});
 export type Chats_Json = z.infer<typeof Chats_Json>;
 export type Chats_Json_Input = z.input<typeof Chats_Json>;
 
@@ -37,13 +33,11 @@ export class Chats extends Cell<typeof Chats_Json> {
 				key: 'by_name',
 				extractor: (chat) => chat.name,
 				query_schema: z.string(),
-				result_schema: Chat_Schema,
 			}),
 
 			create_derived_index({
 				key: 'manual_order',
 				compute: (collection) => collection.values,
-				result_schema: z.array(Chat_Schema),
 			}),
 		],
 	});

@@ -11,14 +11,17 @@
 	import {GLYPH_PASTE, GLYPH_DELETE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		diskfile,
+		editor_state,
+		readonly = false,
+		auto_save = false,
+	}: {
 		diskfile: Diskfile;
 		editor_state: Diskfile_Editor_State;
 		readonly?: boolean | undefined;
 		auto_save?: boolean | undefined;
-	}
-
-	const {diskfile, editor_state, readonly = false, auto_save = false}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 </script>
@@ -37,18 +40,14 @@
 			<Glyph glyph={GLYPH_PASTE} />
 		</Paste_From_Clipboard>
 
-		<Clear_Restore_Button
-			value={editor_state.current_content}
-			onchange={(value) => {
-				editor_state.current_content = value;
-			}}
-		/>
+		<Clear_Restore_Button bind:value={editor_state.current_content} />
 	{/if}
 
 	<!-- Delete button is always available -->
 	<Confirm_Button
 		onconfirm={() => app.diskfiles.delete(diskfile.path)}
-		attrs={{class: 'plain icon_button', title: 'delete file'}}
+		class="plain icon_button"
+		title="delete file"
 	>
 		<Glyph glyph={GLYPH_DELETE} />
 	</Confirm_Button>
@@ -57,7 +56,7 @@
 {#if !readonly && !auto_save}
 	<div class="mt_xs display_flex" transition:slide>
 		<button
-			class="flex_1 color_a"
+			class="flex_1 color_f"
 			type="button"
 			disabled={!editor_state.has_changes}
 			onclick={() => editor_state.save_changes()}

@@ -9,24 +9,27 @@
 	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';
 	import {has_dependencies} from '$lib/diskfile_helpers.js';
 
-	interface Props {
+	const {
+		diskfile,
+		editor_state,
+	}: {
 		diskfile: Diskfile;
 		editor_state: Diskfile_Editor_State;
-	}
-
-	const {diskfile, editor_state}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 </script>
 
-<div class="display_flex flex_column gap_xs w_100">
-	<small class="overflow_wrap_break_all w_100">
+<div class="display_flex flex_direction_column gap_xs width_100">
+	<small class="overflow_wrap_break_all width_100">
 		<Glyph glyph={GLYPH_FILE} />{app.diskfiles.to_relative_path(diskfile.path)}
 	</small>
 
-	<small class="font_family_mono">
+	<small>
 		<div>created {diskfile.created_formatted_datetime}</div>
-		<div>updated {diskfile.updated_formatted_date}</div>
+		{#if diskfile.updated_formatted_datetime !== diskfile.created_formatted_datetime}
+			<div transition:slide>updated {diskfile.updated_formatted_datetime}</div>
+		{/if}
 	</small>
 
 	<Diskfile_Metrics {editor_state} />

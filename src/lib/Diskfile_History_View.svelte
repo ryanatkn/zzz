@@ -7,13 +7,16 @@
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {format_time} from '$lib/time_helpers.js';
 
-	interface Props {
+	const {
+		editor_state,
+		onselectentry,
+		attrs,
+	}: {
 		editor_state: Diskfile_Editor_State;
 		onselectentry: (entry_id: Uuid) => void;
+		// TODO this pattern should probably be changed to either `menu_attrs` or extend the base props with them
 		attrs?: SvelteHTMLElements['menu'] | undefined;
-	}
-
-	const {editor_state, onselectentry, attrs}: Props = $props();
+	} = $props();
 </script>
 
 <div>
@@ -21,13 +24,11 @@
 		<Confirm_Button
 			onconfirm={() => editor_state.clear_history()}
 			position="right"
-			attrs={{
-				class: 'plain compact',
-				disabled: !editor_state.can_clear_history,
-				title: editor_state.can_clear_history
-					? 'Clear history entries except the current disk state'
-					: 'No history entries to clear',
-			}}
+			class="plain compact"
+			disabled={!editor_state.can_clear_history}
+			title={editor_state.can_clear_history
+				? 'Clear history entries except the current disk state'
+				: 'No history entries to clear'}
 		>
 			clear history
 		</Confirm_Button>
@@ -36,13 +37,11 @@
 			onconfirm={() => {
 				editor_state.clear_unsaved_edits();
 			}}
-			attrs={{
-				class: 'plain compact',
-				disabled: !editor_state.can_clear_unsaved_edits,
-				title: editor_state.can_clear_unsaved_edits
-					? 'Remove all unsaved edit entries from history'
-					: 'No unsaved edits to clear',
-			}}
+			class="plain compact"
+			disabled={!editor_state.can_clear_unsaved_edits}
+			title={editor_state.can_clear_unsaved_edits
+				? 'Remove all unsaved edit entries from history'
+				: 'No unsaved edits to clear'}
 		>
 			clear unsaved edits
 		</Confirm_Button>

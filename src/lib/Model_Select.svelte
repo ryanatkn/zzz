@@ -4,14 +4,13 @@
 
 	const app = frontend_context.get();
 
-	interface Props {
+	let {
+		models = app.models.ordered_by_name,
+		selected_model = $bindable(),
+	}: {
 		selected_model: Model; // TODO get from context?
 		models?: Array<Model> | undefined;
-	}
-
-	// I think I like this pattern of `prop_` aliasing for situations like this because
-	// it makes acciental use less likely, the `final_models` pattern is more error-prone
-	let {models = app.models.ordered_by_name, selected_model = $bindable()}: Props = $props();
+	} = $props();
 </script>
 
 <div class="row">

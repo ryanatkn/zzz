@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 	import {page} from '$app/state';
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Model} from '$lib/model.svelte.js';
@@ -10,24 +10,27 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 
-	interface Props {
+	const {
+		model,
+		icon,
+		name,
+		children,
+		...rest
+	}: SvelteHTMLElements['a'] & {
 		model: Model;
 		/**
 		 * `true` is equivalent to `'svg'`
 		 */
 		icon?: boolean | 'svg' | 'glyph' | undefined;
-		attrs?: SvelteHTMLElements['a'] | undefined;
-		children?: Snippet | undefined;
-	}
+		name?: Snippet | undefined;
+	} = $props();
 
-	const {model, icon, attrs, children}: Props = $props();
-
-	const selected = $derived(page.url.pathname === `${base}/models/${model.name}`);
+	const selected = $derived(page.url.pathname === resolve(`/models/${model.name}`));
 </script>
 
 <!-- TODO this contextmenu appears as a duplicate, I think a de-duped key is the best fix, not manually disabling it -->
 <Model_Contextmenu {model}
-	><a {...attrs} href="{base}/models/{model.name}" class:selected
+	><a {...rest} href={resolve(`/models/${model.name}`)} class:selected
 		>{#if children}
 			{@render children()}
 		{:else}
@@ -36,7 +39,7 @@
 			{:else if icon === 'glyph'}
 				<Glyph glyph={GLYPH_MODEL} />
 			{/if}
-			{model.name}
+			{#if name}{@render name()}{:else}{model.name}{/if}
 		{/if}</a
 	></Model_Contextmenu
 >

@@ -14,7 +14,7 @@ export type Schema_Value<T extends z.ZodType, K extends Schema_Keys<T>> = z.infe
 /**
  * Base schema that defines common properties for all cells.
  */
-export const Cell_Json = z.object({
+export const Cell_Json = z.strictObject({
 	id: Uuid_With_Default,
 	created: Datetime_Now,
 	/** Required and initially equal to `created`. */

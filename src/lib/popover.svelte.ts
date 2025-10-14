@@ -1,6 +1,6 @@
-// @slop Claude Sonnet 3.7
+// @slop Claude Sonnet 4
 
-import type {Action} from 'svelte/action';
+import type {Attachment} from 'svelte/attachments';
 import type {Snippet} from 'svelte';
 import {on} from 'svelte/events';
 import {swallow} from '@ryanatkn/belt/dom.js';
@@ -181,7 +181,6 @@ export class Popover {
 
 	/**
 	 * Updates ARIA attributes and state for accessibility.
-	 * But does NOT directly manipulate visibility styling.
 	 */
 	#update_trigger_aria_attributes(): void {
 		if (this.#trigger_element) {
@@ -204,10 +203,7 @@ export class Popover {
 
 		this.visible = true;
 
-		// Set up outside click handler when showing the popover
 		this.#manage_outside_click();
-
-		// Update ARIA attributes
 		this.#update_trigger_aria_attributes();
 
 		if (this.#onshow) this.#onshow();
@@ -221,10 +217,7 @@ export class Popover {
 
 		this.visible = false;
 
-		// Clean up outside click handler when hiding the popover
 		this.#manage_outside_click();
-
-		// Update ARIA attributes
 		this.#update_trigger_aria_attributes();
 
 		if (this.#onhide) this.#onhide();
@@ -242,138 +235,106 @@ export class Popover {
 	}
 
 	/**
-	 * Action for the container element.
+	 * Attachment for the container element.
 	 */
-	container: Action = (node) => {
+	container: Attachment<HTMLElement> = (node) => {
 		this.#container_element = node;
 
-		return {
-			destroy: () => {
-				if (this.#container_element === node) {
-					this.#container_element = null;
-				}
-			},
+		return () => {
+			if (this.#container_element === node) {
+				this.#container_element = null;
+			}
 		};
 	};
 
 	/**
-	 * Action for the trigger element that shows/hides the popover.
+	 * Attachment factory for the trigger element that shows/hides the popover.
 	 */
-	trigger: Action<HTMLElement, Popover_Trigger_Parameters | void> = (node, params) => {
-		this.#trigger_element = node;
+	trigger = (params?: Popover_Trigger_Parameters): Attachment<HTMLElement> => {
+		return (node) => {
+			this.#trigger_element = node;
 
-		// Update instance parameters from action params
-		if (params) {
-			this.update(params);
-		}
+			if (params) {
+				this.update(params);
+			}
 
-		// Initialize ARIA attributes
-		this.#update_trigger_aria_attributes();
+			this.#update_trigger_aria_attributes();
 
-		const click_handler = on(node, 'click', (e) => {
-			swallow(e);
-			this.toggle();
-		});
+			const click_handler = on(node, 'click', (e) => {
+				swallow(e);
+				this.toggle();
+			});
 
-		return {
-			update: (new_params) => {
-				// Update popover parameters reactively when action params change
-				if (new_params) {
-					this.update(new_params);
-				}
-			},
-			destroy: () => {
+			return () => {
 				click_handler();
 				if (this.#trigger_element === node) {
 					this.#trigger_element = null;
 				}
-			},
+			};
 		};
 	};
 
 	/**
-	 * Action for the popover content element.
+	 * Attachment factory for the popover content element.
 	 */
-	content: Action<HTMLElement, Popover_Content_Parameters | void> = (node, params) => {
-		this.#content_element = node;
+	content = (params?: Popover_Content_Parameters): Attachment<HTMLElement> => {
+		return (node) => {
+			this.#content_element = node;
 
-		// Update instance parameters from action params
-		if (params) {
-			this.update(params);
-		}
-
-		// Add classes
-		if (this.popover_class) {
-			node.classList.add(this.popover_class);
-		}
-
-		// Set up position relative to the container (will be absolute)
-		node.style.position = 'absolute';
-
-		// Note: We do not set visibility or display styles here
-		// to allow Svelte's transitions to work properly
-
-		// Apply position styles based on the target container
-		const update_node_position = () => {
-			// Generate styles with direct parameters instead of options object
-			const styles = generate_position_styles(this.position, this.align, this.offset);
-
-			// Clear all position-related properties first
-			// This ensures that properties set previously but not in new styles are removed
-			const position_props = [
-				'top',
-				'bottom',
-				'left',
-				'right',
-				'transform',
-				'transform-origin',
-				'width',
-				'height', // For overlay
-			];
-			for (const prop of position_props) {
-				node.style.removeProperty(prop);
+			if (params) {
+				this.update(params);
 			}
 
-			// Apply new styles
-			for (const key in styles) {
-				node.style.setProperty(key, styles[key]);
+			if (this.popover_class) {
+				node.classList.add(this.popover_class);
 			}
-		};
 
-		// Initial position setup and click handler management
-		update_node_position();
-		this.#manage_outside_click();
+			node.style.position = 'absolute';
+			node.style.zIndex = '10';
 
-		// Set ARIA attributes for accessibility
-		if (!node.hasAttribute('role')) {
-			node.setAttribute('role', 'dialog');
-		}
+			const update_node_position = () => {
+				const styles = generate_position_styles(this.position, this.align, this.offset);
 
-		return {
-			update: (new_params) => {
-				// Update popover parameters reactively when action params change
-				if (new_params) {
-					this.update(new_params);
-					update_node_position();
+				const position_props = [
+					'top',
+					'bottom',
+					'left',
+					'right',
+					'transform',
+					'transform-origin',
+					'width',
+					'height',
+				];
+				for (const prop of position_props) {
+					node.style.removeProperty(prop);
 				}
-			},
-			destroy: () => {
-				// Clean up document click handler if it exists
+
+				for (const key in styles) {
+					node.style.setProperty(key, styles[key]);
+				}
+			};
+
+			update_node_position();
+			this.#manage_outside_click();
+
+			if (!node.hasAttribute('role')) {
+				node.setAttribute('role', 'dialog');
+			}
+
+			return () => {
 				if (this.#document_click_cleanup) {
 					this.#document_click_cleanup();
 					this.#document_click_cleanup = undefined;
 				}
 
-				// Remove class
 				if (this.popover_class) {
 					node.classList.remove(this.popover_class);
 				}
 
-				// Clear reference
 				if (this.#content_element === node) {
 					this.#content_element = null;
 				}
-			},
+			};
 		};
 	};
 }

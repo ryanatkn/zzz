@@ -1,6 +1,13 @@
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
-export const ESTIMATED_CHARS_PER_TOKEN = 3.8; // guesstimate
+// TODO import from moss (and respect prefers-reduced-motion? maybe optionally)
+export const DURATION_LG = 1000;
+export const DURATION_SM = 180;
+
+// TODO configure
+// this is a guesstimate, is lower to better estimate for code,
+// and in general I think it's better better to overestimate counts (which lower does)
+export const ESTIMATED_CHARS_PER_TOKEN = 3;
 
 /**
  * Quick and dirty token count estimate using `ESTIMATED_CHARS_PER_TOKEN`.

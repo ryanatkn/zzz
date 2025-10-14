@@ -8,7 +8,7 @@ import type {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
 
 export const Diskfile_Tab_Json = Cell_Json.extend({
 	diskfile_id: Uuid,
-});
+}).meta({cell_class_name: 'Diskfile_Tab'});
 export type Diskfile_Tab_Json = z.infer<typeof Diskfile_Tab_Json>;
 export type Diskfile_Tab_Json_Input = z.input<typeof Diskfile_Tab_Json>;
 

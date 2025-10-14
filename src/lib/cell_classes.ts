@@ -1,5 +1,5 @@
-import {Bits} from '$lib/bits.svelte.js';
-import {Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
+import {Parts} from '$lib/parts.svelte.js';
+import {Text_Part, Diskfile_Part} from '$lib/part.svelte.js';
 import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
@@ -18,28 +18,22 @@ import {Prompts} from '$lib/prompts.svelte.js';
 import {Provider} from '$lib/provider.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Socket} from '$lib/socket.svelte.js';
-import {Strip} from '$lib/strip.svelte.js';
-import {Tape} from '$lib/tape.svelte.js';
-import {Tapes} from '$lib/tapes.svelte.js';
+import {Turn} from '$lib/turn.svelte.js';
+import {Thread} from '$lib/thread.svelte.js';
+import {Threads} from '$lib/threads.svelte.js';
 import {Time} from '$lib/time.svelte.js';
 import {Ui} from '$lib/ui.svelte.js';
-import {Url_Params} from '$lib/url_params.svelte.js';
 import type {Cell} from '$lib/cell.svelte.js';
 
-// TODO lazy loading, bundling everything at the root is not ideal
-
-/**
- * Flat mapping of all cell classes by name.
- */
 export const cell_classes = {
-	Bits,
+	Parts,
 	Capabilities,
 	Chat,
 	Chats,
 	Diskfile,
 	Diskfile_Tab,
 	Diskfile_Tabs,
-	Diskfile_Bit,
+	Diskfile_Part,
 	Diskfile_History,
 	Diskfiles,
 	Diskfiles_Editor,
@@ -51,15 +45,13 @@ export const cell_classes = {
 	Prompts,
 	Provider,
 	Providers,
-	Sequence_Bit,
 	Socket,
-	Strip,
-	Tape,
-	Tapes,
+	Turn,
+	Thread,
+	Threads,
 	Time,
-	Text_Bit,
+	Text_Part,
 	Ui,
-	Url_Params,
 } satisfies Record<string, typeof Cell<any>>;
 
 export type Cell_Classes = typeof cell_classes;
@@ -74,7 +66,7 @@ export type Cell_Registry_Map = {
  * Type guard to check if a cell is an instance of a specific cell class.
  */
 export const is_cell_type = <K extends Cell_Class_Names>(
-	cell: Cell | null | undefined,
+	cell: Cell<any> | null | undefined,
 	class_name: K,
 ): cell is Cell_Registry_Map[K] => cell?.constructor.name === class_name;
 

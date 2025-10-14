@@ -27,14 +27,14 @@
 			<div class="p_lg">
 				<h1 class="mb_lg">project settings</h1>
 
-				<div class="panel p_md width_md my_lg">
+				<div class="panel p_md width_upto_md my_lg">
 					<div class="mb_md">
 						<label>
 							<div class="title">project name</div>
 							<input
 								type="text"
 								bind:value={project_viewmodel.edited_name}
-								class="w_100"
+								class="width_100"
 								placeholder={project_viewmodel.project.name}
 							/>
 						</label>
@@ -45,7 +45,7 @@
 							<div class="title">description</div>
 							<textarea
 								bind:value={project_viewmodel.edited_description}
-								class="w_100"
+								class="width_100"
 								rows="3"
 								placeholder={project_viewmodel.project.description || 'No description'}
 							></textarea>
@@ -62,7 +62,7 @@
 					</button>
 				</div>
 
-				<div class="panel p_md width_md">
+				<div class="panel p_md width_upto_md">
 					<h2 class="mt_0 mb_lg">danger zone</h2>
 					<p class="mb_md">These actions cannot be undone.</p>
 
@@ -71,7 +71,7 @@
 						class="color_c"
 						onclick={() => project_viewmodel.delete_current_project()}
 					>
-						<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete project
+						<Glyph glyph={GLYPH_DELETE} />&nbsp; delete project
 					</button>
 				</div>
 			</div>

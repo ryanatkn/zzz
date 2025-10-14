@@ -15,7 +15,7 @@ textarea {
 	scrollbar-width: thin; /* TODO maybe upstream? */
 	border-radius: var(--border_radius_xs2); /* TODO upstream? */
 }
-input {
+input[type='text'] {
 	border-radius: var(--border_radius_xs2); /* TODO upstream? */
 }
 
@@ -165,7 +165,7 @@ input.input_xs {
 	background-color: var(--color_c_5);
 } */
 
-/* Layout classes */
+/* TODO upstream */
 .column_fixed {
 	width: var(--column_width, var(--distance_sm));
 	min-width: var(--column_width, var(--distance_sm));
@@ -274,7 +274,7 @@ a.chip {
 }
 
 /* TODO maybe upstream? is weird but has a consistency  */
-.h_input_height {
+.height_input_height {
 	height: var(--input_height);
 }
 
@@ -366,4 +366,9 @@ button.menu_item[disabled] {
 /* TODO upstream? */
 pre code {
 	padding: var(--space_xs) var(--space_md);
+}
+
+/* TODO upstream */
+[role='button'] {
+	outline-color: var(--outline_color);
 }

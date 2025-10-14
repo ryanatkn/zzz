@@ -40,7 +40,7 @@
 					{/if}
 				</p>
 
-				<div class="panel p_md width_md">
+				<div class="panel p_md width_upto_md">
 					<form
 						onsubmit={(e) => {
 							e.preventDefault();
@@ -49,8 +49,8 @@
 					>
 						<div class="mb_lg">
 							<label>
-								<h3 class="mt_0 mb_sm">Domain name</h3>
-								<input type="text" bind:value={domains_viewmodel.domain_name} class="w_100" />
+								<h3 class="mt_0 mb_sm">domain name</h3>
+								<input type="text" bind:value={domains_viewmodel.domain_name} class="width_100" />
 							</label>
 							<p>enter the full domain name, like zzz.software or blog.zzz.software</p>
 						</div>
@@ -64,7 +64,7 @@
 						{/if}
 
 						<div class="mb_lg">
-							<h3 class="mt_0 mb_sm">Status</h3>
+							<h3 class="mt_0 mb_sm">status</h3>
 							<div class="display_flex gap_xl3">
 								<label class="display_flex align_items_center mb_0">
 									<input
@@ -117,7 +117,7 @@
 							{/if}
 						</div>
 
-						<div class="w_100 display_flex justify_content_space_between gap_sm">
+						<div class="width_100 display_flex justify_content_space_between gap_sm">
 							<div>
 								<button
 									type="submit"
@@ -134,7 +134,7 @@
 									class="color_c"
 									onclick={() => domains_viewmodel.remove_domain()}
 								>
-									<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete domain
+									<Glyph glyph={GLYPH_DELETE} />&nbsp; delete domain
 								</button>
 							{/if}
 						</div>

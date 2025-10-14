@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {untrack} from 'svelte';
+	import {slide} from 'svelte/transition';
 
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
@@ -9,17 +10,19 @@
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Diskfile_History_View from '$lib/Diskfile_History_View.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import Diskfile_Bit_View from '$lib/Diskfile_Bit_View.svelte';
+	import Diskfile_Part_View from '$lib/Diskfile_Part_View.svelte';
 	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import Diskfile_Editor_Nav from '$lib/Diskfile_Editor_Nav.svelte';
+	import Tutorial_For_Diskfiles from '$lib/Tutorial_For_Diskfiles.svelte';
 
-	interface Props {
+	const {
+		diskfile,
+		onmodified,
+	}: {
 		diskfile: Diskfile;
 		onmodified?: (diskfile_id: Uuid) => void;
-	}
-
-	const {diskfile, onmodified}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
@@ -57,22 +60,22 @@
 </script>
 
 <Diskfile_Contextmenu {diskfile}>
-	<div class="display_flex h_100">
-		<div class="flex_1 min_width_sm h_100 column">
+	<div class="display_flex height_100">
+		<div class="flex_1 width_atleast_sm height_100 column">
 			<Content_Editor
 				bind:this={content_editor}
 				bind:content={editor_state.current_content}
 				token_count={editor_state.current_token_count}
 				placeholder={GLYPH_PLACEHOLDER + ' ' + diskfile.path_relative}
 				readonly={false}
-				attrs={{class: 'h_100 border_radius_0'}}
+				attrs={{class: 'height_100 border_radius_0'}}
 				onsave={async (value) => {
 					await app.diskfiles.update(diskfile.path, value);
 				}}
 			/>
 		</div>
 
-		<div class="width_sm min_width_sm py_md">
+		<div class="width_upto_sm width_atleast_sm py_md">
 			<div class="px_md mb_lg">
 				<Diskfile_Actions {diskfile} {editor_state} />
 			</div>
@@ -86,7 +89,7 @@
 			</div>
 
 			{#if editor_state.has_history}
-				<div class="slide_container">
+				<div transition:slide>
 					<Diskfile_History_View
 						{editor_state}
 						onselectentry={(entry_id) => {
@@ -97,31 +100,11 @@
 				</div>
 			{/if}
 
-			<Diskfile_Bit_View {diskfile} />
+			<Diskfile_Part_View {diskfile} />
 
-			<div class="p_md">
-				<aside>
-					⚠️ This filesystem interface is an early proof of concept and lacks most features you'd
-					expect, more soon.
-				</aside>
+			<div class="px_md">
+				<Tutorial_For_Diskfiles />
 			</div>
 		</div>
 	</div>
 </Diskfile_Contextmenu>
-
-<style>
-	.slide_container {
-		animation: slide-down 0.2s ease-out;
-	}
-
-	@keyframes slide-down {
-		0% {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-		100% {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-</style>

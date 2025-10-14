@@ -1,7 +1,7 @@
 <script lang="ts">
 	// @slop Claude Opus 4
 
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
@@ -38,12 +38,12 @@
 								class="color_a"
 								onclick={() => project_viewmodel.create_new_domain()}
 							>
-								<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add your first domain
+								<Glyph glyph={GLYPH_ADD} />&nbsp; add your first domain
 							</button>
 						</p>
 					</div>
 				{:else}
-					<table class="w_100">
+					<table class="width_100">
 						<thead>
 							<tr>
 								<th>domain name</th>
@@ -57,7 +57,11 @@
 							{#each project_viewmodel.project.domains as domain (domain.id)}
 								<tr>
 									<td>
-										<a href="{base}/projects/{project_viewmodel.project_id}/domains/{domain.id}">
+										<a
+											href={resolve(
+												`/projects/${project_viewmodel.project_id}/domains/${domain.id}`,
+											)}
+										>
 											{domain.name || '[new domain]'}
 										</a>
 									</td>
@@ -87,7 +91,7 @@
 						class="color_a"
 						onclick={() => project_viewmodel.create_new_domain()}
 					>
-						<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new domain
+						<Glyph glyph={GLYPH_ADD} />&nbsp; new domain
 					</button>
 				</div>
 			</div>

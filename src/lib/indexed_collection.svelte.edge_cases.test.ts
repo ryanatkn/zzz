@@ -415,13 +415,6 @@ describe('Indexed_Collection - Edge Cases', () => {
 						}
 						return stats;
 					},
-					result_schema: z.object({
-						count: z.number(),
-						boolean_a_true_count: z.number(),
-						boolean_a_false_count: z.number(),
-						sum_number_a: z.number(),
-						array_a_frequency: z.record(z.string(), z.number()),
-					}),
 				},
 			],
 		});

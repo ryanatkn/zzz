@@ -1,34 +1,34 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Part_Union} from '$lib/part.svelte.js';
 	import Xml_Attribute_Editor from '$lib/Xml_Attribute_Editor.svelte';
 	import {GLYPH_ADD, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
-		bit: Bit_Type;
-	}
-
-	const {bit}: Props = $props();
+	const {
+		part,
+	}: {
+		part: Part_Union;
+	} = $props();
 
 	let input_el: HTMLInputElement | undefined;
 </script>
 
-<div class="column align_items_start gap_xs">
-	<div class="display_flex align_items_center gap_xs2 w_100">
+<div class="column gap_xs">
+	<div class="display_flex align_items_center gap_xs2">
 		<label
 			class="row mb_0 pr_md"
-			title="when enabled, the prompt's content will be wrapped with the xml tag '{bit.xml_tag_name ||
-				bit.xml_tag_name_default}'"
+			title="when enabled, the prompt's content will be wrapped with the xml tag '{part.xml_tag_name ||
+				part.xml_tag_name_default}'"
 		>
 			<input
 				class="plain compact"
 				type="checkbox"
 				bind:checked={
-					() => bit.has_xml_tag,
+					() => part.has_xml_tag,
 					(v) => {
-						bit.has_xml_tag = v;
+						part.has_xml_tag = v;
 						if (v) input_el?.focus(); // I like this compared to an $effect placed in some arbitrary place
 					}
 				}
@@ -37,31 +37,33 @@
 		</label>
 		<input
 			class="plain flex_1 compact"
-			class:dormant={!bit.has_xml_tag}
-			placeholder={bit.has_xml_tag ? GLYPH_PLACEHOLDER + ' ' + bit.xml_tag_name_default : undefined}
-			bind:value={bit.xml_tag_name}
+			class:dormant={!part.has_xml_tag}
+			placeholder={part.has_xml_tag
+				? GLYPH_PLACEHOLDER + ' ' + part.xml_tag_name_default
+				: undefined}
+			bind:value={part.xml_tag_name}
 			bind:this={input_el}
 		/>
 		<button
 			type="button"
 			class="plain compact"
 			title="add xml attribute"
-			onclick={() => bit.add_attribute()}
+			onclick={() => part.add_attribute()}
 		>
 			<Glyph glyph={GLYPH_ADD} />
 		</button>
 	</div>
 
-	<div class="attributes column gap_xs2">
-		{#each bit.attributes as attribute (attribute.id)}
-			<div transition:slide>
+	<ul class="unstyled">
+		{#each part.attributes as attribute (attribute.id)}
+			<li transition:slide class="py_xs4">
 				<Xml_Attribute_Editor
 					{attribute}
-					dormant={!bit.has_xml_tag}
-					onupdate={(updates) => bit.update_attribute(attribute.id, updates)}
-					onremove={() => bit.remove_attribute(attribute.id)}
+					dormant={!part.has_xml_tag}
+					onupdate={(updates) => part.update_attribute(attribute.id, updates)}
+					onremove={() => part.remove_attribute(attribute.id)}
 				/>
-			</div>
+			</li>
 		{/each}
-	</div>
+	</ul>
 </div>

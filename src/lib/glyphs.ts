@@ -6,7 +6,7 @@ export const GLYPH_IMPORTANT = '⁈';
 export const GLYPH_INFO = 'ⓘ';
 
 export const GLYPH_ADD = '✛'; // + ✚ ✛ ✜
-export const GLYPH_REMOVE = '⨉'; // TODO REMOVE and DELETE are currently the same but shouldn't be, maybe DELETE is a trash can?
+export const GLYPH_REMOVE = '🗙'; //
 export const GLYPH_DELETE = '⌧'; // 🗑 ⨉ ✕ 🗙 ⤫ ⤬ ✖ ⌧ ⨂ ⊝
 export const GLYPH_CLEAR = '⌫';
 export const GLYPH_RESTORE = '⤻';
@@ -20,6 +20,7 @@ export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⊝';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_PLACEHOLDER = '↳';
+export const GLYPH_SEND = '⮥'; // ⮥ ⭷ ↗
 export const GLYPH_PLAY = '▶︎';
 export const GLYPH_PAUSE = '❙❙'; // is 2 chars, should be supported by usage
 // export const GLYPH_STOP = '⏹'; // ⏹ ■ ▣ ▪
@@ -31,7 +32,7 @@ export const GLYPH_XMARK = '✗';
 export const GLYPH_XMARK_HEAVY = '✘';
 
 export const GLYPH_DOWNLOAD = '⭳'; // ⭳ ⥥ ⤓ ⇩
-export const GLYPH_ERROR = '⨂'; // ⁉ ‼ ‽ ⸮ ⸘ ⚠
+export const GLYPH_ERROR = '‼'; // ⨂ ⁉ ‼ ‽ ⸮ ⸘ ⚠
 export const GLYPH_CHEVRON_UP = '⮝'; // ⮝ ⯅ ˄ ∧ ⌃ ▴ ▵ ▲
 export const GLYPH_CHEVRON_RIGHT = '⮞'; // ⮞ ❯ ▸ ⭢ ›
 export const GLYPH_CHEVRON_DOWN = '⮟'; // ⮟ ⌄ ˅ ∨
@@ -51,15 +52,17 @@ export const GLYPH_SORT = '⇅'; // ⇅ ⇵ ⮃ ⮁
 
 export const GLYPH_BACKEND = '🜢';
 export const GLYPH_CHAT = '⌸';
-export const GLYPH_TAPE = '☷';
-export const GLYPH_STRIP = '⎍'; // ⎎ ⎍
+export const GLYPH_THREAD = '☷';
+export const GLYPH_TURN = '⎍'; // ⎎ ⎍
 export const GLYPH_FILE = '⧈'; // ⏚ ⧈ ⊞ ⌺ ▤
-export const GLYPH_LIST = '▤'; //
+// TODO looks too much like chat
+export const GLYPH_LIST = '▤';
 export const GLYPH_DIRECTORY = '▦'; // 🗁 ▦ ▥ 🗀
 export const GLYPH_CREATE_FILE = '🗎';
 export const GLYPH_CREATE_FOLDER = '🗁';
 export const GLYPH_PROMPT = '⌇'; // ⌇ ⍋  ⌭
-export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
+// TODO idk about this one, is maybe better suited for list?
+export const GLYPH_PART = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
 export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
 export const GLYPH_ACTION = '⍾';
@@ -93,12 +96,12 @@ export const get_glyph_for_action_method = (method: Action_Method): string => {
 	switch (method) {
 		case 'ping':
 			return GLYPH_PING;
-		case 'create_completion':
+		case 'completion_create':
 			return GLYPH_RESPONSE;
-		case 'load_session':
+		case 'session_load':
 			return GLYPH_SESSION;
-		case 'update_diskfile':
-		case 'delete_diskfile':
+		case 'diskfile_update':
+		case 'diskfile_delete':
 		case 'filer_change':
 			return GLYPH_FILE;
 		default:
@@ -123,6 +126,14 @@ export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
 //⥘ ⥙ ⇅ ⇵ ⇳ ⇊ ⇈  ⮃
 // ⬎⤣
 
+// ↗ ⤴ ⤊ ⥘ ⭡ ⭧ ⥉ ↱ ⤐ ⤏ ⥟ ⤞ ⤟ ⤠ ⎋ ⧉ ⬈ ⌁ ⍙ ⎗ ⍏ ⍟ ⍝ ⏏ ⎄ ↑ ⇧ ⮕ ⮝ ⤈ ⥁ ⥅ ⥇ ⥓ ⥖ ⥗ ⥚ ⥛ ⤊ ⤉ ⤒
+// ⇗ ⤈ ⤉ ⤒ ⥈ ⥑ ⥒ ⥔ ⥕ ⥙ ⥛ ⭦ ⭧ ⭨ ⭩ ⯁ ⯅ ⯇ ⯈ ⯊ ⯋ ⯏ ⯑ ⯓ ⯕ ⯗ ⯙ ⯛ ⯝ ⯟
+// ⇪ ⮊ ⮌ ⮎ ⮐ ⮒ ⮓ ⮕ ⮗ ⮙ ⮛ ⮝ ⮟ ⮡ ⮣ ⮥ ⮧ ⮩ ⮫ ⮭ ⮯ ⮱ ⮳ ⮵ ⮷ ⮹ ⮻ ⮽ ⮿ ⯁ ⯃ ⯅
+// ⯇ ⯈ ⯊ ⯌ ⯎ ⯐ ⯒ ⯔ ⯖ ⯘ ⯚ ⯜ ⯞ ⯠ ⯢ ⯤ ⯦ ⯨ ⯪ ⯬ ⯮ ⯰ ⯲ ⯴ ⯶ ⯸ ⯺ ⯼ ⯾ Ⰰ Ⰱ
+// Ⰲ Ⰳ Ⰴ Ⰵ Ⰶ Ⰷ Ⰸ Ⰹ Ⰺ Ⰻ Ⰼ Ⰽ Ⰾ Ⰿ Ⱀ Ⱁ Ⱂ Ⱃ Ⱄ Ⱅ Ⱆ Ⱇ Ⱈ Ⱉ Ⱊ Ⱋ Ⱌ Ⱍ Ⱎ Ⱏ
+// Ⱐ Ⱑ Ⱒ Ⱓ Ⱔ Ⱕ Ⱖ Ⱗ Ⱘ Ⱙ Ⱚ Ⱛ Ⱜ Ⱝ Ⱞ Ⱟ ⰰ ⰱ ⰲ ⰳ ⰴ ⰵ ⰶ ⰷ ⰸ ⰹ ⰺ ⰻ ⰼ ⰽ ⰾ ⰿ
+// ⱀ ⱁ ⱂ ⱃ ⱄ ⱅ ⱆ ⱇ ⱈ ⱉ ⱊ ⱋ ⱌ ⱍ ⱎ ⱏ ⱐ ⱑ ⱒ ⱓ ⱔ ⱕ ⱖ ⱗ ⱘ ⱙ ⱚ ⱛ ⱜ ⱝ ⱞ ⱟ
+
 // ⎗ ⎘
 
 // ⊞
@@ -138,7 +149,7 @@ export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
 // ☳ ☷
 // ≣
 // ⠿
-// TODO GLYPH_TAPE
+// TODO GLYPH_THREAD
 // ⧛
 
 // ⚟

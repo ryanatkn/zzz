@@ -7,9 +7,10 @@ import {Datetime, get_datetime_now} from '$lib/zod_helpers.js';
 import {
 	JSONRPC_INTERNAL_ERROR,
 	type Jsonrpc_Error_Message,
-	type Jsonrpc_Request,
 	type Jsonrpc_Request_Id,
+	type Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
+import {Thrown_Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
 // TODO what if this uses a tracker id param that's an opaque UUID but can be used for action association?
 
@@ -19,14 +20,14 @@ import {
  */
 export class Request_Tracker_Item {
 	readonly id: Jsonrpc_Request_Id;
-	readonly deferred: Deferred<Jsonrpc_Request>;
+	readonly deferred: Deferred<Jsonrpc_Response_Or_Error>;
 	readonly created: Datetime;
 	status: Async_Status = $state()!;
 	timeout: NodeJS.Timeout | undefined = $state();
 
 	constructor(
 		id: Jsonrpc_Request_Id,
-		deferred: Deferred<Jsonrpc_Request>,
+		deferred: Deferred<Jsonrpc_Response_Or_Error>,
 		created: Datetime,
 		status: Async_Status,
 		timeout: NodeJS.Timeout | undefined,
@@ -56,8 +57,8 @@ export class Request_Tracker {
 	 * @param id The request id
 	 * @returns A deferred promise that will be resolved when the response is received
 	 */
-	track_request(id: Jsonrpc_Request_Id): Deferred<any> {
-		const deferred = create_deferred<Jsonrpc_Request>();
+	track_request(id: Jsonrpc_Request_Id): Deferred<Jsonrpc_Response_Or_Error> {
+		const deferred = create_deferred<Jsonrpc_Response_Or_Error>();
 		const created = get_datetime_now();
 
 		// If we're tracking a request with the same id, clean up the previous one first
@@ -90,7 +91,7 @@ export class Request_Tracker {
 	 * @param id The request id
 	 * @param response The response data
 	 */
-	resolve_request(id: Jsonrpc_Request_Id, response: Jsonrpc_Request): void {
+	resolve_request(id: Jsonrpc_Request_Id, response: Jsonrpc_Response_Or_Error): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`received response for unknown request: ${id}`);
@@ -127,7 +128,12 @@ export class Request_Tracker {
 		}
 
 		request.status = 'failure';
-		request.deferred.reject(error_message); // TODO rejecting with an error message instead of object feels maybe broken
+		const error = new Thrown_Jsonrpc_Error(
+			error_message.error.code,
+			error_message.error.message,
+			error_message.error.data,
+		);
+		request.deferred.reject(error);
 		this.pending_requests.delete(id);
 	}
 
@@ -183,7 +189,12 @@ export class Request_Tracker {
 			}
 
 			request.status = 'failure';
-			request.deferred.reject(new Error(reason || 'request cancelled'));
+			request.deferred.reject(
+				new Thrown_Jsonrpc_Error(
+					JSONRPC_ERROR_CODES.internal_error, // TODO canceled error?
+					reason || 'request cancelled',
+				),
+			);
 			this.pending_requests.delete(id);
 		}
 	}

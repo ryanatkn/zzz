@@ -2,24 +2,25 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzz.software/)
 
-> fullstack toolkit for adaptive web environments 💤 nice web things
+> nice web things for the tired 💤
 
 ⚠️ early pre-release, does not persist your data yet
 
 **[zzz.software](https://www.zzz.software/)**
 
 Zzz, pronounced "zees" like bees,
-is a fullstack toolkit for adaptive web environments.
-The idea is to make a cross-platform software environment that adapts to your needs and intent
-while remaining fully open, aligned, and in your control. It's a flexible toolkit
-for consuming and creating content, developing web software,
-and crafting experiences with uncompromising UX and DX.
+is a fullstack web toolkit for power users and developers.
+The idea is to make an integrated cross-platform environment that adapts to
+your needs and intent while remaining fully open, aligned, and in your control.
+It's both a customizable local-first web UI for power users,
+and a flexible tool for crafting UX-maximizing websites
+with a streamlined developer experience.
+
+More at [zzz.software/about](https://www.zzz.software/about).
 
 This is an early stage project and the ideas are still developing -
 see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions)
-or @ me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
-
-More at [zzz.software/about](https://www.zzz.software/about).
+or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 ## Setup
 
@@ -29,19 +30,27 @@ Eventually there will be a desktop app but
 for now you'll need Node 22.15+ (YMMV with Deno/Bun/etc)
 and Git to clone the repo.
 
-Zzz is deployed via SvelteKit's static adapter with diminished capabilities.
-([zzz.software](https://www.zzz.software/))
+Running Zzz locally in development with Node is the supported way to use it right now.
+It deploys via SvelteKit's static adapter with diminished capabilities
+([zzz.software](https://www.zzz.software/)),
+and it will have a production build with the Node adapter and Hono server soon.
 
-> Windows probably doesn't work but will be supported - help is appreciated.
-> For now I recommend [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+> Developing on Windows
+> requires something like [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
 
-First set up an `.env` file in your project root:
+To run Zzz, we need an `.env.development` file in your project root.
 
-- see [src/lib/server/.env.example](/src/lib/server/.env.example)
-  - add to `.env` or `.env.development` and `.env.production` -
-    `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
+In your terminal, copy over
+[src/lib/server/.env.development.example](/src/lib/server/.env.development.example):
 
-Then in your terminal:
+```bash
+cp src/lib/server/.env.development.example .env.development --update=none
+```
+
+You can edit `.env.development` with your API keys,
+or update them at runtime on the `/capabilities` page.
+
+Then:
 
 ```bash
 npm run dev

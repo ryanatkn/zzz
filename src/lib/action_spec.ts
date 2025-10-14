@@ -10,23 +10,26 @@ import {
 	Action_Side_Effects,
 } from '$lib/action_types.js';
 
-export const Action_Spec = z.object({
+export const Action_Spec = z.strictObject({
 	method: Action_Method,
 	kind: Action_Kind,
 	initiator: Action_Initiator,
 	auth: Action_Auth.nullable(),
 	// TODO @api should be for GET/POST distinction and probably other things, we get guarantees like cacheability from these, interesting with transport agnosticism
 	side_effects: Action_Side_Effects,
-	input: z.union([z.instanceof(z.ZodObject), z.instanceof(z.ZodNull), z.instanceof(z.ZodOptional)]),
+	input: z.union([
+		z.custom<z.ZodObject<any>>((v) => v instanceof z.ZodObject),
+		z.custom<z.ZodNull>((v) => v instanceof z.ZodNull),
+		z.custom<z.ZodOptional<any>>((v) => v instanceof z.ZodOptional),
+	]),
 	output: z.union([
-		z.instanceof(z.ZodObject),
-		z.instanceof(z.ZodNull),
-		z.instanceof(z.ZodOptional<z.ZodVoid>),
-		// TODO broken type and schema usage, idk what I'm doing
-		z.instanceof(z.ZodUnion),
+		z.custom<z.ZodObject<any>>((v) => v instanceof z.ZodObject),
+		z.custom<z.ZodNull>((v) => v instanceof z.ZodNull),
+		z.custom<z.ZodOptional<any>>((v) => v instanceof z.ZodOptional),
+		z.custom<z.ZodUnion<any>>((v) => v instanceof z.ZodUnion),
 	]),
 	async: z.boolean(),
-}); // TODO also make strict? additional properties are not passed through
+});
 export type Action_Spec = z.infer<typeof Action_Spec>;
 
 export const Request_Response_Action_Spec = Action_Spec.extend({
@@ -40,7 +43,7 @@ export const Remote_Notification_Action_Spec = Action_Spec.extend({
 	kind: z.literal('remote_notification').default('remote_notification'),
 	auth: z.null().default(null),
 	side_effects: z.literal(true).nullable().default(true), // TODO this probably will change hence the awkward types
-	output: z.instanceof(z.ZodVoid),
+	output: z.custom<z.ZodVoid>((v) => v instanceof z.ZodVoid),
 	async: z.literal(true).default(true),
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
@@ -67,4 +70,4 @@ export const is_action_spec = (value: unknown): value is Action_Spec_Union =>
 	typeof value === 'object' &&
 	'method' in value &&
 	'kind' in value &&
-	Action_Kind._def.values.includes(value.kind as any);
+	(value.kind as string) in Action_Kind.def.entries;

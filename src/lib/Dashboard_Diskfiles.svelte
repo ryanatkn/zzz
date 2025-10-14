@@ -1,5 +1,8 @@
 <script lang="ts">
 	import {swallow, is_editable} from '@ryanatkn/belt/dom.js';
+	import {random_item} from '@ryanatkn/belt/random.js';
+	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+	import {onMount} from 'svelte';
 
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Diskfile_Explorer from '$lib/Diskfile_Explorer.svelte';
@@ -7,9 +10,10 @@
 	import Diskfile_Tab_Listitem from '$lib/Diskfile_Tab_Listitem.svelte';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
+	import Error_Message from '$lib/Error_Message.svelte';
 
 	const app = frontend_context.get();
-	const {diskfiles} = app;
+	const {diskfiles, capabilities} = app;
 	const {editor} = diskfiles;
 
 	const tabs_reorderable = new Reorderable({item_class: null}); // remove the normal reorderable item styling
@@ -20,6 +24,29 @@
 	);
 
 	let show_diskfile_picker = $state(false);
+
+	onMount(() => {
+		void capabilities.init_backend_check();
+	});
+
+	// TODO @many this is very hacky and duplicated, refactor into cell methods
+	// TODO @many improve UX to not use alert/prompt
+	const create_file = async () => {
+		if (!app.zzz_cache_dir) {
+			alert('cannot create file: filesystem is not available'); // eslint-disable-line no-alert
+			return;
+		}
+
+		const filename = prompt('new file name:'); // eslint-disable-line no-alert
+		if (!filename) return;
+
+		try {
+			await diskfiles.create_file(filename);
+		} catch (error) {
+			console.error('failed to create file:', error);
+			alert(`failed to create file: ${error}`); // eslint-disable-line no-alert
+		}
+	};
 </script>
 
 <svelte:window
@@ -28,7 +55,7 @@
 			return;
 		}
 
-		// ctrl+q: Close tab
+		// ctrl+q: close tab
 		if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === 'q') {
 			swallow(e);
 			const selected_tab = editor.tabs.selected_tab;
@@ -37,7 +64,7 @@
 			}
 		}
 
-		// ctrl+shift+Q: Reopen last closed tab
+		// ctrl+shift+Q: reopen last closed tab
 		if (e.ctrlKey && e.shiftKey && e.key === 'Q') {
 			swallow(e);
 			editor.reopen_last_closed_tab();
@@ -45,68 +72,119 @@
 	}}
 />
 
-<div class="h_100 display_flex">
-	<div class="h_100 overflow_hidden width_sm">
-		<Diskfile_Explorer />
-	</div>
+<div class="height_100 display_flex">
+	{#if capabilities.filesystem_available === false}
+		<div class="box height_100 width_100">
+			<div class="width_upto_sm">
+				<Error_Message>
+					<p>
+						Filesystem is not available. File management requires a backend connection with
+						filesystem access.
+					</p>
+					<p class="mt_md">
+						<button
+							type="button"
+							disabled={capabilities.backend.status === 'pending'}
+							onclick={() => capabilities.check_backend()}
+						>
+							retry connection
+						</button>
+					</p>
+				</Error_Message>
+			</div>
+		</div>
+	{:else if capabilities.filesystem_available === null || capabilities.filesystem_available === undefined}
+		<div class="box height_100 width_100 display_flex align_items_center justify_content_center">
+			<div class="text_align_center">
+				<p class="mt_md">loading filesystem <Pending_Animation inline /></p>
+			</div>
+		</div>
+	{:else}
+		<div class="height_100 overflow_hidden width_upto_sm">
+			<Diskfile_Explorer />
+		</div>
 
-	<div class="flex_1 column overflow_auto h_100">
-		<!-- Tab Bar -->
-		<ul
-			class="unstyled display_flex overflow_x_auto scrollbar_width_thin"
-			use:tabs_reorderable.list={{
-				onreorder: (from_index, to_index) => editor.reorder_tabs(from_index, to_index),
-			}}
-		>
-			{#each editor.tabs.ordered_tabs as tab, index (tab.id)}
-				<li class="display_flex py_xs3 px_xs4">
-					<div class="display_flex" use:tabs_reorderable.item={{index}}>
-						<!-- TODO notice the different APIs here, needs fixing, diskfiles is higher in the tree -->
-						<Diskfile_Tab_Listitem
-							{tab}
-							onselect={(tab) => diskfiles.select(tab.diskfile_id)}
-							onclose={(tab) => editor.close_tab(tab.id)}
-							onopen={(tab) => editor.open_tab(tab.id)}
-						/>
+		<div class="flex_1 column overflow_auto height_100">
+			<!-- tabs -->
+			<menu
+				class="unstyled display_flex overflow_x_auto scrollbar_width_thin"
+				{@attach tabs_reorderable.list({
+					onreorder: (from_index, to_index) => editor.reorder_tabs(from_index, to_index),
+				})}
+			>
+				{#each editor.tabs.ordered_tabs as tab, index (tab.id)}
+					<li class="display_flex py_xs3 px_xs4">
+						<div class="display_flex" {@attach tabs_reorderable.item({index})}>
+							<!-- TODO notice the different APIs here, needs fixing, diskfiles is higher in the tree -->
+							<Diskfile_Tab_Listitem
+								{tab}
+								onselect={(tab) => diskfiles.select(tab.diskfile_id)}
+								onclose={(tab) => {
+									// TODO does this logic belong in a `diskfiles` method that wraps editor.close_tab?
+									if (tab.diskfile_id === selected_diskfile?.id) {
+										diskfiles.select(null);
+									}
+									editor.close_tab(tab.id);
+								}}
+								onopen={(tab) => editor.open_tab(tab.id)}
+							/>
+						</div>
+					</li>
+				{/each}
+			</menu>
+
+			<!-- editor content area -->
+			{#if selected_tab}
+				{#if selected_diskfile}
+					<Diskfile_Editor_View
+						diskfile={selected_diskfile}
+						onmodified={(diskfile_id) => editor.handle_file_modified(diskfile_id)}
+					/>
+				{:else}
+					<!-- TODO think this through - maybe the tabs should be more flexible than 1:1 with a diskfile? maybe `Diskfile_Editor_View` should have UI to create a file if there is none? -->
+					<div class="box height_100">
+						<p>Something went wrong, this tab has no diskfile</p>
 					</div>
-				</li>
-			{/each}
-		</ul>
-
-		<!-- Editor content area -->
-		{#if selected_tab}
-			{#if selected_diskfile}
-				<Diskfile_Editor_View
-					diskfile={selected_diskfile}
-					onmodified={(diskfile_id) => editor.handle_file_modified(diskfile_id)}
-				/>
+				{/if}
+			{:else if diskfiles.items.size > 0}
+				<div class="box height_100">
+					<p>
+						<button
+							type="button"
+							class="inline"
+							onclick={() => {
+								show_diskfile_picker = true;
+							}}>select</button
+						>
+						a file from the list or
+						<button
+							type="button"
+							class="inline color_f"
+							onclick={() => {
+								const diskfile = random_item(app.diskfiles.items.values);
+								diskfiles.select(diskfile.id);
+							}}>go fish</button
+						> to view and edit its content
+					</p>
+				</div>
 			{:else}
-				<!-- TODO think this through - maybe the tabs should be more flexible than 1:1 with a diskfile? maybe `Diskfile_Editor_View` should have UI to create a file if there is none? -->
-				<div class="display_flex align_items_center justify_content_center h_100">
-					<p>Something went wrong, this tab has no diskfile</p>
+				<div class="box height_100">
+					<p>
+						no files yet, <button type="button" class="inline color_d" onclick={create_file}
+							>create a new file</button
+						>?
+					</p>
 				</div>
 			{/if}
-		{:else}
-			<div class="display_flex align_items_center justify_content_center h_100">
-				<p>
-					<button
-						type="button"
-						class="inline"
-						onclick={() => {
-							show_diskfile_picker = true;
-						}}>select</button
-					> a file from the list to view and edit its content
-				</p>
-			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>
 
 <Diskfile_Picker_Dialog
 	bind:show={show_diskfile_picker}
 	onpick={(diskfile) => {
 		if (!diskfile) return false;
-		editor.open_diskfile(diskfile.id);
+		diskfiles.select(diskfile.id);
 		return true;
 	}}
 />

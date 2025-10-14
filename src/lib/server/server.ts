@@ -1,7 +1,9 @@
 import {Hono} from 'hono';
-import {serve} from '@hono/node-server';
+import {serve, type HttpBindings} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
 import {Logger} from '@ryanatkn/belt/log.js';
+import {ALLOWED_ORIGINS} from '$env/static/private';
+import {DEV} from 'esm-env';
 
 import {Backend} from '$lib/server/backend.js';
 import {backend_action_handlers} from '$lib/server/backend_action_handlers.js';
@@ -13,57 +15,65 @@ import {
 	API_PATH_FOR_HTTP_RPC,
 	SERVER_HOST,
 	SERVER_PROXIED_PORT,
-	SERVER_URL,
 	WEBSOCKET_PATH,
-	ZZZ_DIR,
+	ZZZ_CACHE_DIR,
 } from '$lib/constants.js';
-import {verify_origin} from '$lib/server/security.js';
+import {parse_allowed_origins, verify_request_source} from '$lib/server/security.js';
 import {handle_filer_change} from '$lib/server/backend_actions_api.js';
-import {Ollama_Backend_Provider} from '$lib/server/ollama_backend_provider.js';
-import {Claude_Backend_Provider} from '$lib/server/claude_backend_provider.js';
-import {Chatgpt_Backend_Provider} from '$lib/server/chatgpt_backend_provider.js';
-import {Gemini_Backend_Provider} from '$lib/server/gemini_backend_provider.js';
-import type {Backend_Provider} from '$lib/server/backend_provider.js';
+import {Backend_Provider_Ollama} from '$lib/server/backend_provider_ollama.js';
+import {Backend_Provider_Claude} from '$lib/server/backend_provider_claude.js';
+import {Backend_Provider_Chatgpt} from '$lib/server/backend_provider_chatgpt.js';
+import {Backend_Provider_Gemini} from '$lib/server/backend_provider_gemini.js';
+import type {Backend_Provider_Options} from './backend_provider.js';
 
 const log = new Logger('[server]');
 
-const create_server = (): void => {
+const create_server = async (): Promise<void> => {
 	// TODO better config
 	const config = create_config();
-	// Security: allow only the configured server URL, extend with care
-	const allowed_origins = [SERVER_URL];
 
-	// TODO from config
-	const providers: Array<Backend_Provider> = [
-		new Ollama_Backend_Provider(),
-		new Claude_Backend_Provider(),
-		new Chatgpt_Backend_Provider(),
-		new Gemini_Backend_Provider(),
-	];
+	// Security: allow only the configured server URL, extend with care
+	const allowed_origins = parse_allowed_origins(ALLOWED_ORIGINS);
 
 	// TODO better logging
 	log.info('creating server', {
 		config,
-		ZZZ_DIR,
+		ZZZ_CACHE_DIR,
 		allowed_origins,
-		providers: providers.map((p) => p.name),
 	});
 
 	const app = new Hono();
 
+	app.use(async (c, next) => {
+		// TODO improve this logging
+		log.info(
+			`[request_begin] ${c.req.method} ${c.req.url} origin(${c.req.header('origin')}) referer(${c.req.header('referer')})`,
+		);
+		await next();
+		log.info(`[request_end] ${c.req.method} ${c.req.url}`);
+	});
+
 	// Security: first verify the origin of incoming requests
-	app.use(verify_origin(allowed_origins));
+	app.use(verify_request_source(allowed_origins));
 
 	const {injectWebSocket, upgradeWebSocket} = createNodeWebSocket({app});
 
 	const backend = new Backend({
-		zzz_dir: ZZZ_DIR,
+		zzz_cache_dir: ZZZ_CACHE_DIR, // is the default
 		config,
 		action_specs,
 		action_handlers: backend_action_handlers,
-		providers,
 		handle_filer_change,
 	});
+
+	// TODO manage these dynamically, init from config/state
+	const provider_options: Backend_Provider_Options = {
+		on_completion_progress: backend.api.completion_progress,
+	};
+	backend.add_provider(new Backend_Provider_Ollama(provider_options));
+	backend.add_provider(new Backend_Provider_Claude(provider_options));
+	backend.add_provider(new Backend_Provider_Chatgpt(provider_options));
+	backend.add_provider(new Backend_Provider_Gemini(provider_options));
 
 	// TODO options for everything, maybe a nullable array and an enable/disable flag
 
@@ -73,7 +83,6 @@ const create_server = (): void => {
 			app,
 			backend,
 			upgradeWebSocket,
-			allowed_origins, // TODO is this good or should they be separate?
 		});
 	}
 
@@ -84,6 +93,37 @@ const create_server = (): void => {
 			backend,
 			// TODO allowed_origins ?
 		});
+	}
+
+	// In production with the Node adapter, mount the SvelteKit handler to serve the frontend.
+	if (!DEV) {
+		try {
+			// Dynamically import the handler from the SvelteKit build output.
+
+			// TODO we don't want the path statically analyzed and bundled so the path is constructed --
+			// instead this should probably be configured as an external in the Gro server plugin
+			const handler_path = '../../' + 'build/handler.js'; // eslint-disable-line no-useless-concat
+
+			const {handler} = await import(handler_path);
+
+			// Let SvelteKit handle everything else, including serving prerendered pages and static assets.
+			// Pass Node.js native request/response objects to the SvelteKit handler.
+
+			// TODO this casting is hacky, declaring the `hono` instance above like this causes
+			// the HttpBindings type to propagate to other interfaces, which I don't want right now
+			(app as unknown as Hono<{Bindings: HttpBindings}>).use('*', async (c) => {
+				await handler(c.env.incoming, c.env.outgoing);
+				// The handler writes directly to c.env.outgoing, so return a Response with
+				// the x-hono-already-sent header to tell Hono not to process the response.
+				return new Response(null, {headers: {'x-hono-already-sent': 'true'}});
+			});
+		} catch (error) {
+			log.error(
+				'failed to load SvelteKit handler -- was the Node adapter correctly used with `ZZZ_BUILD=node gro build`?',
+				error,
+			);
+			throw error;
+		}
 	}
 
 	const hono = serve(
@@ -100,10 +140,7 @@ const create_server = (): void => {
 	injectWebSocket(hono);
 };
 
-// Some configured deployment targets in SvelteKit don't support top-level await yet but this is sync atm
-try {
-	create_server();
-} catch (error) {
+void create_server().catch((error) => {
 	log.error('error starting server:', error);
 	throw error;
-}
+});

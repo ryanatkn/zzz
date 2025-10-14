@@ -5,20 +5,22 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 import type {
 	Ollama_List_Response,
 	Ollama_List_Response_Item,
 	Ollama_Ps_Response,
 } from '$lib/ollama_helpers.js';
+import type {Diskfile_Directory_Path} from '$lib/diskfile_types.js';
+
+// TODO namerbot capability, uses backend+(at least one provider) (or rethink its role in a bigger picture, not just names)
 
 // TODO extract reusable stuff to make this generic
 
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
 
-export const Capabilities_Json = Cell_Json.extend({});
+export const Capabilities_Json = Cell_Json.extend({}).meta({cell_class_name: 'Capabilities'});
 export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
 export type Capabilities_Json_Input = z.input<typeof Capabilities_Json>;
 
@@ -68,8 +70,7 @@ export interface Websocket_Capability_Data {
 }
 
 export interface Filesystem_Capability_Data {
-	zzz_dir: Zzz_Dir | null | undefined;
-	zzz_cache_dir: string | null | undefined;
+	zzz_cache_dir: Diskfile_Directory_Path | null | undefined;
 }
 
 export interface Ollama_Capability_Data {
@@ -128,11 +129,11 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	});
 
 	/**
-	 * The filesystem capability derives its state from the backend and `zzz_dir`.
+	 * The filesystem capability derives its state from the backend and `zzz_cache_dir`.
 	 */
 	readonly filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(
 		() => {
-			const {zzz_dir, zzz_cache_dir} = this.app;
+			const {zzz_cache_dir} = this.app;
 			let status: Async_Status;
 
 			if (this.backend.status !== 'success') {
@@ -153,7 +154,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 			return {
 				name: 'filesystem',
-				data: status === 'success' ? {zzz_dir, zzz_cache_dir} : undefined,
+				data: status === 'success' ? {zzz_cache_dir} : undefined,
 				status,
 				message_id: null,
 				error_message: null,
@@ -163,12 +164,53 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	);
 
 	/**
-	 * Ollama capability that derives its state from app.ollama.
+	 * Ollama capability that derives its state from provider_status (authoritative)
+	 * and app.ollama (for richer data when available).
 	 */
 	readonly ollama: Capability<Ollama_Capability_Data | null | undefined> = $derived.by(() => {
 		const {ollama} = this.app;
-		const {list_status} = ollama;
+		const provider_status = this.app.lookup_provider_status('ollama');
 
+		// TODO this is hacky, messy bridge between the Ollama specific data and generic provider status
+
+		// If provider status exists, it's authoritative for availability
+		if (provider_status) {
+			// Provider says unavailable
+			if (!provider_status.available) {
+				return {
+					name: 'ollama',
+					data: null,
+					status: 'failure',
+					message_id: null,
+					error_message: provider_status.error,
+					updated: provider_status.checked_at,
+				};
+			}
+
+			// Provider says available - use it for status,
+			// but show list_status if it has richer data
+			const {list_status} = ollama;
+			return {
+				name: 'ollama',
+				data:
+					list_status === 'success'
+						? {
+								list_response: ollama.list_response,
+								ps_response: ollama.ps_response,
+								round_trip_time: ollama.list_round_trip_time,
+							}
+						: null,
+				// If list never checked (initial), use 'success' from provider_status
+				// Otherwise use list_status (pending/success/failure)
+				status: list_status === 'initial' ? 'success' : list_status,
+				message_id: null,
+				error_message: ollama.list_error,
+				updated: provider_status.checked_at,
+			};
+		}
+
+		// No provider status - derive from list only
+		const {list_status} = ollama;
 		return {
 			name: 'ollama',
 			data:
@@ -185,6 +227,84 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			message_id: null,
 			error_message: ollama.list_error,
 			updated: ollama.list_last_updated,
+		};
+	});
+
+	/**
+	 * Claude capability that derives its state from provider_status.
+	 */
+	readonly claude: Capability<null | undefined> = $derived.by(() => {
+		const status = this.app.lookup_provider_status('claude');
+		if (!status) {
+			return {
+				name: 'claude',
+				data: undefined,
+				status: 'initial',
+				message_id: null,
+				error_message: null,
+				updated: null,
+			};
+		}
+		// TODO @many refactor capabilities with provider status (embed?)
+		return {
+			name: 'claude',
+			data: status.available ? null : undefined,
+			status: status.available ? 'success' : 'failure',
+			message_id: null,
+			error_message: status.available ? null : status.error,
+			updated: status.checked_at,
+		};
+	});
+
+	/**
+	 * ChatGPT capability that derives its state from provider_status.
+	 */
+	readonly chatgpt: Capability<null | undefined> = $derived.by(() => {
+		const status = this.app.lookup_provider_status('chatgpt');
+		if (!status) {
+			return {
+				name: 'chatgpt',
+				data: undefined,
+				status: 'initial',
+				message_id: null,
+				error_message: null,
+				updated: null,
+			};
+		}
+		// TODO @many refactor capabilities with provider status (embed?)
+		return {
+			name: 'chatgpt',
+			data: status.available ? null : undefined,
+			status: status.available ? 'success' : 'failure',
+			message_id: null,
+			error_message: status.available ? null : status.error,
+			updated: status.checked_at,
+		};
+	});
+
+	/**
+	 * Gemini capability that derives its state from provider_status.
+	 */
+	readonly gemini: Capability<null | undefined> = $derived.by(() => {
+		const status = this.app.lookup_provider_status('gemini');
+		if (!status) {
+			return {
+				name: 'gemini',
+				data: undefined,
+				status: 'initial',
+				message_id: null,
+				error_message: null,
+				updated: null,
+			};
+		}
+		// TODO @many refactor capabilities with provider status (embed?)
+		return {
+			name: 'gemini',
+			data: status.available ? null : undefined,
+			status: status.available ? 'success' : 'failure',
+			message_id: null,
+			error_message: status.available ? null : status.error,
+			updated: status.checked_at,
 		};
 	});
 
@@ -260,7 +380,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * boolean indicates if filesystem is available.
 	 */
 	readonly filesystem_available: boolean | null | undefined = $derived(
-		this.filesystem.data === undefined
+		this.filesystem.status === 'initial'
 			? undefined
 			: this.filesystem.status === 'pending'
 				? null
@@ -289,13 +409,20 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Check Server availability only if it hasn't been checked before.
+	 * Check backend availability only if it hasn't been checked before.
 	 * (when status is 'initial')
 	 */
 	async init_backend_check(): Promise<void> {
 		if (this.backend.status !== 'initial') {
 			return;
 		}
+		await this.check_backend();
+	}
+
+	/**
+	 * Check backend availability with a ping.
+	 */
+	async check_backend(): Promise<void> {
 		await this.app.api.ping();
 	}
 
@@ -311,23 +438,22 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Check Ollama availability by connecting to its API.
-	 * @returns A promise that resolves when the check is complete
+	 * Check Ollama availability by loading provider status and refreshing models.
 	 */
 	async check_ollama(): Promise<void> {
-		// Simply delegate to app.ollama.refresh()
-		// The derived state will automatically update based on ollama's state
-		try {
-			await this.app.ollama.refresh();
-		} catch (error) {
-			console.error('failed to check Ollama:', error);
-			// Error handling is done in the ollama class itself
+		if (!this.backend_available) {
+			console.log('[capabilities] skipping ollama check: backend unavailable');
+			return;
 		}
+		// Check provider-level status (authoritative)
+		await this.app.api.provider_load_status({provider_name: 'ollama'});
+		// Then refresh action-level data (models list/ps) if provider is available
+		await this.app.ollama.refresh();
 	}
 
 	// TODO refactor maybe to a `Pings` class
-	handle_sent_ping(request_id: Jsonrpc_Request_Id): void {
-		console.log(`[capabilities] [handle_sent_ping] request_id`, request_id);
+	handle_ping_sent(request_id: Jsonrpc_Request_Id): void {
+		console.log(`[capabilities] [handle_ping_sent] request_id`, request_id);
 		// Create a new pending ping
 		const new_ping: Ping_Data = {
 			ping_id: request_id,
@@ -353,8 +479,8 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	// TODO @many refactor mutations
-	handle_received_ping(ping_id: Jsonrpc_Request_Id): void {
-		console.log(`[capabilities] [handle_received_ping] ping_id`, ping_id);
+	handle_ping_received(ping_id: Jsonrpc_Request_Id): void {
+		console.log(`[capabilities] [handle_ping_received] ping_id`, ping_id);
 		const ping = this.pings.find((p) => p.ping_id === ping_id);
 		// If we can't find the ping, we can safely ignore it
 		if (!ping) {
@@ -384,6 +510,15 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	handle_ping_error(ping_id: Jsonrpc_Request_Id, error_message: string): void {
 		console.error(`[capabilities] [handle_ping_error] ping_id`, ping_id, error_message);
+
+		// Mark the ping as completed (failed)
+		const ping = this.pings.find((p) => p.ping_id === ping_id);
+		if (ping) {
+			ping.completed = true;
+			ping.received_time = Date.now();
+			ping.round_trip_time = null; // null indicates failure
+		}
+
 		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
 		if (this.backend.message_id === ping_id) {
 			this.backend = {
@@ -411,16 +546,66 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		};
 	}
 
-	// TODO maybe should be a method on app.ollama?
-	reset_ollama(): void {
-		// Reset the ollama state in app.ollama
-		this.app.ollama.list_response = null;
-		this.app.ollama.list_status = 'initial';
-		this.app.ollama.list_error = null;
-		this.app.ollama.list_last_updated = null;
-		this.app.ollama.list_round_trip_time = null;
-		this.app.ollama.ps_response = null;
-		this.app.ollama.ps_status = 'initial';
-		this.app.ollama.ps_error = null;
+	/**
+	 * Check Claude availability only if it hasn't been checked before.
+	 */
+	async init_claude_check(): Promise<void> {
+		if (this.claude.status !== 'initial') {
+			return;
+		}
+		await this.check_claude();
+	}
+
+	/**
+	 * Check Claude availability by loading provider status.
+	 */
+	async check_claude(): Promise<void> {
+		if (!this.backend_available) {
+			console.log('[capabilities] skipping claude check: backend unavailable');
+			return;
+		}
+		await this.app.api.provider_load_status({provider_name: 'claude'});
+	}
+
+	/**
+	 * Check ChatGPT availability only if it hasn't been checked before.
+	 */
+	async init_chatgpt_check(): Promise<void> {
+		if (this.chatgpt.status !== 'initial') {
+			return;
+		}
+		await this.check_chatgpt();
+	}
+
+	/**
+	 * Check ChatGPT availability by loading provider status.
+	 */
+	async check_chatgpt(): Promise<void> {
+		if (!this.backend_available) {
+			console.log('[capabilities] skipping chatgpt check: backend unavailable');
+			return;
+		}
+		await this.app.api.provider_load_status({provider_name: 'chatgpt'});
+	}
+
+	/**
+	 * Check Gemini availability only if it hasn't been checked before.
+	 */
+	async init_gemini_check(): Promise<void> {
+		if (this.gemini.status !== 'initial') {
+			return;
+		}
+		await this.check_gemini();
+	}
+
+	/**
+	 * Check Gemini availability by loading provider status.
+	 */
+	async check_gemini(): Promise<void> {
+		if (!this.backend_available) {
+			console.log('[capabilities] skipping gemini check: backend unavailable');
+			return;
+		}
+		await this.app.api.provider_load_status({provider_name: 'gemini'});
 	}
 }

@@ -9,19 +9,6 @@
 	import type {Popover} from '$lib/popover.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props
-		extends Omit_Strict<ComponentProps<typeof Popover_Button>, 'popover_content' | 'children'> {
-		onconfirm: (popover: Popover) => void;
-		popover_button_attrs?: SvelteHTMLElements['button'] | undefined;
-		hide_on_confirm?: boolean | undefined;
-		/** Unlike on `Popover_Button` this is optional and has a `confirm` arg */
-		popover_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
-		/** Content for the popover button */
-		popover_button_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
-		/** Unlike on `Popover_Button` this has a `confirm` arg */
-		children?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
-	}
-
 	const {
 		onconfirm,
 		popover_button_attrs,
@@ -32,7 +19,18 @@
 		button,
 		children,
 		...rest
-	}: Props = $props();
+	}: Omit_Strict<ComponentProps<typeof Popover_Button>, 'popover_content' | 'children'> &
+		Omit_Strict<SvelteHTMLElements['button'], 'children'> & {
+			onconfirm: (popover: Popover) => void;
+			popover_button_attrs?: SvelteHTMLElements['button'] | undefined;
+			hide_on_confirm?: boolean | undefined;
+			/** Unlike on `Popover_Button` this is optional and has a `confirm` arg */
+			popover_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
+			/** Content for the popover button */
+			popover_button_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
+			/** Unlike on `Popover_Button` this has a `confirm` arg */
+			children?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
+		} = $props();
 
 	// TODO @many type union instead of this pattern?
 	if (DEV) {
@@ -61,9 +59,9 @@
 		{:else}
 			<button
 				type="button"
-				class="icon_button color_c bg_c_1"
+				class="icon_button color_c"
 				onclick={() => confirm(popover)}
-				title="confirm {rest.attrs?.title || ''}"
+				title="confirm {rest.title || ''}"
 				{...popover_button_attrs}
 			>
 				{#if popover_button_content}
@@ -83,3 +81,13 @@
 		<Glyph glyph={GLYPH_REMOVE} />
 	{/if}
 {/snippet}
+
+<style>
+	/* TODO these are a hack, fix after changing Moss to opaque bg colors (and use color_c_2 or something) */
+	button {
+		background-color: #fff;
+	}
+	:global(.dark) button {
+		background-color: #000;
+	}
+</style>

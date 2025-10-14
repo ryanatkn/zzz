@@ -6,12 +6,13 @@
 	import {GLYPH_COPY, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+		onclose,
+	}: {
 		ollama: Ollama;
 		onclose: () => void;
-	}
-
-	const {ollama, onclose}: Props = $props();
+	} = $props();
 
 	const handle_copy = async () => {
 		await ollama.copy();
@@ -37,7 +38,7 @@
 		</button>
 	</header>
 
-	<section class="width_md display_flex flex_column gap_md">
+	<section class="width_upto_md display_flex flex_direction_column gap_md">
 		<p>Create a copy of the source model with a new name.</p>
 
 		<fieldset>
@@ -45,7 +46,7 @@
 				<div class="title mb_xs">source model</div>
 				{#if ollama.model_names.length > 0}
 					<select
-						class="plain w_100"
+						class="plain width_100"
 						bind:value={ollama.copy_source_model}
 						disabled={ollama.copy_is_copying}
 					>
@@ -57,7 +58,7 @@
 				{:else}
 					<input
 						type="text"
-						class="plain w_100"
+						class="plain width_100"
 						placeholder="{GLYPH_PLACEHOLDER} source model name"
 						bind:value={ollama.copy_source_model}
 						onkeydown={handle_keydown}
@@ -72,7 +73,7 @@
 				<div class="title mb_xs">destination model name</div>
 				<input
 					type="text"
-					class="plain w_100"
+					class="plain width_100"
 					placeholder="{GLYPH_PLACEHOLDER} new model name"
 					bind:value={ollama.copy_destination_model}
 					onkeydown={handle_keydown}

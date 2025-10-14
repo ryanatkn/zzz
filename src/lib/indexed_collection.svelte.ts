@@ -36,14 +36,7 @@ export interface Index_Definition<T extends Indexed_Item, T_Result = any, T_Quer
 	/**
 	 * Schema for validating query parameters.
 	 */
-	// TODO @many loses type info in the schema
-	query_schema?: z.ZodType<T_Query>; // TODO @many should query/result schemas be optional or required? helpers could make required schemas easier to work with
-
-	/**
-	 * Schema for validating the computed result.
-	 */
-	// TODO @many loses type info in the schema
-	result_schema: z.ZodType<T_Result>; // TODO @many should query/result schemas be optional or required? helpers could make required schemas easier to work with
+	query_schema?: z.ZodType<T_Query>;
 
 	/** Optional predicate to determine if an item is relevant to this index. */
 	matches?: (item: T) => boolean;
@@ -333,16 +326,6 @@ export class Indexed_Collection<
 		for (const def of this.#index_definitions) {
 			if (def.onadd && (!def.matches || def.matches(item))) {
 				const result = def.onadd(this.indexes[def.key], item, this);
-
-				// Validate result if needed
-				if (this.#validate) {
-					try {
-						def.result_schema.parse(result);
-					} catch (error) {
-						console.error(`Index ${def.key} validation failed on add:`, error);
-					}
-				}
-
 				this.indexes[def.key] = result;
 			}
 		}
@@ -355,16 +338,6 @@ export class Indexed_Collection<
 		for (const def of this.#index_definitions) {
 			if (def.onremove && (!def.matches || def.matches(item))) {
 				const result = def.onremove(this.indexes[def.key], item, this);
-
-				// Validate result if needed
-				if (this.#validate) {
-					try {
-						def.result_schema.parse(result);
-					} catch (error) {
-						console.error(`Index ${def.key} validation failed on remove:`, error);
-					}
-				}
-
 				this.indexes[def.key] = result;
 			}
 		}

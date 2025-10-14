@@ -11,7 +11,21 @@
 	import {GLYPH_PASTE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	let {
+		content = $bindable(),
+		token_count: token_count_prop,
+		placeholder = GLYPH_PLACEHOLDER,
+		readonly = false,
+		show_stats = false,
+		show_actions = false,
+		textarea_height,
+		focus_key,
+		pending_element_to_focus_key = $bindable(),
+		attrs, // TODO probably extend base props with SvelteHTMLElements['textarea'] and delete this
+		after,
+		children,
+		onsave,
+	}: {
 		content: string; // TODO maybe rename to value? rethink `Content_Editor` in general when we switch to CodeMirror
 		/** Estimated if not provided and `show_stats` is true. */
 		token_count?: number | undefined;
@@ -27,23 +41,7 @@
 		after?: Snippet | undefined;
 		children?: Snippet | undefined;
 		onsave?: ((value: string) => void) | undefined;
-	}
-
-	let {
-		content = $bindable(),
-		token_count: token_count_prop,
-		placeholder = GLYPH_PLACEHOLDER,
-		readonly = false,
-		show_stats = false,
-		show_actions = false,
-		textarea_height,
-		focus_key,
-		pending_element_to_focus_key = $bindable(),
-		attrs,
-		after,
-		children,
-		onsave,
-	}: Props = $props();
+	} = $props();
 
 	let textarea_el: HTMLTextAreaElement | undefined = $state();
 
@@ -69,11 +67,11 @@
 		: undefined}
 />
 
-<div class="column w_100 flex_1">
-	<div class="display_flex flex_1 gap_xs2 w_100">
+<div class="column width_100 flex_1">
+	<div class="display_flex flex_1 gap_xs2 width_100">
 		<textarea
 			{...attrs}
-			class="plain mb_0 w_100 flex_1 {attrs?.class}"
+			class="plain mb_0 width_100 flex_1 {attrs?.class}"
 			bind:this={textarea_el}
 			bind:value={content}
 			{placeholder}
@@ -112,11 +110,13 @@
 				<Glyph glyph={GLYPH_PASTE} />
 			</Paste_From_Clipboard>
 			<Clear_Restore_Button
-				value={content}
-				onchange={(value) => {
-					content = value;
-					focus();
-				}}
+				bind:value={
+					() => content,
+					(value) => {
+						content = value;
+						focus();
+					}
+				}
 			/>
 		</div>
 	{/if}

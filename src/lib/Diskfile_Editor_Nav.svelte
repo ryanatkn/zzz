@@ -5,11 +5,11 @@
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 
-	interface Props {
+	const {
+		editor_state,
+	}: {
 		editor_state: Diskfile_Editor_State;
-	}
-
-	const {editor_state}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {diskfiles} = app;

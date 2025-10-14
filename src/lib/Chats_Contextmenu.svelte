@@ -8,9 +8,7 @@
 	import {GLYPH_CHAT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	type Props = Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'>;
-
-	const props: Props = $props();
+	const props: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> = $props();
 
 	const app = frontend_context.get();
 </script>

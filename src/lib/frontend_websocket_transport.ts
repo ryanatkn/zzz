@@ -2,12 +2,14 @@
 
 import type {Socket} from '$lib/socket.svelte.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
-import {Thrown_Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import {Thrown_Jsonrpc_Error, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import {
 	is_jsonrpc_notification,
 	is_jsonrpc_request,
 	is_jsonrpc_response,
 	is_jsonrpc_error_message,
+	to_jsonrpc_message_id,
+	create_jsonrpc_error_message,
 } from '$lib/jsonrpc_helpers.js';
 import type {
 	Jsonrpc_Message_From_Client_To_Server,
@@ -15,8 +17,10 @@ import type {
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
 import type {Transport} from '$lib/transports.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO logging - maybe add a getter to Cell that falls back to the app logger?
 
@@ -25,13 +29,15 @@ export class Frontend_Websocket_Transport implements Transport {
 
 	#socket: Socket;
 	#request_tracker: Request_Tracker;
+	#remove_message_handler: (() => void) | null;
+	#remove_error_handler: (() => void) | null;
 
 	constructor(socket: Socket, request_timeout_ms?: number) {
 		this.#socket = socket;
 		this.#request_tracker = new Request_Tracker(request_timeout_ms);
 
-		// Set up the message handler
-		socket.onmessage = async (event) => {
+		// TODO maybe we want to do this setup elsewhere, not hardcoded like this
+		this.#remove_message_handler = socket.add_message_handler(async (event) => {
 			try {
 				const data = JSON.parse(event.data);
 
@@ -44,22 +50,30 @@ export class Frontend_Websocket_Transport implements Transport {
 					// This is a new request/notification from the server
 					await socket.app.peer.receive(data);
 				} else {
-					console.warn('[frontend websocket transport] Received unknown message type:', data);
+					console.warn('[ws_transport] received unknown message type:', data);
 				}
 			} catch (error) {
-				console.error('[frontend websocket transport] Error parsing WebSocket message:', error);
+				console.error('[ws_transport] error parsing WebSocket message:', error);
+				// TODO maybe send the whole thing back wrapped in an error?
+				// can't reference anything else for a response
 			}
-		};
+		});
+
+		this.#remove_error_handler = socket.add_error_handler((event) => {
+			console.error('[ws_transport] WebSocket error:', event);
+		});
 	}
 
 	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification): Promise<null>;
+	async send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
-		console.log(`[frontend websocket transport] data`, message);
 		if (!this.is_ready()) {
-			throw jsonrpc_errors.service_unavailable_error('WebSocket not connected');
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.service_unavailable('WebSocket not connected'),
+			);
 		}
 
 		try {
@@ -71,34 +85,45 @@ export class Frontend_Websocket_Transport implements Transport {
 
 				// Return the promise that will resolve when the response is received
 				const result = await deferred.promise;
-				console.log(`[frontend websocket transport] result`, message, result);
 				return result;
 			} else if (is_jsonrpc_notification(message)) {
 				// For notifications, just send without tracking
 				this.#socket.send(message);
 				return null;
 			}
-			// TODO maybe dont throw, return? figure out error handling
-			throw jsonrpc_errors.invalid_request();
+			// Invalid message type - return error with id if available
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.invalid_request(),
+			);
 		} catch (error) {
-			console.error('[frontend websocket transport] error sending message:', error);
 			if (error instanceof Thrown_Jsonrpc_Error) {
-				throw error;
+				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
+					code: error.code,
+					message: error.message,
+					data: error.data,
+				});
 			}
-			throw jsonrpc_errors.internal_error(
-				error instanceof Error
-					? error.message
-					: // TODO maybe dont throw, return? figure out error handling
-						// in this case it's weirder because maybe the request tracker
-						// should not reject with jsonrpc error messages, intead use return values or correct errors?
-						is_jsonrpc_error_message(error)
-						? error.error.message
-						: 'unknown error sending websocket message',
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.internal_error(error.message || UNKNOWN_ERROR_MESSAGE),
 			);
 		}
 	}
 
 	is_ready(): boolean {
 		return this.#socket.connected;
+	}
+
+	// TODO ? not called, maybe add to base class?
+	dispose(): void {
+		if (this.#remove_message_handler) {
+			this.#remove_message_handler();
+			this.#remove_message_handler = null;
+		}
+		if (this.#remove_error_handler) {
+			this.#remove_error_handler();
+			this.#remove_error_handler = null;
+		}
 	}
 }

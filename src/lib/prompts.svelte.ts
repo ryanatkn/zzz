@@ -2,26 +2,23 @@ import {z} from 'zod';
 import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Prompt, Prompt_Json, Prompt_Schema, type Prompt_Json_Input} from '$lib/prompt.svelte.js';
+import {Prompt, Prompt_Json, type Prompt_Json_Input} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
-import {cell_array, HANDLED} from '$lib/cell_helpers.js';
+import {HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
-import type {Bit_Type} from '$lib/bit.svelte.js';
+import type {Part_Union} from '$lib/part.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {to_prompts_url} from '$lib/nav_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {goto_unless_current} from '$lib/navigation_helpers.js';
 
 export const Prompts_Json = Cell_Json.extend({
-	items: cell_array(
-		z.array(Prompt_Json).default(() => []),
-		'Prompt',
-	),
+	items: z.array(Prompt_Json).default(() => []),
 	selected_id: z.string().nullable().default(null),
 	show_sort_controls: z.boolean().default(false),
-});
+}).meta({cell_class_name: 'Prompts'});
 export type Prompts_Json = z.infer<typeof Prompts_Json>;
 export type Prompts_Json_Input = z.input<typeof Prompts_Json>;
 
@@ -35,7 +32,6 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 				key: 'by_name',
 				extractor: (prompt) => prompt.name,
 				query_schema: z.string(),
-				result_schema: Prompt_Schema,
 			}),
 
 			create_derived_index({
@@ -44,7 +40,6 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 					collection.values
 						.slice()
 						.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()),
-				result_schema: z.array(Prompt_Schema),
 				onadd: (items, item) => {
 					// Insert at the right position based on creation date
 					const index = items.findIndex(
@@ -62,7 +57,6 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 			create_derived_index({
 				key: 'manual_order',
 				compute: (collection) => collection.values,
-				result_schema: z.array(Prompt_Schema),
 			}),
 		],
 	});
@@ -82,7 +76,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	);
 
 	/** Controls visibility of sort controls in the prompts list. */
-	show_sort_controls: boolean = $state(false);
+	show_sort_controls: boolean = $state()!;
 
 	/** Ordered array of prompts derived from the `manual_order` index. */
 	readonly ordered_items: Array<Prompt> = $derived(this.items.derived_index('manual_order'));
@@ -106,9 +100,9 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		this.init();
 	}
 
-	filter_by_bit(bit: Bit_Type): Array<Prompt> {
-		const {id} = bit;
-		return this.ordered_items.filter((p) => p.bits.some((b) => b.id === id)); // TODO add an index?
+	filter_by_part(part: Part_Union): Array<Prompt> {
+		const {id} = part;
+		return this.ordered_items.filter((p) => p.parts.some((b) => b.id === id)); // TODO add an index?
 	}
 
 	add(json?: Prompt_Json_Input): Prompt {
@@ -182,9 +176,9 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		this.items.indexes.manual_order = to_reordered_list(this.ordered_items, from_index, to_index);
 	}
 
-	remove_bit(bit_id: Uuid): void {
+	remove_part(part_id: Uuid): void {
 		if (!this.selected) return;
-		this.selected.remove_bit(bit_id);
+		this.selected.remove_part(part_id);
 	}
 
 	/**

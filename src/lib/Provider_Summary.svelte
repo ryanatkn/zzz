@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
@@ -7,14 +7,15 @@
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import External_Link from '$lib/External_Link.svelte';
 
-	interface Props {
+	const {
+		provider,
+		attrs,
+	}: {
 		provider: Provider;
 		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
+	} = $props();
 
-	const {provider, attrs}: Props = $props();
-
-	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
+	const at_detail_page = $derived(page.url.pathname === resolve(`/providers/${provider.name}`));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
@@ -33,7 +34,7 @@
 			<External_Link href={provider.url}>docs</External_Link>
 		</div>
 	</section>
-	<ul class="display_flex flex_wrap unstyled gap_md">
+	<ul class="display_flex flex_wrap_wrap unstyled gap_md">
 		{#each provider.models as model (model)}
 			<Model_Summary {model} />
 		{/each}

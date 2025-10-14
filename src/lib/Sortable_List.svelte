@@ -83,7 +83,7 @@
 
 {#if filtered_items.length === 0}
 	{#if typeof no_items === 'string'}
-		<div class="p_md">{no_items}</div>
+		{#if no_items}<div class="p_md">{no_items}</div>{/if}
 	{:else}
 		{@render no_items()}
 	{/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
@@ -12,13 +12,16 @@
 	<h2 class="mt_0 mb_lg">Projects</h2>
 
 	{#if projects.projects.length === 0}
-		<div class="panel p_lg width_md">
+		<div class="panel p_lg width_upto_md">
 			<p>no projects yet</p>
 		</div>
 	{:else}
 		<div class="projects_grid">
 			{#each projects.projects as project (project.id)}
-				<a href="{base}/projects/{project.id}" class="project_card panel p_md font_weight_400">
+				<a
+					href={resolve(`/projects/${project.id}`)}
+					class="project_card panel p_md font_weight_400"
+				>
 					<h3 class="mt_0 mb_sm">{project.name}</h3>
 					<p class="mb_md">{project.description}</p>
 					<div class="domains_list mb_md">
@@ -51,7 +54,7 @@
 
 	<div class="display_flex justify_content_between mt_lg">
 		<button type="button" class="color_a" onclick={() => projects.create_new_project()}>
-			<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new project
+			<Glyph glyph={GLYPH_ADD} />&nbsp; new project
 		</button>
 	</div>
 </section>

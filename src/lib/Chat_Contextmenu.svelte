@@ -7,29 +7,21 @@
 
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {
-		GLYPH_CHAT,
-		GLYPH_DELETE,
-		GLYPH_EDIT,
-		GLYPH_REMOVE,
-		GLYPH_VIEW,
-		GLYPH_ADD,
-	} from '$lib/glyphs.js';
+	import {GLYPH_CHAT, GLYPH_DELETE, GLYPH_REMOVE, GLYPH_VIEW, GLYPH_ADD} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		chat,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		chat: Chat;
-	}
-
-	const {chat, ...rest}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
 	let show_model_picker = $state(false);
-
-	// TODO BLOCK edit chat dialog instead of prompt for name (just focus the input for now?)
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -41,7 +33,7 @@
 		{#snippet menu()}
 			<Contextmenu_Entry run={() => (show_model_picker = true)}>
 				{#snippet icon()}<Glyph glyph={GLYPH_ADD} />{/snippet}
-				<span>add tape</span>
+				<span>add thread</span>
 			</Contextmenu_Entry>
 
 			<Contextmenu_Entry
@@ -56,10 +48,10 @@
 			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
 			<Contextmenu_Entry_Copy_To_Clipboard content={chat.id} label="copy id" />
 
-			{#if chat.tapes.length}
-				<Contextmenu_Entry run={() => chat.remove_all_tapes()}>
+			{#if chat.threads.length}
+				<Contextmenu_Entry run={() => chat.remove_all_threads()}>
 					{#snippet icon()}<Glyph glyph={GLYPH_REMOVE} />{/snippet}
-					<span>remove all tapes</span>
+					<span>remove all threads</span>
 				</Contextmenu_Entry>
 			{/if}
 
@@ -80,7 +72,9 @@
 				</Contextmenu_Entry>
 			{/if}
 
-			<Contextmenu_Entry
+			<!-- TODO I think the best UX here is to have a dialog for the chat editor,
+			 focusing the editable input doesn't work outside of the Chat_View  -->
+			<!-- <Contextmenu_Entry
 				run={() => {
 					// TODO make this focus the `Editable_Text` if available, somehow
 					const new_name = prompt('Enter new name for chat:', chat.name); // eslint-disable-line no-alert
@@ -90,17 +84,17 @@
 				}}
 			>
 				{#snippet icon()}<Glyph glyph={GLYPH_EDIT} />{/snippet}
-				<span>rename chat</span>
-			</Contextmenu_Entry>
+				<span>edit chat</span>
+			</Contextmenu_Entry> -->
 
 			<Contextmenu_Entry
 				run={async () => {
-					// TODO make it have a unique name, and adding tapes looks hacky,
+					// TODO make it have a unique name, and adding threads looks hacky,
 					// maybe add a `chats.duplicate` method
 					const new_chat = app.chats.add_chat(chat.clone());
 					// TODO hacky
-					for (const tape of chat.tapes) {
-						new_chat.add_tape(tape.model);
+					for (const thread of chat.threads) {
+						new_chat.add_thread(thread.model);
 					}
 
 					// Select the new chat
@@ -131,7 +125,7 @@
 	bind:show={show_model_picker}
 	onpick={(model) => {
 		if (model) {
-			chat.add_tape(model); // TODO @many insert at an index via a range input
+			chat.add_thread(model); // TODO @many insert at an index via a range input
 		}
 	}}
 />

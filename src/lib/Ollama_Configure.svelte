@@ -18,19 +18,28 @@
 	import Ollama_Ps_Status from '$lib/Ollama_Ps_Status.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+		last_active_view,
+		onshowpull,
+		onback,
+	}: {
 		ollama: Ollama;
 		last_active_view: string | null;
 		onshowpull: () => void;
 		onback?: () => void;
-	}
+	} = $props();
 
-	const {ollama, last_active_view, onshowpull, onback}: Props = $props();
+	const app = frontend_context.get();
+	const {capabilities} = app;
 
 	// TODO maybe add to ollama.svelte.ts
 	const models_with_details = $derived(ollama.models.filter((m) => m.ollama_show_response_loaded));
 	const models_with_details_count = $derived(models_with_details.length);
+
+	const error_message = $derived(capabilities.ollama.error_message);
 </script>
 
 <div class="panel p_md">
@@ -50,16 +59,15 @@
 		{/if}
 	</header>
 
-	<section class="width_md display_flex flex_column gap_lg">
+	<section class="width_upto_md display_flex flex_direction_column gap_lg">
 		<p>
-			Ollama is a local LLM provider. Want to <button
-				type="button"
-				class="inline compact"
-				onclick={onshowpull}>pull a model</button
-			>?
+			Ollama is a local LLM provider. {#if !error_message && capabilities.backend_available}
+				Want to <button type="button" class="inline compact color_a" onclick={onshowpull}
+					>pull a model</button
+				>?{/if}
 		</p>
 
-		<div class="display_flex flex_column gap_md">
+		<div class="display_flex flex_direction_column gap_md">
 			<fieldset>
 				<label>
 					<div class="title mb_xs">Ollama host url</div>
@@ -77,17 +85,15 @@
 				<button
 					type="button"
 					class="justify_content_start"
-					disabled={ollama.list_status === 'pending'}
+					disabled={ollama.list_status === 'pending' || !capabilities.backend_available}
 					onclick={() => ollama.refresh()}
 				>
 					<Glyph glyph={ollama.list_status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT} />
 					<span class="ml_sm">
 						{#if ollama.list_status === 'pending'}
 							checking...
-						{:else if ollama.list_status === 'success'}
-							refresh
 						{:else}
-							connect
+							reload
 						{/if}
 					</span>
 				</button>
@@ -96,7 +102,7 @@
 					<div class="row gap_sm" transition:slide={{axis: 'x'}}>
 						<button
 							type="button"
-							class="shrink_0"
+							class="flex_shrink_0"
 							onclick={async () => {
 								ollama.host = OLLAMA_URL;
 								await ollama.refresh();
@@ -123,9 +129,9 @@
 				</div>
 			</div>
 
-			{#if ollama.list_error}
+			{#if error_message}
 				<div transition:slide>
-					<Error_Message><small class="font_family_mono">{ollama.list_error}</small></Error_Message>
+					<Error_Message><small class="font_family_mono">{error_message}</small></Error_Message>
 				</div>
 			{/if}
 		</div>

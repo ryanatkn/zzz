@@ -17,6 +17,8 @@ export const Action_Event_Phase = z.enum([
 	'receive_request',
 	'send_response',
 	'receive_response',
+	'send_error',
+	'receive_error',
 	'send',
 	'receive',
 	'execute',
@@ -32,7 +34,14 @@ export const ACTION_EVENT_STEP_TRANSITIONS = {
 } as Record<Action_Event_Step, ReadonlyArray<Action_Event_Step>>;
 
 export const ACTION_EVENT_PHASE_BY_KIND = {
-	request_response: ['send_request', 'receive_request', 'send_response', 'receive_response'],
+	request_response: [
+		'send_request',
+		'receive_request',
+		'send_response',
+		'receive_response',
+		'send_error',
+		'receive_error',
+	],
 	remote_notification: ['send', 'receive'],
 	local_call: ['execute'],
 } as Record<Action_Kind, ReadonlyArray<Action_Event_Phase>>;
@@ -42,6 +51,8 @@ export const ACTION_EVENT_PHASE_TRANSITIONS = {
 	receive_request: 'send_response',
 	send_response: null,
 	receive_response: null,
+	send_error: null,
+	receive_error: null,
 	send: null,
 	receive: null,
 	execute: null,

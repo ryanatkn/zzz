@@ -103,5 +103,6 @@ export const set_reorderable_drag_data_transfer = (
 ): void => {
 	dataTransfer.effectAllowed = 'move';
 	dataTransfer.setData('text/plain', item_id);
-	dataTransfer.setData('application/reorderable-item-id', item_id);
+	// TODO do we want this?
+	// dataTransfer.setData('application/reorderable_item_id', item_id);
 };

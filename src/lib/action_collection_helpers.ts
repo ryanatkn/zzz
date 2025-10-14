@@ -24,8 +24,8 @@ export const parse_action_output = <T_Method extends keyof typeof Action_Outputs
 export const safe_parse_action_input = <T_Method extends keyof typeof Action_Inputs>(
 	method: T_Method,
 	data: unknown,
-): z.SafeParseReturnType<unknown, Action_Inputs[T_Method]> =>
-	Action_Inputs[method].safeParse(data) as z.SafeParseReturnType<unknown, Action_Inputs[T_Method]>;
+): z.ZodSafeParseResult<Action_Inputs[T_Method]> =>
+	Action_Inputs[method].safeParse(data) as z.ZodSafeParseResult<Action_Inputs[T_Method]>;
 
 /**
  * Safe parse action result.
@@ -33,8 +33,5 @@ export const safe_parse_action_input = <T_Method extends keyof typeof Action_Inp
 export const safe_parse_action_output = <T_Method extends keyof typeof Action_Outputs>(
 	method: T_Method,
 	data: unknown,
-): z.SafeParseReturnType<unknown, Action_Outputs[T_Method]> =>
-	Action_Outputs[method].safeParse(data) as z.SafeParseReturnType<
-		unknown,
-		Action_Outputs[T_Method]
-	>;
+): z.ZodSafeParseResult<Action_Outputs[T_Method]> =>
+	Action_Outputs[method].safeParse(data) as z.ZodSafeParseResult<Action_Outputs[T_Method]>;

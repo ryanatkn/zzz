@@ -67,7 +67,7 @@ export type Jsonrpc_Method = z.infer<typeof Jsonrpc_Method>;
 export const Jsonrpc_Progress_Token = z.union([z.string(), z.number()]);
 export type Jsonrpc_Progress_Token = z.infer<typeof Jsonrpc_Progress_Token>;
 
-export const Jsonrpc_Mcp_Meta = z.object({}).passthrough(); // uses object over record to be able to use the better `.extend`
+export const Jsonrpc_Mcp_Meta = z.looseObject({}); // uses looseObject to allow additional properties and support `.extend`
 export type Jsonrpc_Mcp_Meta = z.infer<typeof Jsonrpc_Mcp_Meta>;
 
 export const Jsonrpc_Request_Params_Meta = Jsonrpc_Mcp_Meta.extend({
@@ -82,42 +82,36 @@ export const Jsonrpc_Request_Params_Meta = Jsonrpc_Mcp_Meta.extend({
 });
 export type Jsonrpc_Request_Params_Meta = z.infer<typeof Jsonrpc_Request_Params_Meta>;
 
-export const Jsonrpc_Request_Params = z
-	.object({
-		_meta: Jsonrpc_Request_Params_Meta.optional(),
-	})
-	.passthrough();
+export const Jsonrpc_Request_Params = z.looseObject({
+	_meta: Jsonrpc_Request_Params_Meta.optional(),
+});
 export type Jsonrpc_Request_Params = z.infer<typeof Jsonrpc_Request_Params>;
 
-export const Jsonrpc_Notification_Params = z
-	.object({
-		/**
-		 * This parameter name is reserved by MCP to allow clients and servers
-		 * to attach additional metadata to their responses and notifications.
-		 */
-		_meta: Jsonrpc_Mcp_Meta.optional(),
-	})
-	.passthrough();
+export const Jsonrpc_Notification_Params = z.looseObject({
+	/**
+	 * This parameter name is reserved by MCP to allow clients and servers
+	 * to attach additional metadata to their responses and notifications.
+	 */
+	_meta: Jsonrpc_Mcp_Meta.optional(),
+});
 export type Jsonrpc_Notification_Params = z.infer<typeof Jsonrpc_Notification_Params>;
 
 export const Jsonrpc_Params = z.union([Jsonrpc_Request_Params, Jsonrpc_Notification_Params]);
 export type Jsonrpc_Params = z.infer<typeof Jsonrpc_Params>;
 
-export const Jsonrpc_Result = z
-	.object({
-		/**
-		 * This result property is reserved by the protocol to allow clients and servers
-		 * to attach additional metadata to their responses.
-		 */
-		_meta: Jsonrpc_Mcp_Meta.optional(),
-	})
-	.passthrough();
+export const Jsonrpc_Result = z.looseObject({
+	/**
+	 * This result property is reserved by the protocol to allow clients and servers
+	 * to attach additional metadata to their responses.
+	 */
+	_meta: Jsonrpc_Mcp_Meta.optional(),
+});
 export type Jsonrpc_Result = z.infer<typeof Jsonrpc_Result>;
 
 /**
  * A request that expects a response.
  */
-export const Jsonrpc_Request = z.object({
+export const Jsonrpc_Request = z.looseObject({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	id: Jsonrpc_Request_Id,
 	method: Jsonrpc_Method,
@@ -128,7 +122,7 @@ export type Jsonrpc_Request = z.infer<typeof Jsonrpc_Request>;
 /**
  * A notification which does not expect a response.
  */
-export const Jsonrpc_Notification = z.object({
+export const Jsonrpc_Notification = z.looseObject({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	method: Jsonrpc_Method,
 	params: Jsonrpc_Notification_Params.optional(),
@@ -138,7 +132,7 @@ export type Jsonrpc_Notification = z.infer<typeof Jsonrpc_Notification>;
 /**
  * A successful (non-error) response to a request.
  */
-export const Jsonrpc_Response = z.object({
+export const Jsonrpc_Response = z.looseObject({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	id: Jsonrpc_Request_Id,
 	result: Jsonrpc_Result,
@@ -173,7 +167,7 @@ export const Jsonrpc_Error_Code = z.union([
 ]);
 export type Jsonrpc_Error_Code = z.infer<typeof Jsonrpc_Error_Code>;
 
-export const Jsonrpc_Error_Json = z.object({
+export const Jsonrpc_Error_Json = z.looseObject({
 	/**
 	 * The error type that occurred.
 	 */
@@ -193,7 +187,7 @@ export type Jsonrpc_Error_Json = z.infer<typeof Jsonrpc_Error_Json>;
 /**
  * A response to a request that indicates an error occurred.
  */
-export const Jsonrpc_Error_Message = z.object({
+export const Jsonrpc_Error_Message = z.looseObject({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	id: Jsonrpc_Request_Id.nullable(),
 	error: Jsonrpc_Error_Json,

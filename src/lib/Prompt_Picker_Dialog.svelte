@@ -10,15 +10,6 @@
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
-	interface Props {
-		onpick: (prompt: Prompt | undefined) => boolean | void;
-		show?: boolean | undefined;
-		filter?: ((prompt: Prompt) => boolean) | undefined;
-		exclude_ids?: Array<Uuid> | undefined;
-		selected_ids?: Array<Uuid> | undefined;
-		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
-	}
-
 	let {
 		show = $bindable(false),
 		onpick,
@@ -26,7 +17,14 @@
 		exclude_ids,
 		selected_ids,
 		dialog_props,
-	}: Props = $props();
+	}: {
+		onpick: (prompt: Prompt | undefined) => boolean | void;
+		show?: boolean | undefined;
+		filter?: ((prompt: Prompt) => boolean) | undefined;
+		exclude_ids?: Array<Uuid> | undefined;
+		selected_ids?: Array<Uuid> | undefined;
+		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
+	} = $props();
 
 	const app = frontend_context.get();
 	const {prompts} = app;
@@ -53,7 +51,7 @@
 	{#snippet children(prompt, pick)}
 		<button
 			type="button"
-			class="listitem compact w_100"
+			class="listitem compact width_100"
 			class:selected={selected_ids?.includes(prompt.id)}
 			onclick={() => pick(prompt)}
 		>

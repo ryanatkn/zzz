@@ -10,8 +10,14 @@ import type {
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
-import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import {
+	create_jsonrpc_error_message,
+	to_jsonrpc_message_id,
+	is_jsonrpc_request,
+} from '$lib/jsonrpc_helpers.js';
 
 // TODO support a SSE backend transport
 
@@ -45,20 +51,34 @@ export class Backend_Websocket_Transport implements Transport {
 		}
 	}
 
+	// TODO needs implementation, only broadcasts notifications for now
 	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification): Promise<null>;
+	async send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		// TODO currently just broadcasts all messages to all clients, the transport abstraction is still a WIP
-		if ('id' in message) {
-			throw jsonrpc_errors.internal_error(
-				'Backend WebSocket transport cannot send requests expecting responses',
+		if (is_jsonrpc_request(message)) {
+			return create_jsonrpc_error_message(
+				message.id,
+				// TODO maybe use a not yet implemented error message?
+				jsonrpc_error_messages.internal_error(
+					'TODO not yet implemented - backend WebSocket transport cannot send requests expecting responses yet',
+				),
 			);
 		}
 
-		await this.#broadcast(message);
-		return null;
+		try {
+			await this.#broadcast(message);
+			return null;
+		} catch (error) {
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.internal_error(
+					error instanceof Error ? error.message : 'failed to broadcast notification',
+				),
+			);
+		}
 	}
 
 	// TODO refactor something like this with `send`

@@ -2,11 +2,11 @@
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Content_Stats from '$lib/Content_Stats.svelte';
 
-	interface Props {
+	const {
+		prompt,
+	}: {
 		prompt: Prompt;
-	}
-
-	const {prompt}: Props = $props();
+	} = $props();
 
 	const token_count = $derived(prompt.token_count);
 </script>

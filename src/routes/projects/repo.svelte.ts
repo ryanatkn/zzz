@@ -1,14 +1,5 @@
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import type {Uuid} from '$lib/zod_helpers.js';
-import {Repo_Json} from '$routes/projects/projects_schema.js';
-
-// TODO schema and id probably
-export interface Repo_Checkout {
-	id: Uuid;
-	path: string;
-	label: string;
-	tags: Array<string>;
-}
+import {Repo_Json, type Repo_Checkout} from '$routes/projects/projects_schema.js';
 
 export type Repo_Options = Cell_Options<typeof Repo_Json>;
 

@@ -1,15 +1,16 @@
 <script lang="ts">
 	import Alert from '@ryanatkn/fuz/Alert.svelte';
-	import {page} from '$app/state';
 	import {BROWSER} from 'esm-env';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import Provider_Detail from '$lib/Provider_Detail.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
+	const {params} = $props();
+
 	const app = frontend_context.get();
 
-	const provider = $derived(app.providers.find_by_name(page.params.slug));
+	const provider = $derived(app.providers.find_by_name(params.slug));
 
 	// TODO @many consider namespacing under `/llms/`
 
@@ -21,7 +22,7 @@
 		<Provider_Detail {provider} />
 	{:else if BROWSER}
 		<Alert status="error">
-			no provider found with name "{page.params.slug}"
+			no provider found with name "{params.slug}"
 		</Alert>
 	{:else}
 		<!-- for SSR - is the animation what we want? better than nothing? -->

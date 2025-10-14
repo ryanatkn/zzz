@@ -14,13 +14,13 @@ import {Action_Executor, Action_Kind} from '$lib/action_types.js';
 import {Action_Event_Phase, Action_Event_Step} from '$lib/action_event_types.js';
 
 // Base schema for all action event data
-export const Action_Event_Data = z.object({
+export const Action_Event_Data = z.strictObject({
 	kind: Action_Kind,
 	phase: Action_Event_Phase,
 	step: Action_Event_Step,
 	method: Action_Method,
 	executor: Action_Executor,
-	input: z.unknown(),
+	input: z.unknown().nullable(),
 	output: z.unknown().nullable(),
 	error: Jsonrpc_Error_Json.nullable(),
 	progress: z.unknown().nullable(),
@@ -307,6 +307,120 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			executor: Action_Executor;
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method] | null;
+			error: Jsonrpc_Error_Json;
+			progress: unknown;
+			request: Jsonrpc_Request;
+			response: Jsonrpc_Response_Or_Error;
+			notification: null;
+	  }
+	// send_error phase (when send_request fails)
+	| {
+			kind: 'request_response';
+			phase: 'send_error';
+			step: 'initial';
+			method: T_Method;
+			executor: Action_Executor;
+			input: unknown;
+			output: null;
+			error: Jsonrpc_Error_Json;
+			progress: null;
+			request: Jsonrpc_Request | null;
+			response: null;
+			notification: null;
+	  }
+	| {
+			kind: 'request_response';
+			phase: 'send_error';
+			step: 'parsed';
+			method: T_Method;
+			executor: Action_Executor;
+			input: Action_Inputs[T_Method];
+			output: null;
+			error: Jsonrpc_Error_Json;
+			progress: null;
+			request: Jsonrpc_Request | null;
+			response: null;
+			notification: null;
+	  }
+	| {
+			kind: 'request_response';
+			phase: 'send_error';
+			step: 'handling';
+			method: T_Method;
+			executor: Action_Executor;
+			input: Action_Inputs[T_Method];
+			output: null;
+			error: Jsonrpc_Error_Json;
+			progress: unknown;
+			request: Jsonrpc_Request | null;
+			response: null;
+			notification: null;
+	  }
+	| {
+			kind: 'request_response';
+			phase: 'send_error';
+			step: 'handled';
+			method: T_Method;
+			executor: Action_Executor;
+			input: Action_Inputs[T_Method];
+			output: null;
+			error: Jsonrpc_Error_Json;
+			progress: unknown;
+			request: Jsonrpc_Request | null;
+			response: null;
+			notification: null;
+	  }
+	// receive_error phase (when receive_response contains error)
+	| {
+			kind: 'request_response';
+			phase: 'receive_error';
+			step: 'initial';
+			method: T_Method;
+			executor: Action_Executor;
+			input: Action_Inputs[T_Method];
+			output: null;
+			error: Jsonrpc_Error_Json;
+			progress: null;
+			request: Jsonrpc_Request;
+			response: Jsonrpc_Response_Or_Error;
+			notification: null;
+	  }
+	| {
+			kind: 'request_response';
+			phase: 'receive_error';
+			step: 'parsed';
+			method: T_Method;
+			executor: Action_Executor;
+			input: Action_Inputs[T_Method];
+			output: null;
+			error: Jsonrpc_Error_Json;
+			progress: null;
+			request: Jsonrpc_Request;
+			response: Jsonrpc_Response_Or_Error;
+			notification: null;
+	  }
+	| {
+			kind: 'request_response';
+			phase: 'receive_error';
+			step: 'handling';
+			method: T_Method;
+			executor: Action_Executor;
+			input: Action_Inputs[T_Method];
+			output: null;
+			error: Jsonrpc_Error_Json;
+			progress: unknown;
+			request: Jsonrpc_Request;
+			response: Jsonrpc_Response_Or_Error;
+			notification: null;
+	  }
+	| {
+			kind: 'request_response';
+			phase: 'receive_error';
+			step: 'handled';
+			method: T_Method;
+			executor: Action_Executor;
+			input: Action_Inputs[T_Method];
+			output: null;
 			error: Jsonrpc_Error_Json;
 			progress: unknown;
 			request: Jsonrpc_Request;

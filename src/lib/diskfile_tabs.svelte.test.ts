@@ -1,19 +1,19 @@
-// @slop Claude Sonnet 3.7
-
 // @vitest-environment jsdom
 
 import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
 import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
-import {create_uuid, Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test data
-const TEST_DISKFILE_ID_1 = Uuid.parse('11111111-1111-1111-1111-111111111111');
-const TEST_DISKFILE_ID_2 = Uuid.parse('22222222-2222-2222-2222-222222222222');
-const TEST_DISKFILE_ID_3 = Uuid.parse('33333333-3333-3333-3333-333333333333');
+const TEST_DISKFILE_ID_1 = Uuid_With_Default.parse(undefined);
+const TEST_DISKFILE_ID_2 = Uuid_With_Default.parse(undefined);
+const TEST_DISKFILE_ID_3 = Uuid_With_Default.parse(undefined);
+const TEST_DISKFILE_ID_4 = Uuid_With_Default.parse(undefined);
+const TEST_DISKFILE_ID_5 = Uuid_With_Default.parse(undefined);
 
 describe('Diskfile_Tabs', () => {
 	// Test suite
@@ -201,14 +201,76 @@ describe('Diskfile_Tabs', () => {
 
 			// Select tab2 and create another preview (reusing the existing one)
 			tabs.select_tab(tab2.id);
-			const preview2 = tabs.preview_diskfile(Uuid.parse('44444444-4444-4444-4444-444444444444'));
+			const preview2 = tabs.preview_diskfile(TEST_DISKFILE_ID_4);
 
 			// The preview tab should move after tab2
 			expect(tabs.tab_order[0]).toBe(tab1.id);
 			expect(tabs.tab_order[1]).toBe(tab2.id);
 			expect(tabs.tab_order[2]).toBe(preview.id);
 			expect(preview2).toBe(preview); // Same tab instance
-			expect(preview2.diskfile_id).toBe('44444444-4444-4444-4444-444444444444');
+			expect(preview2.diskfile_id).toBe(TEST_DISKFILE_ID_4);
+		});
+
+		test('preview tab positioning bug fix - selecting existing preview should not reorder', () => {
+			// This test specifically reproduces and verifies the fix for the bug where:
+			// 1. Open 2 permanent tabs
+			// 2. Select first tab and preview a 3rd file
+			// 3. Click between tabs - preview tab should NOT move
+
+			// Create two permanent tabs
+			const tab1 = tabs.open_diskfile(TEST_DISKFILE_ID_1);
+			const tab2 = tabs.open_diskfile(TEST_DISKFILE_ID_2);
+
+			// Select the first tab
+			tabs.select_tab(tab1.id);
+
+			// Preview a third file
+			const preview_tab = tabs.preview_diskfile(TEST_DISKFILE_ID_3);
+
+			// Order should be: tab1, preview_tab, tab2
+			expect(tabs.tab_order).toEqual([tab1.id, preview_tab.id, tab2.id]);
+
+			// Select tab2
+			tabs.select_tab(tab2.id);
+
+			// Select the preview tab again
+			tabs.select_tab(preview_tab.id);
+
+			// Order should NOT change - the preview tab should stay in its position
+			expect(tabs.tab_order).toEqual([tab1.id, preview_tab.id, tab2.id]);
+
+			// Select tab1 again
+			tabs.select_tab(tab1.id);
+
+			// Select preview tab again
+			tabs.select_tab(preview_tab.id);
+
+			// Order should still not change
+			expect(tabs.tab_order).toEqual([tab1.id, preview_tab.id, tab2.id]);
+		});
+
+		test('preview tab repositioning only happens when content changes', () => {
+			// Create permanent tabs
+			const tab1 = tabs.open_diskfile(TEST_DISKFILE_ID_1);
+			const tab2 = tabs.open_diskfile(TEST_DISKFILE_ID_2);
+			const tab3 = tabs.open_diskfile(TEST_DISKFILE_ID_3);
+
+			// Select tab1 and create a preview
+			tabs.select_tab(tab1.id);
+			const preview = tabs.preview_diskfile(TEST_DISKFILE_ID_4);
+
+			// Order: tab1, preview, tab2, tab3
+			expect(tabs.tab_order).toEqual([tab1.id, preview.id, tab2.id, tab3.id]);
+
+			// Select tab3
+			tabs.select_tab(tab3.id);
+
+			// Preview the same file - should NOT reposition
+			tabs.preview_diskfile(TEST_DISKFILE_ID_4);
+			expect(tabs.tab_order).toEqual([tab1.id, preview.id, tab2.id, tab3.id]);
+
+			tabs.preview_diskfile(TEST_DISKFILE_ID_5);
+			expect(tabs.tab_order).toEqual([tab1.id, preview.id, tab2.id, tab3.id]);
 		});
 
 		test('reorder_tabs changes tab order', () => {
@@ -542,7 +604,7 @@ describe('Diskfile_Tabs', () => {
 
 			// Create more tabs than the max history size
 			for (let i = 0; i < 5; i++) {
-				const uuid = Uuid.parse(`${i}1111111-1111-4111-8111-111111111111`);
+				const uuid = Uuid_With_Default.parse(undefined);
 				tabs.open_diskfile(uuid);
 			}
 
@@ -748,7 +810,7 @@ describe('Diskfile_Tabs', () => {
 			tabs.open_diskfile(TEST_DISKFILE_ID_1);
 
 			// Try to navigate to a non-existent tab
-			const result = tabs.navigate_to_tab(Uuid.parse('99999999-9999-9999-9999-999999999999'));
+			const result = tabs.navigate_to_tab(Uuid_With_Default.parse(undefined));
 
 			// Should return null without changing selection
 			expect(result.resulting_tab_id).toBe(null);
@@ -833,7 +895,7 @@ describe('Diskfile_Tabs', () => {
 
 			for (let i = 0; i < tab_count; i++) {
 				// Create proper UUIDs that will pass validation - these are real UUIDs
-				const uuid = Uuid.parse(`${i}1111111-1111-4111-8111-111111111111`);
+				const uuid = Uuid_With_Default.parse(undefined);
 				const tab = tabs.open_diskfile(uuid);
 				created_tabs.push(tab);
 			}
@@ -865,6 +927,166 @@ describe('Diskfile_Tabs', () => {
 			// Just ensure operations complete in a reasonable time
 			expect(tabs.items.size).toBe(0);
 			expect(tabs.recently_closed_tabs.length).toBe(tab_count);
+		});
+
+		test('preview tab lifecycle with multiple operations', () => {
+			// Create initial permanent tabs
+			const tab1 = tabs.open_diskfile(TEST_DISKFILE_ID_1);
+			const tab2 = tabs.open_diskfile(TEST_DISKFILE_ID_2);
+
+			// Preview a file
+			const preview = tabs.preview_diskfile(TEST_DISKFILE_ID_3);
+			expect(preview.is_preview).toBe(true);
+
+			// Double-click simulation - promote to permanent
+			tabs.open_tab(preview.id);
+			expect(preview.is_preview).toBe(false);
+			expect(tabs.preview_tab_id).toBe(null);
+
+			// Create a new preview
+			const preview2 = tabs.preview_diskfile(TEST_DISKFILE_ID_4);
+			expect(preview2.is_preview).toBe(true);
+			expect(preview2.id).not.toBe(preview.id);
+
+			// Close the preview
+			tabs.close_tab(preview2.id);
+			expect(tabs.preview_tab_id).toBe(null);
+
+			// All permanent tabs should remain
+			expect(tabs.items.size).toBe(3);
+			expect(tabs.items.by_id.has(tab1.id)).toBe(true);
+			expect(tabs.items.by_id.has(tab2.id)).toBe(true);
+			expect(tabs.items.by_id.has(preview.id)).toBe(true);
+		});
+
+		test('by_diskfile_id map updates correctly', () => {
+			// Create tabs
+			const tab1 = tabs.open_diskfile(TEST_DISKFILE_ID_1);
+			const tab2 = tabs.open_diskfile(TEST_DISKFILE_ID_2);
+
+			// Verify map contents
+			expect(tabs.by_diskfile_id.get(TEST_DISKFILE_ID_1)).toBe(tab1);
+			expect(tabs.by_diskfile_id.get(TEST_DISKFILE_ID_2)).toBe(tab2);
+			expect(tabs.by_diskfile_id.size).toBe(2);
+
+			// Create preview that reuses a tab
+			const preview = tabs.preview_diskfile(TEST_DISKFILE_ID_3);
+			expect(tabs.by_diskfile_id.get(TEST_DISKFILE_ID_3)).toBe(preview);
+			expect(tabs.by_diskfile_id.size).toBe(3);
+
+			// Reuse preview for different file
+			tabs.preview_diskfile(TEST_DISKFILE_ID_4);
+			expect(tabs.by_diskfile_id.get(TEST_DISKFILE_ID_3)).toBeUndefined();
+			expect(tabs.by_diskfile_id.get(TEST_DISKFILE_ID_4)).toBe(preview);
+			expect(tabs.by_diskfile_id.size).toBe(3);
+
+			// Close a tab
+			tabs.close_tab(tab1.id);
+			expect(tabs.by_diskfile_id.get(TEST_DISKFILE_ID_1)).toBeUndefined();
+			expect(tabs.by_diskfile_id.size).toBe(2);
+		});
+	});
+
+	describe('helper method tests', () => {
+		test('#position_tab inserts tab correctly', () => {
+			// Create tabs
+			const tab1 = tabs.open_diskfile(TEST_DISKFILE_ID_1);
+			const tab2 = tabs.open_diskfile(TEST_DISKFILE_ID_2);
+			const tab3 = tabs.open_diskfile(TEST_DISKFILE_ID_3);
+
+			// Initial order
+			expect(tabs.tab_order).toEqual([tab1.id, tab2.id, tab3.id]);
+
+			// Use private method through public API - reorder simulates position_tab behavior
+			tabs.reorder_tabs(2, 0); // Move tab3 to position after tab1 (index 1)
+
+			expect(tabs.tab_order[0]).toBe(tab3.id);
+			expect(tabs.tab_order[1]).toBe(tab1.id);
+			expect(tabs.tab_order[2]).toBe(tab2.id);
+		});
+
+		test('#update_tab_history maintains correct order and size', () => {
+			// Set a small max history for testing
+			tabs.max_tab_history = 3;
+
+			// Create and select tabs to build history
+			const tab1 = tabs.open_diskfile(TEST_DISKFILE_ID_1);
+			const tab2 = tabs.open_diskfile(TEST_DISKFILE_ID_2);
+			const tab3 = tabs.open_diskfile(TEST_DISKFILE_ID_3);
+			const tab4 = tabs.open_diskfile(TEST_DISKFILE_ID_4);
+
+			// Select in specific order
+			tabs.select_tab(tab1.id);
+			tabs.select_tab(tab2.id);
+			tabs.select_tab(tab3.id);
+			tabs.select_tab(tab4.id);
+
+			// History should only contain last 3
+			expect(tabs.recent_tab_ids).toHaveLength(3);
+			expect(tabs.recent_tab_ids[0]).toBe(tab4.id);
+			expect(tabs.recent_tab_ids[1]).toBe(tab3.id);
+			expect(tabs.recent_tab_ids[2]).toBe(tab2.id);
+			expect(tabs.recent_tab_ids).not.toContain(tab1.id);
+
+			// Select an existing tab in history
+			tabs.select_tab(tab2.id);
+
+			// Should move to front
+			expect(tabs.recent_tab_ids[0]).toBe(tab2.id);
+			expect(tabs.recent_tab_ids[1]).toBe(tab4.id);
+			expect(tabs.recent_tab_ids[2]).toBe(tab3.id);
+		});
+	});
+
+	describe('state consistency', () => {
+		test('maintains consistency between tab_order and items collection', () => {
+			// Create tabs
+			tabs.open_diskfile(TEST_DISKFILE_ID_1);
+			const tab2 = tabs.open_diskfile(TEST_DISKFILE_ID_2);
+			tabs.open_diskfile(TEST_DISKFILE_ID_3);
+
+			// Every tab in tab_order should exist in items
+			for (const tab_id of tabs.tab_order) {
+				expect(tabs.items.by_id.has(tab_id)).toBe(true);
+			}
+
+			// Close a tab
+			tabs.close_tab(tab2.id);
+
+			// Check consistency again
+			expect(tabs.tab_order).not.toContain(tab2.id);
+			expect(tabs.items.by_id.has(tab2.id)).toBe(false);
+
+			// Reopen a tab
+			tabs.reopen_last_closed_tab();
+
+			// Check consistency once more
+			for (const tab_id of tabs.tab_order) {
+				expect(tabs.items.by_id.has(tab_id)).toBe(true);
+			}
+		});
+
+		test('maintains consistency of derived properties', () => {
+			// Create tabs
+			const tab1 = tabs.open_diskfile(TEST_DISKFILE_ID_1);
+			const preview = tabs.preview_diskfile(TEST_DISKFILE_ID_2);
+
+			// Check derived properties
+			expect(tabs.selected_tab).toBe(preview);
+			expect(tabs.preview_tab).toBe(preview);
+			expect(tabs.selected_diskfile_id).toBe(TEST_DISKFILE_ID_2);
+
+			// Select different tab
+			tabs.select_tab(tab1.id);
+
+			// Check updated derived properties
+			expect(tabs.selected_tab).toBe(tab1);
+			expect(tabs.selected_diskfile_id).toBe(TEST_DISKFILE_ID_1);
+			expect(tabs.preview_tab).toBe(preview); // Preview unchanged
+
+			// Promote preview
+			tabs.promote_preview_to_permanent();
+			expect(tabs.preview_tab).toBeUndefined();
 		});
 	});
 });

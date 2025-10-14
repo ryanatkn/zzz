@@ -3,22 +3,10 @@
 	import type {Snippet} from 'svelte';
 	import {scale} from 'svelte/transition';
 	import {DEV} from 'esm-env';
+	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import {Popover} from '$lib/popover.svelte.js';
 	import type {Position, Alignment} from '$lib/position_helpers.js';
-
-	interface Props {
-		position?: Position | undefined;
-		align?: Alignment | undefined;
-		disable_outside_click?: boolean | undefined;
-		popover_class?: string | undefined;
-		popover_attrs?: SvelteHTMLElements['div'] | undefined;
-		popover_content: Snippet<[popover: Popover]>;
-		popover_container_attrs?: SvelteHTMLElements['div'] | undefined;
-		attrs?: SvelteHTMLElements['button'] | undefined;
-		button?: Snippet<[popover: Popover]> | undefined;
-		children?: Snippet<[popover: Popover]> | undefined;
-	}
 
 	const {
 		position = 'bottom',
@@ -28,10 +16,20 @@
 		popover_attrs,
 		popover_content,
 		popover_container_attrs,
-		attrs,
 		button,
 		children,
-	}: Props = $props();
+		...rest
+	}: Omit_Strict<SvelteHTMLElements['button'], 'children'> & {
+		position?: Position | undefined;
+		align?: Alignment | undefined;
+		disable_outside_click?: boolean | undefined;
+		popover_class?: string | undefined;
+		popover_attrs?: SvelteHTMLElements['div'] | undefined;
+		popover_content: Snippet<[popover: Popover]>;
+		popover_container_attrs?: SvelteHTMLElements['div'] | undefined;
+		button?: Snippet<[popover: Popover]> | undefined;
+		children?: Snippet<[popover: Popover]> | undefined;
+	} = $props();
 
 	// TODO @many type union instead of this pattern?
 	if (DEV) {
@@ -51,7 +49,7 @@
 	// TODO refactor, try to remove
 	// This hides the popover when the button is disabled
 	$effect.pre(() => {
-		if (attrs?.disabled) {
+		if (rest.disabled) {
 			popover.hide();
 		}
 	});
@@ -61,7 +59,7 @@
 <div
 	{...popover_container_attrs}
 	class="position_relative {popover_container_attrs?.class}"
-	use:popover.container
+	{@attach popover.container}
 >
 	{#if button}
 		{@render button(popover)}
@@ -69,12 +67,12 @@
 		<button
 			type="button"
 			class="icon_button"
-			use:popover.trigger={{
+			{@attach popover.trigger({
 				position,
 				align,
 				disable_outside_click,
-			}}
-			{...attrs}
+			})}
+			{...rest}
 		>
 			{@render children?.(popover)}
 		</button>
@@ -82,12 +80,12 @@
 
 	{#if popover.visible}
 		<div
-			use:popover.content={{
+			{@attach popover.content({
 				position,
 				align,
 				disable_outside_click,
 				popover_class,
-			}}
+			})}
 			in:scale={{duration: 80}}
 			out:scale={{duration: 200}}
 			{...popover_attrs}

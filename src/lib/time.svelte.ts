@@ -11,7 +11,7 @@ import {
 	format_timestamp,
 } from '$lib/time_helpers.js';
 
-export const Time_Json = Cell_Json.extend({});
+export const Time_Json = Cell_Json.extend({}).meta({cell_class_name: 'Time'});
 export type Time_Json = z.infer<typeof Time_Json>;
 export type Time_Json_Input = z.input<typeof Time_Json>;
 

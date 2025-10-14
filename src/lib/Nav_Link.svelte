@@ -2,24 +2,22 @@
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 	import {strip_end} from '@ryanatkn/belt/string.js';
-
-	interface Props {
-		href: string;
-		selected?: boolean | undefined;
-		show_selected_descendent?: boolean | undefined;
-		attrs?: SvelteHTMLElements['a'] | undefined;
-		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
-	}
+	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	const {
 		href,
 		selected: selected_prop,
 		show_selected_descendent = true,
-		attrs,
 		children,
-	}: Props = $props();
+		...rest
+	}: Omit_Strict<SvelteHTMLElements['a'], 'children'> & {
+		href: string;
+		selected?: boolean | undefined;
+		show_selected_descendent?: boolean | undefined;
+		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
+	} = $props();
 
 	const href_normalized = $derived(strip_end(href, '/'));
 	const pathname_normalized = $derived(strip_end(page.url.pathname, '/'));
@@ -27,7 +25,7 @@
 	const selected = $derived(selected_prop ?? pathname_normalized === href_normalized);
 	const selected_descendent = $derived(
 		show_selected_descendent &&
-			(selected || href_normalized === base
+			(selected || href_normalized === resolve('/')
 				? false
 				: (pathname_normalized + '/').startsWith(href + '/')),
 	);
@@ -37,7 +35,7 @@
 
 <!-- 
 	transition:slide -->
-<a {...attrs} {href} class="nav_link {attrs?.class}" class:selected class:selected_descendent
+<a {...rest} {href} class="nav_link {rest.class}" class:selected class:selected_descendent
 	>{@render children(selected, selected_descendent)}</a
 >
 

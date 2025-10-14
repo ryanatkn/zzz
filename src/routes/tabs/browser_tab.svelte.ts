@@ -12,7 +12,7 @@ export const Browser_Tab_Json = Cell_Json.extend({
 	type: z.enum(['raw', 'embedded_html', 'external_url']),
 	// Optional content field for embedded HTML tabs
 	content: z.string().optional(),
-});
+}).meta({cell_class_name: 'Browser_Tab'});
 export type Browser_Tab_Json = z.infer<typeof Browser_Tab_Json>;
 export type Browser_Tab_Json_Input = z.input<typeof Browser_Tab_Json>;
 

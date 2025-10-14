@@ -4,17 +4,17 @@
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
-	import Chat_Tape from '$lib/Chat_Tape.svelte';
-	import {GLYPH_ADD, GLYPH_PLACEHOLDER, GLYPH_REMOVE} from '$lib/glyphs.js';
+	import Chat_Thread from '$lib/Chat_Thread.svelte';
+	import {GLYPH_ADD, GLYPH_PLACEHOLDER, GLYPH_REMOVE, GLYPH_SEND} from '$lib/glyphs.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		chat,
+	}: {
 		chat: Chat;
-	}
-
-	const {chat}: Props = $props();
+	} = $props();
 
 	let content_input: {focus: () => void} | undefined;
 	let pending = $state(false); // TODO refactor request state
@@ -32,7 +32,7 @@
 		pending = false;
 	};
 
-	const count = $derived(chat.enabled_tapes.length);
+	const count = $derived(chat.enabled_threads.length);
 
 	let show_model_picker = $state(false);
 </script>
@@ -60,28 +60,28 @@
 				disabled={!count ? true : undefined}
 				attrs={{class: 'plain'}}
 			>
-				send to {count}
+				<Glyph glyph={GLYPH_SEND} /> to {count}
 			</Pending_Button>
 		</Content_Editor>
 
 		<div class="display_flex mt_lg">
 			<button type="button" class="plain" onclick={() => (show_model_picker = true)}>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add tape
+				<Glyph glyph={GLYPH_ADD} />&nbsp; add thread
 			</button>
 			<Confirm_Button
-				onconfirm={() => chat.remove_all_tapes()}
+				onconfirm={() => chat.remove_all_threads()}
 				position="right"
-				attrs={{disabled: !count, class: 'plain'}}
-				><Glyph glyph={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all</Confirm_Button
+				disabled={!count}
+				class="plain"><Glyph glyph={GLYPH_REMOVE} />&nbsp; remove all</Confirm_Button
 			>
 		</div>
-		<ul class="tapes unstyled mt_lg">
-			{#each chat.tapes as tape (tape.id)}
+		<ul class="threads unstyled mt_lg">
+			{#each chat.threads as thread (thread.id)}
 				<li in:slide>
-					<Chat_Tape
-						{tape}
-						onsend={(input) => chat.send_to_tape(tape.id, input)}
-						strips_attrs={{class: 'max_height_sm'}}
+					<Chat_Thread
+						{thread}
+						onsend={(input) => chat.send_to_thread(thread.id, input)}
+						turns_attrs={{class: 'max_height_sm'}}
 						attrs={{class: 'p_md'}}
 					/>
 				</li>
@@ -94,13 +94,13 @@
 	bind:show={show_model_picker}
 	onpick={(model) => {
 		if (model) {
-			chat.add_tape(model); // TODO @many insert at an index via a range input
+			chat.add_thread(model); // TODO @many insert at an index via a range input
 		}
 	}}
 />
 
 <style>
-	.tapes {
+	.threads {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 		gap: var(--space_md);

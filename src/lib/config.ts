@@ -15,6 +15,7 @@ import {
 } from '$lib/config_defaults.js';
 
 // TODO hacky and temporary, just thinking through designs
+// some of the model param defaults definitely do not belong her
 
 // TODO refactor currently this is imported directly by frontend and backend, but we probably only want to forward a serialized subset to the client -
 // maybe move to zzz.config.ts in the repo root, and genfile for the frontend config

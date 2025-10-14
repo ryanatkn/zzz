@@ -1,7 +1,7 @@
 <script lang="ts">
 	// @slop Claude Opus 4
 
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
@@ -39,11 +39,11 @@
 							class="color_a"
 							onclick={() => project_viewmodel.create_new_page()}
 						>
-							<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create your first page
+							<Glyph glyph={GLYPH_ADD} />&nbsp; create your first page
 						</button>
 					</p>
 				{:else}
-					<table class="w_100">
+					<table class="width_100">
 						<thead>
 							<tr>
 								<th>title</th>
@@ -56,7 +56,7 @@
 							{#each project_viewmodel.project.pages as page (page.id)}
 								<tr>
 									<td>
-										<a href="{base}/projects/{project_viewmodel.project_id}/pages/{page.id}"
+										<a href={resolve(`/projects/${project_viewmodel.project_id}/pages/${page.id}`)}
 											>{page.title}</a
 										>
 									</td>
@@ -74,7 +74,7 @@
 							class="color_a"
 							onclick={() => project_viewmodel.create_new_page()}
 						>
-							<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new page
+							<Glyph glyph={GLYPH_ADD} />&nbsp; new page
 						</button>
 					</div>
 				{/if}

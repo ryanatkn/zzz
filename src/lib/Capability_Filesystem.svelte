@@ -1,25 +1,16 @@
 <script lang="ts">
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
-	import type {Zzz_Dir} from '$lib/diskfile_types.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
-
-	interface Props {
-		zzz_dir?: Zzz_Dir | null | undefined;
-	}
-
-	// Get props with default to context value
-	const {zzz_dir: zzz_dir_prop}: Props = $props();
 
 	const app = frontend_context.get();
 	const {capabilities} = app;
 
-	// Fall back to the context value if not provided
-	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : app.zzz_cache_dir);
+	const zzz_cache_dir = $derived(app.zzz_cache_dir);
 </script>
 
 <div
-	class="chip plain flex_1 font_size_xl px_xl flex_column mb_xl width_sm"
+	class="chip plain flex_1 font_size_xl px_xl flex_direction_column mb_xl width_upto_sm"
 	style:display="display_flex !important"
 	style:align-items="flex-start !important"
 	style:font-weight="400 !important"
@@ -42,27 +33,20 @@
 			{/if}
 		</div>
 		<small class="font_family_mono">
-			{#if zzz_dir === undefined || zzz_dir === null}
+			{#if zzz_cache_dir === undefined || zzz_cache_dir === null}
 				&nbsp;
-			{:else if zzz_dir === ''}
+			{:else if zzz_cache_dir === ''}
 				no backend directory configured
 			{:else}
-				{zzz_dir}
+				{zzz_cache_dir}
 			{/if}
 		</small>
 	</div>
 </div>
 
 <p>
-	This is the backend's filesystem directory, the <code>zzz_dir</code>. It defaults to
-	<code>.zzz</code> in the backend's current working directory. To configure it set the .env
-	variable
-	<code class="font_size_sm">PUBLIC_ZZZ_DIR</code>.
-</p>
-<p>
-	For security reasons, all filesystem operations are confined to this path's parent directory,
-	<small class="chip font_family_mono">{app.zzz_dir || '[no zzz dir configured]'}</small>, and the
-	path cannot be modified after the backend starts. These restrictions may be loosened in the
-	future, but they help ensure predictability when exposing sensitive resources like your local hard
-	drive to web scripts.
+	This is the backend's filesystem directory. For security reasons, filesystem operations are scoped
+	to this directory and symlinks are not followed. Defaults to <code>.zzz</code> in the backend's
+	current working directory. To configure it set the .env variable
+	<code class="font_size_sm">PUBLIC_ZZZ_CACHE_DIR</code>. Configure at your own risk.
 </p>

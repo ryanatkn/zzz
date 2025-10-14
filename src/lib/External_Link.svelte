@@ -16,16 +16,19 @@
 
 	// TODO maybe make this `Link` and infer optional prop `external`?
 
-	interface Props {
+	const {
+		href,
+		open_externally = true,
+		icon,
+		children,
+		...rest
+	}: SvelteHTMLElements['a'] & {
 		href: string;
+		// TODO maybe dont default to external?
 		/** Set to false to disable external link behavior. */
 		open_externally?: boolean | undefined;
-		attrs?: SvelteHTMLElements['a'] | undefined;
 		icon?: Snippet<[known_logo: Svg_Data | null]> | undefined;
-		children?: Snippet | undefined;
-	}
-
-	const {href, open_externally = true, attrs, icon, children}: Props = $props();
+	} = $props();
 
 	const known_logo: Svg_Data | null = $derived(
 		github_regex.test(href)
@@ -41,15 +44,16 @@
 </script>
 
 <a
-	{...attrs}
+	{...rest}
 	{href}
-	target={open_externally ? (attrs?.target ?? '_blank') : attrs?.target}
-	rel={open_externally ? (attrs?.rel ?? 'noopener') : attrs?.rel}
+	target={open_externally ? (rest.target ?? '_blank') : rest.target}
+	rel={open_externally ? (rest.rel ?? 'noopener') : rest.rel}
+	class:color_i_5={true}
 	>{#if children}{@render children()}{:else}{href}{/if}<External_Link_Icon
 		>{#snippet children(text_icon)}{#if icon}{@render icon(known_logo)}{:else if known_logo}<Svg
 					data={known_logo}
 					size="var(--font_size_xs)"
-					fill="var(--text_color)"
+					fill="var(--color_i_5)"
 					inline
 				/>{:else}{text_icon}{/if}{/snippet}</External_Link_Icon
 	></a

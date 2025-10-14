@@ -34,7 +34,7 @@ const Test_Schema = Cell_Json.extend({
 		.optional()
 		.default(() => []),
 	flag: z.boolean().default(true),
-}).strict();
+});
 
 test('Cell supports overriding assign_property', () => {
 	class Custom_Assignment_Cell extends Cell<typeof Test_Schema> {

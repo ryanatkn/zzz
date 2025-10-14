@@ -39,7 +39,6 @@ const DIR_PATHS = {
 	NEW_DIR: '/allowed/path/new-dir',
 };
 
-// Helper to create test instance
 const create_test_instance = () => new Scoped_Fs(TEST_ALLOWED_PATHS);
 
 // Setup/cleanup for each test

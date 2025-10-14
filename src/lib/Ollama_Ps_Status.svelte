@@ -5,20 +5,20 @@
 
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import {GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY} from '$lib/glyphs.js';
+	import {GLYPH_DISCONNECT, GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {format_bytes} from '$lib/format_helpers.js';
 
-	interface Props {
+	const {
+		ollama,
+	}: {
 		ollama: Ollama;
-	}
-
-	const {ollama}: Props = $props();
+	} = $props();
 
 	// TODO this should show "running" models as being actively doing inference, otherwise "loaded"
 </script>
 
-<div class="panel p_md width_md">
+<div class="panel p_md width_upto_md">
 	<div class="display_flex justify_content_space_between align_items_center mb_md">
 		<h4 class="mt_0 mb_0">active models</h4>
 		<div class="display_flex align_items_center gap_sm">
@@ -58,7 +58,7 @@
 						>
 							<div class="display_flex gap_sm align_items_center">
 								<Glyph glyph={GLYPH_INFO} />
-								<span>Model {item.name} not found</span>
+								<span>model {item.name} not found</span>
 							</div>
 						</div>
 					{:else}
@@ -82,20 +82,30 @@
 									</small>
 								{/if}
 							</div>
-							<!-- TODO maybe refactor with derived state -->
-							{#if item.expires_at}
-								{@const expires_at_date = new Date(item.expires_at)}
-								{@const expires_at_ms = expires_at_date.valueOf()}
-								<small>
-									{#if expires_at_ms > ollama.app.time.now_ms}
-										expires {formatDistance(expires_at_date, ollama.app.time.now_ms, {
-											addSuffix: true,
-										})}
-									{:else}
-										expired
-									{/if}
-								</small>
-							{/if}
+							<div class="display_flex gap_sm align_items_center">
+								<!-- TODO maybe refactor with derived state -->
+								{#if item.expires_at}
+									{@const expires_at_date = new Date(item.expires_at)}
+									{@const expires_at_ms = expires_at_date.valueOf()}
+									<small>
+										{#if expires_at_ms > ollama.app.time.now_ms}
+											expires {formatDistance(expires_at_date, ollama.app.time.now_ms, {
+												addSuffix: true,
+											})}
+										{:else}
+											expired
+										{/if}
+									</small>
+								{/if}
+								<button
+									type="button"
+									class="icon_button plain"
+									title="unload model from memory"
+									onclick={() => ollama.unload(item.name)}
+								>
+									<Glyph glyph={GLYPH_DISCONNECT} />
+								</button>
+							</div>
 						</div>
 					{/if}
 				</li>

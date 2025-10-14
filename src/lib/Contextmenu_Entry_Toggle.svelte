@@ -7,13 +7,6 @@
 	import {GLYPH_CHECKMARK} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props
-		extends Omit_Strict<Partial<ComponentProps<typeof Contextmenu_Entry>>, 'children'> {
-		enabled: boolean;
-		label?: string | undefined;
-		children?: Snippet<[enabled: boolean]> | undefined;
-	}
-
 	let {
 		enabled = $bindable(),
 		icon = icon_default,
@@ -23,7 +16,11 @@
 		label = 'item',
 		children,
 		...rest
-	}: Props = $props();
+	}: Omit_Strict<Partial<ComponentProps<typeof Contextmenu_Entry>>, 'children'> & {
+		enabled: boolean;
+		label?: string | undefined;
+		children?: Snippet<[enabled: boolean]> | undefined;
+	} = $props();
 
 	if (DEV && label && children) throw new Error('cannot provide both label and children');
 

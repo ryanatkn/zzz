@@ -2,7 +2,7 @@
 
 import {z} from 'zod';
 import {goto} from '$app/navigation';
-import {base} from '$app/paths';
+import {resolve} from '$app/paths';
 
 import {get_datetime_now, create_uuid, type Uuid} from '$lib/zod_helpers.js';
 import {Domain} from '$routes/projects/domain.svelte.js';
@@ -30,7 +30,7 @@ export class Project_Viewmodel {
 	editing_project: boolean = $state(false);
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.project &&
 			(this.edited_name !== this.project.name ||
@@ -94,7 +94,7 @@ export class Project_Viewmodel {
 
 		if (confirmed) {
 			this.projects.delete_project(this.project_id);
-			void goto('/projects');
+			void goto(resolve('/projects'));
 		}
 	}
 
@@ -121,7 +121,7 @@ export class Project_Viewmodel {
 		if (!this.project) return;
 
 		// Generate a unique page name within this project
-		const base_title = 'New Page';
+		const base_title = 'New page';
 		const existing_titles = this.project.pages.map((p) => p.title);
 		const unique_title = get_unique_name(base_title, new Set(existing_titles));
 
@@ -141,7 +141,7 @@ export class Project_Viewmodel {
 		});
 
 		this.project.add_page(page);
-		void goto(`${base}/projects/${this.project_id}/pages/${page_id}`);
+		void goto(resolve(`/projects/${this.project_id}/pages/${page_id}`));
 	}
 
 	/**
@@ -166,7 +166,7 @@ export class Project_Viewmodel {
 		});
 
 		this.project.add_domain(domain);
-		void goto(`${base}/projects/${this.project_id}/domains/${domain_id}`);
+		void goto(resolve(`/projects/${this.project_id}/domains/${domain_id}`));
 	}
 
 	/**
@@ -192,7 +192,7 @@ export class Project_Viewmodel {
 		this.project.add_repo(repo);
 
 		// Navigate to the repo
-		void goto(`${base}/projects/${this.project_id}/repos/${repo_id}`);
+		void goto(resolve(`/projects/${this.project_id}/repos/${repo_id}`));
 	}
 }
 

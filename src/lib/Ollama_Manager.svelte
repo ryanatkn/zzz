@@ -16,12 +16,16 @@
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
 	import Ollama_Model_Listitem from '$lib/Ollama_Model_Listitem.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+	}: {
 		ollama: Ollama;
-	}
+	} = $props();
 
-	const {ollama}: Props = $props();
+	const app = frontend_context.get();
+	const {capabilities} = app;
 
 	// TODO consider "pinning" views so that when others open, they stay open and stable onscreen (but you probably want to rearrange the panels)
 
@@ -35,7 +39,7 @@
 	// like using SvelteKit's snapshots - https://svelte.dev/docs/kit/snapshots
 
 	onMount(() => {
-		void ollama.refresh();
+		void ollama.refresh(); // TODO maybe only if `this.ollama.status === 'initial'` like the capability?
 
 		// TODO @many probably want a different state to capture user intent of enabling polling, but the whole UX may change
 		// Start polling for `ps` status if not already started
@@ -50,39 +54,47 @@
 				}
 			: undefined;
 	});
+
+	const {status} = $derived(capabilities.ollama);
 </script>
 
-<div class="display_flex h_100">
+<div class="display_flex height_100">
 	<!-- sidebar -->
-	<div class="h_100 overflow_hidden width_sm min_width_sm">
-		<div class="h_100 overflow_auto scrollbar_width_thin p_md">
+	<div class="height_100 overflow_hidden width_upto_sm width_atleast_sm">
+		<div class="height_100 overflow_auto scrollbar_width_thin p_md">
 			<!-- status and connection -->
-			<section class="display_flex flex_column gap_md">
+			<section class="display_flex flex_direction_column gap_md">
 				<div class="display_flex gap_sm align_items_start">
 					<div
 						class="flex_1 chip plain display_flex justify_content_start font_weight_400"
-						class:color_b={ollama.list_status === 'success'}
-						class:color_c={ollama.list_status === 'failure'}
-						class:color_d={ollama.list_status === 'pending'}
-						class:color_e={ollama.list_status === 'initial'}
+						class:color_b={ollama.available}
+						class:color_c={!ollama.available && status === 'failure'}
+						class:color_d={!ollama.available && status === 'pending'}
+						class:color_e={!ollama.available && status === 'initial'}
 					>
 						<div class="column justify_content_center gap_xs p_md">
 							<span class="font_size_lg">
-								Ollama {ollama.list_status === 'success'
+								Ollama {ollama.available
 									? `connected`
-									: ollama.list_status === 'failure'
+									: status === 'failure'
 										? 'unavailable'
-										: ollama.list_status === 'pending'
+										: status === 'pending'
 											? 'connecting'
 											: 'not checked'}
-								{#if ollama.list_status === 'pending'}
+								{#if status === 'pending'}
 									<Pending_Animation inline attrs={{class: 'ml_sm'}} />
 								{/if}
 							</span>
 							<div class="font_family_mono font_size_sm">
-								{ollama.host}
-								{#if ollama.list_round_trip_time}
-									<span> → {Math.round(ollama.list_round_trip_time)}ms</span>
+								{#if capabilities.ollama.error_message}
+									{capabilities.ollama.error_message}
+								{:else if !capabilities.backend_available}
+									backend unavailable
+								{:else}
+									{ollama.host}
+									{#if ollama.list_round_trip_time}
+										<span> → {Math.round(ollama.list_round_trip_time)}ms</span>
+									{/if}
 								{/if}
 							</div>
 						</div>
@@ -90,10 +102,10 @@
 				</div>
 
 				<!-- TODO hacky styles, trying a variant of menu styles here, some of which may be upstreamed (plain doesnt currently mix well with others like menu_item and colors) -->
-				<div class="flex_column gap_sm">
+				<div class="flex_direction_column gap_sm">
 					<button
 						type="button"
-						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
+						class="width_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={ollama.manager_selected_view === 'configure'}
 						onclick={() => {
 							ollama.set_manager_view('configure', null);
@@ -105,7 +117,7 @@
 
 					<button
 						type="button"
-						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
+						class="width_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={ollama.manager_selected_view === 'pull'}
 						disabled={!ollama.available}
 						onclick={() => ollama.set_manager_view('pull', null)}
@@ -116,7 +128,7 @@
 
 					<button
 						type="button"
-						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
+						class="width_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={ollama.manager_selected_view === 'create'}
 						disabled={!ollama.available}
 						onclick={() => ollama.set_manager_view('create', null)}
@@ -127,7 +139,7 @@
 
 					<button
 						type="button"
-						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
+						class="width_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={ollama.manager_selected_view === 'copy'}
 						disabled={!ollama.available || ollama.models_downloaded.length === 0}
 						onclick={() => ollama.set_manager_view('copy', null)}
@@ -138,59 +150,61 @@
 				</div>
 			</section>
 
-			{#if ollama.available}
-				{#if ollama.models_downloaded.length > 0}
-					<!-- downloaded mdels -->
+			{#if ollama.models_downloaded.length > 0}
+				<!-- downloaded models -->
+				<section>
+					<h3 class="mt_xl3 mb_md">
+						{ollama.models_downloaded.length} model{plural(ollama.models_downloaded.length)}
+					</h3>
+
+					<menu class="unstyled column">
+						{#each ollama.models_downloaded as model (model.id)}
+							<li transition:slide>
+								<Ollama_Model_Listitem {model} />
+							</li>
+						{/each}
+					</menu>
+				</section>
+				<!-- models not downloaded -->
+				{#if ollama.models_not_downloaded.length > 0}
 					<section>
 						<h3 class="mt_xl3 mb_md">
-							{ollama.models_downloaded.length} model{plural(ollama.models_downloaded.length)}
+							{ollama.models_not_downloaded.length} not downloaded
 						</h3>
 
-						<div class="column">
-							{#each ollama.models_downloaded as model (model.id)}
-								<Ollama_Model_Listitem {model} />
-							{/each}
-						</div>
-					</section>
-					<!-- models not downloaded -->
-					{#if ollama.models_not_downloaded.length > 0}
-						<section>
-							<h3 class="mt_xl3 mb_md">
-								{ollama.models_not_downloaded.length} not downloaded
-							</h3>
-
-							<div class="column">
-								{#each ollama.models_not_downloaded as model (model.id)}
+						<menu class="unstyled column">
+							{#each ollama.models_not_downloaded as model (model.id)}
+								<li transition:slide>
 									<Ollama_Model_Listitem
 										{model}
 										onclick={async () => {
 											await model.navigate_to_download();
 										}}
 									/>
-								{/each}
-							</div>
-						</section>
-					{/if}
-				{:else}
-					<section class="panel p_md" transition:slide>
-						<p>
-							no models found, <button
-								type="button"
-								class="inline compact"
-								disabled={ollama.manager_selected_view === 'pull'}
-								onclick={() => ollama.set_manager_view('pull', null)}>pull a model</button
-							>
-							or install them using the
-							<External_Link href="https://github.com/ollama/ollama">Ollama CLI</External_Link>
-						</p>
+								</li>
+							{/each}
+						</menu>
 					</section>
 				{/if}
+			{:else if ollama.available}
+				<section class="panel p_md" transition:slide>
+					<p>
+						no models found, <button
+							type="button"
+							class="inline compact"
+							disabled={ollama.manager_selected_view === 'pull'}
+							onclick={() => ollama.set_manager_view('pull', null)}>pull a model</button
+						>
+						or install them using the
+						<External_Link href="https://github.com/ollama/ollama">Ollama CLI</External_Link>
+					</p>
+				</section>
 			{/if}
 		</div>
 	</div>
 
 	<!-- main content -->
-	<div class="flex_1 h_100 overflow_auto p_md">
+	<div class="flex_1 height_100 overflow_auto p_md">
 		{#if ollama.manager_selected_view === 'configure'}
 			<Ollama_Configure
 				{ollama}

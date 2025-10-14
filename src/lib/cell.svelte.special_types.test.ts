@@ -136,6 +136,12 @@ test('Cell handles special types like Map and Set', () => {
 		}
 
 		test_decode<K extends Schema_Keys<typeof Collections_Schema>>(value: unknown, key: K): this[K] {
+			// For Map/Set fields, we need to parse through the schema to trigger preprocess
+			const field_schema = this.field_schemas.get(key);
+			if (field_schema) {
+				const parsed = field_schema.parse(value);
+				return parsed as this[K];
+			}
 			return this.decode_property(value, key);
 		}
 	}

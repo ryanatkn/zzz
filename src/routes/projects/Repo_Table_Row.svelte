@@ -1,18 +1,19 @@
 <script lang="ts">
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 	import type {Repo} from '$routes/projects/repo.svelte.js';
 
-	interface Props {
+	const {
+		repo,
+		project_id,
+	}: {
 		repo: Repo;
 		project_id: string;
-	}
-
-	const {repo, project_id}: Props = $props();
+	} = $props();
 </script>
 
 <tr>
 	<td>
-		<a href="{base}/projects/{project_id}/repos/{repo.id}">
+		<a href={resolve(`/projects/${project_id}/repos/${repo.id}`)}>
 			{repo.git_url || '[new repo]'}
 		</a>
 	</td>

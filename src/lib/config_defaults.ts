@@ -12,7 +12,7 @@ import {create_uuid} from '$lib/zod_helpers.js';
 export const SYSTEM_MESSAGE_DEFAULT =
 	'You are a helpful assistant that responds succinctly unless asked for more.';
 export const OUTPUT_TOKEN_MAX_DEFAULT = 1000;
-export const TEMPERATURE_DEFAULT = 0;
+export const TEMPERATURE_DEFAULT: number | undefined = undefined;
 export const SEED_DEFAULT: number | undefined = undefined;
 export const TOP_K_DEFAULT: number | undefined = undefined;
 export const TOP_P_DEFAULT: number | undefined = undefined;
@@ -26,10 +26,38 @@ export const BOTS_DEFAULT = {
 // TODO needs work, hardcoding a bunch of stuff for now, and needs more support for different providers
 
 export const providers_default: Array<Provider_Json_Input> = [
-	{name: 'ollama', title: 'Ollama', url: 'https://github.com/ollama/ollama/tree/main/docs'},
-	{name: 'claude', title: 'Claude', url: 'https://docs.anthropic.com/en/home'},
-	{name: 'chatgpt', title: 'ChatGPT', url: 'https://platform.openai.com/docs/overview'},
-	{name: 'gemini', title: 'Gemini', url: 'https://ai.google.dev/gemini-api/docs/'},
+	{
+		name: 'ollama',
+		title: 'Ollama',
+		url: 'https://github.com/ollama/ollama/tree/main/docs',
+		homepage: 'https://ollama.com/',
+		company: 'Ollama',
+		api_key_url: null,
+	},
+	{
+		name: 'claude',
+		title: 'Claude',
+		url: 'https://docs.anthropic.com/en/home',
+		homepage: 'https://claude.ai/',
+		company: 'Anthropic',
+		api_key_url: 'https://console.anthropic.com/settings/keys',
+	},
+	{
+		name: 'chatgpt',
+		title: 'ChatGPT',
+		url: 'https://platform.openai.com/docs/overview',
+		homepage: 'https://chatgpt.com/',
+		company: 'OpenAI',
+		api_key_url: 'https://platform.openai.com/api-keys',
+	},
+	{
+		name: 'gemini',
+		title: 'Gemini',
+		url: 'https://ai.google.dev/gemini-api/docs/',
+		homepage: 'https://gemini.google.com/',
+		company: 'Google',
+		api_key_url: 'https://aistudio.google.com/app/api-keys',
+	},
 ];
 
 // TODO any data here beyond name/provider_name/tags (and probably some future ones) should be fetched from the provider API
@@ -54,31 +82,21 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 	{name: 'smollm2:360m', provider_name: 'ollama', tags: ['small']},
 	{name: 'smollm2:1.7b', provider_name: 'ollama', tags: ['small']},
 
-	// https://docs.anthropic.com/en/home
-	{name: 'claude-sonnet-4-20250514', provider_name: 'claude', tags: ['smart']}, // name: 'claude-sonnet-4-0'
-	{name: 'claude-opus-4-20250514', provider_name: 'claude', tags: ['smart', 'smarter']}, // name: 'claude-opus-4-0'
-	{name: 'claude-3-7-sonnet-20250219', provider_name: 'claude', tags: ['smart']}, // name: 'claude-3-7-sonnet-latest'
+	// https://docs.claude.com/en/docs/about-claude/models/overview
+	{name: 'claude-sonnet-4-5-20250929', provider_name: 'claude', tags: ['smart']}, // name: 'claude-sonnet-4-0'
+	{name: 'claude-opus-4-1-20250805', provider_name: 'claude', tags: ['smart', 'smartest']}, // name: 'claude-opus-4-0'
 	{name: 'claude-3-5-haiku-20241022', provider_name: 'claude', tags: ['cheap']}, // name: 'claude-3-5-haiku-latest'
 
-	// https://platform.openai.com/docs/overview
-	{name: 'gpt-4.1-nano-2025-04-14', provider_name: 'chatgpt', tags: ['cheap']},
-	{name: 'gpt-4o-mini-2024-07-18', provider_name: 'chatgpt', tags: ['cheap']},
+	// https://platform.openai.com/docs/models
+	{name: 'gpt-5-2025-08-07', provider_name: 'chatgpt', tags: ['smart']},
+	{name: 'gpt-5-nano-2025-08-07', provider_name: 'chatgpt', tags: ['cheap', 'cheaper']},
+	{name: 'gpt-5-mini-2025-08-07', provider_name: 'chatgpt', tags: ['cheap']},
 	{name: 'gpt-4.1-2025-04-14', provider_name: 'chatgpt', tags: ['smart']},
-	{name: 'gpt-4o-2024-08-06', provider_name: 'chatgpt', tags: ['smart']},
-	{name: 'chatgpt-4o-latest', provider_name: 'chatgpt', tags: ['smart']},
-	// access?
-	{name: 'o4-mini-2025-04-16', provider_name: 'chatgpt', tags: ['reasoning']},
-	// no access :[
-	{name: 'o3-2025-04-16', provider_name: 'chatgpt', tags: ['reasoning', 'smart']},
 
 	// https://ai.google.dev/gemini-api/docs/
-	{name: 'gemini-2.5-flash', provider_name: 'gemini', tags: ['cheap']},
 	{name: 'gemini-2.5-pro', provider_name: 'gemini', tags: ['smart']},
-	{
-		name: 'gemini-2.5-flash-lite-preview-06-17',
-		provider_name: 'gemini',
-		tags: ['cheap', 'cheaper'],
-	},
+	{name: 'gemini-2.5-flash', provider_name: 'gemini', tags: ['cheap']},
+	{name: 'gemini-2.5-flash-lite', provider_name: 'gemini', tags: ['cheap', 'cheaper']},
 ];
 
 /**
@@ -88,18 +106,12 @@ export const chat_template_defaults: Array<Chat_Template> = [
 	{
 		id: create_uuid(),
 		name: 'frontier',
-		model_names: ['claude-opus-4-20250514', 'chatgpt-4o-latest', 'gemini-2.5-pro'],
+		model_names: ['claude-sonnet-4-5-20250929', 'gpt-5-2025-08-07', 'gemini-2.5-pro'],
 	},
 	{
 		id: create_uuid(),
 		name: 'cheap frontier',
-		model_names: [
-			'claude-3-5-haiku-20241022',
-			'gpt-4.1-nano-2025-04-14',
-			'gpt-4o-mini-2024-07-18',
-			'gemini-2.5-flash',
-			'gemini-2.5-flash-lite-preview-06-17',
-		],
+		model_names: ['claude-3-5-haiku-20241022', 'gpt-5-nano-2025-08-07', 'gemini-2.5-flash-lite'],
 	},
 	{
 		id: create_uuid(),
@@ -127,5 +139,15 @@ export const chat_template_defaults: Array<Chat_Template> = [
 		id: create_uuid(),
 		name: 'local gemmas',
 		model_names: ['gemma3:1b', 'gemma3n:e2b', 'gemma3n:e4b', 'gemma3:4b'],
+	},
+	{
+		id: create_uuid(),
+		name: 'quick test',
+		model_names: [
+			'gemma3:1b',
+			'claude-3-5-haiku-20241022',
+			'gpt-5-nano-2025-08-07',
+			'gemini-2.5-flash-lite',
+		],
 	},
 ];

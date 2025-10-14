@@ -7,75 +7,199 @@ import {
 	JSONRPC_METHOD_NOT_FOUND,
 	JSONRPC_PARSE_ERROR,
 	type Jsonrpc_Error_Code,
+	type Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
 
 // TODO maybe move some of this to `jsonrpc.ts` and extract the rest to `jsonrpc_helpers.ts`,
 // some of this is awkward, see `create_jsonrpc_error_message`
 // and `create_jsonrpc_error_message_from_thrown` in `jsonrpc_helpers.ts`
 
+// TODO of these, maybe implement `timeout` first, refine the API
+
+/**
+ * Includes standard JSON-RPC error codes and application-specific errors.
+ */
+export type Jsonrpc_Error_Name =
+	| 'parse_error'
+	| 'invalid_request'
+	| 'method_not_found'
+	| 'invalid_params'
+	| 'internal_error'
+	| 'unauthenticated' // begin application-specific errors
+	| 'forbidden'
+	| 'not_found'
+	| 'conflict'
+	| 'validation_error'
+	| 'rate_limited'
+	| 'service_unavailable'
+	| 'timeout'
+	// | 'insufficient_storage'
+	| 'ai_provider_error';
+
 /**
  * Extended JSON-RPC error codes with application-specific errors.
  */
 export const JSONRPC_ERROR_CODES = {
-	// Standard JSON-RPC errors
-	PARSE_ERROR: JSONRPC_PARSE_ERROR,
-	INVALID_REQUEST: JSONRPC_INVALID_REQUEST,
-	METHOD_NOT_FOUND: JSONRPC_METHOD_NOT_FOUND,
-	INVALID_PARAMS: JSONRPC_INVALID_PARAMS,
-	INTERNAL_ERROR: JSONRPC_INTERNAL_ERROR,
+	// Standard JSON-RPC errors - https://www.jsonrpc.org/specification
+	/** -32700 */
+	parse_error: JSONRPC_PARSE_ERROR,
+	/** -32600 */
+	invalid_request: JSONRPC_INVALID_REQUEST,
+	/** -32601 */
+	method_not_found: JSONRPC_METHOD_NOT_FOUND,
+	/** -32602 */
+	invalid_params: JSONRPC_INVALID_PARAMS,
+	/** -32603 */
+	internal_error: JSONRPC_INTERNAL_ERROR,
 
-	// TODO review/use these
-	// Application-specific errors (-32000 to -32099)
-	UNAUTHORIZED: -32001 as Jsonrpc_Error_Code,
-	FORBIDDEN: -32002 as Jsonrpc_Error_Code,
-	NOT_FOUND: -32003 as Jsonrpc_Error_Code,
-	CONFLICT: -32004 as Jsonrpc_Error_Code,
-	VALIDATION_ERROR: -32005 as Jsonrpc_Error_Code,
-	RATE_LIMITED: -32006 as Jsonrpc_Error_Code,
-	SERVICE_UNAVAILABLE: -32007 as Jsonrpc_Error_Code,
-	TIMEOUT: -32008 as Jsonrpc_Error_Code,
-	INSUFFICIENT_STORAGE: -32009 as Jsonrpc_Error_Code,
-	// FILE_TOO_LARGE: -32010 as Jsonrpc_Error_Code,
-	// UNSUPPORTED_MEDIA_TYPE: -32011 as Jsonrpc_Error_Code,
+	// These are the application-specific errors (-32000 to -32099,
+	// JSONRPC_SERVER_ERROR_START to JSONRPC_SERVER_ERROR_END)
+	// defined in the spec - https://www.jsonrpc.org/specification
+
+	// Casts to `Jsonrpc_Error_Code` because parse has a runtime cost
+	// and this is needed for the exported types.
+
+	/**
+	 * Same as HTTP status code 401 "unauthorized", but correctly named.
+	 *
+	 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses
+	 */
+	unauthenticated: -32001 as Jsonrpc_Error_Code,
+	/**
+	 * This could be `unauthorized` for better symmetry with `unauthenticated`,
+	 * but Zzz names it the same as HTTP status code 403 to avoid confusion
+	 * with 401 which is incorrectly named "unauthorized" in HTTP
+	 * (basics were still being figured out, this is backwards compat in action).
+	 *
+	 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses
+	 */
+	forbidden: -32002 as Jsonrpc_Error_Code,
+	not_found: -32003 as Jsonrpc_Error_Code,
+	conflict: -32004 as Jsonrpc_Error_Code,
+	/**
+	 * For application-level validation failures (e.g., business logic validation).
+	 * Use `invalid_params` (-32602) for schema/parsing failures of input parameters.
+	 */
+	validation_error: -32005 as Jsonrpc_Error_Code,
+	rate_limited: -32006 as Jsonrpc_Error_Code,
+	service_unavailable: -32007 as Jsonrpc_Error_Code,
+	timeout: -32008 as Jsonrpc_Error_Code,
+	// insufficient_storage: -32009 as Jsonrpc_Error_Code,
+	// file_too_large: -32010 as Jsonrpc_Error_Code,
+	// unsupported_media_type: -32011 as Jsonrpc_Error_Code,
 
 	// AI provider specific errors
-	AI_PROVIDER_ERROR: -32020 as Jsonrpc_Error_Code,
-	// AI_MODEL_NOT_FOUND: -32021 as Jsonrpc_Error_Code,
-	// AI_QUOTA_EXCEEDED: -32022 as Jsonrpc_Error_Code,
-	// AI_INVALID_REQUEST: -32023 as Jsonrpc_Error_Code,
-} as const satisfies Record<string, Jsonrpc_Error_Code>;
+	ai_provider_error: -32020 as Jsonrpc_Error_Code,
+	// ai_model_not_found: -32021 as Jsonrpc_Error_Code,
+	// ai_quota_exceeded: -32022 as Jsonrpc_Error_Code,
+	// ai_invalid_request: -32023 as Jsonrpc_Error_Code,
+} as const satisfies Record<Jsonrpc_Error_Name, Jsonrpc_Error_Code>;
 
-/**
- * Maps HTTP status codes to JSON-RPC error codes.
- */
-export const http_status_to_jsonrpc_code = (status: number): Jsonrpc_Error_Code => {
-	switch (status) {
-		case 400:
-			return JSONRPC_ERROR_CODES.INVALID_PARAMS;
-		case 401:
-			return JSONRPC_ERROR_CODES.UNAUTHORIZED;
-		case 403:
-			return JSONRPC_ERROR_CODES.FORBIDDEN;
-		case 404:
-			return JSONRPC_ERROR_CODES.NOT_FOUND;
-		case 409:
-			return JSONRPC_ERROR_CODES.CONFLICT;
-		case 422:
-			return JSONRPC_ERROR_CODES.VALIDATION_ERROR;
-		case 429:
-			return JSONRPC_ERROR_CODES.RATE_LIMITED;
-		case 500:
-			return JSONRPC_ERROR_CODES.INTERNAL_ERROR;
-		case 503:
-			return JSONRPC_ERROR_CODES.SERVICE_UNAVAILABLE;
-		case 504:
-			return JSONRPC_ERROR_CODES.TIMEOUT;
-		case 507:
-			return JSONRPC_ERROR_CODES.INSUFFICIENT_STORAGE;
-		default:
-			return JSONRPC_ERROR_CODES.INTERNAL_ERROR;
-	}
-};
+export const jsonrpc_error_messages = {
+	parse_error: (data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.parse_error,
+		message: 'parse error',
+		data,
+	}),
+
+	invalid_request: (data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.invalid_request,
+		message: 'invalid request',
+		data,
+	}),
+
+	method_not_found: (method?: string, data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.method_not_found,
+		message: method ? `method not found: ${method}` : 'method not found',
+		data,
+	}),
+
+	invalid_params: (message?: string, data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.invalid_params,
+		message: message ?? 'invalid params',
+		data,
+	}),
+
+	internal_error: (
+		message: string = 'internal server error',
+		data?: unknown,
+	): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.internal_error,
+		message,
+		data,
+	}),
+
+	unauthenticated: (message: string = 'unauthenticated', data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.unauthenticated,
+		message,
+		data,
+	}),
+
+	forbidden: (message: string = 'forbidden', data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.forbidden,
+		message,
+		data,
+	}),
+
+	not_found: (resource?: string, data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.not_found,
+		message: resource ? `${resource} not found` : 'not found',
+		data,
+	}),
+
+	conflict: (message: string = 'conflict', data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.conflict,
+		message,
+		data,
+	}),
+
+	validation_error: (message: string = 'validation error', data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.validation_error,
+		message,
+		data,
+	}),
+
+	rate_limited: (message: string = 'rate limited', data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.rate_limited,
+		message,
+		data,
+	}),
+
+	service_unavailable: (
+		message: string = 'service unavailable',
+		data?: unknown,
+	): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.service_unavailable,
+		message,
+		data,
+	}),
+
+	timeout: (message: string = 'timeout', data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.timeout,
+		message,
+		data,
+	}),
+
+	// insufficient_storage: (
+	// 	message: string = 'insufficient storage',
+	// 	data?: unknown,
+	// ): Jsonrpc_Error_Json => ({
+	// 	code: JSONRPC_ERROR_CODES.insufficient_storage,
+	// 	message,
+	// 	data,
+	// }),
+
+	ai_provider_error: (provider?: string, message?: string, data?: unknown): Jsonrpc_Error_Json => ({
+		code: JSONRPC_ERROR_CODES.ai_provider_error,
+		message:
+			provider && message
+				? `${provider}: ${message}`
+				: provider
+					? `${provider}: error`
+					: (message ?? 'ai provider error'),
+		data,
+	}),
+} as const satisfies Record<Jsonrpc_Error_Name, (...args: Array<any>) => Jsonrpc_Error_Json>;
 
 /**
  * Custom error class for JSON-RPC errors.
@@ -91,49 +215,29 @@ export class Thrown_Jsonrpc_Error extends Error {
 	}
 }
 
-// TODO we probably want `jsonrpc_error_messages` to replace a lot of code, but how to declare those and these but DRY?
+const create_error_thrower =
+	<T_Fn extends (...args: Array<any>) => Jsonrpc_Error_Json>(
+		error_fn: T_Fn,
+	): ((...args: Parameters<T_Fn>) => Thrown_Jsonrpc_Error) =>
+	(...args: Parameters<T_Fn>) => {
+		const m = error_fn(...args);
+		return new Thrown_Jsonrpc_Error(m.code, m.message, m.data);
+	};
+
 export const jsonrpc_errors = {
-	parse_error: (data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.PARSE_ERROR, 'parse error', data),
-
-	invalid_request: (data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.INVALID_REQUEST, 'invalid request', data),
-
-	method_not_found: (method: string, data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(
-			JSONRPC_ERROR_CODES.METHOD_NOT_FOUND,
-			`method not found: ${method}`,
-			data,
-		),
-
-	invalid_params: (message: string, data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.INVALID_PARAMS, message, data),
-
-	internal_error: (
-		message: string = 'internal server error',
-		data?: unknown,
-	): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.INTERNAL_ERROR, message, data),
-
-	unauthorized: (message: string = 'unauthorized', data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.UNAUTHORIZED, message, data),
-
-	forbidden: (message: string = 'forbidden', data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.FORBIDDEN, message, data),
-
-	not_found: (resource: string, data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.NOT_FOUND, `${resource} not found`, data),
-
-	validation_error: (message: string, data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.VALIDATION_ERROR, message, data),
-
-	service_unavailable_error: (message: string, data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(JSONRPC_ERROR_CODES.SERVICE_UNAVAILABLE, message, data),
-
-	ai_provider_error: (provider: string, message: string, data?: unknown): Thrown_Jsonrpc_Error =>
-		new Thrown_Jsonrpc_Error(
-			JSONRPC_ERROR_CODES.AI_PROVIDER_ERROR,
-			`${provider}: ${message}`,
-			data,
-		),
-};
+	parse_error: create_error_thrower(jsonrpc_error_messages.parse_error),
+	invalid_request: create_error_thrower(jsonrpc_error_messages.invalid_request),
+	method_not_found: create_error_thrower(jsonrpc_error_messages.method_not_found),
+	invalid_params: create_error_thrower(jsonrpc_error_messages.invalid_params),
+	internal_error: create_error_thrower(jsonrpc_error_messages.internal_error),
+	unauthenticated: create_error_thrower(jsonrpc_error_messages.unauthenticated),
+	forbidden: create_error_thrower(jsonrpc_error_messages.forbidden),
+	not_found: create_error_thrower(jsonrpc_error_messages.not_found),
+	validation_error: create_error_thrower(jsonrpc_error_messages.validation_error),
+	conflict: create_error_thrower(jsonrpc_error_messages.conflict),
+	rate_limited: create_error_thrower(jsonrpc_error_messages.rate_limited),
+	service_unavailable: create_error_thrower(jsonrpc_error_messages.service_unavailable),
+	timeout: create_error_thrower(jsonrpc_error_messages.timeout),
+	// insufficient_storage: create_error_thrower(jsonrpc_error_messages.insufficient_storage),
+	ai_provider_error: create_error_thrower(jsonrpc_error_messages.ai_provider_error),
+} as const satisfies Record<Jsonrpc_Error_Name, (...args: Array<any>) => Thrown_Jsonrpc_Error>;

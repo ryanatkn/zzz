@@ -20,7 +20,7 @@
 		{/snippet}
 		<Time_Widget value={app.time.now} />
 	</Dashboard_Header>
-	<section class="width_md">
+	<section class="width_upto_md">
 		<Settings />
 
 		<div class="mt_lg">

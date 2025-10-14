@@ -34,7 +34,7 @@ export const create_sample_projects = (app: Frontend): Array<Project> => {
 					{
 						id: create_uuid(),
 						path: '/',
-						title: 'Home',
+						title: 'home',
 						content: '# Welcome to Zzz\n\nZzz is both a browser and editor for the read-write web.',
 						created: '2023-01-15T12:05:00Z',
 						updated: '2023-01-16T09:30:00Z',
@@ -42,7 +42,7 @@ export const create_sample_projects = (app: Frontend): Array<Project> => {
 					{
 						id: create_uuid(),
 						path: '/about',
-						title: 'About',
+						title: 'about',
 						content:
 							'# About Zzz\n\nZzz is a project that aims to make managing websites routine and easy.',
 						created: '2023-01-15T14:20:00Z',
@@ -55,8 +55,9 @@ export const create_sample_projects = (app: Frontend): Array<Project> => {
 						git_url: 'https://github.com/ryanatkn/zzz.git',
 						checkouts: [
 							{
+								id: create_uuid(),
 								path: './zzz/',
-								label: 'Development',
+								label: 'development',
 								tags: ['main', 'dev'],
 							},
 						],
@@ -118,13 +119,15 @@ export const create_sample_projects = (app: Frontend): Array<Project> => {
 						git_url: 'https://github.com/ryanatkn/dealt.git',
 						checkouts: [
 							{
+								id: create_uuid(),
 								path: './dealt/',
-								label: 'Development',
+								label: 'development',
 								tags: ['main', 'dev'],
 							},
 							{
+								id: create_uuid(),
 								path: './dealt_prod/',
-								label: 'Production',
+								label: 'production',
 								tags: ['deploy', 'prod'],
 							},
 						],

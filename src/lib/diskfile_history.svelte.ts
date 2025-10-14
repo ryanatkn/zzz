@@ -11,7 +11,7 @@ import {create_uuid, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 /**
  * Schema for history entries.
  */
-export const History_Entry = z.object({
+export const History_Entry = z.strictObject({
 	id: Uuid_With_Default,
 	created: z.number(),
 	content: z.string(),
@@ -29,7 +29,7 @@ export const Diskfile_History_Json = Cell_Json.extend({
 	path: Diskfile_Path,
 	entries: z.array(History_Entry).default(() => []),
 	max_entries: z.number().default(100), // TODO rename? `history_size`? `max_size`? `capacity`?
-});
+}).meta({cell_class_name: 'Diskfile_History'});
 export type Diskfile_History_Json = z.infer<typeof Diskfile_History_Json>;
 export type Diskfile_History_Json_Input = z.input<typeof Diskfile_History_Json>;
 

@@ -1,9 +1,9 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Action, Action_Json, Action_Schema, type Action_Json_Input} from '$lib/action.svelte.js';
+import {Action, Action_Json, type Action_Json_Input} from '$lib/action.svelte.js';
 import {Action_Method} from '$lib/action_metatypes.js';
-import {cell_array, HANDLED} from '$lib/cell_helpers.js';
+import {HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -12,11 +12,8 @@ export const HISTORY_LIMIT_DEFAULT = 512;
 export const PONG_DISPLAY_LIMIT = 6;
 
 export const Actions_Json = Cell_Json.extend({
-	items: cell_array(
-		z.array(Action_Json).default(() => []),
-		'Action',
-	),
-});
+	items: z.array(Action_Json).default(() => []),
+}).meta({cell_class_name: 'Actions'});
 export type Actions_Json = z.infer<typeof Actions_Json>;
 export type Actions_Json_Input = z.input<typeof Actions_Json>;
 
@@ -33,7 +30,6 @@ export class Actions extends Cell<typeof Actions_Json> {
 				key: 'by_method',
 				extractor: (action) => action.method,
 				query_schema: Action_Method,
-				result_schema: Action_Schema,
 			}),
 		],
 	});
@@ -41,7 +37,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	// TODO @many refactor this into the Indexed_Collection -- if this state remains we can have a setter that forwards the value
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
-	// TODO think about these
+	// TODO think about these - filter/sort by method/kind?
 	// readonly pings: Array<Action> = $derived(this.items.where('by_method', 'ping'));
 	// get_latest_by_method(method: Action_Method, limit: number = this.history_limit): Array<Action> {
 	// 	return this.items.latest('by_method', method, limit);

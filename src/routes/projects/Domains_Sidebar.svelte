@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {projects_context} from '$routes/projects/projects.svelte.js';
@@ -12,7 +12,7 @@
 	const project_viewmodel = $derived(projects.current_project_viewmodel);
 </script>
 
-<aside class="h_100 overflow_y_auto unstyled width_xs p_xs">
+<aside class="height_100 overflow_y_auto unstyled width_upto_xs p_xs">
 	{#if project_viewmodel}
 		<div class="display_flex">
 			<button
@@ -20,7 +20,7 @@
 				class="plain justify_content_start flex_1"
 				onclick={() => project_viewmodel.create_new_domain()}
 			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new domain
+				<Glyph glyph={GLYPH_ADD} />&nbsp; new domain
 			</button>
 		</div>
 
@@ -30,9 +30,9 @@
 					{#each project_viewmodel.project.domains as domain (domain.id)}
 						<li transition:slide>
 							<Nav_Link
-								href="{base}/projects/{project_viewmodel.project_id}/domains/{domain.id}"
+								href={resolve(`/projects/${project_viewmodel.project_id}/domains/${domain.id}`)}
 								selected={domain.id === projects.current_domain_id}
-								attrs={{title: domain.name}}
+								title={domain.name}
 							>
 								<div class="ellipsis row flex_1 pr_xs">{domain.name || '[new domain]'}</div>
 								<span

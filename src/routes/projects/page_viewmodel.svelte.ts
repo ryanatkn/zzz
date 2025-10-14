@@ -6,7 +6,7 @@ import {goto} from '$app/navigation';
 import {get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
 import {Page} from '$routes/projects/page.svelte.js';
 import type {Projects} from '$routes/projects/projects.svelte.js';
-import {base} from '$app/paths';
+import {resolve} from '$app/paths';
 
 export interface Page_Viewmodel_Options {
 	projects: Projects;
@@ -93,7 +93,7 @@ export class Page_Viewmodel {
 	content: string = $state()!;
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.current_page &&
 			(this.title !== this.current_page.title ||
@@ -178,7 +178,7 @@ export class Page_Viewmodel {
 			this.current_page.updated = now;
 		}
 
-		void goto(`${base}/projects/${this.project_id}/pages`);
+		void goto(resolve(`/projects/${this.project_id}/pages`));
 	}
 }
 

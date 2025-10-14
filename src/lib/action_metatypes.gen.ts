@@ -1,10 +1,11 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
-import {z} from 'zod';
 
 import {get_innermost_type_name} from '$lib/zod_helpers.js';
 import * as action_specs from '$lib/action_specs.js';
 import {is_action_spec} from '$lib/action_spec.js';
 import {Action_Registry} from '$lib/action_registry.js';
+
+// TODO some of these can probably be declared differently without codegen
 
 /**
  * Outputs a file with generated types and schemas using the action specs as the source of truth.
@@ -20,8 +21,10 @@ export const gen: Gen = ({origin_path}) => {
 		// ${banner}
 
 		import {z} from 'zod';
+		import type {Result} from '@ryanatkn/belt/result.js';
 
 		import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
+		import type {Jsonrpc_Error_Json} from '$lib/jsonrpc.js';
 
 		/**
 		 * All action method names. Request/response actions have two types per method.
@@ -73,23 +76,23 @@ export const gen: Gen = ({origin_path}) => {
 
 		/**
 		 * Interface for action dispatch functions.
+		 * All async methods return Result types for type-safe error handling.
+		 * Sync methods (like toggle_main_menu) return values directly.
 		 */
 		export interface Actions_Api {
 			${registry.specs
 				.map((spec) => {
 					const innermost_type_name = get_innermost_type_name(spec.input);
-					const has_input =
-						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodNull &&
-						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
+					const has_input = innermost_type_name !== 'null' && innermost_type_name !== 'void';
+					const is_async = spec.kind === 'request_response' || spec.async;
+					const return_type = is_async
+						? `Promise<Result<{value: Action_Outputs['${spec.method}']}, {error: Jsonrpc_Error_Json}>>`
+						: `Action_Outputs['${spec.method}']`; // Sync method returns value directly
 					return `${spec.method}: (${
 						has_input
-							? `input${spec.input.isOptional() ? '?' : ''}: Action_Inputs['${spec.method}']`
+							? `input${spec.input.safeParse(undefined).success ? '?' : ''}: Action_Inputs['${spec.method}']`
 							: 'input?: void'
-					}) => ${
-						spec.kind === 'request_response' || spec.async
-							? `Promise<Action_Outputs['${spec.method}']>`
-							: `Action_Outputs['${spec.method}']`
-					};`;
+					}) => ${return_type};`;
 				})
 				.join('\n\t')}
 		}

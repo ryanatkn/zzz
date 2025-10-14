@@ -5,26 +5,20 @@
 	import Contextmenu_Submenu from '@ryanatkn/fuz/Contextmenu_Submenu.svelte';
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
-	import {Bit} from '$lib/bit.svelte.js';
+	import {Part} from '$lib/part.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {
-		GLYPH_BIT,
-		GLYPH_DELETE,
-		GLYPH_FILE,
-		GLYPH_LIST,
-		GLYPH_PROMPT,
-		GLYPH_REMOVE,
-	} from '$lib/glyphs.js';
+	import {GLYPH_PART, GLYPH_DELETE, GLYPH_FILE, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		prompt,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		prompt: Prompt;
-	}
-
-	const {prompt, ...rest}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
@@ -47,20 +41,19 @@
 
 			<Contextmenu_Entry
 				run={() => {
-					prompt.add_bit(
-						Bit.create(app, {
+					prompt.add_part(
+						Part.create(app, {
 							type: 'text',
 							content: '',
 						}),
 					);
 				}}
 			>
-				{#snippet icon()}<Glyph glyph={GLYPH_BIT} />{/snippet}
-				<span>add text bit</span>
+				{#snippet icon()}<Glyph glyph={GLYPH_PART} />{/snippet}
+				<span>add text part</span>
 			</Contextmenu_Entry>
 			<Contextmenu_Entry
 				run={() => {
-					// Get all available files
 					if (!app.diskfiles.items.size) {
 						alert('No files available. Add files first.'); // eslint-disable-line no-alert
 						return;
@@ -70,30 +63,18 @@
 				}}
 			>
 				{#snippet icon()}<Glyph glyph={GLYPH_FILE} />{/snippet}
-				<span>add file bit</span>
+				<span>add file part</span>
 			</Contextmenu_Entry>
-			<Contextmenu_Entry
-				run={() => {
-					prompt.add_bit(
-						Bit.create(app, {
-							type: 'sequence',
-						}),
-					);
-				}}
-			>
-				{#snippet icon()}<Glyph glyph={GLYPH_LIST} />{/snippet}
-				<span>add sequence bit</span>
-			</Contextmenu_Entry>
-			{#if prompt.bits.length}
-				<Contextmenu_Entry run={() => prompt.remove_all_bits()}>
+			{#if prompt.parts.length}
+				<Contextmenu_Entry run={() => prompt.remove_all_parts()}>
 					{#snippet icon()}<Glyph glyph={GLYPH_REMOVE} />{/snippet}
-					<span>remove all bits</span>
+					<span>remove all parts</span>
 				</Contextmenu_Entry>
 			{/if}
 			<!-- <Contextmenu_Entry
 				run={() => {
 					// TODO implement
-					// prompt.rename() after bit name picker
+					// prompt.rename() after part name picker
 				}}
 			>
 				{#snippet icon()}<Glyph text={GLYPH_EDIT} />{/snippet}
@@ -121,8 +102,8 @@
 	onpick={(diskfile) => {
 		if (!diskfile) return false;
 
-		prompt.add_bit(
-			Bit.create(app, {
+		prompt.add_part(
+			Part.create(app, {
 				type: 'diskfile',
 				path: diskfile.path,
 			}),

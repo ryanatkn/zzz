@@ -8,19 +8,17 @@
 	const app = frontend_context.get();
 	const {models} = app;
 
-	interface Props {
-		onpick: (model: Model | undefined) => boolean | void;
-		items?: Array<Model>;
-		filter?: ((model: Model) => boolean) | undefined;
-		heading?: string | null;
-	}
-
 	const {
 		items = models.ordered_by_name,
 		onpick,
 		filter,
 		heading = 'pick a model',
-	}: Props = $props();
+	}: {
+		onpick: (model: Model | undefined) => boolean | void;
+		items?: Array<Model>;
+		filter?: ((model: Model) => boolean) | undefined;
+		heading?: string | null;
+	} = $props();
 </script>
 
 <Picker
@@ -38,7 +36,7 @@
 	{heading}
 >
 	{#snippet children(model, pick)}
-		<button type="button" class="listitem compact w_100" onclick={() => pick(model)}>
+		<button type="button" class="listitem compact width_100" onclick={() => pick(model)}>
 			<Model_Listitem {model} />
 		</button>
 	{/snippet}

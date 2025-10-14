@@ -12,33 +12,53 @@ import type {Action_Outputs} from '$lib/action_collections.js';
  * - initiator: 'both' → all valid phases
  */
 export interface Backend_Action_Handlers {
+	completion_create?: {
+		receive_request?: (
+			action_event: Action_Event<'completion_create', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['completion_create'] | Promise<Action_Outputs['completion_create']>;
+		send_response?: (
+			action_event: Action_Event<'completion_create', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'completion_create', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
 	completion_progress?: {
 		send?: (
 			action_event: Action_Event<'completion_progress', Backend, 'send', 'handling'>,
 		) => void | Promise<void>;
 	};
-	create_completion?: {
+	directory_create?: {
 		receive_request?: (
-			action_event: Action_Event<'create_completion', Backend, 'receive_request', 'handling'>,
-		) => Action_Outputs['create_completion'] | Promise<Action_Outputs['create_completion']>;
+			action_event: Action_Event<'directory_create', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['directory_create'] | Promise<Action_Outputs['directory_create']>;
 		send_response?: (
-			action_event: Action_Event<'create_completion', Backend, 'send_response', 'handling'>,
+			action_event: Action_Event<'directory_create', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'directory_create', Backend, 'send_error', 'handling'>,
 		) => void | Promise<void>;
 	};
-	create_directory?: {
+	diskfile_delete?: {
 		receive_request?: (
-			action_event: Action_Event<'create_directory', Backend, 'receive_request', 'handling'>,
-		) => Action_Outputs['create_directory'] | Promise<Action_Outputs['create_directory']>;
+			action_event: Action_Event<'diskfile_delete', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['diskfile_delete'] | Promise<Action_Outputs['diskfile_delete']>;
 		send_response?: (
-			action_event: Action_Event<'create_directory', Backend, 'send_response', 'handling'>,
+			action_event: Action_Event<'diskfile_delete', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'diskfile_delete', Backend, 'send_error', 'handling'>,
 		) => void | Promise<void>;
 	};
-	delete_diskfile?: {
+	diskfile_update?: {
 		receive_request?: (
-			action_event: Action_Event<'delete_diskfile', Backend, 'receive_request', 'handling'>,
-		) => Action_Outputs['delete_diskfile'] | Promise<Action_Outputs['delete_diskfile']>;
+			action_event: Action_Event<'diskfile_update', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['diskfile_update'] | Promise<Action_Outputs['diskfile_update']>;
 		send_response?: (
-			action_event: Action_Event<'delete_diskfile', Backend, 'send_response', 'handling'>,
+			action_event: Action_Event<'diskfile_update', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'diskfile_update', Backend, 'send_error', 'handling'>,
 		) => void | Promise<void>;
 	};
 	filer_change?: {
@@ -46,27 +66,111 @@ export interface Backend_Action_Handlers {
 			action_event: Action_Event<'filer_change', Backend, 'send', 'handling'>,
 		) => void | Promise<void>;
 	};
-	load_session?: {
+	ollama_copy?: {
 		receive_request?: (
-			action_event: Action_Event<'load_session', Backend, 'receive_request', 'handling'>,
-		) => Action_Outputs['load_session'] | Promise<Action_Outputs['load_session']>;
+			action_event: Action_Event<'ollama_copy', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_copy'] | Promise<Action_Outputs['ollama_copy']>;
 		send_response?: (
-			action_event: Action_Event<'load_session', Backend, 'send_response', 'handling'>,
+			action_event: Action_Event<'ollama_copy', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ollama_copy', Backend, 'send_error', 'handling'>,
 		) => void | Promise<void>;
 	};
-	ollama_copy?: never;
-	ollama_create?: never;
-	ollama_delete?: never;
-	ollama_list?: never;
-	ollama_ps?: never;
-	ollama_pull?: never;
-	ollama_show?: never;
+	ollama_create?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_create', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_create'] | Promise<Action_Outputs['ollama_create']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_create', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ollama_create', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_delete?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_delete', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_delete'] | Promise<Action_Outputs['ollama_delete']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_delete', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ollama_delete', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_list?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_list', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_list'] | Promise<Action_Outputs['ollama_list']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_list', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ollama_list', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_progress?: {
+		send?: (
+			action_event: Action_Event<'ollama_progress', Backend, 'send', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_ps?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_ps', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_ps'] | Promise<Action_Outputs['ollama_ps']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_ps', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ollama_ps', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_pull?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_pull', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_pull'] | Promise<Action_Outputs['ollama_pull']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_pull', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ollama_pull', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_show?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_show', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_show'] | Promise<Action_Outputs['ollama_show']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_show', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ollama_show', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
+	ollama_unload?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_unload', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_unload'] | Promise<Action_Outputs['ollama_unload']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_unload', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ollama_unload', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
 	ping?: {
 		send_request?: (
 			action_event: Action_Event<'ping', Backend, 'send_request', 'handling'>,
 		) => void | Promise<void>;
 		receive_response?: (
 			action_event: Action_Event<'ping', Backend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'ping', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+		receive_error?: (
+			action_event: Action_Event<'ping', Backend, 'receive_error', 'handling'>,
 		) => void | Promise<void>;
 		receive_request?: (
 			action_event: Action_Event<'ping', Backend, 'receive_request', 'handling'>,
@@ -75,15 +179,42 @@ export interface Backend_Action_Handlers {
 			action_event: Action_Event<'ping', Backend, 'send_response', 'handling'>,
 		) => void | Promise<void>;
 	};
-	toggle_main_menu?: never;
-	update_diskfile?: {
+	provider_load_status?: {
 		receive_request?: (
-			action_event: Action_Event<'update_diskfile', Backend, 'receive_request', 'handling'>,
-		) => Action_Outputs['update_diskfile'] | Promise<Action_Outputs['update_diskfile']>;
+			action_event: Action_Event<'provider_load_status', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['provider_load_status'] | Promise<Action_Outputs['provider_load_status']>;
 		send_response?: (
-			action_event: Action_Event<'update_diskfile', Backend, 'send_response', 'handling'>,
+			action_event: Action_Event<'provider_load_status', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'provider_load_status', Backend, 'send_error', 'handling'>,
 		) => void | Promise<void>;
 	};
+	provider_update_api_key?: {
+		receive_request?: (
+			action_event: Action_Event<'provider_update_api_key', Backend, 'receive_request', 'handling'>,
+		) =>
+			| Action_Outputs['provider_update_api_key']
+			| Promise<Action_Outputs['provider_update_api_key']>;
+		send_response?: (
+			action_event: Action_Event<'provider_update_api_key', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'provider_update_api_key', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
+	session_load?: {
+		receive_request?: (
+			action_event: Action_Event<'session_load', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['session_load'] | Promise<Action_Outputs['session_load']>;
+		send_response?: (
+			action_event: Action_Event<'session_load', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+		send_error?: (
+			action_event: Action_Event<'session_load', Backend, 'send_error', 'handling'>,
+		) => void | Promise<void>;
+	};
+	toggle_main_menu?: never;
 }
 
 // generated by src/lib/server/backend_action_types.gen.ts - DO NOT EDIT OR RISK LOST DATA

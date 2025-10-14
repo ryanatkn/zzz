@@ -17,12 +17,13 @@
 	import Browser_Tab_Listitem from '$routes/tabs/Browser_Tab_Listitem.svelte';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 
-	interface Props {
+	const {
+		browser,
+		children,
+	}: {
 		browser: Browser;
 		children: Snippet;
-	}
-
-	const {browser, children}: Props = $props();
+	} = $props();
 
 	const tabs_reorderable = new Reorderable({item_class: null}); // remove the normal reorderable item styling
 </script>
@@ -62,17 +63,17 @@
 />
 
 <div class="browser_container">
-	<!-- Browser Chrome/Header -->
+	<!-- browser chrome/header -->
 	<div class="browser_chrome">
-		<!-- Tab Bar -->
+		<!-- tab bar -->
 		<ul
 			class="browser_tab_bar unstyled display_flex overflow_x_auto overflow_y_hidden scrollbar_width_thin"
-			use:tabs_reorderable.list={{
+			{@attach tabs_reorderable.list({
 				onreorder: (from_index, to_index) => browser.reorder_tab(from_index, to_index),
-			}}
+			})}
 		>
 			{#each browser.tabs.ordered_tabs as tab, index (tab.id)}
-				<li class="display_flex" use:tabs_reorderable.item={{index}}>
+				<li class="display_flex" {@attach tabs_reorderable.item({index})}>
 					<Browser_Tab_Listitem
 						{tab}
 						{index}
@@ -97,7 +98,7 @@
 			</div>
 		</ul>
 
-		<!-- Navigation Controls & Address Bar -->
+		<!-- navigation controls & address bar -->
 		<div class="browser_controls display_flex gap_sm p_xs4">
 			<div class="browser_nav_buttons display_flex gap_xs">
 				<button
@@ -128,12 +129,13 @@
 				</button>
 			</div>
 
-			<!-- Address Bar -->
+			<!-- address bar -->
 			<div class="browser_address_bar flex_1">
 				<input
 					type="text"
 					bind:value={browser.edited_url}
-					class="w_100 plain border_radius_lg"
+					class="width_100 plain"
+					class:url_edited={browser.url_edited}
 					onkeypress={(e) => {
 						if (e.key === 'Enter') {
 							browser.submit_edited_url();
@@ -143,7 +145,7 @@
 				/>
 			</div>
 
-			<!-- Main Menu -->
+			<!-- main menu -->
 			<div class="display_flex gap_xs">
 				<button
 					type="button"
@@ -158,7 +160,7 @@
 		</div>
 	</div>
 
-	<!-- Browser Content Area (Shows selected tab content) -->
+	<!-- selected tab content area -->
 	<div class="browser_content">
 		{#if browser.tabs.selected_tab}
 			<Browser_Tab_Content tab={browser.tabs.selected_tab}>
@@ -194,5 +196,10 @@
 
 	.browser_address_bar input {
 		background: transparent;
+	}
+
+	.browser_address_bar input.url_edited {
+		box-shadow: var(--shadow_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 	}
 </style>

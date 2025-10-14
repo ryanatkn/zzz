@@ -38,12 +38,12 @@
 								class="color_a"
 								onclick={() => project_viewmodel.create_new_repo()}
 							>
-								<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add your first repo
+								<Glyph glyph={GLYPH_ADD} />&nbsp; add your first repo
 							</button>
 						</p>
 					</div>
 				{:else}
-					<table class="w_100">
+					<table class="width_100">
 						<thead>
 							<tr>
 								<th>repo</th>
@@ -62,7 +62,7 @@
 
 				<div>
 					<button type="button" class="color_a" onclick={() => project_viewmodel.create_new_repo()}>
-						<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new repo
+						<Glyph glyph={GLYPH_ADD} />&nbsp; new repo
 					</button>
 				</div>
 			</div>

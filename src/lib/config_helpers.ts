@@ -14,7 +14,7 @@ export interface Zzz_Config {
 	models: Array<Model_Json_Input>;
 	system_message: string;
 	output_token_max: number;
-	temperature: number;
+	temperature: number | undefined;
 	seed: number | undefined;
 	top_k: number | undefined;
 	top_p: number | undefined;

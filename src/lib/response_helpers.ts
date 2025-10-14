@@ -11,7 +11,7 @@ import type {Model_Name} from '$lib/model.svelte.js';
  */
 export const to_completion_response_text = (
 	completion_response:
-		| Action_Outputs['create_completion']['completion_response']
+		| Action_Outputs['completion_create']['completion_response']
 		| null
 		| undefined,
 ): string | null => {
@@ -43,7 +43,7 @@ export const to_completion_result = (
 	model: Model_Name,
 	api_response: unknown, // TODO types
 	progress_token?: Uuid,
-): Action_Outputs['create_completion'] => {
+): Action_Outputs['completion_create'] => {
 	let provider_data: Provider_Data;
 
 	// Convert provider-specific response format to our standard format
@@ -86,7 +86,7 @@ export const to_completion_result = (
 
 	const created = get_datetime_now();
 
-	const output: Action_Outputs['create_completion'] = {
+	const output: Action_Outputs['completion_create'] = {
 		completion_response: {
 			created,
 			provider_name,

@@ -1,8 +1,8 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Model, Model_Json, Model_Schema, type Model_Json_Input} from '$lib/model.svelte.js';
-import {cell_array, HANDLED} from '$lib/cell_helpers.js';
+import {Model, Model_Json, type Model_Json_Input} from '$lib/model.svelte.js';
+import {HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
@@ -12,11 +12,8 @@ import {
 import {Cell_Json} from '$lib/cell_types.js';
 
 export const Models_Json = Cell_Json.extend({
-	items: cell_array(
-		z.array(Model_Json).default(() => []),
-		'Model',
-	),
-});
+	items: z.array(Model_Json).default(() => []),
+}).meta({cell_class_name: 'Models'});
 export type Models_Json = z.infer<typeof Models_Json>;
 export type Models_Json_Input = z.input<typeof Models_Json>;
 
@@ -34,14 +31,12 @@ export class Models extends Cell<typeof Models_Json> {
 				key: 'name',
 				extractor: (model) => model.name,
 				query_schema: z.string(),
-				result_schema: Model_Schema,
 			}),
 
 			create_multi_index({
 				key: 'provider_name',
 				extractor: (model) => model.provider_name,
 				query_schema: z.string(),
-				result_schema: Model_Schema,
 			}),
 
 			create_multi_index({
@@ -49,14 +44,12 @@ export class Models extends Cell<typeof Models_Json> {
 				extractor: (model) => model.tags,
 				query_schema: z.string(),
 				matches: (model) => model.tags.length > 0,
-				result_schema: Model_Schema,
 			}),
 
 			create_derived_index({
 				key: 'ordered_by_name',
 				compute: (collection) => collection.values,
 				sort: (a, b) => a.name.localeCompare(b.name),
-				result_schema: z.array(Model_Schema),
 			}),
 		],
 	});

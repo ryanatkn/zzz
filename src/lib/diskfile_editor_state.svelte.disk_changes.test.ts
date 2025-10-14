@@ -5,14 +5,14 @@
 import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
-import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
+import {Diskfile_Path, Serializable_Disknode} from '$lib/diskfile_types.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
 const TEST_PATH = Diskfile_Path.parse('/path/to/test.txt');
-const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
+const TEST_DIR = Serializable_Disknode.shape.source_dir.parse('/path/');
 const TEST_CONTENT = 'This is test content';
 
 // Test suite variables
@@ -25,13 +25,11 @@ beforeEach(() => {
 	app = monkeypatch_zzz_for_tests(new Frontend());
 
 	// Create a real diskfile through the registry
-	test_diskfile = app.diskfiles.add(
-		app.cell_registry.instantiate('Diskfile', {
-			path: TEST_PATH,
-			source_dir: TEST_DIR,
-			content: TEST_CONTENT,
-		}),
-	);
+	test_diskfile = app.diskfiles.add({
+		path: TEST_PATH,
+		source_dir: TEST_DIR,
+		content: TEST_CONTENT,
+	});
 
 	// Create the editor state with real components
 	editor_state = new Diskfile_Editor_State({
@@ -110,13 +108,11 @@ describe('disk change detection', () => {
 
 	test('handles first-time initialization correctly', () => {
 		// Create a new diskfile with uninitialized last_seen_disk_content
-		const new_diskfile = app.diskfiles.add(
-			app.cell_registry.instantiate('Diskfile', {
-				path: Diskfile_Path.parse('/new/file.txt'),
-				source_dir: Serializable_Source_File.shape.source_dir.parse('/new/'),
-				content: 'Initial content',
-			}),
-		);
+		const new_diskfile = app.diskfiles.add({
+			path: Diskfile_Path.parse('/new/file.txt'),
+			source_dir: Serializable_Disknode.shape.source_dir.parse('/new/'),
+			content: 'Initial content',
+		});
 
 		const new_editor_state = new Diskfile_Editor_State({
 			app,
@@ -327,13 +323,11 @@ describe('edge cases', () => {
 	test('handles disk changes when history is empty', () => {
 		// Create a new diskfile with a custom path
 		const empty_history_path = Diskfile_Path.parse('/empty/history.txt');
-		const empty_history_diskfile = app.diskfiles.add(
-			app.cell_registry.instantiate('Diskfile', {
-				path: empty_history_path,
-				source_dir: Serializable_Source_File.shape.source_dir.parse('/empty/'),
-				content: 'Initial',
-			}),
-		);
+		const empty_history_diskfile = app.diskfiles.add({
+			path: empty_history_path,
+			source_dir: Serializable_Disknode.shape.source_dir.parse('/empty/'),
+			content: 'Initial',
+		});
 
 		// Create editor state but clear the history manually
 		const empty_history_editor = new Diskfile_Editor_State({

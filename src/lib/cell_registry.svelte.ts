@@ -116,6 +116,8 @@ export class Cell_Registry {
 				cell === this.all.get(cell.id)
 					? `registry already has this cell instance: ${cell.id}`
 					: `registry already has a different cell instance with this id: ${cell.id}`,
+				cell.toJSON(),
+				this.all.get(cell.id)?.toJSON(),
 			);
 		}
 		this.all.set(cell.id, cell);

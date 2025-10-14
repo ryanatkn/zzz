@@ -3,13 +3,7 @@
 import {describe, test, expect} from 'vitest';
 import {z} from 'zod';
 
-import {
-	get_schema_class_info,
-	cell_class,
-	cell_array,
-	ZOD_CELL_CLASS_NAME,
-	ZOD_ELEMENT_CLASS_NAME,
-} from '$lib/cell_helpers.js';
+import {get_schema_class_info} from '$lib/cell_helpers.js';
 
 describe('get_schema_class_info', () => {
 	test('handles null or undefined schemas', () => {
@@ -85,42 +79,38 @@ describe('get_schema_class_info', () => {
 
 	test('detects class names set with cell_class', () => {
 		const schema = z.object({id: z.string()});
-		const schema_with_class = cell_class(schema, 'Test_Class');
+		const schema_with_class = schema.meta({cell_class_name: 'Test_Class'});
 
 		const info = get_schema_class_info(schema_with_class);
 		expect(info?.class_name).toBe('Test_Class');
 	});
 
-	test('detects element classes set with cell_array', () => {
-		const array_schema = z.array(z.string());
-		const array_with_class = cell_array(array_schema, 'Element_Class');
+	test('detects element classes from element metadata', () => {
+		const element_schema = z.string().meta({cell_class_name: 'Element_Class'});
+		const array_schema = z.array(element_schema);
 
-		const info = get_schema_class_info(array_with_class);
+		const info = get_schema_class_info(array_schema);
 		expect(info?.is_array).toBe(true);
 		expect(info?.element_class).toBe('Element_Class');
 	});
 
-	test('handles default-wrapped array with element class', () => {
-		const array_schema = z.array(z.string()).default([]);
-		const array_with_class = cell_array(array_schema, 'Element_Class');
+	test('handles default-wrapped array with element metadata', () => {
+		const element_schema = z.string().meta({cell_class_name: 'Element_Class'});
+		const array_schema = z.array(element_schema).default([]);
 
-		const info = get_schema_class_info(array_with_class);
+		const info = get_schema_class_info(array_schema);
 		expect(info?.is_array).toBe(true);
 		expect(info?.element_class).toBe('Element_Class');
 	});
 
-	test('directly inspects array schema internal structure', () => {
-		// This test looks at the internal structure of ZodArray to verify our assumptions
-		const array_schema = z.array(z.string());
+	test('reads element class from nested element schema', () => {
+		// Test that metadata on element schema is properly read
+		const element_schema = z
+			.object({name: z.string()})
+			.meta({cell_class_name: 'Direct_Element_Class'});
+		const array_schema = z.array(element_schema);
 
-		// Check that the schema has the expected internal structure
-		expect(array_schema._def).toBeDefined();
-		expect(array_schema._def.typeName).toBe('ZodArray');
-
-		// Now add the element class metadata
-		(array_schema._def as any)[ZOD_ELEMENT_CLASS_NAME] = 'Direct_Element_Class';
-
-		// Verify that get_schema_class_info can read this metadata
+		// Verify that get_schema_class_info can read element metadata
 		const info = get_schema_class_info(array_schema);
 		expect(info?.is_array).toBe(true);
 		expect(info?.element_class).toBe('Direct_Element_Class');
@@ -132,10 +122,10 @@ describe('get_schema_class_info', () => {
 		const array_schema_default = array_schema.default([]);
 
 		// We can see what the internal structure of ZodDefault looks like
-		expect(array_schema_default._def).toBeDefined();
-		expect(array_schema_default._def.typeName).toBe('ZodDefault');
-		expect(array_schema_default._def.innerType).toBeDefined();
-		expect(array_schema_default._def.innerType._def.typeName).toBe('ZodArray');
+		expect(array_schema_default._zod.def).toBeDefined();
+		expect(array_schema_default._zod.def.type).toBe('default');
+		expect(array_schema_default._zod.def.innerType).toBeDefined();
+		expect(array_schema_default._zod.def.innerType.def.type).toBe('array');
 
 		// Now test the function with our default-wrapped array
 		const info = get_schema_class_info(array_schema_default);
@@ -197,9 +187,9 @@ describe('get_schema_class_info', () => {
 	});
 
 	test('recursive unwrapping preserves metadata through wrappers', () => {
-		// Create an array with element class metadata
-		const array_with_class = z.array(z.string());
-		(array_with_class._def as any)[ZOD_ELEMENT_CLASS_NAME] = 'Test_Element';
+		// Create an array with element that has metadata
+		const element = z.string().meta({cell_class_name: 'Test_Element'});
+		const array_with_class = z.array(element);
 
 		// Wrap it multiple times
 		const wrapped_array = array_with_class.optional().default([]);
@@ -210,67 +200,28 @@ describe('get_schema_class_info', () => {
 		expect(info?.is_array).toBe(true);
 	});
 
-	test('handles cell_array with deeply nested schemas', () => {
-		// Create a deeply nested schema and apply cell_array
-		const nested_schema = z.array(z.string()).optional().default([]);
-		const result = cell_array(nested_schema, 'Nested_Element');
+	test('handles deeply nested schemas with element metadata', () => {
+		// Create a deeply nested schema with element metadata
+		const element = z.string().meta({cell_class_name: 'Nested_Element'});
+		const nested_schema = z.array(element).optional().default([]);
 
-		// Verify metadata was attached correctly through the wrappers
-		const info = get_schema_class_info(result);
+		// Verify metadata is found correctly through the wrappers
+		const info = get_schema_class_info(nested_schema);
 		expect(info?.is_array).toBe(true);
 		expect(info?.element_class).toBe('Nested_Element');
-	});
-});
-
-describe('cell_array', () => {
-	test('adds element class metadata to direct array schemas', () => {
-		const array_schema = z.array(z.string());
-		cell_array(array_schema, 'Test_Element');
-
-		// Verify metadata was added
-		expect((array_schema._def as any)[ZOD_ELEMENT_CLASS_NAME]).toBe('Test_Element');
-
-		// Get schema info should report it correctly
-		const info = get_schema_class_info(array_schema);
-		expect(info?.element_class).toBe('Test_Element');
-	});
-
-	test('adds element class metadata to default-wrapped array schemas', () => {
-		const array_schema = z.array(z.string()).default([]);
-		cell_array(array_schema, 'Default_Test_Element');
-
-		// Verify metadata was added to inner ZodArray, not ZodDefault
-		const inner_array = array_schema._def.innerType;
-		expect((inner_array._def as any)[ZOD_ELEMENT_CLASS_NAME]).toBe('Default_Test_Element');
-
-		// Get schema info should report it correctly
-		const info = get_schema_class_info(array_schema);
-		expect(info?.element_class).toBe('Default_Test_Element');
-	});
-
-	test('handles errors gracefully with non-array schemas', () => {
-		const string_schema = z.string();
-		// This should not throw but should log an error
-		const result = cell_array(string_schema, 'Should_Not_Apply');
-
-		// Should return the original schema unmodified
-		expect(result).toBe(string_schema);
-
-		// Should not have added the metadata
-		expect((string_schema as any)[ZOD_ELEMENT_CLASS_NAME]).toBeUndefined();
 	});
 });
 
 describe('cell_class', () => {
 	test('adds class name metadata to schemas', () => {
 		const schema = z.object({name: z.string()});
-		const result = cell_class(schema, 'Test_Cell_Class');
+		const result = schema.meta({cell_class_name: 'Test_Cell_Class'});
 
-		// Should add the metadata
-		expect((result as any)[ZOD_CELL_CLASS_NAME]).toBe('Test_Cell_Class');
+		// Should add the metadata via .meta()
+		expect(result.meta()?.cell_class_name).toBe('Test_Cell_Class');
 
-		// Should return the same schema instance
-		expect(result).toBe(schema);
+		// Should return a new schema instance (due to .meta() creating a new instance)
+		expect(result).not.toBe(schema);
 
 		// Get schema info should report it correctly
 		const info = get_schema_class_info(result);

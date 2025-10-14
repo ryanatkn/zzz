@@ -6,20 +6,19 @@
 	import {GLYPH_CLEAR} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+	}: {
 		ollama: Ollama;
-	}
+	} = $props();
 
-	const {ollama}: Props = $props();
-
-	// Clear completed actions
 	const clear_completed_actions = () => {
-		const completed_action_ids = ollama.completed_actions.map((action) => action.id);
+		const completed_action_ids = ollama.completed_actions.map((a) => a.id);
 		ollama.app.actions.items.remove_many(completed_action_ids);
 	};
 </script>
 
-<div class="panel p_md width_md">
+<div class="panel p_md width_upto_md">
 	<div class="display_flex justify_content_space_between align_items_center mb_md">
 		<h4 class="mt_0 mb_0">action history</h4>
 		<div class="display_flex gap_xs align_items_center">

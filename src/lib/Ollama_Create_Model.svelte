@@ -6,13 +6,15 @@
 	import {GLYPH_ADD, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+		onclose,
+		onshowpull,
+	}: {
 		ollama: Ollama;
 		onclose: () => void;
 		onshowpull: () => void;
-	}
-
-	const {ollama, onclose, onshowpull}: Props = $props();
+	} = $props();
 
 	const handle_create = async () => {
 		await ollama.create();
@@ -36,7 +38,7 @@
 		</button>
 	</header>
 
-	<section class="width_md display_flex flex_column gap_md">
+	<section class="width_upto_md display_flex flex_direction_column gap_md">
 		<p>
 			This creates a new custom modelfile, to download a builtin model see <button
 				type="button"
@@ -50,7 +52,7 @@
 				<div class="title mb_xs">new model name</div>
 				<input
 					type="text"
-					class="plain w_100"
+					class="plain width_100"
 					placeholder="{GLYPH_PLACEHOLDER} my-custom-model"
 					bind:value={ollama.create_model_name}
 					onkeydown={handle_keydown}
@@ -64,7 +66,7 @@
 				<div class="title mb_xs">base model (optional)</div>
 				{#if ollama.model_names.length > 0}
 					<select
-						class="plain w_100"
+						class="plain width_100"
 						bind:value={ollama.create_from_model}
 						disabled={ollama.create_is_creating}
 					>
@@ -76,7 +78,7 @@
 				{:else}
 					<input
 						type="text"
-						class="plain w_100"
+						class="plain width_100"
 						placeholder="{GLYPH_PLACEHOLDER} base model name"
 						bind:value={ollama.create_from_model}
 						onkeydown={handle_keydown}
@@ -91,7 +93,7 @@
 			<label>
 				<div class="title mb_xs">system prompt (optional)</div>
 				<textarea
-					class="plain w_100"
+					class="plain width_100"
 					rows="4"
 					placeholder="{GLYPH_PLACEHOLDER} You are a helpful assistant..."
 					bind:value={ollama.create_system_prompt}
@@ -106,7 +108,7 @@
 				<div class="title mb_xs">template (optional)</div>
 				<!-- Custom template using Ollama template syntax -->
 				<textarea
-					class="plain w_100"
+					class="plain width_100"
 					rows="3"
 					placeholder="{GLYPH_PLACEHOLDER} {'{{{ .System }}}'} {'{{{ .Prompt }}}'}"
 					bind:value={ollama.create_template}

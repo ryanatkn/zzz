@@ -2,7 +2,7 @@
 	// @slop Claude Opus 4
 
 	import {goto} from '$app/navigation';
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
@@ -39,7 +39,7 @@
 			controller.delete_project_page(page_viewmodel.page_id);
 
 			// Navigate back to pages list
-			void goto(`${base}/projects/${page_viewmodel.project_id}/pages`);
+			void goto(resolve(`/projects/${page_viewmodel.project_id}/pages`));
 		}
 	};
 
@@ -53,14 +53,12 @@
 			{@html page_viewmodel?.formatted_content}
 		</div>
 
-		<!-- Close preview button in top-right corner -->
+		<!-- preview toggle button in top-right corner -->
 		<button
 			type="button"
-			class="position_fixed t_0 r_0 icon_button plain border_radius_xs2"
-			style:border-top-right-radius="0"
-			style:border-bottom-left-radius="var(--border_radius_lg)"
-			aria-label="Close preview"
-			title="Close preview"
+			class="position_fixed top_0 right_0 icon_button plain border_radius_0"
+			aria-label="close preview"
+			title="close preview"
 			onclick={toggle_preview}
 		>
 			<Glyph glyph={GLYPH_PREVIEW} />
@@ -77,7 +75,7 @@
 
 		<div class="editor_content">
 			{#if page_viewmodel && project}
-				<div class="h_100 column p_lg">
+				<div class="height_100 column p_lg">
 					<div>
 						<div class="display_flex gap_sm align_items_center">
 							<h1 class="mb_lg">
@@ -85,7 +83,7 @@
 							</h1>
 						</div>
 
-						<div class="display_flex w_100 justify_content_space_between gap_sm mb_lg">
+						<div class="display_flex width_100 justify_content_space_between gap_sm mb_lg">
 							<div class="display_flex gap_sm">
 								<button
 									type="button"
@@ -97,12 +95,12 @@
 								</button>
 
 								<button type="button" onclick={toggle_preview} class="plain" title="Preview page">
-									<Glyph glyph={GLYPH_PREVIEW} attrs={{class: 'mr_xs2'}} /> preview
+									<Glyph glyph={GLYPH_PREVIEW} />&nbsp; preview
 								</button>
 							</div>
 
 							<button type="button" onclick={delete_page} class="color_c"
-								><Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete</button
+								><Glyph glyph={GLYPH_DELETE} />&nbsp; delete</button
 							>
 						</div>
 					</div>
@@ -115,7 +113,7 @@
 									<input
 										type="text"
 										bind:value={page_viewmodel.title}
-										class="w_100"
+										class="width_100"
 										placeholder="page title"
 									/>
 								</label>
@@ -126,7 +124,7 @@
 									<input
 										type="text"
 										bind:value={page_viewmodel.path}
-										class="w_100"
+										class="width_100"
 										placeholder="/page-path"
 									/>
 								</label>
@@ -138,7 +136,7 @@
 						<div class="panel p_md content_area">
 							<textarea
 								bind:value={page_viewmodel.content}
-								class="w_100 h_100 markdown_editor"
+								class="width_100 height_100 markdown_editor"
 								placeholder="{GLYPH_PLACEHOLDER} markup"
 							></textarea>
 						</div>

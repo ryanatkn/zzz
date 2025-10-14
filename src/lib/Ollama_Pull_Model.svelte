@@ -8,22 +8,21 @@
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+		onclose,
+		oncancel,
+	}: {
 		ollama: Ollama;
 		onclose?: () => void;
 		oncancel?: () => void;
-	}
-
-	const {ollama, onclose, oncancel}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
 	const {models_not_downloaded} = $derived(app.ollama);
 
-	// Filter actions to show only pull operations
-	const pull_actions = $derived(
-		ollama.actions.filter((action) => action.method === 'ollama_pull').reverse(),
-	);
+	const pull_actions = $derived(ollama.actions.filter((a) => a.method === 'ollama_pull')); // TODO index?
 
 	const handle_pull = async () => {
 		onclose?.();
@@ -51,7 +50,7 @@
 		</button>
 	</header>
 
-	<div class="width_md display_flex flex_column gap_md">
+	<div class="width_upto_md display_flex flex_direction_column gap_md">
 		<p>This downloads a builtin model so you can use it locally.</p>
 
 		<fieldset>
@@ -59,7 +58,7 @@
 				<div class="title">model name</div>
 				<input
 					type="text"
-					class="plain w_100"
+					class="plain width_100"
 					placeholder="{GLYPH_PLACEHOLDER} e.g., llama3.1, mistral, codellama"
 					bind:value={ollama.pull_model_name}
 					onkeydown={handle_keydown}
@@ -75,7 +74,7 @@
 				{:else}.{/if}
 			</p>
 			{#if models_not_downloaded.length > 0}
-				<div class="display_flex flex_wrap gap_xs">
+				<div class="display_flex flex_wrap_wrap gap_xs">
 					{#each models_not_downloaded as model (model.id)}
 						<button
 							type="button"

@@ -1,35 +1,41 @@
 <script lang="ts">
 	import type {Chat} from '$lib/chat.svelte.js';
-	import type {Tape} from '$lib/tape.svelte.js';
-	import Chat_Tape from '$lib/Chat_Tape.svelte';
-	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
+	import type {Thread} from '$lib/thread.svelte.js';
+	import Chat_Thread from '$lib/Chat_Thread.svelte';
+	import Chat_Thread_Add_By_Model from '$lib/Chat_Thread_Add_By_Model.svelte';
+	import Chat_Thread_Manage_By_Tag from '$lib/Chat_Thread_Manage_By_Tag.svelte';
 
-	interface Props {
+	const {
+		chat,
+		thread,
+	}: {
 		chat: Chat;
-		tape: Tape | undefined;
-	}
+		thread: Thread | undefined;
+	} = $props();
 
-	const {chat, tape}: Props = $props();
+	const turn_count = $derived(thread?.turns.size);
 
-	const strip_count = $derived(tape?.strips.size);
-
-	const empty = $derived(!strip_count);
+	const empty = $derived(!turn_count);
 </script>
 
 <!-- TODO the overflow change is hacky, allows the shadow to overlap the sidebar -->
-<div
-	class="column_fluid column flex_1"
-	class:pr_xl={empty}
-	style:overflow={empty ? 'visible' : undefined}
-	style:justify-content={empty ? 'center' : undefined}
->
-	<!-- the two `p_sm` are expected to stay in sync so the size is the same regardless of presentation style -->
-	<div class="column width_md min_width_sm" class:h_100={!empty} class:p_sm={!empty}>
-		{#if tape}
-			<Chat_Tape
-				{tape}
-				onsend={(input) => chat.send_to_tape(tape.id, input)}
-				attrs={{class: empty ? 'floating p_sm' : 'h_100'}}
+{#if thread}
+	<div
+		class="column_fluid column flex_1"
+		class:pr_xl={empty}
+		style:overflow={empty ? 'visible' : undefined}
+		style:justify-content={empty ? 'center' : undefined}
+	>
+		<!-- the two `p_sm` are expected to stay in sync so the size is the same regardless of presentation style -->
+		<div
+			class="column width_upto_md width_atleast_sm"
+			class:height_100={!empty}
+			class:p_sm={!empty}
+		>
+			<Chat_Thread
+				{thread}
+				onsend={(input) => chat.send_to_thread(thread.id, input)}
+				attrs={{class: empty ? 'floating p_sm' : 'height_100'}}
 				focus_key={chat.id}
 				bind:pending_element_to_focus_key={
 					() => chat.app.ui.pending_element_to_focus_key,
@@ -38,8 +44,13 @@
 					}
 				}
 			/>
-		{:else}
-			<Chat_Tape_Add_By_Model {chat} />
-		{/if}
+		</div>
 	</div>
-</div>
+{:else}
+	<section class="column_section">
+		<Chat_Thread_Add_By_Model {chat} />
+	</section>
+	<section class="column_section">
+		<Chat_Thread_Manage_By_Tag {chat} />
+	</section>
+{/if}

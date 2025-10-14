@@ -16,6 +16,7 @@ import {
 	Jsonrpc_Singular_Message,
 } from '$lib/jsonrpc.js';
 import {Thrown_Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
+import type {Http_Status} from '$lib/zod_helpers.js';
 
 export const create_jsonrpc_request = (
 	method: Jsonrpc_Method,
@@ -72,11 +73,11 @@ export const create_jsonrpc_error_message = (
  * Handles Jsonrpc_Error and regular Error objects.
  */
 export const create_jsonrpc_error_message_from_thrown = (
-	id: Jsonrpc_Request_Id,
+	id: Jsonrpc_Request_Id | null,
 	error: any,
 ): Jsonrpc_Error_Message => {
-	let code: Jsonrpc_Error_Code = JSONRPC_ERROR_CODES.INTERNAL_ERROR;
-	let message = 'Internal server error';
+	let code: Jsonrpc_Error_Code = JSONRPC_ERROR_CODES.internal_error;
+	let message = 'internal server error';
 	let data = undefined;
 
 	if (error instanceof Thrown_Jsonrpc_Error) {
@@ -181,3 +182,47 @@ export const to_jsonrpc_result = (output: unknown): Record<string, any> => {
 	// Wrap non-object values
 	return {value: output};
 };
+
+const jsonrpc_error_code_to_http_status_mapping: Array<[Jsonrpc_Error_Code, Http_Status]> = [
+	[JSONRPC_ERROR_CODES.parse_error, 400],
+	[JSONRPC_ERROR_CODES.invalid_request, 400],
+	[JSONRPC_ERROR_CODES.method_not_found, 404],
+	[JSONRPC_ERROR_CODES.invalid_params, 400],
+	[JSONRPC_ERROR_CODES.internal_error, 500],
+	[JSONRPC_ERROR_CODES.unauthenticated, 401],
+	[JSONRPC_ERROR_CODES.forbidden, 403],
+	[JSONRPC_ERROR_CODES.not_found, 404],
+	[JSONRPC_ERROR_CODES.conflict, 409],
+	[JSONRPC_ERROR_CODES.validation_error, 422],
+	[JSONRPC_ERROR_CODES.rate_limited, 429],
+	[JSONRPC_ERROR_CODES.service_unavailable, 503],
+	[JSONRPC_ERROR_CODES.timeout, 504],
+	[JSONRPC_ERROR_CODES.ai_provider_error, 502], // bad gateway - external service error
+];
+
+/**
+ * Maps JSON-RPC error codes to HTTP status codes.
+ */
+export const JSONRPC_ERROR_CODE_TO_HTTP_STATUS: Record<Jsonrpc_Error_Code, Http_Status> =
+	Object.fromEntries(jsonrpc_error_code_to_http_status_mapping) as Record<
+		Jsonrpc_Error_Code,
+		Http_Status
+	>;
+
+/**
+ * Maps HTTP status codes to JSON-RPC error codes.
+ */
+export const HTTP_STATUS_TO_JSONRPC_ERROR_CODE: Record<Http_Status, Jsonrpc_Error_Code> =
+	Object.fromEntries(
+		jsonrpc_error_code_to_http_status_mapping.map(([jsonrpc_error_code, http_status]) => [
+			http_status,
+			jsonrpc_error_code,
+		]),
+	) as Record<Http_Status, Jsonrpc_Error_Code>;
+
+export const jsonrpc_error_code_to_http_status = (code: Jsonrpc_Error_Code): Http_Status =>
+	JSONRPC_ERROR_CODE_TO_HTTP_STATUS[code] || 500;
+
+// TODO review, is slop
+export const http_status_to_jsonrpc_error_code = (status: Http_Status): Jsonrpc_Error_Code =>
+	HTTP_STATUS_TO_JSONRPC_ERROR_CODE[status] || JSONRPC_ERROR_CODES.internal_error; // TODO maybe unknown instead?

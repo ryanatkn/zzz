@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	interface Props {
+	const {
+		header,
+		children,
+	}: {
 		header: Snippet;
 		children: Snippet;
-	}
-
-	const {header, children}: Props = $props();
+	} = $props();
 </script>
 
 <div class="display_flex">

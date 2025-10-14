@@ -17,24 +17,22 @@ export type Xml_Attribute_Value = z.infer<typeof Xml_Attribute_Value>;
 export const Xml_Attribute_Value_With_Default = Xml_Attribute_Value.default('');
 export type Xml_Attribute_Value_With_Default = z.infer<typeof Xml_Attribute_Value_With_Default>;
 
+// TODO is strict desired?
 // Base attribute requires all fields with no defaults
-export const Xml_Attribute = z
-	.object({
-		id: Uuid,
-		key: Xml_Attribute_Key,
-		value: Xml_Attribute_Value,
-	})
-	.strict();
+export const Xml_Attribute = z.strictObject({
+	id: Uuid,
+	key: Xml_Attribute_Key,
+	value: Xml_Attribute_Value,
+});
 export type Xml_Attribute = z.infer<typeof Xml_Attribute>;
 
+// TODO is strict desired?
 // Default attribute applies defaults and includes id with default
-export const Xml_Attribute_With_Defaults = z
-	.object({
-		id: Uuid_With_Default,
-		key: Xml_Attribute_Key_With_Default,
-		value: Xml_Attribute_Value_With_Default,
-	})
-	.strict();
+export const Xml_Attribute_With_Defaults = z.strictObject({
+	id: Uuid_With_Default,
+	key: Xml_Attribute_Key_With_Default,
+	value: Xml_Attribute_Value_With_Default,
+});
 export type Xml_Attribute_With_Defaults = z.infer<typeof Xml_Attribute_With_Defaults>;
 
-// TODO: Consider adding support for XML namespaces and special XML character handling if needed// TODO?: Add element, document, and CDATA section schemas to create a complete XML model
+// TODO Consider adding support for XML namespaces and special XML character handling if needed// TODO?: Add element, document, and CDATA section schemas to create a complete XML model
