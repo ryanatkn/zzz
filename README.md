@@ -73,9 +73,8 @@ Zzz builds on a great deal of software.
 - I started using [Claude](https://claude.ai/) after making the initial prototype,
   and and I've continued to use it to varying but sufficient success
   to shape its outputs into my usual style
-  - I'm meticulous with most things,
-    but there's low quality slop in lower prioritity areas like tests and peripheral utilities
-  - search for `// @slop` to see them, I'll make a UI to document this data soon
+  - I'm meticulous with most things, but there's low quality code
+    marked with `// @slop` in lower prioritity areas like tests and peripheral utilities
   - I care about the interfaces and general patterns of `// @slop` modules like all other code,
     but slop module internals may be low quality,
     and in general they should be less trusted for correctness and style
@@ -83,11 +82,7 @@ Zzz builds on a great deal of software.
     (my normal being [Fuz](https://github.com/ryanatkn/fuz)/[Moss](https://github.com/ryanatkn/moss)/[Gro](https://github.com/ryanatkn/gro)/[Belt](https://github.com/ryanatkn/belt)),
     with the caveat that this initial proof of concept
     is intentionally slapdash in places for speed and to experiment,
-    and LLMs make this mindset easy to indulge,
-    so there's a higher quantity of lower quality code in Zzz
-    because I'm using LLMs in my workflows
-    (and yearning for better tools so building Zzz with haste),
-    but the important parts are carefully done, and I still prioritize quality over velocity
+    and LLMs make this mindset easy to indulge
 
 ## License 🐦
 
