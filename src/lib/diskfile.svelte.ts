@@ -1,0 +1,69 @@
+import {z} from 'zod';
+import {strip_start} from '@ryanatkn/belt/string.js';
+
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {
+	Diskfile_Directory_Path,
+	Diskfile_Json,
+	type Diskfile_Path,
+	type Serializable_Disknode,
+} from '$lib/diskfile_types.js';
+import {to_preview, estimate_token_count} from '$lib/helpers.js';
+import type {Part_Union} from '$lib/part.svelte.js';
+
+// TODO support directories/folders
+
+export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+
+export class Diskfile extends Cell<typeof Diskfile_Json> {
+	path: Diskfile_Path = $state()!;
+	source_dir: Diskfile_Directory_Path = $state()!;
+
+	content: string | null = $state()!;
+
+	readonly part: Part_Union | undefined = $derived(
+		this.app.parts.find_part_by_diskfile_path(this.path),
+	);
+
+	// TODO @many add UI support for deps for module diskfiles (TS, Svelte, etc)
+	dependents: Array<[Diskfile_Path, Serializable_Disknode]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
+	dependencies: Array<[Diskfile_Path, Serializable_Disknode]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
+
+	readonly dependencies_by_id: Map<Diskfile_Path, Serializable_Disknode> = $derived(
+		new Map(this.dependencies),
+	);
+	readonly dependents_by_id: Map<Diskfile_Path, Serializable_Disknode> = $derived(
+		new Map(this.dependents),
+	);
+
+	readonly dependency_ids: Array<Diskfile_Path> = $derived(this.dependencies.map(([id]) => id));
+	readonly dependent_ids: Array<Diskfile_Path> = $derived(this.dependents.map(([id]) => id));
+
+	readonly has_dependencies: boolean = $derived(this.dependencies.length > 0);
+	readonly has_dependents: boolean = $derived(this.dependents.length > 0);
+
+	readonly dependencies_count: number = $derived(this.dependencies.length);
+	readonly dependents_count: number = $derived(this.dependents.length);
+
+	/** e.g. .zzz/foo/bar.json */
+	readonly pathname: string | null | undefined = $derived(
+		this.path && this.app.zzz_cache_dir && strip_start(this.path, this.app.zzz_cache_dir),
+	);
+	/** e.g. bar/foo.json */
+	readonly path_relative: string | null | undefined = $derived(
+		this.app.diskfiles.to_relative_path(this.path),
+	);
+
+	readonly content_length: number = $derived(this.content?.length ?? 0);
+	readonly content_token_count: number | null = $derived(
+		this.content === null ? null : estimate_token_count(this.content),
+	);
+	readonly content_preview: string = $derived(to_preview(this.content));
+
+	constructor(options: Diskfile_Options) {
+		super(Diskfile_Json, options);
+		this.init();
+	}
+}
+
+export const Diskfile_Schema = z.instanceof(Diskfile);

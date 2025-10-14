@@ -1,0 +1,43 @@
+import {z} from 'zod';
+
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Provider, Provider_Json} from '$lib/provider.svelte.js';
+import {Cell_Json} from '$lib/cell_types.js';
+import type {Provider_Name} from '$lib/provider_types.js';
+
+export const Providers_Json = Cell_Json.extend({
+	items: z.array(Provider_Json).default(() => []),
+}).meta({cell_class_name: 'Providers'});
+export type Providers_Json = z.infer<typeof Providers_Json>;
+export type Providers_Json_Input = z.input<typeof Providers_Json>;
+
+export interface Providers_Options extends Cell_Options<typeof Providers_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export class Providers extends Cell<typeof Providers_Json> {
+	items: Array<Provider> = $state()!; // TODO probably make an indexed collection for convenient querying, despite small N
+
+	readonly names: ReadonlyArray<Provider_Name> = $derived(this.items.map((p) => p.name));
+
+	constructor(options: Providers_Options) {
+		super(Providers_Json, options);
+		this.init();
+	}
+
+	add(provider: Provider): void {
+		this.items.push(provider);
+	}
+
+	find_by_name(name: string): Provider | undefined {
+		return this.items.find((p) => p.name === name);
+	}
+
+	remove_by_name(name: string): void {
+		const index = this.items.findIndex((p) => p.name === name);
+		if (index !== -1) {
+			this.items.splice(index, 1);
+		}
+	}
+
+	clear(): void {
+		this.items.length = 0;
+	}
+}

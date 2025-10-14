@@ -1,0 +1,54 @@
+<script lang="ts">
+	// @slop claude_sonnet_4
+
+	import Glyph from '$lib/Glyph.svelte';
+	import Ollama_Action_Item from '$lib/Ollama_Action_Item.svelte';
+	import {GLYPH_CLEAR} from '$lib/glyphs.js';
+	import type {Ollama} from '$lib/ollama.svelte.js';
+
+	const {
+		ollama,
+	}: {
+		ollama: Ollama;
+	} = $props();
+
+	const clear_completed_actions = () => {
+		const completed_action_ids = ollama.completed_actions.map((a) => a.id);
+		ollama.app.actions.items.remove_many(completed_action_ids);
+	};
+</script>
+
+<div class="panel p_md width_upto_md">
+	<div class="display_flex justify_content_space_between align_items_center mb_md">
+		<h4 class="mt_0 mb_0">action history</h4>
+		<div class="display_flex gap_xs align_items_center">
+			<label class="display_flex gap_xs align_items_center mb_0">
+				<input type="checkbox" class="compact" bind:checked={ollama.show_read_actions} />
+				<small>show read actions</small>
+			</label>
+			<button
+				type="button"
+				class="icon_button plain"
+				title="clear completed actions"
+				onclick={clear_completed_actions}
+				disabled={ollama.completed_actions.length === 0}
+			>
+				<Glyph glyph={GLYPH_CLEAR} />
+			</button>
+		</div>
+	</div>
+
+	{#if ollama.filtered_actions.length === 0}
+		<p>
+			<small
+				>no action history{ollama.show_read_actions ? '' : ', showing only write actions'}</small
+			>
+		</p>
+	{:else}
+		<ul class="unstyled">
+			{#each ollama.filtered_actions as action (action.id)}
+				<Ollama_Action_Item {action} />
+			{/each}
+		</ul>
+	{/if}
+</div>

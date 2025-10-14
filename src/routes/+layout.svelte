@@ -4,29 +4,68 @@
 	import '$routes/moss.css';
 	import '$routes/style.css';
 
-	import Themed from '@ryanatkn/fuz/Themed.svelte';
-	import type {Snippet} from 'svelte';
-	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
-	import Contextmenu_Root from '@ryanatkn/fuz/Contextmenu_Root.svelte';
+	import {onMount} from 'svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
-	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
+	import {parse_pkg} from '@ryanatkn/belt/pkg.js';
+	import {BROWSER} from 'esm-env';
+	import {page} from '$app/state';
+	import {onNavigate} from '$app/navigation';
+	import {resolve} from '$app/paths';
 
-	import Settings from '$routes/Settings.svelte';
-	import {Zzz} from '$lib/zzz.svelte.js';
-	import Zzz_Root from '$lib/Zzz_Root.svelte';
-	import {pkg_context} from '$routes/pkg.js';
-	import {package_json, src_json} from '$routes/package.js';
+	import {parse_url_param_uuid} from '$lib/url_params_helpers.js';
+	import {App} from '$lib/app.svelte.js';
+	import Frontend_Root from '$lib/Frontend_Root.svelte';
+	import {pkg_context} from '$lib/pkg.js';
+	import {package_json, src_json} from '$lib/package.js';
+	import {Provider_Json} from '$lib/provider.svelte.js';
+	import create_zzz_config from '$lib/config.js';
+	import {Model_Json} from '$lib/model.svelte.js';
 
-	interface Props {
-		children: Snippet;
-	}
+	const {children, params} = $props();
 
-	const {children}: Props = $props();
+	// TODO think through initialization
+	onMount(() => {
+		// TODO init properly from data
+		const zzz_config = create_zzz_config();
 
-	pkg_context.set(parse_package_meta(package_json, src_json));
+		// TODO note the difference between these two APIs, look at both of them and see which makes more sense
+		app.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
+		app.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
 
-	const zzz = new Zzz({
-		//
+		// init the session
+		if (BROWSER) {
+			void app.api.session_load();
+		}
+
+		// init Ollama
+		if (BROWSER) {
+			void app.ollama.refresh();
+		}
+	});
+
+	pkg_context.set(parse_pkg(package_json, src_json));
+
+	// Create the frontend's App, which extends Frontend
+	const app = new App();
+
+	if (BROWSER) (window as any).app = (window as any).app = app; // no types for this, just for runtime convenience
+
+	// TODO refactor, maybe per route?
+	// Handle URL parameter synchronization
+	$effect.pre(() => {
+		// TODO I think we want a different state value for this, so that we can render links to the "selected_id_recent" or something
+		app.chats.selected_id = parse_url_param_uuid(params.chat_id);
+		app.prompts.selected_id = parse_url_param_uuid(params.prompt_id);
+	});
+
+	// TODO refactor this, doesn't belong here - see the comment at `to_nav_link_href`
+	onNavigate(() => {
+		const {pathname} = page.url;
+		if (pathname === resolve('/chats')) {
+			app.chats.selected_id_last_non_null = null;
+		} else if (pathname === resolve('/prompts')) {
+			app.prompts.selected_id_last_non_null = null;
+		}
 	});
 </script>
 
@@ -39,17 +78,18 @@
 		{
 			snippet: 'text',
 			props: {
-				content: 'Settings',
+				content: 'settings',
 				icon: '?',
 				run: () => {
-					zzz.data.show_main_menu = true;
+					console.log('show main dialog');
+					app.api.toggle_main_menu({show: true});
 				},
 			},
 		},
 		{
 			snippet: 'text',
 			props: {
-				content: 'Reload',
+				content: 'reload',
 				icon: '⟳',
 				run: () => {
 					location.reload();
@@ -59,25 +99,6 @@
 	]}
 />
 
-<Zzz_Root {zzz}>
-	<Themed>
-		<Contextmenu_Root>
-			{@render children()}
-			{#if zzz.data.show_main_menu}
-				<Dialog onclose={() => (zzz.data.show_main_menu = false)}>
-					<div class="pane">
-						<section class="width_md box pt_xl3">
-							<h1>Zzz</h1>
-							<p>electric buzz</p>
-							<p>work in progress</p>
-							<p>
-								don't miss the <a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>
-							</p>
-						</section>
-						<Settings />
-					</div>
-				</Dialog>
-			{/if}
-		</Contextmenu_Root>
-	</Themed>
-</Zzz_Root>
+<Frontend_Root {app}>
+	{@render children()}
+</Frontend_Root>

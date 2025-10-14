@@ -1,0 +1,47 @@
+<script lang="ts">
+	import type {Snippet} from 'svelte';
+	import type {SvelteHTMLElements} from 'svelte/elements';
+
+	let {
+		active = $bindable(),
+		active_content,
+		inactive_content,
+		...rest
+	}: SvelteHTMLElements['button'] & {
+		/**
+		 * Current state of the toggle
+		 */
+		active: boolean;
+		/**
+		 * Content to display when toggle is active
+		 */
+		active_content: Snippet | string;
+		/**
+		 * Content to display when toggle is inactive
+		 */
+		inactive_content: Snippet | string;
+	} = $props();
+</script>
+
+<button type="button" class="plain icon_button" {...rest} onclick={() => (active = !active)}>
+	{@render rest.children?.()}
+	<span class="position_relative">
+		<span style:visibility="hidden" class="display_inline_flex flex_direction_column height_0">
+			<span>
+				{#if typeof active_content === 'string'}{active_content}{:else}{@render active_content()}{/if}
+			</span>
+			<span>
+				{#if typeof inactive_content === 'string'}{inactive_content}{:else}{@render inactive_content()}{/if}
+			</span>
+		</span>
+		<span class="position_absolute display_inline_flex align_items_center" style:inset="0">
+			{#if active}
+				{#if typeof active_content === 'string'}{active_content}{:else}{@render active_content()}{/if}
+			{:else if typeof inactive_content === 'string'}
+				{inactive_content}
+			{:else}
+				{@render inactive_content()}
+			{/if}
+		</span>
+	</span>
+</button>

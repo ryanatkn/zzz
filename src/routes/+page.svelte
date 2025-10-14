@@ -1,30 +1,26 @@
 <script lang="ts">
+	import {resolve} from '$app/paths';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-	import {base} from '$app/paths';
 
-	import Zzz_Main from '$lib/Zzz_Main.svelte';
-	import {hud_context} from '$lib/hud.svelte.js';
+	import Page_Footer from '$routes/Page_Footer.svelte';
 
-	// TODO remove this after fixing
-	// class:row
-	// class:content
-	// class:icon
-	// class:title
-
-	hud_context.set(hud);
+	import Dashboard_Home from '$lib/Dashboard_Home.svelte';
 </script>
 
-<Zzz_Main>
-	<header class="box">
-		<Svg data={zzz_logo} size="var(--icon_size_xl2)" classes="my_xl5" />
-		<p class="mt_xl3">nice web things for the tired</p>
-		<p class="mt_xl3">work in progress</p>
-		<p class="mt_xl3">press <code>`</code> to begin</p>
-		<a href="{base}/about" class="size_xl3 px_md radius_0 row h_100">💤</a>
-	</header>
-</Zzz_Main>
+<section class="row gap_xl5 mb_xl5">
+	<div>
+		<Svg data={zzz_logo} size="var(--icon_size_xl2)" attrs={{class: 'mt_xl5'}} />
+	</div>
+	<div>
+		<div class="row mt_xl5 mb_lg">
+			<blockquote>nice web things for the tired 💤</blockquote>
+		</div>
+		<p>Zzz is a fullstack web toolkit for power users and devs.</p>
+		<p>It's an early work in progress, see the <a href={resolve('/about')}>about page</a>.</p>
+	</div>
+</section>
 
-{#snippet hud()}
-	<div class="h_100 row justify_content_space_between"></div>
-{/snippet}
+<Dashboard_Home />
+
+<Page_Footer />

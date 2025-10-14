@@ -1,49 +1,331 @@
 <script lang="ts">
-	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
+	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
-	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import {resolve} from '$app/paths';
+	import Details from '@ryanatkn/fuz/Details.svelte';
+	import {DEV} from 'esm-env';
 
-	import {pkg_context} from '$routes/pkg.js';
+	import {pkg_context} from '$lib/pkg.js';
+	import External_Link from '$lib/External_Link.svelte';
+	import Page_Footer from '$routes/Page_Footer.svelte';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	const pkg = pkg_context.get();
+	const app = frontend_context.get();
 
-	// TODO standardize
+	// TODO probably link to a blog post that's more approachable and less technical
 </script>
 
-<main class="width_md">
-	<section class="box">
-		<header class="box mt_xl4">
-			<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
+<div class="width_upto_md p_lg">
+	<section>
+		<header class="mb_xl5" style:--font_size="var(--font_size_xl)">
+			<h1 class="row">
+				<Svg
+					data={zzz_logo}
+					fill="var(--text_color)"
+					size="var(--icon_size_sm)"
+					attrs={{class: 'ml_xs mr_xl'}}
+				/> about
+			</h1>
 		</header>
-		<p class="mt_xl5">
-			⚠️ early pre-release, see the <a href="https://github.com/ryanatkn/zzz/discussions"
-				>discussions</a
-			>
+		<blockquote>nice web things for the tired 💤</blockquote>
+		<p>
+			Zzz, pronounced "zees" like bees, is a fullstack app and toolkit for power users and
+			developers. The idea is to make an integrated cross-platform environment that adapts to your
+			needs and intent while remaining fully open, aligned, and in your control. It's both a
+			customizable local-first web UI for power users, and a flexible library for crafting
+			UX-maximizing websites with a streamlined developer experience.
+		</p>
+		<aside>
+			⚠️ This is an early pre-release, see the
+			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
+			and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
+			or find me on <External_Link href="https://bsky.app/profile/ryanatkn.com"
+				>Bluesky</External_Link
+			> 💤
+		</aside>
+		<p>Some early (rough) integrations include:</p>
+		<ul>
+			<li>
+				<External_Link href="https://hono.dev/">Hono</External_Link> is the backend web server that provides
+				local system access. It's uses web standards and supports all JS server runtimes.
+			</li>
+			<li>
+				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> is the frontend framework.
+				Hono integrates with its Node adapter, and it uses <External_Link href="https://vite.dev/"
+					>Vite</External_Link
+				> in development.
+			</li>
+			<li>
+				AI providers with <External_Link href="https://github.com/openai/openai-node"
+					>ChatGPT</External_Link
+				>,
+				<External_Link href="https://github.com/anthropics/anthropic-sdk-typescript"
+					>Claude</External_Link
+				>, and <External_Link href="https://github.com/google-gemini/generative-ai-js"
+					>Gemini</External_Link
+				> -- bring your own API keys
+			</li>
+			<li>
+				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
+				locally with easy installation and onboarding. I plan to support more local LLM backends like
+				<External_Link href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link> which Ollama
+				is based on.
+			</li>
+		</ul>
+		<p>Planned integrations:</p>
+		<ul>
+			<li>
+				<!-- TODO @db -->
+				<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link>
+				and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when desired,
+				using <External_Link href="https://github.com/porsager/postgres">Postgres.js</External_Link>
+				and probably <External_Link href="https://github.com/drizzle-team/drizzle-orm"
+					>Drizzle</External_Link
+				>, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
+					>issue #7</External_Link
+				>
+			</li>
+			<li>
+				<External_Link href="https://modelcontextprotocol.io/">Model Context Protocol</External_Link
+				>, maybe others like <External_Link href="https://github.com/google/A2A"
+					>Agent2Agent (A2A) protocol</External_Link
+				>
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
+					href="https://wikipedia.org/wiki/Atom_(web_standard)">Atom</External_Link
+				> and <External_Link href="https://wikipedia.org/wiki/JSON_Feed">JSON Feed</External_Link>
+			</li>
+			<li>git!</li>
+			<li>
+				I think it makes sense to prioritize a few high-utility integrations for manipulating media
+				files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
+				<External_Link href="https://ffmpeg.org/">ffmpeg</External_Link>, and <External_Link
+					href="https://imagemagick.org/">ImageMagick</External_Link
+				>
+			</li>
+			<li>
+				when I regain an appetite for social, <External_Link href="https://atproto.com/"
+					>AT Protocol</External_Link
+				> and <External_Link href="https://activitypub.rocks/">ActivityPub</External_Link> -- probably
+				both but they're not immediate prioritie (I have an initial <External_Link
+					href="https://github.com/ryanatkn/fuz_mastodon">Mastodon integration</External_Link
+				> with readonly embedded posts)
+			</li>
+			<li>
+				more, input welcome
+				<ul>
+					<li>
+						the system is being designed for extensibility, so your use cases are helpful for
+						shaping it
+					</li>
+					<li>
+						devs can extend Zzz without artifcial restriction in their own projects, but Zzz should
+						provide a complete system with useful defaults and optional high-quality first-party
+						integrations
+					</li>
+					<li>
+						some decisions like Postgres, TypeScript, and Svelte limit user choice -- you can always
+						bring other databases and frontend frameworks, but don't expect full integration or
+						reasonable performance; for example there is a serious mismatch with sqlite
+					</li>
+				</ul>
+			</li>
+		</ul>
+		<p>
+			If this sounds interesting and you would like to test out some rickety pre-release software,
+			feedback is appreciated to help make it work for you -- see the
+			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link> and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>.
 		</p>
 	</section>
+	<hr />
 	<section>
-		<div class="panel p_md width_md">
-			<Package_Detail {pkg} />
-		</div>
+		<h2 class="mb_lg">More details</h2>
+		<ul>
+			<li>Zzz is free and open source and permissively licensed</li>
+			<li>it's a noncommercial project and its only official domain is zzz.software</li>
+			<li>
+				I'm looking for <External_Link href="https://www.ryanatkn.com/funding"
+					>funding</External_Link
+				> to sustain my continued work on it
+			</li>
+		</ul>
 	</section>
+	<hr />
+	<section>
+		<h2 class="mb_lg">Peek a possible future</h2>
+		<p class="mb_md">
+			This project has a big speculative scope and it's early in development. What you're seeing is
+			a small part of the idea -- especially if you're viewing this on the website not natively via
+			Node -- so here's a button for previewing some of what's planned:
+		</p>
+		<button
+			type="button"
+			class:color_h={app.futuremode}
+			onclick={() => {
+				app.futuremode = !app.futuremode;
+			}}
+		>
+			<Svg
+				data={zzz_logo}
+				size="var(--icon_size_sm)"
+				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
+				attrs={{
+					class: 'mr_md' + (app.futuremode ? ' flip_x' : ''),
+					style: 'transition: transform 200ms ease',
+				}}
+			/>
+			<span
+				><span class="display_inline_block text_align_right" style:width="6ch"
+					>{app.futuremode ? 'disable' : 'enable'}</span
+				>
+				futuremode</span
+			>
+			<Svg
+				data={zzz_logo}
+				size="var(--icon_size_sm)"
+				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
+				attrs={{
+					class: 'ml_md' + (app.futuremode ? '' : ' flip_x'),
+					style: 'transition: transform 200ms ease',
+				}}
+			/>
+		</button>
+	</section>
+	<hr />
+	<section>
+		<h2 class="mb_lg">Security</h2>
+		<p>
+			Zzz is a powerful and extensible system, and that means it carries significant security risks.
+			Although it can be used to build simple and secure websites, the Zzz backend is capable like
+			an IDE and can do bad things when bidden.
+		</p>
+		<p>
+			Zzz puts the user in control, so if you insist on installing obvious_malware, Zzz will abide.
+			This basic tension between power and safety leads me to think that UX design should be a
+			primary mechanism of influence to protect users -- instead of restricting power from user
+			control, we'll design for its safe usage, including clear visibility into your delegation
+			situation. Maybe you'll have to click through an annoying UI and 2FA, obviously breaking the
+			seal, to install the malware. Every person and situation may have a different threat model, so
+			we want to make it easy to make good choices, where lazy is secure.
+		</p>
+		<aside>
+			⚠️ I am not a security professional and Zzz has not been audited; it may be <strong
+				class="color_c_5">dangerous</strong
+			> to run and there is no auth yet
+		</aside>
+		<p>
+			My current plan is to extract <External_Link href="https://github.com/ryanatkn/fuz"
+				>a reusable framework</External_Link
+			> out of Zzz that prioritizes security from the first commit. More on that soon. For now Zzz is
+			insecure and should definitely not be run in production, and it should be used with caution in
+			development.
+		</p>
+		<p>More thoughts about security:</p>
+		<ul>
+			<li>
+				Zzz's Node server can do things like:
+				<ul>
+					<li>
+						read and write to the configured filesystem directory, defaults to <code>./.zzz</code>
+						in the <code>PUBLIC_ZZZ_CACHE_DIR</code> (which defaults to <code>./</code>), and is
+						securely scoped (does not follow symlinks) -- this opens a significant surface area for
+						both you and attackers to use, and writing untrusted data to it could lead to arbitrary
+						code execution if, for example, you're running a hot reloading dev server in that
+						directory (Zzz does not do this by default)
+					</li>
+					<li>
+						use your API keys for calls to Claude, ChatGPT, and Gemini, and write them to <code
+							>./.env.{DEV ? 'development' : 'production'}</code
+						>
+					</li>
+					<li>call Ollama's API if available -- low risk</li>
+					<li>
+						<strong class="color_c_5">there is no authentication yet</strong>, only an origin check,
+						so do not use this in production
+					</li>
+					<li>
+						soon, more integrations including terminal access assuming Bash, but nothing that
+						powerful before auth
+					</li>
+				</ul>
+			</li>
+			<li>
+				The frontend <External_Link
+					href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_Security_Policy"
+					>CSP</External_Link
+				> is fairly locked down, including blocking all unknown network connections. For details, see
+				the CSP config in <External_Link
+					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
+					>svelte.config.js</External_Link
+				> and the <External_Link href="https://www.fuz.dev/docs/csp">Fuz CSP docs</External_Link>.
+				Configuration will be needed for many usecases, unlocking shenanigans good and bad, so we'll
+				tread carefully.
+			</li>
+			<li>
+				There are no mechanisms for end-users to load executable code or dangerous config. Of
+				course, developers have full control to shoot their own feet, and Node is currently the only
+				supported way to use Zzz. Deno is planned.
+				<ul>
+					<li>
+						we'll develop a plugin API so people can make reusable integrations, and distribution
+						will be through npm/jsr, decentralized like a typical open source web ecosystem project
+						so the risks assumed by developers are unchanged and I gatekeep nothing -- I plan to
+						publish a number of <code>@ryanatkn/zzz_*</code> packages, and if people think it's worth
+						their time to make Zzz things, they can publish according to their taste and devs can vet
+						their code
+					</li>
+					<li>
+						any modules you install from npm/jsr, or any code you add to the src directory, carry
+						the normal elevated risks associated with development and code execution -- I try to
+						practice good <External_Link href="https://github.com/ryanatkn/fuz_template/issues/1"
+							>dependency hygiene</External_Link
+						>
+					</li>
+				</ul>
+			</li>
+			<li>
+				In 2025, LLMs have serious vulnerabilities to attacks like <External_Link
+					href="https://wikipedia.org/wiki/Prompt_injection">prompt injection</External_Link
+				>, where they are unable to reliably discern instructions intended by the prompter from
+				adversarial instructions in the data. It's unclear if this is fixable but people are
+				definitely building sensitive systems with probabilistic components, and I don't want to see
+				Zzz, an AI UI, make dumb predictable errors with LLMs or be designed to encourage us to make
+				them. MCP's utility is high, but it can be used in <External_Link
+					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+					title="Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication"
+					>insecure ways</External_Link
+				> that I want to account for before integrating. Zzz will integrate LLMs into its own functionality
+				slowly and carefully -- currently the only in-app LLM integration is using a local model to name
+				new chats. There will be more, and we'll make sure you always have visibility into and control
+				over this behavior. (for example see the
+				<a href={resolve('/providers/ollama')}>Ollama controls</a>)
+			</li>
+			<li>
+				Security and privacy should be the expected default, so for example Zzz won't make calls to
+				external providers without explicit configuration. No other third party services are used.
+			</li>
+			<li>
+				I prioritize security but it's not my expertise and I will make mistakes, help is always
+				appreciated.
+			</li>
+		</ul>
+	</section>
+	<hr />
 	<Community_Links_Panel />
-	<section class="box mb_xl7">
-		<Library_Footer {pkg}>
-			<div class="mb_xl5">
-				<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
+	<hr />
+	<section>
+		<Details>
+			{#snippet summary()}package details{/snippet}
+			<div class="panel p_md width_upto_md">
+				<Package_Detail {pkg} />
 			</div>
-		</Library_Footer>
+		</Details>
 	</section>
-</main>
-
-<style>
-	main {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		margin: 0 auto;
-	}
-</style>
+	<Page_Footer />
+</div>
