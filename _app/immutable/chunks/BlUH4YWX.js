@@ -1,0 +1,1 @@
+const n=t=>{if(!t)return!1;const{tagName:e}=t;return e==="INPUT"&&t.type!=="hidden"||e==="TEXTAREA"||t.contentEditable==="true"||t.contentEditable===""},o=t=>{const e=t.closest("[contenteditable]");return e!==null&&e.contentEditable!=="false"},s=(t,e=!0,a=!0)=>(a&&t.preventDefault(),e?t.stopImmediatePropagation():t.stopPropagation(),t);export{o as a,n as i,s};

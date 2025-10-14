@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.png" />
+		<link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<script>
+			document.documentElement.classList.add(
+				((c) =>
+					c === 'dark' || (c !== 'light' && matchMedia('(prefers-color-scheme:dark)').matches)
+						? 'dark'
+						: 'light')(localStorage.getItem('fuz:color-scheme')),
+			);
+		</script>
+
+		<meta http-equiv="content-security-policy" content="child-src 'none'; default-src 'none'; frame-src 'self' https://moss.ryanatkn.com/ https://fuz.dev/ https://*.fuz.dev/; worker-src 'self' blob:; connect-src 'self' ws://localhost:8999; font-src 'self' data: https://*.ryanatkn.com/ https://*.spiderspace.org/ https://*.webdevladder.net/ https://*.dealt.dev/ https://*.fuz.dev/ https://*.ztack.net/ https://*.grogarden.org/ https://*.zzz.software/ https://*.zzzbot.dev/ https://*.cosmicplayground.org/ https://ryanatkn.github.io/; img-src 'self' data: blob: filesystem: https://*.ryanatkn.com/ https://*.spiderspace.org/ https://*.webdevladder.net/ https://*.dealt.dev/ https://*.fuz.dev/ https://*.ztack.net/ https://*.grogarden.org/ https://*.zzz.software/ https://*.zzzbot.dev/ https://*.cosmicplayground.org/ https://ryanatkn.github.io/; manifest-src 'self'; media-src 'self' data: blob: mediastream: filesystem: https://*.ryanatkn.com/ https://*.spiderspace.org/ https://*.webdevladder.net/ https://*.dealt.dev/ https://*.fuz.dev/ https://*.ztack.net/ https://*.grogarden.org/ https://*.zzz.software/ https://*.zzzbot.dev/ https://*.cosmicplayground.org/ https://ryanatkn.github.io/; object-src 'none'; script-src 'self' 'sha256-QOxqn7EUzb3ydF9SALJoJGWSvywW9R0AfTDSenB83Z8=' 'sha256-1ep0eOpKfvV66wgXdQKsp9MxNzd3KFFFrUxDA1XVAJM='; script-src-elem 'self' 'sha256-QOxqn7EUzb3ydF9SALJoJGWSvywW9R0AfTDSenB83Z8=' 'sha256-1ep0eOpKfvV66wgXdQKsp9MxNzd3KFFFrUxDA1XVAJM='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; style-src-elem 'self' 'unsafe-inline'; style-src-attr 'unsafe-inline'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests">
+		<link href="/_app/immutable/assets/Contextmenu_Entry.ChMYD8yZ.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Contextmenu_Link_Entry.CJxy9Q52.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Nav_Link.BBwv6HIZ.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Dialog.BpqNbiOB.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/0.BzhjQhbi.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Alert.DVZ59nYR.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Contextmenu_Entry_Copy_To_Clipboard.B5Rh1nwo.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Model_Contextmenu.CJv9tiej.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Model_Link.uCfr2fPW.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Confirm_Button.OBizOut0.css" rel="stylesheet">
+		<link href="/_app/immutable/assets/Model_Summary.PLMKj73y.css" rel="stylesheet">
+		<link rel="modulepreload" href="/_app/immutable/entry/start.ClOfd_cs.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/GnWsGiEa.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/D6t6EFf3.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/DsYFF3e0.js">
+		<link rel="modulepreload" href="/_app/immutable/entry/app.DMbZPDON.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/DsnmJJEf.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/Nwe5dM3j.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/BwYh6stK.js">
+		<link rel="modulepreload" href="/_app/immutable/nodes/0.BncSRuJZ.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/4X2iJCGk.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/dRtQjgBD.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/BlUH4YWX.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/ChYHAxKB.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/z7712QSE.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/CdyEdxWZ.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/DXwaezrr.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/DIXdchkG.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/Dfb2Cv-R.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/CCzjtkw6.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/BkRo67PX.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/R2QwTmpq.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/CR1Zc1Qw.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/saFjAR_G.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/2SX4wb5B.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/D-75x-LD.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/BUALlt3H.js">
+		<link rel="modulepreload" href="/_app/immutable/nodes/27.BUs1OY7x.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/Dbs6j0m1.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/C7li8jHm.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/CEnclk0t.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/BMCZ99yj.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/BeRhWz1w.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/CNYcfd7V.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/BBNa1a7U.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/CNNXyUWI.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/B4cFFwNA.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/DM4ztRtC.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/BSDwi2RM.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/oM8O-Qux.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/ZErG5RAz.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/pdG5Hqyl.js"><!--[--><!--]--><!--[--><!--[!--><!--]--><!--]--><title>Zzz</title>
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents"><!--[--><!--[--><!----><!--[!--><!--[!--><!--]--><!----> <div class="dashboard" style="--sidebar_width: 180px;"><div class="height_100 width_100 position_fixed top_0 left_0" style="padding-left: var(--sidebar_width);"><div class="height_100 overflow_auto"><!--[!--><!----><div class="p_sm"><!--[!--><!--[!--><span class="pending_animation  svelte-1cqkncp running display_flex"><span style="animation-delay: 0s;" class="svelte-1cqkncp"><!--[!-->•<!--]--></span><span style="animation-delay: 0.09s;" class="svelte-1cqkncp"><!--[!-->•<!--]--></span><span style="animation-delay: 0.3s;" class="svelte-1cqkncp"><!--[!-->•<!--]--></span></span><!--]--><!--]--></div><!----><!--]--><!----><!----></div><!----></div> <div class="height_100 position_fixed top_0 left_0 overflow_auto scrollbar_width_thin" style="width: var(--sidebar_width);"><div class="p_sm"><nav class="font_size_lg"><!--[--><!--[--><div class="display_flex p_sm mb_sm"><a title="home" class="nav_link click_effect_scale svelte-xx51e5" href="/"><svg viewBox="0 0 100 100" style="transition: transform 200ms ease; width: var(--icon_size_md); height: var(--icon_size_md); flex-shrink: 1;" aria-label="three sleepy z's"><!--[!--><!--]--><!--[--><!--[--><path fill="#e55d95" d="m 75.29285,61.962268 1.752156,1.914421 14.843359,1.811307 L 74.065203,86.193332 99.966781,85.408255 98.719988,83.648246 85.143565,82.136577 98.430963,62.887945"></path><path fill="#e55d95" d="m 47.636533,44.203704 2.295155,2.48945 25.618425,0.406407 L 45.93783,91.082857 89.425317,93.78003 87.862334,91.36274 61.57861,83.03068 86.244719,42.177019"></path><path fill="#e55d95" d="M 0.62464489,0.27405496 3.9721704,4.0993769 50.515703,10.089712 0.04581262,99.957542 68.009395,98.901532 65.391343,95.487941 24.119119,88.067804 66.301842,2.2896897"></path><!--]--><!--]--></svg><!----></a><!----></div><!--]--> <!--[--><div><a href="/chats" class="nav_link  svelte-xx51e5"><!--[--><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 icon_xs" style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">⌸</span><!----> chats<!--]--><!----></a><!----></div><div><a href="/prompts" class="nav_link  svelte-xx51e5"><!--[--><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 icon_xs" style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">⌇</span><!----> prompts<!--]--><!----></a><!----></div><div><a href="/files" class="nav_link  svelte-xx51e5"><!--[--><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 icon_xs" style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">⧈</span><!----> files<!--]--><!----></a><!----></div><!--]--><!--[!--><div class="font_size_xl font_family_serif mt_xl7 mb_md text_color_3">llms</div><!--]--> <!--[--><div><a href="/models" class="nav_link  svelte-xx51e5"><!--[--><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 icon_xs" style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">⊛</span><!----> models<!--]--><!----></a><!----></div><div><a href="/providers" class="nav_link  svelte-xx51e5 selected_descendent"><!--[--><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 icon_xs" style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">⨕</span><!----> providers<!--]--><!----></a><!----></div><!--]--><!--[!--><div class="font_size_xl font_family_serif mt_xl7 mb_md text_color_3">system</div><!--]--> <!--[--><div><a href="/about" class="nav_link  svelte-xx51e5"><!--[!--><span class="icon_xs"><svg viewBox="0 0 100 100" aria-label="three sleepy z's" style="width: var(--icon_size_xs); height: var(--icon_size_xs); flex-shrink: 1;"><!--[!--><!--]--><!--[--><!--[--><path fill="var(--text_color_1)" d="m 75.29285,61.962268 1.752156,1.914421 14.843359,1.811307 L 74.065203,86.193332 99.966781,85.408255 98.719988,83.648246 85.143565,82.136577 98.430963,62.887945"></path><path fill="var(--text_color_1)" d="m 47.636533,44.203704 2.295155,2.48945 25.618425,0.406407 L 45.93783,91.082857 89.425317,93.78003 87.862334,91.36274 61.57861,83.03068 86.244719,42.177019"></path><path fill="var(--text_color_1)" d="M 0.62464489,0.27405496 3.9721704,4.0993769 50.515703,10.089712 0.04581262,99.957542 68.009395,98.901532 65.391343,95.487941 24.119119,88.067804 66.301842,2.2896897"></path><!--]--><!--]--></svg><!----></span> about<!--]--><!----></a><!----></div><div><a href="/capabilities" class="nav_link  svelte-xx51e5"><!--[--><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 icon_xs" style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">⧰</span><!----> capabilities<!--]--><!----></a><!----></div><div><a href="/actions" class="nav_link  svelte-xx51e5"><!--[--><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 icon_xs" style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">⎙</span><!----> actions<!--]--><!----></a><!----></div><div><a href="/settings" class="nav_link  svelte-xx51e5"><!--[--><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 icon_xs" style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">⛮</span><!----> settings<!--]--><!----></a><!----></div><!--]--><!--]--></nav></div></div> <button type="button" class="position_fixed bottom_0 left_0 icon_button plain border_radius_0" aria-label="hide sidebar [backtick `]" title="hide sidebar [backtick `]"><span class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 " style="width: var(--font_size, 1em); height: var(--font_size, 1em); min-width: var(--font_size, 1em); min-height: var(--font_size, 1em); font-size: var(--font_size, inherit);">←</span><!----></button></div><!----><!----><!--]--> <!--[--><div class="contextmenu_layout svelte-n9h79a" aria-hidden="true"></div><!--]--> <!--[!--><!--]--><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_5ywyib = {
+						base: ""
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/_app/immutable/entry/start.ClOfd_cs.js"),
+						import("/_app/immutable/entry/app.DMbZPDON.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 27],
+							data: [null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
