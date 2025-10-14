@@ -19,7 +19,7 @@ export default {
 	compilerOptions: {runes: true},
 	vitePlugin: {inspector: true},
 	kit: {
-		adapter: is_node_build ? adapter() : adapter({fallback: '404.html'}), // fallback for Github Pages
+		adapter: adapter(),
 		paths: {relative: false}, // use root-absolute paths: https://kit.svelte.dev/docs/configuration#paths
 		alias: {$routes: 'src/routes'},
 		csp: {
