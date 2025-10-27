@@ -276,7 +276,11 @@ export class Diskfile_Editor_State {
 
 		// Create a disk change entry, but only if content is different from any recent entries
 		const first_entry = history.entries[0];
-		if (history.entries.length === 0 || !first_entry || first_entry.content !== this.diskfile.content) {
+		if (
+			history.entries.length === 0 ||
+			!first_entry ||
+			first_entry.content !== this.diskfile.content
+		) {
 			const disk_entry = history.add_entry(this.diskfile.content, {
 				is_disk_change: true,
 				label: 'Disk change',
