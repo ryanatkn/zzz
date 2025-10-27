@@ -178,9 +178,15 @@ describe('Diskfile_Tabs', () => {
 			const preview_tab = tabs.preview_diskfile(TEST_DISKFILE_ID_3);
 
 			// Verify the order: tab1, preview_tab, tab2
-			expect(tabs.tab_order[0]).toBe(tab1.id);
-			expect(tabs.tab_order[1]).toBe(preview_tab.id);
-			expect(tabs.tab_order[2]).toBe(tab2.id);
+			const order0 = tabs.tab_order[0];
+			const order1 = tabs.tab_order[1];
+			const order2 = tabs.tab_order[2];
+			expect(order0).toBeDefined();
+			expect(order1).toBeDefined();
+			expect(order2).toBeDefined();
+			expect(order0).toBe(tab1.id);
+			expect(order1).toBe(preview_tab.id);
+			expect(order2).toBe(tab2.id);
 		});
 
 		test('positioning with additional preview tabs', () => {
@@ -195,18 +201,30 @@ describe('Diskfile_Tabs', () => {
 			const preview = tabs.preview_diskfile(TEST_DISKFILE_ID_3);
 
 			// Expected order: tab1, preview, tab2
-			expect(tabs.tab_order[0]).toBe(tab1.id);
-			expect(tabs.tab_order[1]).toBe(preview.id);
-			expect(tabs.tab_order[2]).toBe(tab2.id);
+			const order0 = tabs.tab_order[0];
+			const order1 = tabs.tab_order[1];
+			const order2 = tabs.tab_order[2];
+			expect(order0).toBeDefined();
+			expect(order1).toBeDefined();
+			expect(order2).toBeDefined();
+			expect(order0).toBe(tab1.id);
+			expect(order1).toBe(preview.id);
+			expect(order2).toBe(tab2.id);
 
 			// Select tab2 and create another preview (reusing the existing one)
 			tabs.select_tab(tab2.id);
 			const preview2 = tabs.preview_diskfile(TEST_DISKFILE_ID_4);
 
 			// The preview tab should move after tab2
-			expect(tabs.tab_order[0]).toBe(tab1.id);
-			expect(tabs.tab_order[1]).toBe(tab2.id);
-			expect(tabs.tab_order[2]).toBe(preview.id);
+			const order0_after = tabs.tab_order[0];
+			const order1_after = tabs.tab_order[1];
+			const order2_after = tabs.tab_order[2];
+			expect(order0_after).toBeDefined();
+			expect(order1_after).toBeDefined();
+			expect(order2_after).toBeDefined();
+			expect(order0_after).toBe(tab1.id);
+			expect(order1_after).toBe(tab2.id);
+			expect(order2_after).toBe(preview.id);
 			expect(preview2).toBe(preview); // Same tab instance
 			expect(preview2.diskfile_id).toBe(TEST_DISKFILE_ID_4);
 		});
@@ -289,9 +307,15 @@ describe('Diskfile_Tabs', () => {
 			expect(tabs.tab_order).toEqual([tab2.id, tab3.id, tab1.id]);
 
 			// ordered_tabs should reflect the new order
-			expect(tabs.ordered_tabs[0].id).toBe(tab2.id);
-			expect(tabs.ordered_tabs[1].id).toBe(tab3.id);
-			expect(tabs.ordered_tabs[2].id).toBe(tab1.id);
+			const ordered0 = tabs.ordered_tabs[0];
+			const ordered1 = tabs.ordered_tabs[1];
+			const ordered2 = tabs.ordered_tabs[2];
+			expect(ordered0).toBeDefined();
+			expect(ordered1).toBeDefined();
+			expect(ordered2).toBeDefined();
+			expect(ordered0!.id).toBe(tab2.id);
+			expect(ordered1!.id).toBe(tab3.id);
+			expect(ordered2!.id).toBe(tab1.id);
 		});
 	});
 
@@ -323,7 +347,9 @@ describe('Diskfile_Tabs', () => {
 			expect(tabs.tab_order).not.toContain(tab.id);
 			expect(tabs.selected_tab_id).toBe(null);
 			expect(tabs.recently_closed_tabs).toHaveLength(1);
-			expect(tabs.recently_closed_tabs[0].id).toBe(tab.id);
+			const closed_tab = tabs.recently_closed_tabs[0];
+			expect(closed_tab).toBeDefined();
+			expect(closed_tab!.id).toBe(tab.id);
 		});
 
 		test('close_tab with multiple tabs selects the most recently opened tab', () => {
@@ -341,7 +367,9 @@ describe('Diskfile_Tabs', () => {
 			expect(tabs.items.size).toBe(2);
 			expect(tabs.selected_tab_id).toBe(tab3.id); // Should select the most recently opened (tab3)
 			expect(tabs.recently_closed_tabs).toHaveLength(1);
-			expect(tabs.recently_closed_tabs[0].id).toBe(tab2.id);
+			const closed_tab = tabs.recently_closed_tabs[0];
+			expect(closed_tab).toBeDefined();
+			expect(closed_tab!.id).toBe(tab2.id);
 		});
 
 		test('close_tab does nothing for non-existent tab', () => {

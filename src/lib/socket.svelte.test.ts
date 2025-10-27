@@ -188,7 +188,9 @@ describe('Socket', () => {
 
 			expect(sent).toBe(true);
 			expect(mock_socket.sent_messages.length).toBe(1);
-			expect(JSON.parse(mock_socket.sent_messages[0])).toEqual(TEST_MESSAGE.BASIC);
+			const first_message = mock_socket.sent_messages[0];
+			expect(first_message).toBeDefined();
+			expect(JSON.parse(first_message!)).toEqual(TEST_MESSAGE.BASIC);
 		});
 
 		test('message queueing sends queued messages when reconnected', () => {
@@ -234,7 +236,8 @@ describe('Socket', () => {
 
 			// Check error reason
 			const failed_message = Array.from(socket.failed_messages.values())[0];
-			expect(failed_message.reason).toBe(error_message);
+			expect(failed_message).toBeDefined();
+			expect(failed_message!.reason).toBe(error_message);
 		});
 
 		test('clear_failed_messages removes all failed messages', () => {

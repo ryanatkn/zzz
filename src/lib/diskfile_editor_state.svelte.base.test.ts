@@ -51,8 +51,10 @@ describe('initialization', () => {
 		const history = app.get_diskfile_history(TEST_PATH);
 		expect(history).toBeDefined();
 		expect(history!.entries.length).toBe(1);
-		expect(editor_state.selected_history_entry_id).toBe(history!.entries[0].id);
-		expect(history!.entries[0].content).toBe(TEST_CONTENT);
+		const first_entry = history!.entries[0];
+		expect(first_entry).toBeDefined();
+		expect(editor_state.selected_history_entry_id).toBe(first_entry!.id);
+		expect(first_entry!.content).toBe(TEST_CONTENT);
 	});
 
 	test('editor_state initializes with correct history entry', () => {
@@ -62,10 +64,11 @@ describe('initialization', () => {
 
 		// The initial entry should contain the original content
 		const initial_entry = history!.entries[0];
-		expect(initial_entry.content).toBe(TEST_CONTENT);
-		expect(initial_entry.is_unsaved_edit).toBe(false);
-		expect(initial_entry.is_disk_change).toBe(false);
-		expect(initial_entry.is_original_state).toBe(true);
+		expect(initial_entry).toBeDefined();
+		expect(initial_entry!.content).toBe(TEST_CONTENT);
+		expect(initial_entry!.is_unsaved_edit).toBe(false);
+		expect(initial_entry!.is_disk_change).toBe(false);
+		expect(initial_entry!.is_original_state).toBe(true);
 	});
 
 	test('editor_state handles initialization with null content', () => {
@@ -282,7 +285,9 @@ describe('file management', () => {
 		const new_history = app.get_diskfile_history(another_path);
 		expect(new_history).toBeDefined();
 		expect(new_history!.entries.length).toBe(1);
-		expect(new_history!.entries[0].content).toBe(another_content);
+		const first_entry = new_history!.entries[0];
+		expect(first_entry).toBeDefined();
+		expect(first_entry!.content).toBe(another_content);
 	});
 
 	test('update_diskfile does nothing when same diskfile is provided', () => {
@@ -429,9 +434,10 @@ describe('saving changes', () => {
 		// Check history entry
 		const history = app.get_diskfile_history(TEST_PATH)!;
 		const entry = history.entries[0]; // Newest entry
+		expect(entry).toBeDefined();
 
-		expect(entry.content).toBe('Content to be saved');
-		expect(entry.is_unsaved_edit).toBe(false);
-		expect(entry.is_disk_change).toBe(false);
+		expect(entry!.content).toBe('Content to be saved');
+		expect(entry!.is_unsaved_edit).toBe(false);
+		expect(entry!.is_disk_change).toBe(false);
 	});
 });

@@ -81,11 +81,13 @@ describe('Sortable', () => {
 				() => sorters,
 			);
 
+			const first_sorter = sorters[0];
+			expect(first_sorter).toBeDefined();
 			expect(sortable.items).toBe(items);
 			expect(sortable.sorters).toBe(sorters);
-			expect(sortable.active_key).toBe(sorters[0].key);
-			expect(sortable.active_sorter).toBe(sorters[0]);
-			expect(sortable.active_sort_fn).toBe(sorters[0].fn);
+			expect(sortable.active_key).toBe(first_sorter!.key);
+			expect(sortable.active_sorter).toBe(first_sorter);
+			expect(sortable.active_sort_fn).toBe(first_sorter!.fn);
 		});
 
 		test('uses default key when provided', () => {
@@ -95,9 +97,11 @@ describe('Sortable', () => {
 				() => 'value',
 			);
 
+			const sorter_at_2 = sorters[2];
+			expect(sorter_at_2).toBeDefined();
 			expect(sortable.default_key).toBe('value');
 			expect(sortable.active_key).toBe('value');
-			expect(sortable.active_sorter).toBe(sorters[2]);
+			expect(sortable.active_sorter).toBe(sorter_at_2);
 		});
 
 		test('falls back to first sorter when default key is invalid', () => {
@@ -107,8 +111,10 @@ describe('Sortable', () => {
 				() => 'invalid_key',
 			);
 
+			const first_sorter = sorters[0];
+			expect(first_sorter).toBeDefined();
 			expect(sortable.default_key).toBe('invalid_key');
-			expect(sortable.active_key).toBe(sorters[0].key);
+			expect(sortable.active_key).toBe(first_sorter!.key);
 		});
 
 		test('handles empty sorters array', () => {
@@ -131,10 +137,12 @@ describe('Sortable', () => {
 				() => current_sorters,
 			);
 
-			expect(sortable.active_key).toBe(sorters[0].key);
+			const first_sorter = sorters[0];
+			expect(first_sorter).toBeDefined();
+			expect(sortable.active_key).toBe(first_sorter!.key);
 
 			// Change sorters to new array without the current active key
-			current_sorters = [sorters[2], sorters[3]];
+			current_sorters = [sorters[2]!, sorters[3]!];
 
 			// Since the effect has been removed, manually call update_active_key
 			// Expect active key to change to value (the key of the first sorter in the new array)
@@ -151,78 +159,127 @@ describe('Sortable', () => {
 				() => current_sorters,
 			);
 
+			const sorter_at_1 = sorters[1];
+			const sorter_at_2 = sorters[2];
+			expect(sorter_at_1).toBeDefined();
+			expect(sorter_at_2).toBeDefined();
+
 			// Set active key to the second sorter
-			sortable.active_key = sorters[1].key;
+			sortable.active_key = sorter_at_1!.key;
 
 			// Change sorters but keep the active key
-			current_sorters = [sorters[1], sorters[2]];
+			current_sorters = [sorter_at_1!, sorter_at_2!];
 			sortable.update_active_key();
 
-			expect(sortable.active_key).toBe(sorters[1].key);
+			expect(sortable.active_key).toBe(sorter_at_1!.key);
 		});
 	});
 
 	describe('sort_by_text', () => {
 		test('sorts text values in ascending order', () => {
+			const sorter_0 = sorters[0];
+			expect(sorter_0).toBeDefined();
 			const sortable = new Sortable(
 				() => items,
-				() => [sorters[0]],
+				() => [sorter_0!],
 			);
 			const sorted = sortable.sorted_items;
 
-			expect(sorted[0].name).toBe('Apple');
-			expect(sorted[1].name).toBe('Apple');
-			expect(sorted[2].name).toBe('Banana');
-			expect(sorted[3].name).toBe('Cherry');
+			const item0 = sorted[0];
+			const item1 = sorted[1];
+			const item2 = sorted[2];
+			const item3 = sorted[3];
+			expect(item0).toBeDefined();
+			expect(item1).toBeDefined();
+			expect(item2).toBeDefined();
+			expect(item3).toBeDefined();
+
+			expect(item0!.name).toBe('Apple');
+			expect(item1!.name).toBe('Apple');
+			expect(item2!.name).toBe('Banana');
+			expect(item3!.name).toBe('Cherry');
 
 			// Verify that items with the same name are sorted by cid as fallback
-			expect(sorted[0].cid).toBe(40); // First "Apple" has higher cid
-			expect(sorted[1].cid).toBe(10); // Second "Apple" has lower cid
+			expect(item0!.cid).toBe(40); // First "Apple" has higher cid
+			expect(item1!.cid).toBe(10); // Second "Apple" has lower cid
 		});
 
 		test('sorts text values in descending order', () => {
+			const sorter_1 = sorters[1];
+			expect(sorter_1).toBeDefined();
 			const sortable = new Sortable(
 				() => items,
-				() => [sorters[1]],
+				() => [sorter_1!],
 			);
 			const sorted = sortable.sorted_items;
 
-			expect(sorted[0].name).toBe('Cherry');
-			expect(sorted[1].name).toBe('Banana');
-			expect(sorted[2].name).toBe('Apple');
-			expect(sorted[3].name).toBe('Apple');
+			const item0 = sorted[0];
+			const item1 = sorted[1];
+			const item2 = sorted[2];
+			const item3 = sorted[3];
+			expect(item0).toBeDefined();
+			expect(item1).toBeDefined();
+			expect(item2).toBeDefined();
+			expect(item3).toBeDefined();
+
+			expect(item0!.name).toBe('Cherry');
+			expect(item1!.name).toBe('Banana');
+			expect(item2!.name).toBe('Apple');
+			expect(item3!.name).toBe('Apple');
 
 			// Verify that items with the same name are sorted by cid as fallback
-			expect(sorted[2].cid).toBe(40); // First "Apple" has higher cid
-			expect(sorted[3].cid).toBe(10); // Second "Apple" has lower cid
+			expect(item2!.cid).toBe(40); // First "Apple" has higher cid
+			expect(item3!.cid).toBe(10); // Second "Apple" has lower cid
 		});
 	});
 
 	describe('sort_by_numeric', () => {
 		test('sorts numeric values in ascending order', () => {
+			const sorter_2 = sorters[2];
+			expect(sorter_2).toBeDefined();
 			const sortable = new Sortable(
 				() => items,
-				() => [sorters[2]],
+				() => [sorter_2!],
 			);
 			const sorted = sortable.sorted_items;
 
-			expect(sorted[0].value).toBe(5);
-			expect(sorted[1].value).toBe(10);
-			expect(sorted[2].value).toBe(15);
-			expect(sorted[3].value).toBe(20);
+			const item0 = sorted[0];
+			const item1 = sorted[1];
+			const item2 = sorted[2];
+			const item3 = sorted[3];
+			expect(item0).toBeDefined();
+			expect(item1).toBeDefined();
+			expect(item2).toBeDefined();
+			expect(item3).toBeDefined();
+
+			expect(item0!.value).toBe(5);
+			expect(item1!.value).toBe(10);
+			expect(item2!.value).toBe(15);
+			expect(item3!.value).toBe(20);
 		});
 
 		test('sorts numeric values in descending order', () => {
+			const sorter_3 = sorters[3];
+			expect(sorter_3).toBeDefined();
 			const sortable = new Sortable(
 				() => items,
-				() => [sorters[3]],
+				() => [sorter_3!],
 			);
 			const sorted = sortable.sorted_items;
 
-			expect(sorted[0].value).toBe(20);
-			expect(sorted[1].value).toBe(15);
-			expect(sorted[2].value).toBe(10);
-			expect(sorted[3].value).toBe(5);
+			const item0 = sorted[0];
+			const item1 = sorted[1];
+			const item2 = sorted[2];
+			const item3 = sorted[3];
+			expect(item0).toBeDefined();
+			expect(item1).toBeDefined();
+			expect(item2).toBeDefined();
+			expect(item3).toBeDefined();
+
+			expect(item0!.value).toBe(20);
+			expect(item1!.value).toBe(15);
+			expect(item2!.value).toBe(10);
+			expect(item3!.value).toBe(5);
 		});
 
 		test('maintains stable sort order with equal values using cid', () => {
@@ -240,10 +297,17 @@ describe('Sortable', () => {
 			);
 			const sorted = sortable.sorted_items;
 
+			const item0 = sorted[0];
+			const item1 = sorted[1];
+			const item2 = sorted[2];
+			expect(item0).toBeDefined();
+			expect(item1).toBeDefined();
+			expect(item2).toBeDefined();
+
 			// Items with equal values should be sorted by cid
-			expect(sorted[0].cid).toBe(300);
-			expect(sorted[1].cid).toBe(200);
-			expect(sorted[2].cid).toBe(100);
+			expect(item0!.cid).toBe(300);
+			expect(item1!.cid).toBe(200);
+			expect(item2!.cid).toBe(100);
 		});
 	});
 
@@ -276,14 +340,20 @@ describe('Sortable', () => {
 				() => sorters,
 			);
 
+			const first_item = sortable.sorted_items[0];
+			expect(first_item).toBeDefined();
+
 			// Initially sorted by name (first sorter)
-			expect(sortable.sorted_items[0].name).toBe('Apple');
+			expect(first_item!.name).toBe('Apple');
 
 			// Change to sort by value
 			sortable.active_key = 'value';
 
+			const first_item_after = sortable.sorted_items[0];
+			expect(first_item_after).toBeDefined();
+
 			// Should now be sorted by value
-			expect(sortable.sorted_items[0].value).toBe(5);
+			expect(first_item_after!.value).toBe(5);
 		});
 	});
 });
