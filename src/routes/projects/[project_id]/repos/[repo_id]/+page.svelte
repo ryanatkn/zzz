@@ -19,7 +19,6 @@
 	const add_tag = (dir_index: number, tag: string) => {
 		if (!repos_viewmodel || !tag.trim()) return;
 		const checkout_dir = repos_viewmodel.checkouts[dir_index];
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (checkout_dir && !checkout_dir.tags.includes(tag)) {
 			checkout_dir.tags.push(tag);
 		}
@@ -28,7 +27,6 @@
 	const remove_tag = (dir_index: number, tag_index: number) => {
 		if (!repos_viewmodel) return;
 		const checkout_dir = repos_viewmodel.checkouts[dir_index];
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (checkout_dir) {
 			checkout_dir.tags.splice(tag_index, 1);
 		}
