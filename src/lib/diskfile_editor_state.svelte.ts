@@ -275,7 +275,8 @@ export class Diskfile_Editor_State {
 		const history = this.#ensure_history();
 
 		// Create a disk change entry, but only if content is different from any recent entries
-		if (history.entries.length === 0 || history.entries[0].content !== this.diskfile.content) {
+		const first_entry = history.entries[0];
+		if (history.entries.length === 0 || !first_entry || first_entry.content !== this.diskfile.content) {
 			const disk_entry = history.add_entry(this.diskfile.content, {
 				is_disk_change: true,
 				label: 'Disk change',
@@ -289,8 +290,8 @@ export class Diskfile_Editor_State {
 			// The first entry is the same as the current disk content
 			// TODO maybe update created? should already be the latest one though,
 			// given it's the first entry in the logic above
-			history.entries[0].is_disk_change = true;
-			history.entries[0].is_unsaved_edit = false;
+			first_entry.is_disk_change = true;
+			first_entry.is_unsaved_edit = false;
 		}
 
 		// Always update last seen content

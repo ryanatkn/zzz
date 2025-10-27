@@ -92,10 +92,11 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 
 		// Find the correct insertion point to maintain sort order (newest first)
 		let insertion_index = 0;
-		while (
-			insertion_index < new_entries.length &&
-			new_entries[insertion_index].created > entry.created
-		) {
+		while (insertion_index < new_entries.length) {
+			const current_entry = new_entries[insertion_index];
+			if (!current_entry || current_entry.created <= entry.created) {
+				break;
+			}
 			insertion_index++;
 		}
 

@@ -15,7 +15,11 @@ const create_mock_fs = (initial_files: Record<string, string> = {}) => {
 				error.code = 'ENOENT';
 				throw error;
 			}
-			return files[path];
+			const file_content = files[path];
+			if (file_content === undefined) {
+				throw new Error(`File at ${path} exists in record but has undefined content`);
+			}
+			return file_content;
 		},
 		write_file: async (path: string, content: string, _encoding: string): Promise<void> => {
 			files[path] = content;

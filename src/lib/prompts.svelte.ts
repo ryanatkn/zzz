@@ -126,7 +126,10 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 		// Set selected_id to the first prompt if none is selected
 		if (this.selected_id === null && prompts.length > 0) {
-			this.selected_id = prompts[0].id;
+			const first_prompt = prompts[0];
+			if (first_prompt) {
+				this.selected_id = first_prompt.id;
+			}
 		}
 
 		return prompts;
