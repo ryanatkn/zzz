@@ -121,7 +121,7 @@ export abstract class Part<T extends z.ZodType = typeof Part_Json_Base> extends 
 		// TODO refactor this code, maybe update directly? using svelte 5 idioms
 		const new_attributes = [...this.attributes];
 
-		const attr = new_attributes[index];
+		const attr = new_attributes[index]!; // guaranteed by index !== -1 check above
 
 		if ('key' in updates && updates.key !== undefined) {
 			attr.key = updates.key;
@@ -218,7 +218,7 @@ export class Diskfile_Part extends Part<typeof Diskfile_Part_Json> {
 		if (path_attr_index >= 0) {
 			// Update existing path attribute
 			const new_attributes = [...this.attributes];
-			new_attributes[path_attr_index].value = relative_path;
+			new_attributes[path_attr_index]!.value = relative_path; // guaranteed by >= 0 check
 			this.attributes = new_attributes;
 		} else {
 			// Add new path attribute
