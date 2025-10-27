@@ -58,10 +58,11 @@ const render_markdown = (text: string): string => {
 					.map((item) => `<li>${sanitize_html(item)}</li>`)
 					.join('');
 
-				if (items[0].trim() === '') {
+				const first_item = items[0];
+				if (!first_item || first_item.trim() === '') {
 					return `<ul>${list_items}</ul>`;
 				} else {
-					return `<p>${sanitize_html(items[0])}</p><ul>${list_items}</ul>`;
+					return `<p>${sanitize_html(first_item)}</p><ul>${list_items}</ul>`;
 				}
 			}
 

@@ -48,9 +48,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	 * Since entries are always kept sorted by creation time (newest first),
 	 * the most recent is always the first element.
 	 */
-	readonly current_entry: History_Entry | null = $derived(
-		this.entries.length > 0 ? this.entries[0] : null,
-	);
+	readonly current_entry: History_Entry | null = $derived(this.entries[0] ?? null);
 
 	constructor(options: Diskfile_History_Options) {
 		super(Diskfile_History_Json, options);

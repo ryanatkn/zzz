@@ -91,7 +91,11 @@ export class Threads extends Cell<typeof Threads_Json> {
 			typeof select === 'number' ||
 			(this.selected_id === null && threads.length > 0)
 		) {
-			this.selected_id = threads[typeof select === 'number' ? select : 0].id;
+			const index = typeof select === 'number' ? select : 0;
+			const thread = threads[index];
+			if (thread) {
+				this.selected_id = thread.id;
+			}
 		}
 
 		return threads;
