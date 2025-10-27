@@ -449,18 +449,18 @@ describe('Indexed_Collection - Advanced Features', () => {
 		expect(collection.where('by_category', 'c2').length).toBe(2);
 
 		// Test removing multiple items at once
-		const ids_to_remove = [items[0].id, items[2].id, items[4].id];
+		const ids_to_remove = [items[0]!.id, items[2]!.id, items[4]!.id];
 		const removed_count = collection.remove_many(ids_to_remove);
 
 		expect(removed_count).toBe(3);
 		expect(collection.size).toBe(2);
 
 		// Verify specific items were removed
-		expect(collection.has(items[0].id)).toBe(false);
-		expect(collection.has(items[1].id)).toBe(true);
-		expect(collection.has(items[2].id)).toBe(false);
-		expect(collection.has(items[3].id)).toBe(true);
-		expect(collection.has(items[4].id)).toBe(false);
+		expect(collection.has(items[0]!.id)).toBe(false);
+		expect(collection.has(items[1]!.id)).toBe(true);
+		expect(collection.has(items[2]!.id)).toBe(false);
+		expect(collection.has(items[3]!.id)).toBe(true);
+		expect(collection.has(items[4]!.id)).toBe(false);
 
 		// Verify indexes were properly updated
 		expect(collection.where('by_category', 'c1').length).toBe(1);

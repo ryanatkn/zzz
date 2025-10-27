@@ -198,10 +198,10 @@ describe('Ollama', () => {
 		};
 
 		expect(ollama.running_models).toHaveLength(2);
-		expect(ollama.running_models[0].name).toBe('llama3.2:1b');
-		expect(ollama.running_models[0].size_vram).toBe(1024 * 1024 * 1024);
-		expect(ollama.running_models[1].name).toBe('gemma:2b');
-		expect(ollama.running_models[1].size_vram).toBe(2 * 1024 * 1024 * 1024);
+		expect(ollama.running_models[0]!.name).toBe('llama3.2:1b');
+		expect(ollama.running_models[0]!.size_vram).toBe(1024 * 1024 * 1024);
+		expect(ollama.running_models[1]!.name).toBe('gemma:2b');
+		expect(ollama.running_models[1]!.size_vram).toBe(2 * 1024 * 1024 * 1024);
 
 		expect(ollama.running_model_names.has('llama3.2:1b')).toBe(true);
 		expect(ollama.running_model_names.has('gemma:2b')).toBe(true);
@@ -338,7 +338,7 @@ describe('Ollama', () => {
 		// With show_read_actions = false (default)
 		expect(ollama.show_read_actions).toBe(false);
 		expect(ollama.filtered_actions).toHaveLength(1);
-		expect(ollama.filtered_actions[0].method).toBe('ollama_pull');
+		expect(ollama.filtered_actions[0]!.method).toBe('ollama_pull');
 
 		// With show_read_actions = true
 		ollama.show_read_actions = true;
@@ -369,7 +369,7 @@ describe('Ollama', () => {
 		});
 
 		expect(ollama.pending_actions).toHaveLength(1);
-		expect(ollama.pending_actions[0].action_event_data?.progress).toEqual({
+		expect(ollama.pending_actions[0]!.action_event_data?.progress).toEqual({
 			status: 'downloading',
 			completed: 50,
 			total: 100,
@@ -399,7 +399,7 @@ describe('Ollama', () => {
 			completed: 75,
 			total: 100,
 		});
-		expect(ollama.pending_actions[0].action_event_data?.progress).toEqual({
+		expect(ollama.pending_actions[0]!.action_event_data?.progress).toEqual({
 			status: 'downloading',
 			completed: 75,
 			total: 100,
@@ -440,7 +440,7 @@ describe('Ollama', () => {
 
 		expect(ollama.pending_actions).toHaveLength(0);
 		expect(ollama.completed_actions).toHaveLength(1);
-		expect(ollama.completed_actions[0].action_event_data?.step).toBe('failed');
+		expect(ollama.completed_actions[0]!.action_event_data?.step).toBe('failed');
 	});
 
 	test('should only include ollama provider models', () => {
@@ -454,8 +454,8 @@ describe('Ollama', () => {
 		const ollama = new Ollama({app});
 
 		expect(ollama.models).toHaveLength(1);
-		expect(ollama.models[0].name).toBe('ollama_model');
-		expect(ollama.models[0].provider_name).toBe('ollama');
+		expect(ollama.models[0]!.name).toBe('ollama_model');
+		expect(ollama.models[0]!.provider_name).toBe('ollama');
 	});
 
 	test('should handle ps response with empty models array', () => {

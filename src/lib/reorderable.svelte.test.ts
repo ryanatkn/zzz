@@ -206,7 +206,9 @@ describe('Reorderable', () => {
 			const elements = create_elements();
 			items = elements.items;
 			reorderable = new Reorderable();
-			item = items[0];
+			const first_item = items[0];
+			if (!first_item) throw new Error('Expected at least one item in test setup');
+			item = first_item;
 		});
 
 		afterEach(() => {
@@ -298,7 +300,9 @@ describe('Reorderable', () => {
 			const elements = create_elements();
 			items = elements.items;
 			reorderable = new Reorderable();
-			item = items[0];
+			const first_item = items[0];
+			if (!first_item) throw new Error('Expected at least one item in test setup');
+			item = first_item;
 
 			// Set up item
 			cleanup_fn = attach_item(reorderable, item, {index: 0});
@@ -373,8 +377,11 @@ describe('Reorderable', () => {
 		});
 
 		test('dragstart sets up source item', () => {
+			const first_item = items[0];
+			if (!first_item) throw new Error('Expected first item');
+
 			// Get item id
-			const item_id = items[0].dataset.reorderable_item_id as Reorderable_Item_Id;
+			const item_id = first_item.dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Create mock event
 			const mock_data_transfer = {
@@ -382,33 +389,36 @@ describe('Reorderable', () => {
 				dropEffect: 'none',
 				effectAllowed: 'none',
 			};
-			const drag_event = create_mock_drag_event('dragstart', items[0], mock_data_transfer);
+			const drag_event = create_mock_drag_event('dragstart', first_item, mock_data_transfer);
 
 			// Dispatch the event
-			items[0].dispatchEvent(drag_event);
+			first_item.dispatchEvent(drag_event);
 
 			// Check if drag operation was set up
 			expect(reorderable.source_index).toBe(0);
 			expect(reorderable.source_item_id).toBe(item_id);
-			expect(items[0].classList.contains(reorderable.dragging_class!)).toBe(true);
+			expect(first_item.classList.contains(reorderable.dragging_class!)).toBe(true);
 			expect(mock_data_transfer.setData).toHaveBeenCalled();
 		});
 
 		test('dragend resets state', () => {
+			const first_item = items[0];
+			if (!first_item) throw new Error('Expected first item');
+
 			// Set up drag state manually
-			const item_id = items[0].dataset.reorderable_item_id as Reorderable_Item_Id;
+			const item_id = first_item.dataset.reorderable_item_id as Reorderable_Item_Id;
 			reorderable.source_index = 0;
 			reorderable.source_item_id = item_id;
-			items[0].classList.add(reorderable.dragging_class!);
+			first_item.classList.add(reorderable.dragging_class!);
 
 			// Trigger dragend event to reset state
-			const dragend_event = create_mock_drag_event('dragend', items[0]);
+			const dragend_event = create_mock_drag_event('dragend', first_item);
 			list.dispatchEvent(dragend_event);
 
 			// Check if state was reset
 			expect(reorderable.source_index).toBe(-1);
 			expect(reorderable.source_item_id).toBeNull();
-			expect(items[0].classList.contains(reorderable.dragging_class!)).toBe(false);
+			expect(first_item.classList.contains(reorderable.dragging_class!)).toBe(false);
 		});
 	});
 
@@ -515,12 +525,16 @@ describe('Reorderable', () => {
 			force_initialize(reorderable);
 
 			// Set up source item (index 0)
+			const source_item = items[0];
+			const target_item = items[1];
+			if (!source_item || !target_item) throw new Error('Expected source and target items');
+
 			reorderable.source_index = 0;
-			reorderable.source_item_id = items[0].dataset.reorderable_item_id as Reorderable_Item_Id;
+			reorderable.source_item_id = source_item.dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Mock drop event on item 1 (should be prevented)
-			const drop_event1 = create_mock_drag_event('drop', items[1]);
-			items[1].dispatchEvent(drop_event1);
+			const drop_event1 = create_mock_drag_event('drop', target_item);
+			target_item.dispatchEvent(drop_event1);
 
 			// onreorder should not be called for invalid target
 			expect(onreorder).not.toHaveBeenCalled();
@@ -552,21 +566,25 @@ describe('Reorderable', () => {
 			force_initialize(reorderable);
 
 			// Set up source item (index 0)
-			const source_id = items[0].dataset.reorderable_item_id as Reorderable_Item_Id;
+			const source_item = items[0];
+			const other_item = items[1];
+			if (!source_item || !other_item) throw new Error('Expected source and other items');
+
+			const source_id = source_item.dataset.reorderable_item_id as Reorderable_Item_Id;
 			reorderable.source_index = 0;
 			reorderable.source_item_id = source_id;
 
 			// Apply indicators to another item
-			const other_id = items[1].dataset.reorderable_item_id as Reorderable_Item_Id;
+			const other_id = other_item.dataset.reorderable_item_id as Reorderable_Item_Id;
 			reorderable.update_indicator(other_id, 'bottom');
 
-			expect(items[1].classList.contains(reorderable.drag_over_class!)).toBe(true);
+			expect(other_item.classList.contains(reorderable.drag_over_class!)).toBe(true);
 
 			// Now try to apply indicators to the source item
 			reorderable.update_indicator(source_id, 'top');
 
 			// Indicators should be cleared instead
-			expect(items[0].classList.contains(reorderable.drag_over_class!)).toBe(false);
+			expect(source_item.classList.contains(reorderable.drag_over_class!)).toBe(false);
 			expect(reorderable.active_indicator_item_id).toBeNull();
 			expect(reorderable.current_indicator).toBe('none');
 
@@ -607,13 +625,16 @@ describe('Reorderable', () => {
 			force_initialize(reorderable2);
 
 			// Set up drag on first list
+			const first_item1 = items1[0];
+			if (!first_item1) throw new Error('Expected first item in list1');
+
 			const mock_data_transfer1 = {
 				setData: vi.fn(),
 				dropEffect: 'none',
 				effectAllowed: 'none',
 			};
-			const drag_event1 = create_mock_drag_event('dragstart', items1[0], mock_data_transfer1);
-			items1[0].dispatchEvent(drag_event1);
+			const drag_event1 = create_mock_drag_event('dragstart', first_item1, mock_data_transfer1);
+			first_item1.dispatchEvent(drag_event1);
 
 			// Should only affect first reorderable
 			expect(reorderable1.source_index).toBe(0);
@@ -658,17 +679,21 @@ describe('Reorderable', () => {
 			expect(list.classList.contains('my_list')).toBe(true);
 
 			// Check item class
-			expect(items[0].classList.contains('my_item')).toBe(true);
+			const first_item = items[0];
+			const second_item = items[1];
+			if (!first_item || !second_item) throw new Error('Expected first and second items');
+
+			expect(first_item.classList.contains('my_item')).toBe(true);
 
 			// Apply dragging class
-			items[0].classList.add(reorderable.dragging_class!);
-			expect(items[0].classList.contains('my_dragging')).toBe(true);
+			first_item.classList.add(reorderable.dragging_class!);
+			expect(first_item.classList.contains('my_dragging')).toBe(true);
 
 			// Apply indicator
-			items[1].classList.add(reorderable.drag_over_class!);
-			items[1].classList.add(reorderable.drag_over_top_class!);
-			expect(items[1].classList.contains('my_drag_over')).toBe(true);
-			expect(items[1].classList.contains('my_drag_over_top')).toBe(true);
+			second_item.classList.add(reorderable.drag_over_class!);
+			second_item.classList.add(reorderable.drag_over_top_class!);
+			expect(second_item.classList.contains('my_drag_over')).toBe(true);
+			expect(second_item.classList.contains('my_drag_over_top')).toBe(true);
 
 			// Clean up
 			for (const r of action_results) r?.destroy();
@@ -691,7 +716,9 @@ describe('Reorderable', () => {
 			expect(list.getAttribute('role')).toBe('list');
 
 			// Check item role
-			expect(items[0].getAttribute('role')).toBe('listitem');
+			const first_item = items[0];
+			if (!first_item) throw new Error('Expected first item');
+			expect(first_item.getAttribute('role')).toBe('listitem');
 
 			// Clean up
 			for (const r of action_results) r?.destroy();

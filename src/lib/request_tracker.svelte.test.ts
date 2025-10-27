@@ -1005,6 +1005,7 @@ describe('Request_Tracker', () => {
 			// Resolve them in reverse order
 			for (let i = ids.length - 1; i >= 0; i--) {
 				const id = ids[i];
+				if (id === undefined) throw Error();
 				tracker.resolve_request(id, create_jsonrpc_response(id, {test: 'result'}));
 			}
 

@@ -835,7 +835,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 		// Remove an item
 		const items = collection.where('by_boolean_a', true);
-		collection.remove(items[0].id);
+		collection.remove(items[0]!.id);
 
 		expect(true_count).toBe(1);
 		expect(false_count).toBe(1);
@@ -870,7 +870,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 		// Remove an item
 		const tag1_items = collection.where('by_tags', 'tag1');
-		collection.remove(tag1_items[0].id);
+		collection.remove(tag1_items[0]!.id);
 
 		// Derived value should update again
 		expect(tag1_derived_length).toBe(1);
