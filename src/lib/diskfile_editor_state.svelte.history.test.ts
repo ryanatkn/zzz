@@ -221,16 +221,13 @@ describe('saving history changes', () => {
 
 		// A new entry should be created with correct properties
 		const history = app.get_diskfile_history(TEST_PATH)!;
-		const new_saved_entry = history.entries[0];
-		expect(new_saved_entry).toBeDefined();
-
-		expect(new_saved_entry!).toMatchObject({
+		expect(history.entries[0]!).toMatchObject({
 			content: 'Content to save',
 			is_unsaved_edit: false,
 		});
 
 		// Selection should point to the new entry
-		expect(editor_state.selected_history_entry_id).toBe(new_saved_entry!.id);
+		expect(editor_state.selected_history_entry_id).toBe(history.entries[0]!.id);
 	});
 
 	test('save_changes with no changes returns false', async () => {

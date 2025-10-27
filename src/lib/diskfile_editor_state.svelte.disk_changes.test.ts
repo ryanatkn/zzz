@@ -192,10 +192,8 @@ describe('disk change detection', () => {
 		editor_state.check_disk_changes();
 
 		// The existing entry should now be marked as a disk change and not an unsaved edit
-		const first_entry = history.entries[0];
-		expect(first_entry).toBeDefined();
-		expect(first_entry!.is_disk_change).toBe(true);
-		expect(first_entry!.is_unsaved_edit).toBe(false);
+		expect(history.entries[0]!.is_disk_change).toBe(true);
+		expect(history.entries[0]!.is_unsaved_edit).toBe(false);
 
 		// No new entry should be created
 		expect(history.entries.length).toBe(2); // Original + our added entry
@@ -349,9 +347,7 @@ describe('edge cases', () => {
 		expect(empty_history_editor.current_content).toBe('Disk changed');
 
 		// The implementation should create an entry with the disk_change flag
-		const first_entry = history.entries[0];
-		expect(first_entry).toBeDefined();
-		expect(first_entry).toMatchObject({
+		expect(history.entries[0]!).toMatchObject({
 			content: 'Disk changed',
 			is_disk_change: true,
 		});

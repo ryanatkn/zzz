@@ -157,9 +157,7 @@ describe('Indexed_Collection - Index Types', () => {
 		// Test index update on removal
 		collection.remove(item1.id);
 		expect(collection.where<string>('by_category', 'c1')).toHaveLength(1);
-		const c1_after_remove = collection.where<string>('by_category', 'c1')[0];
-		expect(c1_after_remove).toBeDefined();
-		expect(c1_after_remove!.id).toBe(item2.id);
+		expect(collection.where<string>('by_category', 'c1')[0]!.id).toBe(item2.id);
 	});
 
 	test('derived index operations', () => {
@@ -198,15 +196,9 @@ describe('Indexed_Collection - Index Types', () => {
 		const high_numbers = collection.derived_index('high_numbers');
 		expect(high_numbers).toHaveLength(3);
 		// Compare by id instead of reference
-		const hn0 = high_numbers[0];
-		const hn1 = high_numbers[1];
-		const hn2 = high_numbers[2];
-		expect(hn0).toBeDefined();
-		expect(hn1).toBeDefined();
-		expect(hn2).toBeDefined();
-		expect(hn0!.id).toBe(high_item.id); // Highest number first (10)
-		expect(hn1!.id).toBe(medium_item.id); // Second number (8)
-		expect(hn2!.id).toBe(threshold_item.id); // Third number (6)
+		expect(high_numbers[0]!.id).toBe(high_item.id); // Highest number first (10)
+		expect(high_numbers[1]!.id).toBe(medium_item.id); // Second number (8)
+		expect(high_numbers[2]!.id).toBe(threshold_item.id); // Third number (6)
 		expect(high_numbers.some((item) => item.id === low_item.id)).toBe(false); // Low number excluded (3)
 
 		// Test direct access via get_index
@@ -219,26 +211,16 @@ describe('Indexed_Collection - Index Types', () => {
 
 		const updated_high_numbers = collection.derived_index('high_numbers');
 		expect(updated_high_numbers).toHaveLength(4);
-		const uhn0 = updated_high_numbers[0];
-		const uhn1 = updated_high_numbers[1];
-		const uhn2 = updated_high_numbers[2];
-		const uhn3 = updated_high_numbers[3];
-		expect(uhn0).toBeDefined();
-		expect(uhn1).toBeDefined();
-		expect(uhn2).toBeDefined();
-		expect(uhn3).toBeDefined();
-		expect(uhn0!.id).toBe(high_item.id); // 10
-		expect(uhn1!.id).toBe(new_high_item.id); // 9
-		expect(uhn2!.id).toBe(medium_item.id); // 8
-		expect(uhn3!.id).toBe(threshold_item.id); // 6
+		expect(updated_high_numbers[0]!.id).toBe(high_item.id); // 10
+		expect(updated_high_numbers[1]!.id).toBe(new_high_item.id); // 9
+		expect(updated_high_numbers[2]!.id).toBe(medium_item.id); // 8
+		expect(updated_high_numbers[3]!.id).toBe(threshold_item.id); // 6
 
 		// Test removal from derived index
 		collection.remove(high_item.id);
 		const numbers_after_removal = collection.derived_index('high_numbers');
 		expect(numbers_after_removal).toHaveLength(3);
-		const nar0 = numbers_after_removal[0];
-		expect(nar0).toBeDefined();
-		expect(nar0!.id).toBe(new_high_item.id); // Now highest number
+		expect(numbers_after_removal[0]!.id).toBe(new_high_item.id); // Now highest number
 	});
 
 	test('function indexes', () => {
