@@ -91,7 +91,11 @@ export class Threads extends Cell<typeof Threads_Json> {
 			typeof select === 'number' ||
 			(this.selected_id === null && threads.length > 0)
 		) {
-			this.selected_id = threads[typeof select === 'number' ? select : 0].id;
+			const index = typeof select === 'number' ? select : 0;
+			const thread = threads[index];
+			if (thread) {
+				this.selected_id = thread.id;
+			}
 		}
 
 		return threads;
@@ -134,7 +138,7 @@ export class Threads extends Cell<typeof Threads_Json> {
 	#remove_references_from_chats(thread_ids: Array<Uuid>): void {
 		// If there's only one item, use the single-item optimized version
 		if (thread_ids.length === 1) {
-			this.#remove_reference_from_chats(thread_ids[0]);
+			this.#remove_reference_from_chats(thread_ids[0]!); // guaranteed by length === 1
 			return;
 		}
 

@@ -310,7 +310,7 @@ export class Popover {
 				}
 
 				for (const key in styles) {
-					node.style.setProperty(key, styles[key]);
+					node.style.setProperty(key, styles[key]!);
 				}
 			};
 

@@ -1085,12 +1085,12 @@ describe('Popover', () => {
 
 			// Hide them one by one and verify others remain visible
 			for (let i = 0; i < popovers.length; i++) {
-				popovers[i].hide();
-				expect(popovers[i].visible).toBe(false);
+				popovers[i]!.hide();
+				expect(popovers[i]!.visible).toBe(false);
 
 				// Check remaining popovers are still visible
 				for (let j = i + 1; j < popovers.length; j++) {
-					expect(popovers[j].visible).toBe(true);
+					expect(popovers[j]!.visible).toBe(true);
 				}
 			}
 

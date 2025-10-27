@@ -327,11 +327,11 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 
 				// Try to select the next tab first
 				if (tab_index !== -1 && tab_index < this.tab_order.length - 1) {
-					this.selected_tab_id = this.tab_order[tab_index + 1];
+					this.selected_tab_id = this.tab_order[tab_index + 1]!; // bounds check guarantees
 				}
 				// If no next tab, try to select the previous tab
 				else if (tab_index > 0) {
-					this.selected_tab_id = this.tab_order[tab_index - 1];
+					this.selected_tab_id = this.tab_order[tab_index - 1]!; // bounds check guarantees
 				}
 				// If no tabs left, set to null
 				else {

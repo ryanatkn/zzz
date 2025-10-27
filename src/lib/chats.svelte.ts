@@ -117,7 +117,11 @@ export class Chats extends Cell<typeof Chats_Json> {
 			typeof select === 'number' ||
 			(this.#selected_id === null && chats.length > 0)
 		) {
-			void this.select(chats[typeof select === 'number' ? select : 0].id);
+			const index = typeof select === 'number' ? select : 0;
+			const chat = chats[index];
+			if (chat) {
+				void this.select(chat.id);
+			}
 		}
 
 		return chats;
@@ -177,7 +181,11 @@ export class Chats extends Cell<typeof Chats_Json> {
 		return this.chat_templates.find((t) => t.id === id);
 	}
 	get_default_template(): Chat_Template {
-		return this.chat_templates[0];
+		const template = this.chat_templates[0];
+		if (!template) {
+			throw new Error('No chat templates available');
+		}
+		return template;
 	}
 }
 

@@ -147,7 +147,7 @@ export const extract_parameter_count = (parameter_size: string | undefined): num
 	if (!parameter_size) return undefined;
 	const match = /^(\d+(?:\.\d+)?)[BM]?$/i.exec(parameter_size);
 	if (!match) return undefined;
-	const value = parseFloat(match[1]);
+	const value = parseFloat(match[1]!); // guaranteed by regex and !match check
 	// If it ends with M, convert to billions
 	if (parameter_size.toUpperCase().endsWith('M')) {
 		return value / 1000;

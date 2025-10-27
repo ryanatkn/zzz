@@ -108,7 +108,15 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 		throw new Error(`Invalid origin pattern: ${pattern}`);
 	}
 
-	const [, protocol, hostname, port = '', path = ''] = parts;
+	const protocol = parts[1];
+	const hostname = parts[2];
+	const port = parts[3] ?? '';
+	const path = parts[4] ?? '';
+
+	// These should always exist if the regex matched, but check defensively
+	if (!protocol || !hostname) {
+		throw new Error(`Failed to parse origin pattern: ${pattern}`);
+	}
 
 	// Origins cannot have paths
 	if (path) {

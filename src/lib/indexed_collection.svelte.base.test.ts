@@ -157,7 +157,7 @@ describe('Indexed_Collection - Index Types', () => {
 		// Test index update on removal
 		collection.remove(item1.id);
 		expect(collection.where<string>('by_category', 'c1')).toHaveLength(1);
-		expect(collection.where<string>('by_category', 'c1')[0].id).toBe(item2.id);
+		expect(collection.where<string>('by_category', 'c1')[0]!.id).toBe(item2.id);
 	});
 
 	test('derived index operations', () => {
@@ -196,9 +196,9 @@ describe('Indexed_Collection - Index Types', () => {
 		const high_numbers = collection.derived_index('high_numbers');
 		expect(high_numbers).toHaveLength(3);
 		// Compare by id instead of reference
-		expect(high_numbers[0].id).toBe(high_item.id); // Highest number first (10)
-		expect(high_numbers[1].id).toBe(medium_item.id); // Second number (8)
-		expect(high_numbers[2].id).toBe(threshold_item.id); // Third number (6)
+		expect(high_numbers[0]!.id).toBe(high_item.id); // Highest number first (10)
+		expect(high_numbers[1]!.id).toBe(medium_item.id); // Second number (8)
+		expect(high_numbers[2]!.id).toBe(threshold_item.id); // Third number (6)
 		expect(high_numbers.some((item) => item.id === low_item.id)).toBe(false); // Low number excluded (3)
 
 		// Test direct access via get_index
@@ -211,16 +211,16 @@ describe('Indexed_Collection - Index Types', () => {
 
 		const updated_high_numbers = collection.derived_index('high_numbers');
 		expect(updated_high_numbers).toHaveLength(4);
-		expect(updated_high_numbers[0].id).toBe(high_item.id); // 10
-		expect(updated_high_numbers[1].id).toBe(new_high_item.id); // 9
-		expect(updated_high_numbers[2].id).toBe(medium_item.id); // 8
-		expect(updated_high_numbers[3].id).toBe(threshold_item.id); // 6
+		expect(updated_high_numbers[0]!.id).toBe(high_item.id); // 10
+		expect(updated_high_numbers[1]!.id).toBe(new_high_item.id); // 9
+		expect(updated_high_numbers[2]!.id).toBe(medium_item.id); // 8
+		expect(updated_high_numbers[3]!.id).toBe(threshold_item.id); // 6
 
 		// Test removal from derived index
 		collection.remove(high_item.id);
 		const numbers_after_removal = collection.derived_index('high_numbers');
 		expect(numbers_after_removal).toHaveLength(3);
-		expect(numbers_after_removal[0].id).toBe(new_high_item.id); // Now highest number
+		expect(numbers_after_removal[0]!.id).toBe(new_high_item.id); // Now highest number
 	});
 
 	test('function indexes', () => {
@@ -431,18 +431,18 @@ describe('Indexed_Collection - Advanced Features', () => {
 		expect(collection.where('by_category', 'c2').length).toBe(2);
 
 		// Test removing multiple items at once
-		const ids_to_remove = [items[0].id, items[2].id, items[4].id];
+		const ids_to_remove = [items[0]!.id, items[2]!.id, items[4]!.id];
 		const removed_count = collection.remove_many(ids_to_remove);
 
 		expect(removed_count).toBe(3);
 		expect(collection.size).toBe(2);
 
 		// Verify specific items were removed
-		expect(collection.has(items[0].id)).toBe(false);
-		expect(collection.has(items[1].id)).toBe(true);
-		expect(collection.has(items[2].id)).toBe(false);
-		expect(collection.has(items[3].id)).toBe(true);
-		expect(collection.has(items[4].id)).toBe(false);
+		expect(collection.has(items[0]!.id)).toBe(false);
+		expect(collection.has(items[1]!.id)).toBe(true);
+		expect(collection.has(items[2]!.id)).toBe(false);
+		expect(collection.has(items[3]!.id)).toBe(true);
+		expect(collection.has(items[4]!.id)).toBe(false);
 
 		// Verify indexes were properly updated
 		expect(collection.where('by_category', 'c1').length).toBe(1);

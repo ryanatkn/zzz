@@ -54,7 +54,6 @@ export class Backend_Provider_Chatgpt extends Backend_Provider_Remote<OpenAI> {
 			// Extract content from choices
 			const delta = chunk.choices[0]?.delta;
 			// TODO temporary bug: https://github.com/typescript-eslint/typescript-eslint/issues/11666
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			if (delta?.content) {
 				accumulated_content += delta.content;
 

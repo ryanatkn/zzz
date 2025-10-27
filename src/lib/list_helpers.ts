@@ -36,6 +36,11 @@ export const to_reordered_list = <T>(
 	}
 
 	const item_moved = items[from_index];
+	if (item_moved === undefined) {
+		// Defensive check: should never happen due to validation above
+		console.error('Unexpected undefined item at validated index', from_index);
+		return items;
+	}
 
 	if (from_index < to_index) {
 		// Moving forward: take slices before and after the move, skipping the moved item

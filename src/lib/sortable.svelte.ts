@@ -101,7 +101,14 @@ export class Sortable<T> {
 
 		// If current key isn't valid anymore, reset to first sorter
 		if (!sorters.some((sorter) => sorter.key === this.active_key)) {
-			this.active_key = sorters[0].key;
+			const first_sorter = sorters[0];
+			if (first_sorter) {
+				this.active_key = first_sorter.key;
+			} else {
+				// Should never happen due to length check above, but handle defensively
+				console.error('Unexpected empty sorters array after length check');
+				this.active_key = '';
+			}
 		}
 	}
 }

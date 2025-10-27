@@ -117,6 +117,8 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 		const tabs = this.ordered_tabs;
 		if (index >= 0 && index < tabs.length) {
 			const tab_to_close = tabs[index];
+			if (!tab_to_close) return;
+
 			const was_selected = tab_to_close.selected;
 
 			// Store a copy of the tab before removing it
@@ -129,7 +131,10 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 				// Try to select the tab to the right (next index), or the last tab if there's nothing to the right
 				const new_index = Math.min(this.ordered_tabs.length - 1, index);
 				// Select the tab at the new index
-				this.ordered_tabs[new_index].selected = true;
+				const tab_to_select = this.ordered_tabs[new_index];
+				if (tab_to_select) {
+					tab_to_select.selected = true;
+				}
 			}
 		}
 	}
@@ -153,7 +158,10 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 		const tabs = this.ordered_tabs;
 		if (index >= 0 && index < tabs.length) {
 			for (let i = 0; i < tabs.length; i++) {
-				tabs[i].selected = i === index;
+				const tab = tabs[i];
+				if (tab) {
+					tab.selected = i === index;
+				}
 			}
 		}
 	}

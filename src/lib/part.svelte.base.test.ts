@@ -44,19 +44,25 @@ describe('Part base class functionality', () => {
 		for (const part of [text_part, diskfile_part]) {
 			part.add_attribute({key: 'test-attr', value: 'test-value'});
 			expect(part.attributes).toHaveLength(1);
-			expect(part.attributes[0].key).toBe('test-attr');
-			expect(part.attributes[0].value).toBe('test-value');
+			let first_attr = part.attributes[0];
+			if (!first_attr) throw new Error('Expected first attribute');
+			expect(first_attr.key).toBe('test-attr');
+			expect(first_attr.value).toBe('test-value');
 
-			const attr_id = part.attributes[0].id;
+			const attr_id = first_attr.id;
 
 			const updated = part.update_attribute(attr_id, {value: 'updated-value'});
 			expect(updated).toBe(true);
-			expect(part.attributes[0].key).toBe('test-attr');
-			expect(part.attributes[0].value).toBe('updated-value');
+			first_attr = part.attributes[0];
+			if (!first_attr) throw new Error('Expected attribute after update');
+			expect(first_attr.key).toBe('test-attr');
+			expect(first_attr.value).toBe('updated-value');
 
 			part.update_attribute(attr_id, {key: 'updated-key', value: 'updated-value-2'});
-			expect(part.attributes[0].key).toBe('updated-key');
-			expect(part.attributes[0].value).toBe('updated-value-2');
+			first_attr = part.attributes[0];
+			if (!first_attr) throw new Error('Expected attribute after second update');
+			expect(first_attr.key).toBe('updated-key');
+			expect(first_attr.value).toBe('updated-value-2');
 
 			part.remove_attribute(attr_id);
 			expect(part.attributes).toHaveLength(0);
@@ -193,8 +199,10 @@ describe('Text_Part specific behavior', () => {
 		expect(restored.title).toBe('Test Title');
 		expect(restored.summary).toBe('Test Summary');
 		expect(restored.attributes).toHaveLength(1);
-		expect(restored.attributes[0].key).toBe('class');
-		expect(restored.attributes[0].value).toBe('highlight');
+		const restored_attr = restored.attributes[0];
+		if (!restored_attr) throw new Error('Expected restored attribute');
+		expect(restored_attr.key).toBe('class');
+		expect(restored_attr.value).toBe('highlight');
 	});
 
 	test('Text_Part cloning creates independent copy', () => {

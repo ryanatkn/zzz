@@ -246,8 +246,12 @@ describe('XML use cases', () => {
 		];
 		const result = expect_parse_success(AttributeArray, attrs);
 		expect(result).toHaveLength(2);
-		expect(result?.[0].id).toMatch(uuid_regex);
-		expect(result?.[1].id).toMatch(uuid_regex);
+		const first_attr = result?.[0];
+		const second_attr = result?.[1];
+		expect(first_attr).toBeDefined();
+		expect(second_attr).toBeDefined();
+		expect(first_attr!.id).toMatch(uuid_regex);
+		expect(second_attr!.id).toMatch(uuid_regex);
 	});
 
 	test('integration with record of attributes', () => {

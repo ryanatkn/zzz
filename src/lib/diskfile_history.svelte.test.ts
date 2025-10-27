@@ -114,9 +114,9 @@ describe('Diskfile_History', () => {
 
 			// Verify entries are sorted newest first
 			expect(history.entries.length).toBe(3);
-			expect(history.entries[0].content).toBe('content 3');
-			expect(history.entries[1].content).toBe('content 2');
-			expect(history.entries[2].content).toBe('content 1');
+			expect(history.entries[0]!.content).toBe('content 3');
+			expect(history.entries[1]!.content).toBe('content 2');
+			expect(history.entries[2]!.content).toBe('content 1');
 		});
 
 		test('current_entry returns most recent entry', () => {
@@ -147,9 +147,9 @@ describe('Diskfile_History', () => {
 
 			// Verify only the most recent entries were kept
 			expect(history.entries.length).toBe(3);
-			expect(history.entries[0].content).toBe('content 4');
-			expect(history.entries[1].content).toBe('content 3');
-			expect(history.entries[2].content).toBe('content 2');
+			expect(history.entries[0]!.content).toBe('content 4');
+			expect(history.entries[1]!.content).toBe('content 3');
+			expect(history.entries[2]!.content).toBe('content 2');
 		});
 
 		test('add_entry correctly handles insertion with capacity limit', () => {
@@ -170,8 +170,8 @@ describe('Diskfile_History', () => {
 
 			// Verify correct entries were kept (newest two)
 			expect(history.entries.length).toBe(2);
-			expect(history.entries[0].content).toBe('newest entry');
-			expect(history.entries[1].content).toBe('middle entry');
+			expect(history.entries[0]!.content).toBe('newest entry');
+			expect(history.entries[1]!.content).toBe('middle entry');
 		});
 	});
 
@@ -243,8 +243,8 @@ describe('Diskfile_History', () => {
 
 			// Verify only newest remains
 			expect(history.entries.length).toBe(1);
-			expect(history.entries[0].id).toBe(newest.id);
-			expect(history.entries[0].content).toBe('newest content');
+			expect(history.entries[0]!.id).toBe(newest.id);
+			expect(history.entries[0]!.content).toBe('newest content');
 		});
 
 		test('clear_except_current handles empty history', () => {
@@ -269,8 +269,8 @@ describe('Diskfile_History', () => {
 
 			// Verify newest and original entries were kept
 			expect(history.entries.length).toBe(2);
-			expect(history.entries[0].id).toBe(newest.id);
-			expect(history.entries[1].id).toBe(original.id);
+			expect(history.entries[0]!.id).toBe(newest.id);
+			expect(history.entries[1]!.id).toBe(original.id);
 		});
 
 		test('clear_except_current with single entry does nothing', () => {
@@ -282,7 +282,7 @@ describe('Diskfile_History', () => {
 
 			// Verify entry is still there
 			expect(history.entries.length).toBe(1);
-			expect(history.entries[0].id).toBe(entry.id);
+			expect(history.entries[0]!.id).toBe(entry.id);
 		});
 	});
 
@@ -325,9 +325,9 @@ describe('Diskfile_History', () => {
 
 			// Should have original, saved, and latest
 			expect(history.entries.length).toBe(3);
-			expect(history.entries[0].id).toBe(latest.id);
-			expect(history.entries[1].id).toBe(saved.id);
-			expect(history.entries[2].id).toBe(original.id);
+			expect(history.entries[0]!.id).toBe(latest.id);
+			expect(history.entries[1]!.id).toBe(saved.id);
+			expect(history.entries[2]!.id).toBe(original.id);
 		});
 	});
 });

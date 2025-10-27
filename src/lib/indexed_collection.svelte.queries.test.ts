@@ -246,7 +246,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		const c1_items = collection.where('by_string_c', 'c1');
 		const b1_c1_items = c1_items.filter((item) => item.string_b === 'b1');
 		expect(b1_c1_items).toHaveLength(1);
-		expect(b1_c1_items[0].string_a).toBe('a1');
+		expect(b1_c1_items[0]!.string_a).toBe('a1');
 
 		// Find boolean_a=true items with number_a=5
 		const boolean_a_true_items = collection.where('by_boolean_a', 'y');
@@ -268,7 +268,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		const tag2_items = collection.where('by_array_a', 'tag2');
 		const tag2_and_tag3_items = tag2_items.filter((item) => item.array_a.includes('tag3'));
 		expect(tag2_and_tag3_items).toHaveLength(1);
-		expect(tag2_and_tag3_items[0].string_a).toBe('a1');
+		expect(tag2_and_tag3_items[0]!.string_a).toBe('a1');
 	});
 
 	test('derived index queries', () => {
@@ -277,9 +277,15 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		expect(recent_boolean_a_true).toHaveLength(3); // All boolean_a=true items
 
 		// Verify order (most recent first)
-		expect(recent_boolean_a_true[0].string_a).toBe('b2'); // 3 days ago
-		expect(recent_boolean_a_true[1].string_a).toBe('a1'); // 10 days ago
-		expect(recent_boolean_a_true[2].string_a).toBe('a2'); // 20 days ago
+		const rbt0 = recent_boolean_a_true[0];
+		const rbt1 = recent_boolean_a_true[1];
+		const rbt2 = recent_boolean_a_true[2];
+		expect(rbt0).toBeDefined();
+		expect(rbt1).toBeDefined();
+		expect(rbt2).toBeDefined();
+		expect(rbt0!.string_a).toBe('b2'); // 3 days ago
+		expect(rbt1!.string_a).toBe('a1'); // 10 days ago
+		expect(rbt2!.string_a).toBe('a2'); // 20 days ago
 
 		// Test the high_number_a derived index which should include all items with number_a >= 4
 		const high_number_a = collection.derived_index('high_number_a');
@@ -291,10 +297,14 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		// Get first c1 item
 		const first_c1 = collection.first('by_string_c', 'c1', 1);
 		expect(first_c1).toHaveLength(1);
+		const first_c1_item = first_c1[0];
+		expect(first_c1_item).toBeDefined();
 
 		// Get latest c2 item
 		const latest_c2 = collection.latest('by_string_c', 'c2', 1);
 		expect(latest_c2).toHaveLength(1);
+		const latest_c2_item = latest_c2[0];
+		expect(latest_c2_item).toBeDefined();
 	});
 
 	test('time-based queries', () => {
@@ -332,7 +342,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 
 		// Check that it appears at the top of the recent_boolean_a_true list
 		const recent_boolean_a_true = collection.derived_index('recent_boolean_a_true');
-		expect(recent_boolean_a_true[0].id).toBe(new_item.id);
+		expect(recent_boolean_a_true[0]!.id).toBe(new_item.id);
 
 		// Check that it appears in high_number_a
 		const high_number_a = collection.derived_index('high_number_a');
@@ -342,14 +352,19 @@ describe('Indexed_Collection - Query Capabilities', () => {
 	test('removing items updates derived queries', () => {
 		// Remove the most recent boolean_a=true item
 		const item_to_remove = items[4]; // b2 (most recent boolean_a=true)
+		expect(item_to_remove).toBeDefined();
 
-		collection.remove(item_to_remove.id);
+		collection.remove(item_to_remove!.id);
 
 		// Check that recent_boolean_a_true updates correctly
 		const recent_boolean_a_true = collection.derived_index('recent_boolean_a_true');
 		expect(recent_boolean_a_true).toHaveLength(2);
-		expect(recent_boolean_a_true[0].string_a).toBe('a1');
-		expect(recent_boolean_a_true[1].string_a).toBe('a2');
+		const rbt0 = recent_boolean_a_true[0];
+		const rbt1 = recent_boolean_a_true[1];
+		expect(rbt0).toBeDefined();
+		expect(rbt1).toBeDefined();
+		expect(rbt0!.string_a).toBe('a1');
+		expect(rbt1!.string_a).toBe('a2');
 
 		// Check that high_number_a updates correctly
 		const high_number_a = collection.derived_index('high_number_a');
@@ -360,13 +375,13 @@ describe('Indexed_Collection - Query Capabilities', () => {
 	test('dynamic ordering of query results', () => {
 		// Get all items and sort by number_a (highest first)
 		const sorted_by_number_a = collection.values.slice().sort((a, b) => b.number_a - a.number_a);
-		expect(sorted_by_number_a[0].number_a).toBe(5);
+		expect(sorted_by_number_a[0]!.number_a).toBe(5);
 
 		// Sort by creation time (newest first)
 		const sorted_by_time = collection.values
 			.slice()
 			.sort((a, b) => b.date_a.getTime() - a.date_a.getTime());
-		expect(sorted_by_time[0].string_a).toBe('b2'); // 3 days ago
+		expect(sorted_by_time[0]!.string_a).toBe('b2'); // 3 days ago
 	});
 });
 
@@ -432,14 +447,14 @@ describe('Indexed_Collection - Search Patterns', () => {
 			item.string_a.toLowerCase().includes('beta'),
 		);
 		expect(alpha_beta_items).toHaveLength(1);
-		expect(alpha_beta_items[0].string_a).toBe('alpha beta gamma');
+		expect(alpha_beta_items[0]!.string_a).toBe('alpha beta gamma');
 	});
 
 	test('range-based categorization', () => {
 		// Find high-number_a items
 		const high_number_a = collection.where('by_number_a_range', 'high');
 		expect(high_number_a).toHaveLength(1);
-		expect(high_number_a[0].number_a).toBe(5);
+		expect(high_number_a[0]!.number_a).toBe(5);
 
 		// Find mid-number_a items
 		const mid_number_a = collection.where('by_number_a_range', 'mid');
@@ -448,6 +463,6 @@ describe('Indexed_Collection - Search Patterns', () => {
 		// Find low-number_a items
 		const low_number_a = collection.where('by_number_a_range', 'low');
 		expect(low_number_a).toHaveLength(1);
-		expect(low_number_a[0].number_a).toBe(2);
+		expect(low_number_a[0]!.number_a).toBe(2);
 	});
 });

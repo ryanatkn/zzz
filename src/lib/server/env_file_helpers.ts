@@ -116,7 +116,8 @@ const find_last_key_line_index = (lines: Array<string>, key: string): number => 
 		if (!trimmed || trimmed.startsWith('#')) return;
 
 		const match = /^([^=]+)=/.exec(line);
-		if (match && match[1].trim() === key) {
+		const matched_key = match?.[1];
+		if (matched_key && matched_key.trim() === key) {
 			last_match_idx = idx;
 		}
 	});
@@ -143,6 +144,7 @@ const extract_inline_comment = (value_part: string): string => {
 	if (is_quoted_value(trimmed_value)) {
 		// Quoted value - find comment after closing quote
 		const quote_char = trimmed_value[0];
+		if (!quote_char) return '';
 		let closing_quote_idx = trimmed_value.indexOf(quote_char, 1);
 
 		// Handle escaped quotes by checking backslash count
@@ -153,15 +155,17 @@ const extract_inline_comment = (value_part: string): string => {
 		if (closing_quote_idx !== -1) {
 			const after_quote = trimmed_value.substring(closing_quote_idx + 1);
 			const comment_match = /(\s*#.*)/.exec(after_quote);
-			if (comment_match) {
-				return comment_match[1];
+			const captured_comment = comment_match?.[1];
+			if (captured_comment) {
+				return captured_comment;
 			}
 		}
 	} else {
 		// Unquoted value - comment starts at first #
 		const comment_match = /(\s*#.*)/.exec(value_part);
-		if (comment_match) {
-			return comment_match[1];
+		const captured_comment = comment_match?.[1];
+		if (captured_comment) {
+			return captured_comment;
 		}
 	}
 

@@ -192,8 +192,8 @@ describe('disk change detection', () => {
 		editor_state.check_disk_changes();
 
 		// The existing entry should now be marked as a disk change and not an unsaved edit
-		expect(history.entries[0].is_disk_change).toBe(true);
-		expect(history.entries[0].is_unsaved_edit).toBe(false);
+		expect(history.entries[0]!.is_disk_change).toBe(true);
+		expect(history.entries[0]!.is_unsaved_edit).toBe(false);
 
 		// No new entry should be created
 		expect(history.entries.length).toBe(2); // Original + our added entry
@@ -347,12 +347,10 @@ describe('edge cases', () => {
 		expect(empty_history_editor.current_content).toBe('Disk changed');
 
 		// The implementation should create an entry with the disk_change flag
-		expect(history.entries).toMatchObject([
-			{
-				content: 'Disk changed',
-				is_disk_change: true,
-			},
-		]);
+		expect(history.entries[0]!).toMatchObject({
+			content: 'Disk changed',
+			is_disk_change: true,
+		});
 	});
 
 	test('changing diskfile to null content is handled properly', () => {

@@ -34,7 +34,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				key: 'by_extension',
 				extractor: (file) => {
 					const match = /\.([^.]+)$/.exec(file.path);
-					return match ? match[1].toLowerCase() : 'no_extension';
+					return match ? match[1]!.toLowerCase() : 'no_extension'; // guaranteed by ternary check
 				},
 				query_schema: z.string(),
 			}),

@@ -40,7 +40,10 @@ export class Browser extends Cell<typeof Browser_Json> {
 					// Make sure one tab is selected
 					const selected_tab = this.tabs.ordered_tabs.find((tab) => tab.selected);
 					if (!selected_tab && this.tabs.ordered_tabs.length > 0) {
-						this.tabs.ordered_tabs[0].selected = true;
+						const first_tab = this.tabs.ordered_tabs[0];
+						if (first_tab) {
+							first_tab.selected = true;
+						}
 					}
 
 					// Set the edited URL from the selected tab

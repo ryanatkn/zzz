@@ -56,6 +56,8 @@
 
 		// Get the previous tab from history
 		const previous_id = history_stack[0];
+		if (!previous_id) return; // Defensive check
+
 		const remaining_history = history_stack.slice(1);
 
 		// Push current tab to future stack
@@ -89,6 +91,8 @@
 
 		// Get the next tab from future stack
 		const next_id = future_stack[0];
+		if (!next_id) return; // Defensive check
+
 		const remaining_future = future_stack.slice(1);
 
 		// Push current tab to history stack

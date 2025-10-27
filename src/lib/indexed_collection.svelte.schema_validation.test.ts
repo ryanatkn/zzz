@@ -124,7 +124,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Test range query validation
 		const mid_items = collection.query<Array<Test_Item>, string>('by_number_range', 'mid');
 		expect(mid_items.length).toBe(1);
-		expect(mid_items[0].string_a).toBe('a2');
+		expect(mid_items[0]!.string_a).toBe('a2');
 
 		// Test array index
 		const item2_matches = collection.query<Array<Test_Item>, string>('by_array', 'item2');
@@ -172,7 +172,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Check derived index correctness
 		const flagged_adults = collection.derived_index('flagged_adults');
 		expect(flagged_adults.length).toBe(1);
-		expect(flagged_adults[0].string_a).toBe('a1');
+		expect(flagged_adults[0]!.string_a).toBe('a1');
 
 		// Add another qualifying item and verify index updates
 		collection.add(create_item('a5', 'b5@test.com', 40, true));
@@ -257,7 +257,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 			array_values: ['item5'],
 		});
 		expect(with_item5.length).toBe(1);
-		expect(with_item5[0].string_a).toBe('a4');
+		expect(with_item5[0]!.string_a).toBe('a4');
 	});
 
 	test('schema validation errors are properly handled', () => {

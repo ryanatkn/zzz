@@ -144,7 +144,7 @@ export const create_turn_from_parts = (
 ): Turn => {
 	if (parts.length === 0) throw new Error('create_turn_from_parts requires at least one part');
 	return new Turn({
-		app: parts[0].app,
+		app: parts[0]!.app, // guaranteed by length check above
 		json: {
 			...json,
 			role,

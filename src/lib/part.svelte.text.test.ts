@@ -97,8 +97,10 @@ describe('Text_Part initialization', () => {
 		expect(part.end).toBe(20);
 		expect(part.enabled).toBe(false);
 		expect(part.attributes).toHaveLength(1);
-		expect(part.attributes[0].key).toBe('attr1');
-		expect(part.attributes[0].value).toBe('value1');
+		const first_attr = part.attributes[0];
+		if (!first_attr) throw new Error('Expected first attribute');
+		expect(first_attr.key).toBe('attr1');
+		expect(first_attr.value).toBe('value1');
 	});
 });
 
@@ -293,16 +295,20 @@ describe('Text_Part attribute management', () => {
 		// Add attribute
 		part.add_attribute({key: 'class', value: 'highlight'});
 		expect(part.attributes).toHaveLength(1);
-		expect(part.attributes[0].key).toBe('class');
-		expect(part.attributes[0].value).toBe('highlight');
+		let first_attr = part.attributes[0];
+		if (!first_attr) throw new Error('Expected first attribute');
+		expect(first_attr.key).toBe('class');
+		expect(first_attr.value).toBe('highlight');
 
-		const attr_id = part.attributes[0].id;
+		const attr_id = first_attr.id;
 
 		// Update attribute
 		const updated = part.update_attribute(attr_id, {value: 'special-highlight'});
 		expect(updated).toBe(true);
-		expect(part.attributes[0].key).toBe('class');
-		expect(part.attributes[0].value).toBe('special-highlight');
+		first_attr = part.attributes[0];
+		if (!first_attr) throw new Error('Expected attribute after update');
+		expect(first_attr.key).toBe('class');
+		expect(first_attr.value).toBe('special-highlight');
 
 		// Remove attribute
 		part.remove_attribute(attr_id);
@@ -317,13 +323,17 @@ describe('Text_Part attribute management', () => {
 		const part = app.cell_registry.instantiate('Text_Part');
 
 		part.add_attribute({key: 'class', value: 'highlight'});
-		const attr_id = part.attributes[0].id;
+		const first_attr = part.attributes[0];
+		if (!first_attr) throw new Error('Expected first attribute');
+		const attr_id = first_attr.id;
 
 		// Update both key and value
 		const updated = part.update_attribute(attr_id, {key: 'data-type', value: 'important'});
 		expect(updated).toBe(true);
-		expect(part.attributes[0].key).toBe('data-type');
-		expect(part.attributes[0].value).toBe('important');
+		const updated_attr = part.attributes[0];
+		if (!updated_attr) throw new Error('Expected attribute after update');
+		expect(updated_attr.key).toBe('data-type');
+		expect(updated_attr.value).toBe('important');
 	});
 
 	test('attributes are preserved when serializing to JSON', () => {
@@ -338,15 +348,21 @@ describe('Text_Part attribute management', () => {
 		const json = part.to_json();
 
 		expect(json.attributes).toHaveLength(2);
-		expect(json.attributes[0].key).toBe('data-test');
-		expect(json.attributes[1].key).toBe('class');
+		const json_attr0 = json.attributes[0];
+		const json_attr1 = json.attributes[1];
+		if (!json_attr0 || !json_attr1) throw new Error('Expected both attributes in JSON');
+		expect(json_attr0.key).toBe('data-test');
+		expect(json_attr1.key).toBe('class');
 
 		// Verify they're properly restored
 		const new_part = app.cell_registry.instantiate('Text_Part', json);
 
 		expect(new_part.attributes).toHaveLength(2);
-		expect(new_part.attributes[0].key).toBe('data-test');
-		expect(new_part.attributes[1].key).toBe('class');
+		const new_attr0 = new_part.attributes[0];
+		const new_attr1 = new_part.attributes[1];
+		if (!new_attr0 || !new_attr1) throw new Error('Expected both attributes in restored part');
+		expect(new_attr0.key).toBe('data-test');
+		expect(new_attr1.key).toBe('class');
 	});
 });
 
