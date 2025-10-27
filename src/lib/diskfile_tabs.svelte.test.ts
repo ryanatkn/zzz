@@ -601,17 +601,27 @@ describe('Diskfile_Tabs', () => {
 			const tab3 = tabs.open_diskfile(TEST_DISKFILE_ID_3);
 
 			// Initial history should have tab3 (most recently opened)
-			expect(tabs.recent_tabs[0].id).toBe(tab3.id);
+			const recent0 = tabs.recent_tabs[0];
+			expect(recent0).toBeDefined();
+			expect(recent0!.id).toBe(tab3.id);
 
 			// Select tab1, should move to front of history
 			tabs.select_tab(tab1.id);
-			expect(tabs.recent_tabs[0].id).toBe(tab1.id);
+			const recent0_after1 = tabs.recent_tabs[0];
+			expect(recent0_after1).toBeDefined();
+			expect(recent0_after1!.id).toBe(tab1.id);
 
 			// Select tab2, should move to front of history
 			tabs.select_tab(tab2.id);
-			expect(tabs.recent_tabs[0].id).toBe(tab2.id);
-			expect(tabs.recent_tabs[1].id).toBe(tab1.id);
-			expect(tabs.recent_tabs[2].id).toBe(tab3.id);
+			const recent0_after2 = tabs.recent_tabs[0];
+			const recent1_after2 = tabs.recent_tabs[1];
+			const recent2_after2 = tabs.recent_tabs[2];
+			expect(recent0_after2).toBeDefined();
+			expect(recent1_after2).toBeDefined();
+			expect(recent2_after2).toBeDefined();
+			expect(recent0_after2!.id).toBe(tab2.id);
+			expect(recent1_after2!.id).toBe(tab1.id);
+			expect(recent2_after2!.id).toBe(tab3.id);
 		});
 
 		test('maintains history when reopening tabs', () => {
@@ -624,7 +634,9 @@ describe('Diskfile_Tabs', () => {
 
 			// Verify the reopened tab is in history
 			expect(tabs.recent_tabs).toHaveLength(1);
-			expect(tabs.recent_tabs[0].id).toBe(tabs.selected_tab_id);
+			const recent_tab = tabs.recent_tabs[0];
+			expect(recent_tab).toBeDefined();
+			expect(recent_tab!.id).toBe(tabs.selected_tab_id);
 		});
 
 		test('limits history to max size', () => {
@@ -755,8 +767,12 @@ describe('Diskfile_Tabs', () => {
 			tabs.select_tab(tab2.id);
 
 			// Verify initial history state
-			expect(tabs.recent_tabs[0].id).toBe(tab2.id);
-			expect(tabs.recent_tabs[1].id).toBe(tab1.id);
+			const recent0 = tabs.recent_tabs[0];
+			const recent1 = tabs.recent_tabs[1];
+			expect(recent0).toBeDefined();
+			expect(recent1).toBeDefined();
+			expect(recent0!.id).toBe(tab2.id);
+			expect(recent1!.id).toBe(tab1.id);
 
 			// Store tabs for reference before closing
 			const tab1_diskfile_id = tab1.diskfile_id;
@@ -765,8 +781,10 @@ describe('Diskfile_Tabs', () => {
 			tabs.close_tab(tab2.id);
 
 			// Check history - tab1 should still be accessible
-			expect(tabs.recent_tabs[0].id).toBe(tab1.id);
-			expect(tabs.recent_tabs[0].diskfile_id).toBe(tab1_diskfile_id);
+			const recent0_after = tabs.recent_tabs[0];
+			expect(recent0_after).toBeDefined();
+			expect(recent0_after!.id).toBe(tab1.id);
+			expect(recent0_after!.diskfile_id).toBe(tab1_diskfile_id);
 		});
 	});
 
@@ -875,8 +893,12 @@ describe('Diskfile_Tabs', () => {
 
 			// ordered_tabs should include both tabs
 			expect(tabs.ordered_tabs).toHaveLength(2);
-			expect(tabs.ordered_tabs[0].id).toBe(tab1.id);
-			expect(tabs.ordered_tabs[1].id).toBe(tab2.id);
+			const ordered0 = tabs.ordered_tabs[0];
+			const ordered1 = tabs.ordered_tabs[1];
+			expect(ordered0).toBeDefined();
+			expect(ordered1).toBeDefined();
+			expect(ordered0!.id).toBe(tab1.id);
+			expect(ordered1!.id).toBe(tab2.id);
 		});
 
 		test('complex tab workflow', () => {
@@ -1051,18 +1073,30 @@ describe('Diskfile_Tabs', () => {
 
 			// History should only contain last 3
 			expect(tabs.recent_tab_ids).toHaveLength(3);
-			expect(tabs.recent_tab_ids[0]).toBe(tab4.id);
-			expect(tabs.recent_tab_ids[1]).toBe(tab3.id);
-			expect(tabs.recent_tab_ids[2]).toBe(tab2.id);
+			const id0 = tabs.recent_tab_ids[0];
+			const id1 = tabs.recent_tab_ids[1];
+			const id2 = tabs.recent_tab_ids[2];
+			expect(id0).toBeDefined();
+			expect(id1).toBeDefined();
+			expect(id2).toBeDefined();
+			expect(id0).toBe(tab4.id);
+			expect(id1).toBe(tab3.id);
+			expect(id2).toBe(tab2.id);
 			expect(tabs.recent_tab_ids).not.toContain(tab1.id);
 
 			// Select an existing tab in history
 			tabs.select_tab(tab2.id);
 
 			// Should move to front
-			expect(tabs.recent_tab_ids[0]).toBe(tab2.id);
-			expect(tabs.recent_tab_ids[1]).toBe(tab4.id);
-			expect(tabs.recent_tab_ids[2]).toBe(tab3.id);
+			const id0_after = tabs.recent_tab_ids[0];
+			const id1_after = tabs.recent_tab_ids[1];
+			const id2_after = tabs.recent_tab_ids[2];
+			expect(id0_after).toBeDefined();
+			expect(id1_after).toBeDefined();
+			expect(id2_after).toBeDefined();
+			expect(id0_after).toBe(tab2.id);
+			expect(id1_after).toBe(tab4.id);
+			expect(id2_after).toBe(tab3.id);
 		});
 	});
 

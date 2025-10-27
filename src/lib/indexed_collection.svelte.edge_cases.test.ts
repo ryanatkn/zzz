@@ -69,7 +69,9 @@ describe('Indexed_Collection - Edge Cases', () => {
 		collection.add_many([item1, item2, item3, item4]);
 
 		// Test retrieving with null values
-		expect(collection.by_optional('by_number_a', null)?.string_a).toBe('a2');
+		const null_item = collection.by_optional('by_number_a', null);
+		expect(null_item).toBeDefined();
+		expect(null_item!.string_a).toBe('a2');
 
 		// Test filtering with non-existing value
 		expect(collection.by_optional('by_number_a', 999)).toBeUndefined();
@@ -89,7 +91,9 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Add another item with null value
 		const item5 = create_test_item('a5', null, ['tag5']);
 		collection.add(item5);
-		expect(collection.by_optional('by_number_a', null)?.string_a).toBe('a5');
+		const null_item_after = collection.by_optional('by_number_a', null);
+		expect(null_item_after).toBeDefined();
+		expect(null_item_after!.string_a).toBe('a5');
 	});
 
 	test('handling duplicates in single indexes', () => {
@@ -347,7 +351,9 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Search functions should work
 		const x_results = search_fn('x');
 		expect(x_results.length).toBe(1);
-		expect(x_results[0].string_a).toBe('x1');
+		const x_result_0 = x_results[0];
+		expect(x_result_0).toBeDefined();
+		expect(x_result_0!.string_a).toBe('x1');
 		expect(compute_fn).toHaveBeenLastCalledWith('x');
 
 		// Test removing an item triggers onremove
