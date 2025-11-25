@@ -1193,7 +1193,7 @@ export const src_json: SrcJson = {
 					name: 'create_action_event',
 					kind: 'function',
 					doc_comment: 'Create an action event from a spec and initial input.',
-					source_line: 453,
+					source_line: 456,
 					type_signature:
 						'<TMethod extends ActionMethod>(environment: ActionEventEnvironment, spec: { method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | ... 15 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; }, input: unknown, initial_phase?: "send_request" | ... 8 more ... | undefined): ActionEvent<...>',
 					return_type:
@@ -1225,7 +1225,7 @@ export const src_json: SrcJson = {
 					name: 'create_action_event_from_json',
 					kind: 'function',
 					doc_comment: 'Reconstruct an action event from serialized JSON data.',
-					source_line: 480,
+					source_line: 483,
 					type_signature:
 						'<TMethod extends ActionMethod>(json: ActionEventDatas[TMethod], environment: ActionEventEnvironment): ActionEvent<TMethod, ActionEventEnvironment, "send_request" | ... 7 more ... | "execute", "initial" | ... 3 more ... | "failed">',
 					return_type:
@@ -1246,7 +1246,7 @@ export const src_json: SrcJson = {
 				{
 					name: 'parse_action_event',
 					kind: 'function',
-					source_line: 494,
+					source_line: 497,
 					type_signature:
 						'(raw_json: unknown, environment: ActionEventEnvironment): ActionEvent<"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | ... 14 more ... | "toggle_main_menu", ActionEventEnvironment, "send_request" | ... 7 more ... | "execute", "initial" | ... 3 more ... | "failed">',
 					return_type:
@@ -10944,7 +10944,7 @@ export const src_json: SrcJson = {
 					kind: 'function',
 					source_line: 21,
 					type_signature:
-						'(method: string, params: void | { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined, id: string | number): { [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { ...; } | undefined; }',
+						'(method: string, params: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined, id: string | number): { [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { ...; } | undefined; }',
 					return_type:
 						'{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
 					parameters: [
@@ -10955,7 +10955,7 @@ export const src_json: SrcJson = {
 						},
 						{
 							name: 'params',
-							type: 'void | { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined',
+							type: '{ [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined',
 							optional: false,
 						},
 						{
@@ -10991,7 +10991,7 @@ export const src_json: SrcJson = {
 					kind: 'function',
 					source_line: 47,
 					type_signature:
-						'(method: string, params: void | { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined): { [x: string]: unknown; jsonrpc: "2.0"; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined; }',
+						'(method: string, params: { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined): { [x: string]: unknown; jsonrpc: "2.0"; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined; }',
 					return_type:
 						'{ [x: string]: unknown; jsonrpc: "2.0"; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined; }',
 					parameters: [
@@ -11002,7 +11002,7 @@ export const src_json: SrcJson = {
 						},
 						{
 							name: 'params',
-							type: 'void | { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined',
+							type: '{ [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined',
 							optional: false,
 						},
 					],
@@ -19028,7 +19028,7 @@ export const src_json: SrcJson = {
 							name: 'stat',
 							kind: 'function',
 							type_signature:
-								'(path_to_stat: string, options?: (StatOptions & { bigint?: false | undefined; }) | undefined): Promise<Stats>',
+								'(path_to_stat: string, options?: StatOptions | undefined): Promise<Stats>',
 							return_type: 'Promise<Stats>',
 							parameters: [
 								{
@@ -19038,7 +19038,7 @@ export const src_json: SrcJson = {
 								},
 								{
 									name: 'options',
-									type: '(StatOptions & { bigint?: false | undefined; }) | undefined',
+									type: 'StatOptions | undefined',
 									optional: true,
 								},
 							],
@@ -19047,7 +19047,7 @@ export const src_json: SrcJson = {
 							name: 'stat',
 							kind: 'function',
 							type_signature:
-								'(path_to_stat: string, options?: (StatOptions & { bigint?: false | undefined; }) | undefined): Promise<Stats>',
+								'(path_to_stat: string, options?: StatOptions | undefined): Promise<Stats>',
 							return_type: 'Promise<Stats>',
 							parameters: [
 								{
@@ -19057,7 +19057,7 @@ export const src_json: SrcJson = {
 								},
 								{
 									name: 'options',
-									type: '(StatOptions & { bigint?: false | undefined; }) | undefined',
+									type: 'StatOptions | undefined',
 									optional: true,
 								},
 							],
@@ -19066,7 +19066,7 @@ export const src_json: SrcJson = {
 							name: 'stat',
 							kind: 'function',
 							type_signature:
-								'(path_to_stat: string, options?: (StatOptions & { bigint?: false | undefined; }) | undefined): Promise<Stats>',
+								'(path_to_stat: string, options?: StatOptions | undefined): Promise<Stats>',
 							return_type: 'Promise<Stats>',
 							parameters: [
 								{
@@ -19076,7 +19076,7 @@ export const src_json: SrcJson = {
 								},
 								{
 									name: 'options',
-									type: '(StatOptions & { bigint?: false | undefined; }) | undefined',
+									type: 'StatOptions | undefined',
 									optional: true,
 								},
 							],
@@ -19124,7 +19124,7 @@ export const src_json: SrcJson = {
 					name: 'PathNotAllowedError',
 					kind: 'class',
 					doc_comment: 'Error thrown when a path is not allowed',
-					source_line: 251,
+					source_line: 241,
 					extends: ['Error'],
 					implements: [],
 					members: [
@@ -19156,7 +19156,7 @@ export const src_json: SrcJson = {
 					name: 'SymlinkNotAllowedError',
 					kind: 'class',
 					doc_comment: 'Error thrown when a path is a symlink',
-					source_line: 262,
+					source_line: 252,
 					extends: ['Error'],
 					implements: [],
 					members: [
