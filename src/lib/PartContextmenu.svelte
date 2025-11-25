@@ -46,7 +46,11 @@
 
 			<ContextmenuEntryToggle bind:enabled={part.enabled} label="part" />
 
-			<ContextmenuEntry run={() => (show_editor = true)}>
+			<ContextmenuEntry
+				run={() => {
+					show_editor = true;
+				}}
+			>
 				{#snippet icon()}<Glyph glyph={GLYPH_EDIT} />{/snippet}
 				<span>edit part</span>
 			</ContextmenuEntry>

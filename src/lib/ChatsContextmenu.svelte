@@ -16,7 +16,11 @@
 <Contextmenu {...props} {entries} />
 
 {#snippet entries()}
-	<ContextmenuEntry run={() => app.chats.add(undefined, true)}>
+	<ContextmenuEntry
+		run={() => {
+			app.chats.add(undefined, true);
+		}}
+	>
 		{#snippet icon()}<Glyph glyph={GLYPH_CHAT} />{/snippet}
 		<span>create new chat</span>
 	</ContextmenuEntry>
