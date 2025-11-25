@@ -5534,13 +5534,13 @@ export const src_json: SrcJson = {
 					name: 'SERVER_PROTOCOL',
 					kind: 'variable',
 					source_line: 28,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'SERVER_HOST',
 					kind: 'variable',
 					source_line: 30,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'SERVER_URL',
@@ -5579,7 +5579,7 @@ export const src_json: SrcJson = {
 					kind: 'variable',
 					doc_comment: '',
 					source_line: 54,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'API_URL',
@@ -5626,7 +5626,7 @@ export const src_json: SrcJson = {
 					name: 'UNKNOWN_ERROR_MESSAGE',
 					kind: 'variable',
 					source_line: 94,
-					type_signature: '"unknown error"',
+					type_signature: 'string',
 				},
 			],
 			dependencies: ['zod_helpers.ts'],
