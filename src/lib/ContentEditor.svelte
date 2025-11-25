@@ -99,7 +99,7 @@
 		<div class="display_flex mt_xs">
 			<CopyToClipboard text={content} class="plain" />
 			<PasteFromClipboard
-				onpaste={(value) => {
+				onclipboardtext={(value) => {
 					const new_content = content + value;
 					content = new_content;
 					focus();

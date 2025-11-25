@@ -32,7 +32,7 @@
 
 	{#if !readonly}
 		<PasteFromClipboard
-			onpaste={(text) => {
+			onclipboardtext={(text) => {
 				editor_state.current_content += text;
 			}}
 			class="plain icon_button font_size_lg"
