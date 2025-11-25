@@ -10,7 +10,7 @@
 	import ExternalLink from './ExternalLink.svelte';
 	import {GLYPH_ADD, GLYPH_COPY, GLYPH_DOWNLOAD, GLYPH_SETTINGS} from './glyphs.js';
 	import OllamaConfigure from './OllamaConfigure.svelte';
-	import OllamaModelDetails from './OllamaModelDetails.svelte';
+	import OllamaModelDetail from './OllamaModelDetail.svelte';
 	import OllamaPullModel from './OllamaPullModel.svelte';
 	import OllamaCreateModel from './OllamaCreateModel.svelte';
 	import OllamaCopyModel from './OllamaCopyModel.svelte';
@@ -214,7 +214,7 @@
 			/>
 		{:else if ollama.manager_selected_view === 'model' && ollama.manager_selected_model}
 			<div class="display_block panel p_md">
-				<OllamaModelDetails
+				<OllamaModelDetail
 					model={ollama.manager_selected_model}
 					onshow={(m) => ollama.app.api.ollama_show({model: m.name})}
 					onclose={() => ollama.close_form()}

@@ -279,10 +279,11 @@ export const get_handler_return_type = (
 	spec: ActionSpecUnion,
 	phase: ActionEventPhase,
 	imports: ImportBuilder,
+	path_prefix: string,
 ): string => {
 	// For request_response receive_request, handler returns the output
 	if (spec.kind === 'request_response' && phase === 'receive_request') {
-		imports.add_type('./action_collections.js', 'ActionOutputs');
+		imports.add_type(`${path_prefix}action_collections.js`, 'ActionOutputs');
 		const base_type = `ActionOutputs['${spec.method}']`;
 		// Request/response actions are always async
 		return `${base_type} | Promise<${base_type}>`;
@@ -290,7 +291,7 @@ export const get_handler_return_type = (
 
 	// For local_call execute, handler returns the output
 	if (spec.kind === 'local_call' && phase === 'execute') {
-		imports.add_type('./action_collections.js', 'ActionOutputs');
+		imports.add_type(`${path_prefix}action_collections.js`, 'ActionOutputs');
 		const base_type = `ActionOutputs['${spec.method}']`;
 		return spec.async ? `${base_type} | Promise<${base_type}>` : base_type;
 	}
@@ -316,19 +317,21 @@ export const generate_phase_handlers = (
 	}
 
 	// Add necessary imports for the unified system
-	imports.add_type('./action_event.js', 'ActionEvent');
+	// Backend types file is in server/ subdirectory, so needs different relative paths
+	const path_prefix = executor === 'frontend' ? './' : '../';
+	imports.add_type(`${path_prefix}action_event.js`, 'ActionEvent');
 
 	// Add environment type import
 	const environment_type = executor === 'frontend' ? 'Frontend' : 'Backend';
 	const environment_module =
-		executor === 'frontend' ? './frontend.svelte.js' : './server/backend.js';
+		executor === 'frontend' ? './frontend.svelte.js' : './backend.js';
 	imports.add_type(environment_module, environment_type);
 
 	// Generate handler definitions for each phase
 	const phase_handlers = phases
 		.map((phase: ActionEventPhase) => {
 			// Pass imports to get_handler_return_type so it can add necessary imports
-			const return_type = get_handler_return_type(spec, phase, imports);
+			const return_type = get_handler_return_type(spec, phase, imports, path_prefix);
 			// Use the new type parameter approach
 			return `${phase}?: (
 			action_event: ActionEvent<'${method}', ${environment_type}, '${phase}', 'handling'>

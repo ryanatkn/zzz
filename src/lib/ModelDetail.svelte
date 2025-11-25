@@ -13,7 +13,7 @@
 	import {frontend_context} from './frontend.svelte.js';
 	import Glyph from './Glyph.svelte';
 	import ModelContextmenu from './ModelContextmenu.svelte';
-	import OllamaModelDetails from './OllamaModelDetails.svelte';
+	import OllamaModelDetail from './OllamaModelDetail.svelte';
 
 	const {
 		model,
@@ -92,7 +92,7 @@
 	</section>
 
 	{#if model.provider_name === 'ollama'}
-		<OllamaModelDetails
+		<OllamaModelDetail
 			{model}
 			onshow={() => app.api.ollama_show({model: model.name})}
 			ondelete={async (m) => {
@@ -100,7 +100,7 @@
 			}}
 		>
 			{#snippet header()}{/snippet}
-		</OllamaModelDetails>
+		</OllamaModelDetail>
 	{:else}
 		<aside class="mt_xl3 width_upto_md">
 			⚠️ This should show model info, but the APIs for ChatGPT and Claude do not provide metadata

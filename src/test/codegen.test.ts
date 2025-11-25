@@ -459,7 +459,7 @@ describe('get_handler_return_type', () => {
 			const imports = new ImportBuilder();
 
 			// ping_action_spec is a request/response action
-			const result = get_handler_return_type(ping_action_spec, 'receive_request', imports);
+			const result = get_handler_return_type(ping_action_spec, 'receive_request', imports, './');
 			expect(result).toBe(`ActionOutputs['ping'] | Promise<ActionOutputs['ping']>`);
 
 			// Check that ActionOutputs was added to imports
@@ -471,15 +471,15 @@ describe('get_handler_return_type', () => {
 		test('other phases return void and do not add imports', () => {
 			const imports = new ImportBuilder();
 
-			expect(get_handler_return_type(session_load_action_spec, 'send_request', imports)).toBe(
-				'void | Promise<void>',
-			);
-			expect(get_handler_return_type(session_load_action_spec, 'send_response', imports)).toBe(
-				'void | Promise<void>',
-			);
-			expect(get_handler_return_type(session_load_action_spec, 'receive_response', imports)).toBe(
-				'void | Promise<void>',
-			);
+			expect(
+				get_handler_return_type(session_load_action_spec, 'send_request', imports, './'),
+			).toBe('void | Promise<void>');
+			expect(
+				get_handler_return_type(session_load_action_spec, 'send_response', imports, './'),
+			).toBe('void | Promise<void>');
+			expect(
+				get_handler_return_type(session_load_action_spec, 'receive_response', imports, './'),
+			).toBe('void | Promise<void>');
 
 			// Should not add ActionOutputs for void returns
 			expect(imports.build()).toBe('');
@@ -491,7 +491,12 @@ describe('get_handler_return_type', () => {
 			const imports = new ImportBuilder();
 
 			// toggle_main_menu is a sync local_call (async: false)
-			const result = get_handler_return_type(toggle_main_menu_action_spec, 'execute', imports);
+			const result = get_handler_return_type(
+				toggle_main_menu_action_spec,
+				'execute',
+				imports,
+				'./',
+			);
 			expect(result).toBe(`ActionOutputs['toggle_main_menu']`);
 
 			// Should add ActionOutputs import
@@ -507,7 +512,7 @@ describe('get_handler_return_type', () => {
 				async: true,
 			};
 
-			const result = get_handler_return_type(async_local_spec, 'execute', imports);
+			const result = get_handler_return_type(async_local_spec, 'execute', imports, './');
 			expect(result).toBe(
 				`ActionOutputs['toggle_main_menu'] | Promise<ActionOutputs['toggle_main_menu']>`,
 			);
@@ -518,10 +523,10 @@ describe('get_handler_return_type', () => {
 		test('all phases return void', () => {
 			const imports = new ImportBuilder();
 
-			expect(get_handler_return_type(filer_change_action_spec, 'send', imports)).toBe(
+			expect(get_handler_return_type(filer_change_action_spec, 'send', imports, './')).toBe(
 				'void | Promise<void>',
 			);
-			expect(get_handler_return_type(filer_change_action_spec, 'receive', imports)).toBe(
+			expect(get_handler_return_type(filer_change_action_spec, 'receive', imports, './')).toBe(
 				'void | Promise<void>',
 			);
 
@@ -535,15 +540,15 @@ describe('get_handler_return_type', () => {
 			const imports = new ImportBuilder();
 
 			// First call adds import
-			get_handler_return_type(ping_action_spec, 'receive_request', imports);
+			get_handler_return_type(ping_action_spec, 'receive_request', imports, './');
 			expect(imports.import_count).toBe(1);
 
 			// Second call doesn't add duplicate
-			get_handler_return_type(session_load_action_spec, 'receive_request', imports);
+			get_handler_return_type(session_load_action_spec, 'receive_request', imports, './');
 			expect(imports.import_count).toBe(1);
 
 			// Void return doesn't add import
-			get_handler_return_type(ping_action_spec, 'send_request', imports);
+			get_handler_return_type(ping_action_spec, 'send_request', imports, './');
 			expect(imports.import_count).toBe(1);
 		});
 	});
