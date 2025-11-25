@@ -323,8 +323,7 @@ export const generate_phase_handlers = (
 
 	// Add environment type import
 	const environment_type = executor === 'frontend' ? 'Frontend' : 'Backend';
-	const environment_module =
-		executor === 'frontend' ? './frontend.svelte.js' : './backend.js';
+	const environment_module = executor === 'frontend' ? './frontend.svelte.js' : './backend.js';
 	imports.add_type(environment_module, environment_type);
 
 	// Generate handler definitions for each phase

@@ -471,9 +471,9 @@ describe('get_handler_return_type', () => {
 		test('other phases return void and do not add imports', () => {
 			const imports = new ImportBuilder();
 
-			expect(
-				get_handler_return_type(session_load_action_spec, 'send_request', imports, './'),
-			).toBe('void | Promise<void>');
+			expect(get_handler_return_type(session_load_action_spec, 'send_request', imports, './')).toBe(
+				'void | Promise<void>',
+			);
 			expect(
 				get_handler_return_type(session_load_action_spec, 'send_response', imports, './'),
 			).toBe('void | Promise<void>');
