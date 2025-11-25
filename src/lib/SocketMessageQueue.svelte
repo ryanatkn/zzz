@@ -198,14 +198,12 @@
 
 							<CopyToClipboard
 								text={message.id}
-								attrs={{
-									class: 'plain font_size_xs text_color_5',
-									style: 'width: 120px;',
-									title: 'copy message id to clipboard',
-								}}
+								class="plain font_size_xs text_color_5"
+								style="width: 120px;"
+								title="copy message id to clipboard"
 								copied_display_duration={0}
 							>
-								{#snippet children(copied)}
+								{#snippet children(copied, _failed)}
 									{#if copied}
 										<div><small class="font_size_xs">{message.id}</small></div>
 									{:else}
@@ -218,14 +216,12 @@
 							<small class="chip">{message.data.method}</small>
 							<CopyToClipboard
 								text={message.data.id}
-								attrs={{
-									class: 'plain font_size_xs text_color_5',
-									style: 'width: 120px;',
-									title: 'copy message id to clipboard',
-								}}
+								class="plain font_size_xs text_color_5"
+								style="width: 120px;"
+								title="copy message id to clipboard"
 								copied_display_duration={0}
 							>
-								{#snippet children(copied)}
+								{#snippet children(copied, _failed)}
 									{#if copied}
 										<div><small class="font_size_xs">{message.data.id}</small></div>
 									{:else}

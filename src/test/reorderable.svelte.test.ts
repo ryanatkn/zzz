@@ -139,14 +139,14 @@ describe('Reorderable', () => {
 	describe('list attachment', () => {
 		let list: HTMLElement;
 		let reorderable: Reorderable;
-		let mock_callback: ReturnType<typeof vi.fn>;
+		let mock_callback: (from_index: number, to_index: number) => void;
 		let cleanup_fn: (() => void) | undefined;
 
 		beforeEach(() => {
 			const elements = create_elements();
 			list = elements.list;
 			reorderable = new Reorderable();
-			mock_callback = vi.fn();
+			mock_callback = vi.fn() as typeof mock_callback;
 		});
 
 		afterEach(() => {
