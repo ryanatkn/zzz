@@ -1,10 +1,10 @@
 {
   "name": "@ryanatkn/zzz",
   "version": "0.0.1",
-  "modules": {
-    "./action_collection_helpers.js": {
+  "modules": [
+    {
       "path": "action_collection_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "parse_action_input",
           "kind": "function"
@@ -23,24 +23,24 @@
         }
       ]
     },
-    "./action_collections.gen.js": {
+    {
       "path": "action_collections.gen.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "gen",
           "kind": "function"
         }
       ]
     },
-    "./action_collections.js": {
+    {
       "path": "action_collections.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Methods",
+          "name": "ActionMethods",
           "kind": "variable"
         },
         {
-          "name": "Action_Specs",
+          "name": "ActionSpecs",
           "kind": "variable"
         },
         {
@@ -48,47 +48,47 @@
           "kind": "variable"
         },
         {
-          "name": "Action_Inputs",
+          "name": "ActionInputs",
           "kind": "variable"
         },
         {
-          "name": "Action_Outputs",
+          "name": "ActionOutputs",
           "kind": "variable"
         },
         {
-          "name": "Action_Event_Datas",
+          "name": "ActionEventDatas",
           "kind": "type"
         }
       ]
     },
-    "./action_event_data.js": {
+    {
       "path": "action_event_data.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Event_Data",
+          "name": "ActionEventData",
           "kind": "variable"
         },
         {
-          "name": "Action_Event_Request_Response_Data",
+          "name": "ActionEventRequestResponseData",
           "kind": "type"
         },
         {
-          "name": "Action_Event_Remote_Notification_Data",
+          "name": "ActionEventRemoteNotificationData",
           "kind": "type"
         },
         {
-          "name": "Action_Event_Local_Call_Data",
+          "name": "ActionEventLocalCallData",
           "kind": "type"
         },
         {
-          "name": "Action_Event_Data_Union",
+          "name": "ActionEventDataUnion",
           "kind": "type"
         }
       ]
     },
-    "./action_event_helpers.js": {
+    {
       "path": "action_event_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "is_request_response",
           "kind": "function"
@@ -191,15 +191,15 @@
         }
       ]
     },
-    "./action_event_types.js": {
+    {
       "path": "action_event_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Event_Step",
+          "name": "ActionEventStep",
           "kind": "variable"
         },
         {
-          "name": "Action_Event_Phase",
+          "name": "ActionEventPhase",
           "kind": "variable"
         },
         {
@@ -215,20 +215,20 @@
           "kind": "variable"
         },
         {
-          "name": "Action_Event_Environment",
+          "name": "ActionEventEnvironment",
           "kind": "type"
         }
       ]
     },
-    "./action_event.js": {
+    {
       "path": "action_event.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Event_Change_Observer",
+          "name": "ActionEventChangeObserver",
           "kind": "type"
         },
         {
-          "name": "Action_Event",
+          "name": "ActionEvent",
           "kind": "class"
         },
         {
@@ -245,9 +245,9 @@
         }
       ]
     },
-    "./action_helpers.js": {
+    {
       "path": "action_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "ACTION_DATE_FORMAT",
           "kind": "variable"
@@ -270,95 +270,95 @@
         }
       ]
     },
-    "./action_metatypes.gen.js": {
+    {
       "path": "action_metatypes.gen.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "gen",
           "kind": "function"
         }
       ]
     },
-    "./action_metatypes.js": {
+    {
       "path": "action_metatypes.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Method",
+          "name": "ActionMethod",
           "kind": "variable"
         },
         {
-          "name": "Request_Response_Action_Method",
+          "name": "RequestResponseActionMethod",
           "kind": "variable"
         },
         {
-          "name": "Remote_Notification_Action_Method",
+          "name": "RemoteNotificationActionMethod",
           "kind": "variable"
         },
         {
-          "name": "Local_Call_Action_Method",
+          "name": "LocalCallActionMethod",
           "kind": "variable"
         },
         {
-          "name": "Frontend_Action_Method",
+          "name": "FrontendActionMethod",
           "kind": "variable"
         },
         {
-          "name": "Backend_Action_Method",
+          "name": "BackendActionMethod",
           "kind": "variable"
         },
         {
-          "name": "Actions_Api",
+          "name": "ActionsApi",
           "kind": "type"
         }
       ]
     },
-    "./action_peer.js": {
+    {
       "path": "action_peer.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Peer_Send_Options",
+          "name": "ActionPeerSendOptions",
           "kind": "type"
         },
         {
-          "name": "Action_Peer_Options",
+          "name": "ActionPeerOptions",
           "kind": "type"
         },
         {
-          "name": "Action_Peer",
+          "name": "ActionPeer",
           "kind": "class"
         }
       ]
     },
-    "./action_registry.js": {
+    {
       "path": "action_registry.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Registry",
+          "name": "ActionRegistry",
           "kind": "class"
         }
       ]
     },
-    "./action_spec.js": {
+    {
       "path": "action_spec.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Spec",
+          "name": "ActionSpec",
           "kind": "variable"
         },
         {
-          "name": "Request_Response_Action_Spec",
+          "name": "RequestResponseActionSpec",
           "kind": "variable"
         },
         {
-          "name": "Remote_Notification_Action_Spec",
+          "name": "RemoteNotificationActionSpec",
           "kind": "variable"
         },
         {
-          "name": "Local_Call_Action_Spec",
+          "name": "LocalCallActionSpec",
           "kind": "variable"
         },
         {
-          "name": "Action_Spec_Union",
+          "name": "ActionSpecUnion",
           "kind": "variable"
         },
         {
@@ -367,9 +367,9 @@
         }
       ]
     },
-    "./action_specs.js": {
+    {
       "path": "action_specs.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "ping_action_spec",
           "kind": "variable"
@@ -452,19 +452,19 @@
         }
       ]
     },
-    "./action_types.js": {
+    {
       "path": "action_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Kind",
+          "name": "ActionKind",
           "kind": "variable"
         },
         {
-          "name": "Action_Executor",
+          "name": "ActionExecutor",
           "kind": "variable"
         },
         {
-          "name": "Action_Initiator",
+          "name": "ActionInitiator",
           "kind": "variable"
         },
         {
@@ -472,36 +472,36 @@
           "kind": "function"
         },
         {
-          "name": "Action_Auth",
+          "name": "ActionAuth",
           "kind": "variable"
         },
         {
-          "name": "Action_Side_Effects",
+          "name": "ActionSideEffects",
           "kind": "variable"
         },
         {
-          "name": "Action_Input",
+          "name": "ActionInput",
           "kind": "variable"
         },
         {
-          "name": "Action_Output",
+          "name": "ActionOutput",
           "kind": "variable"
         }
       ]
     },
-    "./action.svelte.js": {
+    {
       "path": "action.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Action_Json",
+          "name": "ActionJson",
           "kind": "variable"
         },
         {
-          "name": "Action_Json_Input",
+          "name": "ActionJsonInput",
           "kind": "type"
         },
         {
-          "name": "Action_Options",
+          "name": "ActionOptions",
           "kind": "type"
         },
         {
@@ -509,14 +509,14 @@
           "kind": "class"
         },
         {
-          "name": "Action_Schema",
+          "name": "ActionSchema",
           "kind": "variable"
         }
       ]
     },
-    "./actions.svelte.js": {
+    {
       "path": "actions.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "HISTORY_LIMIT_DEFAULT",
           "kind": "variable"
@@ -526,15 +526,15 @@
           "kind": "variable"
         },
         {
-          "name": "Actions_Json",
+          "name": "ActionsJson",
           "kind": "variable"
         },
         {
-          "name": "Actions_Json_Input",
+          "name": "ActionsJsonInput",
           "kind": "type"
         },
         {
-          "name": "Actions_Options",
+          "name": "ActionsOptions",
           "kind": "type"
         },
         {
@@ -543,15 +543,15 @@
         }
       ]
     },
-    "./app.svelte.js": {
+    {
       "path": "app.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "app_context",
           "kind": "variable"
         },
         {
-          "name": "App_Options",
+          "name": "AppOptions",
           "kind": "type"
         },
         {
@@ -560,19 +560,19 @@
         }
       ]
     },
-    "./capabilities.svelte.js": {
+    {
       "path": "capabilities.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "PING_HISTORY_MAX",
           "kind": "variable"
         },
         {
-          "name": "Capabilities_Json",
+          "name": "CapabilitiesJson",
           "kind": "variable"
         },
         {
-          "name": "Capabilities_Json_Input",
+          "name": "CapabilitiesJsonInput",
           "kind": "type"
         },
         {
@@ -580,23 +580,23 @@
           "kind": "type"
         },
         {
-          "name": "Ping_Data",
+          "name": "PingData",
           "kind": "type"
         },
         {
-          "name": "Server_Capability_Data",
+          "name": "ServerCapabilityData",
           "kind": "type"
         },
         {
-          "name": "Websocket_Capability_Data",
+          "name": "WebsocketCapabilityData",
           "kind": "type"
         },
         {
-          "name": "Filesystem_Capability_Data",
+          "name": "FilesystemCapabilityData",
           "kind": "type"
         },
         {
-          "name": "Ollama_Capability_Data",
+          "name": "OllamaCapabilityData",
           "kind": "type"
         },
         {
@@ -605,23 +605,23 @@
         }
       ]
     },
-    "./cell_classes.js": {
+    {
       "path": "cell_classes.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "cell_classes",
           "kind": "variable"
         },
         {
-          "name": "Cell_Classes",
+          "name": "CellClasses",
           "kind": "type"
         },
         {
-          "name": "Cell_Class_Names",
+          "name": "CellClassNames",
           "kind": "type"
         },
         {
-          "name": "Cell_Registry_Map",
+          "name": "CellRegistryMap",
           "kind": "type"
         },
         {
@@ -634,9 +634,9 @@
         }
       ]
     },
-    "./cell_helpers.js": {
+    {
       "path": "cell_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "HANDLED",
           "kind": "variable"
@@ -654,15 +654,15 @@
           "kind": "variable"
         },
         {
-          "name": "Schema_Class_Info",
+          "name": "SchemaClassInfo",
           "kind": "type"
         },
         {
-          "name": "Value_Parser",
+          "name": "ValueParser",
           "kind": "type"
         },
         {
-          "name": "Cell_Value_Decoder",
+          "name": "CellValueDecoder",
           "kind": "type"
         },
         {
@@ -671,45 +671,45 @@
         }
       ]
     },
-    "./cell_registry.svelte.js": {
+    {
       "path": "cell_registry.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Class_Not_Registered_Error",
+          "name": "ClassNotRegisteredError",
           "kind": "class"
         },
         {
-          "name": "Cell_Registry",
+          "name": "CellRegistry",
           "kind": "class"
         }
       ]
     },
-    "./cell_types.js": {
+    {
       "path": "cell_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Schema_Keys",
+          "name": "SchemaKeys",
           "kind": "type"
         },
         {
-          "name": "Schema_Value",
+          "name": "SchemaValue",
           "kind": "type"
         },
         {
-          "name": "Cell_Json",
+          "name": "CellJson",
           "kind": "variable"
         },
         {
-          "name": "Cell_Json_Input",
+          "name": "CellJsonInput",
           "kind": "type"
         }
       ]
     },
-    "./cell.svelte.js": {
+    {
       "path": "cell.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Cell_Options",
+          "name": "CellOptions",
           "kind": "type"
         },
         {
@@ -722,32 +722,32 @@
         }
       ]
     },
-    "./chat_template.js": {
+    {
       "path": "chat_template.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Chat_Template",
+          "name": "ChatTemplate",
           "kind": "type"
         }
       ]
     },
-    "./chat.svelte.js": {
+    {
       "path": "chat.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Chat_View_Mode",
+          "name": "ChatViewMode",
           "kind": "type"
         },
         {
-          "name": "Chat_Json",
+          "name": "ChatJson",
           "kind": "variable"
         },
         {
-          "name": "Chat_Json_Input",
+          "name": "ChatJsonInput",
           "kind": "type"
         },
         {
-          "name": "Chat_Options",
+          "name": "ChatOptions",
           "kind": "type"
         },
         {
@@ -755,24 +755,24 @@
           "kind": "class"
         },
         {
-          "name": "Chat_Schema",
+          "name": "ChatSchema",
           "kind": "variable"
         }
       ]
     },
-    "./chats.svelte.js": {
+    {
       "path": "chats.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Chats_Json",
+          "name": "ChatsJson",
           "kind": "variable"
         },
         {
-          "name": "Chats_Json_Input",
+          "name": "ChatsJsonInput",
           "kind": "type"
         },
         {
-          "name": "Chats_Options",
+          "name": "ChatsOptions",
           "kind": "type"
         },
         {
@@ -780,16 +780,16 @@
           "kind": "class"
         },
         {
-          "name": "Chats_Schema",
+          "name": "ChatsSchema",
           "kind": "variable"
         }
       ]
     },
-    "./codegen.js": {
+    {
       "path": "codegen.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Import_Builder",
+          "name": "ImportBuilder",
           "kind": "class"
         },
         {
@@ -810,30 +810,30 @@
         }
       ]
     },
-    "./completion_types.js": {
+    {
       "path": "completion_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Completion_Role",
+          "name": "CompletionRole",
           "kind": "variable"
         },
         {
-          "name": "Completion_Message",
+          "name": "CompletionMessage",
           "kind": "variable"
         },
         {
-          "name": "Completion_Request",
+          "name": "CompletionRequest",
           "kind": "variable"
         },
         {
-          "name": "Completion_Response",
+          "name": "CompletionResponse",
           "kind": "variable"
         }
       ]
     },
-    "./config_defaults.js": {
+    {
       "path": "config_defaults.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "SYSTEM_MESSAGE_DEFAULT",
           "kind": "variable"
@@ -888,31 +888,31 @@
         }
       ]
     },
-    "./config_helpers.js": {
+    {
       "path": "config_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Zzz_Config_Creator",
+          "name": "ZzzConfigCreator",
           "kind": "type"
         },
         {
-          "name": "Zzz_Config",
+          "name": "ZzzConfig",
           "kind": "type"
         }
       ]
     },
-    "./config.js": {
+    {
       "path": "config.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "default",
           "kind": "function"
         }
       ]
     },
-    "./constants.js": {
+    {
       "path": "constants.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "SERVER_PROTOCOL",
           "kind": "variable"
@@ -975,18 +975,18 @@
         }
       ]
     },
-    "./diskfile_editor_state.svelte.js": {
+    {
       "path": "diskfile_editor_state.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Diskfile_Editor_State",
+          "name": "DiskfileEditorState",
           "kind": "class"
         }
       ]
     },
-    "./diskfile_helpers.js": {
+    {
       "path": "diskfile_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "is_path_absolute",
           "kind": "function"
@@ -1017,119 +1017,119 @@
         }
       ]
     },
-    "./diskfile_history.svelte.js": {
+    {
       "path": "diskfile_history.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "History_Entry",
+          "name": "HistoryEntry",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_History_Json",
+          "name": "DiskfileHistoryJson",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_History_Json_Input",
+          "name": "DiskfileHistoryJsonInput",
           "kind": "type"
         },
         {
-          "name": "Diskfile_History_Options",
+          "name": "DiskfileHistoryOptions",
           "kind": "type"
         },
         {
-          "name": "Diskfile_History",
+          "name": "DiskfileHistory",
           "kind": "class"
         }
       ]
     },
-    "./diskfile_tab.svelte.js": {
+    {
       "path": "diskfile_tab.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Diskfile_Tab_Json",
+          "name": "DiskfileTabJson",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Tab_Json_Input",
+          "name": "DiskfileTabJsonInput",
           "kind": "type"
         },
         {
-          "name": "Diskfile_Tab_Options",
+          "name": "DiskfileTabOptions",
           "kind": "type"
         },
         {
-          "name": "Diskfile_Tab",
+          "name": "DiskfileTab",
           "kind": "class"
         },
         {
-          "name": "Diskfile_Tab_Schema",
+          "name": "DiskfileTabSchema",
           "kind": "variable"
         }
       ]
     },
-    "./diskfile_tabs.svelte.js": {
+    {
       "path": "diskfile_tabs.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Diskfile_Tabs_Json",
+          "name": "DiskfileTabsJson",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Tabs_Json_Input",
+          "name": "DiskfileTabsJsonInput",
           "kind": "type"
         },
         {
-          "name": "Diskfile_Tabs_Options",
+          "name": "DiskfileTabsOptions",
           "kind": "type"
         },
         {
-          "name": "Diskfile_Tabs",
+          "name": "DiskfileTabs",
           "kind": "class"
         },
         {
-          "name": "Diskfile_Tabs_Schema",
+          "name": "DiskfileTabsSchema",
           "kind": "variable"
         }
       ]
     },
-    "./diskfile_types.js": {
+    {
       "path": "diskfile_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Diskfile_Change_Type",
+          "name": "DiskfileChangeType",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Path",
+          "name": "DiskfilePath",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Directory_Path",
+          "name": "DiskfileDirectoryPath",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Change",
+          "name": "DiskfileChange",
           "kind": "variable"
         },
         {
-          "name": "Serializable_Disknode",
+          "name": "SerializableDisknode",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Json",
+          "name": "DiskfileJson",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Json_Input",
+          "name": "DiskfileJsonInput",
           "kind": "type"
         }
       ]
     },
-    "./diskfile.svelte.js": {
+    {
       "path": "diskfile.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Diskfile_Options",
+          "name": "DiskfileOptions",
           "kind": "type"
         },
         {
@@ -1137,49 +1137,49 @@
           "kind": "class"
         },
         {
-          "name": "Diskfile_Schema",
+          "name": "DiskfileSchema",
           "kind": "variable"
         }
       ]
     },
-    "./diskfiles_editor.svelte.js": {
+    {
       "path": "diskfiles_editor.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Diskfiles_Editor_Json",
+          "name": "DiskfilesEditorJson",
           "kind": "variable"
         },
         {
-          "name": "Diskfiles_Editor_Json_Input",
+          "name": "DiskfilesEditorJsonInput",
           "kind": "type"
         },
         {
-          "name": "Diskfiles_Editor_Options",
+          "name": "DiskfilesEditorOptions",
           "kind": "type"
         },
         {
-          "name": "Diskfiles_Editor",
+          "name": "DiskfilesEditor",
           "kind": "class"
         },
         {
-          "name": "Diskfiles_Editor_Schema",
+          "name": "DiskfilesEditorSchema",
           "kind": "variable"
         }
       ]
     },
-    "./diskfiles.svelte.js": {
+    {
       "path": "diskfiles.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Diskfiles_Json",
+          "name": "DiskfilesJson",
           "kind": "variable"
         },
         {
-          "name": "Diskfiles_Json_Input",
+          "name": "DiskfilesJsonInput",
           "kind": "type"
         },
         {
-          "name": "Diskfiles_Options",
+          "name": "DiskfilesOptions",
           "kind": "type"
         },
         {
@@ -1188,9 +1188,9 @@
         }
       ]
     },
-    "./format_helpers.js": {
+    {
       "path": "format_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "format_bytes",
           "kind": "function"
@@ -1209,77 +1209,77 @@
         }
       ]
     },
-    "./frontend_action_handlers.js": {
+    {
       "path": "frontend_action_handlers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "frontend_action_handlers",
           "kind": "variable"
         }
       ]
     },
-    "./frontend_action_types.gen.js": {
+    {
       "path": "frontend_action_types.gen.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "gen",
           "kind": "function"
         }
       ]
     },
-    "./frontend_action_types.js": {
+    {
       "path": "frontend_action_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Frontend_Action_Handlers",
+          "name": "FrontendActionHandlers",
           "kind": "type"
         }
       ]
     },
-    "./frontend_actions_api.js": {
+    {
       "path": "frontend_actions_api.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "create_frontend_actions_api",
           "kind": "function"
         }
       ]
     },
-    "./frontend_http_transport.js": {
+    {
       "path": "frontend_http_transport.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Frontend_Http_Transport",
+          "name": "FrontendHttpTransport",
           "kind": "class"
         }
       ]
     },
-    "./frontend_websocket_transport.js": {
+    {
       "path": "frontend_websocket_transport.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Frontend_Websocket_Transport",
+          "name": "FrontendWebsocketTransport",
           "kind": "class"
         }
       ]
     },
-    "./frontend.svelte.js": {
+    {
       "path": "frontend.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "frontend_context",
           "kind": "variable"
         },
         {
-          "name": "Frontend_Json",
+          "name": "FrontendJson",
           "kind": "variable"
         },
         {
-          "name": "Frontend_Json_Input",
+          "name": "FrontendJsonInput",
           "kind": "type"
         },
         {
-          "name": "Frontend_Options",
+          "name": "FrontendOptions",
           "kind": "type"
         },
         {
@@ -1288,9 +1288,9 @@
         }
       ]
     },
-    "./glyphs.js": {
+    {
       "path": "glyphs.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "GLYPH_UNKNOWN",
           "kind": "variable"
@@ -1573,9 +1573,9 @@
         }
       ]
     },
-    "./helpers.js": {
+    {
       "path": "helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "DURATION_LG",
           "kind": "variable"
@@ -1610,19 +1610,19 @@
         }
       ]
     },
-    "./indexed_collection_helpers.svelte.js": {
+    {
       "path": "indexed_collection_helpers.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Indexed_Item",
+          "name": "IndexedItem",
           "kind": "variable"
         },
         {
-          "name": "Index_Options",
+          "name": "IndexOptions",
           "kind": "type"
         },
         {
-          "name": "Single_Index_Options",
+          "name": "SingleIndexOptions",
           "kind": "type"
         },
         {
@@ -1630,7 +1630,7 @@
           "kind": "function"
         },
         {
-          "name": "Multi_Index_Options",
+          "name": "MultiIndexOptions",
           "kind": "type"
         },
         {
@@ -1638,7 +1638,7 @@
           "kind": "function"
         },
         {
-          "name": "Derived_Index_Options",
+          "name": "DerivedIndexOptions",
           "kind": "type"
         },
         {
@@ -1646,7 +1646,7 @@
           "kind": "function"
         },
         {
-          "name": "Dynamic_Index_Options",
+          "name": "DynamicIndexOptions",
           "kind": "type"
         },
         {
@@ -1655,41 +1655,41 @@
         }
       ]
     },
-    "./indexed_collection.svelte.js": {
+    {
       "path": "indexed_collection.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Index_Type",
+          "name": "IndexType",
           "kind": "type"
         },
         {
-          "name": "Index_Definition",
+          "name": "IndexDefinition",
           "kind": "type"
         },
         {
-          "name": "Indexed_Collection_Options",
+          "name": "IndexedCollectionOptions",
           "kind": "type"
         },
         {
-          "name": "Indexed_Collection",
+          "name": "IndexedCollection",
           "kind": "class"
         }
       ]
     },
-    "./iterable_helpers.js": {
+    {
       "path": "iterable_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "create_map_by_property",
           "kind": "function"
         }
       ]
     },
-    "./jsonrpc_errors.js": {
+    {
       "path": "jsonrpc_errors.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Jsonrpc_Error_Name",
+          "name": "JsonrpcErrorName",
           "kind": "type"
         },
         {
@@ -1701,7 +1701,7 @@
           "kind": "variable"
         },
         {
-          "name": "Thrown_Jsonrpc_Error",
+          "name": "ThrownJsonrpcError",
           "kind": "class"
         },
         {
@@ -1710,9 +1710,9 @@
         }
       ]
     },
-    "./jsonrpc_helpers.js": {
+    {
       "path": "jsonrpc_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "create_jsonrpc_request",
           "kind": "function"
@@ -1795,9 +1795,9 @@
         }
       ]
     },
-    "./jsonrpc.js": {
+    {
       "path": "jsonrpc.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "JSONRPC_VERSION",
           "kind": "variable"
@@ -1807,51 +1807,51 @@
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Request_Id",
+          "name": "JsonrpcRequestId",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Method",
+          "name": "JsonrpcMethod",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Progress_Token",
+          "name": "JsonrpcProgressToken",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Mcp_Meta",
+          "name": "JsonrpcMcpMeta",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Request_Params_Meta",
+          "name": "JsonrpcRequestParamsMeta",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Request_Params",
+          "name": "JsonrpcRequestParams",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Notification_Params",
+          "name": "JsonrpcNotificationParams",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Params",
+          "name": "JsonrpcParams",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Result",
+          "name": "JsonrpcResult",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Request",
+          "name": "JsonrpcRequest",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Notification",
+          "name": "JsonrpcNotification",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Response",
+          "name": "JsonrpcResponse",
           "kind": "variable"
         },
         {
@@ -1883,46 +1883,46 @@
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Server_Error_Code",
+          "name": "JsonrpcServerErrorCode",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Error_Code",
+          "name": "JsonrpcErrorCode",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Error_Json",
+          "name": "JsonrpcErrorJson",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Error_Message",
+          "name": "JsonrpcErrorMessage",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Response_Or_Error",
+          "name": "JsonrpcResponseOrError",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Message",
+          "name": "JsonrpcMessage",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Message_From_Client_To_Server",
+          "name": "JsonrpcMessageFromClientToServer",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Message_From_Server_To_Client",
+          "name": "JsonrpcMessageFromServerToClient",
           "kind": "variable"
         },
         {
-          "name": "Jsonrpc_Singular_Message",
+          "name": "JsonrpcSingularMessage",
           "kind": "variable"
         }
       ]
     },
-    "./list_helpers.js": {
+    {
       "path": "list_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "reorder_list",
           "kind": "function"
@@ -1933,23 +1933,23 @@
         }
       ]
     },
-    "./model.svelte.js": {
+    {
       "path": "model.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Model_Name",
+          "name": "ModelName",
           "kind": "variable"
         },
         {
-          "name": "Model_Json",
+          "name": "ModelJson",
           "kind": "variable"
         },
         {
-          "name": "Model_Json_Input",
+          "name": "ModelJsonInput",
           "kind": "type"
         },
         {
-          "name": "Model_Options",
+          "name": "ModelOptions",
           "kind": "type"
         },
         {
@@ -1957,24 +1957,24 @@
           "kind": "class"
         },
         {
-          "name": "Model_Schema",
+          "name": "ModelSchema",
           "kind": "variable"
         }
       ]
     },
-    "./models.svelte.js": {
+    {
       "path": "models.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Models_Json",
+          "name": "ModelsJson",
           "kind": "variable"
         },
         {
-          "name": "Models_Json_Input",
+          "name": "ModelsJsonInput",
           "kind": "type"
         },
         {
-          "name": "Models_Options",
+          "name": "ModelsOptions",
           "kind": "type"
         },
         {
@@ -1983,9 +1983,9 @@
         }
       ]
     },
-    "./nav_helpers.js": {
+    {
       "path": "nav_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "to_chats_url",
           "kind": "function"
@@ -1996,15 +1996,15 @@
         }
       ]
     },
-    "./nav.js": {
+    {
       "path": "nav.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Nav_Link_Item",
+          "name": "NavLinkItem",
           "kind": "type"
         },
         {
-          "name": "Nav_Item",
+          "name": "NavItem",
           "kind": "type"
         },
         {
@@ -2017,84 +2017,84 @@
         }
       ]
     },
-    "./navigation_helpers.js": {
+    {
       "path": "navigation_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "goto_unless_current",
           "kind": "function"
         }
       ]
     },
-    "./ollama_helpers.js": {
+    {
       "path": "ollama_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "OLLAMA_URL",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Status_Response",
+          "name": "OllamaStatusResponse",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Progress_Response",
+          "name": "OllamaProgressResponse",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Model_Details",
+          "name": "OllamaModelDetails",
           "kind": "variable"
         },
         {
-          "name": "Ollama_List_Response_Item",
+          "name": "OllamaListResponseItem",
           "kind": "variable"
         },
         {
-          "name": "Ollama_List_Response",
+          "name": "OllamaListResponse",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Show_Response",
+          "name": "OllamaShowResponse",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Ps_Response_Item",
+          "name": "OllamaPsResponseItem",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Ps_Response",
+          "name": "OllamaPsResponse",
           "kind": "variable"
         },
         {
-          "name": "Ollama_List_Request",
+          "name": "OllamaListRequest",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Ps_Request",
+          "name": "OllamaPsRequest",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Show_Request",
+          "name": "OllamaShowRequest",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Pull_Request",
+          "name": "OllamaPullRequest",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Push_Request",
+          "name": "OllamaPushRequest",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Create_Request",
+          "name": "OllamaCreateRequest",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Delete_Request",
+          "name": "OllamaDeleteRequest",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Copy_Request",
+          "name": "OllamaCopyRequest",
           "kind": "variable"
         },
         {
@@ -2107,19 +2107,19 @@
         }
       ]
     },
-    "./ollama.svelte.js": {
+    {
       "path": "ollama.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Ollama_Json",
+          "name": "OllamaJson",
           "kind": "variable"
         },
         {
-          "name": "Ollama_Json_Input",
+          "name": "OllamaJsonInput",
           "kind": "type"
         },
         {
-          "name": "Ollama_Options",
+          "name": "OllamaOptions",
           "kind": "type"
         },
         {
@@ -2128,31 +2128,9 @@
         }
       ]
     },
-    "./package.gen.js": {
-      "path": "package.gen.ts",
-      "declarations": [
-        {
-          "name": "gen",
-          "kind": "variable"
-        }
-      ]
-    },
-    "./package.js": {
-      "path": "package.ts",
-      "declarations": [
-        {
-          "name": "package_json",
-          "kind": "variable"
-        },
-        {
-          "name": "src_json",
-          "kind": "variable"
-        }
-      ]
-    },
-    "./part_helpers.js": {
+    {
       "path": "part_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "PART_GLYPHS",
           "kind": "variable"
@@ -2163,59 +2141,59 @@
         }
       ]
     },
-    "./part.svelte.js": {
+    {
       "path": "part.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Part_Json_Base",
+          "name": "PartJsonBase",
           "kind": "variable"
         },
         {
-          "name": "Text_Part_Json",
+          "name": "TextPartJson",
           "kind": "variable"
         },
         {
-          "name": "Text_Part_Json_Input",
+          "name": "TextPartJsonInput",
           "kind": "type"
         },
         {
-          "name": "Diskfile_Part_Json",
+          "name": "DiskfilePartJson",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Part_Json_Input",
+          "name": "DiskfilePartJsonInput",
           "kind": "type"
         },
         {
-          "name": "Part_Json",
+          "name": "PartJson",
           "kind": "variable"
         },
         {
-          "name": "Part_Json_Input",
+          "name": "PartJsonInput",
           "kind": "type"
         },
         {
-          "name": "Part_Union",
+          "name": "PartUnion",
           "kind": "type"
         },
         {
-          "name": "Part_Json_Type",
+          "name": "PartJsonType",
           "kind": "type"
         },
         {
-          "name": "Part_Options",
+          "name": "PartOptions",
           "kind": "type"
         },
         {
-          "name": "Text_Part_Options",
+          "name": "TextPartOptions",
           "kind": "type"
         },
         {
-          "name": "Diskfile_Part_Options",
+          "name": "DiskfilePartOptions",
           "kind": "type"
         },
         {
-          "name": "Part_Options_Union",
+          "name": "PartOptionsUnion",
           "kind": "type"
         },
         {
@@ -2223,40 +2201,40 @@
           "kind": "class"
         },
         {
-          "name": "Part_Schema",
+          "name": "PartSchema",
           "kind": "variable"
         },
         {
-          "name": "Text_Part",
+          "name": "TextPart",
           "kind": "class"
         },
         {
-          "name": "Text_Part_Schema",
+          "name": "TextPartSchema",
           "kind": "variable"
         },
         {
-          "name": "Diskfile_Part",
+          "name": "DiskfilePart",
           "kind": "class"
         },
         {
-          "name": "Diskfile_Part_Schema",
+          "name": "DiskfilePartSchema",
           "kind": "variable"
         }
       ]
     },
-    "./parts.svelte.js": {
+    {
       "path": "parts.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Parts_Json",
+          "name": "PartsJson",
           "kind": "variable"
         },
         {
-          "name": "Parts_Json_Input",
+          "name": "PartsJsonInput",
           "kind": "type"
         },
         {
-          "name": "Parts_Options",
+          "name": "PartsOptions",
           "kind": "type"
         },
         {
@@ -2265,20 +2243,20 @@
         }
       ]
     },
-    "./pkg.js": {
+    {
       "path": "pkg.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "pkg_context",
           "kind": "variable"
         }
       ]
     },
-    "./poller.svelte.js": {
+    {
       "path": "poller.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Poller_Options",
+          "name": "PollerOptions",
           "kind": "type"
         },
         {
@@ -2287,23 +2265,23 @@
         }
       ]
     },
-    "./popover.svelte.js": {
+    {
       "path": "popover.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Popover_Parameters",
+          "name": "PopoverParameters",
           "kind": "type"
         },
         {
-          "name": "Popover_Trigger_Parameters",
+          "name": "PopoverTriggerParameters",
           "kind": "type"
         },
         {
-          "name": "Transition_Function",
+          "name": "TransitionFunction",
           "kind": "type"
         },
         {
-          "name": "Popover_Content_Parameters",
+          "name": "PopoverContentParameters",
           "kind": "type"
         },
         {
@@ -2312,11 +2290,11 @@
         }
       ]
     },
-    "./position_helpers.js": {
+    {
       "path": "position_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Cardinal_Position",
+          "name": "CardinalPosition",
           "kind": "type"
         },
         {
@@ -2333,36 +2311,36 @@
         }
       ]
     },
-    "./prompt_helpers.js": {
+    {
       "path": "prompt_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "format_prompt_content",
           "kind": "function"
         }
       ]
     },
-    "./prompt.svelte.js": {
+    {
       "path": "prompt.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Prompt_Message",
+          "name": "PromptMessage",
           "kind": "type"
         },
         {
-          "name": "Prompt_Action_Content",
+          "name": "PromptActionContent",
           "kind": "type"
         },
         {
-          "name": "Prompt_Json",
+          "name": "PromptJson",
           "kind": "variable"
         },
         {
-          "name": "Prompt_Json_Input",
+          "name": "PromptJsonInput",
           "kind": "type"
         },
         {
-          "name": "Prompt_Options",
+          "name": "PromptOptions",
           "kind": "type"
         },
         {
@@ -2370,24 +2348,24 @@
           "kind": "class"
         },
         {
-          "name": "Prompt_Schema",
+          "name": "PromptSchema",
           "kind": "variable"
         }
       ]
     },
-    "./prompts.svelte.js": {
+    {
       "path": "prompts.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Prompts_Json",
+          "name": "PromptsJson",
           "kind": "variable"
         },
         {
-          "name": "Prompts_Json_Input",
+          "name": "PromptsJsonInput",
           "kind": "type"
         },
         {
-          "name": "Prompts_Options",
+          "name": "PromptsOptions",
           "kind": "type"
         },
         {
@@ -2395,40 +2373,40 @@
           "kind": "class"
         },
         {
-          "name": "Prompts_Schema",
+          "name": "PromptsSchema",
           "kind": "variable"
         }
       ]
     },
-    "./provider_types.js": {
+    {
       "path": "provider_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Provider_Name",
+          "name": "ProviderName",
           "kind": "variable"
         },
         {
-          "name": "Provider_Data_Ollama",
+          "name": "ProviderDataOllama",
           "kind": "variable"
         },
         {
-          "name": "Provider_Data_Claude",
+          "name": "ProviderDataClaude",
           "kind": "variable"
         },
         {
-          "name": "Provider_Data_Chatgpt",
+          "name": "ProviderDataChatgpt",
           "kind": "variable"
         },
         {
-          "name": "Provider_Data_Gemini",
+          "name": "ProviderDataGemini",
           "kind": "variable"
         },
         {
-          "name": "Provider_Data_Schema",
+          "name": "ProviderDataSchema",
           "kind": "variable"
         },
         {
-          "name": "Provider_Data",
+          "name": "ProviderData",
           "kind": "type"
         },
         {
@@ -2440,24 +2418,24 @@
           "kind": "variable"
         },
         {
-          "name": "Provider_Status",
+          "name": "ProviderStatus",
           "kind": "variable"
         }
       ]
     },
-    "./provider.svelte.js": {
+    {
       "path": "provider.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Provider_Json",
+          "name": "ProviderJson",
           "kind": "variable"
         },
         {
-          "name": "Provider_Json_Input",
+          "name": "ProviderJsonInput",
           "kind": "type"
         },
         {
-          "name": "Provider_Options",
+          "name": "ProviderOptions",
           "kind": "type"
         },
         {
@@ -2466,19 +2444,19 @@
         }
       ]
     },
-    "./providers.svelte.js": {
+    {
       "path": "providers.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Providers_Json",
+          "name": "ProvidersJson",
           "kind": "variable"
         },
         {
-          "name": "Providers_Json_Input",
+          "name": "ProvidersJsonInput",
           "kind": "type"
         },
         {
-          "name": "Providers_Options",
+          "name": "ProvidersOptions",
           "kind": "type"
         },
         {
@@ -2487,9 +2465,9 @@
         }
       ]
     },
-    "./reorderable_helpers.js": {
+    {
       "path": "reorderable_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "detect_reorderable_direction",
           "kind": "function"
@@ -2516,31 +2494,31 @@
         }
       ]
     },
-    "./reorderable.svelte.js": {
+    {
       "path": "reorderable.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Reorderable_Id",
+          "name": "ReorderableId",
           "kind": "type"
         },
         {
-          "name": "Reorderable_Item_Id",
+          "name": "ReorderableItemId",
           "kind": "type"
         },
         {
-          "name": "Reorderable_Direction",
+          "name": "ReorderableDirection",
           "kind": "type"
         },
         {
-          "name": "Reorderable_Drop_Position",
+          "name": "ReorderableDropPosition",
           "kind": "type"
         },
         {
-          "name": "Reorderable_Valid_Drop_Position",
+          "name": "ReorderableValidDropPosition",
           "kind": "type"
         },
         {
-          "name": "Reorderable_Style_Config",
+          "name": "ReorderableStyleConfig",
           "kind": "type"
         },
         {
@@ -2580,15 +2558,15 @@
           "kind": "variable"
         },
         {
-          "name": "Reorderable_List_Params",
+          "name": "ReorderableListParams",
           "kind": "type"
         },
         {
-          "name": "Reorderable_Item_Params",
+          "name": "ReorderableItemParams",
           "kind": "type"
         },
         {
-          "name": "Reorderable_Options",
+          "name": "ReorderableOptions",
           "kind": "type"
         },
         {
@@ -2597,22 +2575,22 @@
         }
       ]
     },
-    "./request_tracker.svelte.js": {
+    {
       "path": "request_tracker.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Request_Tracker_Item",
+          "name": "RequestTrackerItem",
           "kind": "class"
         },
         {
-          "name": "Request_Tracker",
+          "name": "RequestTracker",
           "kind": "class"
         }
       ]
     },
-    "./response_helpers.js": {
+    {
       "path": "response_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "to_completion_response_text",
           "kind": "function"
@@ -2623,9 +2601,9 @@
         }
       ]
     },
-    "./schema_helpers.js": {
+    {
       "path": "schema_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "camel_to_snake_case",
           "kind": "function"
@@ -2636,15 +2614,15 @@
         }
       ]
     },
-    "./schema_registry.js": {
+    {
       "path": "schema_registry.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Vocab_Name",
+          "name": "VocabName",
           "kind": "type"
         },
         {
-          "name": "Schema_Registry",
+          "name": "SchemaRegistry",
           "kind": "class"
         },
         {
@@ -2653,11 +2631,11 @@
         }
       ]
     },
-    "./scrollable.svelte.js": {
+    {
       "path": "scrollable.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Scrollable_Parameters",
+          "name": "ScrollableParameters",
           "kind": "type"
         },
         {
@@ -2666,9 +2644,9 @@
         }
       ]
     },
-    "./socket_helpers.js": {
+    {
       "path": "socket_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "DEFAULT_HEARTBEAT_INTERVAL",
           "kind": "variable"
@@ -2695,35 +2673,35 @@
         }
       ]
     },
-    "./socket.svelte.js": {
+    {
       "path": "socket.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Socket_Json",
+          "name": "SocketJson",
           "kind": "variable"
         },
         {
-          "name": "Socket_Json_Input",
+          "name": "SocketJsonInput",
           "kind": "type"
         },
         {
-          "name": "Socket_Options",
+          "name": "SocketOptions",
           "kind": "type"
         },
         {
-          "name": "Socket_Action_Handler",
+          "name": "SocketActionHandler",
           "kind": "type"
         },
         {
-          "name": "Socket_Error_Handler",
+          "name": "SocketErrorHandler",
           "kind": "type"
         },
         {
-          "name": "Queued_Message",
+          "name": "QueuedMessage",
           "kind": "type"
         },
         {
-          "name": "Failed_Message",
+          "name": "FailedMessage",
           "kind": "type"
         },
         {
@@ -2732,9 +2710,9 @@
         }
       ]
     },
-    "./sortable.svelte.js": {
+    {
       "path": "sortable.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "Sorter",
           "kind": "type"
@@ -2753,9 +2731,9 @@
         }
       ]
     },
-    "./test_helpers.js": {
+    {
       "path": "test_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "expect_ok",
           "kind": "function"
@@ -2774,9 +2752,9 @@
         }
       ]
     },
-    "./thread_helpers.js": {
+    {
       "path": "thread_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "render_message_with_role",
           "kind": "function"
@@ -2791,24 +2769,24 @@
         }
       ]
     },
-    "./thread_types.js": {
+    {
       "path": "thread_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Thread_Json",
+          "name": "ThreadJson",
           "kind": "variable"
         },
         {
-          "name": "Thread_Json_Input",
+          "name": "ThreadJsonInput",
           "kind": "type"
         }
       ]
     },
-    "./thread.svelte.js": {
+    {
       "path": "thread.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Thread_Options",
+          "name": "ThreadOptions",
           "kind": "type"
         },
         {
@@ -2817,19 +2795,19 @@
         }
       ]
     },
-    "./threads.svelte.js": {
+    {
       "path": "threads.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Threads_Json",
+          "name": "ThreadsJson",
           "kind": "variable"
         },
         {
-          "name": "Threads_Json_Input",
+          "name": "ThreadsJsonInput",
           "kind": "type"
         },
         {
-          "name": "Threads_Options",
+          "name": "ThreadsOptions",
           "kind": "type"
         },
         {
@@ -2838,11 +2816,11 @@
         }
       ]
     },
-    "./time_helpers.js": {
+    {
       "path": "time_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Time_Value",
+          "name": "TimeValue",
           "kind": "type"
         },
         {
@@ -2867,19 +2845,19 @@
         }
       ]
     },
-    "./time.svelte.js": {
+    {
       "path": "time.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Time_Json",
+          "name": "TimeJson",
           "kind": "variable"
         },
         {
-          "name": "Time_Json_Input",
+          "name": "TimeJsonInput",
           "kind": "type"
         },
         {
-          "name": "Time_Options",
+          "name": "TimeOptions",
           "kind": "type"
         },
         {
@@ -2888,11 +2866,11 @@
         }
       ]
     },
-    "./transports.js": {
+    {
       "path": "transports.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Transport_Name",
+          "name": "TransportName",
           "kind": "variable"
         },
         {
@@ -2905,28 +2883,28 @@
         }
       ]
     },
-    "./turn_types.js": {
+    {
       "path": "turn_types.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Turn_Json",
+          "name": "TurnJson",
           "kind": "variable"
         },
         {
-          "name": "Turn_Json_Input",
+          "name": "TurnJsonInput",
           "kind": "type"
         },
         {
-          "name": "Turn_Schema",
+          "name": "TurnSchema",
           "kind": "variable"
         }
       ]
     },
-    "./turn.svelte.js": {
+    {
       "path": "turn.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Turn_Options",
+          "name": "TurnOptions",
           "kind": "type"
         },
         {
@@ -2947,19 +2925,19 @@
         }
       ]
     },
-    "./ui.svelte.js": {
+    {
       "path": "ui.svelte.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Ui_Json",
+          "name": "UiJson",
           "kind": "variable"
         },
         {
-          "name": "Ui_Json_Input",
+          "name": "UiJsonInput",
           "kind": "type"
         },
         {
-          "name": "Ui_Options",
+          "name": "UiOptions",
           "kind": "type"
         },
         {
@@ -2968,77 +2946,77 @@
         }
       ]
     },
-    "./url_params_helpers.js": {
+    {
       "path": "url_params_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "parse_url_param_uuid",
           "kind": "function"
         }
       ]
     },
-    "./xml.js": {
+    {
       "path": "xml.ts",
-      "declarations": [
+      "identifiers": [
         {
-          "name": "Xml_Attribute_Key",
+          "name": "XmlAttributeKey",
           "kind": "variable"
         },
         {
-          "name": "Xml_Attribute_Key_With_Default",
+          "name": "XmlAttributeKeyWithDefault",
           "kind": "variable"
         },
         {
-          "name": "Xml_Attribute_Value",
+          "name": "XmlAttributeValue",
           "kind": "variable"
         },
         {
-          "name": "Xml_Attribute_Value_With_Default",
+          "name": "XmlAttributeValueWithDefault",
           "kind": "variable"
         },
         {
-          "name": "Xml_Attribute",
+          "name": "XmlAttribute",
           "kind": "variable"
         },
         {
-          "name": "Xml_Attribute_With_Defaults",
+          "name": "XmlAttributeWithDefaults",
           "kind": "variable"
         }
       ]
     },
-    "./zod_helpers.js": {
+    {
       "path": "zod_helpers.ts",
-      "declarations": [
+      "identifiers": [
         {
           "name": "Any",
           "kind": "variable"
         },
         {
-          "name": "Http_Status",
+          "name": "HttpStatus",
           "kind": "variable"
         },
         {
-          "name": "Type_Literal",
+          "name": "TypeLiteral",
           "kind": "variable"
         },
         {
-          "name": "Path_With_Trailing_Slash",
+          "name": "PathWithTrailingSlash",
           "kind": "variable"
         },
         {
-          "name": "Path_Without_Trailing_Slash",
+          "name": "PathWithoutTrailingSlash",
           "kind": "variable"
         },
         {
-          "name": "Path_With_Leading_Slash",
+          "name": "PathWithLeadingSlash",
           "kind": "variable"
         },
         {
-          "name": "Path_Without_Leading_Slash",
+          "name": "PathWithoutLeadingSlash",
           "kind": "variable"
         },
         {
-          "name": "Svelte_Map_Schema",
+          "name": "SvelteMapSchema",
           "kind": "variable"
         },
         {
@@ -3050,7 +3028,7 @@
           "kind": "variable"
         },
         {
-          "name": "Datetime_Now",
+          "name": "DatetimeNow",
           "kind": "variable"
         },
         {
@@ -3062,7 +3040,7 @@
           "kind": "variable"
         },
         {
-          "name": "Uuid_With_Default",
+          "name": "UuidWithDefault",
           "kind": "variable"
         },
         {
@@ -3103,1175 +3081,1175 @@
         }
       ]
     },
-    "./Action_Contextmenu.svelte": {
-      "path": "Action_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "ActionContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Action_Detail.svelte": {
-      "path": "Action_Detail.svelte",
-      "declarations": [
+    {
+      "path": "ActionDetail.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Action_List.svelte": {
-      "path": "Action_List.svelte",
-      "declarations": [
+    {
+      "path": "ActionList.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Action_Listitem.svelte": {
-      "path": "Action_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "ActionListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Capabilities_View.svelte": {
-      "path": "Capabilities_View.svelte",
-      "declarations": [
+    {
+      "path": "CapabilitiesView.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Capability_Backend.svelte": {
-      "path": "Capability_Backend.svelte",
-      "declarations": [
+    {
+      "path": "CapabilityBackend.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Capability_Filesystem.svelte": {
-      "path": "Capability_Filesystem.svelte",
-      "declarations": [
+    {
+      "path": "CapabilityFilesystem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Capability_Provider_Api.svelte": {
-      "path": "Capability_Provider_Api.svelte",
-      "declarations": [
+    {
+      "path": "CapabilityProvider.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Capability_Provider_Ollama.svelte": {
-      "path": "Capability_Provider_Ollama.svelte",
-      "declarations": [
+    {
+      "path": "CapabilityProviderApi.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Capability_Provider.svelte": {
-      "path": "Capability_Provider.svelte",
-      "declarations": [
+    {
+      "path": "CapabilityProviderOllama.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Capability_System.svelte": {
-      "path": "Capability_System.svelte",
-      "declarations": [
+    {
+      "path": "CapabilitySystem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Capability_Websocket.svelte": {
-      "path": "Capability_Websocket.svelte",
-      "declarations": [
+    {
+      "path": "CapabilityWebsocket.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_Contextmenu.svelte": {
-      "path": "Chat_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "ChatContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_Initializer.svelte": {
-      "path": "Chat_Initializer.svelte",
-      "declarations": [
+    {
+      "path": "ChatInitializer.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_List.svelte": {
-      "path": "Chat_List.svelte",
-      "declarations": [
+    {
+      "path": "ChatList.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_Listitem.svelte": {
-      "path": "Chat_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "ChatListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_Thread_Add_By_Model.svelte": {
-      "path": "Chat_Thread_Add_By_Model.svelte",
-      "declarations": [
+    {
+      "path": "ChatsContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_Thread_Manage_By_Tag.svelte": {
-      "path": "Chat_Thread_Manage_By_Tag.svelte",
-      "declarations": [
+    {
+      "path": "ChatThread.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_Thread.svelte": {
-      "path": "Chat_Thread.svelte",
-      "declarations": [
+    {
+      "path": "ChatThreadAddByModel.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_View_Multi.svelte": {
-      "path": "Chat_View_Multi.svelte",
-      "declarations": [
+    {
+      "path": "ChatThreadManageByTag.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_View_Simple.svelte": {
-      "path": "Chat_View_Simple.svelte",
-      "declarations": [
+    {
+      "path": "ChatView.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chat_View.svelte": {
-      "path": "Chat_View.svelte",
-      "declarations": [
+    {
+      "path": "ChatViewMulti.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Chats_Contextmenu.svelte": {
-      "path": "Chats_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "ChatViewSimple.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Clear_Restore_Button.svelte": {
-      "path": "Clear_Restore_Button.svelte",
-      "declarations": [
+    {
+      "path": "ClearRestoreButton.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Confirm_Button.svelte": {
-      "path": "Confirm_Button.svelte",
-      "declarations": [
+    {
+      "path": "ConfirmButton.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Content_Editor.svelte": {
-      "path": "Content_Editor.svelte",
-      "declarations": [
+    {
+      "path": "ContentEditor.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Content_Preview.svelte": {
-      "path": "Content_Preview.svelte",
-      "declarations": [
+    {
+      "path": "ContentPreview.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Content_Stats.svelte": {
-      "path": "Content_Stats.svelte",
-      "declarations": [
+    {
+      "path": "ContentStats.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Contextmenu_Entry_Copy_To_Clipboard.svelte": {
-      "path": "Contextmenu_Entry_Copy_To_Clipboard.svelte",
-      "declarations": [
+    {
+      "path": "ContextmenuEntryCopyToClipboard.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Contextmenu_Entry_Toggle.svelte": {
-      "path": "Contextmenu_Entry_Toggle.svelte",
-      "declarations": [
+    {
+      "path": "ContextmenuEntryToggle.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Dashboard_Actions.svelte": {
-      "path": "Dashboard_Actions.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Capabilities.svelte": {
-      "path": "Dashboard_Capabilities.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Chats.svelte": {
-      "path": "Dashboard_Chats.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Diskfiles.svelte": {
-      "path": "Dashboard_Diskfiles.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Header.svelte": {
-      "path": "Dashboard_Header.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Home.svelte": {
-      "path": "Dashboard_Home.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Models.svelte": {
-      "path": "Dashboard_Models.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Prompts.svelte": {
-      "path": "Dashboard_Prompts.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Providers.svelte": {
-      "path": "Dashboard_Providers.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard_Settings.svelte": {
-      "path": "Dashboard_Settings.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Dashboard.svelte": {
+    {
       "path": "Dashboard.svelte",
-      "declarations": [
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Actions.svelte": {
-      "path": "Diskfile_Actions.svelte",
-      "declarations": [
+    {
+      "path": "DashboardActions.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Contextmenu.svelte": {
-      "path": "Diskfile_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "DashboardCapabilities.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Editor_Nav.svelte": {
-      "path": "Diskfile_Editor_Nav.svelte",
-      "declarations": [
+    {
+      "path": "DashboardChats.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Editor_View.svelte": {
-      "path": "Diskfile_Editor_View.svelte",
-      "declarations": [
+    {
+      "path": "DashboardDiskfiles.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Explorer.svelte": {
-      "path": "Diskfile_Explorer.svelte",
-      "declarations": [
+    {
+      "path": "DashboardHeader.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_History_View.svelte": {
-      "path": "Diskfile_History_View.svelte",
-      "declarations": [
+    {
+      "path": "DashboardHome.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Info.svelte": {
-      "path": "Diskfile_Info.svelte",
-      "declarations": [
+    {
+      "path": "DashboardModels.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Listitem.svelte": {
-      "path": "Diskfile_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "DashboardPrompts.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Metrics.svelte": {
-      "path": "Diskfile_Metrics.svelte",
-      "declarations": [
+    {
+      "path": "DashboardProviders.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Part_View.svelte": {
-      "path": "Diskfile_Part_View.svelte",
-      "declarations": [
+    {
+      "path": "DashboardSettings.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Picker_Dialog.svelte": {
-      "path": "Diskfile_Picker_Dialog.svelte",
-      "declarations": [
+    {
+      "path": "DiskfileActions.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Picker.svelte": {
-      "path": "Diskfile_Picker.svelte",
-      "declarations": [
+    {
+      "path": "DiskfileContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Diskfile_Tab_Listitem.svelte": {
-      "path": "Diskfile_Tab_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "DiskfileEditorNav.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Editable_Text.svelte": {
-      "path": "Editable_Text.svelte",
-      "declarations": [
+    {
+      "path": "DiskfileEditorView.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Error_Message_Inline.svelte": {
-      "path": "Error_Message_Inline.svelte",
-      "declarations": [
+    {
+      "path": "DiskfileExplorer.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Error_Message.svelte": {
-      "path": "Error_Message.svelte",
-      "declarations": [
+    {
+      "path": "DiskfileHistoryView.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./External_Link_Icon.svelte": {
-      "path": "External_Link_Icon.svelte",
-      "declarations": [
+    {
+      "path": "DiskfileInfo.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./External_Link.svelte": {
-      "path": "External_Link.svelte",
-      "declarations": [
+    {
+      "path": "DiskfileListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Footer.svelte": {
+    {
+      "path": "DiskfileMetrics.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfilePartView.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfilePicker.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfilePickerDialog.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileTabListitem.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "EditableText.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ErrorMessage.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ErrorMessageInline.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ExternalLink.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ExternalLinkIcon.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
       "path": "Footer.svelte",
-      "declarations": [
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Frontend_Root.svelte": {
-      "path": "Frontend_Root.svelte",
-      "declarations": [
+    {
+      "path": "FrontendRoot.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Glyph.svelte": {
+    {
       "path": "Glyph.svelte",
-      "declarations": [
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Main_Dialog.svelte": {
-      "path": "Main_Dialog.svelte",
-      "declarations": [
+    {
+      "path": "MainDialog.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Model_Contextmenu.svelte": {
-      "path": "Model_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "ModelContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Model_Detail.svelte": {
-      "path": "Model_Detail.svelte",
-      "declarations": [
+    {
+      "path": "ModelDetail.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Model_Link.svelte": {
-      "path": "Model_Link.svelte",
-      "declarations": [
+    {
+      "path": "ModelLink.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Model_Listitem.svelte": {
-      "path": "Model_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "ModelListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Model_Picker_Dialog.svelte": {
-      "path": "Model_Picker_Dialog.svelte",
-      "declarations": [
+    {
+      "path": "ModelPicker.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Model_Picker.svelte": {
-      "path": "Model_Picker.svelte",
-      "declarations": [
+    {
+      "path": "ModelPickerDialog.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Model_Select.svelte": {
-      "path": "Model_Select.svelte",
-      "declarations": [
+    {
+      "path": "ModelSelect.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Model_Summary.svelte": {
-      "path": "Model_Summary.svelte",
-      "declarations": [
+    {
+      "path": "ModelSummary.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Nav_Link.svelte": {
-      "path": "Nav_Link.svelte",
-      "declarations": [
+    {
+      "path": "NavLink.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Action_Item.svelte": {
-      "path": "Ollama_Action_Item.svelte",
-      "declarations": [
+    {
+      "path": "OllamaActionItem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Actions.svelte": {
-      "path": "Ollama_Actions.svelte",
-      "declarations": [
+    {
+      "path": "OllamaActions.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Configure.svelte": {
-      "path": "Ollama_Configure.svelte",
-      "declarations": [
+    {
+      "path": "OllamaConfigure.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Copy_Model.svelte": {
-      "path": "Ollama_Copy_Model.svelte",
-      "declarations": [
+    {
+      "path": "OllamaCopyModel.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Create_Model.svelte": {
-      "path": "Ollama_Create_Model.svelte",
-      "declarations": [
+    {
+      "path": "OllamaCreateModel.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Manager.svelte": {
-      "path": "Ollama_Manager.svelte",
-      "declarations": [
+    {
+      "path": "OllamaManager.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Model_Details.svelte": {
-      "path": "Ollama_Model_Details.svelte",
-      "declarations": [
+    {
+      "path": "OllamaModelDetail.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Model_Listitem.svelte": {
-      "path": "Ollama_Model_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "OllamaModelListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Model_Status.svelte": {
-      "path": "Ollama_Model_Status.svelte",
-      "declarations": [
+    {
+      "path": "OllamaModelStatus.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Ps_Status.svelte": {
-      "path": "Ollama_Ps_Status.svelte",
-      "declarations": [
+    {
+      "path": "OllamaPsStatus.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ollama_Pull_Model.svelte": {
-      "path": "Ollama_Pull_Model.svelte",
-      "declarations": [
+    {
+      "path": "OllamaPullModel.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Contextmenu.svelte": {
-      "path": "Part_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "PartContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Editor_For_Diskfile.svelte": {
-      "path": "Part_Editor_For_Diskfile.svelte",
-      "declarations": [
+    {
+      "path": "PartEditorForDiskfile.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Editor_For_Text.svelte": {
-      "path": "Part_Editor_For_Text.svelte",
-      "declarations": [
+    {
+      "path": "PartEditorForText.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_List.svelte": {
-      "path": "Part_List.svelte",
-      "declarations": [
+    {
+      "path": "PartList.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Listitem.svelte": {
-      "path": "Part_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "PartListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Picker_Dialog.svelte": {
-      "path": "Part_Picker_Dialog.svelte",
-      "declarations": [
+    {
+      "path": "PartPicker.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Picker.svelte": {
-      "path": "Part_Picker.svelte",
-      "declarations": [
+    {
+      "path": "PartPickerDialog.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Remove_Button.svelte": {
-      "path": "Part_Remove_Button.svelte",
-      "declarations": [
+    {
+      "path": "PartRemoveButton.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Stats.svelte": {
-      "path": "Part_Stats.svelte",
-      "declarations": [
+    {
+      "path": "PartStats.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Summary.svelte": {
-      "path": "Part_Summary.svelte",
-      "declarations": [
+    {
+      "path": "PartSummary.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_Toggle_Button.svelte": {
-      "path": "Part_Toggle_Button.svelte",
-      "declarations": [
+    {
+      "path": "PartToggleButton.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Part_View.svelte": {
-      "path": "Part_View.svelte",
-      "declarations": [
+    {
+      "path": "PartView.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Picker_Dialog.svelte": {
-      "path": "Picker_Dialog.svelte",
-      "declarations": [
-        {
-          "name": "default",
-          "kind": "component"
-        }
-      ]
-    },
-    "./Picker.svelte": {
+    {
       "path": "Picker.svelte",
-      "declarations": [
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Ping_Form.svelte": {
-      "path": "Ping_Form.svelte",
-      "declarations": [
+    {
+      "path": "PickerDialog.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Popover_Button.svelte": {
-      "path": "Popover_Button.svelte",
-      "declarations": [
+    {
+      "path": "PingForm.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Progress_Bar.svelte": {
-      "path": "Progress_Bar.svelte",
-      "declarations": [
+    {
+      "path": "PopoverButton.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Prompt_Contextmenu.svelte": {
-      "path": "Prompt_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "ProgressBar.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Prompt_List.svelte": {
-      "path": "Prompt_List.svelte",
-      "declarations": [
+    {
+      "path": "PromptContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Prompt_Listitem.svelte": {
-      "path": "Prompt_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "PromptList.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Prompt_Picker_Dialog.svelte": {
-      "path": "Prompt_Picker_Dialog.svelte",
-      "declarations": [
+    {
+      "path": "PromptListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Prompt_Picker.svelte": {
-      "path": "Prompt_Picker.svelte",
-      "declarations": [
+    {
+      "path": "PromptPicker.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Prompt_Stats.svelte": {
-      "path": "Prompt_Stats.svelte",
-      "declarations": [
+    {
+      "path": "PromptPickerDialog.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Prompt_Summary.svelte": {
-      "path": "Prompt_Summary.svelte",
-      "declarations": [
+    {
+      "path": "PromptStats.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Provider_Detail.svelte": {
-      "path": "Provider_Detail.svelte",
-      "declarations": [
+    {
+      "path": "PromptSummary.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Provider_Link.svelte": {
-      "path": "Provider_Link.svelte",
-      "declarations": [
+    {
+      "path": "ProviderDetail.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Provider_Logo.svelte": {
-      "path": "Provider_Logo.svelte",
-      "declarations": [
+    {
+      "path": "ProviderLink.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Provider_Summary.svelte": {
-      "path": "Provider_Summary.svelte",
-      "declarations": [
+    {
+      "path": "ProviderLogo.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Settings.svelte": {
+    {
+      "path": "ProviderSummary.svelte",
+      "identifiers": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
       "path": "Settings.svelte",
-      "declarations": [
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Socket_Message_Queue.svelte": {
-      "path": "Socket_Message_Queue.svelte",
-      "declarations": [
+    {
+      "path": "SocketMessageQueue.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Sortable_List.svelte": {
-      "path": "Sortable_List.svelte",
-      "declarations": [
+    {
+      "path": "SortableList.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Thread_Contextmenu.svelte": {
-      "path": "Thread_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "ThreadContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Thread_List.svelte": {
-      "path": "Thread_List.svelte",
-      "declarations": [
+    {
+      "path": "ThreadList.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Thread_Listitem.svelte": {
-      "path": "Thread_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "ThreadListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Thread_Toggle_Button.svelte": {
-      "path": "Thread_Toggle_Button.svelte",
-      "declarations": [
+    {
+      "path": "ThreadToggleButton.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Time_Widget.svelte": {
-      "path": "Time_Widget.svelte",
-      "declarations": [
+    {
+      "path": "TimeWidget.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Toggle_Button.svelte": {
-      "path": "Toggle_Button.svelte",
-      "declarations": [
+    {
+      "path": "ToggleButton.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Turn_Contextmenu.svelte": {
-      "path": "Turn_Contextmenu.svelte",
-      "declarations": [
+    {
+      "path": "TurnContextmenu.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Turn_List.svelte": {
-      "path": "Turn_List.svelte",
-      "declarations": [
+    {
+      "path": "TurnList.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Turn_Listitem.svelte": {
-      "path": "Turn_Listitem.svelte",
-      "declarations": [
+    {
+      "path": "TurnListitem.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Turn_View.svelte": {
-      "path": "Turn_View.svelte",
-      "declarations": [
+    {
+      "path": "TurnView.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Tutorial_For_Chats.svelte": {
-      "path": "Tutorial_For_Chats.svelte",
-      "declarations": [
+    {
+      "path": "TutorialForChats.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Tutorial_For_Database.svelte": {
-      "path": "Tutorial_For_Database.svelte",
-      "declarations": [
+    {
+      "path": "TutorialForDatabase.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Tutorial_For_Diskfiles.svelte": {
-      "path": "Tutorial_For_Diskfiles.svelte",
-      "declarations": [
+    {
+      "path": "TutorialForDiskfiles.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Tutorial_For_Prompts.svelte": {
-      "path": "Tutorial_For_Prompts.svelte",
-      "declarations": [
+    {
+      "path": "TutorialForPrompts.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Xml_Attribute_Editor.svelte": {
-      "path": "Xml_Attribute_Editor.svelte",
-      "declarations": [
+    {
+      "path": "XmlAttributeEditor.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     },
-    "./Xml_Tag_Controls.svelte": {
-      "path": "Xml_Tag_Controls.svelte",
-      "declarations": [
+    {
+      "path": "XmlTagControls.svelte",
+      "identifiers": [
         {
           "name": "default",
           "kind": "component"
         }
       ]
     }
-  }
+  ]
 }
