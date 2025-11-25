@@ -35,6 +35,7 @@
 
 <!-- 
 	transition:slide -->
+<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 <a {...rest} {href} class="nav_link {rest.class}" class:selected class:selected_descendent
 	>{@render children(selected, selected_descendent)}</a
 >

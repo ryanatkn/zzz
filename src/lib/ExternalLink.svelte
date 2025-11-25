@@ -43,6 +43,7 @@
 	);
 </script>
 
+<!-- eslint-disable svelte/no-navigation-without-resolve -->
 <a
 	{...rest}
 	{href}

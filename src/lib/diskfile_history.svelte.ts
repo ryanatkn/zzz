@@ -70,8 +70,7 @@ export class DiskfileHistory extends Cell<typeof DiskfileHistoryJson> {
 	): HistoryEntry {
 		// Don't add duplicate entries with the same content and metadata back-to-back
 		if (
-			this.current_entry &&
-			this.current_entry.content === content &&
+			this.current_entry?.content === content &&
 			this.#has_same_metadata(this.current_entry, options)
 		) {
 			return this.current_entry;

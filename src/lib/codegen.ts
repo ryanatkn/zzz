@@ -102,7 +102,7 @@ export class ImportBuilder {
 		const existing = module_imports.get(name);
 
 		// If already imported as a value, don't downgrade to type
-		if (existing && existing.kind === 'value' && kind === 'type') {
+		if (existing?.kind === 'value' && kind === 'type') {
 			return this;
 		}
 
