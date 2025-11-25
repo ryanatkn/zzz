@@ -31,7 +31,11 @@
 		{#snippet icon()}<Glyph glyph={GLYPH_CHAT} />{/snippet}
 		chat
 		{#snippet menu()}
-			<ContextmenuEntry run={() => (show_model_picker = true)}>
+			<ContextmenuEntry
+				run={() => {
+					show_model_picker = true;
+				}}
+			>
 				{#snippet icon()}<Glyph glyph={GLYPH_ADD} />{/snippet}
 				<span>add thread</span>
 			</ContextmenuEntry>

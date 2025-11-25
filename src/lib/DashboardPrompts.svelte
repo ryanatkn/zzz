@@ -106,7 +106,7 @@
 						</small>
 					</div>
 					<div class="row gap_xs py_xs">
-						<CopyToClipboard text={app.prompts.selected.content} attrs={{class: 'plain'}} />
+						<CopyToClipboard text={app.prompts.selected.content} class="plain" />
 						<div class="flex_1">
 							<PromptStats prompt={app.prompts.selected} />
 						</div>

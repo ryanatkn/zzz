@@ -76,7 +76,7 @@
 			<div class="display_flex gap_xs2">
 				<PendingButton
 					pending={TODO_create_file_pending}
-					attrs={{class: 'plain compact'}}
+					class="plain compact"
 					title="create file in {zzz_cache_dir}"
 					onclick={create_file}
 				>
@@ -84,7 +84,7 @@
 				</PendingButton>
 				<PendingButton
 					pending={TODO_create_folder_pending}
-					attrs={{class: 'plain compact'}}
+					class="plain compact"
 					title="create folder in {zzz_cache_dir}"
 					onclick={create_folder}
 				>

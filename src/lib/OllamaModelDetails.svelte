@@ -233,7 +233,7 @@
 
 			<!-- license -->
 			{#if model.ollama_show_response.license}
-				<Details attrs={{class: 'mt_xl3'}}>
+				<Details class="mt_xl3">
 					{#snippet summary()}<h5 class="display_inline">license:</h5>{/snippet}
 					<pre><code>{model.ollama_show_response.license}</code></pre>
 				</Details>
@@ -241,7 +241,7 @@
 
 			<!-- modelfile -->
 			{#if model.ollama_show_response.modelfile}
-				<Details attrs={{class: 'mt_xl3'}}>
+				<Details class="mt_xl3">
 					{#snippet summary()}<h5 class="display_inline">modelfile:</h5>{/snippet}
 					<pre><code>{model.ollama_show_response.modelfile}</code></pre>
 				</Details>

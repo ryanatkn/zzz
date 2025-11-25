@@ -123,7 +123,7 @@
 						{pending}
 						disabled={send_disabled}
 						onclick={send}
-						attrs={{class: 'plain' + (provider_error ? ' color_c_5' : '')}}
+						class="plain {provider_error ? ' color_c_5' : ''}"
 						title={provider?.available
 							? `send ${input_token_count} tokens to ${thread.model_name}`
 							: (provider_error ?? undefined)}

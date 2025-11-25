@@ -98,7 +98,7 @@
 							: socket.status === 'pending'
 								? 'connecting'
 								: 'disconnected'}{#if socket.status === 'pending'}
-							<PendingAnimation inline attrs={{class: 'ml_sm'}} />{/if}</span
+							<PendingAnimation inline class="ml_sm" />{/if}</span
 					>
 					<small class="font_family_mono"
 						>{#if socket.url}{socket.url}{:else}&nbsp;{/if}</small

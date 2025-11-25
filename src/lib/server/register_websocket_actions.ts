@@ -3,13 +3,13 @@ import type {createNodeWebSocket} from '@hono/node-ws';
 import {wait} from '@ryanatkn/belt/async.js';
 
 import type {Backend} from './backend.js';
-import {BACKEND_ARTIFICIAL_RESPONSE_DELAY} from './constants.js';
+import {BACKEND_ARTIFICIAL_RESPONSE_DELAY} from '../constants.js';
 import {BackendWebsocketTransport} from './backend_websocket_transport.js';
-import {jsonrpc_error_messages} from './jsonrpc_errors.js';
+import {jsonrpc_error_messages} from '../jsonrpc_errors.js';
 import {
 	create_jsonrpc_error_message_from_thrown,
 	to_jsonrpc_message_id,
-} from './jsonrpc_helpers.js';
+} from '../jsonrpc_helpers.js';
 
 export interface RegisterWebsocketActionsOptions {
 	path: string;

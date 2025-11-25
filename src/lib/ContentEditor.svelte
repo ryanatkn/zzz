@@ -97,14 +97,14 @@
 
 	{#if show_actions && !readonly}
 		<div class="display_flex mt_xs">
-			<CopyToClipboard text={content} attrs={{class: 'plain'}} />
+			<CopyToClipboard text={content} class="plain" />
 			<PasteFromClipboard
 				onpaste={(value) => {
 					const new_content = content + value;
 					content = new_content;
 					focus();
 				}}
-				attrs={{class: 'plain icon_button font_size_lg'}}
+				class="plain icon_button font_size_lg"
 			>
 				<!-- TODO should be default -->
 				<Glyph glyph={GLYPH_PASTE} />

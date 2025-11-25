@@ -58,7 +58,7 @@
 				{pending}
 				onclick={send_to_all}
 				disabled={!count ? true : undefined}
-				attrs={{class: 'plain'}}
+				class="plain"
 			>
 				<Glyph glyph={GLYPH_SEND} /> to {count}
 			</PendingButton>

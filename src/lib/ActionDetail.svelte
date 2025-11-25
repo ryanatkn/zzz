@@ -56,7 +56,7 @@
 </div>
 
 <div class="display_flex gap_md mb_sm">
-	<CopyToClipboard text={JSON.stringify(action.json, null, 2)} attrs={{class: 'plain'}} />
+	<CopyToClipboard text={JSON.stringify(action.json, null, 2)} class="plain" />
 </div>
 <pre
 	class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm width_100">{JSON.stringify(

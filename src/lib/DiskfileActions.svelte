@@ -28,14 +28,14 @@
 
 <!-- Content modification actions (copy, paste, clear) -->
 <div class="display_flex gap_xs">
-	<CopyToClipboard text={editor_state.current_content} attrs={{class: 'plain'}} />
+	<CopyToClipboard text={editor_state.current_content} class="plain" />
 
 	{#if !readonly}
 		<PasteFromClipboard
 			onpaste={(text) => {
 				editor_state.current_content += text;
 			}}
-			attrs={{class: 'plain icon_button font_size_lg'}}
+			class="plain icon_button font_size_lg"
 		>
 			<Glyph glyph={GLYPH_PASTE} />
 		</PasteFromClipboard>

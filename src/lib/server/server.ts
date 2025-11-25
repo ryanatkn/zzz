@@ -9,15 +9,15 @@ import {Backend} from './backend.js';
 import {backend_action_handlers} from './backend_action_handlers.js';
 import {register_http_actions} from './register_http_actions.js';
 import {register_websocket_actions} from './register_websocket_actions.js';
-import create_config from './config.js';
-import {action_specs} from './action_collections.js';
+import create_config from '../config.js';
+import {action_specs} from '../action_collections.js';
 import {
 	API_PATH_FOR_HTTP_RPC,
 	SERVER_HOST,
 	SERVER_PROXIED_PORT,
 	WEBSOCKET_PATH,
 	ZZZ_CACHE_DIR,
-} from './constants.js';
+} from '../constants.js';
 import {parse_allowed_origins, verify_request_source} from './security.js';
 import {handle_filer_change} from './backend_actions_api.js';
 import {BackendProviderOllama} from './backend_provider_ollama.js';

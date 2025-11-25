@@ -3,14 +3,14 @@ import {wait} from '@ryanatkn/belt/async.js';
 import type {ContentfulStatusCode} from 'hono/utils/http-status';
 
 import type {Backend} from './backend.js';
-import {PathWithoutTrailingSlash} from './zod_helpers.js';
+import {PathWithoutTrailingSlash} from '../zod_helpers.js';
 import {
 	create_jsonrpc_error_message_from_thrown,
 	jsonrpc_error_code_to_http_status,
 	to_jsonrpc_message_id,
-} from './jsonrpc_helpers.js';
-import {jsonrpc_error_messages} from './jsonrpc_errors.js';
-import {BACKEND_ARTIFICIAL_RESPONSE_DELAY} from './constants.js';
+} from '../jsonrpc_helpers.js';
+import {jsonrpc_error_messages} from '../jsonrpc_errors.js';
+import {BACKEND_ARTIFICIAL_RESPONSE_DELAY} from '../constants.js';
 
 export interface RegisterActionsOptions {
 	path: string;

@@ -2,7 +2,7 @@ import {dirname, join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 
 import {ScopedFs} from './scoped_fs.js';
-import {ActionInputs, type ActionOutputs} from './action_collections.js';
+import {ActionInputs, type ActionOutputs} from '../action_collections.js';
 
 // TODO @db refactor
 export const save_completion_response_to_disk = async (

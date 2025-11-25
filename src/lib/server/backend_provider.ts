@@ -1,12 +1,12 @@
-import type {CompletionMessage} from './completion_types.js';
-import type {ActionInputs, ActionOutputs} from './action_collections.js';
-import type {Uuid} from './zod_helpers.js';
-import {jsonrpc_errors} from './jsonrpc_errors.js';
+import type {CompletionMessage} from '../completion_types.js';
+import type {ActionInputs, ActionOutputs} from '../action_collections.js';
+import type {Uuid} from '../zod_helpers.js';
+import {jsonrpc_errors} from '../jsonrpc_errors.js';
 import {
 	type ProviderStatus,
 	PROVIDER_ERROR_NEEDS_API_KEY,
 	PROVIDER_ERROR_NOT_INSTALLED,
-} from './provider_types.js';
+} from '../provider_types.js';
 
 // TODO proper logging
 

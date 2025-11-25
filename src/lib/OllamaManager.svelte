@@ -82,7 +82,7 @@
 											? 'connecting'
 											: 'not checked'}
 								{#if status === 'pending'}
-									<PendingAnimation inline attrs={{class: 'ml_sm'}} />
+									<PendingAnimation inline class="ml_sm" />
 								{/if}
 							</span>
 							<div class="font_family_mono font_size_sm">

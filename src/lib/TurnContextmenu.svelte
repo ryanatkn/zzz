@@ -37,7 +37,11 @@
 				/>
 			{/if}
 
-			<ContextmenuEntry run={() => (show_editor = true)}>
+			<ContextmenuEntry
+				run={() => {
+					show_editor = true;
+				}}
+			>
 				{#snippet icon()}<Glyph glyph={GLYPH_EDIT} />{/snippet}
 				<span>edit content</span>
 			</ContextmenuEntry>

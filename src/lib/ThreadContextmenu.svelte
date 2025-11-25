@@ -62,7 +62,11 @@
 
 			<ContextmenuEntryToggle bind:enabled={thread.enabled} label="thread" />
 
-			<ContextmenuEntry run={() => (show_model_picker = true)}>
+			<ContextmenuEntry
+				run={() => {
+					show_model_picker = true;
+				}}
+			>
 				{#snippet icon()}<Glyph glyph={GLYPH_MODEL} />{/snippet}
 				switch model &nbsp; <small>{thread.model_name}</small>
 			</ContextmenuEntry>
