@@ -6,7 +6,7 @@
 
 	import {onMount} from 'svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
-	import {parse_pkg} from '@ryanatkn/belt/pkg.js';
+	import {Pkg} from '@ryanatkn/fuz/pkg.svelte.js';
 	import {BROWSER} from 'esm-env';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
-	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
+	import Ecosystem_Links_Panel from '@ryanatkn/fuz/Ecosystem_Links_Panel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 	import {resolve} from '$app/paths';
 	import Details from '@ryanatkn/fuz/Details.svelte';
@@ -317,7 +317,7 @@
 		</ul>
 	</section>
 	<hr />
-	<Community_Links_Panel />
+	<Ecosystem_Links_Panel />
 	<hr />
 	<section>
 		<Details>
