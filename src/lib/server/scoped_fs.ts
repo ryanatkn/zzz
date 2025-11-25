@@ -154,18 +154,8 @@ export class ScopedFs {
 		return fs.readdir(safe_path, options);
 	}
 
-	async stat(
-		path_to_stat: string,
-		options?: fs_types.StatOptions & {
-			bigint?: false | undefined;
-		},
-	): Promise<fs_types.Stats>;
-	async stat(
-		path_to_stat: string,
-		options: fs_types.StatOptions & {
-			bigint: true;
-		},
-	): Promise<fs_types.BigIntStats>;
+	async stat(path_to_stat: string, options?: fs_types.StatOptions): Promise<fs_types.Stats>;
+	async stat(path_to_stat: string, options: fs_types.StatOptions): Promise<fs_types.BigIntStats>;
 	async stat(
 		path_to_stat: string,
 		options?: fs_types.StatOptions,

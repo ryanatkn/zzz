@@ -20,7 +20,7 @@ import type {HttpStatus} from './zod_helpers.js';
 
 export const create_jsonrpc_request = (
 	method: JsonrpcMethod,
-	params: JsonrpcRequestParams | undefined | void,
+	params: JsonrpcRequestParams | undefined,
 	id: JsonrpcRequestId,
 ): JsonrpcRequest => {
 	const message: JsonrpcRequest = {
@@ -46,7 +46,7 @@ export const create_jsonrpc_response = (
 
 export const create_jsonrpc_notification = (
 	method: JsonrpcMethod,
-	params: JsonrpcNotificationParams | undefined | void,
+	params: JsonrpcNotificationParams | undefined,
 ): JsonrpcNotification => {
 	const message: JsonrpcNotification = {
 		jsonrpc: JSONRPC_VERSION,
