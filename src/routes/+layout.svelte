@@ -5,7 +5,7 @@
 	import '$routes/style.css';
 
 	import {onMount} from 'svelte';
-	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
+	import {contextmenu_attachment} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {Pkg} from '@ryanatkn/fuz/pkg.svelte.js';
 	import {BROWSER} from 'esm-env';
 	import {page} from '$app/state';
@@ -43,7 +43,7 @@
 		}
 	});
 
-	pkg_context.set(parse_pkg(package_json, src_json));
+	pkg_context.set(new Pkg(package_json, src_json));
 
 	// Create the frontend's App, which extends Frontend
 	const app = new App();
@@ -74,7 +74,7 @@
 </svelte:head>
 
 <svelte:body
-	use:contextmenu_action={[
+	{@attach contextmenu_attachment([
 		{
 			snippet: 'text',
 			props: {
@@ -96,7 +96,7 @@
 				},
 			},
 		},
-	]}
+	])}
 />
 
 <FrontendRoot {app}>
