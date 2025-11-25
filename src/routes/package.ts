@@ -13431,29 +13431,6 @@ export const src_json: SrcJson = {
 			dependents: ['OllamaManager.svelte'],
 		},
 		{
-			path: 'package.gen.ts',
-			identifiers: [],
-		},
-		{
-			path: 'package.ts',
-			identifiers: [
-				{
-					name: 'package_json',
-					kind: 'variable',
-					source_line: 7,
-					type_signature:
-						'{ [x: string]: unknown; name: string; version: string; private?: boolean | undefined; public?: boolean | undefined; description?: string | undefined; motto?: string | undefined; glyph?: string | undefined; ... 24 more ...; exports?: string | ... 2 more ... | undefined; }',
-				},
-				{
-					name: 'src_json',
-					kind: 'variable',
-					source_line: 117,
-					type_signature:
-						'{ [x: string]: unknown; name: string; version: string; modules?: { [x: string]: unknown; path: string; identifiers?: { [x: string]: unknown; name: string; kind: "function" | "type" | "json" | "variable" | "class" | "constructor" | "component" | "css"; ... 19 more ...; alias_of?: { ...; } | undefined; }[] | undefined...',
-				},
-			],
-		},
-		{
 			path: 'part_helpers.ts',
 			identifiers: [
 				{

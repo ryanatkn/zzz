@@ -16,7 +16,7 @@
 	import {App} from '$lib/app.svelte.js';
 	import FrontendRoot from '$lib/FrontendRoot.svelte';
 	import {pkg_context} from '$lib/pkg.js';
-	import {package_json, src_json} from '$lib/package.js';
+	import {package_json, src_json} from '$routes/package.js';
 	import {ProviderJson} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {ModelJson} from '$lib/model.svelte.js';
