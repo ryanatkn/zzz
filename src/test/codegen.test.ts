@@ -465,7 +465,7 @@ describe('get_handler_return_type', () => {
 			// Check that ActionOutputs was added to imports
 			const built = imports.build();
 			expect(built).toContain('ActionOutputs');
-			expect(built).toContain('$lib/action_collections.js');
+			expect(built).toContain('./action_collections.js');
 		});
 
 		test('other phases return void and do not add imports', () => {
