@@ -5534,13 +5534,13 @@ export const src_json: SrcJson = {
 					name: 'SERVER_PROTOCOL',
 					kind: 'variable',
 					source_line: 28,
-					type_signature: 'string',
+					type_signature: 'any',
 				},
 				{
 					name: 'SERVER_HOST',
 					kind: 'variable',
 					source_line: 30,
-					type_signature: 'string',
+					type_signature: 'any',
 				},
 				{
 					name: 'SERVER_URL',
@@ -5579,7 +5579,7 @@ export const src_json: SrcJson = {
 					kind: 'variable',
 					doc_comment: '',
 					source_line: 54,
-					type_signature: 'string',
+					type_signature: 'any',
 				},
 				{
 					name: 'API_URL',
