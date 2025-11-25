@@ -690,4 +690,24 @@ describe('generate_phase_handlers', () => {
 		expect(import_str.match(/Frontend/g)?.length).toBe(1);
 		expect(import_str.match(/ActionOutputs/g)?.length).toBe(1);
 	});
+
+	test('frontend generates correct relative import paths', () => {
+		const imports = new ImportBuilder();
+		generate_phase_handlers(ping_action_spec, 'frontend', imports);
+
+		const import_str = imports.build();
+		expect(import_str).toContain("from './action_event.js'");
+		expect(import_str).toContain("from './frontend.svelte.js'");
+		expect(import_str).toContain("from './action_collections.js'");
+	});
+
+	test('backend generates correct relative import paths', () => {
+		const imports = new ImportBuilder();
+		generate_phase_handlers(ping_action_spec, 'backend', imports);
+
+		const import_str = imports.build();
+		expect(import_str).toContain("from '../action_event.js'");
+		expect(import_str).toContain("from './backend.js'");
+		expect(import_str).toContain("from '../action_collections.js'");
+	});
 });

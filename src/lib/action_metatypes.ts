@@ -2,7 +2,6 @@
 
 import {z} from 'zod';
 import type {Result} from '@ryanatkn/belt/result.js';
-
 import type {ActionInputs, ActionOutputs} from './action_collections.js';
 import type {JsonrpcErrorJson} from './jsonrpc.js';
 

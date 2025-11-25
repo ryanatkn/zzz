@@ -1343,7 +1343,13 @@ export const src_json: SrcJson = {
 		{
 			path: 'action_metatypes.gen.ts',
 			identifiers: [],
-			dependencies: ['action_registry.ts', 'action_spec.ts', 'action_specs.ts', 'zod_helpers.ts'],
+			dependencies: [
+				'action_registry.ts',
+				'action_spec.ts',
+				'action_specs.ts',
+				'codegen.ts',
+				'zod_helpers.ts',
+			],
 		},
 		{
 			path: 'action_metatypes.ts',
@@ -1353,7 +1359,7 @@ export const src_json: SrcJson = {
 					kind: 'type',
 					doc_comment:
 						'All action method names. Request/response actions have two types per method.',
-					source_line: 12,
+					source_line: 11,
 					type_signature:
 						'ZodEnum<{ completion_create: "completion_create"; completion_progress: "completion_progress"; directory_create: "directory_create"; diskfile_delete: "diskfile_delete"; diskfile_update: "diskfile_update"; ... 14 more ...; toggle_main_menu: "toggle_main_menu"; }>',
 				},
@@ -1361,7 +1367,7 @@ export const src_json: SrcJson = {
 					name: 'RequestResponseActionMethod',
 					kind: 'type',
 					doc_comment: 'Names of all request_response actions.',
-					source_line: 39,
+					source_line: 38,
 					type_signature:
 						'ZodEnum<{ completion_create: "completion_create"; directory_create: "directory_create"; diskfile_delete: "diskfile_delete"; diskfile_update: "diskfile_update"; ollama_copy: "ollama_copy"; ... 10 more ...; session_load: "session_load"; }>',
 				},
@@ -1369,7 +1375,7 @@ export const src_json: SrcJson = {
 					name: 'RemoteNotificationActionMethod',
 					kind: 'type',
 					doc_comment: 'Names of all remote_notification actions.',
-					source_line: 62,
+					source_line: 61,
 					type_signature:
 						'ZodEnum<{ completion_progress: "completion_progress"; filer_change: "filer_change"; ollama_progress: "ollama_progress"; }>',
 				},
@@ -1377,14 +1383,14 @@ export const src_json: SrcJson = {
 					name: 'LocalCallActionMethod',
 					kind: 'type',
 					doc_comment: 'Names of all local_call actions.',
-					source_line: 72,
+					source_line: 71,
 					type_signature: 'ZodEnum<{ toggle_main_menu: "toggle_main_menu"; }>',
 				},
 				{
 					name: 'FrontendActionMethod',
 					kind: 'type',
 					doc_comment: 'Names of all actions that may be handled on the client.',
-					source_line: 78,
+					source_line: 77,
 					type_signature:
 						'ZodEnum<{ completion_create: "completion_create"; completion_progress: "completion_progress"; directory_create: "directory_create"; diskfile_delete: "diskfile_delete"; diskfile_update: "diskfile_update"; ... 14 more ...; toggle_main_menu: "toggle_main_menu"; }>',
 				},
@@ -1392,7 +1398,7 @@ export const src_json: SrcJson = {
 					name: 'BackendActionMethod',
 					kind: 'type',
 					doc_comment: 'Names of all actions that may be handled on the server.',
-					source_line: 105,
+					source_line: 104,
 					type_signature:
 						'ZodEnum<{ completion_create: "completion_create"; completion_progress: "completion_progress"; directory_create: "directory_create"; diskfile_delete: "diskfile_delete"; diskfile_update: "diskfile_update"; ... 13 more ...; session_load: "session_load"; }>',
 				},
@@ -1401,7 +1407,7 @@ export const src_json: SrcJson = {
 					kind: 'type',
 					doc_comment:
 						'Interface for action dispatch functions.\nAll async methods return Result types for type-safe error handling.\nSync methods (like toggle_main_menu) return values directly.',
-					source_line: 133,
+					source_line: 132,
 					type_signature: 'ActionsApi',
 					properties: [
 						{
@@ -5240,6 +5246,7 @@ export const src_json: SrcJson = {
 			dependencies: ['action_types.ts'],
 			dependents: [
 				'action_collections.gen.ts',
+				'action_metatypes.gen.ts',
 				'frontend_action_types.gen.ts',
 				'server/backend_action_types.gen.ts',
 			],
@@ -5527,13 +5534,13 @@ export const src_json: SrcJson = {
 					name: 'SERVER_PROTOCOL',
 					kind: 'variable',
 					source_line: 28,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'SERVER_HOST',
 					kind: 'variable',
 					source_line: 30,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'SERVER_URL',
@@ -5572,7 +5579,7 @@ export const src_json: SrcJson = {
 					kind: 'variable',
 					doc_comment: '',
 					source_line: 54,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'API_URL',
