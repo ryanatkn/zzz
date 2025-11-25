@@ -5,12 +5,12 @@
 	import ContextmenuSubmenu from '@ryanatkn/fuz/ContextmenuSubmenu.svelte';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import type {Chat} from '$lib/chat.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {GLYPH_CHAT, GLYPH_DELETE, GLYPH_REMOVE, GLYPH_VIEW, GLYPH_ADD} from '$lib/glyphs.js';
-	import ContextmenuEntryCopyToClipboard from '$lib/ContextmenuEntryCopyToClipboard.svelte';
-	import ModelPickerDialog from '$lib/ModelPickerDialog.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {Chat} from './chat.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import {GLYPH_CHAT, GLYPH_DELETE, GLYPH_REMOVE, GLYPH_VIEW, GLYPH_ADD} from './glyphs.js';
+	import ContextmenuEntryCopyToClipboard from './ContextmenuEntryCopyToClipboard.svelte';
+	import ModelPickerDialog from './ModelPickerDialog.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		chat,

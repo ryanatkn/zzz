@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {PartUnion} from '$lib/part.svelte.js';
-	import PartContextmenu from '$lib/PartContextmenu.svelte';
+	import type {PartUnion} from './part.svelte.js';
+	import PartContextmenu from './PartContextmenu.svelte';
 
 	const {
 		part,

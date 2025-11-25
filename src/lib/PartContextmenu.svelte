@@ -6,14 +6,14 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
-	import type {PartUnion} from '$lib/part.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {GLYPH_PART, GLYPH_DELETE, GLYPH_EDIT} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ContextmenuEntryCopyToClipboard from '$lib/ContextmenuEntryCopyToClipboard.svelte';
-	import PartView from '$lib/PartView.svelte';
-	import {get_part_type_glyph} from '$lib/part_helpers.js';
-	import ContextmenuEntryToggle from '$lib/ContextmenuEntryToggle.svelte';
+	import type {PartUnion} from './part.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import {GLYPH_PART, GLYPH_DELETE, GLYPH_EDIT} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
+	import ContextmenuEntryCopyToClipboard from './ContextmenuEntryCopyToClipboard.svelte';
+	import PartView from './PartView.svelte';
+	import {get_part_type_glyph} from './part_helpers.js';
+	import ContextmenuEntryToggle from './ContextmenuEntryToggle.svelte';
 
 	const {
 		part,

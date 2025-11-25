@@ -2,13 +2,13 @@
 	import PendingButton from '@ryanatkn/fuz/PendingButton.svelte';
 	import {slide} from 'svelte/transition';
 
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import {Chat} from '$lib/chat.svelte.js';
-	import ChatThread from '$lib/ChatThread.svelte';
-	import {GLYPH_ADD, GLYPH_PLACEHOLDER, GLYPH_REMOVE, GLYPH_SEND} from '$lib/glyphs.js';
-	import ContentEditor from '$lib/ContentEditor.svelte';
-	import ModelPickerDialog from '$lib/ModelPickerDialog.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import {Chat} from './chat.svelte.js';
+	import ChatThread from './ChatThread.svelte';
+	import {GLYPH_ADD, GLYPH_PLACEHOLDER, GLYPH_REMOVE, GLYPH_SEND} from './glyphs.js';
+	import ContentEditor from './ContentEditor.svelte';
+	import ModelPickerDialog from './ModelPickerDialog.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		chat,

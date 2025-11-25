@@ -1,9 +1,9 @@
 import type {z} from 'zod';
 
-import type {ProviderJsonInput} from '$lib/provider.svelte.js';
-import type {ModelJson} from '$lib/model.svelte.js';
-import type {ChatTemplate} from '$lib/chat_template.js';
-import {create_uuid} from '$lib/zod_helpers.js';
+import type {ProviderJsonInput} from './provider.svelte.js';
+import type {ModelJson} from './model.svelte.js';
+import type {ChatTemplate} from './chat_template.js';
+import {create_uuid} from './zod_helpers.js';
 
 // TODO this is a temporary source of truth, use APIs instead
 // TODO @many refactor with db

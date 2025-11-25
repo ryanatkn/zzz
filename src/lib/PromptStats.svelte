@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type {Prompt} from '$lib/prompt.svelte.js';
-	import ContentStats from '$lib/ContentStats.svelte';
+	import type {Prompt} from './prompt.svelte.js';
+	import ContentStats from './ContentStats.svelte';
 
 	const {
 		prompt,

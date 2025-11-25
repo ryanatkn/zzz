@@ -2,10 +2,10 @@ import type {ClassConstructor} from '@ryanatkn/belt/types.js';
 import type {z} from 'zod';
 import {DEV} from 'esm-env';
 
-import type {Cell} from '$lib/cell.svelte.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
-import type {CellRegistryMap} from '$lib/cell_classes.js';
-import type {Uuid} from '$lib/zod_helpers.js';
+import type {Cell} from './cell.svelte.js';
+import type {Frontend} from './frontend.svelte.js';
+import type {CellRegistryMap} from './cell_classes.js';
+import type {Uuid} from './zod_helpers.js';
 
 /**
  * Error thrown when attempting to instantiate an unregistered class.

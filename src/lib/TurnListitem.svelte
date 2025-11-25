@@ -1,10 +1,10 @@
 <script lang="ts">
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 
-	import ErrorMessageInline from '$lib/ErrorMessageInline.svelte';
-	import type {Turn} from '$lib/turn.svelte.js';
-	import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
-	import TurnContextmenu from '$lib/TurnContextmenu.svelte';
+	import ErrorMessageInline from './ErrorMessageInline.svelte';
+	import type {Turn} from './turn.svelte.js';
+	import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
+	import TurnContextmenu from './TurnContextmenu.svelte';
 
 	const {
 		turn,

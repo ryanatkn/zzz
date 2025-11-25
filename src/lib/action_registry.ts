@@ -5,9 +5,9 @@ import type {
 	RequestResponseActionSpec,
 	RemoteNotificationActionSpec,
 	LocalCallActionSpec,
-} from '$lib/action_spec.js';
-import {to_action_spec_identifier} from '$lib/action_helpers.js';
-import type {ActionMethod} from '$lib/action_metatypes.js';
+} from './action_spec.js';
+import {to_action_spec_identifier} from './action_helpers.js';
+import type {ActionMethod} from './action_metatypes.js';
 
 // TODO use derived or `??=` in lazy getters for memoization
 

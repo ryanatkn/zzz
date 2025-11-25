@@ -2,8 +2,8 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import type {ComponentProps} from 'svelte';
 
-	import {TextPart} from '$lib/part.svelte.js';
-	import ContentEditor from '$lib/ContentEditor.svelte';
+	import {TextPart} from './part.svelte.js';
+	import ContentEditor from './ContentEditor.svelte';
 
 	const {
 		text_part,

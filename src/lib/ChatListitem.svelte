@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {resolve} from '$app/paths';
 
-	import NavLink from '$lib/NavLink.svelte';
-	import ChatContextmenu from '$lib/ChatContextmenu.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_CHAT} from '$lib/glyphs.js';
-	import type {Chat} from '$lib/chat.svelte.js';
+	import NavLink from './NavLink.svelte';
+	import ChatContextmenu from './ChatContextmenu.svelte';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_CHAT} from './glyphs.js';
+	import type {Chat} from './chat.svelte.js';
 
 	const {
 		chat,

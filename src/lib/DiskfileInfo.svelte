@@ -1,13 +1,13 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import {GLYPH_FILE} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {DiskfileEditorState} from '$lib/diskfile_editor_state.svelte.js';
-	import DiskfileMetrics from '$lib/DiskfileMetrics.svelte';
-	import {has_dependencies} from '$lib/diskfile_helpers.js';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import {GLYPH_FILE} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {DiskfileEditorState} from './diskfile_editor_state.svelte.js';
+	import DiskfileMetrics from './DiskfileMetrics.svelte';
+	import {has_dependencies} from './diskfile_helpers.js';
 
 	const {
 		diskfile,

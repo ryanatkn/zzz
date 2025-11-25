@@ -4,15 +4,15 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {format_url} from '@ryanatkn/belt/url.js';
 
-	import type {Provider} from '$lib/provider.svelte.js';
-	import ProviderLogo from '$lib/ProviderLogo.svelte';
-	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
-	import ExternalLink from '$lib/ExternalLink.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import OllamaManager from '$lib/OllamaManager.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import ModelSummary from '$lib/ModelSummary.svelte';
-	import CapabilityProviderApi from '$lib/CapabilityProviderApi.svelte';
+	import type {Provider} from './provider.svelte.js';
+	import ProviderLogo from './ProviderLogo.svelte';
+	import {GLYPH_PROVIDER} from './glyphs.js';
+	import ExternalLink from './ExternalLink.svelte';
+	import Glyph from './Glyph.svelte';
+	import OllamaManager from './OllamaManager.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import ModelSummary from './ModelSummary.svelte';
+	import CapabilityProviderApi from './CapabilityProviderApi.svelte';
 
 	const {
 		provider,

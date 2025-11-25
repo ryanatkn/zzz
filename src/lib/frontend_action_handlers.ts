@@ -1,6 +1,6 @@
-import type {FrontendActionHandlers} from '$lib/frontend_action_types.js';
-import {Turn} from '$lib/turn.svelte.js';
-import {to_completion_response_text} from '$lib/response_helpers.js';
+import type {FrontendActionHandlers} from './frontend_action_types.js';
+import {Turn} from './turn.svelte.js';
+import {to_completion_response_text} from './response_helpers.js';
 
 // TODO stubbing out a lot of these
 

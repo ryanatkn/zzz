@@ -1,13 +1,13 @@
 import {z} from 'zod';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {Part, PartJson, type PartJsonInput, type PartUnion} from '$lib/part.svelte.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index} from '$lib/indexed_collection_helpers.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
-import {get_unique_name} from '$lib/helpers.js';
-import {CellJson} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Part, PartJson, type PartJsonInput, type PartUnion} from './part.svelte.js';
+import {HANDLED} from './cell_helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import {create_single_index} from './indexed_collection_helpers.svelte.js';
+import {Uuid} from './zod_helpers.js';
+import {get_unique_name} from './helpers.js';
+import {CellJson} from './cell_types.js';
 
 export const PartsJson = CellJson.extend({
 	items: z.array(PartJson).default(() => []),

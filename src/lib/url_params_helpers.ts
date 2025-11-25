@@ -1,4 +1,4 @@
-import {Uuid} from '$lib/zod_helpers.js';
+import {Uuid} from './zod_helpers.js';
 
 /**
  * Parse and validate a UUID parameter value from the URL.

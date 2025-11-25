@@ -3,8 +3,8 @@
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 	import type {ComponentProps} from 'svelte';
 
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import Picker from '$lib/Picker.svelte';
+	import type {Uuid} from './zod_helpers.js';
+	import Picker from './Picker.svelte';
 
 	let {
 		onpick,

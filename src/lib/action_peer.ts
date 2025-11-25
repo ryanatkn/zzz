@@ -1,6 +1,6 @@
 // @slop Claude Opus 4
 
-import {create_action_event} from '$lib/action_event.js';
+import {create_action_event} from './action_event.js';
 import {
 	JsonrpcMessageFromClientToServer,
 	JsonrpcMessageFromServerToClient,
@@ -8,19 +8,19 @@ import {
 	JsonrpcRequest,
 	JsonrpcResponseOrError,
 	JsonrpcErrorMessage,
-} from '$lib/jsonrpc.js';
-import {Transports, type TransportName} from '$lib/transports.js';
-import type {ActionEventEnvironment} from '$lib/action_event_types.js';
+} from './jsonrpc.js';
+import {Transports, type TransportName} from './transports.js';
+import type {ActionEventEnvironment} from './action_event_types.js';
 import {
 	create_jsonrpc_error_message,
 	create_jsonrpc_error_message_from_thrown,
 	to_jsonrpc_message_id,
 	is_jsonrpc_request,
 	is_jsonrpc_notification,
-} from '$lib/jsonrpc_helpers.js';
-import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
-import type {ActionMethod} from '$lib/action_metatypes.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+} from './jsonrpc_helpers.js';
+import {jsonrpc_error_messages} from './jsonrpc_errors.js';
+import type {ActionMethod} from './action_metatypes.js';
+import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 

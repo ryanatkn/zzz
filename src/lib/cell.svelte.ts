@@ -6,16 +6,16 @@ import {
 	type Uuid,
 	type Datetime,
 	get_datetime_now,
-} from '$lib/zod_helpers.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
+} from './zod_helpers.js';
+import type {Frontend} from './frontend.svelte.js';
 import {
 	get_schema_class_info,
 	type SchemaClassInfo,
 	HANDLED,
 	type CellValueDecoder,
-} from '$lib/cell_helpers.js';
-import type {SchemaKeys, CellJson} from '$lib/cell_types.js';
-import {format_datetime, format_short_date, format_time} from '$lib/time_helpers.js';
+} from './cell_helpers.js';
+import type {SchemaKeys, CellJson} from './cell_types.js';
+import {format_datetime, format_short_date, format_time} from './time_helpers.js';
 
 // TODO improve types, especially casting
 

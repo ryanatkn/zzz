@@ -3,11 +3,11 @@
 import {z} from 'zod';
 import type {Logger} from '@ryanatkn/belt/log.js';
 
-import type {ActionMethod} from '$lib/action_metatypes.js';
-import type {ActionExecutor, ActionKind} from '$lib/action_types.js';
-import type {ActionSpecUnion} from '$lib/action_spec.js';
-import type {ActionPeer} from '$lib/action_peer.js';
-import type {Actions} from '$lib/actions.svelte.js';
+import type {ActionMethod} from './action_metatypes.js';
+import type {ActionExecutor, ActionKind} from './action_types.js';
+import type {ActionSpecUnion} from './action_spec.js';
+import type {ActionPeer} from './action_peer.js';
+import type {Actions} from './actions.svelte.js';
 
 export const ActionEventStep = z.enum(['initial', 'parsed', 'handling', 'handled', 'failed']);
 export type ActionEventStep = z.infer<typeof ActionEventStep>;

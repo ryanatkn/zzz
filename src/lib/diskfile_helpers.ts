@@ -2,15 +2,15 @@ import type {WatcherChangeType} from '@ryanatkn/gro/watch_dir.js';
 import type {Disknode} from '@ryanatkn/gro/disknode.js';
 import {strip_start} from '@ryanatkn/belt/string.js';
 
-import {Uuid, Datetime, DatetimeNow, create_uuid} from '$lib/zod_helpers.js';
+import {Uuid, Datetime, DatetimeNow, create_uuid} from './zod_helpers.js';
 import {
 	DiskfileChangeType,
 	DiskfileDirectoryPath,
 	DiskfilePath,
 	SerializableDisknode,
 	type DiskfileJson,
-} from '$lib/diskfile_types.js';
-import type {Diskfile} from '$lib/diskfile.svelte.js';
+} from './diskfile_types.js';
+import type {Diskfile} from './diskfile.svelte.js';
 
 // TODO probably extract to `@ryanatkn/belt/path.js`
 export const is_path_absolute = (path: string): boolean => path[0] === '/';

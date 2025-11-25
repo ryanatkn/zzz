@@ -6,20 +6,20 @@ import {
 	ACTION_EVENT_STEP_TRANSITIONS,
 	ACTION_EVENT_PHASE_BY_KIND,
 	ACTION_EVENT_PHASE_TRANSITIONS,
-} from '$lib/action_event_types.js';
+} from './action_event_types.js';
 import type {
 	ActionEventData,
 	ActionEventRequestResponseData,
 	ActionEventRemoteNotificationData,
 	ActionEventLocalCallData,
-} from '$lib/action_event_data.js';
+} from './action_event_data.js';
 import type {Result} from '@ryanatkn/belt/result.js';
 
-import type {ActionMethod} from '$lib/action_metatypes.js';
-import type {ActionInputs} from '$lib/action_collections.js';
-import type {ActionExecutor, ActionInitiator, ActionKind} from '$lib/action_types.js';
-import type {ActionEvent} from '$lib/action_event.js';
-import type {JsonrpcErrorJson} from '$lib/jsonrpc.js';
+import type {ActionMethod} from './action_metatypes.js';
+import type {ActionInputs} from './action_collections.js';
+import type {ActionExecutor, ActionInitiator, ActionKind} from './action_types.js';
+import type {ActionEvent} from './action_event.js';
+import type {JsonrpcErrorJson} from './jsonrpc.js';
 
 // Type guards for action kinds
 export const is_request_response = (

@@ -1,5 +1,5 @@
-import type {Frontend} from '$lib/frontend.svelte.js';
-import type {DiskfilePath} from '$lib/diskfile_types.js';
+import type {Frontend} from './frontend.svelte.js';
+import type {DiskfilePath} from './diskfile_types.js';
 
 // TODO these aren't used, should they be for improved type safety?
 

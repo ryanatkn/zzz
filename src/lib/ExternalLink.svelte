@@ -12,7 +12,7 @@
 	import {chatgpt_logo, claude_logo, gemini_logo, github_logo} from '@ryanatkn/fuz/logos.js';
 	import Svg, {type SvgData} from '@ryanatkn/fuz/Svg.svelte';
 
-	import ExternalLinkIcon from '$lib/ExternalLinkIcon.svelte';
+	import ExternalLinkIcon from './ExternalLinkIcon.svelte';
 
 	// TODO maybe make this `Link` and infer optional prop `external`?
 

@@ -1,14 +1,14 @@
 <script lang="ts">
-	import type {Turn} from '$lib/turn.svelte.js';
-	import PartStats from '$lib/PartStats.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {get_part_type_glyph} from '$lib/part_helpers.js';
-	import PartEditorForText from '$lib/PartEditorForText.svelte';
-	import TurnContextmenu from '$lib/TurnContextmenu.svelte';
-	import PartEditorForDiskfile from '$lib/PartEditorForDiskfile.svelte';
-	import PartToggleButton from '$lib/PartToggleButton.svelte';
-	import PartRemoveButton from '$lib/PartRemoveButton.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	import type {Turn} from './turn.svelte.js';
+	import PartStats from './PartStats.svelte';
+	import Glyph from './Glyph.svelte';
+	import {get_part_type_glyph} from './part_helpers.js';
+	import PartEditorForText from './PartEditorForText.svelte';
+	import TurnContextmenu from './TurnContextmenu.svelte';
+	import PartEditorForDiskfile from './PartEditorForDiskfile.svelte';
+	import PartToggleButton from './PartToggleButton.svelte';
+	import PartRemoveButton from './PartRemoveButton.svelte';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const {
 		turn,

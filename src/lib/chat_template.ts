@@ -1,4 +1,4 @@
-import type {Uuid} from '$lib/zod_helpers.js';
+import type {Uuid} from './zod_helpers.js';
 
 // TODO @many refactor with db
 

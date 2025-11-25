@@ -14,9 +14,9 @@ import {
 	JsonrpcMessage,
 	JSONRPC_VERSION,
 	JsonrpcSingularMessage,
-} from '$lib/jsonrpc.js';
-import {ThrownJsonrpcError, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
-import type {HttpStatus} from '$lib/zod_helpers.js';
+} from './jsonrpc.js';
+import {ThrownJsonrpcError, JSONRPC_ERROR_CODES} from './jsonrpc_errors.js';
+import type {HttpStatus} from './zod_helpers.js';
 
 export const create_jsonrpc_request = (
 	method: JsonrpcMethod,

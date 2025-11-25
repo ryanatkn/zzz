@@ -1,12 +1,12 @@
 import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-import {estimate_token_count} from '$lib/helpers.js';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
-import type {PartUnion} from '$lib/part.svelte.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
-import {TurnJson} from '$lib/turn_types.js';
-import type {CompletionRequest, CompletionResponse, CompletionRole} from '$lib/completion_types.js';
+import {estimate_token_count} from './helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Uuid} from './zod_helpers.js';
+import type {PartUnion} from './part.svelte.js';
+import type {Frontend} from './frontend.svelte.js';
+import {TurnJson} from './turn_types.js';
+import type {CompletionRequest, CompletionResponse, CompletionRole} from './completion_types.js';
 
 export interface TurnOptions extends CellOptions<typeof TurnJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

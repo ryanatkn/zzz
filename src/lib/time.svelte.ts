@@ -2,14 +2,9 @@ import {z} from 'zod';
 import {SvelteDate} from 'svelte/reactivity';
 import {BROWSER} from 'esm-env';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import {
-	format_datetime,
-	format_short_date,
-	format_time,
-	format_timestamp,
-} from '$lib/time_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {format_datetime, format_short_date, format_time, format_timestamp} from './time_helpers.js';
 
 export const TimeJson = CellJson.extend({}).meta({cell_class_name: 'Time'});
 export type TimeJson = z.infer<typeof TimeJson>;

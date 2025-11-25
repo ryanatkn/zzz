@@ -2,9 +2,9 @@
 
 import {UnreachableError} from '@ryanatkn/belt/error.js';
 
-import type {ActionSpecUnion} from '$lib/action_spec.js';
-import {is_action_initiator} from '$lib/action_types.js';
-import type {ActionEventPhase} from '$lib/action_event_types.js';
+import type {ActionSpecUnion} from './action_spec.js';
+import {is_action_initiator} from './action_types.js';
+import type {ActionEventPhase} from './action_event_types.js';
 
 // TODO probably refactor this into more reusable and more app-specific helpers/config,
 // maybe `import_builder.ts` and `gen_helpers.ts`
@@ -29,15 +29,15 @@ interface ImportItem {
  * @example
  * ```typescript
  * const imports = new ImportBuilder();
- * imports.add_types('$lib/types.js', 'Foo', 'Bar');
- * imports.add('$lib/utils.js', 'helper');
- * imports.add_type('$lib/utils.js', 'HelperOptions');
- * imports.add('$lib/action_specs.js', '* as specs');
+ * imports.add_types('./types.js', 'Foo', 'Bar');
+ * imports.add('./utils.js', 'helper');
+ * imports.add_type('./utils.js', 'HelperOptions');
+ * imports.add('./action_specs.js', '* as specs');
  *
  * // Generates:
- * // import type {Foo, Bar} from '$lib/types.js';
- * // import {helper, type HelperOptions} from '$lib/utils.js';
- * // import * as specs from '$lib/action_specs.js';
+ * // import type {Foo, Bar} from './types.js';
+ * // import {helper, type HelperOptions} from './utils.js';
+ * // import * as specs from './action_specs.js';
  * ```
  */
 export class ImportBuilder {
@@ -282,7 +282,7 @@ export const get_handler_return_type = (
 ): string => {
 	// For request_response receive_request, handler returns the output
 	if (spec.kind === 'request_response' && phase === 'receive_request') {
-		imports.add_type('$lib/action_collections.js', 'ActionOutputs');
+		imports.add_type('./action_collections.js', 'ActionOutputs');
 		const base_type = `ActionOutputs['${spec.method}']`;
 		// Request/response actions are always async
 		return `${base_type} | Promise<${base_type}>`;
@@ -290,7 +290,7 @@ export const get_handler_return_type = (
 
 	// For local_call execute, handler returns the output
 	if (spec.kind === 'local_call' && phase === 'execute') {
-		imports.add_type('$lib/action_collections.js', 'ActionOutputs');
+		imports.add_type('./action_collections.js', 'ActionOutputs');
 		const base_type = `ActionOutputs['${spec.method}']`;
 		return spec.async ? `${base_type} | Promise<${base_type}>` : base_type;
 	}
@@ -316,12 +316,12 @@ export const generate_phase_handlers = (
 	}
 
 	// Add necessary imports for the unified system
-	imports.add_type('$lib/action_event.js', 'ActionEvent');
+	imports.add_type('./action_event.js', 'ActionEvent');
 
 	// Add environment type import
 	const environment_type = executor === 'frontend' ? 'Frontend' : 'Backend';
 	const environment_module =
-		executor === 'frontend' ? '$lib/frontend.svelte.js' : '$lib/server/backend.js';
+		executor === 'frontend' ? './frontend.svelte.js' : './server/backend.js';
 	imports.add_type(environment_module, environment_type);
 
 	// Generate handler definitions for each phase

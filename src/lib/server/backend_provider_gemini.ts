@@ -6,10 +6,10 @@ import {
 	BackendProviderRemote,
 	type BackendProviderOptions,
 	type CompletionHandlerOptions,
-} from '$lib/server/backend_provider.js';
-import {to_completion_result} from '$lib/response_helpers.js';
-import type {ActionOutputs} from '$lib/action_collections.js';
-import type {CompletionMessage} from '$lib/completion_types.js';
+} from './backend_provider.js';
+import {to_completion_result} from '../response_helpers.js';
+import type {ActionOutputs} from '../action_collections.js';
+import type {CompletionMessage} from '../completion_types.js';
 
 export class BackendProviderGemini extends BackendProviderRemote<GoogleGenerativeAI> {
 	readonly name = 'gemini';

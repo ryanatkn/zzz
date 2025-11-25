@@ -1,14 +1,16 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
-import {get_innermost_type_name} from '$lib/zod_helpers.js';
-import * as action_specs from '$lib/action_specs.js';
-import {is_action_spec} from '$lib/action_spec.js';
-import {ActionRegistry} from '$lib/action_registry.js';
+import {get_innermost_type_name} from './zod_helpers.js';
+import * as action_specs from './action_specs.js';
+import {is_action_spec} from './action_spec.js';
+import {ActionRegistry} from './action_registry.js';
 
 // TODO some of these can probably be declared differently without codegen
 
 /**
  * Outputs a file with generated types and schemas using the action specs as the source of truth.
+ *
+ * @nodocs
  */
 export const gen: Gen = ({origin_path}) => {
 	const registry = new ActionRegistry(Object.values(action_specs).filter((s) => is_action_spec(s)));
@@ -21,8 +23,8 @@ export const gen: Gen = ({origin_path}) => {
 		import {z} from 'zod';
 		import type {Result} from '@ryanatkn/belt/result.js';
 
-		import type {ActionInputs, ActionOutputs} from '$lib/action_collections.js';
-		import type {JsonrpcErrorJson} from '$lib/jsonrpc.js';
+		import type {ActionInputs, ActionOutputs} from './action_collections.js';
+		import type {JsonrpcErrorJson} from './jsonrpc.js';
 
 		/**
 		 * All action method names. Request/response actions have two types per method.

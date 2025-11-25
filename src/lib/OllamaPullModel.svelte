@@ -1,12 +1,12 @@
 <script lang="ts">
 	// @slop claude_sonnet_4
 
-	import Glyph from '$lib/Glyph.svelte';
-	import ErrorMessage from '$lib/ErrorMessage.svelte';
-	import OllamaActionItem from '$lib/OllamaActionItem.svelte';
-	import {GLYPH_DOWNLOAD, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import type {Ollama} from '$lib/ollama.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ErrorMessage from './ErrorMessage.svelte';
+	import OllamaActionItem from './OllamaActionItem.svelte';
+	import {GLYPH_DOWNLOAD, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from './glyphs.js';
+	import type {Ollama} from './ollama.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const {
 		ollama,

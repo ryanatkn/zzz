@@ -9,7 +9,7 @@ import type {
 	JsonrpcRequest,
 	JsonrpcResponseOrError,
 	JsonrpcErrorMessage,
-} from '$lib/jsonrpc.js';
+} from './jsonrpc.js';
 
 // TODO figure out the symmetry of frontend and backend transports (none/partial/full?) --
 // we may also need orthogonal abstractions to clarify the transport role

@@ -1,16 +1,16 @@
 import {z} from 'zod';
 import type {AsyncStatus} from '@ryanatkn/belt/async.js';
 
-import type {Model} from '$lib/model.svelte.js';
-import {to_completion_response_text} from '$lib/response_helpers.js';
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import {Thread} from '$lib/thread.svelte.js';
-import {reorder_list} from '$lib/list_helpers.js';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import {get_unique_name, estimate_token_count} from '$lib/helpers.js';
-import {CompletionRequest} from '$lib/completion_types.js';
-import {render_message_with_role} from '$lib/thread_helpers.js';
+import type {Model} from './model.svelte.js';
+import {to_completion_response_text} from './response_helpers.js';
+import {get_datetime_now, Uuid} from './zod_helpers.js';
+import {Thread} from './thread.svelte.js';
+import {reorder_list} from './list_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {get_unique_name, estimate_token_count} from './helpers.js';
+import {CompletionRequest} from './completion_types.js';
+import {render_message_with_role} from './thread_helpers.js';
 
 const ChatViewMode = z.enum(['simple', 'multi']).default('simple');
 export type ChatViewMode = z.infer<typeof ChatViewMode>;

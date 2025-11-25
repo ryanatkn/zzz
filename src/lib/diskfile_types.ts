@@ -1,8 +1,8 @@
 import {z} from 'zod';
 
-import {CellJson} from '$lib/cell_types.js';
-import {is_path_absolute} from '$lib/diskfile_helpers.js';
-import {PathWithTrailingSlash} from '$lib/zod_helpers.js';
+import {CellJson} from './cell_types.js';
+import {is_path_absolute} from './diskfile_helpers.js';
+import {PathWithTrailingSlash} from './zod_helpers.js';
 
 export const DiskfileChangeType = z.enum(['add', 'change', 'delete']);
 export type DiskfileChangeType = z.infer<typeof DiskfileChangeType>;

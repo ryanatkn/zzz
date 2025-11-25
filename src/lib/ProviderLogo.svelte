@@ -4,8 +4,8 @@
 	import {chatgpt_logo, claude_logo, gemini_logo} from '@ryanatkn/fuz/logos.js';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import type {ProviderName} from '$lib/provider_types.js';
-	import {ollama_logo} from '$lib/ollama_helpers.js';
+	import type {ProviderName} from './provider_types.js';
+	import {ollama_logo} from './ollama_helpers.js';
 
 	const {
 		name,

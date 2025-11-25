@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
-import {DatetimeNow} from '$lib/zod_helpers.js';
-import {ProviderName, ProviderDataSchema} from '$lib/provider_types.js';
+import {DatetimeNow} from './zod_helpers.js';
+import {ProviderName, ProviderDataSchema} from './provider_types.js';
 
 // TODO any restrictions?
 export const CompletionRole = z.string(); // branding is too unwieldy at data declaration sites

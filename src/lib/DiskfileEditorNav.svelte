@@ -1,9 +1,9 @@
 <script lang="ts">
-	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_REFRESH} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {DiskfileEditorState} from '$lib/diskfile_editor_state.svelte.js';
-	import type {Uuid} from '$lib/zod_helpers.js';
+	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_REFRESH} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {DiskfileEditorState} from './diskfile_editor_state.svelte.js';
+	import type {Uuid} from './zod_helpers.js';
 
 	const {
 		editor_state,

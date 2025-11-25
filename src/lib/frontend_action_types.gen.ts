@@ -2,10 +2,10 @@
 
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
-import * as action_specs from '$lib/action_specs.js';
-import {is_action_spec} from '$lib/action_spec.js';
-import {ActionRegistry} from '$lib/action_registry.js';
-import {ImportBuilder, generate_phase_handlers, create_banner} from '$lib/codegen.js';
+import * as action_specs from './action_specs.js';
+import {is_action_spec} from './action_spec.js';
+import {ActionRegistry} from './action_registry.js';
+import {ImportBuilder, generate_phase_handlers, create_banner} from './codegen.js';
 
 /**
  * Generates frontend action handler types based on spec.initiator.
@@ -15,10 +15,12 @@ import {ImportBuilder, generate_phase_handlers, create_banner} from '$lib/codege
  *
  * Example generated imports:
  * ```typescript
- * import type {ActionEvent} from '$lib/action_event.js';
- * import type {ActionInputs, ActionOutputs} from '$lib/action_collections.js';
- * import type {Frontend} from '$lib/frontend.svelte.js';
+ * import type {ActionEvent} from './action_event.js';
+ * import type {ActionInputs, ActionOutputs} from './action_collections.js';
+ * import type {Frontend} from './frontend.svelte.js';
  * ```
+ *
+ * @nodocs
  */
 export const gen: Gen = ({origin_path}) => {
 	const registry = new ActionRegistry(Object.values(action_specs).filter((s) => is_action_spec(s)));

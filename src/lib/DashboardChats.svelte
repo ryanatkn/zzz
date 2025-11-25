@@ -3,16 +3,16 @@
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 	import {onMount} from 'svelte';
 
-	import ChatList from '$lib/ChatList.svelte';
-	import ChatView from '$lib/ChatView.svelte';
-	import ChatContextmenu from '$lib/ChatContextmenu.svelte';
-	import {GLYPH_ADD, GLYPH_SORT} from '$lib/glyphs.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ChatsContextmenu from '$lib/ChatsContextmenu.svelte';
-	import TutorialForDatabase from '$lib/TutorialForDatabase.svelte';
-	import TutorialForChats from '$lib/TutorialForChats.svelte';
-	import ErrorMessage from '$lib/ErrorMessage.svelte';
+	import ChatList from './ChatList.svelte';
+	import ChatView from './ChatView.svelte';
+	import ChatContextmenu from './ChatContextmenu.svelte';
+	import {GLYPH_ADD, GLYPH_SORT} from './glyphs.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ChatsContextmenu from './ChatsContextmenu.svelte';
+	import TutorialForDatabase from './TutorialForDatabase.svelte';
+	import TutorialForChats from './TutorialForChats.svelte';
+	import ErrorMessage from './ErrorMessage.svelte';
 
 	const app = frontend_context.get();
 	const {chats, capabilities} = app;

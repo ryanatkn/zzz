@@ -5,11 +5,11 @@
 	import ContextmenuSubmenu from '@ryanatkn/fuz/ContextmenuSubmenu.svelte';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import {GLYPH_DELETE, GLYPH_FILE, GLYPH_REMOVE} from '$lib/glyphs.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import ContextmenuEntryCopyToClipboard from '$lib/ContextmenuEntryCopyToClipboard.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import {GLYPH_DELETE, GLYPH_FILE, GLYPH_REMOVE} from './glyphs.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import ContextmenuEntryCopyToClipboard from './ContextmenuEntryCopyToClipboard.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		diskfile,

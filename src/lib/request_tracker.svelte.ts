@@ -3,14 +3,14 @@
 import {create_deferred, type Deferred, type AsyncStatus} from '@ryanatkn/belt/async.js';
 import {SvelteMap} from 'svelte/reactivity';
 
-import {Datetime, get_datetime_now} from '$lib/zod_helpers.js';
+import {Datetime, get_datetime_now} from './zod_helpers.js';
 import {
 	JSONRPC_INTERNAL_ERROR,
 	type JsonrpcErrorMessage,
 	type JsonrpcRequestId,
 	type JsonrpcResponseOrError,
-} from '$lib/jsonrpc.js';
-import {ThrownJsonrpcError, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
+} from './jsonrpc.js';
+import {ThrownJsonrpcError, JSONRPC_ERROR_CODES} from './jsonrpc_errors.js';
 
 // TODO what if this uses a tracker id param that's an opaque UUID but can be used for action association?
 

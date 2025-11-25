@@ -4,13 +4,13 @@
 	import {SvelteMap} from 'svelte/reactivity';
 	import CopyToClipboard from '@ryanatkn/fuz/CopyToClipboard.svelte';
 
-	import type {Socket, QueuedMessage, FailedMessage} from '$lib/socket.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_RETRY, GLYPH_REMOVE, GLYPH_INFO} from '$lib/glyphs.js';
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import PopoverButton from '$lib/PopoverButton.svelte';
-	import {format_timestamp} from '$lib/time_helpers.js';
-	import {DURATION_SM} from '$lib/helpers.js';
+	import type {Socket, QueuedMessage, FailedMessage} from './socket.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_RETRY, GLYPH_REMOVE, GLYPH_INFO} from './glyphs.js';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import PopoverButton from './PopoverButton.svelte';
+	import {format_timestamp} from './time_helpers.js';
+	import {DURATION_SM} from './helpers.js';
 
 	const {
 		socket,

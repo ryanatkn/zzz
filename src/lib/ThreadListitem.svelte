@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type {Chat} from '$lib/chat.svelte.js';
-	import type {Thread} from '$lib/thread.svelte.js';
-	import {GLYPH_REMOVE} from '$lib/glyphs.js';
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import ThreadContextmenu from '$lib/ThreadContextmenu.svelte';
-	import ProviderLogo from '$lib/ProviderLogo.svelte';
-	import ThreadToggleButton from '$lib/ThreadToggleButton.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {Chat} from './chat.svelte.js';
+	import type {Thread} from './thread.svelte.js';
+	import {GLYPH_REMOVE} from './glyphs.js';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import ThreadContextmenu from './ThreadContextmenu.svelte';
+	import ProviderLogo from './ProviderLogo.svelte';
+	import ThreadToggleButton from './ThreadToggleButton.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		thread,

@@ -6,8 +6,8 @@ import {on} from 'svelte/events';
 import {swallow} from '@ryanatkn/belt/dom.js';
 import type {TransitionConfig} from 'svelte/transition';
 
-import {type Position, type Alignment, generate_position_styles} from '$lib/position_helpers.js';
-import {create_client_id} from '$lib/helpers.js';
+import {type Position, type Alignment, generate_position_styles} from './position_helpers.js';
+import {create_client_id} from './helpers.js';
 
 // TODO refactor to use the builtin Popover API, but needs to use absolute positioning still because the anchor API isn't supported enough yet
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/popover

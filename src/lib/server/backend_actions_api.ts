@@ -1,18 +1,18 @@
 import {DEV} from 'esm-env';
 
-import type {FilerChangeHandler, Backend} from '$lib/server/backend.js';
-import type {ActionInputs} from '$lib/action_collections.js';
-import {create_action_event} from '$lib/action_event.js';
+import type {FilerChangeHandler, Backend} from './backend.js';
+import type {ActionInputs} from '../action_collections.js';
+import {create_action_event} from '../action_event.js';
 import {
 	filer_change_action_spec,
 	completion_progress_action_spec,
 	ollama_progress_action_spec,
-} from '$lib/action_specs.js';
+} from '../action_specs.js';
 import {
 	map_watcher_change_to_diskfile_change,
 	to_serializable_disknode,
-} from '$lib/diskfile_helpers.js';
-import {DiskfilePath, SerializableDisknode} from '$lib/diskfile_types.js';
+} from '../diskfile_helpers.js';
+import {DiskfilePath, SerializableDisknode} from '../diskfile_types.js';
 
 // TODO very unfinished/hacky
 

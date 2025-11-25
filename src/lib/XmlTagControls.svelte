@@ -1,10 +1,10 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import type {PartUnion} from '$lib/part.svelte.js';
-	import XmlAttributeEditor from '$lib/XmlAttributeEditor.svelte';
-	import {GLYPH_ADD, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {PartUnion} from './part.svelte.js';
+	import XmlAttributeEditor from './XmlAttributeEditor.svelte';
+	import {GLYPH_ADD, GLYPH_PLACEHOLDER} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		part,

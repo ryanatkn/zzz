@@ -7,11 +7,11 @@ import {
 	DiskfileDirectoryPath,
 	DiskfilePath,
 	SerializableDisknode,
-} from '$lib/diskfile_types.js';
-import {ProviderStatus, ProviderName} from '$lib/provider_types.js';
-import {CompletionMessage, CompletionRequest, CompletionResponse} from '$lib/completion_types.js';
-import type {ActionSpecUnion} from '$lib/action_spec.js';
-import {JsonrpcRequestId} from '$lib/jsonrpc.js';
+} from './diskfile_types.js';
+import {ProviderStatus, ProviderName} from './provider_types.js';
+import {CompletionMessage, CompletionRequest, CompletionResponse} from './completion_types.js';
+import type {ActionSpecUnion} from './action_spec.js';
+import {JsonrpcRequestId} from './jsonrpc.js';
 import {
 	OllamaListRequest,
 	OllamaListResponse,
@@ -24,8 +24,8 @@ import {
 	OllamaCopyRequest,
 	OllamaCreateRequest,
 	OllamaProgressResponse,
-} from '$lib/ollama_helpers.js';
-import {Uuid} from '$lib/zod_helpers.js';
+} from './ollama_helpers.js';
+import {Uuid} from './zod_helpers.js';
 
 // TODO I tried using the helper `create_action_spec` but I don't see how to get proper typing,
 // we want the declared specs to have their literal types but not need to include optional

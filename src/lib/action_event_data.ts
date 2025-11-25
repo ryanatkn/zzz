@@ -2,16 +2,16 @@
 
 import {z} from 'zod';
 
-import {ActionMethod} from '$lib/action_metatypes.js';
-import type {ActionInputs, ActionOutputs} from '$lib/action_collections.js';
+import {ActionMethod} from './action_metatypes.js';
+import type {ActionInputs, ActionOutputs} from './action_collections.js';
 import {
 	JsonrpcRequest,
 	JsonrpcResponseOrError,
 	JsonrpcNotification,
 	JsonrpcErrorJson,
-} from '$lib/jsonrpc.js';
-import {ActionExecutor, ActionKind} from '$lib/action_types.js';
-import {ActionEventPhase, ActionEventStep} from '$lib/action_event_types.js';
+} from './jsonrpc.js';
+import {ActionExecutor, ActionKind} from './action_types.js';
+import {ActionEventPhase, ActionEventStep} from './action_event_types.js';
 
 // Base schema for all action event data
 export const ActionEventData = z.strictObject({

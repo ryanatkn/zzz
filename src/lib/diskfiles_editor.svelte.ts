@@ -2,10 +2,10 @@
 
 import {z} from 'zod';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {DiskfileTabs} from '$lib/diskfile_tabs.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
-import {CellJson} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {DiskfileTabs} from './diskfile_tabs.svelte.js';
+import {Uuid} from './zod_helpers.js';
+import {CellJson} from './cell_types.js';
 
 export const DiskfilesEditorJson = CellJson.extend({
 	show_sort_controls: z.boolean().default(false),

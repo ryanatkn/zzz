@@ -1,4 +1,4 @@
-import type {ZzzConfigCreator} from '$lib/config_helpers.js';
+import type {ZzzConfigCreator} from './config_helpers.js';
 import {
 	models_default,
 	providers_default,
@@ -12,7 +12,7 @@ import {
 	PRESENCE_PENALTY_DEFAULT,
 	STOP_SEQUENCES_DEFAULT,
 	BOTS_DEFAULT,
-} from '$lib/config_defaults.js';
+} from './config_defaults.js';
 
 // TODO hacky and temporary, just thinking through designs
 // some of the model param defaults definitely do not belong her

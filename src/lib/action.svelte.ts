@@ -2,15 +2,15 @@
 
 import {z} from 'zod';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {ActionMethod} from '$lib/action_metatypes.js';
-import {ActionKind} from '$lib/action_types.js';
-import {ActionSpecs} from '$lib/action_collections.js';
-import type {ActionSpecUnion} from '$lib/action_spec.js';
-import {CellJson} from '$lib/cell_types.js';
-import {ActionEventData} from '$lib/action_event_data.js';
-import type {ActionEvent} from '$lib/action_event.js';
-import {is_action_complete} from '$lib/action_event_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {ActionMethod} from './action_metatypes.js';
+import {ActionKind} from './action_types.js';
+import {ActionSpecs} from './action_collections.js';
+import type {ActionSpecUnion} from './action_spec.js';
+import {CellJson} from './cell_types.js';
+import {ActionEventData} from './action_event_data.js';
+import type {ActionEvent} from './action_event.js';
+import {is_action_complete} from './action_event_helpers.js';
 
 // TODO this isnt in action_types.ts because of circular dependencies, idk what pattern is best yet
 export const ActionJson = CellJson.extend({

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import ChatListitem from '$lib/ChatListitem.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
-	import type {Chat} from '$lib/chat.svelte.js';
-	import SortableList from '$lib/SortableList.svelte';
+	import ChatListitem from './ChatListitem.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import {sort_by_text, sort_by_numeric} from './sortable.svelte.js';
+	import type {Chat} from './chat.svelte.js';
+	import SortableList from './SortableList.svelte';
 
 	const app = frontend_context.get();
 	const {chats} = app;

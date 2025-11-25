@@ -6,14 +6,14 @@
 	import {onMount} from 'svelte';
 	import {plural} from '@ryanatkn/belt/string.js';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ModelLink from '$lib/ModelLink.svelte';
-	import ProviderLink from '$lib/ProviderLink.svelte';
-	import {GLYPH_ARROW_RIGHT, GLYPH_MODEL, GLYPH_PROVIDER} from '$lib/glyphs.js';
-	import ErrorMessage from '$lib/ErrorMessage.svelte';
-	import ExternalLink from '$lib/ExternalLink.svelte';
-	import OllamaPsStatus from '$lib/OllamaPsStatus.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ModelLink from './ModelLink.svelte';
+	import ProviderLink from './ProviderLink.svelte';
+	import {GLYPH_ARROW_RIGHT, GLYPH_MODEL, GLYPH_PROVIDER} from './glyphs.js';
+	import ErrorMessage from './ErrorMessage.svelte';
+	import ExternalLink from './ExternalLink.svelte';
+	import OllamaPsStatus from './OllamaPsStatus.svelte';
 
 	const app = frontend_context.get();
 	const {capabilities, ollama} = app;

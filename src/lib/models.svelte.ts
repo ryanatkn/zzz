@@ -1,15 +1,15 @@
 import {z} from 'zod';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {Model, ModelJson, type ModelJsonInput} from '$lib/model.svelte.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Model, ModelJson, type ModelJsonInput} from './model.svelte.js';
+import {HANDLED} from './cell_helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
 	create_derived_index,
-} from '$lib/indexed_collection_helpers.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
+} from './indexed_collection_helpers.svelte.js';
+import {CellJson} from './cell_types.js';
 
 export const ModelsJson = CellJson.extend({
 	items: z.array(ModelJson).default(() => []),

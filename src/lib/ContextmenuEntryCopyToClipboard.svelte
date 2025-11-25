@@ -4,9 +4,9 @@
 	import type {Thunk} from '@ryanatkn/belt/function.js';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import {GLYPH_COPY} from '$lib/glyphs.js';
-	import {to_preview} from '$lib/helpers.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import {GLYPH_COPY} from './glyphs.js';
+	import {to_preview} from './helpers.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		content,

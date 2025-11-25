@@ -1,10 +1,10 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import type {Chat} from '$lib/chat.svelte.js';
-	import {Reorderable} from '$lib/reorderable.svelte.js';
-	import ThreadListitem from '$lib/ThreadListitem.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	import type {Chat} from './chat.svelte.js';
+	import {Reorderable} from './reorderable.svelte.js';
+	import ThreadListitem from './ThreadListitem.svelte';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const {
 		chat = frontend_context.get().chats.selected,

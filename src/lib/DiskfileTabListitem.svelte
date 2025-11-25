@@ -1,10 +1,10 @@
 <script lang="ts">
 	import {swallow} from '@ryanatkn/belt/dom.js';
 
-	import {GLYPH_REMOVE} from '$lib/glyphs.js';
-	import type {DiskfileTab} from '$lib/diskfile_tab.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import DiskfileContextmenu from '$lib/DiskfileContextmenu.svelte';
+	import {GLYPH_REMOVE} from './glyphs.js';
+	import type {DiskfileTab} from './diskfile_tab.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import DiskfileContextmenu from './DiskfileContextmenu.svelte';
 
 	const {
 		tab,

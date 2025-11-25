@@ -1,14 +1,14 @@
 // @slop Claude Opus 4
 
 import {DEV} from 'esm-env';
-import {ThrownJsonrpcError, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import {ThrownJsonrpcError, jsonrpc_error_messages} from './jsonrpc_errors.js';
 import {
 	create_jsonrpc_error_message,
 	to_jsonrpc_message_id,
 	is_jsonrpc_error_message,
 	http_status_to_jsonrpc_error_code,
-} from '$lib/jsonrpc_helpers.js';
-import type {Transport} from '$lib/transports.js';
+} from './jsonrpc_helpers.js';
+import type {Transport} from './transports.js';
 import type {
 	JsonrpcMessageFromClientToServer,
 	JsonrpcMessageFromServerToClient,
@@ -16,8 +16,8 @@ import type {
 	JsonrpcRequest,
 	JsonrpcResponseOrError,
 	JsonrpcErrorMessage,
-} from '$lib/jsonrpc.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+} from './jsonrpc.js';
+import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
 
 export class FrontendHttpTransport implements Transport {
 	readonly transport_name = 'frontend_http_rpc' as const;

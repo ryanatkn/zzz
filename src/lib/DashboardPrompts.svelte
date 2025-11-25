@@ -3,9 +3,9 @@
 	import CopyToClipboard from '@ryanatkn/fuz/CopyToClipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import PartView from '$lib/PartView.svelte';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import Glyph from './Glyph.svelte';
+	import PartView from './PartView.svelte';
 	import {
 		GLYPH_PART,
 		GLYPH_ADD,
@@ -14,19 +14,19 @@
 		GLYPH_DELETE,
 		GLYPH_FILE,
 		GLYPH_SORT,
-	} from '$lib/glyphs.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import PromptStats from '$lib/PromptStats.svelte';
-	import PartList from '$lib/PartList.svelte';
-	import ContentPreview from '$lib/ContentPreview.svelte';
-	import {Part} from '$lib/part.svelte.js';
-	import PromptContextmenu from '$lib/PromptContextmenu.svelte';
-	import DiskfilePickerDialog from '$lib/DiskfilePickerDialog.svelte';
-	import PromptList from '$lib/PromptList.svelte';
-	import EditableText from '$lib/EditableText.svelte';
-	import TutorialForDatabase from '$lib/TutorialForDatabase.svelte';
-	import TutorialForPrompts from '$lib/TutorialForPrompts.svelte';
-	import {DURATION_SM} from '$lib/helpers.js';
+	} from './glyphs.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import PromptStats from './PromptStats.svelte';
+	import PartList from './PartList.svelte';
+	import ContentPreview from './ContentPreview.svelte';
+	import {Part} from './part.svelte.js';
+	import PromptContextmenu from './PromptContextmenu.svelte';
+	import DiskfilePickerDialog from './DiskfilePickerDialog.svelte';
+	import PromptList from './PromptList.svelte';
+	import EditableText from './EditableText.svelte';
+	import TutorialForDatabase from './TutorialForDatabase.svelte';
+	import TutorialForPrompts from './TutorialForPrompts.svelte';
+	import {DURATION_SM} from './helpers.js';
 
 	const app = frontend_context.get();
 

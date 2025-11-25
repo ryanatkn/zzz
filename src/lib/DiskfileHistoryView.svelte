@@ -2,10 +2,10 @@
 	import {slide} from 'svelte/transition';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import type {DiskfileEditorState} from '$lib/diskfile_editor_state.svelte.js';
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import {format_time} from '$lib/time_helpers.js';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import type {DiskfileEditorState} from './diskfile_editor_state.svelte.js';
+	import type {Uuid} from './zod_helpers.js';
+	import {format_time} from './time_helpers.js';
 
 	const {
 		editor_state,

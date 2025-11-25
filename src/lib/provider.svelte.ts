@@ -1,9 +1,9 @@
 import {z} from 'zod';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
 
-import type {Model} from '$lib/model.svelte.js';
-import {ProviderName, type ProviderStatus} from '$lib/provider_types.js';
-import {CellJson} from '$lib/cell_types.js';
+import type {Model} from './model.svelte.js';
+import {ProviderName, type ProviderStatus} from './provider_types.js';
+import {CellJson} from './cell_types.js';
 
 // TODO optional/defaults?
 export const ProviderJson = CellJson.extend({

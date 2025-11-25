@@ -6,14 +6,14 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {onMount} from 'svelte';
 
-	import ModelLink from '$lib/ModelLink.svelte';
-	import ProviderLink from '$lib/ProviderLink.svelte';
-	import type {Model} from '$lib/model.svelte.js';
-	import {GLYPH_MODEL, GLYPH_CHECKMARK, GLYPH_ADD, GLYPH_XMARK, GLYPH_ERROR} from '$lib/glyphs.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ModelContextmenu from '$lib/ModelContextmenu.svelte';
-	import OllamaModelDetails from '$lib/OllamaModelDetails.svelte';
+	import ModelLink from './ModelLink.svelte';
+	import ProviderLink from './ProviderLink.svelte';
+	import type {Model} from './model.svelte.js';
+	import {GLYPH_MODEL, GLYPH_CHECKMARK, GLYPH_ADD, GLYPH_XMARK, GLYPH_ERROR} from './glyphs.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ModelContextmenu from './ModelContextmenu.svelte';
+	import OllamaModelDetails from './OllamaModelDetails.svelte';
 
 	const {
 		model,

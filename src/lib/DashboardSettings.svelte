@@ -1,11 +1,11 @@
 <script lang="ts">
-	import {GLYPH_SETTINGS} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import Settings from '$lib/Settings.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import DashboardHeader from '$lib/DashboardHeader.svelte';
-	import TimeWidget from '$lib/TimeWidget.svelte';
-	import Footer from '$lib/Footer.svelte';
+	import {GLYPH_SETTINGS} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
+	import Settings from './Settings.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import DashboardHeader from './DashboardHeader.svelte';
+	import TimeWidget from './TimeWidget.svelte';
+	import Footer from './Footer.svelte';
 
 	const app = frontend_context.get();
 

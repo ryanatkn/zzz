@@ -4,18 +4,13 @@
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 	import PendingButton from '@ryanatkn/fuz/PendingButton.svelte';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import DiskfileListitem from '$lib/DiskfileListitem.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {
-		GLYPH_DIRECTORY,
-		GLYPH_CREATE_FILE,
-		GLYPH_CREATE_FOLDER,
-		GLYPH_SORT,
-	} from '$lib/glyphs.js';
-	import SortableList from '$lib/SortableList.svelte';
-	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import DiskfileListitem from './DiskfileListitem.svelte';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_DIRECTORY, GLYPH_CREATE_FILE, GLYPH_CREATE_FOLDER, GLYPH_SORT} from './glyphs.js';
+	import SortableList from './SortableList.svelte';
+	import {sort_by_text, sort_by_numeric} from './sortable.svelte.js';
 
 	const {
 		empty,

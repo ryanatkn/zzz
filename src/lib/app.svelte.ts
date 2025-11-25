@@ -1,9 +1,9 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 
-import {Frontend, frontend_context, type FrontendOptions} from '$lib/frontend.svelte.js';
-import {cell_classes} from '$lib/cell_classes.js';
-import {frontend_action_handlers} from '$lib/frontend_action_handlers.js';
-import {WEBSOCKET_URL, API_URL_FOR_HTTP_RPC} from '$lib/constants.js';
+import {Frontend, frontend_context, type FrontendOptions} from './frontend.svelte.js';
+import {cell_classes} from './cell_classes.js';
+import {frontend_action_handlers} from './frontend_action_handlers.js';
+import {WEBSOCKET_URL, API_URL_FOR_HTTP_RPC} from './constants.js';
 
 // TODO some of this is awkward -- the idea
 // is that this `App` is specific to the Zzz frontend application,

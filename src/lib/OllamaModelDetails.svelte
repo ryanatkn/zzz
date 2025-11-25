@@ -5,7 +5,7 @@
 	import Details from '@ryanatkn/fuz/Details.svelte';
 	import type {Snippet} from 'svelte';
 
-	import Glyph from '$lib/Glyph.svelte';
+	import Glyph from './Glyph.svelte';
 	import {
 		GLYPH_REFRESH,
 		GLYPH_DELETE,
@@ -13,13 +13,13 @@
 		GLYPH_ADD,
 		GLYPH_DOWNLOAD,
 		GLYPH_DISCONNECT,
-	} from '$lib/glyphs.js';
-	import type {Model} from '$lib/model.svelte.js';
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import ModelContextmenu from '$lib/ModelContextmenu.svelte';
-	import ModelLink from '$lib/ModelLink.svelte';
-	import {format_short_date} from '$lib/time_helpers.js';
-	import {format_gigabytes} from '$lib/format_helpers.js';
+	} from './glyphs.js';
+	import type {Model} from './model.svelte.js';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import ModelContextmenu from './ModelContextmenu.svelte';
+	import ModelLink from './ModelLink.svelte';
+	import {format_short_date} from './time_helpers.js';
+	import {format_gigabytes} from './format_helpers.js';
 
 	const {
 		model,

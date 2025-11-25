@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import type {XmlAttributeWithDefaults} from '$lib/xml.js';
-	import {GLYPH_REMOVE} from '$lib/glyphs.js';
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {XmlAttributeWithDefaults} from './xml.js';
+	import {GLYPH_REMOVE} from './glyphs.js';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		attribute,

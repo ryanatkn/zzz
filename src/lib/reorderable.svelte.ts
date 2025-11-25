@@ -12,8 +12,8 @@ import {
 	is_reorder_allowed,
 	validate_reorderable_target_index,
 	set_reorderable_drag_data_transfer,
-} from '$lib/reorderable_helpers.js';
-import {create_client_id} from '$lib/helpers.js';
+} from './reorderable_helpers.js';
+import {create_client_id} from './helpers.js';
 
 export type ReorderableId = Flavored<string, 'ReorderableId'>;
 export type ReorderableItemId = Flavored<string, 'ReorderableItemId'>;

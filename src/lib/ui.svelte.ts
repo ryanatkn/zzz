@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
 
 export const UiJson = CellJson.extend({
 	show_main_dialog: z.boolean().default(false),

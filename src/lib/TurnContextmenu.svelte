@@ -6,11 +6,11 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
-	import type {Turn} from '$lib/turn.svelte.js';
-	import {GLYPH_EDIT, GLYPH_TURN} from '$lib/glyphs.js';
-	import ContextmenuEntryCopyToClipboard from '$lib/ContextmenuEntryCopyToClipboard.svelte';
-	import TurnView from '$lib/TurnView.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {Turn} from './turn.svelte.js';
+	import {GLYPH_EDIT, GLYPH_TURN} from './glyphs.js';
+	import ContextmenuEntryCopyToClipboard from './ContextmenuEntryCopyToClipboard.svelte';
+	import TurnView from './TurnView.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		turn,

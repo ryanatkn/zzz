@@ -2,12 +2,12 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import type {PartUnion} from '$lib/part.svelte.js';
-	import type {Prompt} from '$lib/prompt.svelte.js';
-	import type {Prompts} from '$lib/prompts.svelte.js';
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import {GLYPH_REMOVE} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {PartUnion} from './part.svelte.js';
+	import type {Prompt} from './prompt.svelte.js';
+	import type {Prompts} from './prompts.svelte.js';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import {GLYPH_REMOVE} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		part,

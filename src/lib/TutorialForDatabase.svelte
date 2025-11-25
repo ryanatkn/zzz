@@ -2,9 +2,9 @@
 	import {blur, scale, slide} from 'svelte/transition';
 	import {sineInOut} from 'svelte/easing';
 
-	import ExternalLink from '$lib/ExternalLink.svelte';
-	import {DURATION_LG} from '$lib/helpers.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	import ExternalLink from './ExternalLink.svelte';
+	import {DURATION_LG} from './helpers.js';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const app = frontend_context.get();
 </script>

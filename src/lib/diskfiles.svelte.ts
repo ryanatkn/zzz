@@ -1,16 +1,16 @@
 import {z} from 'zod';
 
-import {get_datetime_now, PathWithLeadingSlash, Uuid} from '$lib/zod_helpers.js';
-import {Diskfile} from '$lib/diskfile.svelte.js';
-import {DiskfileJson, DiskfilePath, type DiskfileJsonInput} from '$lib/diskfile_types.js';
-import {disknode_to_diskfile_json, to_relative_path} from '$lib/diskfile_helpers.js';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.svelte.js';
-import {DiskfilesEditor} from '$lib/diskfiles_editor.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import type {ActionInputs} from '$lib/action_collections.js';
+import {get_datetime_now, PathWithLeadingSlash, Uuid} from './zod_helpers.js';
+import {Diskfile} from './diskfile.svelte.js';
+import {DiskfileJson, DiskfilePath, type DiskfileJsonInput} from './diskfile_types.js';
+import {disknode_to_diskfile_json, to_relative_path} from './diskfile_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {HANDLED} from './cell_helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import {create_single_index, create_multi_index} from './indexed_collection_helpers.svelte.js';
+import {DiskfilesEditor} from './diskfiles_editor.svelte.js';
+import {CellJson} from './cell_types.js';
+import type {ActionInputs} from './action_collections.js';
 
 export const DiskfilesJson = CellJson.extend({
 	diskfiles: z.array(DiskfileJson).default(() => []),

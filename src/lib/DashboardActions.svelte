@@ -1,12 +1,12 @@
 <script lang="ts">
-	import ActionList from '$lib/ActionList.svelte';
-	import ActionDetail from '$lib/ActionDetail.svelte';
-	import DashboardHeader from '$lib/DashboardHeader.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_LOG} from '$lib/glyphs.js';
-	import type {Action} from '$lib/action.svelte.js';
-	import {app_context} from '$lib/app.svelte.js';
-	import TimeWidget from '$lib/TimeWidget.svelte';
+	import ActionList from './ActionList.svelte';
+	import ActionDetail from './ActionDetail.svelte';
+	import DashboardHeader from './DashboardHeader.svelte';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_LOG} from './glyphs.js';
+	import type {Action} from './action.svelte.js';
+	import {app_context} from './app.svelte.js';
+	import TimeWidget from './TimeWidget.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 
 	const app = app_context.get();

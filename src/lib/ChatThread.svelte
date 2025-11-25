@@ -4,16 +4,16 @@
 	import {tick} from 'svelte';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import {estimate_token_count} from '$lib/helpers.js';
-	import type {Thread} from '$lib/thread.svelte.js';
-	import ModelPickerDialog from '$lib/ModelPickerDialog.svelte';
-	import TurnList from '$lib/TurnList.svelte';
-	import ProviderLink from '$lib/ProviderLink.svelte';
-	import ThreadContextmenu from '$lib/ThreadContextmenu.svelte';
-	import ModelContextmenu from '$lib/ModelContextmenu.svelte';
-	import ContentEditor from '$lib/ContentEditor.svelte';
-	import {GLYPH_ERROR, GLYPH_PLACEHOLDER, GLYPH_SEND} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import {estimate_token_count} from './helpers.js';
+	import type {Thread} from './thread.svelte.js';
+	import ModelPickerDialog from './ModelPickerDialog.svelte';
+	import TurnList from './TurnList.svelte';
+	import ProviderLink from './ProviderLink.svelte';
+	import ThreadContextmenu from './ThreadContextmenu.svelte';
+	import ModelContextmenu from './ModelContextmenu.svelte';
+	import ContentEditor from './ContentEditor.svelte';
+	import {GLYPH_ERROR, GLYPH_PLACEHOLDER, GLYPH_SEND} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
 
 	// TODO no longer uses `Chat`, maybe rename to `ThreadView` or similar?
 

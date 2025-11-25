@@ -3,12 +3,12 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
-	import PickerDialog from '$lib/PickerDialog.svelte';
-	import PartListitem from '$lib/PartListitem.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {PartUnion} from '$lib/part.svelte.js';
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
+	import PickerDialog from './PickerDialog.svelte';
+	import PartListitem from './PartListitem.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {PartUnion} from './part.svelte.js';
+	import type {Uuid} from './zod_helpers.js';
+	import {sort_by_text, sort_by_numeric} from './sortable.svelte.js';
 
 	const app = frontend_context.get();
 	const {parts} = app;

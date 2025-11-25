@@ -3,10 +3,10 @@
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
-import {DiskfilePath} from '$lib/diskfile_types.js';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import {create_uuid, Uuid, UuidWithDefault} from '$lib/zod_helpers.js';
+import {DiskfilePath} from './diskfile_types.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {create_uuid, Uuid, UuidWithDefault} from './zod_helpers.js';
 
 /**
  * Schema for history entries.

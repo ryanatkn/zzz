@@ -2,16 +2,16 @@
 	import {untrack} from 'svelte';
 	import {slide} from 'svelte/transition';
 
-	import {DiskfilePart} from '$lib/part.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import ContentEditor from '$lib/ContentEditor.svelte';
-	import DiskfileActions from '$lib/DiskfileActions.svelte';
-	import DiskfileMetrics from '$lib/DiskfileMetrics.svelte';
-	import {DiskfileEditorState} from '$lib/diskfile_editor_state.svelte.js';
-	import DiskfileHistoryView from '$lib/DiskfileHistoryView.svelte';
-	import DiskfilePickerDialog from '$lib/DiskfilePickerDialog.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_FILE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import {DiskfilePart} from './part.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import ContentEditor from './ContentEditor.svelte';
+	import DiskfileActions from './DiskfileActions.svelte';
+	import DiskfileMetrics from './DiskfileMetrics.svelte';
+	import {DiskfileEditorState} from './diskfile_editor_state.svelte.js';
+	import DiskfileHistoryView from './DiskfileHistoryView.svelte';
+	import DiskfilePickerDialog from './DiskfilePickerDialog.svelte';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_FILE, GLYPH_PLACEHOLDER} from './glyphs.js';
 
 	const {
 		diskfile_part,

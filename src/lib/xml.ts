@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {Uuid, UuidWithDefault} from '$lib/zod_helpers.js';
+import {Uuid, UuidWithDefault} from './zod_helpers.js';
 
 export const XmlAttributeKey = z
 	.string()

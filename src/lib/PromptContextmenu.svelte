@@ -5,13 +5,13 @@
 	import ContextmenuSubmenu from '@ryanatkn/fuz/ContextmenuSubmenu.svelte';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import {Part} from '$lib/part.svelte.js';
-	import type {Prompt} from '$lib/prompt.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {GLYPH_PART, GLYPH_DELETE, GLYPH_FILE, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/glyphs.js';
-	import ContextmenuEntryCopyToClipboard from '$lib/ContextmenuEntryCopyToClipboard.svelte';
-	import DiskfilePickerDialog from '$lib/DiskfilePickerDialog.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import {Part} from './part.svelte.js';
+	import type {Prompt} from './prompt.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import {GLYPH_PART, GLYPH_DELETE, GLYPH_FILE, GLYPH_PROMPT, GLYPH_REMOVE} from './glyphs.js';
+	import ContextmenuEntryCopyToClipboard from './ContextmenuEntryCopyToClipboard.svelte';
+	import DiskfilePickerDialog from './DiskfilePickerDialog.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		prompt,

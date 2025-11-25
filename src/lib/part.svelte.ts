@@ -4,15 +4,15 @@ import {DEV} from 'esm-env';
 import {UnreachableError} from '@ryanatkn/belt/error.js';
 import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-import {estimate_token_count} from '$lib/helpers.js';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
-import {XmlAttributeWithDefaults} from '$lib/xml.js';
-import {CellJson} from '$lib/cell_types.js';
-import type {Diskfile} from '$lib/diskfile.svelte.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
-import {DiskfilePath} from '$lib/diskfile_types.js';
-import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
+import {estimate_token_count} from './helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Uuid} from './zod_helpers.js';
+import {XmlAttributeWithDefaults} from './xml.js';
+import {CellJson} from './cell_types.js';
+import type {Diskfile} from './diskfile.svelte.js';
+import type {Frontend} from './frontend.svelte.js';
+import {DiskfilePath} from './diskfile_types.js';
+import {CONTENT_PREVIEW_LENGTH} from './constants.js';
 
 /** Common properties for all part types. */
 export const PartJsonBase = CellJson.extend({

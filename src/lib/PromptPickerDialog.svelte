@@ -3,12 +3,12 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
-	import PickerDialog from '$lib/PickerDialog.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Prompt} from '$lib/prompt.svelte.js';
-	import PromptSummary from '$lib/PromptSummary.svelte';
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
+	import PickerDialog from './PickerDialog.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Prompt} from './prompt.svelte.js';
+	import PromptSummary from './PromptSummary.svelte';
+	import type {Uuid} from './zod_helpers.js';
+	import {sort_by_text, sort_by_numeric} from './sortable.svelte.js';
 
 	let {
 		show = $bindable(false),

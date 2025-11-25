@@ -4,10 +4,10 @@
 	import {DEV} from 'esm-env';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import PopoverButton from '$lib/PopoverButton.svelte';
-	import {GLYPH_REMOVE} from '$lib/glyphs.js';
-	import type {Popover} from '$lib/popover.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import PopoverButton from './PopoverButton.svelte';
+	import {GLYPH_REMOVE} from './glyphs.js';
+	import type {Popover} from './popover.svelte.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		onconfirm,

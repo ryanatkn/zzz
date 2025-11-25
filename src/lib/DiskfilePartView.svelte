@@ -2,9 +2,9 @@
 	import {slide} from 'svelte/transition';
 	import {resolve} from '$app/paths';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import PartSummary from '$lib/PartSummary.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import PartSummary from './PartSummary.svelte';
 
 	const {
 		diskfile,

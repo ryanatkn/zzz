@@ -1,14 +1,14 @@
 <script lang="ts">
 	import {resolve} from '$app/paths';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ProviderLink from '$lib/ProviderLink.svelte';
-	import PromptList from '$lib/PromptList.svelte';
-	import ChatList from '$lib/ChatList.svelte';
-	import ModelLink from '$lib/ModelLink.svelte';
-	import {GLYPH_ADD, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
-	import {to_nav_link_href} from '$lib/nav.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ProviderLink from './ProviderLink.svelte';
+	import PromptList from './PromptList.svelte';
+	import ChatList from './ChatList.svelte';
+	import ModelLink from './ModelLink.svelte';
+	import {GLYPH_ADD, GLYPH_PROVIDER, GLYPH_MODEL} from './glyphs.js';
+	import {to_nav_link_href} from './nav.js';
 
 	const app = frontend_context.get();
 </script>

@@ -1,15 +1,15 @@
 import {z} from 'zod';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {Thread} from '$lib/thread.svelte.js';
-import {ThreadJson, type ThreadJsonInput} from '$lib/thread_types.js';
-import type {Uuid} from '$lib/zod_helpers.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
-import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
-import {ModelName} from '$lib/model.svelte.js';
-import {to_reordered_list} from '$lib/list_helpers.js';
-import {CellJson} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Thread} from './thread.svelte.js';
+import {ThreadJson, type ThreadJsonInput} from './thread_types.js';
+import type {Uuid} from './zod_helpers.js';
+import {HANDLED} from './cell_helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import {create_multi_index, create_derived_index} from './indexed_collection_helpers.svelte.js';
+import {ModelName} from './model.svelte.js';
+import {to_reordered_list} from './list_helpers.js';
+import {CellJson} from './cell_types.js';
 
 export const ThreadsJson = CellJson.extend({
 	items: z.array(ThreadJson).default(() => []),

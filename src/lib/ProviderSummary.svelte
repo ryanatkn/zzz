@@ -3,9 +3,9 @@
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Provider} from '$lib/provider.svelte.js';
-	import ModelSummary from '$lib/ModelSummary.svelte';
-	import ExternalLink from '$lib/ExternalLink.svelte';
+	import type {Provider} from './provider.svelte.js';
+	import ModelSummary from './ModelSummary.svelte';
+	import ExternalLink from './ExternalLink.svelte';
 
 	const {
 		provider,

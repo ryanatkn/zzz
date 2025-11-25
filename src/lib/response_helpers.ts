@@ -1,7 +1,7 @@
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import type {ActionOutputs} from '$lib/action_collections.js';
-import type {ProviderName, ProviderData} from '$lib/provider_types.js';
-import type {ModelName} from '$lib/model.svelte.js';
+import {get_datetime_now, Uuid} from './zod_helpers.js';
+import type {ActionOutputs} from './action_collections.js';
+import type {ProviderName, ProviderData} from './provider_types.js';
+import type {ModelName} from './model.svelte.js';
 
 // TODO refactor these
 

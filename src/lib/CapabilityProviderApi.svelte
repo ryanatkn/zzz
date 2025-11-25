@@ -2,12 +2,12 @@
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 	import {onMount} from 'svelte';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ProviderLink from '$lib/ProviderLink.svelte';
-	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
-	import ErrorMessage from '$lib/ErrorMessage.svelte';
-	import ExternalLink from '$lib/ExternalLink.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ProviderLink from './ProviderLink.svelte';
+	import {GLYPH_PROVIDER} from './glyphs.js';
+	import ErrorMessage from './ErrorMessage.svelte';
+	import ExternalLink from './ExternalLink.svelte';
 
 	const {
 		provider_name,

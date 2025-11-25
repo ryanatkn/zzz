@@ -1,12 +1,12 @@
 import {z} from 'zod';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {Action, ActionJson, type ActionJsonInput} from '$lib/action.svelte.js';
-import {ActionMethod} from '$lib/action_metatypes.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
-import {create_multi_index} from '$lib/indexed_collection_helpers.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Action, ActionJson, type ActionJsonInput} from './action.svelte.js';
+import {ActionMethod} from './action_metatypes.js';
+import {HANDLED} from './cell_helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import {create_multi_index} from './indexed_collection_helpers.svelte.js';
+import {CellJson} from './cell_types.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
 export const PONG_DISPLAY_LIMIT = 6;

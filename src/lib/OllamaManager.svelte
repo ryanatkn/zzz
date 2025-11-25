@@ -6,17 +6,17 @@
 	import {onMount} from 'svelte';
 	import {plural} from '@ryanatkn/belt/string.js';
 
-	import Glyph from '$lib/Glyph.svelte';
-	import ExternalLink from '$lib/ExternalLink.svelte';
-	import {GLYPH_ADD, GLYPH_COPY, GLYPH_DOWNLOAD, GLYPH_SETTINGS} from '$lib/glyphs.js';
-	import OllamaConfigure from '$lib/OllamaConfigure.svelte';
-	import OllamaModelDetails from '$lib/OllamaModelDetails.svelte';
-	import OllamaPullModel from '$lib/OllamaPullModel.svelte';
-	import OllamaCreateModel from '$lib/OllamaCreateModel.svelte';
-	import OllamaCopyModel from '$lib/OllamaCopyModel.svelte';
-	import OllamaModelListitem from '$lib/OllamaModelListitem.svelte';
-	import type {Ollama} from '$lib/ollama.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ExternalLink from './ExternalLink.svelte';
+	import {GLYPH_ADD, GLYPH_COPY, GLYPH_DOWNLOAD, GLYPH_SETTINGS} from './glyphs.js';
+	import OllamaConfigure from './OllamaConfigure.svelte';
+	import OllamaModelDetails from './OllamaModelDetails.svelte';
+	import OllamaPullModel from './OllamaPullModel.svelte';
+	import OllamaCreateModel from './OllamaCreateModel.svelte';
+	import OllamaCopyModel from './OllamaCopyModel.svelte';
+	import OllamaModelListitem from './OllamaModelListitem.svelte';
+	import type {Ollama} from './ollama.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const {
 		ollama,

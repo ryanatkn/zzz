@@ -4,10 +4,10 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {page} from '$app/state';
 
-	import type {Provider} from '$lib/provider.svelte.js';
-	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
-	import ProviderLogo from '$lib/ProviderLogo.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {Provider} from './provider.svelte.js';
+	import {GLYPH_PROVIDER} from './glyphs.js';
+	import ProviderLogo from './ProviderLogo.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		provider,

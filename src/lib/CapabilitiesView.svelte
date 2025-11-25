@@ -2,14 +2,14 @@
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 
-	import CapabilityWebsocket from '$lib/CapabilityWebsocket.svelte';
-	import CapabilityFilesystem from '$lib/CapabilityFilesystem.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import ProviderLogo from '$lib/ProviderLogo.svelte';
-	import {GLYPH_CONNECT, GLYPH_DIRECTORY, GLYPH_BACKEND} from '$lib/glyphs.js';
-	import CapabilityProvider from '$lib/CapabilityProvider.svelte';
-	import CapabilityBackend from '$lib/CapabilityBackend.svelte';
-	import CapabilitySystem from '$lib/CapabilitySystem.svelte';
+	import CapabilityWebsocket from './CapabilityWebsocket.svelte';
+	import CapabilityFilesystem from './CapabilityFilesystem.svelte';
+	import Glyph from './Glyph.svelte';
+	import ProviderLogo from './ProviderLogo.svelte';
+	import {GLYPH_CONNECT, GLYPH_DIRECTORY, GLYPH_BACKEND} from './glyphs.js';
+	import CapabilityProvider from './CapabilityProvider.svelte';
+	import CapabilityBackend from './CapabilityBackend.svelte';
+	import CapabilitySystem from './CapabilitySystem.svelte';
 
 	// TODO add ping button that forces websocket transport
 </script>

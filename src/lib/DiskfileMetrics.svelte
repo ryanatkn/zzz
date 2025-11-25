@@ -1,9 +1,9 @@
 <script lang="ts">
 	import {fade, slide} from 'svelte/transition';
 
-	import {GLYPH_ARROW_RIGHT} from '$lib/glyphs.js';
-	import type {DiskfileEditorState} from '$lib/diskfile_editor_state.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import {GLYPH_ARROW_RIGHT} from './glyphs.js';
+	import type {DiskfileEditorState} from './diskfile_editor_state.svelte.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		editor_state,

@@ -2,19 +2,19 @@
 	import {untrack} from 'svelte';
 	import {slide} from 'svelte/transition';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import DiskfileInfo from '$lib/DiskfileInfo.svelte';
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import ContentEditor from '$lib/ContentEditor.svelte';
-	import DiskfileActions from '$lib/DiskfileActions.svelte';
-	import {DiskfileEditorState} from '$lib/diskfile_editor_state.svelte.js';
-	import DiskfileHistoryView from '$lib/DiskfileHistoryView.svelte';
-	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import DiskfilePartView from '$lib/DiskfilePartView.svelte';
-	import DiskfileContextmenu from '$lib/DiskfileContextmenu.svelte';
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import DiskfileEditorNav from '$lib/DiskfileEditorNav.svelte';
-	import TutorialForDiskfiles from '$lib/TutorialForDiskfiles.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import DiskfileInfo from './DiskfileInfo.svelte';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import ContentEditor from './ContentEditor.svelte';
+	import DiskfileActions from './DiskfileActions.svelte';
+	import {DiskfileEditorState} from './diskfile_editor_state.svelte.js';
+	import DiskfileHistoryView from './DiskfileHistoryView.svelte';
+	import {GLYPH_PLACEHOLDER} from './glyphs.js';
+	import DiskfilePartView from './DiskfilePartView.svelte';
+	import DiskfileContextmenu from './DiskfileContextmenu.svelte';
+	import type {Uuid} from './zod_helpers.js';
+	import DiskfileEditorNav from './DiskfileEditorNav.svelte';
+	import TutorialForDiskfiles from './TutorialForDiskfiles.svelte';
 
 	const {
 		diskfile,

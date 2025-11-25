@@ -1,15 +1,15 @@
 import {z} from 'zod';
 import {strip_start} from '@ryanatkn/belt/string.js';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
 import {
 	DiskfileDirectoryPath,
 	DiskfileJson,
 	type DiskfilePath,
 	type SerializableDisknode,
-} from '$lib/diskfile_types.js';
-import {to_preview, estimate_token_count} from '$lib/helpers.js';
-import type {PartUnion} from '$lib/part.svelte.js';
+} from './diskfile_types.js';
+import {to_preview, estimate_token_count} from './helpers.js';
+import type {PartUnion} from './part.svelte.js';
 
 // TODO support directories/folders
 

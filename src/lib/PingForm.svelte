@@ -3,10 +3,10 @@
 	import type {Snippet} from 'svelte';
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {GLYPH_ACTION_TYPE_REQUEST_RESPONSE} from '$lib/glyphs.js';
-	import {PING_HISTORY_MAX, type PingData} from '$lib/capabilities.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import {GLYPH_ACTION_TYPE_REQUEST_RESPONSE} from './glyphs.js';
+	import {PING_HISTORY_MAX, type PingData} from './capabilities.svelte.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		children,

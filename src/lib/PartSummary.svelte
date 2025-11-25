@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type {Prompt} from '$lib/prompt.svelte.js';
-	import type {PartUnion} from '$lib/part.svelte.js';
-	import PartToggleButton from '$lib/PartToggleButton.svelte';
-	import PartRemoveButton from '$lib/PartRemoveButton.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import PartContextmenu from '$lib/PartContextmenu.svelte';
-	import {get_part_type_glyph} from '$lib/part_helpers.js';
+	import type {Prompt} from './prompt.svelte.js';
+	import type {PartUnion} from './part.svelte.js';
+	import PartToggleButton from './PartToggleButton.svelte';
+	import PartRemoveButton from './PartRemoveButton.svelte';
+	import Glyph from './Glyph.svelte';
+	import PartContextmenu from './PartContextmenu.svelte';
+	import {get_part_type_glyph} from './part_helpers.js';
 
 	const {
 		part,

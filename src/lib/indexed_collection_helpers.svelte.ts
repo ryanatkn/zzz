@@ -3,8 +3,8 @@
 import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
 
-import type {IndexDefinition, IndexedCollection} from '$lib/indexed_collection.svelte.js';
-import {UuidWithDefault} from '$lib/zod_helpers.js';
+import type {IndexDefinition, IndexedCollection} from './indexed_collection.svelte.js';
+import {UuidWithDefault} from './zod_helpers.js';
 
 // TODO @many rethink the indexed collection API -
 // particularly type safety, performance, and integration with Svelte patterns -

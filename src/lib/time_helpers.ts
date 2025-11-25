@@ -1,6 +1,6 @@
 import {format} from 'date-fns';
 
-import {FILE_DATETIME_FORMAT, FILE_SHORT_DATE_FORMAT, FILE_TIME_FORMAT} from '$lib/cell_helpers.js';
+import {FILE_DATETIME_FORMAT, FILE_SHORT_DATE_FORMAT, FILE_TIME_FORMAT} from './cell_helpers.js';
 
 export type TimeValue = string | number | Date;
 

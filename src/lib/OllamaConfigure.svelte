@@ -4,7 +4,7 @@
 	import {slide} from 'svelte/transition';
 	import {plural} from '@ryanatkn/belt/string.js';
 
-	import Glyph from '$lib/Glyph.svelte';
+	import Glyph from './Glyph.svelte';
 	import {
 		GLYPH_CONNECT,
 		GLYPH_REFRESH,
@@ -12,13 +12,13 @@
 		GLYPH_PLACEHOLDER,
 		GLYPH_ARROW_RIGHT,
 		GLYPH_CLEAR,
-	} from '$lib/glyphs.js';
-	import ErrorMessage from '$lib/ErrorMessage.svelte';
-	import OllamaActions from '$lib/OllamaActions.svelte';
-	import OllamaPsStatus from '$lib/OllamaPsStatus.svelte';
-	import type {Ollama} from '$lib/ollama.svelte.js';
-	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	} from './glyphs.js';
+	import ErrorMessage from './ErrorMessage.svelte';
+	import OllamaActions from './OllamaActions.svelte';
+	import OllamaPsStatus from './OllamaPsStatus.svelte';
+	import type {Ollama} from './ollama.svelte.js';
+	import {OLLAMA_URL} from './ollama_helpers.js';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const {
 		ollama,

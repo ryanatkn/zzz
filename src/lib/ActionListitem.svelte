@@ -2,14 +2,10 @@
 	import {slide} from 'svelte/transition';
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 
-	import Glyph from '$lib/Glyph.svelte';
-	import type {Action} from '$lib/action.svelte.js';
-	import {
-		get_glyph_for_action_method,
-		get_glyph_for_action_kind,
-		GLYPH_ERROR,
-	} from '$lib/glyphs.js';
-	import ActionContextmenu from '$lib/ActionContextmenu.svelte';
+	import Glyph from './Glyph.svelte';
+	import type {Action} from './action.svelte.js';
+	import {get_glyph_for_action_method, get_glyph_for_action_kind, GLYPH_ERROR} from './glyphs.js';
+	import ActionContextmenu from './ActionContextmenu.svelte';
 
 	const {
 		action,

@@ -2,8 +2,8 @@
 
 import {z} from 'zod';
 
-import {ActionMethod} from '$lib/action_metatypes.js';
-import {ActionAuth, ActionInitiator, ActionKind, ActionSideEffects} from '$lib/action_types.js';
+import {ActionMethod} from './action_metatypes.js';
+import {ActionAuth, ActionInitiator, ActionKind, ActionSideEffects} from './action_types.js';
 
 export const ActionSpec = z.strictObject({
 	method: ActionMethod,

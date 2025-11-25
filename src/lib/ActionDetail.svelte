@@ -1,9 +1,9 @@
 <script lang="ts">
 	import CopyToClipboard from '@ryanatkn/fuz/CopyToClipboard.svelte';
 
-	import Glyph from '$lib/Glyph.svelte';
-	import {get_glyph_for_action_kind} from '$lib/glyphs.js';
-	import type {Action} from '$lib/action.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import {get_glyph_for_action_kind} from './glyphs.js';
+	import type {Action} from './action.svelte.js';
 
 	const {
 		action,

@@ -4,10 +4,10 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {DEV} from 'esm-env';
 
-	import {Reorderable, type ReorderableOptions} from '$lib/reorderable.svelte.js';
-	import PartSummary from '$lib/PartSummary.svelte';
-	import type {PartUnion} from '$lib/part.svelte.js';
-	import type {Prompt} from '$lib/prompt.svelte.js';
+	import {Reorderable, type ReorderableOptions} from './reorderable.svelte.js';
+	import PartSummary from './PartSummary.svelte';
+	import type {PartUnion} from './part.svelte.js';
+	import type {Prompt} from './prompt.svelte.js';
 
 	const {
 		parts,

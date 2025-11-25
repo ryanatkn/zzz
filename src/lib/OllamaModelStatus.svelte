@@ -2,8 +2,8 @@
 	import {fade} from 'svelte/transition';
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 
-	import type {Model} from '$lib/model.svelte.js';
-	import type {Ollama} from '$lib/ollama.svelte.js';
+	import type {Model} from './model.svelte.js';
+	import type {Ollama} from './ollama.svelte.js';
 
 	const {
 		model,

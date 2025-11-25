@@ -2,7 +2,7 @@
 	import ColorSchemeInput from '@ryanatkn/fuz/ColorSchemeInput.svelte';
 	import ThemeInput from '@ryanatkn/fuz/ThemeInput.svelte';
 
-	import ExternalLink from '$lib/ExternalLink.svelte';
+	import ExternalLink from './ExternalLink.svelte';
 </script>
 
 <h3>color scheme</h3>

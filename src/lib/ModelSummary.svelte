@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import ModelLink from '$lib/ModelLink.svelte';
-	import ModelContextmenu from '$lib/ModelContextmenu.svelte';
-	import ProviderLink from '$lib/ProviderLink.svelte';
-	import type {Model} from '$lib/model.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ProviderLogo from '$lib/ProviderLogo.svelte';
-	import {GLYPH_DOWNLOAD} from '$lib/glyphs.js';
-	import {format_gigabytes} from '$lib/format_helpers.js';
+	import ModelLink from './ModelLink.svelte';
+	import ModelContextmenu from './ModelContextmenu.svelte';
+	import ProviderLink from './ProviderLink.svelte';
+	import type {Model} from './model.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ProviderLogo from './ProviderLogo.svelte';
+	import {GLYPH_DOWNLOAD} from './glyphs.js';
+	import {format_gigabytes} from './format_helpers.js';
 
 	const {
 		model,

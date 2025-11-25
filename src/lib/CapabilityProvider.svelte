@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type {ProviderName} from '$lib/provider_types.js';
+	import type {ProviderName} from './provider_types.js';
 
-	import CapabilityProviderOllama from '$lib/CapabilityProviderOllama.svelte';
-	import CapabilityProviderApi from '$lib/CapabilityProviderApi.svelte';
+	import CapabilityProviderOllama from './CapabilityProviderOllama.svelte';
+	import CapabilityProviderApi from './CapabilityProviderApi.svelte';
 
 	const {
 		provider_name,

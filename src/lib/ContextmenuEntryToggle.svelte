@@ -4,8 +4,8 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import {DEV} from 'esm-env';
 
-	import {GLYPH_CHECKMARK} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import {GLYPH_CHECKMARK} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
 
 	let {
 		enabled = $bindable(),

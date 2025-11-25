@@ -12,8 +12,8 @@ import {
 	GLYPH_PROMPT,
 	GLYPH_PROVIDER,
 	GLYPH_SETTINGS,
-} from '$lib/glyphs.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
+} from './glyphs.js';
+import type {Frontend} from './frontend.svelte.js';
 
 export interface NavLinkItem {
 	label: string;

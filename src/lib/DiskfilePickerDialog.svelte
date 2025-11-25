@@ -3,12 +3,12 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
-	import PickerDialog from '$lib/PickerDialog.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
-	import DiskfileListitem from '$lib/DiskfileListitem.svelte';
+	import PickerDialog from './PickerDialog.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import type {Uuid} from './zod_helpers.js';
+	import {sort_by_text, sort_by_numeric} from './sortable.svelte.js';
+	import DiskfileListitem from './DiskfileListitem.svelte';
 
 	let {
 		show = $bindable(false),

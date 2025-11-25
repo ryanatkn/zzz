@@ -6,7 +6,7 @@
 	import {page} from '$app/state';
 	import {resolve} from '$app/paths';
 
-	import {pkg_context} from '$lib/pkg.js';
+	import {pkg_context} from './pkg.js';
 
 	const pkg = pkg_context.get();
 </script>

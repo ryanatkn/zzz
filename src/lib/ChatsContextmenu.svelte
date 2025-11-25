@@ -4,9 +4,9 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import ContextmenuEntry from '@ryanatkn/fuz/ContextmenuEntry.svelte';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {GLYPH_CHAT} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import {GLYPH_CHAT} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
 
 	const props: OmitStrict<ComponentProps<typeof Contextmenu>, 'entries'> = $props();
 

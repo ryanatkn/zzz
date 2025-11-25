@@ -4,7 +4,7 @@ import type {
 	ReorderableDirection,
 	ReorderableValidDropPosition,
 	ReorderableItemId,
-} from '$lib/reorderable.svelte.js';
+} from './reorderable.svelte.js';
 
 // TODO maybe make this a DOM helper? in Belt?
 /**

@@ -2,18 +2,20 @@
 
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
-import * as action_specs from '$lib/action_specs.js';
-import {is_action_spec} from '$lib/action_spec.js';
-import {ActionRegistry} from '$lib/action_registry.js';
+import * as action_specs from './action_specs.js';
+import {is_action_spec} from './action_spec.js';
+import {ActionRegistry} from './action_registry.js';
 import {
 	to_action_spec_input_identifier,
 	to_action_spec_output_identifier,
-} from '$lib/action_helpers.js';
-import {ImportBuilder, create_banner} from '$lib/codegen.js';
+} from './action_helpers.js';
+import {ImportBuilder, create_banner} from './codegen.js';
 
 /**
  * Outputs a file with action collection types that can be imported by schemas.ts.
  * This is separate from `action_metatypes.gen.ts` to avoid circular dependencies.
+ *
+ * @nodocs
  */
 export const gen: Gen = ({origin_path}) => {
 	const registry = new ActionRegistry(Object.values(action_specs).filter((s) => is_action_spec(s)));
@@ -22,8 +24,8 @@ export const gen: Gen = ({origin_path}) => {
 
 	// Add base imports
 	imports.add('zod', 'z');
-	imports.add_type('$lib/action_spec.js', 'ActionSpecUnion');
-	imports.add_many('$lib/action_specs.js', '* as specs');
+	imports.add_type('./action_spec.js', 'ActionSpecUnion');
+	imports.add_many('./action_specs.js', '* as specs');
 
 	// Determine which data type to use for each method based on its spec
 	const action_event_data_mappings = registry.specs.map((spec) => {
@@ -34,7 +36,7 @@ export const gen: Gen = ({origin_path}) => {
 					? 'ActionEventRemoteNotificationData'
 					: 'ActionEventLocalCallData';
 
-		imports.add_types('$lib/action_event_data.js', data_type);
+		imports.add_types('./action_event_data.js', data_type);
 
 		return `${spec.method}: ${data_type}<'${spec.method}'>`;
 	});

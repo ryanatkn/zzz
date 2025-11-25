@@ -1,12 +1,12 @@
 import {z} from 'zod';
 
-import {Uuid} from '$lib/zod_helpers.js';
-import {to_preview, estimate_token_count} from '$lib/helpers.js';
-import {PartJson, type PartUnion} from '$lib/part.svelte.js';
-import {reorder_list} from '$lib/list_helpers.js';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import {format_prompt_content} from '$lib/prompt_helpers.js';
+import {Uuid} from './zod_helpers.js';
+import {to_preview, estimate_token_count} from './helpers.js';
+import {PartJson, type PartUnion} from './part.svelte.js';
+import {reorder_list} from './list_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {format_prompt_content} from './prompt_helpers.js';
 
 export interface PromptMessage {
 	role: 'user' | 'system'; // TODO assistant? string? eh?

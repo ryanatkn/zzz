@@ -1,8 +1,8 @@
 // @slop Claude Opus 4
 
-import type {Socket} from '$lib/socket.svelte.js';
-import {RequestTracker} from '$lib/request_tracker.svelte.js';
-import {ThrownJsonrpcError, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import type {Socket} from './socket.svelte.js';
+import {RequestTracker} from './request_tracker.svelte.js';
+import {ThrownJsonrpcError, jsonrpc_error_messages} from './jsonrpc_errors.js';
 import {
 	is_jsonrpc_notification,
 	is_jsonrpc_request,
@@ -10,7 +10,7 @@ import {
 	is_jsonrpc_error_message,
 	to_jsonrpc_message_id,
 	create_jsonrpc_error_message,
-} from '$lib/jsonrpc_helpers.js';
+} from './jsonrpc_helpers.js';
 import type {
 	JsonrpcMessageFromClientToServer,
 	JsonrpcMessageFromServerToClient,
@@ -18,9 +18,9 @@ import type {
 	JsonrpcRequest,
 	JsonrpcResponseOrError,
 	JsonrpcErrorMessage,
-} from '$lib/jsonrpc.js';
-import type {Transport} from '$lib/transports.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+} from './jsonrpc.js';
+import type {Transport} from './transports.js';
+import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
 
 // TODO logging - maybe add a getter to Cell that falls back to the app logger?
 

@@ -2,8 +2,8 @@
 	import type {Snippet} from 'svelte';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import {GLYPH_CLEAR, GLYPH_RESTORE} from '$lib/glyphs.js';
-	import ToggleButton from '$lib/ToggleButton.svelte';
+	import {GLYPH_CLEAR, GLYPH_RESTORE} from './glyphs.js';
+	import ToggleButton from './ToggleButton.svelte';
 
 	let {
 		value = $bindable(),

@@ -1,5 +1,5 @@
-import type {PartUnion} from '$lib/part.svelte.js';
-import {GLYPH_PART, GLYPH_FILE} from '$lib/glyphs.js';
+import type {PartUnion} from './part.svelte.js';
+import {GLYPH_PART, GLYPH_FILE} from './glyphs.js';
 
 export const PART_GLYPHS = {
 	text: GLYPH_PART,

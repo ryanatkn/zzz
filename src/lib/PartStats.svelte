@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type {PartUnion} from '$lib/part.svelte.js';
-	import ContentStats from '$lib/ContentStats.svelte';
+	import type {PartUnion} from './part.svelte.js';
+	import ContentStats from './ContentStats.svelte';
 
 	const {
 		part,

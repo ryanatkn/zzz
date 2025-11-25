@@ -3,15 +3,15 @@
 import {z} from 'zod';
 import type {AsyncStatus} from '@ryanatkn/belt/async.js';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import type {JsonrpcRequestId} from '$lib/jsonrpc.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import type {JsonrpcRequestId} from './jsonrpc.js';
 import type {
 	OllamaListResponse,
 	OllamaListResponseItem,
 	OllamaPsResponse,
-} from '$lib/ollama_helpers.js';
-import type {DiskfileDirectoryPath} from '$lib/diskfile_types.js';
+} from './ollama_helpers.js';
+import type {DiskfileDirectoryPath} from './diskfile_types.js';
 
 // TODO namerbot capability, uses backend+(at least one provider) (or rethink its role in a bigger picture, not just names)
 

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {resolve} from '$app/paths';
 
-	import NavLink from '$lib/NavLink.svelte';
-	import {GLYPH_PROMPT} from '$lib/glyphs.js';
-	import PromptContextmenu from '$lib/PromptContextmenu.svelte';
-	import type {Prompt} from '$lib/prompt.svelte.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import NavLink from './NavLink.svelte';
+	import {GLYPH_PROMPT} from './glyphs.js';
+	import PromptContextmenu from './PromptContextmenu.svelte';
+	import type {Prompt} from './prompt.svelte.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		prompt,

@@ -4,11 +4,11 @@
 
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Action} from '$lib/action.svelte.js';
-	import ActionListitem from '$lib/ActionListitem.svelte';
-	import SortableList from '$lib/SortableList.svelte';
-	import {sort_by_numeric, sort_by_text} from '$lib/sortable.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Action} from './action.svelte.js';
+	import ActionListitem from './ActionListitem.svelte';
+	import SortableList from './SortableList.svelte';
+	import {sort_by_numeric, sort_by_text} from './sortable.svelte.js';
 
 	const {
 		limit = 20,

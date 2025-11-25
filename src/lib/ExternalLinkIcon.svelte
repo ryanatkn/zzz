@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	import {GLYPH_EXTERNAL_LINK} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import {GLYPH_EXTERNAL_LINK} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		children,

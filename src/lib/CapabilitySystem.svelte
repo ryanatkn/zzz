@@ -3,8 +3,8 @@
 	import {resolve} from '$app/paths';
 	import {format_url} from '@ryanatkn/belt/url.js';
 
-	import {pkg_context} from '$lib/pkg.js';
-	import ExternalLink from '$lib/ExternalLink.svelte';
+	import {pkg_context} from './pkg.js';
+	import ExternalLink from './ExternalLink.svelte';
 
 	const pkg = pkg_context.get();
 </script>

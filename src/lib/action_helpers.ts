@@ -1,4 +1,4 @@
-import {ActionMethod} from '$lib/action_metatypes.js';
+import {ActionMethod} from './action_metatypes.js';
 
 export const ACTION_DATE_FORMAT = 'MMM d, p';
 export const ACTION_TIME_FORMAT = 'p';

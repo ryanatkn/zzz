@@ -5,11 +5,11 @@
 	import PasteFromClipboard from '@ryanatkn/fuz/PasteFromClipboard.svelte';
 	import {swallow} from '@ryanatkn/belt/dom.js';
 
-	import {estimate_token_count} from '$lib/helpers.js';
-	import ContentStats from '$lib/ContentStats.svelte';
-	import ClearRestoreButton from '$lib/ClearRestoreButton.svelte';
-	import {GLYPH_PASTE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import {estimate_token_count} from './helpers.js';
+	import ContentStats from './ContentStats.svelte';
+	import ClearRestoreButton from './ClearRestoreButton.svelte';
+	import {GLYPH_PASTE, GLYPH_PLACEHOLDER} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
 
 	let {
 		content = $bindable(),

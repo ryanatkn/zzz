@@ -5,8 +5,8 @@ import type {z} from 'zod';
 import {DEV} from 'esm-env';
 import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 
-import {Uuid} from '$lib/zod_helpers.js';
-import type {IndexedItem} from '$lib/indexed_collection_helpers.svelte.js';
+import {Uuid} from './zod_helpers.js';
+import type {IndexedItem} from './indexed_collection_helpers.svelte.js';
 
 // TODO @many rethink the indexed collection API -
 // particularly type safety, performance, and integration with Svelte patterns -

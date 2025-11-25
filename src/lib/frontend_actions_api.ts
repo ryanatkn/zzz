@@ -1,19 +1,19 @@
 // @slop Claude Opus 4
 
-import type {ActionMethod, ActionsApi} from '$lib/action_metatypes.js';
-import type {ActionEventEnvironment} from '$lib/action_event_types.js';
-import {create_action_event} from '$lib/action_event.js';
+import type {ActionMethod, ActionsApi} from './action_metatypes.js';
+import type {ActionEventEnvironment} from './action_event_types.js';
+import {create_action_event} from './action_event.js';
 import type {
 	ActionSpecUnion,
 	LocalCallActionSpec,
 	RemoteNotificationActionSpec,
 	RequestResponseActionSpec,
-} from '$lib/action_spec.js';
+} from './action_spec.js';
 import {
 	is_send_request,
 	is_notification_send,
 	extract_action_result,
-} from '$lib/action_event_helpers.js';
+} from './action_event_helpers.js';
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 

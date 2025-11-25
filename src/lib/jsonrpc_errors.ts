@@ -8,7 +8,7 @@ import {
 	JSONRPC_PARSE_ERROR,
 	type JsonrpcErrorCode,
 	type JsonrpcErrorJson,
-} from '$lib/jsonrpc.js';
+} from './jsonrpc.js';
 
 // TODO maybe move some of this to `jsonrpc.ts` and extract the rest to `jsonrpc_helpers.ts`,
 // some of this is awkward, see `create_jsonrpc_error_message`

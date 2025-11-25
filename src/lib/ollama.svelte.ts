@@ -5,9 +5,9 @@ import type {AsyncStatus} from '@ryanatkn/belt/async.js';
 import {BROWSER, DEV} from 'esm-env';
 import {SvelteSet} from 'svelte/reactivity';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import {get_datetime_now, create_uuid} from '$lib/zod_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {get_datetime_now, create_uuid} from './zod_helpers.js';
 import {
 	OLLAMA_URL,
 	OllamaShowResponse,
@@ -17,10 +17,10 @@ import {
 	OllamaDeleteRequest,
 	OllamaShowRequest,
 	extract_parameter_count,
-} from '$lib/ollama_helpers.js';
-import {ModelName, type Model} from '$lib/model.svelte.js';
-import {Poller} from '$lib/poller.svelte.js';
-import {create_map_by_property} from '$lib/iterable_helpers.js';
+} from './ollama_helpers.js';
+import {ModelName, type Model} from './model.svelte.js';
+import {Poller} from './poller.svelte.js';
+import {create_map_by_property} from './iterable_helpers.js';
 
 // TODO IDK about the `handle_` prefix for methods called by the action handlers, maybe rethink
 // some things

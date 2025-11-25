@@ -4,8 +4,8 @@
 	import {slide} from 'svelte/transition';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import {Sortable, type Sorter} from '$lib/sortable.svelte.js';
+	import type {Uuid} from './zod_helpers.js';
+	import {Sortable, type Sorter} from './sortable.svelte.js';
 
 	const {
 		items,

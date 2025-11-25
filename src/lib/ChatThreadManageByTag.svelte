@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import {Chat} from '$lib/chat.svelte.js';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import {Chat} from './chat.svelte.js';
 
 	const {
 		chat,

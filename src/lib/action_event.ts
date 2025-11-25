@@ -1,13 +1,13 @@
 // @slop Claude Opus 4
 
-import type {ActionMethod} from '$lib/action_metatypes.js';
-import type {ActionSpecUnion} from '$lib/action_spec.js';
+import type {ActionMethod} from './action_metatypes.js';
+import type {ActionSpecUnion} from './action_spec.js';
 import type {
 	ActionEventEnvironment,
 	ActionEventPhase,
 	ActionEventStep,
-} from '$lib/action_event_types.js';
-import {ActionEventData} from '$lib/action_event_data.js';
+} from './action_event_types.js';
+import {ActionEventData} from './action_event_data.js';
 import {
 	validate_step_transition,
 	validate_phase_transition,
@@ -18,9 +18,9 @@ import {
 	is_request_response,
 	is_send_request_with_parsed_input,
 	is_notification_send_with_parsed_input,
-} from '$lib/action_event_helpers.js';
-import type {ActionEventDatas} from '$lib/action_collections.js';
-import {safe_parse_action_input, safe_parse_action_output} from '$lib/action_collection_helpers.js';
+} from './action_event_helpers.js';
+import type {ActionEventDatas} from './action_collections.js';
+import {safe_parse_action_input, safe_parse_action_output} from './action_collection_helpers.js';
 import {
 	create_jsonrpc_request,
 	create_jsonrpc_response,
@@ -29,17 +29,17 @@ import {
 	to_jsonrpc_params,
 	to_jsonrpc_result,
 	is_jsonrpc_error_message,
-} from '$lib/jsonrpc_helpers.js';
-import {create_uuid, format_zod_validation_error} from '$lib/zod_helpers.js';
-import {jsonrpc_error_messages, ThrownJsonrpcError} from '$lib/jsonrpc_errors.js';
+} from './jsonrpc_helpers.js';
+import {create_uuid, format_zod_validation_error} from './zod_helpers.js';
+import {jsonrpc_error_messages, ThrownJsonrpcError} from './jsonrpc_errors.js';
 import type {
 	JsonrpcRequest,
 	JsonrpcResponseOrError,
 	JsonrpcNotification,
 	JsonrpcErrorJson,
-} from '$lib/jsonrpc.js';
-import type {ActionKind} from '$lib/action_types.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+} from './jsonrpc.js';
+import type {ActionKind} from './action_types.js';
+import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
 
 // TODO maybe just use runes in this module and remove `observe`
 export type ActionEventChangeObserver<TMethod extends ActionMethod> = (

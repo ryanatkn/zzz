@@ -5,8 +5,8 @@
 	import {DEV} from 'esm-env';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import {Popover} from '$lib/popover.svelte.js';
-	import type {Position, Alignment} from '$lib/position_helpers.js';
+	import {Popover} from './popover.svelte.js';
+	import type {Position, Alignment} from './position_helpers.js';
 
 	const {
 		position = 'bottom',

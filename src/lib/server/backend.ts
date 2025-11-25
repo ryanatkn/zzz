@@ -3,29 +3,26 @@ import type {Disknode} from '@ryanatkn/gro/disknode.js';
 import type {WatcherChange} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
-import type {BackendProviderOllama} from '$lib/server/backend_provider_ollama.js';
-import type {BackendProviderGemini} from '$lib/server/backend_provider_gemini.js';
-import type {BackendProviderChatgpt} from '$lib/server/backend_provider_chatgpt.js';
-import type {BackendProviderClaude} from '$lib/server/backend_provider_claude.js';
+import type {BackendProviderOllama} from './backend_provider_ollama.js';
+import type {BackendProviderGemini} from './backend_provider_gemini.js';
+import type {BackendProviderChatgpt} from './backend_provider_chatgpt.js';
+import type {BackendProviderClaude} from './backend_provider_claude.js';
 
-import type {ActionSpecUnion} from '$lib/action_spec.js';
-import type {ZzzConfig} from '$lib/config_helpers.js';
-import {DiskfileDirectoryPath} from '$lib/diskfile_types.js';
-import {ScopedFs} from '$lib/server/scoped_fs.js';
-import {ActionRegistry} from '$lib/action_registry.js';
-import {ZZZ_CACHE_DIR} from '$lib/constants.js';
-import type {BackendActionHandlers} from '$lib/server/backend_action_types.js';
-import type {ActionEventPhase, ActionEventEnvironment} from '$lib/action_event_types.js';
-import type {ActionMethod} from '$lib/action_metatypes.js';
-import {
-	create_backend_actions_api,
-	type BackendActionsApi,
-} from '$lib/server/backend_actions_api.js';
-import {ActionPeer} from '$lib/action_peer.js';
-import type {JsonrpcMessageFromServerToClient} from '$lib/jsonrpc.js';
-import type {ActionExecutor} from '$lib/action_types.js';
-import type {BackendProvider} from '$lib/server/backend_provider.js';
-import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import type {ActionSpecUnion} from './action_spec.js';
+import type {ZzzConfig} from './config_helpers.js';
+import {DiskfileDirectoryPath} from './diskfile_types.js';
+import {ScopedFs} from './scoped_fs.js';
+import {ActionRegistry} from './action_registry.js';
+import {ZZZ_CACHE_DIR} from './constants.js';
+import type {BackendActionHandlers} from './backend_action_types.js';
+import type {ActionEventPhase, ActionEventEnvironment} from './action_event_types.js';
+import type {ActionMethod} from './action_metatypes.js';
+import {create_backend_actions_api, type BackendActionsApi} from './backend_actions_api.js';
+import {ActionPeer} from './action_peer.js';
+import type {JsonrpcMessageFromServerToClient} from './jsonrpc.js';
+import type {ActionExecutor} from './action_types.js';
+import type {BackendProvider} from './backend_provider.js';
+import {jsonrpc_errors} from './jsonrpc_errors.js';
 
 // TODO refactor for extensibility
 interface BackendProviders {

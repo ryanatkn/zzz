@@ -1,11 +1,11 @@
 import ollama, {Ollama} from 'ollama';
 import {find_cli} from '@ryanatkn/gro/cli.js';
 
-import {BackendProviderLocal, type CompletionHandlerOptions} from '$lib/server/backend_provider.js';
-import {to_completion_result} from '$lib/response_helpers.js';
-import {ActionInputs, type ActionOutputs} from '$lib/action_collections.js';
-import type {CompletionMessage} from '$lib/completion_types.js';
-import {type ProviderStatus, PROVIDER_ERROR_NOT_INSTALLED} from '$lib/provider_types.js';
+import {BackendProviderLocal, type CompletionHandlerOptions} from './backend_provider.js';
+import {to_completion_result} from '../response_helpers.js';
+import {ActionInputs, type ActionOutputs} from '../action_collections.js';
+import type {CompletionMessage} from '../completion_types.js';
+import {type ProviderStatus, PROVIDER_ERROR_NOT_INSTALLED} from '../provider_types.js';
 
 export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 	readonly name = 'ollama';

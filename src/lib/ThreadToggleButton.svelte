@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Thread} from '$lib/thread.svelte.js';
+	import type {Thread} from './thread.svelte.js';
 
 	const {
 		thread,

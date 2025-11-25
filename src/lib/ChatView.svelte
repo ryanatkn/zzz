@@ -2,19 +2,19 @@
 	import {slide} from 'svelte/transition';
 	import Details from '@ryanatkn/fuz/Details.svelte';
 
-	import Glyph from '$lib/Glyph.svelte';
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import {Chat} from '$lib/chat.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {GLYPH_THREAD, GLYPH_CHAT, GLYPH_DELETE, GLYPH_VIEW} from '$lib/glyphs.js';
-	import ThreadList from '$lib/ThreadList.svelte';
-	import ChatViewSimple from '$lib/ChatViewSimple.svelte';
-	import ChatViewMulti from '$lib/ChatViewMulti.svelte';
-	import ToggleButton from '$lib/ToggleButton.svelte';
-	import ChatInitializer from '$lib/ChatInitializer.svelte';
-	import ChatThreadAddByModel from '$lib/ChatThreadAddByModel.svelte';
-	import ChatThreadManageByTag from '$lib/ChatThreadManageByTag.svelte';
-	import EditableText from '$lib/EditableText.svelte';
+	import Glyph from './Glyph.svelte';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import {Chat} from './chat.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import {GLYPH_THREAD, GLYPH_CHAT, GLYPH_DELETE, GLYPH_VIEW} from './glyphs.js';
+	import ThreadList from './ThreadList.svelte';
+	import ChatViewSimple from './ChatViewSimple.svelte';
+	import ChatViewMulti from './ChatViewMulti.svelte';
+	import ToggleButton from './ToggleButton.svelte';
+	import ChatInitializer from './ChatInitializer.svelte';
+	import ChatThreadAddByModel from './ChatThreadAddByModel.svelte';
+	import ChatThreadManageByTag from './ChatThreadManageByTag.svelte';
+	import EditableText from './EditableText.svelte';
 
 	const app = frontend_context.get();
 	const {chats} = app;

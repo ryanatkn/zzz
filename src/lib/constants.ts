@@ -13,7 +13,7 @@ import {
 	PathWithLeadingSlash,
 	PathWithTrailingSlash,
 	PathWithoutTrailingSlash,
-} from '$lib/zod_helpers.js';
+} from './zod_helpers.js';
 
 // This module re-exports public environment variables with parsed values.
 // It should generally be preferred to using the variables directly.

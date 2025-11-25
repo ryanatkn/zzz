@@ -6,25 +6,25 @@
 	import {BROWSER} from 'esm-env';
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Socket} from '$lib/socket.svelte.js';
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Socket} from './socket.svelte.js';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import Glyph from './Glyph.svelte';
 	import {
 		GLYPH_CONNECT,
 		GLYPH_CANCEL,
 		GLYPH_DISCONNECT,
 		GLYPH_RESET,
 		GLYPH_PLACEHOLDER,
-	} from '$lib/glyphs.js';
-	import {format_ms_to_readable, format_timestamp} from '$lib/time_helpers.js';
+	} from './glyphs.js';
+	import {format_ms_to_readable, format_timestamp} from './time_helpers.js';
 	import {
 		DEFAULT_HEARTBEAT_INTERVAL,
 		DEFAULT_RECONNECT_DELAY,
 		DEFAULT_RECONNECT_DELAY_MAX,
-	} from '$lib/socket_helpers.js';
-	import SocketMessageQueue from '$lib/SocketMessageQueue.svelte';
-	import {WEBSOCKET_URL} from '$lib/constants.js';
+	} from './socket_helpers.js';
+	import SocketMessageQueue from './SocketMessageQueue.svelte';
+	import {WEBSOCKET_URL} from './constants.js';
 
 	const pid = $props.id();
 

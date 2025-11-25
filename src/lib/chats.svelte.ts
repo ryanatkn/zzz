@@ -1,19 +1,19 @@
 import {z} from 'zod';
 import {page} from '$app/state';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {Chat, ChatJson, type ChatJsonInput} from '$lib/chat.svelte.js';
-import type {Uuid} from '$lib/zod_helpers.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
-import {to_reordered_list} from '$lib/list_helpers.js';
-import {get_unique_name} from '$lib/helpers.js';
-import {to_chats_url} from '$lib/nav_helpers.js';
-import {chat_template_defaults} from '$lib/config_defaults.js';
-import type {ChatTemplate} from '$lib/chat_template.js';
-import {CellJson} from '$lib/cell_types.js';
-import {goto_unless_current} from '$lib/navigation_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Chat, ChatJson, type ChatJsonInput} from './chat.svelte.js';
+import type {Uuid} from './zod_helpers.js';
+import {HANDLED} from './cell_helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import {create_single_index, create_derived_index} from './indexed_collection_helpers.svelte.js';
+import {to_reordered_list} from './list_helpers.js';
+import {get_unique_name} from './helpers.js';
+import {to_chats_url} from './nav_helpers.js';
+import {chat_template_defaults} from './config_defaults.js';
+import type {ChatTemplate} from './chat_template.js';
+import {CellJson} from './cell_types.js';
+import {goto_unless_current} from './navigation_helpers.js';
 
 export const ChatsJson = CellJson.extend({
 	items: z.array(ChatJson).default(() => []),

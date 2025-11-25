@@ -3,8 +3,8 @@
 import {z} from 'zod';
 import type {Result} from '@ryanatkn/belt/result.js';
 
-import type {ActionInputs, ActionOutputs} from '$lib/action_collections.js';
-import type {JsonrpcErrorJson} from '$lib/jsonrpc.js';
+import type {ActionInputs, ActionOutputs} from './action_collections.js';
+import type {JsonrpcErrorJson} from './jsonrpc.js';
 
 /**
  * All action method names. Request/response actions have two types per method.

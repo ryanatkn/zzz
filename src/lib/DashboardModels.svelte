@@ -1,8 +1,8 @@
 <script lang="ts">
-	import {GLYPH_MODEL} from '$lib/glyphs.js';
-	import ModelSummary from '$lib/ModelSummary.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	import {GLYPH_MODEL} from './glyphs.js';
+	import ModelSummary from './ModelSummary.svelte';
+	import Glyph from './Glyph.svelte';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const app = frontend_context.get();
 

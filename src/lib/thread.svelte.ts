@@ -1,15 +1,15 @@
-import type {Model} from '$lib/model.svelte.js';
-import {Turn, create_turn_from_text, create_turn_from_part} from '$lib/turn.svelte.js';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {ThreadJson} from '$lib/thread_types.js';
-import {CompletionRequest, CompletionRole} from '$lib/completion_types.js';
-import {render_messages_to_string, render_completion_messages} from '$lib/thread_helpers.js';
-import type {PartUnion} from '$lib/part.svelte.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {to_preview, estimate_token_count} from '$lib/helpers.js';
-import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
-import type {Uuid} from '$lib/zod_helpers.js';
-import type {TurnJson} from '$lib/turn_types.js';
+import type {Model} from './model.svelte.js';
+import {Turn, create_turn_from_text, create_turn_from_part} from './turn.svelte.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {ThreadJson} from './thread_types.js';
+import {CompletionRequest, CompletionRole} from './completion_types.js';
+import {render_messages_to_string, render_completion_messages} from './thread_helpers.js';
+import type {PartUnion} from './part.svelte.js';
+import {HANDLED} from './cell_helpers.js';
+import {to_preview, estimate_token_count} from './helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import type {Uuid} from './zod_helpers.js';
+import type {TurnJson} from './turn_types.js';
 
 // TODO add `thread.name` and lots of other things probably
 

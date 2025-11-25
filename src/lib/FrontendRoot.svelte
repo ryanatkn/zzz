@@ -3,9 +3,9 @@
 	import Themed from '@ryanatkn/fuz/Themed.svelte';
 	import ContextmenuRoot from '@ryanatkn/fuz/ContextmenuRoot.svelte';
 
-	import {Frontend, frontend_context} from '$lib/frontend.svelte.js';
-	import Dashboard from '$lib/Dashboard.svelte';
-	import MainDialog from '$lib/MainDialog.svelte';
+	import {Frontend, frontend_context} from './frontend.svelte.js';
+	import Dashboard from './Dashboard.svelte';
+	import MainDialog from './MainDialog.svelte';
 
 	// TODO maybe just make this `Zzz`?
 

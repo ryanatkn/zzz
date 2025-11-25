@@ -5,13 +5,13 @@
 	import ContextmenuSubmenu from '@ryanatkn/fuz/ContextmenuSubmenu.svelte';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import type {Thread} from '$lib/thread.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {GLYPH_DELETE, GLYPH_REMOVE, GLYPH_THREAD, GLYPH_MODEL} from '$lib/glyphs.js';
-	import ContextmenuEntryToggle from '$lib/ContextmenuEntryToggle.svelte';
-	import ContextmenuEntryCopyToClipboard from '$lib/ContextmenuEntryCopyToClipboard.svelte';
-	import ModelPickerDialog from '$lib/ModelPickerDialog.svelte';
-	import Glyph from '$lib/Glyph.svelte';
+	import type {Thread} from './thread.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import {GLYPH_DELETE, GLYPH_REMOVE, GLYPH_THREAD, GLYPH_MODEL} from './glyphs.js';
+	import ContextmenuEntryToggle from './ContextmenuEntryToggle.svelte';
+	import ContextmenuEntryCopyToClipboard from './ContextmenuEntryCopyToClipboard.svelte';
+	import ModelPickerDialog from './ModelPickerDialog.svelte';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		thread,

@@ -6,10 +6,10 @@
 	import ContextmenuLinkEntry from '@ryanatkn/fuz/ContextmenuLinkEntry.svelte';
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-	import type {Model} from '$lib/model.svelte.js';
-	import {GLYPH_MODEL, GLYPH_CHAT} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ContextmenuEntryCopyToClipboard from '$lib/ContextmenuEntryCopyToClipboard.svelte';
+	import type {Model} from './model.svelte.js';
+	import {GLYPH_MODEL, GLYPH_CHAT} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
+	import ContextmenuEntryCopyToClipboard from './ContextmenuEntryCopyToClipboard.svelte';
 
 	const {
 		model,

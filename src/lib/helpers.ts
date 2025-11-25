@@ -1,4 +1,4 @@
-import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
+import {CONTENT_PREVIEW_LENGTH} from './constants.js';
 
 // TODO import from moss (and respect prefers-reduced-motion? maybe optionally)
 export const DURATION_LG = 1000;

@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {DatetimeNow, UuidWithDefault} from '$lib/zod_helpers.js';
+import {DatetimeNow, UuidWithDefault} from './zod_helpers.js';
 
 /**
  * Get keys from a Zod schema object.

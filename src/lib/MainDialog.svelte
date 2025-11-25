@@ -5,7 +5,7 @@
 	import {resolve} from '$app/paths';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const {
 		disabled,

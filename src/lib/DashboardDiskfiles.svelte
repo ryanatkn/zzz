@@ -4,13 +4,13 @@
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 	import {onMount} from 'svelte';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import DiskfileExplorer from '$lib/DiskfileExplorer.svelte';
-	import DiskfileEditorView from '$lib/DiskfileEditorView.svelte';
-	import DiskfileTabListitem from '$lib/DiskfileTabListitem.svelte';
-	import {Reorderable} from '$lib/reorderable.svelte.js';
-	import DiskfilePickerDialog from '$lib/DiskfilePickerDialog.svelte';
-	import ErrorMessage from '$lib/ErrorMessage.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import DiskfileExplorer from './DiskfileExplorer.svelte';
+	import DiskfileEditorView from './DiskfileEditorView.svelte';
+	import DiskfileTabListitem from './DiskfileTabListitem.svelte';
+	import {Reorderable} from './reorderable.svelte.js';
+	import DiskfilePickerDialog from './DiskfilePickerDialog.svelte';
+	import ErrorMessage from './ErrorMessage.svelte';
 
 	const app = frontend_context.get();
 	const {diskfiles, capabilities} = app;

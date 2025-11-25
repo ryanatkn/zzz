@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_ERROR} from '$lib/glyphs.js';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_ERROR} from './glyphs.js';
 
 	const {
 		glyph = GLYPH_ERROR,

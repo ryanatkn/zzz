@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {JsonrpcParams, JsonrpcResult} from '$lib/jsonrpc.js';
+import {JsonrpcParams, JsonrpcResult} from './jsonrpc.js';
 
 export const ActionKind = z.enum(['request_response', 'remote_notification', 'local_call']);
 export type ActionKind = z.infer<typeof ActionKind>;

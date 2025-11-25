@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Picker from '$lib/Picker.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
-	import DiskfileListitem from '$lib/DiskfileListitem.svelte';
+	import Picker from './Picker.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import type {Uuid} from './zod_helpers.js';
+	import {sort_by_text, sort_by_numeric} from './sortable.svelte.js';
+	import DiskfileListitem from './DiskfileListitem.svelte';
 
 	const {
 		onpick,

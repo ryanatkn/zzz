@@ -1,11 +1,11 @@
 // @slop Claude Sonnet 3.7
 
-import {estimate_token_count} from '$lib/helpers.js';
-import type {Diskfile} from '$lib/diskfile.svelte.js';
-import type {DiskfilePath} from '$lib/diskfile_types.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
-import type {DiskfileHistory, HistoryEntry} from '$lib/diskfile_history.svelte.js';
-import type {Uuid} from '$lib/zod_helpers.js';
+import {estimate_token_count} from './helpers.js';
+import type {Diskfile} from './diskfile.svelte.js';
+import type {DiskfilePath} from './diskfile_types.js';
+import type {Frontend} from './frontend.svelte.js';
+import type {DiskfileHistory, HistoryEntry} from './diskfile_history.svelte.js';
+import type {Uuid} from './zod_helpers.js';
 
 // TODO maybe should be a cell?
 /**

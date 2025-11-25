@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type {Model} from '$lib/model.svelte.js';
-	import ModelContextmenu from '$lib/ModelContextmenu.svelte';
-	import ProviderLogo from '$lib/ProviderLogo.svelte';
+	import type {Model} from './model.svelte.js';
+	import ModelContextmenu from './ModelContextmenu.svelte';
+	import ProviderLogo from './ProviderLogo.svelte';
 
 	const {
 		model,

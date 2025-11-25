@@ -5,17 +5,17 @@ import {SvelteMap} from 'svelte/reactivity';
 import type {AsyncStatus} from '@ryanatkn/belt/async.js';
 import {BROWSER} from 'esm-env';
 
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import {create_uuid, Uuid} from '$lib/zod_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {create_uuid, Uuid} from './zod_helpers.js';
 import {
 	DEFAULT_HEARTBEAT_INTERVAL,
 	DEFAULT_RECONNECT_DELAY,
 	DEFAULT_RECONNECT_DELAY_MAX,
 	DEFAULT_AUTO_RECONNECT,
 	DEFAULT_CLOSE_CODE,
-} from '$lib/socket_helpers.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+} from './socket_helpers.js';
+import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
 
 // TODO the plan here is to make websockets one of multiple transports, this just gets the proof of concept working
 

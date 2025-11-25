@@ -1,10 +1,10 @@
 <script lang="ts">
 	// @slop claude_sonnet_4
 
-	import Glyph from '$lib/Glyph.svelte';
-	import ErrorMessage from '$lib/ErrorMessage.svelte';
-	import {GLYPH_COPY, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import type {Ollama} from '$lib/ollama.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import ErrorMessage from './ErrorMessage.svelte';
+	import {GLYPH_COPY, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from './glyphs.js';
+	import type {Ollama} from './ollama.svelte.js';
 
 	const {
 		ollama,

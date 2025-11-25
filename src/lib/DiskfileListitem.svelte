@@ -1,10 +1,10 @@
 <script lang="ts">
 	import {swallow} from '@ryanatkn/belt/dom.js';
 
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import DiskfileContextmenu from '$lib/DiskfileContextmenu.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_FILE} from '$lib/glyphs.js';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import DiskfileContextmenu from './DiskfileContextmenu.svelte';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_FILE} from './glyphs.js';
 
 	const {
 		diskfile,

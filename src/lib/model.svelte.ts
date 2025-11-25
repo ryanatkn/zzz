@@ -1,12 +1,12 @@
 import {z} from 'zod';
 import {resolve} from '$app/paths';
 
-import {ProviderName} from '$lib/provider_types.js';
-import {Cell, type CellOptions} from '$lib/cell.svelte.js';
-import {CellJson} from '$lib/cell_types.js';
-import {OllamaShowResponse, OllamaListResponseItem} from '$lib/ollama_helpers.js';
-import {goto_unless_current} from '$lib/navigation_helpers.js';
-import type {Provider} from '$lib/provider.svelte.js';
+import {ProviderName} from './provider_types.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {OllamaShowResponse, OllamaListResponseItem} from './ollama_helpers.js';
+import {goto_unless_current} from './navigation_helpers.js';
+import type {Provider} from './provider.svelte.js';
 
 export const ModelName = z.string().trim();
 export type ModelName = z.infer<typeof ModelName>;

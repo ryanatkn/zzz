@@ -2,8 +2,8 @@
 
 import type {WSContext} from 'hono/ws';
 
-import {create_uuid, Uuid} from '$lib/zod_helpers.js';
-import type {Transport} from '$lib/transports.js';
+import {create_uuid, Uuid} from './zod_helpers.js';
+import type {Transport} from './transports.js';
 import type {
 	JsonrpcMessageFromClientToServer,
 	JsonrpcMessageFromServerToClient,
@@ -11,13 +11,13 @@ import type {
 	JsonrpcRequest,
 	JsonrpcResponseOrError,
 	JsonrpcErrorMessage,
-} from '$lib/jsonrpc.js';
-import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+} from './jsonrpc.js';
+import {jsonrpc_error_messages} from './jsonrpc_errors.js';
 import {
 	create_jsonrpc_error_message,
 	to_jsonrpc_message_id,
 	is_jsonrpc_request,
-} from '$lib/jsonrpc_helpers.js';
+} from './jsonrpc_helpers.js';
 
 // TODO support a SSE backend transport
 

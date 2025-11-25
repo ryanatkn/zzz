@@ -4,11 +4,11 @@
 	import {resolve} from '$app/paths';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Model} from '$lib/model.svelte.js';
-	import ProviderLogo from '$lib/ProviderLogo.svelte';
-	import {GLYPH_MODEL} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import ModelContextmenu from '$lib/ModelContextmenu.svelte';
+	import type {Model} from './model.svelte.js';
+	import ProviderLogo from './ProviderLogo.svelte';
+	import {GLYPH_MODEL} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
+	import ModelContextmenu from './ModelContextmenu.svelte';
 
 	const {
 		model,

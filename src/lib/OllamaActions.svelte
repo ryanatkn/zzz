@@ -1,10 +1,10 @@
 <script lang="ts">
 	// @slop claude_sonnet_4
 
-	import Glyph from '$lib/Glyph.svelte';
-	import OllamaActionItem from '$lib/OllamaActionItem.svelte';
-	import {GLYPH_CLEAR} from '$lib/glyphs.js';
-	import type {Ollama} from '$lib/ollama.svelte.js';
+	import Glyph from './Glyph.svelte';
+	import OllamaActionItem from './OllamaActionItem.svelte';
+	import {GLYPH_CLEAR} from './glyphs.js';
+	import type {Ollama} from './ollama.svelte.js';
 
 	const {
 		ollama,

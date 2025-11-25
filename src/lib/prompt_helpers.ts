@@ -1,4 +1,4 @@
-import type {PartUnion} from '$lib/part.svelte.js';
+import type {PartUnion} from './part.svelte.js';
 
 /**
  * Formats a collection of parts into a prompt string,

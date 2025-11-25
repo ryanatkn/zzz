@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ModelPicker from '$lib/ModelPicker.svelte';
-	import type {Chat} from '$lib/chat.svelte.js';
+	import ModelPicker from './ModelPicker.svelte';
+	import type {Chat} from './chat.svelte.js';
 	import type {Snippet} from 'svelte';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 

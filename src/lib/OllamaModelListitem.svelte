@@ -1,10 +1,10 @@
 <script lang="ts">
 	// @slop claude_sonnet_4
 
-	import OllamaModelStatus from '$lib/OllamaModelStatus.svelte';
-	import ModelContextmenu from '$lib/ModelContextmenu.svelte';
-	import {format_gigabytes} from '$lib/format_helpers.js';
-	import type {Model} from '$lib/model.svelte.js';
+	import OllamaModelStatus from './OllamaModelStatus.svelte';
+	import ModelContextmenu from './ModelContextmenu.svelte';
+	import {format_gigabytes} from './format_helpers.js';
+	import type {Model} from './model.svelte.js';
 
 	const {
 		model,

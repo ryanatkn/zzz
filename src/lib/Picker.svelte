@@ -2,9 +2,9 @@
 	import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 	import type {Snippet} from 'svelte';
 
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import type {Sorter} from '$lib/sortable.svelte.js';
-	import SortableList from '$lib/SortableList.svelte';
+	import type {Uuid} from './zod_helpers.js';
+	import type {Sorter} from './sortable.svelte.js';
+	import SortableList from './SortableList.svelte';
 
 	const {
 		items,

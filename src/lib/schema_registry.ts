@@ -9,8 +9,8 @@ import type {
 	RequestResponseActionSpec,
 	RemoteNotificationActionSpec,
 	LocalCallActionSpec,
-} from '$lib/action_spec.js';
-import type {ActionMethod} from '$lib/action_metatypes.js';
+} from './action_spec.js';
+import type {ActionMethod} from './action_metatypes.js';
 
 // TODO currently unused
 

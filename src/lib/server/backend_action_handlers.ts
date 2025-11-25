@@ -1,17 +1,13 @@
-import {SerializableDisknode} from '$lib/diskfile_types.js';
-import type {BackendActionHandlers} from '$lib/server/backend_action_types.js';
-import type {ActionOutputs} from '$lib/action_collections.js';
-import {jsonrpc_errors, ThrownJsonrpcError} from '$lib/jsonrpc_errors.js';
-import {to_serializable_disknode} from '$lib/diskfile_helpers.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
-import type {CompletionOptions, CompletionHandlerOptions} from '$lib/server/backend_provider.js';
-import {save_completion_response_to_disk} from '$lib/server/helpers.js';
-import type {
-	OllamaListResponse,
-	OllamaPsResponse,
-	OllamaShowResponse,
-} from '$lib/ollama_helpers.js';
-import {update_env_variable} from '$lib/server/env_file_helpers.js';
+import {SerializableDisknode} from '../diskfile_types.js';
+import type {BackendActionHandlers} from './backend_action_types.js';
+import type {ActionOutputs} from '../action_collections.js';
+import {jsonrpc_errors, ThrownJsonrpcError} from '../jsonrpc_errors.js';
+import {to_serializable_disknode} from '../diskfile_helpers.js';
+import {UNKNOWN_ERROR_MESSAGE} from '../constants.js';
+import type {CompletionOptions, CompletionHandlerOptions} from './backend_provider.js';
+import {save_completion_response_to_disk} from './helpers.js';
+import type {OllamaListResponse, OllamaPsResponse, OllamaShowResponse} from '../ollama_helpers.js';
+import {update_env_variable} from './env_file_helpers.js';
 
 // TODO refactor to a plugin architecture
 

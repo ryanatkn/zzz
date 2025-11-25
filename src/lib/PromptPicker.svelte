@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Picker from '$lib/Picker.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Prompt} from '$lib/prompt.svelte.js';
-	import PromptSummary from '$lib/PromptSummary.svelte';
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
+	import Picker from './Picker.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Prompt} from './prompt.svelte.js';
+	import PromptSummary from './PromptSummary.svelte';
+	import type {Uuid} from './zod_helpers.js';
+	import {sort_by_text, sort_by_numeric} from './sortable.svelte.js';
 
 	const {
 		onpick,

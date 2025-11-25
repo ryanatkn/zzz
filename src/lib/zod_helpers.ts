@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {ensure_end, ensure_start, strip_end, strip_start} from '@ryanatkn/belt/string.js';
-import type {SchemaKeys} from '$lib/cell_types.js';
+import type {SchemaKeys} from './cell_types.js';
 
 export const Any = z.any();
 export type Any = z.infer<typeof Any>;

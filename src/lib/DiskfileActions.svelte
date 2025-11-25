@@ -3,13 +3,13 @@
 	import PasteFromClipboard from '@ryanatkn/fuz/PasteFromClipboard.svelte';
 	import {slide} from 'svelte/transition';
 
-	import ConfirmButton from '$lib/ConfirmButton.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import ClearRestoreButton from '$lib/ClearRestoreButton.svelte';
-	import type {DiskfileEditorState} from '$lib/diskfile_editor_state.svelte.js';
-	import {GLYPH_PASTE, GLYPH_DELETE} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
+	import ConfirmButton from './ConfirmButton.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Diskfile} from './diskfile.svelte.js';
+	import ClearRestoreButton from './ClearRestoreButton.svelte';
+	import type {DiskfileEditorState} from './diskfile_editor_state.svelte.js';
+	import {GLYPH_PASTE, GLYPH_DELETE} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
 
 	const {
 		diskfile,

@@ -2,8 +2,8 @@
 	import {slide} from 'svelte/transition';
 	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 
-	import Glyph from '$lib/Glyph.svelte';
-	import ProgressBar from '$lib/ProgressBar.svelte';
+	import Glyph from './Glyph.svelte';
+	import ProgressBar from './ProgressBar.svelte';
 	import {
 		GLYPH_DOWNLOAD,
 		GLYPH_ADD,
@@ -12,9 +12,9 @@
 		GLYPH_CHECKMARK,
 		GLYPH_INFO,
 		GLYPH_XMARK,
-	} from '$lib/glyphs.js';
-	import type {Action} from '$lib/action.svelte.js';
-	import {format_timestamp} from '$lib/time_helpers.js';
+	} from './glyphs.js';
+	import type {Action} from './action.svelte.js';
+	import {format_timestamp} from './time_helpers.js';
 
 	const {
 		action,

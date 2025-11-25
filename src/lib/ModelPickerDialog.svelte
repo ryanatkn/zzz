@@ -3,11 +3,11 @@
 	import type {OmitStrict} from '@ryanatkn/belt/types.js';
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
-	import PickerDialog from '$lib/PickerDialog.svelte';
-	import ModelListitem from '$lib/ModelListitem.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import type {Model} from '$lib/model.svelte.js';
-	import {sort_by_text} from '$lib/sortable.svelte.js';
+	import PickerDialog from './PickerDialog.svelte';
+	import ModelListitem from './ModelListitem.svelte';
+	import {frontend_context} from './frontend.svelte.js';
+	import type {Model} from './model.svelte.js';
+	import {sort_by_text} from './sortable.svelte.js';
 
 	const app = frontend_context.get();
 	const {models} = app;

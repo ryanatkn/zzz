@@ -1,6 +1,6 @@
 import type {z} from 'zod';
 
-import {ActionInputs, ActionOutputs} from '$lib/action_collections.js';
+import {ActionInputs, ActionOutputs} from './action_collections.js';
 
 /**
  * Parse action params with validation.

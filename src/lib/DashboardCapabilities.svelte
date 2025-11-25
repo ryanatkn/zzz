@@ -1,11 +1,11 @@
 <script lang="ts">
-	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
-	import Glyph from '$lib/Glyph.svelte';
-	import Footer from '$lib/Footer.svelte';
-	import CapabilitiesView from '$lib/CapabilitiesView.svelte';
-	import TimeWidget from '$lib/TimeWidget.svelte';
-	import DashboardHeader from '$lib/DashboardHeader.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
+	import {GLYPH_CAPABILITY} from './glyphs.js';
+	import Glyph from './Glyph.svelte';
+	import Footer from './Footer.svelte';
+	import CapabilitiesView from './CapabilitiesView.svelte';
+	import TimeWidget from './TimeWidget.svelte';
+	import DashboardHeader from './DashboardHeader.svelte';
+	import {frontend_context} from './frontend.svelte.js';
 
 	const app = frontend_context.get();
 </script>

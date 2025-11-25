@@ -3,11 +3,11 @@
 	import {formatDistance} from 'date-fns';
 	import {slide} from 'svelte/transition';
 
-	import Glyph from '$lib/Glyph.svelte';
-	import ModelLink from '$lib/ModelLink.svelte';
-	import {GLYPH_DISCONNECT, GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY} from '$lib/glyphs.js';
-	import type {Ollama} from '$lib/ollama.svelte.js';
-	import {format_bytes} from '$lib/format_helpers.js';
+	import Glyph from './Glyph.svelte';
+	import ModelLink from './ModelLink.svelte';
+	import {GLYPH_DISCONNECT, GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY} from './glyphs.js';
+	import type {Ollama} from './ollama.svelte.js';
+	import {format_bytes} from './format_helpers.js';
 
 	const {
 		ollama,

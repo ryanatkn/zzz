@@ -1,13 +1,13 @@
 <script lang="ts">
 	import {format_url} from '@ryanatkn/belt/url.js';
 
-	import ProviderLink from '$lib/ProviderLink.svelte';
-	import ModelLink from '$lib/ModelLink.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_CHECKMARK, GLYPH_ERROR, GLYPH_PROVIDER} from '$lib/glyphs.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import ExternalLink from '$lib/ExternalLink.svelte';
-	import ProviderLogo from '$lib/ProviderLogo.svelte';
+	import ProviderLink from './ProviderLink.svelte';
+	import ModelLink from './ModelLink.svelte';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_CHECKMARK, GLYPH_ERROR, GLYPH_PROVIDER} from './glyphs.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import ExternalLink from './ExternalLink.svelte';
+	import ProviderLogo from './ProviderLogo.svelte';
 
 	const app = frontend_context.get();
 </script>
