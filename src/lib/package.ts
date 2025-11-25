@@ -5231,7 +5231,7 @@ export const src_json: SrcJson = {
 					name: 'create_banner',
 					kind: 'function',
 					doc_comment: 'Creates a file banner comment.',
-					source_line: 348,
+					source_line: 347,
 					type_signature: '(origin_path: string): string',
 					return_type: 'string',
 					parameters: [
@@ -5534,13 +5534,13 @@ export const src_json: SrcJson = {
 					name: 'SERVER_PROTOCOL',
 					kind: 'variable',
 					source_line: 28,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'SERVER_HOST',
 					kind: 'variable',
 					source_line: 30,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'SERVER_URL',
@@ -5579,7 +5579,7 @@ export const src_json: SrcJson = {
 					kind: 'variable',
 					doc_comment: '',
 					source_line: 54,
-					type_signature: 'any',
+					type_signature: 'string',
 				},
 				{
 					name: 'API_URL',
