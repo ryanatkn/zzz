@@ -2,16 +2,16 @@ import type {Hono} from 'hono';
 import type {createNodeWebSocket} from '@hono/node-ws';
 import {wait} from '@ryanatkn/belt/async.js';
 
-import type {Backend} from '$lib/server/backend.js';
-import {BACKEND_ARTIFICIAL_RESPONSE_DELAY} from '$lib/constants.js';
-import {Backend_Websocket_Transport} from '$lib/server/backend_websocket_transport.js';
-import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import type {Backend} from './backend.js';
+import {BACKEND_ARTIFICIAL_RESPONSE_DELAY} from '../constants.js';
+import {BackendWebsocketTransport} from './backend_websocket_transport.js';
+import {jsonrpc_error_messages} from '../jsonrpc_errors.js';
 import {
 	create_jsonrpc_error_message_from_thrown,
 	to_jsonrpc_message_id,
-} from '$lib/jsonrpc_helpers.js';
+} from '../jsonrpc_helpers.js';
 
-export interface Register_Websocket_Actions_Options {
+export interface RegisterWebsocketActionsOptions {
 	path: string;
 	app: Hono;
 	backend: Backend;
@@ -19,7 +19,7 @@ export interface Register_Websocket_Actions_Options {
 	 * @see https://hono.dev/helpers/websocket
 	 */
 	upgradeWebSocket: ReturnType<typeof createNodeWebSocket>['upgradeWebSocket'];
-	transport?: Backend_Websocket_Transport;
+	transport?: BackendWebsocketTransport;
 }
 
 /**
@@ -30,8 +30,8 @@ export const register_websocket_actions = ({
 	app,
 	backend,
 	upgradeWebSocket,
-	transport = new Backend_Websocket_Transport(),
-}: Register_Websocket_Actions_Options): void => {
+	transport = new BackendWebsocketTransport(),
+}: RegisterWebsocketActionsOptions): void => {
 	backend.peer.transports.register_transport(transport);
 
 	app.get(

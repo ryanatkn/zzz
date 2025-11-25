@@ -4,9 +4,9 @@
 
 import {test, expect, describe, beforeEach} from 'vitest';
 
-import {Part, Text_Part, Diskfile_Part} from '$lib/part.svelte.js';
+import {Part, TextPart, DiskfilePart} from '$lib/part.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Diskfile_Directory_Path, Diskfile_Path} from '$lib/diskfile_types.js';
+import {DiskfileDirectoryPath, DiskfilePath} from '$lib/diskfile_types.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 import {estimate_token_count} from '$lib/helpers.js';
@@ -21,8 +21,8 @@ const TEST_CONTENT = {
 	EMPTY: '',
 };
 
-const TEST_PATH = Diskfile_Path.parse('/path/to/test/file.txt');
-const TEST_DIR = Diskfile_Directory_Path.parse('/path/');
+const TEST_PATH = DiskfilePath.parse('/path/to/test/file.txt');
+const TEST_DIR = DiskfileDirectoryPath.parse('/path/');
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
@@ -31,12 +31,12 @@ beforeEach(() => {
 
 describe('Part base class functionality', () => {
 	test('attribute management works across all part types', () => {
-		const text_part = app.cell_registry.instantiate('Text_Part', {
+		const text_part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 		});
 
-		const diskfile_part = app.cell_registry.instantiate('Diskfile_Part', {
+		const diskfile_part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: TEST_PATH,
 		});
@@ -76,7 +76,7 @@ describe('Part base class functionality', () => {
 
 	test('derived properties work correctly', () => {
 		// Create a text part to test length and token properties
-		const text_part = app.cell_registry.instantiate('Text_Part', {
+		const text_part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 		});
@@ -107,12 +107,12 @@ describe('Part factory method', () => {
 			name: 'Diskfile Part',
 		});
 
-		expect(text_part).toBeInstanceOf(Text_Part);
+		expect(text_part).toBeInstanceOf(TextPart);
 		expect(text_part.type).toBe('text');
 		expect(text_part.name).toBe('Text Part');
 		expect(text_part.content).toBe(TEST_CONTENT.BASIC);
 
-		expect(diskfile_part).toBeInstanceOf(Diskfile_Part);
+		expect(diskfile_part).toBeInstanceOf(DiskfilePart);
 		expect(diskfile_part.type).toBe('diskfile');
 		expect(diskfile_part.name).toBe('Diskfile Part');
 		expect(diskfile_part.path).toBe(TEST_PATH);
@@ -137,10 +137,10 @@ describe('Part factory method', () => {
 	});
 });
 
-describe('Text_Part specific behavior', () => {
-	test('Text_Part initialization and content management', () => {
+describe('TextPart specific behavior', () => {
+	test('TextPart initialization and content management', () => {
 		// Create with constructor
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 		});
@@ -157,12 +157,12 @@ describe('Text_Part specific behavior', () => {
 		expect(part.content).toBe(TEST_CONTENT.EMPTY);
 	});
 
-	test('Text_Part serialization and deserialization', () => {
+	test('TextPart serialization and deserialization', () => {
 		const test_id = create_uuid();
 		const test_date = get_datetime_now();
 
 		// Create part with all properties
-		const original = app.cell_registry.instantiate('Text_Part', {
+		const original = app.cell_registry.instantiate('TextPart', {
 			id: test_id,
 			created: test_date,
 			type: 'text',
@@ -184,7 +184,7 @@ describe('Text_Part specific behavior', () => {
 		const json = original.to_json();
 
 		// Create new part from JSON
-		const restored = app.cell_registry.instantiate('Text_Part', json);
+		const restored = app.cell_registry.instantiate('TextPart', json);
 
 		// Verify all properties were preserved
 		expect(restored.id).toBe(test_id);
@@ -205,9 +205,9 @@ describe('Text_Part specific behavior', () => {
 		expect(restored_attr.value).toBe('highlight');
 	});
 
-	test('Text_Part cloning creates independent copy', () => {
+	test('TextPart cloning creates independent copy', () => {
 		// Create original part
-		const original = app.cell_registry.instantiate('Text_Part', {
+		const original = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 			name: 'Original',
@@ -235,8 +235,8 @@ describe('Text_Part specific behavior', () => {
 	});
 });
 
-describe('Diskfile_Part specific behavior', () => {
-	test('Diskfile_Part initialization and content access', () => {
+describe('DiskfilePart specific behavior', () => {
+	test('DiskfilePart initialization and content access', () => {
 		// Create a diskfile first
 		const diskfile = app.diskfiles.add({
 			path: TEST_PATH,
@@ -245,7 +245,7 @@ describe('Diskfile_Part specific behavior', () => {
 		});
 
 		// Create diskfile part that references the diskfile
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: TEST_PATH,
 		});
@@ -264,8 +264,8 @@ describe('Diskfile_Part specific behavior', () => {
 		expect(part.diskfile?.content).toBe(TEST_CONTENT.SECONDARY);
 	});
 
-	test('Diskfile_Part handles null path properly', () => {
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+	test('DiskfilePart handles null path properly', () => {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: null,
 		});
@@ -275,25 +275,25 @@ describe('Diskfile_Part specific behavior', () => {
 		expect(part.content).toBeUndefined();
 	});
 
-	test('Diskfile_Part handles changing path', () => {
+	test('DiskfilePart handles changing path', () => {
 		// Create two diskfiles
-		const path1 = Diskfile_Path.parse('/path/to/file1.txt');
-		const path2 = Diskfile_Path.parse('/path/to/file2.txt');
+		const path1 = DiskfilePath.parse('/path/to/file1.txt');
+		const path2 = DiskfilePath.parse('/path/to/file2.txt');
 
 		app.diskfiles.add({
 			path: path1,
-			source_dir: Diskfile_Directory_Path.parse('/path/'),
+			source_dir: DiskfileDirectoryPath.parse('/path/'),
 			content: 'File 1 content',
 		});
 
 		app.diskfiles.add({
 			path: path2,
-			source_dir: Diskfile_Directory_Path.parse('/path/'),
+			source_dir: DiskfileDirectoryPath.parse('/path/'),
 			content: 'File 2 content',
 		});
 
 		// Create part referencing first file
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: path1,
 		});
@@ -311,14 +311,14 @@ describe('Diskfile_Part specific behavior', () => {
 
 describe('Common part behavior across types', () => {
 	test('Position markers work across part types', () => {
-		const text_part = app.cell_registry.instantiate('Text_Part', {
+		const text_part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 			start: 5,
 			end: 10,
 		});
 
-		const diskfile_part = app.cell_registry.instantiate('Diskfile_Part', {
+		const diskfile_part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: TEST_PATH,
 			start: 15,
@@ -345,13 +345,13 @@ describe('Common part behavior across types', () => {
 	});
 
 	test('XML tag properties work across part types', () => {
-		const text_part = app.cell_registry.instantiate('Text_Part', {
+		const text_part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			has_xml_tag: true,
 			xml_tag_name: 'text-tag',
 		});
 
-		const diskfile_part = app.cell_registry.instantiate('Diskfile_Part', {
+		const diskfile_part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			has_xml_tag: true,
 			xml_tag_name: 'file-tag',
@@ -376,16 +376,16 @@ describe('Common part behavior across types', () => {
 	});
 
 	test('has_xml_tag defaults correctly for each part type', () => {
-		const text_part = app.cell_registry.instantiate('Text_Part');
-		const diskfile_part = app.cell_registry.instantiate('Diskfile_Part');
+		const text_part = app.cell_registry.instantiate('TextPart');
+		const diskfile_part = app.cell_registry.instantiate('DiskfilePart');
 
 		expect(text_part.has_xml_tag).toBe(false);
 		expect(diskfile_part.has_xml_tag).toBe(true);
 
-		const custom_text_part = app.cell_registry.instantiate('Text_Part', {
+		const custom_text_part = app.cell_registry.instantiate('TextPart', {
 			has_xml_tag: true,
 		});
-		const custom_diskfile_part = app.cell_registry.instantiate('Diskfile_Part', {
+		const custom_diskfile_part = app.cell_registry.instantiate('DiskfilePart', {
 			has_xml_tag: false,
 		});
 

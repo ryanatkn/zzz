@@ -2,26 +2,26 @@
 
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {Browser_Tab, Browser_Tab_Json} from '$routes/tabs/browser_tab.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
+import {BrowserTab, BrowserTabJson} from '$routes/tabs/browser_tab.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {fake_sites} from '$routes/tabs/sample_tabs.js';
 
-export const Browser_Tabs_Json = Cell_Json.extend({
-	tabs: z.array(Browser_Tab_Json).default(() => []),
-	recently_closed_tabs: z.array(Browser_Tab_Json).default(() => []),
-}).meta({cell_class_name: 'Browser_Tabs'});
-export type Browser_Tabs_Json_Input = z.input<typeof Browser_Tabs_Json>;
+export const BrowserTabsJson = CellJson.extend({
+	tabs: z.array(BrowserTabJson).default(() => []),
+	recently_closed_tabs: z.array(BrowserTabJson).default(() => []),
+}).meta({cell_class_name: 'BrowserTabs'});
+export type BrowserTabsJsonInput = z.input<typeof BrowserTabsJson>;
 
-export type Browser_Tabs_Options = Cell_Options<typeof Browser_Tabs_Json>;
+export type BrowserTabsOptions = CellOptions<typeof BrowserTabsJson>;
 
-export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
-	items: Indexed_Collection<Browser_Tab> = new Indexed_Collection({
+export class BrowserTabs extends Cell<typeof BrowserTabsJson> {
+	items: IndexedCollection<BrowserTab> = new IndexedCollection({
 		indexes: [
 			create_single_index({
 				key: 'url',
@@ -36,18 +36,18 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 	});
 
 	/** Ordered array of tabs derived from the `manual_order` index. */
-	readonly ordered_tabs: Array<Browser_Tab> = $derived(this.items.derived_index('manual_order'));
+	readonly ordered_tabs: Array<BrowserTab> = $derived(this.items.derived_index('manual_order'));
 
-	recently_closed_tabs: Array<Browser_Tab> = $state([]);
+	recently_closed_tabs: Array<BrowserTab> = $state([]);
 
-	readonly selected_tab: Browser_Tab | undefined = $derived(
+	readonly selected_tab: BrowserTab | undefined = $derived(
 		this.ordered_tabs.find((t) => t.selected),
 	);
 
 	readonly selected_url: string = $derived(this.selected_tab?.url || '');
 
-	constructor(options: Browser_Tabs_Options) {
-		super(Browser_Tabs_Json, options);
+	constructor(options: BrowserTabsOptions) {
+		super(BrowserTabsJson, options);
 
 		this.decoders = {
 			tabs: (tabs) => {
@@ -57,7 +57,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 
 					// Add tabs from JSON
 					for (const tab_json of tabs) {
-						const tab = new Browser_Tab({
+						const tab = new BrowserTab({
 							app: this.app,
 							json: tab_json,
 						});
@@ -70,7 +70,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 				if (Array.isArray(tabs)) {
 					this.recently_closed_tabs = tabs.map(
 						(tab_json) =>
-							new Browser_Tab({
+							new BrowserTab({
 								app: this.app,
 								json: tab_json,
 							}),
@@ -83,9 +83,9 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 		this.init();
 	}
 
-	add(tab_data: Browser_Tab_Json): void {
+	add(tab_data: BrowserTabJson): void {
 		// Add new tab to collection
-		const tab = new Browser_Tab({
+		const tab = new BrowserTab({
 			app: this.app,
 			json: tab_data,
 		});
@@ -196,4 +196,4 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 	}
 }
 
-export const Browser_Tabs_Schema = z.instanceof(Browser_Tabs);
+export const BrowserTabsSchema = z.instanceof(BrowserTabs);

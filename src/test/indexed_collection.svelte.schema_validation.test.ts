@@ -5,7 +5,7 @@
 import {test, expect, describe, vi} from 'vitest';
 import {z} from 'zod';
 
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
@@ -16,8 +16,8 @@ import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-// Mock item type that implements Indexed_Item
-interface Test_Item {
+// Mock item type that implements IndexedItem
+interface TestItem {
 	id: Uuid;
 	string_a: string;
 	string_b: string;
@@ -38,7 +38,7 @@ const create_item = (
 	flag: boolean = true,
 	array: Array<string> = ['item1'],
 	option: 'x' | 'y' = 'x',
-): Test_Item => ({
+): TestItem => ({
 	id: create_uuid(),
 	string_a,
 	string_b,
@@ -56,10 +56,10 @@ const email_schema = z.email();
 const range_schema = z.number().int().gte(10).lte(100);
 const str_schema = z.string().min(1);
 
-describe('Indexed_Collection - Schema Validation', () => {
+describe('IndexedCollection - Schema Validation', () => {
 	test('single index validates schemas correctly', () => {
 		// Create a collection with validation enabled
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_string_b',
@@ -83,7 +83,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		collection.add(item2);
 
 		// Test query with valid email
-		const query_result = collection.query<Test_Item, string>('by_string_b', 'a1@zzz.software');
+		const query_result = collection.query<TestItem, string>('by_string_b', 'a1@zzz.software');
 		expect(query_result.string_a).toBe('a1');
 
 		// Get single index and check schema validation passed
@@ -95,7 +95,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Create spy to check console errors
 		const console_error_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_array',
@@ -122,17 +122,17 @@ describe('Indexed_Collection - Schema Validation', () => {
 		collection.add(create_item('a4', 'b4@test.com', 90, true, ['item3', 'item4']));
 
 		// Test range query validation
-		const mid_items = collection.query<Array<Test_Item>, string>('by_number_range', 'mid');
+		const mid_items = collection.query<Array<TestItem>, string>('by_number_range', 'mid');
 		expect(mid_items.length).toBe(1);
 		expect(mid_items[0]!.string_a).toBe('a2');
 
 		// Test array index
-		const item2_matches = collection.query<Array<Test_Item>, string>('by_array', 'item2');
+		const item2_matches = collection.query<Array<TestItem>, string>('by_array', 'item2');
 		expect(item2_matches.length).toBe(2);
 		expect(item2_matches.some((item) => item.string_a === 'a1')).toBe(true);
 		expect(item2_matches.some((item) => item.string_a === 'a3')).toBe(true);
 
-		const item3_matches = collection.query<Array<Test_Item>, string>('by_array', 'item3');
+		const item3_matches = collection.query<Array<TestItem>, string>('by_array', 'item3');
 		expect(item3_matches.length).toBe(2);
 		expect(item3_matches.some((item) => item.string_a === 'a2')).toBe(true);
 		expect(item3_matches.some((item) => item.string_a === 'a4')).toBe(true);
@@ -143,7 +143,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 
 	test('derived index supports schema validation', () => {
 		// Create collection with derived index using schemas
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_derived_index({
 					key: 'flagged_adults',
@@ -188,15 +188,15 @@ describe('Indexed_Collection - Schema Validation', () => {
 			array_values: z.array(z.string()).optional(),
 		});
 
-		type Item_Query = z.infer<typeof query_schema>;
+		type ItemQuery = z.infer<typeof query_schema>;
 
 		// Create a dynamic index with complex query parameters
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
-				create_dynamic_index<Test_Item, (query: Item_Query) => Array<Test_Item>>({
+				create_dynamic_index<TestItem, (query: ItemQuery) => Array<TestItem>>({
 					key: 'item_search',
 					factory: (collection) => {
-						return (query: Item_Query) => {
+						return (query: ItemQuery) => {
 							const result = [];
 							for (const item of collection.by_id.values()) {
 								// Filter by number range if specified
@@ -231,7 +231,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		collection.add(create_item('a5', 'b5@test.com', 16, true, ['item4']));
 
 		// Get the dynamic search function
-		const search_fn = collection.get_index<(query: Item_Query) => Array<Test_Item>>('item_search');
+		const search_fn = collection.get_index<(query: ItemQuery) => Array<TestItem>>('item_search');
 
 		// Test number range query
 		const young_range = search_fn({min_number: 18, max_number: 30});
@@ -253,7 +253,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		expect(high_number_with_item3.map((item) => item.string_a).sort()).toEqual(['a2', 'a4']);
 
 		// Test using query method
-		const with_item5 = collection.query<Array<Test_Item>, Item_Query>('item_search', {
+		const with_item5 = collection.query<Array<TestItem>, ItemQuery>('item_search', {
 			array_values: ['item5'],
 		});
 		expect(with_item5.length).toBe(1);
@@ -265,7 +265,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		const console_error_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 		// Create collection with validation
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_string_b',
@@ -306,7 +306,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		const console_error_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 		// Create collection without validation
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_string_b',
@@ -340,7 +340,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		const option_schema = z.enum(['x', 'y']);
 
 		// Create collection with complex validation
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_nested_option',

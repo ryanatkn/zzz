@@ -1,4 +1,4 @@
-import type {Zzz_Config_Creator} from '$lib/config_helpers.js';
+import type {ZzzConfigCreator} from './config_helpers.js';
 import {
 	models_default,
 	providers_default,
@@ -12,14 +12,14 @@ import {
 	PRESENCE_PENALTY_DEFAULT,
 	STOP_SEQUENCES_DEFAULT,
 	BOTS_DEFAULT,
-} from '$lib/config_defaults.js';
+} from './config_defaults.js';
 
 // TODO hacky and temporary, just thinking through designs
 // some of the model param defaults definitely do not belong her
 
 // TODO refactor currently this is imported directly by frontend and backend, but we probably only want to forward a serialized subset to the client -
 // maybe move to zzz.config.ts in the repo root, and genfile for the frontend config
-const config: Zzz_Config_Creator = () => {
+const config: ZzzConfigCreator = () => {
 	return {
 		providers: providers_default,
 		models: models_default,

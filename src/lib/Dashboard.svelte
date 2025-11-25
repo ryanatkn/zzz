@@ -8,11 +8,11 @@
 	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
 	import {slide} from 'svelte/transition';
 
-	import Nav_Link from '$lib/Nav_Link.svelte';
-	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_PROJECT, GLYPH_TAB} from '$lib/glyphs.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {main_nav_items_default, to_nav_link_href} from '$lib/nav.js';
+	import NavLink from './NavLink.svelte';
+	import Glyph from './Glyph.svelte';
+	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_PROJECT, GLYPH_TAB} from './glyphs.js';
+	import {frontend_context} from './frontend.svelte.js';
+	import {main_nav_items_default, to_nav_link_href} from './nav.js';
 
 	// TODO dashboard should be mounted with Markdown
 
@@ -103,7 +103,7 @@
 				{#each dashboard_nav_items as section (section.group)}
 					{#if section.group === 'main'}
 						<div class="display_flex p_sm mb_sm">
-							<Nav_Link
+							<NavLink
 								href={resolve('/')}
 								title={app.futuremode ? 'futuremode' : 'home'}
 								class="click_effect_scale"
@@ -131,7 +131,7 @@
 										class: app.futuremode ? 'flip_x' : '',
 									}}
 								/>
-							</Nav_Link>
+							</NavLink>
 						</div>
 					{:else}
 						<div class="font_size_xl font_family_serif mt_xl7 mb_md text_color_3">
@@ -141,7 +141,7 @@
 
 					{#each section.items as link (link.label)}
 						<div transition:slide>
-							<Nav_Link href={to_nav_link_href(app, link.label, link.href)}>
+							<NavLink href={to_nav_link_href(app, link.label, link.href)}>
 								{#snippet children(selected)}
 									{#if typeof link.icon === 'string'}
 										<Glyph glyph={link.icon} class="icon_xs" /> {link.label}
@@ -156,7 +156,7 @@
 										{link.label}
 									{/if}
 								{/snippet}
-							</Nav_Link>
+							</NavLink>
 						</div>
 					{/each}
 				{/each}

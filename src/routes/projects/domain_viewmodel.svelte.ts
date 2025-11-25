@@ -8,7 +8,7 @@ import {get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
 import {Domain} from '$routes/projects/domain.svelte.js';
 import type {Projects} from '$routes/projects/projects.svelte.js';
 
-export interface Domain_Viewmodel_Options {
+export interface DomainViewmodelOptions {
 	projects: Projects;
 	project_id: Uuid;
 	domain_id: Uuid | null;
@@ -17,7 +17,7 @@ export interface Domain_Viewmodel_Options {
 /**
  * Controller for domain management functionality.
  */
-export class Domain_Viewmodel {
+export class DomainViewmodel {
 	readonly projects: Projects;
 
 	project_id: Uuid = $state()!;
@@ -47,9 +47,9 @@ export class Domain_Viewmodel {
 	});
 
 	/**
-	 * Creates a new Domain_Viewmodel instance.
+	 * Creates a new DomainViewmodel instance.
 	 */
-	constructor(options: Domain_Viewmodel_Options) {
+	constructor(options: DomainViewmodelOptions) {
 		this.projects = options.projects;
 
 		this.project_id = options.project_id;
@@ -120,4 +120,4 @@ export class Domain_Viewmodel {
 	}
 }
 
-export const Domain_Viewmodel_Schema = z.instanceof(Domain_Viewmodel);
+export const DomainViewmodelSchema = z.instanceof(DomainViewmodel);

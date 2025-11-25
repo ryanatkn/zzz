@@ -1,35 +1,31 @@
-import type {Omit_Strict} from '@ryanatkn/belt/types.js';
+import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-import {estimate_token_count} from '$lib/helpers.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
-import type {Part_Union} from '$lib/part.svelte.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
-import {Turn_Json} from '$lib/turn_types.js';
-import type {
-	Completion_Request,
-	Completion_Response,
-	Completion_Role,
-} from '$lib/completion_types.js';
+import {estimate_token_count} from './helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Uuid} from './zod_helpers.js';
+import type {PartUnion} from './part.svelte.js';
+import type {Frontend} from './frontend.svelte.js';
+import {TurnJson} from './turn_types.js';
+import type {CompletionRequest, CompletionResponse, CompletionRole} from './completion_types.js';
 
-export interface Turn_Options extends Cell_Options<typeof Turn_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface TurnOptions extends CellOptions<typeof TurnJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * Turn represents a conversation turn (like A2A Message).
  * Contextualizes parts within a conversation, providing role, metadata, and ordering.
  */
-export class Turn extends Cell<typeof Turn_Json> {
+export class Turn extends Cell<typeof TurnJson> {
 	part_ids: Array<Uuid> = $state()!;
 	thread_id: Uuid | null | undefined = $state();
-	role: Completion_Role = $state()!;
-	request: Completion_Request | undefined = $state.raw();
-	response: Completion_Response | undefined = $state.raw();
+	role: CompletionRole = $state()!;
+	request: CompletionRequest | undefined = $state.raw();
+	response: CompletionResponse | undefined = $state.raw();
 	error_message: string | undefined = $state();
 
-	readonly parts: Array<Part_Union> = $derived(
+	readonly parts: Array<PartUnion> = $derived(
 		this.part_ids
 			.map((id) => this.app.parts.items.by_id.get(id))
-			.filter((part): part is Part_Union => !!part),
+			.filter((part): part is PartUnion => !!part),
 	);
 
 	get enabled(): boolean {
@@ -72,16 +68,16 @@ export class Turn extends Cell<typeof Turn_Json> {
 			!this.error_message,
 	);
 
-	constructor(options: Turn_Options) {
-		super(Turn_Json, options);
+	constructor(options: TurnOptions) {
+		super(TurnJson, options);
 		this.init();
 	}
 
-	set_part(part: Part_Union): void {
+	set_part(part: PartUnion): void {
 		this.part_ids = [part.id];
 	}
 
-	add_part(part: Part_Union): void {
+	add_part(part: PartUnion): void {
 		if (!this.part_ids.includes(part.id)) {
 			this.part_ids.push(part.id);
 		}
@@ -106,9 +102,9 @@ export class Turn extends Cell<typeof Turn_Json> {
 }
 
 export const create_turn_from_part = (
-	part: Part_Union,
-	role: Completion_Role,
-	json: Partial<Omit_Strict<Turn_Json, 'role' | 'part_ids'>>,
+	part: PartUnion,
+	role: CompletionRole,
+	json: Partial<OmitStrict<TurnJson, 'role' | 'part_ids'>>,
 ): Turn => {
 	return new Turn({
 		app: part.app,
@@ -122,8 +118,8 @@ export const create_turn_from_part = (
 
 export const create_turn_from_text = (
 	content: string,
-	role: Completion_Role,
-	json: Partial<Omit_Strict<Turn_Json, 'role' | 'part_ids'>>,
+	role: CompletionRole,
+	json: Partial<OmitStrict<TurnJson, 'role' | 'part_ids'>>,
 	app: Frontend,
 ): Turn => {
 	const part = app.parts.add({type: 'text', content});
@@ -138,9 +134,9 @@ export const create_turn_from_text = (
 };
 
 export const create_turn_from_parts = (
-	parts: Array<Part_Union>,
-	role: Completion_Role,
-	json: Partial<Omit_Strict<Turn_Json, 'role' | 'part_ids'>>,
+	parts: Array<PartUnion>,
+	role: CompletionRole,
+	json: Partial<OmitStrict<TurnJson, 'role' | 'part_ids'>>,
 ): Turn => {
 	if (parts.length === 0) throw new Error('create_turn_from_parts requires at least one part');
 	return new Turn({

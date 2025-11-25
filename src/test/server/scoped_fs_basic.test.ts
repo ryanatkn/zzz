@@ -4,7 +4,7 @@ import {test, expect, vi, beforeEach, afterEach, describe} from 'vitest';
 import * as fs from 'node:fs/promises';
 import * as fs_sync from 'node:fs';
 
-import {Scoped_Fs, Symlink_Not_Allowed_Error} from '$lib/server/scoped_fs.js';
+import {ScopedFs, SymlinkNotAllowedError} from '$lib/server/scoped_fs.js';
 
 /* eslint-disable no-await-in-loop, @typescript-eslint/no-empty-function */
 
@@ -39,7 +39,7 @@ const DIR_PATHS = {
 	NEW_DIR: '/allowed/path/new-dir',
 };
 
-const create_test_instance = () => new Scoped_Fs(TEST_ALLOWED_PATHS);
+const create_test_instance = () => new ScopedFs(TEST_ALLOWED_PATHS);
 
 // Setup/cleanup for each test
 let console_spy: any;
@@ -65,15 +65,15 @@ afterEach(() => {
 	console_spy.mockRestore();
 });
 
-describe('Scoped_Fs - Construction and Initialization', () => {
+describe('ScopedFs - Construction and Initialization', () => {
 	test('constructor - should accept an array of allowed paths', () => {
 		const scoped_fs = create_test_instance();
-		expect(scoped_fs).toBeInstanceOf(Scoped_Fs);
+		expect(scoped_fs).toBeInstanceOf(ScopedFs);
 	});
 
 	test('constructor - should make a defensive copy of allowed paths', () => {
 		const original_paths = [...TEST_ALLOWED_PATHS];
-		const scoped_fs = new Scoped_Fs(original_paths);
+		const scoped_fs = new ScopedFs(original_paths);
 
 		// Modifying the original array should not affect the instance
 		original_paths.push('/new/path');
@@ -84,15 +84,15 @@ describe('Scoped_Fs - Construction and Initialization', () => {
 
 	test('constructor - should throw for invalid paths', () => {
 		// Non-absolute path
-		expect(() => new Scoped_Fs(['relative/path'])).toThrow();
+		expect(() => new ScopedFs(['relative/path'])).toThrow();
 
 		// Empty path array should work but won't allow any paths
-		const empty_scoped_fs = new Scoped_Fs([]);
+		const empty_scoped_fs = new ScopedFs([]);
 		expect(empty_scoped_fs.is_path_allowed('/any/path')).toBe(false);
 	});
 });
 
-describe('Scoped_Fs - Path Validation', () => {
+describe('ScopedFs - Path Validation', () => {
 	test('is_path_allowed - should return true for paths within allowed directories', () => {
 		const scoped_fs = create_test_instance();
 
@@ -153,7 +153,7 @@ describe('Scoped_Fs - Path Validation', () => {
 		expect(scoped_fs.is_path_allowed('/')).toBe(false);
 
 		// With root directory explicitly allowed
-		const root_scoped_fs = new Scoped_Fs(['/']);
+		const root_scoped_fs = new ScopedFs(['/']);
 		expect(root_scoped_fs.is_path_allowed('/')).toBe(true);
 		expect(root_scoped_fs.is_path_allowed('/any/path')).toBe(true);
 	});
@@ -184,7 +184,7 @@ describe('Scoped_Fs - Path Validation', () => {
 	});
 });
 
-describe('Scoped_Fs - File Operations', () => {
+describe('ScopedFs - File Operations', () => {
 	test('read_file - should read files in allowed paths', async () => {
 		const scoped_fs = create_test_instance();
 		const test_content = 'test file content';
@@ -223,7 +223,7 @@ describe('Scoped_Fs - File Operations', () => {
 	});
 });
 
-describe('Scoped_Fs - Directory Operations', () => {
+describe('ScopedFs - Directory Operations', () => {
 	test('mkdir - should create directories in allowed paths', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -275,7 +275,7 @@ describe('Scoped_Fs - Directory Operations', () => {
 	});
 });
 
-describe('Scoped_Fs - Stat Operations', () => {
+describe('ScopedFs - Stat Operations', () => {
 	test('stat - should get stats for paths in allowed directories', async () => {
 		const scoped_fs = create_test_instance();
 		const mock_stats = {
@@ -316,7 +316,7 @@ describe('Scoped_Fs - Stat Operations', () => {
 	});
 });
 
-describe('Scoped_Fs - Existence Checking', () => {
+describe('ScopedFs - Existence Checking', () => {
 	test('exists - should check existence for paths in allowed directories', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -344,7 +344,7 @@ describe('Scoped_Fs - Existence Checking', () => {
 	});
 });
 
-describe('Scoped_Fs - Copy Operations', () => {
+describe('ScopedFs - Copy Operations', () => {
 	test('copy_file - should copy files between allowed paths', async () => {
 		const scoped_fs = create_test_instance();
 		const source = FILE_PATHS.ALLOWED;
@@ -371,7 +371,7 @@ describe('Scoped_Fs - Copy Operations', () => {
 	});
 });
 
-describe('Scoped_Fs - Symlink Detection', () => {
+describe('ScopedFs - Symlink Detection', () => {
 	test('should reject operations on paths containing symlinks', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -385,7 +385,7 @@ describe('Scoped_Fs - Symlink Detection', () => {
 		);
 
 		await expect(scoped_fs.read_file('/allowed/path/symlink.txt')).rejects.toThrow(
-			Symlink_Not_Allowed_Error,
+			SymlinkNotAllowedError,
 		);
 
 		expect(fs.readFile).not.toHaveBeenCalled();
@@ -413,7 +413,7 @@ describe('Scoped_Fs - Symlink Detection', () => {
 		);
 
 		await expect(scoped_fs.read_file('/allowed/path/symlink-dir/file.txt')).rejects.toThrow(
-			Symlink_Not_Allowed_Error,
+			SymlinkNotAllowedError,
 		);
 
 		expect(fs.readFile).not.toHaveBeenCalled();

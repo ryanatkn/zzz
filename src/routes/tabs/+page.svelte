@@ -3,9 +3,9 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {Browser} from '$routes/tabs/browser.svelte.js';
 	import {sample_tabs} from '$routes/tabs/sample_tabs.js';
-	import Browser_View from '$routes/tabs/Browser_View.svelte';
+	import BrowserView from '$routes/tabs/BrowserView.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
-	import External_Link from '$lib/External_Link.svelte';
+	import ExternalLink from '$lib/ExternalLink.svelte';
 
 	const app = frontend_context.get();
 
@@ -17,9 +17,9 @@
 </script>
 
 {#if browser.browserified}
-	<Browser_View {browser}>
+	<BrowserView {browser}>
 		{@render content()}
-	</Browser_View>
+	</BrowserView>
 {:else}
 	<div class="p_lg">
 		{@render content()}
@@ -84,10 +84,10 @@
 		<p>
 			I think that by optimizing for UX, Zzz and a lot of software is converging on similar
 			architectures. I'm not well-read in The Literature or staying current with the design or
-			product communities, but some of my favorite writing is from Ink and Switch: <External_Link
-				href="https://www.inkandswitch.com/local-first/">local-first</External_Link
-			> and <External_Link href="https://www.inkandswitch.com/malleable-software/"
-				>malleable software</External_Link
+			product communities, but some of my favorite writing is from Ink and Switch: <ExternalLink
+				href="https://www.inkandswitch.com/local-first/">local-first</ExternalLink
+			> and <ExternalLink href="https://www.inkandswitch.com/malleable-software/"
+				>malleable software</ExternalLink
 			>. I think that we can all have software that's really nice to use, not that expensive to
 			produce, that also respects individual rights and is designed for our benefit, that
 			<small class="font_size_xs">UNLEASHES THE FULL POWER OF THE WEB</small>, and integrates our

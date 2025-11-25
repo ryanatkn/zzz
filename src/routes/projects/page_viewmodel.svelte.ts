@@ -8,7 +8,7 @@ import {Page} from '$routes/projects/page.svelte.js';
 import type {Projects} from '$routes/projects/projects.svelte.js';
 import {resolve} from '$app/paths';
 
-export interface Page_Viewmodel_Options {
+export interface PageViewmodelOptions {
 	projects: Projects;
 	project_id: Uuid;
 	page_id: Uuid;
@@ -83,7 +83,7 @@ const render_markdown = (text: string): string => {
 /**
  * Manages page editor functionality.
  */
-export class Page_Viewmodel {
+export class PageViewmodel {
 	readonly projects: Projects;
 
 	project_id: Uuid = $state()!;
@@ -115,9 +115,9 @@ export class Page_Viewmodel {
 	readonly formatted_content = $derived(render_markdown(this.content));
 
 	/**
-	 * Creates a new Page_Viewmodel instance.
+	 * Creates a new PageViewmodel instance.
 	 */
-	constructor(options: Page_Viewmodel_Options) {
+	constructor(options: PageViewmodelOptions) {
 		this.projects = options.projects;
 
 		this.project_id = options.project_id;
@@ -183,4 +183,4 @@ export class Page_Viewmodel {
 	}
 }
 
-export const Page_Viewmodel_Schema = z.instanceof(Page_Viewmodel);
+export const PageViewmodelSchema = z.instanceof(PageViewmodel);

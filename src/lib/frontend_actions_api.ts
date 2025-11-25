@@ -1,19 +1,19 @@
 // @slop Claude Opus 4
 
-import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
-import type {Action_Event_Environment} from '$lib/action_event_types.js';
-import {create_action_event} from '$lib/action_event.js';
+import type {ActionMethod, ActionsApi} from './action_metatypes.js';
+import type {ActionEventEnvironment} from './action_event_types.js';
+import {create_action_event} from './action_event.js';
 import type {
-	Action_Spec_Union,
-	Local_Call_Action_Spec,
-	Remote_Notification_Action_Spec,
-	Request_Response_Action_Spec,
-} from '$lib/action_spec.js';
+	ActionSpecUnion,
+	LocalCallActionSpec,
+	RemoteNotificationActionSpec,
+	RequestResponseActionSpec,
+} from './action_spec.js';
 import {
 	is_send_request,
 	is_notification_send,
 	extract_action_result,
-} from '$lib/action_event_helpers.js';
+} from './action_event_helpers.js';
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 
@@ -23,12 +23,12 @@ import {
  * Creates the actions API methods for the frontend.
  * Uses a Proxy to provide dynamic method lookup with full type safety.
  */
-export const create_frontend_actions_api = <T extends Action_Event_Environment>(
+export const create_frontend_actions_api = <T extends ActionEventEnvironment>(
 	environment: T,
-): Actions_Api => {
-	return new Proxy({} as Actions_Api, {
+): ActionsApi => {
+	return new Proxy({} as ActionsApi, {
 		get(_target, method: string) {
-			const spec = environment.lookup_action_spec(method as Action_Method);
+			const spec = environment.lookup_action_spec(method as ActionMethod);
 			if (!spec) {
 				return undefined;
 			}
@@ -36,7 +36,7 @@ export const create_frontend_actions_api = <T extends Action_Event_Environment>(
 			return create_action_method(environment, spec);
 		},
 		has(_target, method: string) {
-			return environment.lookup_action_spec(method as Action_Method) !== undefined;
+			return environment.lookup_action_spec(method as ActionMethod) !== undefined;
 		},
 	});
 };
@@ -44,7 +44,7 @@ export const create_frontend_actions_api = <T extends Action_Event_Environment>(
 /**
  * Creates a method that executes an action through its complete lifecycle.
  */
-const create_action_method = (environment: Action_Event_Environment, spec: Action_Spec_Union) => {
+const create_action_method = (environment: ActionEventEnvironment, spec: ActionSpecUnion) => {
 	switch (spec.kind) {
 		case 'local_call':
 			return spec.async
@@ -62,8 +62,8 @@ const create_action_method = (environment: Action_Event_Environment, spec: Actio
  * Returns value directly - can throw on error (sync methods cannot return Result).
  */
 const create_sync_local_call_method = (
-	environment: Action_Event_Environment,
-	spec: Local_Call_Action_Spec,
+	environment: ActionEventEnvironment,
+	spec: LocalCallActionSpec,
 ) => {
 	return (input?: unknown) => {
 		const event = create_action_event(environment, spec, input);
@@ -90,8 +90,8 @@ const create_sync_local_call_method = (
  * Returns Result for type-safe error handling.
  */
 const create_async_local_call_method = (
-	environment: Action_Event_Environment,
-	spec: Local_Call_Action_Spec,
+	environment: ActionEventEnvironment,
+	spec: LocalCallActionSpec,
 ) => {
 	return async (input?: unknown) => {
 		const event = create_action_event(environment, spec, input);
@@ -111,8 +111,8 @@ const create_async_local_call_method = (
  * Creates a request/response method that communicates over the network.
  */
 const create_request_response_method = (
-	environment: Action_Event_Environment,
-	spec: Request_Response_Action_Spec,
+	environment: ActionEventEnvironment,
+	spec: RequestResponseActionSpec,
 ) => {
 	return async (input?: unknown) => {
 		const event = create_action_event(environment, spec, input);
@@ -156,8 +156,8 @@ const create_request_response_method = (
  * Returns Result<{value: void}> for consistency.
  */
 const create_remote_notification_method = (
-	environment: Action_Event_Environment,
-	spec: Remote_Notification_Action_Spec,
+	environment: ActionEventEnvironment,
+	spec: RemoteNotificationActionSpec,
 ) => {
 	return async (input?: unknown) => {
 		const event = create_action_event(environment, spec, input);

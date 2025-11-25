@@ -3,15 +3,15 @@
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_uuid, Uuid} from '$lib/zod_helpers.js';
-import {to_reordered_list} from '$lib/list_helpers.js';
-import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {create_map_by_property} from '$lib/iterable_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import {create_uuid, Uuid} from './zod_helpers.js';
+import {to_reordered_list} from './list_helpers.js';
+import {DiskfileTab} from './diskfile_tab.svelte.js';
+import {CellJson} from './cell_types.js';
+import {create_map_by_property} from './iterable_helpers.js';
 
-export const Diskfile_Tabs_Json = Cell_Json.extend({
+export const DiskfileTabsJson = CellJson.extend({
 	selected_tab_id: Uuid.nullable().default(null),
 	preview_tab_id: Uuid.nullable().default(null),
 	tab_order: z.array(Uuid).default(() => []),
@@ -19,28 +19,28 @@ export const Diskfile_Tabs_Json = Cell_Json.extend({
 	recent_tab_ids: z.array(Uuid).default(() => []),
 	/** Maximum number of tabs to track in access history. */
 	max_tab_history: z.number().default(20),
-}).meta({cell_class_name: 'Diskfile_Tabs'});
-export type Diskfile_Tabs_Json = z.infer<typeof Diskfile_Tabs_Json>;
-export type Diskfile_Tabs_Json_Input = z.input<typeof Diskfile_Tabs_Json>;
+}).meta({cell_class_name: 'DiskfileTabs'});
+export type DiskfileTabsJson = z.infer<typeof DiskfileTabsJson>;
+export type DiskfileTabsJsonInput = z.input<typeof DiskfileTabsJson>;
 
-export type Diskfile_Tabs_Options = Cell_Options<typeof Diskfile_Tabs_Json>;
+export type DiskfileTabsOptions = CellOptions<typeof DiskfileTabsJson>;
 
 /**
  * Manages tabs for diskfiles in the editor with preview behavior.
  */
-export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
+export class DiskfileTabs extends Cell<typeof DiskfileTabsJson> {
 	selected_tab_id: Uuid | null = $state()!;
 	preview_tab_id: Uuid | null = $state()!;
 	tab_order: Array<Uuid> = $state()!;
 	recent_tab_ids: Array<Uuid> = $state()!;
 	max_tab_history: number = $state()!;
 
-	items: Indexed_Collection<Diskfile_Tab> = new Indexed_Collection();
+	items: IndexedCollection<DiskfileTab> = new IndexedCollection();
 
 	/**
 	 * Map for looking up tabs by their associated diskfile_id.
 	 */
-	readonly by_diskfile_id: Map<Uuid, Diskfile_Tab> = $derived(
+	readonly by_diskfile_id: Map<Uuid, DiskfileTab> = $derived(
 		create_map_by_property(this.items.by_id.values(), 'diskfile_id'),
 	);
 
@@ -48,9 +48,9 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Ordered array of tabs derived directly from tab_order.
 	 * Includes tabs in the explicit order plus any tabs not yet in the order.
 	 */
-	readonly ordered_tabs: Array<Diskfile_Tab> = $derived.by(() => {
+	readonly ordered_tabs: Array<DiskfileTab> = $derived.by(() => {
 		const {by_id} = this.items;
-		const result: Array<Diskfile_Tab> = [];
+		const result: Array<DiskfileTab> = [];
 		// Track which tabs have been added to avoid duplicates
 		const added_tab_ids: Set<string> = new Set();
 
@@ -74,7 +74,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	});
 
 	/** The currently selected tab. */
-	readonly selected_tab: Diskfile_Tab | undefined = $derived(
+	readonly selected_tab: DiskfileTab | undefined = $derived(
 		this.selected_tab_id ? this.items.by_id.get(this.selected_tab_id) : undefined,
 	);
 
@@ -82,12 +82,12 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	readonly selected_diskfile_id: Uuid | null = $derived(this.selected_tab?.diskfile_id ?? null);
 
 	/** The preview tab, if any. */
-	readonly preview_tab: Diskfile_Tab | undefined = $derived(
+	readonly preview_tab: DiskfileTab | undefined = $derived(
 		this.preview_tab_id ? this.items.by_id.get(this.preview_tab_id) : undefined,
 	);
 
-	readonly recent_tabs: Array<Diskfile_Tab> = $derived.by(() => {
-		const result: Array<Diskfile_Tab> = [];
+	readonly recent_tabs: Array<DiskfileTab> = $derived.by(() => {
+		const result: Array<DiskfileTab> = [];
 		for (const tab_id of this.recent_tab_ids) {
 			const tab = this.items.by_id.get(tab_id);
 			if (tab) result.push(tab); // for now just ignore missing tabs
@@ -96,13 +96,13 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	});
 
 	/** Recently closed tabs for potential reopening. */
-	recently_closed_tabs: Array<Diskfile_Tab> = $state([]);
+	recently_closed_tabs: Array<DiskfileTab> = $state([]);
 
 	/** Map of closed tab ids to their diskfile ids - used for browser navigation. */
 	readonly closed_tab_diskfiles: SvelteMap<Uuid, Uuid> = new SvelteMap();
 
-	constructor(options: Diskfile_Tabs_Options) {
-		super(Diskfile_Tabs_Json, options);
+	constructor(options: DiskfileTabsOptions) {
+		super(DiskfileTabsJson, options);
 		this.init();
 	}
 
@@ -145,7 +145,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Sets the selected tab.
 	 */
 	select_tab(tab_id: Uuid): void {
-		console.log('Diskfile_Tabs.select_tab', {tab_id});
+		console.log('DiskfileTabs.select_tab', {tab_id});
 		this.selected_tab_id = tab_id;
 		this.#update_tab_history(tab_id);
 	}
@@ -180,8 +180,8 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Creates a new tab with the given diskfile id.
 	 * If insert_after is provided, the new tab will be positioned after that tab in the order.
 	 */
-	#create_tab(diskfile_id: Uuid, insert_after?: Uuid | null): Diskfile_Tab {
-		const new_tab = new Diskfile_Tab({
+	#create_tab(diskfile_id: Uuid, insert_after?: Uuid | null): DiskfileTab {
+		const new_tab = new DiskfileTab({
 			app: this.app,
 			tabs: this,
 			json: {
@@ -205,7 +205,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	#get_or_create_tab(
 		diskfile_id: Uuid,
 		create_mode: 'preview' | 'permanent',
-	): {tab: Diskfile_Tab; is_new: boolean} {
+	): {tab: DiskfileTab; is_new: boolean} {
 		// Check if the file is already open in a tab - use direct map lookup for reliability
 		const existing_tab = this.by_diskfile_id.get(diskfile_id);
 		if (existing_tab) {
@@ -247,8 +247,8 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Handles preview state when opening a file.
 	 * If a preview tab for this file already exists, it just selects it.
 	 */
-	preview_diskfile(diskfile_id: Uuid): Diskfile_Tab {
-		console.log('Diskfile_Tabs.preview_diskfile', {diskfile_id});
+	preview_diskfile(diskfile_id: Uuid): DiskfileTab {
+		console.log('DiskfileTabs.preview_diskfile', {diskfile_id});
 
 		const previously_selected_id = this.selected_tab_id;
 		const previous_preview_diskfile_id = this.preview_tab?.diskfile_id;
@@ -276,8 +276,8 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Opens a diskfile as a permanent tab (not preview).
 	 * If the file is already in a preview tab, promotes it to permanent.
 	 */
-	open_diskfile(diskfile_id: Uuid): Diskfile_Tab {
-		console.log('Diskfile_Tabs.open_diskfile', {diskfile_id});
+	open_diskfile(diskfile_id: Uuid): DiskfileTab {
+		console.log('DiskfileTabs.open_diskfile', {diskfile_id});
 
 		const {tab} = this.#get_or_create_tab(diskfile_id, 'permanent');
 
@@ -293,7 +293,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * @returns true if a tab was promoted, false otherwise
 	 */
 	promote_preview_to_permanent(): boolean {
-		console.log('Diskfile_Tabs.promote_preview_to_permanent');
+		console.log('DiskfileTabs.promote_preview_to_permanent');
 		if (this.preview_tab_id) {
 			this.preview_tab_id = null;
 			return true;
@@ -305,7 +305,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Closes a tab by id.
 	 */
 	close_tab(tab_id: Uuid): void {
-		console.log('Diskfile_Tabs.close_tab', {tab_id});
+		console.log('DiskfileTabs.close_tab', {tab_id});
 		const tab_to_close = this.items.by_id.get(tab_id);
 		if (!tab_to_close) return;
 
@@ -364,7 +364,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * @returns Object containing the resulting tab id and a boolean indicating if a new tab was created
 	 */
 	navigate_to_tab(tab_id: Uuid): {resulting_tab_id: Uuid | null; created_preview: boolean} {
-		console.log('Diskfile_Tabs.navigate_to_tab', {tab_id});
+		console.log('DiskfileTabs.navigate_to_tab', {tab_id});
 
 		// If the tab still exists, just select it
 		if (this.items.by_id.has(tab_id)) {
@@ -388,7 +388,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Opens (makes permanent) a tab by id.
 	 */
 	open_tab(tab_id: Uuid): void {
-		console.log('Diskfile_Tabs.open_tab', {tab_id});
+		console.log('DiskfileTabs.open_tab', {tab_id});
 		if (tab_id === this.preview_tab_id) {
 			this.preview_tab_id = null;
 		}
@@ -398,7 +398,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Reorders tabs by dragging.
 	 */
 	reorder_tabs(from_index: number, to_index: number): void {
-		console.log('Diskfile_Tabs.reorder_tabs', {from_index, to_index});
+		console.log('DiskfileTabs.reorder_tabs', {from_index, to_index});
 		this.tab_order = to_reordered_list(this.tab_order, from_index, to_index);
 	}
 
@@ -406,7 +406,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Reopens the last closed tab.
 	 */
 	reopen_last_closed_tab(): void {
-		console.log('Diskfile_Tabs.reopen_last_closed_tab');
+		console.log('DiskfileTabs.reopen_last_closed_tab');
 		if (this.recently_closed_tabs.length > 0) {
 			const tab_to_reopen = this.recently_closed_tabs.pop();
 			if (tab_to_reopen) {
@@ -424,7 +424,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 * Closes all tabs.
 	 */
 	close_all_tabs(): void {
-		console.log('Diskfile_Tabs.close_all_tabs');
+		console.log('DiskfileTabs.close_all_tabs');
 
 		// Remember diskfile ids for all tabs before clearing
 		for (const tab of this.ordered_tabs) {
@@ -445,4 +445,4 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	}
 }
 
-export const Diskfile_Tabs_Schema = z.instanceof(Diskfile_Tabs);
+export const DiskfileTabsSchema = z.instanceof(DiskfileTabs);

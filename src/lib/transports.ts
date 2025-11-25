@@ -3,34 +3,32 @@
 import {z} from 'zod';
 
 import type {
-	Jsonrpc_Message_From_Client_To_Server,
-	Jsonrpc_Message_From_Server_To_Client,
-	Jsonrpc_Notification,
-	Jsonrpc_Request,
-	Jsonrpc_Response_Or_Error,
-	Jsonrpc_Error_Message,
-} from '$lib/jsonrpc.js';
+	JsonrpcMessageFromClientToServer,
+	JsonrpcMessageFromServerToClient,
+	JsonrpcNotification,
+	JsonrpcRequest,
+	JsonrpcResponseOrError,
+	JsonrpcErrorMessage,
+} from './jsonrpc.js';
 
 // TODO figure out the symmetry of frontend and backend transports (none/partial/full?) --
 // we may also need orthogonal abstractions to clarify the transport role
 
-export const Transport_Name = z.string(); // not branded for convenience, will just error at runtime, the schema is just for docs atm
-export type Transport_Name = z.infer<typeof Transport_Name>;
+export const TransportName = z.string(); // not branded for convenience, will just error at runtime, the schema is just for docs atm
+export type TransportName = z.infer<typeof TransportName>;
 
 export interface Transport {
-	transport_name: Transport_Name;
+	transport_name: TransportName;
 	/* eslint-disable @typescript-eslint/method-signature-style */
-	send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
-	send(
-		message: Jsonrpc_Message_From_Client_To_Server,
-	): Promise<Jsonrpc_Message_From_Server_To_Client | null>;
+	send(message: JsonrpcRequest): Promise<JsonrpcResponseOrError>;
+	send(message: JsonrpcNotification): Promise<JsonrpcErrorMessage | null>;
+	send(message: JsonrpcMessageFromClientToServer): Promise<JsonrpcMessageFromServerToClient | null>;
 	is_ready: () => boolean;
 }
 
 export class Transports {
 	#current_transport: Transport | null = null;
-	#transport_by_name: Map<Transport_Name, Transport> = new Map();
+	#transport_by_name: Map<TransportName, Transport> = new Map();
 
 	/**
 	 * Whether to allow fallback to other transports if the current one is not available.
@@ -50,7 +48,7 @@ export class Transports {
 		}
 	}
 
-	set_current_transport(transport_name: Transport_Name): void {
+	set_current_transport(transport_name: TransportName): void {
 		const transport = this.#transport_by_name.get(transport_name);
 		if (!transport) throw new Error(`transport not registered: ${transport_name}`);
 		this.#current_transport = transport;
@@ -62,7 +60,7 @@ export class Transports {
 	 * @param transport_name Optional transport to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	get_transport(transport_name?: Transport_Name): Transport | null {
+	get_transport(transport_name?: TransportName): Transport | null {
 		return this.allow_fallback
 			? this.#get_first_ready(transport_name)
 			: this.#get_exact(transport_name);
@@ -79,11 +77,11 @@ export class Transports {
 		return this.#current_transport ?? null;
 	}
 
-	get_current_transport_name(): Transport_Name | null {
+	get_current_transport_name(): TransportName | null {
 		return this.#current_transport?.transport_name ?? null;
 	}
 
-	get_transport_by_name(transport_name: Transport_Name): Transport | null {
+	get_transport_by_name(transport_name: TransportName): Transport | null {
 		return this.#transport_by_name.get(transport_name) ?? null;
 	}
 
@@ -92,7 +90,7 @@ export class Transports {
 	 * @param transport_name Optional transport type to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_exact(transport_name?: Transport_Name): Transport | null {
+	#get_exact(transport_name?: TransportName): Transport | null {
 		const transport = transport_name
 			? this.#transport_by_name.get(transport_name)
 			: this.#current_transport;
@@ -109,7 +107,7 @@ export class Transports {
 	 * @param transport_name Optional transport type or array of types to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_first_ready(transport_name?: Transport_Name | Array<Transport_Name>): Transport | null {
+	#get_first_ready(transport_name?: TransportName | Array<TransportName>): Transport | null {
 		// First try the specified transport(s) if provided
 		if (transport_name) {
 			const transport_names = Array.isArray(transport_name) ? transport_name : [transport_name];

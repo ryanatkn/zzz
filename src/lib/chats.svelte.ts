@@ -1,33 +1,33 @@
 import {z} from 'zod';
 import {page} from '$app/state';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Chat, Chat_Json, type Chat_Json_Input} from '$lib/chat.svelte.js';
-import type {Uuid} from '$lib/zod_helpers.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
-import {to_reordered_list} from '$lib/list_helpers.js';
-import {get_unique_name} from '$lib/helpers.js';
-import {to_chats_url} from '$lib/nav_helpers.js';
-import {chat_template_defaults} from '$lib/config_defaults.js';
-import type {Chat_Template} from '$lib/chat_template.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {goto_unless_current} from '$lib/navigation_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Chat, ChatJson, type ChatJsonInput} from './chat.svelte.js';
+import type {Uuid} from './zod_helpers.js';
+import {HANDLED} from './cell_helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import {create_single_index, create_derived_index} from './indexed_collection_helpers.svelte.js';
+import {to_reordered_list} from './list_helpers.js';
+import {get_unique_name} from './helpers.js';
+import {to_chats_url} from './nav_helpers.js';
+import {chat_template_defaults} from './config_defaults.js';
+import type {ChatTemplate} from './chat_template.js';
+import {CellJson} from './cell_types.js';
+import {goto_unless_current} from './navigation_helpers.js';
 
-export const Chats_Json = Cell_Json.extend({
-	items: z.array(Chat_Json).default(() => []),
+export const ChatsJson = CellJson.extend({
+	items: z.array(ChatJson).default(() => []),
 	selected_id: z.string().nullable().default(null),
 	selected_id_last_non_null: z.string().nullable().default(null),
 	show_sort_controls: z.boolean().default(false),
 }).meta({cell_class_name: 'Chats'});
-export type Chats_Json = z.infer<typeof Chats_Json>;
-export type Chats_Json_Input = z.input<typeof Chats_Json>;
+export type ChatsJson = z.infer<typeof ChatsJson>;
+export type ChatsJsonInput = z.input<typeof ChatsJson>;
 
-export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface ChatsOptions extends CellOptions<typeof ChatsJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Chats extends Cell<typeof Chats_Json> {
-	readonly items: Indexed_Collection<Chat> = new Indexed_Collection({
+export class Chats extends Cell<typeof ChatsJson> {
+	readonly items: IndexedCollection<Chat> = new IndexedCollection({
 		indexes: [
 			create_single_index({
 				key: 'by_name',
@@ -69,8 +69,8 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	readonly items_by_name = $derived(this.items.single_index('by_name'));
 
-	constructor(options: Chats_Options) {
-		super(Chats_Json, options);
+	constructor(options: ChatsOptions) {
+		super(ChatsJson, options);
 
 		this.decoders = {
 			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
@@ -89,7 +89,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 		this.init();
 	}
 
-	add(json?: Chat_Json_Input, select?: boolean): Chat {
+	add(json?: ChatJsonInput, select?: boolean): Chat {
 		const j = !json?.name ? {...json, name: this.generate_unique_name('new chat')} : json;
 		const chat = new Chat({app: this.app, json: j});
 		return this.add_chat(chat, select);
@@ -107,7 +107,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 		return chat;
 	}
 
-	add_many(chats_json: Array<Chat_Json_Input>, select?: boolean | number): Array<Chat> {
+	add_many(chats_json: Array<ChatJsonInput>, select?: boolean | number): Array<Chat> {
 		const chats = chats_json.map((json) => new Chat({app: this.app, json}));
 		this.items.add_many(chats);
 
@@ -177,10 +177,10 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	// TODO @many refactor with db
 	chat_templates = $state.raw(chat_template_defaults);
-	get_template_by_id(id: string): Chat_Template | undefined {
+	get_template_by_id(id: string): ChatTemplate | undefined {
 		return this.chat_templates.find((t) => t.id === id);
 	}
-	get_default_template(): Chat_Template {
+	get_default_template(): ChatTemplate {
 		const template = this.chat_templates[0];
 		if (!template) {
 			throw new Error('No chat templates available');
@@ -189,4 +189,4 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 }
 
-export const Chats_Schema = z.instanceof(Chats);
+export const ChatsSchema = z.instanceof(Chats);

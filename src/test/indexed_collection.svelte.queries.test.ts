@@ -5,17 +5,17 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 import {z} from 'zod';
 
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
 	create_derived_index,
-	type Indexed_Item,
+	type IndexedItem,
 } from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 // Test item representing a generic item
-interface Test_Item {
+interface TestItem {
 	id: Uuid;
 	string_a: string;
 	string_b: string;
@@ -27,7 +27,7 @@ interface Test_Item {
 }
 
 // Helper to create items with default values that can be overridden
-const create_test_item = (overrides: Partial<Test_Item> = {}): Test_Item => ({
+const create_test_item = (overrides: Partial<TestItem> = {}): TestItem => ({
 	id: create_uuid(),
 	string_a: 'a1',
 	string_b: 'b1',
@@ -40,16 +40,16 @@ const create_test_item = (overrides: Partial<Test_Item> = {}): Test_Item => ({
 });
 
 // Helper functions for id-based object equality checks
-const has_item_with_id = (array: Array<Indexed_Item>, item: Indexed_Item): boolean =>
+const has_item_with_id = (array: Array<IndexedItem>, item: IndexedItem): boolean =>
 	array.some((i) => i.id === item.id);
 
-describe('Indexed_Collection - Query Capabilities', () => {
-	let collection: Indexed_Collection<Test_Item>;
-	let items: Array<Test_Item>;
+describe('IndexedCollection - Query Capabilities', () => {
+	let collection: IndexedCollection<TestItem>;
+	let items: Array<TestItem>;
 
 	beforeEach(() => {
 		// Create a collection with various indexes
-		collection = new Indexed_Collection<Test_Item>({
+		collection = new IndexedCollection<TestItem>({
 			indexes: [
 				// Single value indexes
 				create_single_index({
@@ -385,11 +385,11 @@ describe('Indexed_Collection - Query Capabilities', () => {
 	});
 });
 
-describe('Indexed_Collection - Search Patterns', () => {
-	let collection: Indexed_Collection<Test_Item>;
+describe('IndexedCollection - Search Patterns', () => {
+	let collection: IndexedCollection<TestItem>;
 
 	beforeEach(() => {
-		collection = new Indexed_Collection<Test_Item>({
+		collection = new IndexedCollection<TestItem>({
 			indexes: [
 				// Word-based index that splits string_a into words for searching
 				create_multi_index({

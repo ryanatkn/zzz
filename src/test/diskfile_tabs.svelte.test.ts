@@ -2,30 +2,30 @@
 
 import {test, expect, beforeEach, describe} from 'vitest';
 
-import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
-import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
-import {create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {DiskfileTabs} from '$lib/diskfile_tabs.svelte.js';
+import {DiskfileTab} from '$lib/diskfile_tab.svelte.js';
+import {create_uuid, UuidWithDefault} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test data
-const TEST_DISKFILE_ID_1 = Uuid_With_Default.parse(undefined);
-const TEST_DISKFILE_ID_2 = Uuid_With_Default.parse(undefined);
-const TEST_DISKFILE_ID_3 = Uuid_With_Default.parse(undefined);
-const TEST_DISKFILE_ID_4 = Uuid_With_Default.parse(undefined);
-const TEST_DISKFILE_ID_5 = Uuid_With_Default.parse(undefined);
+const TEST_DISKFILE_ID_1 = UuidWithDefault.parse(undefined);
+const TEST_DISKFILE_ID_2 = UuidWithDefault.parse(undefined);
+const TEST_DISKFILE_ID_3 = UuidWithDefault.parse(undefined);
+const TEST_DISKFILE_ID_4 = UuidWithDefault.parse(undefined);
+const TEST_DISKFILE_ID_5 = UuidWithDefault.parse(undefined);
 
-describe('Diskfile_Tabs', () => {
+describe('DiskfileTabs', () => {
 	// Test suite
 	let app: Frontend;
-	let tabs: Diskfile_Tabs;
+	let tabs: DiskfileTabs;
 
 	beforeEach(() => {
 		// Create a real Zzz instance for each test
 		app = monkeypatch_zzz_for_tests(new Frontend());
 
 		// Create a fresh tabs instance for each test
-		tabs = new Diskfile_Tabs({
+		tabs = new DiskfileTabs({
 			app,
 			json: {
 				id: create_uuid(),
@@ -51,7 +51,7 @@ describe('Diskfile_Tabs', () => {
 		test('preview_diskfile creates a new preview tab', () => {
 			const tab = tabs.preview_diskfile(TEST_DISKFILE_ID_1);
 
-			expect(tab).toBeInstanceOf(Diskfile_Tab);
+			expect(tab).toBeInstanceOf(DiskfileTab);
 			expect(tab.diskfile_id).toBe(TEST_DISKFILE_ID_1);
 			expect(tabs.preview_tab_id).toBe(tab.id);
 			expect(tabs.selected_tab_id).toBe(tab.id);
@@ -88,7 +88,7 @@ describe('Diskfile_Tabs', () => {
 		test('open_diskfile creates a permanent tab', () => {
 			const tab = tabs.open_diskfile(TEST_DISKFILE_ID_1);
 
-			expect(tab).toBeInstanceOf(Diskfile_Tab);
+			expect(tab).toBeInstanceOf(DiskfileTab);
 			expect(tab.diskfile_id).toBe(TEST_DISKFILE_ID_1);
 			expect(tab.is_preview).toBe(false);
 			expect(tabs.preview_tab_id).toBe(null);
@@ -604,7 +604,7 @@ describe('Diskfile_Tabs', () => {
 
 			// Create more tabs than the max history size
 			for (let i = 0; i < 5; i++) {
-				const uuid = Uuid_With_Default.parse(undefined);
+				const uuid = UuidWithDefault.parse(undefined);
 				tabs.open_diskfile(uuid);
 			}
 
@@ -810,7 +810,7 @@ describe('Diskfile_Tabs', () => {
 			tabs.open_diskfile(TEST_DISKFILE_ID_1);
 
 			// Try to navigate to a non-existent tab
-			const result = tabs.navigate_to_tab(Uuid_With_Default.parse(undefined));
+			const result = tabs.navigate_to_tab(UuidWithDefault.parse(undefined));
 
 			// Should return null without changing selection
 			expect(result.resulting_tab_id).toBe(null);
@@ -895,7 +895,7 @@ describe('Diskfile_Tabs', () => {
 
 			for (let i = 0; i < tab_count; i++) {
 				// Create proper UUIDs that will pass validation - these are real UUIDs
-				const uuid = Uuid_With_Default.parse(undefined);
+				const uuid = UuidWithDefault.parse(undefined);
 				const tab = tabs.open_diskfile(uuid);
 				created_tabs.push(tab);
 			}

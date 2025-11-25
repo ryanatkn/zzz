@@ -11,12 +11,12 @@ import {z} from 'zod';
 /**
  * A branded type for representing safely normalized filesystem paths
  */
-export const Scoped_Fs_Path = z
+export const ScopedFsPath = z
 	.string()
 	.refine((p) => p.startsWith('/'), {message: 'Path must be absolute'})
 	.transform((p) => normalize(p.trim()))
-	.brand('Scoped_Fs_Path');
-export type Scoped_Fs_Path = z.infer<typeof Scoped_Fs_Path>;
+	.brand('ScopedFsPath');
+export type ScopedFsPath = z.infer<typeof ScopedFsPath>;
 
 /**
  * Provides a secure wrapper around filesystem operations to prevent path traversal attacks and
@@ -32,17 +32,17 @@ export type Scoped_Fs_Path = z.infer<typeof Scoped_Fs_Path>;
  * This class should be used whenever performing filesystem operations on
  * user-provided or untrusted input paths to ensure proper access boundaries.
  */
-export class Scoped_Fs {
-	readonly allowed_paths: ReadonlyArray<Scoped_Fs_Path>;
+export class ScopedFs {
+	readonly allowed_paths: ReadonlyArray<ScopedFsPath>;
 
 	/**
-	 * Create a new Scoped_Fs instance with the specified allowed paths.
+	 * Create a new ScopedFs instance with the specified allowed paths.
 	 * @param allowed_paths Array of absolute paths that operations will be restricted to
 	 */
 	constructor(allowed_paths: Array<string> | ReadonlyArray<string>) {
 		try {
 			this.allowed_paths = Object.freeze(
-				allowed_paths.filter(Boolean).map((p) => Scoped_Fs_Path.parse(ensure_end(p, '/'))),
+				allowed_paths.filter(Boolean).map((p) => ScopedFsPath.parse(ensure_end(p, '/'))),
 			);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
@@ -61,7 +61,7 @@ export class Scoped_Fs {
 		try {
 			// Let the parser normalize and validate - this handles absolute path requirement
 			// and normalizes all path traversal attempts
-			const normalized_path = Scoped_Fs_Path.parse(path_to_check);
+			const normalized_path = ScopedFsPath.parse(path_to_check);
 
 			// Check if within allowed paths
 			for (const allowed_path of this.allowed_paths) {
@@ -154,18 +154,8 @@ export class Scoped_Fs {
 		return fs.readdir(safe_path, options);
 	}
 
-	async stat(
-		path_to_stat: string,
-		options?: fs_types.StatOptions & {
-			bigint?: false | undefined;
-		},
-	): Promise<fs_types.Stats>;
-	async stat(
-		path_to_stat: string,
-		options: fs_types.StatOptions & {
-			bigint: true;
-		},
-	): Promise<fs_types.BigIntStats>;
+	async stat(path_to_stat: string, options?: fs_types.StatOptions): Promise<fs_types.Stats>;
+	async stat(path_to_stat: string, options: fs_types.StatOptions): Promise<fs_types.BigIntStats>;
 	async stat(
 		path_to_stat: string,
 		options?: fs_types.StatOptions,
@@ -187,7 +177,7 @@ export class Scoped_Fs {
 		}
 		try {
 			await this.#ensure_safe_path(path_to_check);
-			await fs.access(Scoped_Fs_Path.parse(path_to_check));
+			await fs.access(ScopedFsPath.parse(path_to_check));
 			return true;
 		} catch {
 			return false;
@@ -199,22 +189,22 @@ export class Scoped_Fs {
 	 * Throws an error if the path is not allowed or contains symlinks.
 	 */
 	async #ensure_safe_path(path_to_check: string): Promise<string> {
-		let normalized_path: Scoped_Fs_Path;
+		let normalized_path: ScopedFsPath;
 		try {
-			normalized_path = Scoped_Fs_Path.parse(path_to_check);
+			normalized_path = ScopedFsPath.parse(path_to_check);
 		} catch {
-			throw new Path_Not_Allowed_Error(path_to_check);
+			throw new PathNotAllowedError(path_to_check);
 		}
 
 		if (!this.is_path_allowed(normalized_path)) {
-			throw new Path_Not_Allowed_Error(normalized_path);
+			throw new PathNotAllowedError(normalized_path);
 		}
 
 		// Check the target path if it exists
 		try {
 			const stats = await fs.lstat(normalized_path);
 			if (stats.isSymbolicLink()) {
-				throw new Symlink_Not_Allowed_Error(normalized_path);
+				throw new SymlinkNotAllowedError(normalized_path);
 			}
 		} catch (error) {
 			// If error is due to non-existence, ignore
@@ -232,7 +222,7 @@ export class Scoped_Fs {
 			try {
 				const stats = await fs.lstat(parent); // eslint-disable-line no-await-in-loop
 				if (stats.isSymbolicLink()) {
-					throw new Symlink_Not_Allowed_Error(parent);
+					throw new SymlinkNotAllowedError(parent);
 				}
 			} catch (error) {
 				if (!(error instanceof Error && error.message.includes('ENOENT'))) {
@@ -248,8 +238,8 @@ export class Scoped_Fs {
 /**
  * Error thrown when a path is not allowed
  */
-export class Path_Not_Allowed_Error extends Error {
-	override name = 'Path_Not_Allowed_Error' as const;
+export class PathNotAllowedError extends Error {
+	override name = 'PathNotAllowedError' as const;
 
 	constructor(path: string, options?: ErrorOptions) {
 		super(`Path is not allowed: ${path}`, options);
@@ -259,8 +249,8 @@ export class Path_Not_Allowed_Error extends Error {
 /**
  * Error thrown when a path is a symlink
  */
-export class Symlink_Not_Allowed_Error extends Error {
-	override name = 'Symlink_Not_Allowed_Error' as const;
+export class SymlinkNotAllowedError extends Error {
+	override name = 'SymlinkNotAllowedError' as const;
 
 	constructor(path: string, options?: ErrorOptions) {
 		super(`Path is a symlink which is not allowed: ${path}`, options);

@@ -4,27 +4,27 @@
 
 import {test, expect, beforeEach, describe} from 'vitest';
 
-import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
-import {Diskfile_Path} from '$lib/diskfile_types.js';
+import {DiskfileHistory} from '$lib/diskfile_history.svelte.js';
+import {DiskfilePath} from '$lib/diskfile_types.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test data
-const TEST_PATH = Diskfile_Path.parse('/path/to/file.txt');
+const TEST_PATH = DiskfilePath.parse('/path/to/file.txt');
 const TEST_CONTENT = 'Test content';
 
-describe('Diskfile_History', () => {
+describe('DiskfileHistory', () => {
 	// Test suite
 	let app: Frontend;
-	let history: Diskfile_History;
+	let history: DiskfileHistory;
 
 	beforeEach(() => {
 		// Create a real Zzz instance for each test
 		app = monkeypatch_zzz_for_tests(new Frontend());
 
 		// Create a fresh history instance for each test with the real Zzz instance
-		history = new Diskfile_History({
+		history = new DiskfileHistory({
 			app,
 			json: {
 				path: TEST_PATH,

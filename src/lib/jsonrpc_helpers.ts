@@ -1,29 +1,29 @@
 import {DEV} from 'esm-env';
 
 import {
-	Jsonrpc_Error_Message,
-	Jsonrpc_Error_Code,
-	type Jsonrpc_Method,
-	type Jsonrpc_Notification,
-	type Jsonrpc_Notification_Params,
-	type Jsonrpc_Request,
-	type Jsonrpc_Request_Id,
-	type Jsonrpc_Request_Params,
-	Jsonrpc_Result,
-	Jsonrpc_Response,
-	Jsonrpc_Message,
+	JsonrpcErrorMessage,
+	JsonrpcErrorCode,
+	type JsonrpcMethod,
+	type JsonrpcNotification,
+	type JsonrpcNotificationParams,
+	type JsonrpcRequest,
+	type JsonrpcRequestId,
+	type JsonrpcRequestParams,
+	JsonrpcResult,
+	JsonrpcResponse,
+	JsonrpcMessage,
 	JSONRPC_VERSION,
-	Jsonrpc_Singular_Message,
-} from '$lib/jsonrpc.js';
-import {Thrown_Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
-import type {Http_Status} from '$lib/zod_helpers.js';
+	JsonrpcSingularMessage,
+} from './jsonrpc.js';
+import {ThrownJsonrpcError, JSONRPC_ERROR_CODES} from './jsonrpc_errors.js';
+import type {HttpStatus} from './zod_helpers.js';
 
 export const create_jsonrpc_request = (
-	method: Jsonrpc_Method,
-	params: Jsonrpc_Request_Params | undefined | void,
-	id: Jsonrpc_Request_Id,
-): Jsonrpc_Request => {
-	const message: Jsonrpc_Request = {
+	method: JsonrpcMethod,
+	params: JsonrpcRequestParams | undefined,
+	id: JsonrpcRequestId,
+): JsonrpcRequest => {
+	const message: JsonrpcRequest = {
 		jsonrpc: JSONRPC_VERSION,
 		id,
 		method,
@@ -36,19 +36,19 @@ export const create_jsonrpc_request = (
 };
 
 export const create_jsonrpc_response = (
-	id: Jsonrpc_Request_Id,
-	result: Jsonrpc_Result,
-): Jsonrpc_Response => ({
+	id: JsonrpcRequestId,
+	result: JsonrpcResult,
+): JsonrpcResponse => ({
 	jsonrpc: JSONRPC_VERSION,
 	id,
 	result,
 });
 
 export const create_jsonrpc_notification = (
-	method: Jsonrpc_Method,
-	params: Jsonrpc_Notification_Params | undefined | void,
-): Jsonrpc_Notification => {
-	const message: Jsonrpc_Notification = {
+	method: JsonrpcMethod,
+	params: JsonrpcNotificationParams | undefined,
+): JsonrpcNotification => {
+	const message: JsonrpcNotification = {
 		jsonrpc: JSONRPC_VERSION,
 		method,
 	};
@@ -60,9 +60,9 @@ export const create_jsonrpc_notification = (
 };
 
 export const create_jsonrpc_error_message = (
-	id: Jsonrpc_Error_Message['id'],
-	error: Jsonrpc_Error_Message['error'],
-): Jsonrpc_Error_Message => ({
+	id: JsonrpcErrorMessage['id'],
+	error: JsonrpcErrorMessage['error'],
+): JsonrpcErrorMessage => ({
 	jsonrpc: JSONRPC_VERSION,
 	id,
 	error,
@@ -70,17 +70,17 @@ export const create_jsonrpc_error_message = (
 
 /**
  * Creates a JSON-RPC error response from any error.
- * Handles Jsonrpc_Error and regular Error objects.
+ * Handles JsonrpcError and regular Error objects.
  */
 export const create_jsonrpc_error_message_from_thrown = (
-	id: Jsonrpc_Request_Id | null,
+	id: JsonrpcRequestId | null,
 	error: any,
-): Jsonrpc_Error_Message => {
-	let code: Jsonrpc_Error_Code = JSONRPC_ERROR_CODES.internal_error;
+): JsonrpcErrorMessage => {
+	let code: JsonrpcErrorCode = JSONRPC_ERROR_CODES.internal_error;
 	let message = 'internal server error';
 	let data = undefined;
 
-	if (error instanceof Thrown_Jsonrpc_Error) {
+	if (error instanceof ThrownJsonrpcError) {
 		// Use the error directly
 		code = error.code;
 		message = error.message;
@@ -104,7 +104,7 @@ export const create_jsonrpc_error_message_from_thrown = (
 	};
 };
 
-export const to_jsonrpc_message_id = (message_or_id: unknown): Jsonrpc_Request_Id | null => {
+export const to_jsonrpc_message_id = (message_or_id: unknown): JsonrpcRequestId | null => {
 	if (!message_or_id) return null;
 
 	const maybe_id =
@@ -114,7 +114,7 @@ export const to_jsonrpc_message_id = (message_or_id: unknown): Jsonrpc_Request_I
 };
 
 // TODO @api probably parse with schema instead
-export const is_jsonrpc_request_id = (id: unknown): id is Jsonrpc_Request_Id => {
+export const is_jsonrpc_request_id = (id: unknown): id is JsonrpcRequestId => {
 	const type = typeof id;
 	return type === 'string' || (type === 'number' && !Number.isNaN(id) && Number.isFinite(id));
 };
@@ -125,26 +125,25 @@ export const is_jsonrpc_object = (message: unknown): message is {jsonrpc: typeof
 	!Array.isArray(message) &&
 	(message as any).jsonrpc === JSONRPC_VERSION;
 
-export const is_jsonrpc_message = (message: unknown): message is Jsonrpc_Message =>
+export const is_jsonrpc_message = (message: unknown): message is JsonrpcMessage =>
 	Array.isArray(message)
 		? message.length > 0 && message.every((m) => is_jsonrpc_object(m))
 		: is_jsonrpc_object(message);
 
-export const is_jsonrpc_request = (message: unknown): message is Jsonrpc_Request =>
+export const is_jsonrpc_request = (message: unknown): message is JsonrpcRequest =>
 	is_jsonrpc_object(message) && 'method' in message && 'id' in message;
 
-export const is_jsonrpc_notification = (message: unknown): message is Jsonrpc_Notification =>
+export const is_jsonrpc_notification = (message: unknown): message is JsonrpcNotification =>
 	is_jsonrpc_object(message) && 'method' in message && !('id' in message);
 
-export const is_jsonrpc_response = (message: unknown): message is Jsonrpc_Response =>
+export const is_jsonrpc_response = (message: unknown): message is JsonrpcResponse =>
 	is_jsonrpc_object(message) && 'result' in message && 'id' in message;
 
-export const is_jsonrpc_error_message = (message: unknown): message is Jsonrpc_Error_Message =>
+export const is_jsonrpc_error_message = (message: unknown): message is JsonrpcErrorMessage =>
 	is_jsonrpc_object(message) && 'error' in message && 'id' in message;
 
-export const is_jsonrpc_singular_message = (
-	message: unknown,
-): message is Jsonrpc_Singular_Message => is_jsonrpc_object(message);
+export const is_jsonrpc_singular_message = (message: unknown): message is JsonrpcSingularMessage =>
+	is_jsonrpc_object(message);
 
 /**
  * Normalizes input to JSON-RPC params format.
@@ -183,7 +182,7 @@ export const to_jsonrpc_result = (output: unknown): Record<string, any> => {
 	return {value: output};
 };
 
-const jsonrpc_error_code_to_http_status_mapping: Array<[Jsonrpc_Error_Code, Http_Status]> = [
+const jsonrpc_error_code_to_http_status_mapping: Array<[JsonrpcErrorCode, HttpStatus]> = [
 	[JSONRPC_ERROR_CODES.parse_error, 400],
 	[JSONRPC_ERROR_CODES.invalid_request, 400],
 	[JSONRPC_ERROR_CODES.method_not_found, 404],
@@ -203,26 +202,26 @@ const jsonrpc_error_code_to_http_status_mapping: Array<[Jsonrpc_Error_Code, Http
 /**
  * Maps JSON-RPC error codes to HTTP status codes.
  */
-export const JSONRPC_ERROR_CODE_TO_HTTP_STATUS: Record<Jsonrpc_Error_Code, Http_Status> =
+export const JSONRPC_ERROR_CODE_TO_HTTP_STATUS: Record<JsonrpcErrorCode, HttpStatus> =
 	Object.fromEntries(jsonrpc_error_code_to_http_status_mapping) as Record<
-		Jsonrpc_Error_Code,
-		Http_Status
+		JsonrpcErrorCode,
+		HttpStatus
 	>;
 
 /**
  * Maps HTTP status codes to JSON-RPC error codes.
  */
-export const HTTP_STATUS_TO_JSONRPC_ERROR_CODE: Record<Http_Status, Jsonrpc_Error_Code> =
+export const HTTP_STATUS_TO_JSONRPC_ERROR_CODE: Record<HttpStatus, JsonrpcErrorCode> =
 	Object.fromEntries(
 		jsonrpc_error_code_to_http_status_mapping.map(([jsonrpc_error_code, http_status]) => [
 			http_status,
 			jsonrpc_error_code,
 		]),
-	) as Record<Http_Status, Jsonrpc_Error_Code>;
+	) as Record<HttpStatus, JsonrpcErrorCode>;
 
-export const jsonrpc_error_code_to_http_status = (code: Jsonrpc_Error_Code): Http_Status =>
+export const jsonrpc_error_code_to_http_status = (code: JsonrpcErrorCode): HttpStatus =>
 	JSONRPC_ERROR_CODE_TO_HTTP_STATUS[code] || 500;
 
 // TODO review, is slop
-export const http_status_to_jsonrpc_error_code = (status: Http_Status): Jsonrpc_Error_Code =>
+export const http_status_to_jsonrpc_error_code = (status: HttpStatus): JsonrpcErrorCode =>
 	HTTP_STATUS_TO_JSONRPC_ERROR_CODE[status] || JSONRPC_ERROR_CODES.internal_error; // TODO maybe unknown instead?

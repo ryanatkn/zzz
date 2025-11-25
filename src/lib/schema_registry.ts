@@ -2,25 +2,25 @@
 
 import type {z} from 'zod';
 import type {Flavored} from '@ryanatkn/belt/types.js';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+import {UnreachableError} from '@ryanatkn/belt/error.js';
 
 import type {
-	Action_Spec_Union,
-	Request_Response_Action_Spec,
-	Remote_Notification_Action_Spec,
-	Local_Call_Action_Spec,
-} from '$lib/action_spec.js';
-import type {Action_Method} from '$lib/action_metatypes.js';
+	ActionSpecUnion,
+	RequestResponseActionSpec,
+	RemoteNotificationActionSpec,
+	LocalCallActionSpec,
+} from './action_spec.js';
+import type {ActionMethod} from './action_metatypes.js';
 
 // TODO currently unused
 
-export type Vocab_Name = Flavored<string, 'Vocab_Name'>;
+export type VocabName = Flavored<string, 'VocabName'>;
 
 /**
  * A central registry for schemas and actions.
  * Provides a single source of truth for schema definitions.
  */
-export class Schema_Registry {
+export class SchemaRegistry {
 	/**
 	 * All schemas, including model schemas, action params, and responses.
 	 */
@@ -46,43 +46,43 @@ export class Schema_Registry {
 	/**
 	 * Map of schema names to schemas.
 	 */
-	schema_by_name: Map<Vocab_Name, z.ZodType> = new Map();
+	schema_by_name: Map<VocabName, z.ZodType> = new Map();
 
 	/**
 	 * Map of schemas to their names, for reverse lookup.
 	 * Zod schemas don't have a `name` property and we don't want to abuse `description`.
 	 */
-	name_by_schema: Map<z.ZodType, Vocab_Name> = new Map();
+	name_by_schema: Map<z.ZodType, VocabName> = new Map();
 
 	/**
 	 * Collection of all action specs.
 	 */
-	action_specs: Array<Action_Spec_Union> = [];
+	action_specs: Array<ActionSpecUnion> = [];
 
 	/**
 	 * Collection of 'request_response' action specs.
 	 */
-	request_response_action_specs: Array<Request_Response_Action_Spec> = [];
+	request_response_action_specs: Array<RequestResponseActionSpec> = [];
 
 	/**
 	 * Collection of 'remote_notification' action specs.
 	 */
-	remote_notification_action_specs: Array<Remote_Notification_Action_Spec> = [];
+	remote_notification_action_specs: Array<RemoteNotificationActionSpec> = [];
 
 	/**
 	 * Collection of 'local_call' action specs.
 	 */
-	local_call_action_specs: Array<Local_Call_Action_Spec> = [];
+	local_call_action_specs: Array<LocalCallActionSpec> = [];
 
 	/**
 	 * Map of action spec names to action specs.
 	 */
-	action_spec_by_name_map: Map<Action_Method, Action_Spec_Union> = new Map();
+	action_spec_by_name_map: Map<ActionMethod, ActionSpecUnion> = new Map();
 
 	/**
 	 * Add a schema to the appropriate registries.
 	 */
-	add_schema(name: Vocab_Name, schema: z.ZodType | Action_Spec_Union): void {
+	add_schema(name: VocabName, schema: z.ZodType | ActionSpecUnion): void {
 		if ('_def' in schema) {
 			// It's a Zod schema
 			this.schemas.push(schema);
@@ -112,7 +112,7 @@ export class Schema_Registry {
 					this.local_call_action_specs.push(schema);
 					break;
 				default:
-					throw new Unreachable_Error(schema);
+					throw new UnreachableError(schema);
 			}
 		}
 	}
@@ -122,14 +122,14 @@ export class Schema_Registry {
 	 */
 	register_many(schemas: Record<string, any>): void {
 		for (const name in schemas) {
-			this.add_schema(name as Vocab_Name, schemas[name]);
+			this.add_schema(name as VocabName, schemas[name]);
 		}
 	}
 
 	/**
 	 * Lookup a schema name, guaranteed to return a string, or throws.
 	 */
-	lookup_schema_name(schema: z.ZodType): Vocab_Name {
+	lookup_schema_name(schema: z.ZodType): VocabName {
 		const name = this.name_by_schema.get(schema);
 		if (!name) {
 			throw new Error(`Schema not found in name_by_schema registry`);
@@ -140,21 +140,21 @@ export class Schema_Registry {
 	/**
 	 * Get an action specification by method name.
 	 */
-	get_action_spec(method: Action_Method): Action_Spec_Union | undefined {
+	get_action_spec(method: ActionMethod): ActionSpecUnion | undefined {
 		return this.action_spec_by_name_map.get(method);
 	}
 
 	/**
 	 * Get all schema names.
 	 */
-	get schema_names(): Array<Vocab_Name> {
+	get schema_names(): Array<VocabName> {
 		return Array.from(this.schema_by_name.keys());
 	}
 
 	/**
 	 * Get a schema by name.
 	 */
-	get_schema(name: Vocab_Name): z.ZodType | undefined {
+	get_schema(name: VocabName): z.ZodType | undefined {
 		return this.schema_by_name.get(name);
 	}
 }
@@ -162,4 +162,4 @@ export class Schema_Registry {
 /**
  * Global instance of the schema registry for convenience.
  */
-export const global_schema_registry = new Schema_Registry();
+export const global_schema_registry = new SchemaRegistry();

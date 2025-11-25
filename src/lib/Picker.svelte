@@ -2,9 +2,9 @@
 	import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 	import type {Snippet} from 'svelte';
 
-	import type {Uuid} from '$lib/zod_helpers.js';
-	import type {Sorter} from '$lib/sortable.svelte.js';
-	import Sortable_List from '$lib/Sortable_List.svelte';
+	import type {Uuid} from './zod_helpers.js';
+	import type {Sorter} from './sortable.svelte.js';
+	import SortableList from './SortableList.svelte';
 
 	const {
 		items,
@@ -48,7 +48,7 @@
 	<h2 class="mt_lg text_align_center">{heading}</h2>
 {/if}
 
-<Sortable_List
+<SortableList
 	{items}
 	{filter}
 	{exclude_ids}
@@ -60,4 +60,4 @@
 	{#snippet children(item)}
 		{@render children_prop(item, pick)}
 	{/snippet}
-</Sortable_List>
+</SortableList>

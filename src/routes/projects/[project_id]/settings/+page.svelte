@@ -2,9 +2,9 @@
 	// @slop Claude Opus 4
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
-	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
-	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
-	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
+	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
+	import SectionSidebar from '$routes/projects/SectionSidebar.svelte';
+	import ProjectNotFound from '$routes/projects/ProjectNotFound.svelte';
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -17,9 +17,9 @@
 
 <div class="project_layout">
 	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
-	<Project_Sidebar />
+	<ProjectSidebar />
 	{#if project}
-		<Section_Sidebar {project} section="settings" />
+		<SectionSidebar {project} section="settings" />
 	{/if}
 
 	<div class="project_content">
@@ -76,7 +76,7 @@
 				</div>
 			</div>
 		{:else}
-			<Project_Not_Found />
+			<ProjectNotFound />
 		{/if}
 	</div>
 </div>

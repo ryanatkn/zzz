@@ -1,75 +1,75 @@
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {DEV} from 'esm-env';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
-import type {Omit_Strict} from '@ryanatkn/belt/types.js';
+import {UnreachableError} from '@ryanatkn/belt/error.js';
+import type {OmitStrict} from '@ryanatkn/belt/types.js';
 
-import {estimate_token_count} from '$lib/helpers.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
-import {Xml_Attribute_With_Defaults} from '$lib/xml.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import type {Diskfile} from '$lib/diskfile.svelte.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
-import {Diskfile_Path} from '$lib/diskfile_types.js';
-import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
+import {estimate_token_count} from './helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Uuid} from './zod_helpers.js';
+import {XmlAttributeWithDefaults} from './xml.js';
+import {CellJson} from './cell_types.js';
+import type {Diskfile} from './diskfile.svelte.js';
+import type {Frontend} from './frontend.svelte.js';
+import {DiskfilePath} from './diskfile_types.js';
+import {CONTENT_PREVIEW_LENGTH} from './constants.js';
 
 /** Common properties for all part types. */
-export const Part_Json_Base = Cell_Json.extend({
+export const PartJsonBase = CellJson.extend({
 	type: z.string(),
 	name: z.string().default(''),
 	start: z.number().nullable().default(null),
 	end: z.number().nullable().default(null),
 	has_xml_tag: z.boolean().default(false),
 	xml_tag_name: z.string().default(''), // TODO @many move to the prompt somewhere
-	attributes: z.array(Xml_Attribute_With_Defaults).default(() => []), // TODO @many move to the prompt somewhere
+	attributes: z.array(XmlAttributeWithDefaults).default(() => []), // TODO @many move to the prompt somewhere
 	// TODO should maybe be swapped to `disabled`
 	enabled: z.boolean().default(true),
 	title: z.string().nullable().default(null),
 	summary: z.string().nullable().default(null),
 });
-export type Part_Json_Base = z.infer<typeof Part_Json_Base>;
+export type PartJsonBase = z.infer<typeof PartJsonBase>;
 
 /** Text part schema - direct content storage. */
-export const Text_Part_Json = Part_Json_Base.extend({
+export const TextPartJson = PartJsonBase.extend({
 	type: z.literal('text').default('text'),
 	content: z.string().default(''),
 });
-export type Text_Part_Json = z.infer<typeof Text_Part_Json>;
-export type Text_Part_Json_Input = z.input<typeof Text_Part_Json>;
+export type TextPartJson = z.infer<typeof TextPartJson>;
+export type TextPartJsonInput = z.input<typeof TextPartJson>;
 
 /** Diskfile part schema - references a diskfile. */
-export const Diskfile_Part_Json = Part_Json_Base.extend({
+export const DiskfilePartJson = PartJsonBase.extend({
 	type: z.literal('diskfile').default('diskfile'),
-	path: Diskfile_Path.nullable().default(null),
-	has_xml_tag: Part_Json_Base.shape.has_xml_tag.default(true), // Override to make true only for diskfiles
+	path: DiskfilePath.nullable().default(null),
+	has_xml_tag: PartJsonBase.shape.has_xml_tag.default(true), // Override to make true only for diskfiles
 	// `content` is on disk at `path`, not in the serialized representation
 });
-export type Diskfile_Part_Json = z.infer<typeof Diskfile_Part_Json>;
-export type Diskfile_Part_Json_Input = z.input<typeof Diskfile_Part_Json>;
+export type DiskfilePartJson = z.infer<typeof DiskfilePartJson>;
+export type DiskfilePartJsonInput = z.input<typeof DiskfilePartJson>;
 
 /** Union of all part types for deserialization. */
-export const Part_Json = z
-	.discriminatedUnion('type', [Text_Part_Json, Diskfile_Part_Json])
+export const PartJson = z
+	.discriminatedUnion('type', [TextPartJson, DiskfilePartJson])
 	.meta({cell_class_name: 'Part'});
-export type Part_Json = z.infer<typeof Part_Json>;
-export type Part_Json_Input = z.input<typeof Part_Json>;
+export type PartJson = z.infer<typeof PartJson>;
+export type PartJsonInput = z.input<typeof PartJson>;
 
-export type Part_Union = Text_Part | Diskfile_Part;
-export type Part_Json_Type = Text_Part_Json | Diskfile_Part_Json;
+export type PartUnion = TextPart | DiskfilePart;
+export type PartJsonType = TextPartJson | DiskfilePartJson;
 
-export interface Part_Options<T extends z.ZodType = typeof Part_Json_Base> extends Cell_Options<T> {
+export interface PartOptions<T extends z.ZodType = typeof PartJsonBase> extends CellOptions<T> {
 	json?: z.input<T>;
 }
 
-export type Text_Part_Options = Part_Options<typeof Text_Part_Json>;
-export type Diskfile_Part_Options = Part_Options<typeof Diskfile_Part_Json>;
-export type Part_Options_Union = Text_Part_Options | Diskfile_Part_Options;
+export type TextPartOptions = PartOptions<typeof TextPartJson>;
+export type DiskfilePartOptions = PartOptions<typeof DiskfilePartJson>;
+export type PartOptionsUnion = TextPartOptions | DiskfilePartOptions;
 
 /**
  * Abstract base class for all part types.
  */
-export abstract class Part<T extends z.ZodType = typeof Part_Json_Base> extends Cell<T> {
+export abstract class Part<T extends z.ZodType = typeof PartJsonBase> extends Cell<T> {
 	// The type discriminator - to be set by subclasses
 	abstract readonly type: string;
 
@@ -93,7 +93,7 @@ export abstract class Part<T extends z.ZodType = typeof Part_Json_Base> extends 
 	name: string = $state()!;
 	has_xml_tag: boolean = $state()!;
 	xml_tag_name: string = $state()!;
-	attributes: Array<Xml_Attribute_With_Defaults> = $state()!; // TODO if kept, name `xml_attributes`?
+	attributes: Array<XmlAttributeWithDefaults> = $state()!; // TODO if kept, name `xml_attributes`?
 	enabled: boolean = $state()!;
 	title: string | null = $state()!;
 	summary: string | null = $state()!;
@@ -102,9 +102,9 @@ export abstract class Part<T extends z.ZodType = typeof Part_Json_Base> extends 
 		this.type === 'diskfile' ? 'File' : 'Fragment',
 	);
 
-	add_attribute(partial: z.input<typeof Xml_Attribute_With_Defaults> = EMPTY_OBJECT): void {
+	add_attribute(partial: z.input<typeof XmlAttributeWithDefaults> = EMPTY_OBJECT): void {
 		// TODO add with a default name
-		this.attributes.push(Xml_Attribute_With_Defaults.parse(partial));
+		this.attributes.push(XmlAttributeWithDefaults.parse(partial));
 	}
 
 	/**
@@ -112,7 +112,7 @@ export abstract class Part<T extends z.ZodType = typeof Part_Json_Base> extends 
 	 */
 	update_attribute(
 		id: Uuid,
-		updates: Partial<Omit_Strict<Xml_Attribute_With_Defaults, 'id'>>,
+		updates: Partial<OmitStrict<XmlAttributeWithDefaults, 'id'>>,
 	): boolean {
 		// Find the attribute by id
 		const index = this.attributes.findIndex((a) => a.id === id);
@@ -143,65 +143,65 @@ export abstract class Part<T extends z.ZodType = typeof Part_Json_Base> extends 
 		}
 	}
 
-	static create(app: Frontend, json: Text_Part_Json_Input, options?: Text_Part_Options): Text_Part;
+	static create(app: Frontend, json: TextPartJsonInput, options?: TextPartOptions): TextPart;
 	static create(
 		app: Frontend,
-		json: Diskfile_Part_Json_Input,
-		options?: Diskfile_Part_Options,
-	): Diskfile_Part;
-	static create(app: Frontend, json: Part_Json_Input, options?: Part_Options_Union): Part_Union;
-	static create(app: Frontend, json: Part_Json_Input, options?: Part_Options_Union): Part_Union {
+		json: DiskfilePartJsonInput,
+		options?: DiskfilePartOptions,
+	): DiskfilePart;
+	static create(app: Frontend, json: PartJsonInput, options?: PartOptionsUnion): PartUnion;
+	static create(app: Frontend, json: PartJsonInput, options?: PartOptionsUnion): PartUnion {
 		if (!json.type) {
 			throw new Error('Missing required "type" field in part JSON');
 		}
 
 		switch (json.type) {
 			case 'text':
-				return new Text_Part({...options, app, json});
+				return new TextPart({...options, app, json});
 			case 'diskfile':
-				return new Diskfile_Part({...options, app, json});
+				return new DiskfilePart({...options, app, json});
 			default:
-				throw new Unreachable_Error(json.type);
+				throw new UnreachableError(json.type);
 		}
 	}
 }
 
-export const Part_Schema = z.instanceof(Part);
+export const PartSchema = z.instanceof(Part);
 
 /**
  * Text part - stores content directly.
  */
-export class Text_Part extends Part<typeof Text_Part_Json> {
+export class TextPart extends Part<typeof TextPartJson> {
 	override readonly type = 'text';
 
 	override content: string = $state()!;
 
-	constructor(options: Text_Part_Options) {
-		super(Text_Part_Json, options);
+	constructor(options: TextPartOptions) {
+		super(TextPartJson, options);
 		this.init();
 	}
 }
 
-export const Text_Part_Schema = z.instanceof(Text_Part);
+export const TextPartSchema = z.instanceof(TextPart);
 
 /**
  * Diskfile part - references content from a Diskfile.
  */
-export class Diskfile_Part extends Part<typeof Diskfile_Part_Json> {
+export class DiskfilePart extends Part<typeof DiskfilePartJson> {
 	override readonly type = 'diskfile';
 
 	/** Path property with private backing field */
-	#path: Diskfile_Path | null = $state()!;
+	#path: DiskfilePath | null = $state()!;
 
 	/**
 	 * Writable value that determines `this.diskfile`.
 	 * Also includes special diskfile part logic for attributes.
 	 */
-	get path(): Diskfile_Path | null {
+	get path(): DiskfilePath | null {
 		return this.#path;
 	}
 
-	set path(value: Diskfile_Path | null) {
+	set path(value: DiskfilePath | null) {
 		this.#path = value;
 
 		if (value === null) return;
@@ -255,8 +255,8 @@ export class Diskfile_Part extends Part<typeof Diskfile_Part_Json> {
 		}
 	}
 
-	constructor(options: Diskfile_Part_Options) {
-		super(Diskfile_Part_Json, options);
+	constructor(options: DiskfilePartOptions) {
+		super(DiskfilePartJson, options);
 		this.init();
 	}
 
@@ -269,4 +269,4 @@ export class Diskfile_Part extends Part<typeof Diskfile_Part_Json> {
 	}
 }
 
-export const Diskfile_Part_Schema = z.instanceof(Diskfile_Part);
+export const DiskfilePartSchema = z.instanceof(DiskfilePart);

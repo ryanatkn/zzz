@@ -6,16 +6,16 @@ import {
 	type Uuid,
 	type Datetime,
 	get_datetime_now,
-} from '$lib/zod_helpers.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
+} from './zod_helpers.js';
+import type {Frontend} from './frontend.svelte.js';
 import {
 	get_schema_class_info,
-	type Schema_Class_Info,
+	type SchemaClassInfo,
 	HANDLED,
-	type Cell_Value_Decoder,
-} from '$lib/cell_helpers.js';
-import type {Schema_Keys, Cell_Json} from '$lib/cell_types.js';
-import {format_datetime, format_short_date, format_time} from '$lib/time_helpers.js';
+	type CellValueDecoder,
+} from './cell_helpers.js';
+import type {SchemaKeys, CellJson} from './cell_types.js';
+import {format_datetime, format_short_date, format_time} from './time_helpers.js';
 
 // TODO improve types, especially casting
 
@@ -23,9 +23,9 @@ import {format_datetime, format_short_date, format_time} from '$lib/time_helpers
  * Any options besides these declared ones are ignored,
  * so they're safe to forward when subclassing without needing to extract the rest options.
  */
-export interface Cell_Options<T_Schema extends z.ZodType> {
+export interface CellOptions<TSchema extends z.ZodType> {
 	app: Frontend; // TODO needs to be generic
-	json?: z.input<T_Schema>;
+	json?: z.input<TSchema>;
 }
 
 /**
@@ -68,22 +68,22 @@ let global_cell_count = 0;
  *
  * Many things will be possible with this pattern, but it's still a work in progress.
  */
-export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Cell_Json {
+export abstract class Cell<TSchema extends z.ZodType = z.ZodType> implements CellJson {
 	readonly cid = ++global_cell_count;
 
-	// Base properties from Cell_Json
+	// Base properties from CellJson
 	id: Uuid = $state()!;
 	created: Datetime = $state()!;
 	updated: Datetime = $state()!;
 
 	// the `!` is needed for `$derived(` to work over `$derived.by(`
-	readonly schema!: T_Schema;
+	readonly schema!: TSchema;
 
-	readonly schema_keys: Array<Schema_Keys<T_Schema>> = $derived(zod_get_schema_keys(this.schema));
-	readonly field_schemas: Map<Schema_Keys<T_Schema>, z.ZodType> = $derived(
+	readonly schema_keys: Array<SchemaKeys<TSchema>> = $derived(zod_get_schema_keys(this.schema));
+	readonly field_schemas: Map<SchemaKeys<TSchema>, z.ZodType> = $derived(
 		new Map(this.schema_keys.map((key) => [key, get_field_schema(this.schema, key)])),
 	);
-	readonly field_schema_info: Map<Schema_Keys<T_Schema>, Schema_Class_Info | null> = $derived(
+	readonly field_schema_info: Map<SchemaKeys<TSchema>, SchemaClassInfo | null> = $derived(
 		new Map(
 			this.schema_keys.map((key) => {
 				const field_schema = this.field_schemas.get(key);
@@ -95,10 +95,10 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		),
 	);
 
-	readonly json: z.output<T_Schema> = $derived(this.to_json());
+	readonly json: z.output<TSchema> = $derived(this.to_json());
 	readonly json_serialized: string = $derived(JSON.stringify(this.json));
 	// TODO maybe add a variant `json_serialized_pretty` or `_formatted`
-	readonly json_parsed: z.ZodSafeParseResult<z.output<T_Schema>> = $derived.by(() =>
+	readonly json_parsed: z.ZodSafeParseResult<z.output<TSchema>> = $derived.by(() =>
 		this.schema.safeParse(this.json),
 	);
 
@@ -115,7 +115,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * 3. Return HANDLED to indicate the decoder has fully processed the property
 	 *    (virtual properties MUST return HANDLED if they exist in schema but not in class)
 	 */
-	protected decoders: Cell_Value_Decoder<T_Schema> = {};
+	protected decoders: CellValueDecoder<TSchema> = {};
 
 	readonly created_date: Date = $derived(new Date(this.created));
 	readonly created_formatted_short_date: string = $derived(format_short_date(this.created_date));
@@ -128,9 +128,9 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	readonly updated_formatted_time: string = $derived(format_time(this.updated_date));
 
 	/** Stored only between construction and initialization */
-	#initial_json: z.input<T_Schema> | undefined;
+	#initial_json: z.input<TSchema> | undefined;
 
-	constructor(schema: T_Schema, options: Cell_Options<T_Schema>) {
+	constructor(schema: TSchema, options: CellOptions<TSchema>) {
 		this.schema = schema;
 		this.app = options.app;
 		this.#initial_json = options.json;
@@ -215,7 +215,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	/**
 	 * For Svelte's $snapshot.
 	 */
-	toJSON(): z.output<T_Schema> {
+	toJSON(): z.output<TSchema> {
 		return this.json;
 	}
 
@@ -223,7 +223,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * Encodes the cell's serializable state as JSON.
 	 * Use the derived `cell.json` if you don't need a fresh copy.
 	 */
-	to_json(): z.output<T_Schema> {
+	to_json(): z.output<TSchema> {
 		const result = {} as Record<string, any>;
 
 		for (const key of this.schema_keys) {
@@ -236,7 +236,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			}
 		}
 
-		return result as z.output<T_Schema>;
+		return result as z.output<TSchema>;
 	}
 
 	/**
@@ -244,7 +244,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * Overwrites all properties including 'id'.
 	 * Special-cases `created` and `updated` for synchronization.
 	 */
-	set_json(value: z.input<T_Schema> | undefined): void {
+	set_json(value: z.input<TSchema> | undefined): void {
 		try {
 			// Prepare the input by ensuring `created`/`updated` are in sync when using defaults
 			let v = value as any;
@@ -280,7 +280,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * Update only the specified properties on this instance.
 	 * Preserves current values for any properties not included in the input.
 	 */
-	set_json_partial(partial_value: Partial<z.input<T_Schema>>): void {
+	set_json_partial(partial_value: Partial<z.input<TSchema>>): void {
 		if (!partial_value || typeof partial_value !== 'object') return; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
 		try {
@@ -293,7 +293,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			}
 
 			// Directly process each property in the partial update
-			for (const key of Object.keys(v) as Array<Schema_Keys<T_Schema>>) {
+			for (const key of Object.keys(v) as Array<SchemaKeys<TSchema>>) {
 				// Skip empty properties
 				if (v[key] === undefined) continue;
 
@@ -341,7 +341,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * Complex property types might require custom handling in parser functions
 	 * rather than using this general decoding mechanism.
 	 */
-	decode_property<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): any {
+	decode_property<K extends SchemaKeys<TSchema>>(value: unknown, key: K): any {
 		const schema_info = this.field_schema_info.get(key);
 		if (!schema_info) return value;
 
@@ -387,7 +387,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * 5. For properties not directly represented in the class instance but defined
 	 *    in the schema, the decoder MUST return HANDLED to indicate proper handling
 	 */
-	protected assign_property(key: Schema_Keys<T_Schema>, value: unknown): void {
+	protected assign_property(key: SchemaKeys<TSchema>, value: unknown): void {
 		// 1. Check if we have a property and decoder for this key
 		const has_property = key in this;
 		const has_decoder = key in this.decoders;
@@ -441,8 +441,8 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	}
 
 	/** Generic clone method that works for any subclass. */
-	clone(json?: z.input<T_Schema>, options?: Cell_Options<T_Schema>): this {
-		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
+	clone(json?: z.input<TSchema>, options?: CellOptions<TSchema>): this {
+		const constructor = this.constructor as new (options: CellOptions<TSchema>) => this;
 
 		const {id: _, ...current_json} = this.json as any;
 

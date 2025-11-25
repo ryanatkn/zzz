@@ -11,7 +11,7 @@ export const camel_to_snake_case = (str: string): string => {
 
 /**
  * Convert each segment of a snake_case identifier to Pascalsnake case,
- * e.g., "create_directory" -> "Create_Directory".
+ * e.g., "create_directory" -> "CreateDirectory".
  */
 export const to_pascalsnake_case = (str: string, from_camel = false): string => {
 	let result = str;

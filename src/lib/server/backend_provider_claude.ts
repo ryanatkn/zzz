@@ -2,18 +2,18 @@ import Anthropic from '@anthropic-ai/sdk';
 import {SECRET_ANTHROPIC_API_KEY} from '$env/static/private';
 
 import {
-	Backend_Provider_Remote,
-	type Backend_Provider_Options,
-	type Completion_Handler_Options,
-} from '$lib/server/backend_provider.js';
-import {to_completion_result} from '$lib/response_helpers.js';
-import type {Action_Outputs} from '$lib/action_collections.js';
-import type {Completion_Message} from '$lib/completion_types.js';
+	BackendProviderRemote,
+	type BackendProviderOptions,
+	type CompletionHandlerOptions,
+} from './backend_provider.js';
+import {to_completion_result} from '../response_helpers.js';
+import type {ActionOutputs} from '../action_collections.js';
+import type {CompletionMessage} from '../completion_types.js';
 
-export class Backend_Provider_Claude extends Backend_Provider_Remote<Anthropic> {
+export class BackendProviderClaude extends BackendProviderRemote<Anthropic> {
 	readonly name = 'claude';
 
-	constructor(options: Backend_Provider_Options) {
+	constructor(options: BackendProviderOptions) {
 		super({...options, api_key: options.api_key ?? (SECRET_ANTHROPIC_API_KEY || null)});
 	}
 
@@ -22,8 +22,8 @@ export class Backend_Provider_Claude extends Backend_Provider_Remote<Anthropic> 
 	}
 
 	async handle_streaming_completion(
-		options: Completion_Handler_Options,
-	): Promise<Action_Outputs['completion_create']> {
+		options: CompletionHandlerOptions,
+	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
@@ -84,8 +84,8 @@ export class Backend_Provider_Claude extends Backend_Provider_Remote<Anthropic> 
 	}
 
 	async handle_non_streaming_completion(
-		options: Completion_Handler_Options,
-	): Promise<Action_Outputs['completion_create']> {
+		options: CompletionHandlerOptions,
+	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt} = options;
 
 		const response = await this.get_client().messages.create(
@@ -118,8 +118,8 @@ export class Backend_Provider_Claude extends Backend_Provider_Remote<Anthropic> 
 
 const create_claude_completion_options = <T extends boolean>(
 	model: string,
-	completion_options: Completion_Handler_Options['completion_options'],
-	completion_messages: Array<Completion_Message> | undefined,
+	completion_options: CompletionHandlerOptions['completion_options'],
+	completion_messages: Array<CompletionMessage> | undefined,
 	prompt: string,
 	stream: T,
 ) => ({
@@ -136,7 +136,7 @@ const create_claude_completion_options = <T extends boolean>(
 
 // TODO @many cleanup with better data structures/helpers
 const to_messages = (
-	completion_messages: Array<Completion_Message> | undefined,
+	completion_messages: Array<CompletionMessage> | undefined,
 	prompt: string,
 ): Array<{role: 'user' | 'assistant'; content: Array<{type: 'text'; text: string}>}> => {
 	const claude_messages: Array<{

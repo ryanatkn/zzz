@@ -4,13 +4,13 @@
 	import {swallow} from '@ryanatkn/belt/dom.js';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
-	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
-	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
-	import Repos_Sidebar from '$routes/projects/Repos_Sidebar.svelte';
+	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
+	import SectionSidebar from '$routes/projects/SectionSidebar.svelte';
+	import ReposSidebar from '$routes/projects/ReposSidebar.svelte';
 	import {GLYPH_DELETE, GLYPH_ADD} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
-	import Repo_Checkout_Item from '$routes/projects/Repo_Checkout_Item.svelte';
+	import ProjectNotFound from '$routes/projects/ProjectNotFound.svelte';
+	import RepoCheckoutItem from '$routes/projects/RepoCheckoutItem.svelte';
 
 	const projects = projects_context.get();
 
@@ -37,10 +37,10 @@
 
 <div class="repo_layout">
 	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
-	<Project_Sidebar />
+	<ProjectSidebar />
 	{#if project}
-		<Section_Sidebar {project} section="repos" />
-		<Repos_Sidebar />
+		<SectionSidebar {project} section="repos" />
+		<ReposSidebar />
 	{/if}
 
 	<div class="repo_content">
@@ -81,7 +81,7 @@
 								<p class="mb_md">no checkouts yet</p>
 							{:else}
 								{#each repos_viewmodel.checkouts as checkout, i (checkout.id)}
-									<Repo_Checkout_Item
+									<RepoCheckoutItem
 										{checkout}
 										index={i}
 										on_remove={(index) => repos_viewmodel.remove_checkout_dir(index)}
@@ -123,7 +123,7 @@
 				</div>
 			</div>
 		{:else}
-			<Project_Not_Found />
+			<ProjectNotFound />
 		{/if}
 	</div>
 </div>

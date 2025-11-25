@@ -1,10 +1,10 @@
 // @slop Claude Opus 4
 
 import {z} from 'zod';
-import type {Array_Element} from '@ryanatkn/belt/types.js';
+import type {ArrayElement} from '@ryanatkn/belt/types.js';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Project_Json} from '$routes/projects/projects_schema.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {ProjectJson} from '$routes/projects/projects_schema.js';
 import {Domain} from '$routes/projects/domain.svelte.js';
 import {Page} from '$routes/projects/page.svelte.js';
 import {Repo} from '$routes/projects/repo.svelte.js';
@@ -12,22 +12,22 @@ import {HANDLED} from '$lib/cell_helpers.js';
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 
 export const project_sections = ['project', 'pages', 'domains', 'repos', 'settings'] as const;
-export type Project_Section = Array_Element<typeof project_sections>;
+export type ProjectSection = ArrayElement<typeof project_sections>;
 
-export type Project_Options = Cell_Options<typeof Project_Json>;
+export type ProjectOptions = CellOptions<typeof ProjectJson>;
 
 /**
  * Represents a project with pages and domains.
  */
-export class Project extends Cell<typeof Project_Json> {
+export class Project extends Cell<typeof ProjectJson> {
 	name: string = $state()!;
 	description: string = $state()!;
 	pages: Array<Page> = $state([]);
 	domains: Array<Domain> = $state([]);
 	repos: Array<Repo> = $state([]);
 
-	constructor(options: Project_Options) {
-		super(Project_Json, options);
+	constructor(options: ProjectOptions) {
+		super(ProjectJson, options);
 
 		this.decoders = {
 			pages: (pages_data) => {
@@ -122,4 +122,4 @@ export class Project extends Cell<typeof Project_Json> {
 	}
 }
 
-export const Project_Schema = z.instanceof(Project);
+export const ProjectSchema = z.instanceof(Project);

@@ -7,7 +7,7 @@ import {DEV} from 'esm-env';
 /**
  * Options for updating environment variables in a .env file.
  */
-export interface Update_Env_Variable_Options {
+export interface UpdateEnvVariableOptions {
 	/**
 	 * Path to the .env file (defaults to ./.env)
 	 */
@@ -38,7 +38,7 @@ export interface Update_Env_Variable_Options {
 export async function update_env_variable(
 	key: string,
 	value: string,
-	options: Update_Env_Variable_Options = {},
+	options: UpdateEnvVariableOptions = {},
 ): Promise<void> {
 	const {
 		env_file_path = DEV ? './.env.development' : './.env.production', // TODO hacky

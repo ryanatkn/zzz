@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import type {Svg_Data} from '@ryanatkn/fuz/Svg.svelte.js';
+import type {SvgData} from '@ryanatkn/fuz/Svg.svelte.js';
 
 export const OLLAMA_URL = 'http://127.0.0.1:11434'; // TODO config
 
@@ -9,22 +9,22 @@ export const OLLAMA_URL = 'http://127.0.0.1:11434'; // TODO config
 // are generally used for DEV-only parsing checks, with the parsed result discarded.
 
 // TODO @many assert type: StatusResponse
-export const Ollama_Status_Response = z.looseObject({
+export const OllamaStatusResponse = z.looseObject({
 	status: z.string(),
 });
-export type Ollama_Status_Response = z.infer<typeof Ollama_Status_Response>;
+export type OllamaStatusResponse = z.infer<typeof OllamaStatusResponse>;
 
 // TODO @many assert type: ProgressResponse
-export const Ollama_Progress_Response = z.looseObject({
+export const OllamaProgressResponse = z.looseObject({
 	status: z.string(),
 	digest: z.string().optional(),
 	total: z.number().optional(),
 	completed: z.number().optional(),
 });
-export type Ollama_Progress_Response = z.infer<typeof Ollama_Progress_Response>;
+export type OllamaProgressResponse = z.infer<typeof OllamaProgressResponse>;
 
 // TODO @many assert type: ModelDetails
-export const Ollama_Model_Details = z.looseObject({
+export const OllamaModelDetails = z.looseObject({
 	families: z.array(z.string()),
 	family: z.string(),
 	format: z.string(),
@@ -32,11 +32,11 @@ export const Ollama_Model_Details = z.looseObject({
 	parent_model: z.string(),
 	quantization_level: z.string(),
 });
-export type Ollama_Model_Details = z.infer<typeof Ollama_Model_Details>;
+export type OllamaModelDetails = z.infer<typeof OllamaModelDetails>;
 
 // TODO @many assert type: ModelResponse
-export const Ollama_List_Response_Item = z.looseObject({
-	details: Ollama_Model_Details.optional(),
+export const OllamaListResponseItem = z.looseObject({
+	details: OllamaModelDetails.optional(),
 	digest: z.string(),
 	// TODO @many Ollama bug - is this ever returned? marked as required in the types but not showing up - and is the type a string like elsewhere?
 	// expires_at: Date;
@@ -47,18 +47,18 @@ export const Ollama_List_Response_Item = z.looseObject({
 	// TODO @many Ollama bug - is this ever returned? marked as required in the types but not showing up
 	// size_vram: number;
 });
-export type Ollama_List_Response_Item = z.infer<typeof Ollama_List_Response_Item>;
+export type OllamaListResponseItem = z.infer<typeof OllamaListResponseItem>;
 
 // TODO @many assert type: ListResponse
-export const Ollama_List_Response = z.looseObject({
-	models: z.array(Ollama_List_Response_Item),
+export const OllamaListResponse = z.looseObject({
+	models: z.array(OllamaListResponseItem),
 });
-export type Ollama_List_Response = z.infer<typeof Ollama_List_Response>;
+export type OllamaListResponse = z.infer<typeof OllamaListResponse>;
 
 // TODO @many assert type: ShowResponse
-export const Ollama_Show_Response = z.looseObject({
+export const OllamaShowResponse = z.looseObject({
 	capabilities: z.array(z.string()).optional(),
-	details: Ollama_Model_Details.optional(),
+	details: OllamaModelDetails.optional(),
 	license: z.string().optional(),
 	model_info: z.any().optional(), // Map<string, any> in the API
 	modelfile: z.string().optional(),
@@ -66,11 +66,11 @@ export const Ollama_Show_Response = z.looseObject({
 	template: z.string().optional(),
 	tensors: z.array(z.any()).optional(), // TODO maybe turn? is removed atm in `ollama.svelte.ts`
 });
-export type Ollama_Show_Response = z.infer<typeof Ollama_Show_Response>;
+export type OllamaShowResponse = z.infer<typeof OllamaShowResponse>;
 
 // TODO @many assert type: ModelResponse -- Ollama is bugged, PS response item has additional fields compared to list
-export const Ollama_Ps_Response_Item = z.looseObject({
-	details: Ollama_Model_Details.optional(),
+export const OllamaPsResponseItem = z.looseObject({
+	details: OllamaModelDetails.optional(),
 	digest: z.string(),
 	expires_at: z.string(), // ISO date string for when the model will be unloaded
 	model: z.string(),
@@ -78,44 +78,44 @@ export const Ollama_Ps_Response_Item = z.looseObject({
 	size: z.number(),
 	size_vram: z.number(), // Amount of VRAM used by the model
 });
-export type Ollama_Ps_Response_Item = z.infer<typeof Ollama_Ps_Response_Item>;
+export type OllamaPsResponseItem = z.infer<typeof OllamaPsResponseItem>;
 
 // TODO @many assert type: ListResponse (bugged in Ollama, is different for list vs ps)
-export const Ollama_Ps_Response = z.looseObject({
-	models: z.array(Ollama_Ps_Response_Item),
+export const OllamaPsResponse = z.looseObject({
+	models: z.array(OllamaPsResponseItem),
 });
-export type Ollama_Ps_Response = z.infer<typeof Ollama_Ps_Response>;
+export type OllamaPsResponse = z.infer<typeof OllamaPsResponse>;
 
 // Request schemas
-export const Ollama_List_Request = z.void().optional();
-export type Ollama_List_Request = z.infer<typeof Ollama_List_Request>;
+export const OllamaListRequest = z.void().optional();
+export type OllamaListRequest = z.infer<typeof OllamaListRequest>;
 
-export const Ollama_Ps_Request = z.void().optional();
-export type Ollama_Ps_Request = z.infer<typeof Ollama_Ps_Request>;
+export const OllamaPsRequest = z.void().optional();
+export type OllamaPsRequest = z.infer<typeof OllamaPsRequest>;
 
-export const Ollama_Show_Request = z.looseObject({
+export const OllamaShowRequest = z.looseObject({
 	model: z.string(),
 	system: z.string().optional(),
 	template: z.string().optional(),
 	options: z.any().optional(), // Partial<Options>
 });
-export type Ollama_Show_Request = z.infer<typeof Ollama_Show_Request>;
+export type OllamaShowRequest = z.infer<typeof OllamaShowRequest>;
 
-export const Ollama_Pull_Request = z.looseObject({
+export const OllamaPullRequest = z.looseObject({
 	model: z.string(),
 	insecure: z.boolean().optional(),
 	stream: z.boolean().optional(),
 });
-export type Ollama_Pull_Request = z.infer<typeof Ollama_Pull_Request>;
+export type OllamaPullRequest = z.infer<typeof OllamaPullRequest>;
 
-export const Ollama_Push_Request = z.looseObject({
+export const OllamaPushRequest = z.looseObject({
 	model: z.string(),
 	insecure: z.boolean().optional(),
 	stream: z.boolean().optional(),
 });
-export type Ollama_Push_Request = z.infer<typeof Ollama_Push_Request>;
+export type OllamaPushRequest = z.infer<typeof OllamaPushRequest>;
 
-export const Ollama_Create_Request = z.looseObject({
+export const OllamaCreateRequest = z.looseObject({
 	model: z.string(),
 	from: z.string().optional(),
 	stream: z.boolean().optional(),
@@ -127,18 +127,18 @@ export const Ollama_Create_Request = z.looseObject({
 	messages: z.array(z.any()).optional(), // Array<Message>
 	adapters: z.record(z.string(), z.string()).optional(),
 });
-export type Ollama_Create_Request = z.infer<typeof Ollama_Create_Request>;
+export type OllamaCreateRequest = z.infer<typeof OllamaCreateRequest>;
 
-export const Ollama_Delete_Request = z.looseObject({
+export const OllamaDeleteRequest = z.looseObject({
 	model: z.string(),
 });
-export type Ollama_Delete_Request = z.infer<typeof Ollama_Delete_Request>;
+export type OllamaDeleteRequest = z.infer<typeof OllamaDeleteRequest>;
 
-export const Ollama_Copy_Request = z.looseObject({
+export const OllamaCopyRequest = z.looseObject({
 	source: z.string(),
 	destination: z.string(),
 });
-export type Ollama_Copy_Request = z.infer<typeof Ollama_Copy_Request>;
+export type OllamaCopyRequest = z.infer<typeof OllamaCopyRequest>;
 
 /**
  * Extract parameter count from parameter size string like "7B", "13B", etc.
@@ -174,4 +174,4 @@ export const ollama_logo = {
 			d: 'm 68.168479,42.751283 c -0.983501,0.265608 -1.859374,0.997788 -2.326062,1.959855 l -0.301445,0.617413 0.0071,0.861468 c 0,0.804085 0.01441,0.904567 0.24406,1.471621 0.315967,0.804086 0.631815,1.299464 1.213272,1.866633 0.997904,0.990644 2.124982,1.24911 3.632673,0.854327 0.868613,-0.229772 1.737227,-0.96207 2.153675,-1.816394 0.358945,-0.725035 0.445022,-1.249108 0.330253,-2.074741 -0.265609,-1.888068 -1.371255,-3.259205 -3.015263,-3.740182 -0.480975,-0.143577 -1.414233,-0.143577 -1.938306,0 z',
 		},
 	],
-} satisfies Svg_Data;
+} satisfies SvgData;

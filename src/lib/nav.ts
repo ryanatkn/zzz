@@ -1,4 +1,4 @@
-import type {Svg_Data} from '@ryanatkn/fuz/Svg.svelte';
+import type {SvgData} from '@ryanatkn/fuz/Svg.svelte';
 import {resolve} from '$app/paths';
 import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 import {page} from '$app/state';
@@ -12,19 +12,19 @@ import {
 	GLYPH_PROMPT,
 	GLYPH_PROVIDER,
 	GLYPH_SETTINGS,
-} from '$lib/glyphs.js';
-import type {Frontend} from '$lib/frontend.svelte.js';
+} from './glyphs.js';
+import type {Frontend} from './frontend.svelte.js';
 
-export interface Nav_Link_Item {
+export interface NavLinkItem {
 	label: string;
 	href: string;
-	icon: string | Svg_Data;
+	icon: string | SvgData;
 }
 
 // TODO fuz api for this in its library nav? look into it at the library -> docs rename
-export interface Nav_Item {
+export interface NavItem {
 	group: string;
-	items: Array<Nav_Link_Item>;
+	items: Array<NavLinkItem>;
 }
 
 // TODO generalize this pattern, it's one part of a hacky fix
@@ -50,7 +50,7 @@ export const to_nav_link_href = (app: Frontend, label: string, href: string): st
 };
 
 // TODO make this configurable
-export const main_nav_items_default: Array<Nav_Item> = [
+export const main_nav_items_default: Array<NavItem> = [
 	{
 		group: 'main',
 		items: [

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Dashboard_Prompts from '$lib/Dashboard_Prompts.svelte';
+	import DashboardPrompts from '$lib/DashboardPrompts.svelte';
 </script>
 
-<Dashboard_Prompts />
+<DashboardPrompts />

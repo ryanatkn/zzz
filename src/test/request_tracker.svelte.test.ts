@@ -4,12 +4,12 @@
 
 import {test, expect, describe, vi, beforeEach, afterEach} from 'vitest';
 
-import {Request_Tracker} from '$lib/request_tracker.svelte.js';
-import {JSONRPC_INTERNAL_ERROR, JSONRPC_VERSION, Jsonrpc_Error_Code} from '$lib/jsonrpc.js';
+import {RequestTracker} from '$lib/request_tracker.svelte.js';
+import {JSONRPC_INTERNAL_ERROR, JSONRPC_VERSION, JsonrpcErrorCode} from '$lib/jsonrpc.js';
 import {create_jsonrpc_response, is_jsonrpc_response} from '$lib/jsonrpc_helpers.js';
-import {Thrown_Jsonrpc_Error} from '$lib/jsonrpc_errors.js';
+import {ThrownJsonrpcError} from '$lib/jsonrpc_errors.js';
 
-describe('Request_Tracker', () => {
+describe('RequestTracker', () => {
 	let warn_spy: ReturnType<typeof vi.spyOn>;
 	let log_spy: ReturnType<typeof vi.spyOn>;
 
@@ -35,16 +35,16 @@ describe('Request_Tracker', () => {
 
 	describe('constructor', () => {
 		test('creates with default timeout', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 
-			expect(tracker).toBeInstanceOf(Request_Tracker);
+			expect(tracker).toBeInstanceOf(RequestTracker);
 			expect(tracker.request_timeout_ms).toBe(120_000);
 			expect(tracker.pending_requests.size).toBe(0);
 		});
 
 		test('creates with custom timeout', () => {
 			const custom_timeout = 5000;
-			const tracker = new Request_Tracker(custom_timeout);
+			const tracker = new RequestTracker(custom_timeout);
 
 			expect(tracker.request_timeout_ms).toBe(custom_timeout);
 			expect(tracker.pending_requests).toBeInstanceOf(Map);
@@ -52,18 +52,18 @@ describe('Request_Tracker', () => {
 
 		test('handles zero or negative timeout values', () => {
 			// Zero timeout should be allowed but would cause immediate timeouts
-			const zero_tracker = new Request_Tracker(0);
+			const zero_tracker = new RequestTracker(0);
 			expect(zero_tracker.request_timeout_ms).toBe(0);
 
 			// Negative timeout should be allowed (though it's an edge case)
-			const negative_tracker = new Request_Tracker(-1000);
+			const negative_tracker = new RequestTracker(-1000);
 			expect(negative_tracker.request_timeout_ms).toBe(-1000);
 		});
 	});
 
 	describe('track_request', () => {
 		test('creates new tracked request with all expected properties', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 			const deferred = tracker.track_request(id);
 
@@ -89,7 +89,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('creates unique request trackers for different ids', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id1 = 'req_1';
 			const id2 = 'req_2';
 
@@ -117,7 +117,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('automatically times out requests after specified delay', async () => {
-			const tracker = new Request_Tracker(1000); // 1 second timeout
+			const tracker = new RequestTracker(1000); // 1 second timeout
 			const id = 'timeout_req';
 
 			const deferred = tracker.track_request(id);
@@ -138,13 +138,13 @@ describe('Request_Tracker', () => {
 			// Request should be removed and promise rejected with timeout error
 			expect(tracker.pending_requests.has(id)).toBe(false);
 			expect(rejection_error).toBeDefined();
-			expect(rejection_error).toBeInstanceOf(Thrown_Jsonrpc_Error);
+			expect(rejection_error).toBeInstanceOf(ThrownJsonrpcError);
 			expect(rejection_error.code).toBe(JSONRPC_INTERNAL_ERROR);
 			expect(rejection_error.message).toBe(`request timed out: ${id}`);
 		});
 
 		test('cleans up previous request with same id', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'duplicate_req';
 
 			const clear_timeout_spy = vi.spyOn(global, 'clearTimeout');
@@ -170,7 +170,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('first request promise is never resolved when replaced by a new one', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'replaced_req';
 
 			// Track first request
@@ -219,7 +219,7 @@ describe('Request_Tracker', () => {
 
 	describe('resolve_request', () => {
 		test('resolves tracked request with value', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 			const response = create_jsonrpc_response(id, {test: 'result'});
 
@@ -242,7 +242,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('logs warning for unknown request id', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const unknown_id = 'unknown_req';
 
 			const response = create_jsonrpc_response(unknown_id, {test: 'result'});
@@ -254,7 +254,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('handles various data types', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const test_cases = [
 				{id: 'string_req', method: 'test_method_1'},
 				{id: 'number_req', method: 'test_method_2'},
@@ -276,7 +276,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('updates request status to success before resolving', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'status_req';
 
 			// Track request but keep reference to the tracker item
@@ -302,12 +302,12 @@ describe('Request_Tracker', () => {
 
 	describe('reject_request', () => {
 		test('rejects tracked request with error and cleans up', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 			const error = {
 				jsonrpc: JSONRPC_VERSION,
 				id,
-				error: {code: Jsonrpc_Error_Code.parse(-32000), message: 'test error'},
+				error: {code: JsonrpcErrorCode.parse(-32000), message: 'test error'},
 			} as const;
 
 			const deferred = tracker.track_request(id);
@@ -322,7 +322,7 @@ describe('Request_Tracker', () => {
 			expect(tracker.pending_requests.has(id)).toBe(false);
 
 			// Verify promise rejects with the correct error
-			await expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
+			await expect(deferred.promise).rejects.toBeInstanceOf(ThrownJsonrpcError);
 
 			const rejection_error = await deferred.promise.catch((err) => err);
 			expect(rejection_error.code).toBe(error.error.code);
@@ -330,13 +330,13 @@ describe('Request_Tracker', () => {
 		});
 
 		test('logs warning for unknown request id', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const unknown_id = 'unknown_req';
 
 			tracker.reject_request(unknown_id, {
 				jsonrpc: JSONRPC_VERSION,
 				id: unknown_id,
-				error: {code: Jsonrpc_Error_Code.parse(-32000), message: 'test'},
+				error: {code: JsonrpcErrorCode.parse(-32000), message: 'test'},
 			});
 
 			expect(warn_spy).toHaveBeenCalledTimes(1);
@@ -344,14 +344,14 @@ describe('Request_Tracker', () => {
 		});
 
 		test('handles various error types', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const test_cases = [
 				{
 					id: 'error_req',
 					error: {
 						jsonrpc: JSONRPC_VERSION,
 						id: 'error_req',
-						error: {code: Jsonrpc_Error_Code.parse(-32000), message: 'standard error'},
+						error: {code: JsonrpcErrorCode.parse(-32000), message: 'standard error'},
 					},
 				},
 				{
@@ -360,7 +360,7 @@ describe('Request_Tracker', () => {
 						jsonrpc: JSONRPC_VERSION,
 						id: 'data_req',
 						error: {
-							code: Jsonrpc_Error_Code.parse(-32001),
+							code: JsonrpcErrorCode.parse(-32001),
 							message: 'error with data',
 							data: {detail: 'extra info'},
 						},
@@ -371,7 +371,7 @@ describe('Request_Tracker', () => {
 					error: {
 						jsonrpc: JSONRPC_VERSION,
 						id: 'object_req',
-						error: {code: Jsonrpc_Error_Code.parse(-32000), message: 'object error'},
+						error: {code: JsonrpcErrorCode.parse(-32000), message: 'object error'},
 					},
 				},
 			] as const;
@@ -379,7 +379,7 @@ describe('Request_Tracker', () => {
 			for (const {id, error} of test_cases) {
 				const deferred = tracker.track_request(id);
 				tracker.reject_request(id, error);
-				await expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error); // eslint-disable-line no-await-in-loop
+				await expect(deferred.promise).rejects.toBeInstanceOf(ThrownJsonrpcError); // eslint-disable-line no-await-in-loop
 
 				const rejection_error = await deferred.promise.catch((err) => err); // eslint-disable-line no-await-in-loop
 				expect(rejection_error.code).toBe(error.error.code);
@@ -390,7 +390,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('updates request status to failure before rejecting', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'status_req';
 
 			// Track request but keep reference to the tracker item
@@ -412,7 +412,7 @@ describe('Request_Tracker', () => {
 			tracker.reject_request(id, {
 				jsonrpc: JSONRPC_VERSION,
 				id,
-				error: {code: Jsonrpc_Error_Code.parse(-32000), message: 'test error'},
+				error: {code: JsonrpcErrorCode.parse(-32000), message: 'test error'},
 			});
 			await promise;
 
@@ -422,7 +422,7 @@ describe('Request_Tracker', () => {
 
 	describe('handle_message', () => {
 		test('resolves request with result when message contains result', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 			const message = {
 				jsonrpc: JSONRPC_VERSION,
@@ -448,7 +448,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('rejects request with error when message contains error', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_2';
 			const error = {code: -32000, message: 'test error'};
 			const message = {
@@ -469,7 +469,7 @@ describe('Request_Tracker', () => {
 			expect(reject_spy).toHaveBeenCalledWith(id, message);
 
 			// Verify promise rejects with correct error
-			await expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
+			await expect(deferred.promise).rejects.toBeInstanceOf(ThrownJsonrpcError);
 
 			const rejection_error = await deferred.promise.catch((err) => err);
 			expect(rejection_error.code).toBe(message.error.code);
@@ -478,7 +478,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('ignores notification messages (no id)', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const resolve_spy = vi.spyOn(tracker, 'resolve_request');
 			const reject_spy = vi.spyOn(tracker, 'reject_request');
 
@@ -505,7 +505,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('ignores messages with id but no result or error', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const resolve_spy = vi.spyOn(tracker, 'resolve_request');
 			const reject_spy = vi.spyOn(tracker, 'reject_request');
 
@@ -532,7 +532,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('handles null/undefined/empty messages gracefully', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const resolve_spy = vi.spyOn(tracker, 'resolve_request');
 			const reject_spy = vi.spyOn(tracker, 'reject_request');
 
@@ -557,7 +557,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('correctly handles zero as a valid id', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 0;
 			const message = {
 				jsonrpc: JSONRPC_VERSION,
@@ -579,7 +579,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('prioritizes error over result if both exist in the message', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'conflict_req';
 			const error = {code: -32000, message: 'test error'};
 
@@ -601,7 +601,7 @@ describe('Request_Tracker', () => {
 			expect(reject_spy).toHaveBeenCalledWith(id, message);
 
 			// Promise should be rejected with the error
-			await expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
+			await expect(deferred.promise).rejects.toBeInstanceOf(ThrownJsonrpcError);
 
 			const rejection_error = await deferred.promise.catch((err) => err);
 			expect(rejection_error.code).toBe(message.error.code);
@@ -611,7 +611,7 @@ describe('Request_Tracker', () => {
 
 	describe('cancel_request', () => {
 		test('cancels tracked request and cleans up timeouts', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 
 			tracker.track_request(id);
@@ -628,7 +628,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('does nothing for unknown request id', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const unknown_id = 'unknown_req';
 			const clear_timeout_spy = vi.spyOn(global, 'clearTimeout');
 
@@ -639,7 +639,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('handles cancel without affecting other requests', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id1 = 'req_1';
 			const id2 = 'req_2';
 
@@ -657,7 +657,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('does not reject or resolve the promise when canceled', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'cancel_req';
 
 			const deferred = tracker.track_request(id);
@@ -704,7 +704,7 @@ describe('Request_Tracker', () => {
 
 	describe('cancel_all_requests', () => {
 		test('cancels all tracked requests with custom reason', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id1 = 'req_1';
 			const id2 = 'req_2';
 			const custom_reason = 'Custom cancel reason';
@@ -718,8 +718,8 @@ describe('Request_Tracker', () => {
 			const timeout2 = tracker.pending_requests.get(id2)?.timeout;
 
 			// Set up promise rejection tracking
-			const promise1 = expect(deferred1.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
-			const promise2 = expect(deferred2.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
+			const promise1 = expect(deferred1.promise).rejects.toBeInstanceOf(ThrownJsonrpcError);
+			const promise2 = expect(deferred2.promise).rejects.toBeInstanceOf(ThrownJsonrpcError);
 
 			// Cancel all requests
 			tracker.cancel_all_requests(custom_reason);
@@ -736,11 +736,11 @@ describe('Request_Tracker', () => {
 		});
 
 		test('uses default message when reason not provided', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 
 			const deferred = tracker.track_request(id);
-			const promise = expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
+			const promise = expect(deferred.promise).rejects.toBeInstanceOf(ThrownJsonrpcError);
 
 			tracker.cancel_all_requests();
 			expect(tracker.pending_requests.size).toBe(0);
@@ -749,7 +749,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('does nothing when no requests are tracked', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const clear_timeout_spy = vi.spyOn(global, 'clearTimeout');
 
 			tracker.cancel_all_requests();
@@ -759,7 +759,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('sets failure status before rejecting', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 
 			// Track request but keep reference to the tracker item
@@ -784,14 +784,14 @@ describe('Request_Tracker', () => {
 			expect(status_when_rejected).toBe('failure');
 		});
 
-		test('rejects with Thrown_Jsonrpc_Error instance when cancelling all requests', async () => {
-			const tracker = new Request_Tracker();
+		test('rejects with ThrownJsonrpcError instance when cancelling all requests', async () => {
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 
 			const deferred = tracker.track_request(id);
 
-			// Set up testing for Thrown_Jsonrpc_Error instance
-			const promise = expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
+			// Set up testing for ThrownJsonrpcError instance
+			const promise = expect(deferred.promise).rejects.toBeInstanceOf(ThrownJsonrpcError);
 
 			tracker.cancel_all_requests();
 
@@ -801,7 +801,7 @@ describe('Request_Tracker', () => {
 
 	describe('edge cases and corner cases', () => {
 		test('retracking the same request id replaces previous tracking', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 			const clear_timeout_spy = vi.spyOn(global, 'clearTimeout');
 
@@ -824,8 +824,8 @@ describe('Request_Tracker', () => {
 			tracker.cancel_request(id);
 		});
 
-		test('handles various Jsonrpc_Request_Id types', async () => {
-			const tracker = new Request_Tracker();
+		test('handles various JsonrpcRequestId types', async () => {
+			const tracker = new RequestTracker();
 			const test_cases = [
 				{id: 123, method: 'test'},
 				{id: 'string-id', method: 'test'},
@@ -847,7 +847,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('handles Object.hasOwn correctly for result property checking', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 			const deferred = tracker.track_request(id);
 
@@ -870,7 +870,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('request timeout uses correct error object', async () => {
-			const tracker = new Request_Tracker(100);
+			const tracker = new RequestTracker(100);
 			const id = 'timeout_req';
 
 			const deferred = tracker.track_request(id);
@@ -882,13 +882,13 @@ describe('Request_Tracker', () => {
 			vi.advanceTimersByTime(101);
 
 			const error = await error_promise;
-			expect(error).toBeInstanceOf(Thrown_Jsonrpc_Error);
+			expect(error).toBeInstanceOf(ThrownJsonrpcError);
 			expect(error.code).toBe(JSONRPC_INTERNAL_ERROR);
 			expect(error.message).toBe(`request timed out: ${id}`);
 		});
 
 		test('handles undefined timeout when clearing timeouts', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_undefined_timeout';
 
 			// Create a request
@@ -910,7 +910,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('handles undefined request objects gracefully', () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'req_1';
 
 			// Create a request and then manually delete it from the map
@@ -922,13 +922,13 @@ describe('Request_Tracker', () => {
 			tracker.reject_request(id, {
 				jsonrpc: '2.0' as const,
 				id,
-				error: {code: Jsonrpc_Error_Code.parse(-32000), message: 'test error'},
+				error: {code: JsonrpcErrorCode.parse(-32000), message: 'test error'},
 			});
 			tracker.cancel_request(id);
 		});
 
 		test('handles duplicate resolve/reject calls', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const id = 'duplicate_calls';
 
 			const deferred = tracker.track_request(id);
@@ -944,7 +944,7 @@ describe('Request_Tracker', () => {
 				jsonrpc: JSONRPC_VERSION,
 				id,
 				error: {
-					code: Jsonrpc_Error_Code.parse(-32000),
+					code: JsonrpcErrorCode.parse(-32000),
 					message: 'ignored',
 				},
 			});
@@ -966,7 +966,7 @@ describe('Request_Tracker', () => {
 
 	describe('integration scenarios', () => {
 		test('handles a complete request lifecycle', async () => {
-			const tracker = new Request_Tracker(5000);
+			const tracker = new RequestTracker(5000);
 			const id = 'lifecycle_req';
 
 			// Track the request
@@ -990,7 +990,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('handles simultaneous requests with different IDs', async () => {
-			const tracker = new Request_Tracker();
+			const tracker = new RequestTracker();
 			const ids = ['req_1', 'req_2', 'req_3'];
 
 			// Track multiple requests
@@ -1025,7 +1025,7 @@ describe('Request_Tracker', () => {
 		});
 
 		test('handles a mix of resolved, rejected, and timed out requests', async () => {
-			const tracker = new Request_Tracker(500);
+			const tracker = new RequestTracker(500);
 
 			// Create requests with different fates
 			const resolve_id = 'to_resolve';
@@ -1043,7 +1043,7 @@ describe('Request_Tracker', () => {
 			tracker.reject_request(reject_id, {
 				jsonrpc: '2.0' as const,
 				id: reject_id,
-				error: {code: Jsonrpc_Error_Code.parse(-32000), message: 'rejected'},
+				error: {code: JsonrpcErrorCode.parse(-32000), message: 'rejected'},
 			});
 
 			// Let the third request time out
@@ -1056,13 +1056,13 @@ describe('Request_Tracker', () => {
 			});
 
 			const reject_promise = reject_deferred.promise.catch((error) => {
-				expect(error).toBeInstanceOf(Thrown_Jsonrpc_Error);
+				expect(error).toBeInstanceOf(ThrownJsonrpcError);
 				expect(error.message).toBe('rejected');
 				return true;
 			});
 
 			const timeout_promise = timeout_deferred.promise.catch((error) => {
-				expect(error).toBeInstanceOf(Thrown_Jsonrpc_Error);
+				expect(error).toBeInstanceOf(ThrownJsonrpcError);
 				expect(error.message).toBe(`request timed out: ${timeout_id}`);
 				return true;
 			});

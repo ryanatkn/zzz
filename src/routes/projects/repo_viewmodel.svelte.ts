@@ -6,10 +6,10 @@ import {resolve} from '$app/paths';
 
 import {create_uuid, get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
 import {Repo} from '$routes/projects/repo.svelte.js';
-import type {Repo_Checkout} from '$routes/projects/projects_schema.js';
+import type {RepoCheckout} from '$routes/projects/projects_schema.js';
 import type {Projects} from '$routes/projects/projects.svelte.js';
 
-export interface Repo_Viewmodel_Options {
+export interface RepoViewmodelOptions {
 	projects: Projects;
 	project_id: Uuid;
 	repo_id: Uuid | null;
@@ -18,14 +18,14 @@ export interface Repo_Viewmodel_Options {
 /**
  * Controller for repo management functionality.
  */
-export class Repo_Viewmodel {
+export class RepoViewmodel {
 	readonly projects: Projects;
 
 	project_id: Uuid = $state()!;
 	repo_id: Uuid | null = $state()!;
 
 	git_url: string = $state()!;
-	checkouts: Array<Repo_Checkout> = $state([]);
+	checkouts: Array<RepoCheckout> = $state([]);
 
 	/** Whether the form has unsaved changes. */
 	readonly has_changes = $derived.by(
@@ -47,9 +47,9 @@ export class Repo_Viewmodel {
 	});
 
 	/**
-	 * Creates a new Repo_Viewmodel instance.
+	 * Creates a new RepoViewmodel instance.
 	 */
-	constructor(options: Repo_Viewmodel_Options) {
+	constructor(options: RepoViewmodelOptions) {
 		this.projects = options.projects;
 
 		this.project_id = options.project_id;
@@ -73,7 +73,7 @@ export class Repo_Viewmodel {
 	/**
 	 * Add a new checkout directory
 	 */
-	add_checkout_dir(json?: Partial<Repo_Checkout>): void {
+	add_checkout_dir(json?: Partial<RepoCheckout>): void {
 		this.checkouts.push({
 			// TODO parse with schema
 			id: create_uuid(),
@@ -137,4 +137,4 @@ export class Repo_Viewmodel {
 	}
 }
 
-export const Repo_Viewmodel_Schema = z.instanceof(Repo_Viewmodel);
+export const RepoViewmodelSchema = z.instanceof(RepoViewmodel);

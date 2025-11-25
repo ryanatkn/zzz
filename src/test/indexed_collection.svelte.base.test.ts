@@ -5,18 +5,18 @@
 import {test, expect, describe} from 'vitest';
 import {z} from 'zod';
 
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
 	create_derived_index,
 	create_dynamic_index,
-	type Indexed_Item,
+	type IndexedItem,
 } from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
-// Mock item type that implements Indexed_Item
-interface Test_Item {
+// Mock item type that implements IndexedItem
+interface TestItem {
 	id: Uuid;
 	text: string;
 	category: string;
@@ -31,7 +31,7 @@ const create_item = (
 	category: string,
 	list: Array<string> = [],
 	number: number = 0,
-): Test_Item => ({
+): TestItem => ({
 	id: create_uuid(),
 	text,
 	category,
@@ -41,17 +41,17 @@ const create_item = (
 });
 
 // Helper functions for id-based equality checks
-const has_item_with_id = (items: Iterable<Test_Item>, item: Test_Item): boolean => {
+const has_item_with_id = (items: Iterable<TestItem>, item: TestItem): boolean => {
 	for (const i of items) {
 		if (i.id === item.id) return true;
 	}
 	return false;
 };
 
-describe('Indexed_Collection - Base Functionality', () => {
+describe('IndexedCollection - Base Functionality', () => {
 	test('basic operations with no indexes', () => {
 		// Create a collection with no indexes
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+		const collection: IndexedCollection<TestItem> = new IndexedCollection();
 
 		// Add items
 		const item1 = create_item('a1', 'c1');
@@ -77,7 +77,7 @@ describe('Indexed_Collection - Base Functionality', () => {
 	});
 
 	test('single index operations', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_text',
@@ -107,7 +107,7 @@ describe('Indexed_Collection - Base Functionality', () => {
 		expect(collection.by<string>('by_text', 'a1').id).toBe(item1.id);
 
 		// Test query method
-		expect(collection.query<Test_Item, string>('by_text', 'a1').id).toBe(item1.id);
+		expect(collection.query<TestItem, string>('by_text', 'a1').id).toBe(item1.id);
 
 		// Test index update on removal
 		collection.remove(item2.id);
@@ -116,9 +116,9 @@ describe('Indexed_Collection - Base Functionality', () => {
 	});
 });
 
-describe('Indexed_Collection - Index Types', () => {
+describe('IndexedCollection - Index Types', () => {
 	test('multi index operations', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_category',
@@ -161,7 +161,7 @@ describe('Indexed_Collection - Index Types', () => {
 	});
 
 	test('derived index operations', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_derived_index({
 					key: 'high_numbers',
@@ -225,9 +225,9 @@ describe('Indexed_Collection - Index Types', () => {
 
 	test('function indexes', () => {
 		// Test a function-based index using the new helper function
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
-				create_dynamic_index<Test_Item, (range: string) => Array<Test_Item>>({
+				create_dynamic_index<TestItem, (range: string) => Array<TestItem>>({
 					key: 'by_range',
 					factory: (collection) => {
 						return (range: string) => {
@@ -258,7 +258,7 @@ describe('Indexed_Collection - Index Types', () => {
 		collection.add(create_item('a6', 'c1', [], 1)); // Low number
 
 		// The index is a function that can be queried
-		const range_function = collection.get_index<(range: string) => Array<Test_Item>>('by_range');
+		const range_function = collection.get_index<(range: string) => Array<TestItem>>('by_range');
 
 		// Test function index queries
 		expect(range_function('high')).toHaveLength(2);
@@ -266,15 +266,15 @@ describe('Indexed_Collection - Index Types', () => {
 		expect(range_function('low')).toHaveLength(2);
 
 		// Test using the query method
-		expect(collection.query<Array<Test_Item>, string>('by_range', 'high')).toHaveLength(2);
-		expect(collection.query<Array<Test_Item>, string>('by_range', 'medium')).toHaveLength(2);
-		expect(collection.query<Array<Test_Item>, string>('by_range', 'low')).toHaveLength(2);
+		expect(collection.query<Array<TestItem>, string>('by_range', 'high')).toHaveLength(2);
+		expect(collection.query<Array<TestItem>, string>('by_range', 'medium')).toHaveLength(2);
+		expect(collection.query<Array<TestItem>, string>('by_range', 'low')).toHaveLength(2);
 	});
 });
 
-describe('Indexed_Collection - Advanced Features', () => {
+describe('IndexedCollection - Advanced Features', () => {
 	test('combined indexing strategies', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_text',
@@ -336,9 +336,9 @@ describe('Indexed_Collection - Advanced Features', () => {
 
 	test('complex data structures', () => {
 		// Create a custom helper function for this specialized case
-		const create_stats_index = <T extends Indexed_Item>(key: string) => ({
+		const create_stats_index = <T extends IndexedItem>(key: string) => ({
 			key,
-			compute: (collection: Indexed_Collection<T>) => {
+			compute: (collection: IndexedCollection<T>) => {
 				const items = [...collection.by_id.values()];
 				return {
 					count: items.length,
@@ -353,7 +353,7 @@ describe('Indexed_Collection - Advanced Features', () => {
 				stats.unique_values.add(item.category);
 				return stats;
 			},
-			onremove: (stats: any, item: any, collection: Indexed_Collection<T>) => {
+			onremove: (stats: any, item: any, collection: IndexedCollection<T>) => {
 				stats.count--;
 				if (stats.count === 0) {
 					stats.average = 0;
@@ -374,8 +374,8 @@ describe('Indexed_Collection - Advanced Features', () => {
 			},
 		});
 
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-			indexes: [create_stats_index<Test_Item>('stats')],
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
+			indexes: [create_stats_index<TestItem>('stats')],
 		});
 
 		// Add items
@@ -403,7 +403,7 @@ describe('Indexed_Collection - Advanced Features', () => {
 	});
 
 	test('batch operations', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_category',

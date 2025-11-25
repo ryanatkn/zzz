@@ -11,7 +11,7 @@ import {Projects} from '$routes/projects/projects.svelte.js';
 import {Repo} from '$routes/projects/repo.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 
-export interface Project_Viewmodel_Options {
+export interface ProjectViewmodelOptions {
 	projects: Projects;
 	project_id: Uuid;
 }
@@ -19,7 +19,7 @@ export interface Project_Viewmodel_Options {
 /**
  * Controller for managing project details and operations.
  */
-export class Project_Viewmodel {
+export class ProjectViewmodel {
 	readonly projects: Projects;
 
 	project_id: Uuid = $state()!;
@@ -41,9 +41,9 @@ export class Project_Viewmodel {
 	readonly project = $derived.by(() => this.projects.current_project);
 
 	/**
-	 * Creates a new Project_Viewmodel instance.
+	 * Creates a new ProjectViewmodel instance.
 	 */
-	constructor(options: Project_Viewmodel_Options) {
+	constructor(options: ProjectViewmodelOptions) {
 		this.projects = options.projects;
 
 		this.project_id = options.project_id;
@@ -196,4 +196,4 @@ export class Project_Viewmodel {
 	}
 }
 
-export const Project_Viewmodel_Schema = z.instanceof(Project_Viewmodel);
+export const ProjectViewmodelSchema = z.instanceof(ProjectViewmodel);

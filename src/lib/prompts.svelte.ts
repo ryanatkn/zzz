@@ -1,32 +1,32 @@
 import {z} from 'zod';
 import {page} from '$app/state';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Prompt, Prompt_Json, type Prompt_Json_Input} from '$lib/prompt.svelte.js';
-import type {Uuid} from '$lib/zod_helpers.js';
-import {HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
-import {to_reordered_list} from '$lib/list_helpers.js';
-import type {Part_Union} from '$lib/part.svelte.js';
-import {get_unique_name} from '$lib/helpers.js';
-import {to_prompts_url} from '$lib/nav_helpers.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {goto_unless_current} from '$lib/navigation_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {Prompt, PromptJson, type PromptJsonInput} from './prompt.svelte.js';
+import type {Uuid} from './zod_helpers.js';
+import {HANDLED} from './cell_helpers.js';
+import {IndexedCollection} from './indexed_collection.svelte.js';
+import {create_single_index, create_derived_index} from './indexed_collection_helpers.svelte.js';
+import {to_reordered_list} from './list_helpers.js';
+import type {PartUnion} from './part.svelte.js';
+import {get_unique_name} from './helpers.js';
+import {to_prompts_url} from './nav_helpers.js';
+import {CellJson} from './cell_types.js';
+import {goto_unless_current} from './navigation_helpers.js';
 
-export const Prompts_Json = Cell_Json.extend({
-	items: z.array(Prompt_Json).default(() => []),
+export const PromptsJson = CellJson.extend({
+	items: z.array(PromptJson).default(() => []),
 	selected_id: z.string().nullable().default(null),
 	show_sort_controls: z.boolean().default(false),
 }).meta({cell_class_name: 'Prompts'});
-export type Prompts_Json = z.infer<typeof Prompts_Json>;
-export type Prompts_Json_Input = z.input<typeof Prompts_Json>;
+export type PromptsJson = z.infer<typeof PromptsJson>;
+export type PromptsJsonInput = z.input<typeof PromptsJson>;
 
-export interface Prompts_Options extends Cell_Options<typeof Prompts_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface PromptsOptions extends CellOptions<typeof PromptsJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Prompts extends Cell<typeof Prompts_Json> {
+export class Prompts extends Cell<typeof PromptsJson> {
 	// Initialize items with proper typing and unified indexes
-	readonly items: Indexed_Collection<Prompt> = new Indexed_Collection({
+	readonly items: IndexedCollection<Prompt> = new IndexedCollection({
 		indexes: [
 			create_single_index({
 				key: 'by_name',
@@ -81,8 +81,8 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	/** Ordered array of prompts derived from the `manual_order` index. */
 	readonly ordered_items: Array<Prompt> = $derived(this.items.derived_index('manual_order'));
 
-	constructor(options: Prompts_Options) {
-		super(Prompts_Json, options);
+	constructor(options: PromptsOptions) {
+		super(PromptsJson, options);
 
 		this.decoders = {
 			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
@@ -100,12 +100,12 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		this.init();
 	}
 
-	filter_by_part(part: Part_Union): Array<Prompt> {
+	filter_by_part(part: PartUnion): Array<Prompt> {
 		const {id} = part;
 		return this.ordered_items.filter((p) => p.parts.some((b) => b.id === id)); // TODO add an index?
 	}
 
-	add(json?: Prompt_Json_Input): Prompt {
+	add(json?: PromptJsonInput): Prompt {
 		const j = !json?.name ? {...json, name: this.generate_unique_name('new prompt')} : json;
 		const prompt = new Prompt({app: this.app, json: j});
 		this.items.add(prompt);
@@ -120,7 +120,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	// TODO @many look into making these more generic, less manual bookkeeping
-	add_many(prompts_json: Array<Prompt_Json_Input>): Array<Prompt> {
+	add_many(prompts_json: Array<PromptJsonInput>): Array<Prompt> {
 		const prompts = prompts_json.map((json) => new Prompt({app: this.app, json}));
 		this.items.add_many(prompts);
 
@@ -192,4 +192,4 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 }
 
-export const Prompts_Schema = z.instanceof(Prompts);
+export const PromptsSchema = z.instanceof(Prompts);

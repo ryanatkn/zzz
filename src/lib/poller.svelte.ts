@@ -1,6 +1,6 @@
 import {BROWSER} from 'esm-env';
 
-export interface Poller_Options {
+export interface PollerOptions {
 	/** Function to call on each poll interval. */
 	poll_fn: () => void | Promise<void>;
 	/** Polling interval in milliseconds. */
@@ -32,7 +32,7 @@ export class Poller {
 	#interval: number;
 	#immediate: boolean;
 
-	constructor(options: Poller_Options) {
+	constructor(options: PollerOptions) {
 		this.#poll_fn = options.poll_fn;
 		this.#interval = options.interval ?? Poller.DEFAULT_INTERVAL;
 		this.#immediate = options.immediate ?? true;

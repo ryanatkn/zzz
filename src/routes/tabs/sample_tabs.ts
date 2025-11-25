@@ -1,5 +1,5 @@
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import type {Browser_Tab_Json} from '$routes/tabs/browser_tab.svelte.js';
+import type {BrowserTabJson} from '$routes/tabs/browser_tab.svelte.js';
 
 // Fake site content for embedded HTML tabs
 export const fake_sites = {
@@ -37,7 +37,7 @@ export const fake_sites = {
 
 // Sample tabs for browser initialization
 const created = get_datetime_now();
-export const sample_tabs: Array<Browser_Tab_Json> = [
+export const sample_tabs: Array<BrowserTabJson> = [
 	{
 		id: create_uuid(),
 		title: 'Zzz is a browser',

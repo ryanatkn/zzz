@@ -2,26 +2,26 @@
 
 import type {WSContext} from 'hono/ws';
 
-import {create_uuid, Uuid} from '$lib/zod_helpers.js';
-import type {Transport} from '$lib/transports.js';
+import {create_uuid, Uuid} from '../zod_helpers.js';
+import type {Transport} from '../transports.js';
 import type {
-	Jsonrpc_Message_From_Client_To_Server,
-	Jsonrpc_Message_From_Server_To_Client,
-	Jsonrpc_Notification,
-	Jsonrpc_Request,
-	Jsonrpc_Response_Or_Error,
-	Jsonrpc_Error_Message,
-} from '$lib/jsonrpc.js';
-import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+	JsonrpcMessageFromClientToServer,
+	JsonrpcMessageFromServerToClient,
+	JsonrpcNotification,
+	JsonrpcRequest,
+	JsonrpcResponseOrError,
+	JsonrpcErrorMessage,
+} from '../jsonrpc.js';
+import {jsonrpc_error_messages} from '../jsonrpc_errors.js';
 import {
 	create_jsonrpc_error_message,
 	to_jsonrpc_message_id,
 	is_jsonrpc_request,
-} from '$lib/jsonrpc_helpers.js';
+} from '../jsonrpc_helpers.js';
 
 // TODO support a SSE backend transport
 
-export class Backend_Websocket_Transport implements Transport {
+export class BackendWebsocketTransport implements Transport {
 	readonly transport_name = 'backend_websocket_rpc' as const;
 
 	// Map connection IDs to WebSocket contexts
@@ -52,11 +52,11 @@ export class Backend_Websocket_Transport implements Transport {
 	}
 
 	// TODO needs implementation, only broadcasts notifications for now
-	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
+	async send(message: JsonrpcRequest): Promise<JsonrpcResponseOrError>;
+	async send(message: JsonrpcNotification): Promise<JsonrpcErrorMessage | null>;
 	async send(
-		message: Jsonrpc_Message_From_Client_To_Server,
-	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+		message: JsonrpcMessageFromClientToServer,
+	): Promise<JsonrpcMessageFromServerToClient | null> {
 		// TODO currently just broadcasts all messages to all clients, the transport abstraction is still a WIP
 		if (is_jsonrpc_request(message)) {
 			return create_jsonrpc_error_message(
@@ -83,7 +83,7 @@ export class Backend_Websocket_Transport implements Transport {
 
 	// TODO refactor something like this with `send`
 	// async #send_to_connection(
-	// 	message: Jsonrpc_Message_From_Server_To_Client,
+	// 	message: JsonrpcMessageFromServerToClient,
 	// 	connection_id: Uuid,
 	// ): Promise<void> {
 	// 	const ws = this.#connections.get(connection_id);
@@ -97,7 +97,7 @@ export class Backend_Websocket_Transport implements Transport {
 	/**
 	 * Broadcast a message to all connected clients.
 	 */
-	#broadcast(message: Jsonrpc_Message_From_Server_To_Client): Promise<void> {
+	#broadcast(message: JsonrpcMessageFromServerToClient): Promise<void> {
 		const serialized = JSON.stringify(message);
 		for (const ws of this.#connections.values()) {
 			try {

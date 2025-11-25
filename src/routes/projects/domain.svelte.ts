@@ -1,18 +1,18 @@
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Domain_Json} from '$routes/projects/projects_schema.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {DomainJson} from '$routes/projects/projects_schema.js';
 
-export type Domain_Options = Cell_Options<typeof Domain_Json>;
+export type DomainOptions = CellOptions<typeof DomainJson>;
 
 /**
  * Represents a domain in a project.
  */
-export class Domain extends Cell<typeof Domain_Json> {
+export class Domain extends Cell<typeof DomainJson> {
 	name: string = $state()!;
 	status: 'active' | 'pending' | 'inactive' = $state()!;
 	ssl: boolean = $state()!;
 
-	constructor(options: Domain_Options) {
-		super(Domain_Json, options);
+	constructor(options: DomainOptions) {
+		super(DomainJson, options);
 		this.init();
 	}
 }

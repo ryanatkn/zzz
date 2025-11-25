@@ -5,26 +5,26 @@ import {Logger} from '@ryanatkn/belt/log.js';
 import {ALLOWED_ORIGINS} from '$env/static/private';
 import {DEV} from 'esm-env';
 
-import {Backend} from '$lib/server/backend.js';
-import {backend_action_handlers} from '$lib/server/backend_action_handlers.js';
-import {register_http_actions} from '$lib/server/register_http_actions.js';
-import {register_websocket_actions} from '$lib/server/register_websocket_actions.js';
-import create_config from '$lib/config.js';
-import {action_specs} from '$lib/action_collections.js';
+import {Backend} from './backend.js';
+import {backend_action_handlers} from './backend_action_handlers.js';
+import {register_http_actions} from './register_http_actions.js';
+import {register_websocket_actions} from './register_websocket_actions.js';
+import create_config from '../config.js';
+import {action_specs} from '../action_collections.js';
 import {
 	API_PATH_FOR_HTTP_RPC,
 	SERVER_HOST,
 	SERVER_PROXIED_PORT,
 	WEBSOCKET_PATH,
 	ZZZ_CACHE_DIR,
-} from '$lib/constants.js';
-import {parse_allowed_origins, verify_request_source} from '$lib/server/security.js';
-import {handle_filer_change} from '$lib/server/backend_actions_api.js';
-import {Backend_Provider_Ollama} from '$lib/server/backend_provider_ollama.js';
-import {Backend_Provider_Claude} from '$lib/server/backend_provider_claude.js';
-import {Backend_Provider_Chatgpt} from '$lib/server/backend_provider_chatgpt.js';
-import {Backend_Provider_Gemini} from '$lib/server/backend_provider_gemini.js';
-import type {Backend_Provider_Options} from './backend_provider.js';
+} from '../constants.js';
+import {parse_allowed_origins, verify_request_source} from './security.js';
+import {handle_filer_change} from './backend_actions_api.js';
+import {BackendProviderOllama} from './backend_provider_ollama.js';
+import {BackendProviderClaude} from './backend_provider_claude.js';
+import {BackendProviderChatgpt} from './backend_provider_chatgpt.js';
+import {BackendProviderGemini} from './backend_provider_gemini.js';
+import type {BackendProviderOptions} from './backend_provider.js';
 
 const log = new Logger('[server]');
 
@@ -67,13 +67,13 @@ const create_server = async (): Promise<void> => {
 	});
 
 	// TODO manage these dynamically, init from config/state
-	const provider_options: Backend_Provider_Options = {
+	const provider_options: BackendProviderOptions = {
 		on_completion_progress: backend.api.completion_progress,
 	};
-	backend.add_provider(new Backend_Provider_Ollama(provider_options));
-	backend.add_provider(new Backend_Provider_Claude(provider_options));
-	backend.add_provider(new Backend_Provider_Chatgpt(provider_options));
-	backend.add_provider(new Backend_Provider_Gemini(provider_options));
+	backend.add_provider(new BackendProviderOllama(provider_options));
+	backend.add_provider(new BackendProviderClaude(provider_options));
+	backend.add_provider(new BackendProviderChatgpt(provider_options));
+	backend.add_provider(new BackendProviderGemini(provider_options));
 
 	// TODO options for everything, maybe a nullable array and an enable/disable flag
 

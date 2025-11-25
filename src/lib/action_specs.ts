@@ -3,33 +3,29 @@
 import {z} from 'zod';
 
 import {
-	Diskfile_Change,
-	Diskfile_Directory_Path,
-	Diskfile_Path,
-	Serializable_Disknode,
-} from '$lib/diskfile_types.js';
-import {Provider_Status, Provider_Name} from '$lib/provider_types.js';
+	DiskfileChange,
+	DiskfileDirectoryPath,
+	DiskfilePath,
+	SerializableDisknode,
+} from './diskfile_types.js';
+import {ProviderStatus, ProviderName} from './provider_types.js';
+import {CompletionMessage, CompletionRequest, CompletionResponse} from './completion_types.js';
+import type {ActionSpecUnion} from './action_spec.js';
+import {JsonrpcRequestId} from './jsonrpc.js';
 import {
-	Completion_Message,
-	Completion_Request,
-	Completion_Response,
-} from '$lib/completion_types.js';
-import type {Action_Spec_Union} from '$lib/action_spec.js';
-import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
-import {
-	Ollama_List_Request,
-	Ollama_List_Response,
-	Ollama_Ps_Request,
-	Ollama_Ps_Response,
-	Ollama_Show_Request,
-	Ollama_Show_Response,
-	Ollama_Pull_Request,
-	Ollama_Delete_Request,
-	Ollama_Copy_Request,
-	Ollama_Create_Request,
-	Ollama_Progress_Response,
-} from '$lib/ollama_helpers.js';
-import {Uuid} from '$lib/zod_helpers.js';
+	OllamaListRequest,
+	OllamaListResponse,
+	OllamaPsRequest,
+	OllamaPsResponse,
+	OllamaShowRequest,
+	OllamaShowResponse,
+	OllamaPullRequest,
+	OllamaDeleteRequest,
+	OllamaCopyRequest,
+	OllamaCreateRequest,
+	OllamaProgressResponse,
+} from './ollama_helpers.js';
+import {Uuid} from './zod_helpers.js';
 
 // TODO I tried using the helper `create_action_spec` but I don't see how to get proper typing,
 // we want the declared specs to have their literal types but not need to include optional
@@ -43,10 +39,10 @@ export const ping_action_spec = {
 	side_effects: null,
 	input: z.void().optional(),
 	output: z.strictObject({
-		ping_id: Jsonrpc_Request_Id,
+		ping_id: JsonrpcRequestId,
 	}),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const session_load_action_spec = {
 	method: 'session_load',
@@ -60,13 +56,13 @@ export const session_load_action_spec = {
 	output: z.strictObject({
 		data: z.strictObject({
 			// TODO extract this schema to diskfile_types or something
-			zzz_cache_dir: Diskfile_Directory_Path,
-			files: z.array(Serializable_Disknode),
-			provider_status: z.array(Provider_Status),
+			zzz_cache_dir: DiskfileDirectoryPath,
+			files: z.array(SerializableDisknode),
+			provider_status: z.array(ProviderStatus),
 		}),
 	}),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const filer_change_action_spec = {
 	method: 'filer_change',
@@ -75,12 +71,12 @@ export const filer_change_action_spec = {
 	auth: null,
 	side_effects: true,
 	input: z.strictObject({
-		change: Diskfile_Change,
-		disknode: Serializable_Disknode,
+		change: DiskfileChange,
+		disknode: SerializableDisknode,
 	}),
 	output: z.void(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const diskfile_update_action_spec = {
 	method: 'diskfile_update',
@@ -89,12 +85,12 @@ export const diskfile_update_action_spec = {
 	auth: 'public',
 	side_effects: true,
 	input: z.strictObject({
-		path: Diskfile_Path,
+		path: DiskfilePath,
 		content: z.string(),
 	}),
 	output: z.null(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const diskfile_delete_action_spec = {
 	method: 'diskfile_delete',
@@ -103,11 +99,11 @@ export const diskfile_delete_action_spec = {
 	auth: 'public',
 	side_effects: true,
 	input: z.strictObject({
-		path: Diskfile_Path,
+		path: DiskfilePath,
 	}),
 	output: z.null(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const directory_create_action_spec = {
 	method: 'directory_create',
@@ -116,11 +112,11 @@ export const directory_create_action_spec = {
 	auth: 'public',
 	side_effects: true,
 	input: z.strictObject({
-		path: Diskfile_Path,
+		path: DiskfilePath,
 	}),
 	output: z.null(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const completion_create_action_spec = {
 	method: 'completion_create',
@@ -129,15 +125,15 @@ export const completion_create_action_spec = {
 	auth: 'public',
 	side_effects: true,
 	input: z.strictObject({
-		completion_request: Completion_Request,
+		completion_request: CompletionRequest,
 		_meta: z.looseObject({progressToken: Uuid.optional()}).optional(),
 	}),
 	output: z.strictObject({
-		completion_response: Completion_Response,
+		completion_response: CompletionResponse,
 		_meta: z.looseObject({progressToken: Uuid.optional()}).optional(),
 	}),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const completion_progress_action_spec = {
 	method: 'completion_progress',
@@ -170,14 +166,14 @@ export const completion_progress_action_spec = {
 				model: z.string().optional(),
 				created_at: z.string().optional(),
 				done: z.boolean().optional(),
-				message: Completion_Message.optional(),
+				message: CompletionMessage.optional(),
 			})
 			.optional(),
 		_meta: z.looseObject({progressToken: Uuid.optional()}).optional(),
 	}),
 	output: z.void(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_progress_action_spec = {
 	method: 'ollama_progress',
@@ -186,13 +182,13 @@ export const ollama_progress_action_spec = {
 	auth: null,
 	side_effects: true,
 	input: z.strictObject(
-		Ollama_Progress_Response.extend({
+		OllamaProgressResponse.extend({
 			_meta: z.looseObject({progressToken: Uuid.optional()}).optional(),
 		}).shape,
 	),
 	output: z.void(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 // TODO this is just a placeholder for a local call
 export const toggle_main_menu_action_spec = {
@@ -204,7 +200,7 @@ export const toggle_main_menu_action_spec = {
 	input: z.strictObject({show: z.boolean().optional()}).optional(),
 	output: z.strictObject({show: z.boolean()}),
 	async: false,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_list_action_spec = {
 	method: 'ollama_list',
@@ -212,10 +208,10 @@ export const ollama_list_action_spec = {
 	initiator: 'frontend',
 	auth: 'public',
 	side_effects: null,
-	input: Ollama_List_Request,
-	output: z.union([Ollama_List_Response, z.null()]),
+	input: OllamaListRequest,
+	output: z.union([OllamaListResponse, z.null()]),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_ps_action_spec = {
 	method: 'ollama_ps',
@@ -223,10 +219,10 @@ export const ollama_ps_action_spec = {
 	initiator: 'frontend',
 	auth: 'public',
 	side_effects: null,
-	input: Ollama_Ps_Request,
-	output: z.union([Ollama_Ps_Response, z.null()]),
+	input: OllamaPsRequest,
+	output: z.union([OllamaPsResponse, z.null()]),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_show_action_spec = {
 	method: 'ollama_show',
@@ -234,10 +230,10 @@ export const ollama_show_action_spec = {
 	initiator: 'frontend',
 	auth: 'public',
 	side_effects: null,
-	input: Ollama_Show_Request,
-	output: z.union([Ollama_Show_Response, z.null()]),
+	input: OllamaShowRequest,
+	output: z.union([OllamaShowResponse, z.null()]),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_pull_action_spec = {
 	method: 'ollama_pull',
@@ -246,13 +242,13 @@ export const ollama_pull_action_spec = {
 	auth: 'public',
 	side_effects: true,
 	input: z.strictObject(
-		Ollama_Pull_Request.extend({
+		OllamaPullRequest.extend({
 			_meta: z.looseObject({progressToken: Uuid.optional()}).optional(),
 		}).shape,
 	), // TODO @many is strict right here?
 	output: z.void().optional(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_delete_action_spec = {
 	method: 'ollama_delete',
@@ -260,10 +256,10 @@ export const ollama_delete_action_spec = {
 	initiator: 'frontend',
 	auth: 'public',
 	side_effects: true,
-	input: Ollama_Delete_Request,
+	input: OllamaDeleteRequest,
 	output: z.void().optional(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_copy_action_spec = {
 	method: 'ollama_copy',
@@ -271,10 +267,10 @@ export const ollama_copy_action_spec = {
 	initiator: 'frontend',
 	auth: 'public',
 	side_effects: true,
-	input: Ollama_Copy_Request,
+	input: OllamaCopyRequest,
 	output: z.void().optional(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_create_action_spec = {
 	method: 'ollama_create',
@@ -283,13 +279,13 @@ export const ollama_create_action_spec = {
 	auth: 'public',
 	side_effects: true,
 	input: z.strictObject(
-		Ollama_Create_Request.extend({
+		OllamaCreateRequest.extend({
 			_meta: z.looseObject({progressToken: Uuid.optional()}).optional(),
 		}).shape,
 	), // TODO @many is strict right here?
 	output: z.void().optional(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const ollama_unload_action_spec = {
 	method: 'ollama_unload',
@@ -302,7 +298,7 @@ export const ollama_unload_action_spec = {
 	}),
 	output: z.void().optional(),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const provider_load_status_action_spec = {
 	method: 'provider_load_status',
@@ -311,14 +307,14 @@ export const provider_load_status_action_spec = {
 	auth: 'public',
 	side_effects: null,
 	input: z.strictObject({
-		provider_name: Provider_Name,
+		provider_name: ProviderName,
 		reload: z.boolean().default(true).optional(),
 	}),
 	output: z.strictObject({
-		status: Provider_Status,
+		status: ProviderStatus,
 	}),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;
 
 export const provider_update_api_key_action_spec = {
 	method: 'provider_update_api_key',
@@ -327,11 +323,11 @@ export const provider_update_api_key_action_spec = {
 	auth: 'public',
 	side_effects: true,
 	input: z.strictObject({
-		provider_name: Provider_Name,
+		provider_name: ProviderName,
 		api_key: z.string(),
 	}),
 	output: z.strictObject({
-		status: Provider_Status,
+		status: ProviderStatus,
 	}),
 	async: true,
-} satisfies Action_Spec_Union;
+} satisfies ActionSpecUnion;

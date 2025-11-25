@@ -1,10 +1,10 @@
 // @slop Claude Opus 4
 
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+import {UnreachableError} from '@ryanatkn/belt/error.js';
 
-import type {Action_Spec_Union} from '$lib/action_spec.js';
-import {is_action_initiator} from '$lib/action_types.js';
-import type {Action_Event_Phase} from '$lib/action_event_types.js';
+import type {ActionSpecUnion} from './action_spec.js';
+import {is_action_initiator} from './action_types.js';
+import type {ActionEventPhase} from './action_event_types.js';
 
 // TODO probably refactor this into more reusable and more app-specific helpers/config,
 // maybe `import_builder.ts` and `gen_helpers.ts`
@@ -12,7 +12,7 @@ import type {Action_Event_Phase} from '$lib/action_event_types.js';
 /**
  * Represents an import item with its kind (type, value, or namespace).
  */
-interface Import_Item {
+interface ImportItem {
 	name: string;
 	kind: 'type' | 'value' | 'namespace';
 }
@@ -28,20 +28,20 @@ interface Import_Item {
  *
  * @example
  * ```typescript
- * const imports = new Import_Builder();
- * imports.add_types('$lib/types.js', 'Foo', 'Bar');
- * imports.add('$lib/utils.js', 'helper');
- * imports.add_type('$lib/utils.js', 'Helper_Options');
- * imports.add('$lib/action_specs.js', '* as specs');
+ * const imports = new ImportBuilder();
+ * imports.add_types('./types.js', 'Foo', 'Bar');
+ * imports.add('./utils.js', 'helper');
+ * imports.add_type('./utils.js', 'HelperOptions');
+ * imports.add('./action_specs.js', '* as specs');
  *
  * // Generates:
- * // import type {Foo, Bar} from '$lib/types.js';
- * // import {helper, type Helper_Options} from '$lib/utils.js';
- * // import * as specs from '$lib/action_specs.js';
+ * // import type {Foo, Bar} from './types.js';
+ * // import {helper, type HelperOptions} from './utils.js';
+ * // import * as specs from './action_specs.js';
  * ```
  */
-export class Import_Builder {
-	imports: Map<string, Map<string, Import_Item>> = new Map();
+export class ImportBuilder {
+	imports: Map<string, Map<string, ImportItem>> = new Map();
 
 	/**
 	 * Add a value import to be included in the generated code.
@@ -102,7 +102,7 @@ export class Import_Builder {
 		const existing = module_imports.get(name);
 
 		// If already imported as a value, don't downgrade to type
-		if (existing && existing.kind === 'value' && kind === 'type') {
+		if (existing?.kind === 'value' && kind === 'type') {
 			return this;
 		}
 
@@ -202,11 +202,11 @@ export class Import_Builder {
  * Determines which phases an executor can handle based on the action spec.
  */
 export const get_executor_phases = (
-	spec: Action_Spec_Union,
+	spec: ActionSpecUnion,
 	executor: 'frontend' | 'backend',
-): Array<Action_Event_Phase> => {
+): Array<ActionEventPhase> => {
 	const {kind, initiator} = spec;
-	const phases: Array<Action_Event_Phase> = [];
+	const phases: Array<ActionEventPhase> = [];
 
 	if (!is_action_initiator(initiator)) {
 		return phases;
@@ -243,7 +243,7 @@ export const get_executor_phases = (
 					}
 					break;
 				default:
-					throw new Unreachable_Error(executor);
+					throw new UnreachableError(executor);
 			}
 			break;
 		}
@@ -264,7 +264,7 @@ export const get_executor_phases = (
 		}
 
 		default:
-			throw new Unreachable_Error(kind);
+			throw new UnreachableError(kind);
 	}
 
 	// Deduplicate phases (e.g., send_error added twice for initiator:'both' backend actions)
@@ -273,25 +273,26 @@ export const get_executor_phases = (
 
 /**
  * Gets the handler return type for a specific phase and spec.
- * Also adds necessary imports to the Import_Builder.
+ * Also adds necessary imports to the ImportBuilder.
  */
 export const get_handler_return_type = (
-	spec: Action_Spec_Union,
-	phase: Action_Event_Phase,
-	imports: Import_Builder,
+	spec: ActionSpecUnion,
+	phase: ActionEventPhase,
+	imports: ImportBuilder,
+	path_prefix: string,
 ): string => {
 	// For request_response receive_request, handler returns the output
 	if (spec.kind === 'request_response' && phase === 'receive_request') {
-		imports.add_type('$lib/action_collections.js', 'Action_Outputs');
-		const base_type = `Action_Outputs['${spec.method}']`;
+		imports.add_type(`${path_prefix}action_collections.js`, 'ActionOutputs');
+		const base_type = `ActionOutputs['${spec.method}']`;
 		// Request/response actions are always async
 		return `${base_type} | Promise<${base_type}>`;
 	}
 
 	// For local_call execute, handler returns the output
 	if (spec.kind === 'local_call' && phase === 'execute') {
-		imports.add_type('$lib/action_collections.js', 'Action_Outputs');
-		const base_type = `Action_Outputs['${spec.method}']`;
+		imports.add_type(`${path_prefix}action_collections.js`, 'ActionOutputs');
+		const base_type = `ActionOutputs['${spec.method}']`;
 		return spec.async ? `${base_type} | Promise<${base_type}>` : base_type;
 	}
 
@@ -300,13 +301,13 @@ export const get_handler_return_type = (
 };
 
 /**
- * Generates the phase handlers for an action spec using the unified Action_Event type
+ * Generates the phase handlers for an action spec using the unified ActionEvent type
  * with the new phase/step type parameters.
  */
 export const generate_phase_handlers = (
-	spec: Action_Spec_Union,
+	spec: ActionSpecUnion,
 	executor: 'frontend' | 'backend',
-	imports: Import_Builder,
+	imports: ImportBuilder,
 ): string => {
 	const {method} = spec;
 	const phases = get_executor_phases(spec, executor);
@@ -316,22 +317,23 @@ export const generate_phase_handlers = (
 	}
 
 	// Add necessary imports for the unified system
-	imports.add_type('$lib/action_event.js', 'Action_Event');
+	// Backend types file is in server/ subdirectory, so needs different relative paths
+	const path_prefix = executor === 'frontend' ? './' : '../';
+	imports.add_type(`${path_prefix}action_event.js`, 'ActionEvent');
 
 	// Add environment type import
 	const environment_type = executor === 'frontend' ? 'Frontend' : 'Backend';
-	const environment_module =
-		executor === 'frontend' ? '$lib/frontend.svelte.js' : '$lib/server/backend.js';
+	const environment_module = executor === 'frontend' ? './frontend.svelte.js' : './backend.js';
 	imports.add_type(environment_module, environment_type);
 
 	// Generate handler definitions for each phase
 	const phase_handlers = phases
-		.map((phase: Action_Event_Phase) => {
+		.map((phase: ActionEventPhase) => {
 			// Pass imports to get_handler_return_type so it can add necessary imports
-			const return_type = get_handler_return_type(spec, phase, imports);
+			const return_type = get_handler_return_type(spec, phase, imports, path_prefix);
 			// Use the new type parameter approach
 			return `${phase}?: (
-			action_event: Action_Event<'${method}', ${environment_type}, '${phase}', 'handling'>
+			action_event: ActionEvent<'${method}', ${environment_type}, '${phase}', 'handling'>
 		) => ${return_type}`;
 		})
 		.join(';\n\t\t');

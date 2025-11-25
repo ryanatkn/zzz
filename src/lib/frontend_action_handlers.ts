@@ -1,10 +1,10 @@
-import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
-import {Turn} from '$lib/turn.svelte.js';
-import {to_completion_response_text} from '$lib/response_helpers.js';
+import type {FrontendActionHandlers} from './frontend_action_types.js';
+import {Turn} from './turn.svelte.js';
+import {to_completion_response_text} from './response_helpers.js';
 
 // TODO stubbing out a lot of these
 
-export const frontend_action_handlers: Frontend_Action_Handlers = {
+export const frontend_action_handlers: FrontendActionHandlers = {
 	ping: {
 		send_request: ({app, data: {request}}) => {
 			app.capabilities.handle_ping_sent(request.id);

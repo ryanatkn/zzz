@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Dashboard_Capabilities from '$lib/Dashboard_Capabilities.svelte';
+	import DashboardCapabilities from '$lib/DashboardCapabilities.svelte';
 </script>
 
-<Dashboard_Capabilities />
+<DashboardCapabilities />

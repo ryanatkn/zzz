@@ -1,6 +1,6 @@
 import {resolve} from '$app/paths';
 
-import type {Uuid} from '$lib/zod_helpers.js';
+import type {Uuid} from './zod_helpers.js';
 
 // TODO think about refactoring with related code
 

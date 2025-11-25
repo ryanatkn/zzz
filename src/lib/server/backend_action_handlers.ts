@@ -1,17 +1,13 @@
-import {Serializable_Disknode} from '$lib/diskfile_types.js';
-import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
-import type {Action_Outputs} from '$lib/action_collections.js';
-import {jsonrpc_errors, Thrown_Jsonrpc_Error} from '$lib/jsonrpc_errors.js';
-import {to_serializable_disknode} from '$lib/diskfile_helpers.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
-import type {Completion_Options, Completion_Handler_Options} from '$lib/server/backend_provider.js';
-import {save_completion_response_to_disk} from '$lib/server/helpers.js';
-import type {
-	Ollama_List_Response,
-	Ollama_Ps_Response,
-	Ollama_Show_Response,
-} from '$lib/ollama_helpers.js';
-import {update_env_variable} from '$lib/server/env_file_helpers.js';
+import {SerializableDisknode} from '../diskfile_types.js';
+import type {BackendActionHandlers} from './backend_action_types.js';
+import type {ActionOutputs} from '../action_collections.js';
+import {jsonrpc_errors, ThrownJsonrpcError} from '../jsonrpc_errors.js';
+import {to_serializable_disknode} from '../diskfile_helpers.js';
+import {UNKNOWN_ERROR_MESSAGE} from '../constants.js';
+import type {CompletionOptions, CompletionHandlerOptions} from './backend_provider.js';
+import {save_completion_response_to_disk} from './helpers.js';
+import type {OllamaListResponse, OllamaPsResponse, OllamaShowResponse} from '../ollama_helpers.js';
+import {update_env_variable} from './env_file_helpers.js';
 
 // TODO refactor to a plugin architecture
 
@@ -22,10 +18,10 @@ import {update_env_variable} from '$lib/server/env_file_helpers.js';
 
 /**
  * Handle client messages and produce appropriate server responses.
- * Each returns a value or throws a `Thrown_Jsonrpc_Error`.
+ * Each returns a value or throws a `ThrownJsonrpcError`.
  * Organized by method and phase for symmetric handling.
  */
-export const backend_action_handlers: Backend_Action_Handlers = {
+export const backend_action_handlers: BackendActionHandlers = {
 	ping: {
 		receive_request: ({data: {request}}) => {
 			console.log(
@@ -42,7 +38,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 		receive_request: async ({backend}) => {
 			// TODO change so this only returns metadata, not file contents
 			// Access filers through server and collect all files
-			const files_array: Array<Serializable_Disknode> = [];
+			const files_array: Array<SerializableDisknode> = [];
 
 			// Iterate through all filers and collect their files
 			for (const filer of backend.filers.values()) {
@@ -88,7 +84,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				top_p,
 			} = backend.config;
 
-			const completion_options: Completion_Options = {
+			const completion_options: CompletionOptions = {
 				frequency_penalty,
 				output_token_max,
 				presence_penalty,
@@ -105,7 +101,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				prompt.substring(0, 100),
 			);
 
-			const handler_options: Completion_Handler_Options = {
+			const handler_options: CompletionHandlerOptions = {
 				model,
 				completion_options,
 				completion_messages,
@@ -117,13 +113,13 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 
 			const handler = provider.get_handler(!!progress_token);
 
-			let result: Action_Outputs['completion_create'];
+			let result: ActionOutputs['completion_create'];
 
 			try {
 				result = await handler(handler_options);
 			} catch (error) {
 				// Let our own errors bubble through, wrap provider client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error(
@@ -252,14 +248,14 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				const response = (await backend
 					.lookup_provider('ollama')
 					.get_client()
-					.list()) as unknown as Ollama_List_Response;
+					.list()) as unknown as OllamaListResponse;
 				console.log(
 					`[backend_action_handlers.ollama_list.receive_request] found ${response.models.length} models`,
 				);
 				return response;
 			} catch (error) {
 				// Let our own errors bubble through, wrap external/client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error('[backend_action_handlers.ollama_list.receive_request] failed:', error);
@@ -276,14 +272,14 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				const response = (await backend
 					.lookup_provider('ollama')
 					.get_client()
-					.ps()) as unknown as Ollama_Ps_Response;
+					.ps()) as unknown as OllamaPsResponse;
 				console.log(
 					`[backend_action_handlers.ollama_ps.receive_request] found ${response.models.length} running models`,
 				);
 				return response;
 			} catch (error) {
 				// Let our own errors bubble through, wrap external/client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error('[backend_action_handlers.ollama_ps.receive_request] failed:', error);
@@ -300,14 +296,14 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				const response = (await backend
 					.lookup_provider('ollama')
 					.get_client()
-					.show(input)) as unknown as Ollama_Show_Response;
+					.show(input)) as unknown as OllamaShowResponse;
 				console.log(
 					`[backend_action_handlers.ollama_show.receive_request] success for: ${input.model}`,
 				);
 				return response;
 			} catch (error) {
 				// Let our own errors bubble through, wrap external/client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error(
@@ -345,7 +341,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				return undefined;
 			} catch (error) {
 				// Let our own errors bubble through, wrap external/client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error(
@@ -371,7 +367,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				return undefined;
 			} catch (error) {
 				// Let our own errors bubble through, wrap external/client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error(
@@ -398,7 +394,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				return undefined;
 			} catch (error) {
 				// Let our own errors bubble through, wrap external/client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error(
@@ -441,7 +437,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				return undefined;
 			} catch (error) {
 				// Let our own errors bubble through, wrap external/client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error(
@@ -470,7 +466,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				return undefined;
 			} catch (error) {
 				// Let our own errors bubble through, wrap external/client errors
-				if (error instanceof Thrown_Jsonrpc_Error) {
+				if (error instanceof ThrownJsonrpcError) {
 					throw error;
 				}
 				console.error(

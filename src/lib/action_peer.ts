@@ -1,57 +1,57 @@
 // @slop Claude Opus 4
 
-import {create_action_event} from '$lib/action_event.js';
+import {create_action_event} from './action_event.js';
 import {
-	Jsonrpc_Message_From_Client_To_Server,
-	Jsonrpc_Message_From_Server_To_Client,
-	Jsonrpc_Notification,
-	Jsonrpc_Request,
-	Jsonrpc_Response_Or_Error,
-	Jsonrpc_Error_Message,
-} from '$lib/jsonrpc.js';
-import {Transports, type Transport_Name} from '$lib/transports.js';
-import type {Action_Event_Environment} from '$lib/action_event_types.js';
+	JsonrpcMessageFromClientToServer,
+	JsonrpcMessageFromServerToClient,
+	JsonrpcNotification,
+	JsonrpcRequest,
+	JsonrpcResponseOrError,
+	JsonrpcErrorMessage,
+} from './jsonrpc.js';
+import {Transports, type TransportName} from './transports.js';
+import type {ActionEventEnvironment} from './action_event_types.js';
 import {
 	create_jsonrpc_error_message,
 	create_jsonrpc_error_message_from_thrown,
 	to_jsonrpc_message_id,
 	is_jsonrpc_request,
 	is_jsonrpc_notification,
-} from '$lib/jsonrpc_helpers.js';
-import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
-import type {Action_Method} from '$lib/action_metatypes.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+} from './jsonrpc_helpers.js';
+import {jsonrpc_error_messages} from './jsonrpc_errors.js';
+import type {ActionMethod} from './action_metatypes.js';
+import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 
 // TODO the goal is to make this fully symmetric but we're not quite there,
 // this does receiving but only part of sending, and some deeper changes may be needed
 
-export interface Action_Peer_Send_Options {
-	transport_name?: Transport_Name;
+export interface ActionPeerSendOptions {
+	transport_name?: TransportName;
 }
 
-export interface Action_Peer_Options {
-	environment: Action_Event_Environment;
+export interface ActionPeerOptions {
+	environment: ActionEventEnvironment;
 
 	// For sending - optional because some peers may be receive-only
 	transports?: Transports;
 
 	// Default send options
-	default_send_options?: Partial<Action_Peer_Send_Options>;
+	default_send_options?: Partial<ActionPeerSendOptions>;
 }
 
-export class Action_Peer {
-	readonly environment: Action_Event_Environment;
+export class ActionPeer {
+	readonly environment: ActionEventEnvironment;
 	readonly transports: Transports;
 	// TODO maybe expand the pattern of using `transports` in send, so what's used in receive?
 	// It seems abstracting that out would make this class much simpler and generic, but too much so?
 	// What deps should it actually know about, and what gains could we have by making it more decoupled?
 	// e.g. don't just decouple for the sake of imagined flexibility!
 
-	default_send_options: Action_Peer_Send_Options;
+	default_send_options: ActionPeerSendOptions;
 
-	constructor(options: Action_Peer_Options) {
+	constructor(options: ActionPeerOptions) {
 		this.environment = options.environment;
 		this.transports = options.transports ?? new Transports();
 		this.default_send_options = options.default_send_options ?? {};
@@ -59,17 +59,17 @@ export class Action_Peer {
 
 	// TODO the transport type option here may be bad magic
 	async send(
-		message: Jsonrpc_Request,
-		options?: Action_Peer_Send_Options,
-	): Promise<Jsonrpc_Response_Or_Error>;
+		message: JsonrpcRequest,
+		options?: ActionPeerSendOptions,
+	): Promise<JsonrpcResponseOrError>;
 	async send(
-		message: Jsonrpc_Notification,
-		options?: Action_Peer_Send_Options,
-	): Promise<Jsonrpc_Error_Message | null>;
+		message: JsonrpcNotification,
+		options?: ActionPeerSendOptions,
+	): Promise<JsonrpcErrorMessage | null>;
 	async send(
-		message: Jsonrpc_Message_From_Client_To_Server,
-		options?: Action_Peer_Send_Options,
-	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+		message: JsonrpcMessageFromClientToServer,
+		options?: ActionPeerSendOptions,
+	): Promise<JsonrpcMessageFromServerToClient | null> {
 		try {
 			const transport = this.transports.get_transport(
 				options?.transport_name ?? this.default_send_options.transport_name,
@@ -108,7 +108,7 @@ export class Action_Peer {
 		} // TODO finally?
 	}
 
-	async receive(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+	async receive(message: unknown): Promise<JsonrpcMessageFromServerToClient | null> {
 		try {
 			const result = await this.#receive_message(message);
 			return result;
@@ -122,7 +122,7 @@ export class Action_Peer {
 	/**
 	 * Process a single JSON-RPC message, returning a response message if any.
 	 */
-	async #receive_message(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+	async #receive_message(message: unknown): Promise<JsonrpcMessageFromServerToClient | null> {
 		if (is_jsonrpc_request(message)) {
 			return this.#receive_request(message);
 		} else if (is_jsonrpc_notification(message)) {
@@ -139,8 +139,8 @@ export class Action_Peer {
 	/**
 	 * Process a JSON-RPC request. Returns the response message.
 	 */
-	async #receive_request(request: Jsonrpc_Request): Promise<Jsonrpc_Message_From_Server_To_Client> {
-		const spec = this.environment.lookup_action_spec(request.method as Action_Method); // TODO @many try not to cast, idk what the best design is here
+	async #receive_request(request: JsonrpcRequest): Promise<JsonrpcMessageFromServerToClient> {
+		const spec = this.environment.lookup_action_spec(request.method as ActionMethod); // TODO @many try not to cast, idk what the best design is here
 		if (!spec) {
 			this.environment.log?.warn(`[peer] receive request: method not found:`, request.method);
 			return create_jsonrpc_error_message(
@@ -210,8 +210,8 @@ export class Action_Peer {
 	/**
 	 * Process a JSON-RPC notification. Returns nothing, no response exists.
 	 */
-	async #receive_notification(notification: Jsonrpc_Notification): Promise<void> {
-		const spec = this.environment.lookup_action_spec(notification.method as Action_Method); // TODO @many try not to cast, idk what the best design is here
+	async #receive_notification(notification: JsonrpcNotification): Promise<void> {
+		const spec = this.environment.lookup_action_spec(notification.method as ActionMethod); // TODO @many try not to cast, idk what the best design is here
 		if (!spec) {
 			this.environment.log?.warn(
 				`[peer] receive notification: method not found:`,

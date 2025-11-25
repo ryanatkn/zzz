@@ -1,26 +1,26 @@
 // @slop claude_sonnet_4
 
 import {z} from 'zod';
-import type {Async_Status} from '@ryanatkn/belt/async.js';
+import type {AsyncStatus} from '@ryanatkn/belt/async.js';
 import {BROWSER, DEV} from 'esm-env';
 import {SvelteSet} from 'svelte/reactivity';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {get_datetime_now, create_uuid} from '$lib/zod_helpers.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {get_datetime_now, create_uuid} from './zod_helpers.js';
 import {
 	OLLAMA_URL,
-	Ollama_Show_Response,
-	Ollama_List_Response,
-	Ollama_Ps_Response,
-	Ollama_Ps_Response_Item,
-	Ollama_Delete_Request,
-	Ollama_Show_Request,
+	OllamaShowResponse,
+	OllamaListResponse,
+	OllamaPsResponse,
+	OllamaPsResponseItem,
+	OllamaDeleteRequest,
+	OllamaShowRequest,
 	extract_parameter_count,
-} from '$lib/ollama_helpers.js';
-import {Model_Name, type Model} from '$lib/model.svelte.js';
-import {Poller} from '$lib/poller.svelte.js';
-import {create_map_by_property} from '$lib/iterable_helpers.js';
+} from './ollama_helpers.js';
+import {ModelName, type Model} from './model.svelte.js';
+import {Poller} from './poller.svelte.js';
+import {create_map_by_property} from './iterable_helpers.js';
 
 // TODO IDK about the `handle_` prefix for methods called by the action handlers, maybe rethink
 // some things
@@ -35,13 +35,13 @@ import {create_map_by_property} from '$lib/iterable_helpers.js';
 
 const NO_RESPONSE_ERROR_MESSAGE = 'no response from Ollama server';
 
-export const Ollama_Json = Cell_Json.extend({
+export const OllamaJson = CellJson.extend({
 	host: z.string().default(OLLAMA_URL),
 }).meta({cell_class_name: 'Ollama'});
-export type Ollama_Json = z.infer<typeof Ollama_Json>;
-export type Ollama_Json_Input = z.input<typeof Ollama_Json>;
+export type OllamaJson = z.infer<typeof OllamaJson>;
+export type OllamaJsonInput = z.input<typeof OllamaJson>;
 
-export type Ollama_Options = Cell_Options<typeof Ollama_Json>;
+export type OllamaOptions = CellOptions<typeof OllamaJson>;
 
 /**
  * Ollama client state management with simplified API.
@@ -63,13 +63,13 @@ export type Ollama_Options = Cell_Options<typeof Ollama_Json>;
  * - Action-specific error handling
  * - Internal state management
  */
-export class Ollama extends Cell<typeof Ollama_Json> {
+export class Ollama extends Cell<typeof OllamaJson> {
 	// Private serializable state
 	#host: string = $state()!;
 
 	// Runtime-only state
-	list_response: Ollama_List_Response | null = $state.raw(null);
-	list_status: Async_Status = $state('initial');
+	list_response: OllamaListResponse | null = $state.raw(null);
+	list_status: AsyncStatus = $state('initial');
 	list_error: string | null = $state(null);
 	list_last_updated: number | null = $state(null);
 	list_round_trip_time: number | null = $state(null);
@@ -79,8 +79,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	ever_responded: boolean = $state(false);
 
 	// PS (running models) state
-	ps_response: Ollama_Ps_Response | null = $state.raw(null);
-	ps_status: Async_Status = $state('initial');
+	ps_response: OllamaPsResponse | null = $state.raw(null);
+	ps_status: AsyncStatus = $state('initial');
 	ps_error: string | null = $state(null);
 	ps_polling_enabled: boolean = $state(false);
 
@@ -118,7 +118,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		return this.#host;
 	}
 	set host(value: string) {
-		this.#host = Ollama_Json.shape.host.parse(value);
+		this.#host = OllamaJson.shape.host.parse(value);
 	}
 
 	// Derived state
@@ -157,23 +157,21 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	readonly models_downloaded = $derived(this.models.filter((m) => m.downloaded));
 	readonly models_not_downloaded = $derived(this.models.filter((m) => !m.downloaded));
 
-	readonly model_by_name: Map<Model_Name, Model> = $derived(
+	readonly model_by_name: Map<ModelName, Model> = $derived(
 		create_map_by_property(this.models, 'name'),
 	);
 
-	readonly model_names: Array<Model_Name> = $derived(Array.from(this.model_by_name.keys()));
+	readonly model_names: Array<ModelName> = $derived(Array.from(this.model_by_name.keys()));
 
 	// `ps` derived state
-	readonly running_models: Array<Ollama_Ps_Response_Item> = $derived(
-		this.ps_response?.models ?? [],
-	);
-	readonly running_model_names: Set<Model_Name> = $derived(
+	readonly running_models: Array<OllamaPsResponseItem> = $derived(this.ps_response?.models ?? []);
+	readonly running_model_names: Set<ModelName> = $derived(
 		new Set(this.running_models.map((m) => m.name)),
 	);
 
 	// TODO the prefix naming is awkward but sometimes useful, but inconsistently used
 	// `pull` model derived state
-	readonly pull_parsed_model_name: Model_Name = $derived(Model_Name.parse(this.pull_model_name));
+	readonly pull_parsed_model_name: ModelName = $derived(ModelName.parse(this.pull_model_name));
 	readonly pull_already_downloaded: boolean = $derived(
 		!!(
 			this.pull_parsed_model_name && this.model_by_name.get(this.pull_parsed_model_name)?.downloaded
@@ -185,16 +183,14 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			!this.pulling_models.has(this.pull_parsed_model_name),
 	);
 
-	pull_is_pulling(model_name: Model_Name): boolean {
+	pull_is_pulling(model_name: ModelName): boolean {
 		return this.pulling_models.has(model_name);
 	}
 
 	// `copy` model derived state
-	readonly copy_parsed_source_model: Model_Name = $derived(
-		Model_Name.parse(this.copy_source_model),
-	);
-	readonly copy_parsed_destination_model: Model_Name = $derived(
-		Model_Name.parse(this.copy_destination_model),
+	readonly copy_parsed_source_model: ModelName = $derived(ModelName.parse(this.copy_source_model));
+	readonly copy_parsed_destination_model: ModelName = $derived(
+		ModelName.parse(this.copy_destination_model),
 	);
 	readonly copy_is_duplicate_name: boolean = $derived(
 		!!this.copy_parsed_destination_model &&
@@ -207,9 +203,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	);
 
 	// `create` model derived state
-	readonly create_parsed_model_name: Model_Name = $derived(
-		Model_Name.parse(this.create_model_name),
-	);
+	readonly create_parsed_model_name: ModelName = $derived(ModelName.parse(this.create_model_name));
 	readonly create_is_duplicate_name: boolean = $derived(
 		!!this.create_parsed_model_name && this.model_by_name.has(this.create_parsed_model_name),
 	);
@@ -217,8 +211,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		!!this.create_parsed_model_name && !this.create_is_duplicate_name,
 	);
 
-	constructor(options: Ollama_Options) {
-		super(Ollama_Json, options);
+	constructor(options: OllamaOptions) {
+		super(OllamaJson, options);
 
 		this.#ps_poller = new Poller({
 			poll_fn: () => {
@@ -246,8 +240,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	 * overwriting the provider status with action error messages.
 	 */
 	async refresh(): Promise<{
-		list_response: Ollama_List_Response | null;
-		ps_response: Ollama_Ps_Response | null;
+		list_response: OllamaListResponse | null;
+		ps_response: OllamaPsResponse | null;
 	}> {
 		// Check if Ollama provider is available before making API calls
 		const provider_status = this.app.lookup_provider_status('ollama');
@@ -307,7 +301,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * List all models available on the Ollama server and sync with app.models.
 	 */
-	handle_ollama_list_complete(response: Ollama_List_Response | null): void {
+	handle_ollama_list_complete(response: OllamaListResponse | null): void {
 		if (!response) {
 			console.error('[ollama.handle_ollama_list_complete] no response');
 			this.list_response = null;
@@ -324,7 +318,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 		// Parse to log bugs but assign data anyway to avoid breaking the UX
 		if (DEV) {
-			const parsed = Ollama_List_Response.safeParse(response);
+			const parsed = OllamaListResponse.safeParse(response);
 			if (!parsed.success) {
 				console.error(`[ollama.handle_ollama_list_complete] failed to parse:`, parsed.error);
 			}
@@ -351,7 +345,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Get the list of currently running models.
 	 */
-	handle_ollama_ps_complete(response: Ollama_Ps_Response | null): void {
+	handle_ollama_ps_complete(response: OllamaPsResponse | null): void {
 		if (!response) {
 			console.error('[ollama.handle_ollama_ps_complete] no response');
 			this.ps_response = null;
@@ -367,7 +361,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 		// Parse to log bugs but assign data anyway to avoid breaking the UX
 		if (DEV) {
-			const parsed = Ollama_Ps_Response.safeParse(response);
+			const parsed = OllamaPsResponse.safeParse(response);
 			if (!parsed.success) {
 				console.error(`[ollama.handle_ollama_ps_complete] failed to parse:`, parsed.error);
 			}
@@ -382,7 +376,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Get detailed information about a specific model.
 	 */
-	handle_ollama_show(request: Ollama_Show_Request, response: Ollama_Show_Response | null): void {
+	handle_ollama_show(request: OllamaShowRequest, response: OllamaShowResponse | null): void {
 		const model = this.app.models.find_by_name(request.model);
 		if (!model) {
 			console.error(`[ollama.handle_ollama_show] model not found: ${request.model}`);
@@ -404,7 +398,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 		// Parse to log bugs but assign data anyway to avoid breaking the UX
 		if (DEV) {
-			const parsed = Ollama_Show_Response.safeParse(response);
+			const parsed = OllamaShowResponse.safeParse(response);
 			if (!parsed.success) {
 				console.error(
 					`[ollama.handle_ollama_show] failed to parse for ${request.model}:`,
@@ -425,7 +419,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Delete a model from the Ollama server.
 	 */
-	async handle_ollama_delete(request: Ollama_Delete_Request): Promise<void> {
+	async handle_ollama_delete(request: OllamaDeleteRequest): Promise<void> {
 		console.log(`[ollama.handle_ollama_delete] deleting: ${request.model}`);
 
 		// Refresh model list after successful deletion
@@ -507,7 +501,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Submit delete model form.
 	 */
-	async delete(model_name: Model_Name): Promise<void> {
+	async delete(model_name: ModelName): Promise<void> {
 		console.log(`[ollama.delete_model] deleting from manager: ${model_name}`);
 		const result = await this.app.api.ollama_delete({model: model_name});
 		// Handler already updated state on error
@@ -522,7 +516,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Unload a model from memory.
 	 */
-	async unload(model_name: Model_Name): Promise<void> {
+	async unload(model_name: ModelName): Promise<void> {
 		console.log(`[ollama.unload] unloading from memory: ${model_name}`);
 		const result = await this.app.api.ollama_unload({model: model_name});
 		// Handler already updated state on error
@@ -586,7 +580,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Sync the list response with app.models.
 	 */
-	#sync_models_with_list_response(response: Ollama_List_Response): void {
+	#sync_models_with_list_response(response: OllamaListResponse): void {
 		// Get current ollama models for comparison
 		const existing_models = new Map(this.models.map((m) => [m.name, m]));
 

@@ -1,38 +1,38 @@
 import {z} from 'zod';
 
-import {Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {Uuid, UuidWithDefault} from './zod_helpers.js';
 
-export const Xml_Attribute_Key = z
+export const XmlAttributeKey = z
 	.string()
 	.transform((s) => s.trim())
 	.pipe(z.string().min(1));
-export type Xml_Attribute_Key = z.infer<typeof Xml_Attribute_Key>;
+export type XmlAttributeKey = z.infer<typeof XmlAttributeKey>;
 
-export const Xml_Attribute_Key_With_Default = Xml_Attribute_Key.default('attr');
-export type Xml_Attribute_Key_With_Default = z.infer<typeof Xml_Attribute_Key_With_Default>;
+export const XmlAttributeKeyWithDefault = XmlAttributeKey.default('attr');
+export type XmlAttributeKeyWithDefault = z.infer<typeof XmlAttributeKeyWithDefault>;
 
-export const Xml_Attribute_Value = z.string();
-export type Xml_Attribute_Value = z.infer<typeof Xml_Attribute_Value>;
+export const XmlAttributeValue = z.string();
+export type XmlAttributeValue = z.infer<typeof XmlAttributeValue>;
 
-export const Xml_Attribute_Value_With_Default = Xml_Attribute_Value.default('');
-export type Xml_Attribute_Value_With_Default = z.infer<typeof Xml_Attribute_Value_With_Default>;
+export const XmlAttributeValueWithDefault = XmlAttributeValue.default('');
+export type XmlAttributeValueWithDefault = z.infer<typeof XmlAttributeValueWithDefault>;
 
 // TODO is strict desired?
 // Base attribute requires all fields with no defaults
-export const Xml_Attribute = z.strictObject({
+export const XmlAttribute = z.strictObject({
 	id: Uuid,
-	key: Xml_Attribute_Key,
-	value: Xml_Attribute_Value,
+	key: XmlAttributeKey,
+	value: XmlAttributeValue,
 });
-export type Xml_Attribute = z.infer<typeof Xml_Attribute>;
+export type XmlAttribute = z.infer<typeof XmlAttribute>;
 
 // TODO is strict desired?
 // Default attribute applies defaults and includes id with default
-export const Xml_Attribute_With_Defaults = z.strictObject({
-	id: Uuid_With_Default,
-	key: Xml_Attribute_Key_With_Default,
-	value: Xml_Attribute_Value_With_Default,
+export const XmlAttributeWithDefaults = z.strictObject({
+	id: UuidWithDefault,
+	key: XmlAttributeKeyWithDefault,
+	value: XmlAttributeValueWithDefault,
 });
-export type Xml_Attribute_With_Defaults = z.infer<typeof Xml_Attribute_With_Defaults>;
+export type XmlAttributeWithDefaults = z.infer<typeof XmlAttributeWithDefaults>;
 
 // TODO Consider adding support for XML namespaces and special XML character handling if needed// TODO?: Add element, document, and CDATA section schemas to create a complete XML model

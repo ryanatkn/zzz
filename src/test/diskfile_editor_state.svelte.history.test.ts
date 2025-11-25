@@ -4,21 +4,21 @@
 
 import {test, expect, beforeEach, describe} from 'vitest';
 
-import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
-import {Diskfile_Path, Serializable_Disknode} from '$lib/diskfile_types.js';
+import {DiskfileEditorState} from '$lib/diskfile_editor_state.svelte.js';
+import {DiskfilePath, SerializableDisknode} from '$lib/diskfile_types.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
-const TEST_PATH = Diskfile_Path.parse('/path/to/test.txt');
-const TEST_DIR = Serializable_Disknode.shape.source_dir.parse('/path/');
+const TEST_PATH = DiskfilePath.parse('/path/to/test.txt');
+const TEST_DIR = SerializableDisknode.shape.source_dir.parse('/path/');
 const TEST_CONTENT = 'This is test content';
 
 // Test suite variables
 let app: Frontend;
 let test_diskfile: Diskfile;
-let editor_state: Diskfile_Editor_State;
+let editor_state: DiskfileEditorState;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
@@ -32,7 +32,7 @@ beforeEach(() => {
 	});
 
 	// Create the editor state with real components
-	editor_state = new Diskfile_Editor_State({
+	editor_state = new DiskfileEditorState({
 		app,
 		diskfile: test_diskfile,
 	});

@@ -4,16 +4,16 @@ import {z} from 'zod';
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {page} from '$app/state';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Projects_Json} from '$routes/projects/projects_schema.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {ProjectsJson} from '$routes/projects/projects_schema.js';
 import {Project} from '$routes/projects/project.svelte.js';
 import {Page} from '$routes/projects/page.svelte.js';
 import {Domain} from '$routes/projects/domain.svelte.js';
 import {Repo} from '$routes/projects/repo.svelte.js';
-import {Project_Viewmodel} from '$routes/projects/project_viewmodel.svelte.js';
-import {Page_Viewmodel} from '$routes/projects/page_viewmodel.svelte.js';
-import {Domain_Viewmodel} from '$routes/projects/domain_viewmodel.svelte.js';
-import {Repo_Viewmodel} from '$routes/projects/repo_viewmodel.svelte.js';
+import {ProjectViewmodel} from '$routes/projects/project_viewmodel.svelte.js';
+import {PageViewmodel} from '$routes/projects/page_viewmodel.svelte.js';
+import {DomainViewmodel} from '$routes/projects/domain_viewmodel.svelte.js';
+import {RepoViewmodel} from '$routes/projects/repo_viewmodel.svelte.js';
 import {get_datetime_now, create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
@@ -21,12 +21,12 @@ import {create_sample_projects as create_example_projects} from '$routes/project
 
 export const projects_context = create_context<Projects>();
 
-export type Projects_Options = Cell_Options<typeof Projects_Json>;
+export type ProjectsOptions = CellOptions<typeof ProjectsJson>;
 
 /**
  * Manages projects, pages, and domains using Svelte 5 runes and Cell patterns.
  */
-export class Projects extends Cell<typeof Projects_Json> {
+export class Projects extends Cell<typeof ProjectsJson> {
 	projects: Array<Project> = $state([]);
 	current_project_id: Uuid | null = $state(null);
 	current_page_id: Uuid | null = $state(null);
@@ -72,7 +72,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 
 	readonly current_repos_viewmodel = $derived.by(() => {
 		if (!this.current_project_id) return null;
-		return new Repo_Viewmodel({
+		return new RepoViewmodel({
 			projects: this,
 			project_id: this.current_project_id,
 			repo_id: this.current_repo_id,
@@ -80,13 +80,13 @@ export class Projects extends Cell<typeof Projects_Json> {
 	});
 
 	/** Cache of project viewmodels. */
-	#project_viewmodels: Map<string, Project_Viewmodel> = new Map();
+	#project_viewmodels: Map<string, ProjectViewmodel> = new Map();
 
 	/** Cache of page editors. */
-	#page_viewmodels: Map<string, Page_Viewmodel> = new Map();
+	#page_viewmodels: Map<string, PageViewmodel> = new Map();
 
 	/** Cache of domain viewmodels. */
-	#domain_viewmodels: Map<string, Domain_Viewmodel> = new Map();
+	#domain_viewmodels: Map<string, DomainViewmodel> = new Map();
 
 	/** Current project viewmodel derived from current_project_id. */
 	readonly current_project_viewmodel = $derived.by(() => {
@@ -94,7 +94,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 
 		let viewmodel = this.#project_viewmodels.get(this.current_project_id);
 		if (!viewmodel) {
-			viewmodel = new Project_Viewmodel({
+			viewmodel = new ProjectViewmodel({
 				projects: this,
 				project_id: this.current_project_id,
 			});
@@ -110,7 +110,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 		const key = `${this.current_project_id}_${this.current_page_id}`;
 		let viewmodel = this.#page_viewmodels.get(key);
 		if (!viewmodel) {
-			viewmodel = new Page_Viewmodel({
+			viewmodel = new PageViewmodel({
 				projects: this,
 				project_id: this.current_project_id,
 				page_id: this.current_page_id,
@@ -130,7 +130,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 		const key = `${this.current_project_id}_${this.current_domain_id || 'new'}`;
 		let viewmodel = this.#domain_viewmodels.get(key);
 		if (!viewmodel) {
-			viewmodel = new Domain_Viewmodel({
+			viewmodel = new DomainViewmodel({
 				projects: this,
 				project_id: this.current_project_id,
 				domain_id: this.current_domain_id,
@@ -140,8 +140,8 @@ export class Projects extends Cell<typeof Projects_Json> {
 		return viewmodel;
 	});
 
-	constructor(options: Projects_Options) {
-		super(Projects_Json, options);
+	constructor(options: ProjectsOptions) {
+		super(ProjectsJson, options);
 
 		this.decoders = {
 			// TODO hacky
@@ -337,4 +337,4 @@ export class Projects extends Cell<typeof Projects_Json> {
 	}
 }
 
-export const Projects_Schema = z.instanceof(Projects);
+export const ProjectsSchema = z.instanceof(Projects);

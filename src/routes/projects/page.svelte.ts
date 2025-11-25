@@ -1,18 +1,18 @@
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Page_Json} from '$routes/projects/projects_schema.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {PageJson} from '$routes/projects/projects_schema.js';
 
-export type Page_Options = Cell_Options<typeof Page_Json>;
+export type PageOptions = CellOptions<typeof PageJson>;
 
 /**
  * Represents a page in a project.
  */
-export class Page extends Cell<typeof Page_Json> {
+export class Page extends Cell<typeof PageJson> {
 	path: string = $state()!;
 	title: string = $state()!;
 	content: string = $state()!;
 
-	constructor(options: Page_Options) {
-		super(Page_Json, options);
+	constructor(options: PageOptions) {
+		super(PageJson, options);
 		this.init();
 	}
 }

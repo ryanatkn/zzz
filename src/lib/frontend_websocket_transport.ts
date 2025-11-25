@@ -1,8 +1,8 @@
 // @slop Claude Opus 4
 
-import type {Socket} from '$lib/socket.svelte.js';
-import {Request_Tracker} from '$lib/request_tracker.svelte.js';
-import {Thrown_Jsonrpc_Error, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import type {Socket} from './socket.svelte.js';
+import {RequestTracker} from './request_tracker.svelte.js';
+import {ThrownJsonrpcError, jsonrpc_error_messages} from './jsonrpc_errors.js';
 import {
 	is_jsonrpc_notification,
 	is_jsonrpc_request,
@@ -10,31 +10,31 @@ import {
 	is_jsonrpc_error_message,
 	to_jsonrpc_message_id,
 	create_jsonrpc_error_message,
-} from '$lib/jsonrpc_helpers.js';
+} from './jsonrpc_helpers.js';
 import type {
-	Jsonrpc_Message_From_Client_To_Server,
-	Jsonrpc_Message_From_Server_To_Client,
-	Jsonrpc_Notification,
-	Jsonrpc_Request,
-	Jsonrpc_Response_Or_Error,
-	Jsonrpc_Error_Message,
-} from '$lib/jsonrpc.js';
-import type {Transport} from '$lib/transports.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+	JsonrpcMessageFromClientToServer,
+	JsonrpcMessageFromServerToClient,
+	JsonrpcNotification,
+	JsonrpcRequest,
+	JsonrpcResponseOrError,
+	JsonrpcErrorMessage,
+} from './jsonrpc.js';
+import type {Transport} from './transports.js';
+import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
 
 // TODO logging - maybe add a getter to Cell that falls back to the app logger?
 
-export class Frontend_Websocket_Transport implements Transport {
+export class FrontendWebsocketTransport implements Transport {
 	readonly transport_name = 'frontend_websocket_rpc' as const;
 
 	#socket: Socket;
-	#request_tracker: Request_Tracker;
+	#request_tracker: RequestTracker;
 	#remove_message_handler: (() => void) | null;
 	#remove_error_handler: (() => void) | null;
 
 	constructor(socket: Socket, request_timeout_ms?: number) {
 		this.#socket = socket;
-		this.#request_tracker = new Request_Tracker(request_timeout_ms);
+		this.#request_tracker = new RequestTracker(request_timeout_ms);
 
 		// TODO maybe we want to do this setup elsewhere, not hardcoded like this
 		this.#remove_message_handler = socket.add_message_handler(async (event) => {
@@ -64,11 +64,11 @@ export class Frontend_Websocket_Transport implements Transport {
 		});
 	}
 
-	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
+	async send(message: JsonrpcRequest): Promise<JsonrpcResponseOrError>;
+	async send(message: JsonrpcNotification): Promise<JsonrpcErrorMessage | null>;
 	async send(
-		message: Jsonrpc_Message_From_Client_To_Server,
-	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+		message: JsonrpcMessageFromClientToServer,
+	): Promise<JsonrpcMessageFromServerToClient | null> {
 		if (!this.is_ready()) {
 			return create_jsonrpc_error_message(
 				to_jsonrpc_message_id(message),
@@ -97,7 +97,7 @@ export class Frontend_Websocket_Transport implements Transport {
 				jsonrpc_error_messages.invalid_request(),
 			);
 		} catch (error) {
-			if (error instanceof Thrown_Jsonrpc_Error) {
+			if (error instanceof ThrownJsonrpcError) {
 				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
 					code: error.code,
 					message: error.message,

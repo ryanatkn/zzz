@@ -1,18 +1,18 @@
 import {DEV} from 'esm-env';
 
-import type {Filer_Change_Handler, Backend} from '$lib/server/backend.js';
-import type {Action_Inputs} from '$lib/action_collections.js';
-import {create_action_event} from '$lib/action_event.js';
+import type {FilerChangeHandler, Backend} from './backend.js';
+import type {ActionInputs} from '../action_collections.js';
+import {create_action_event} from '../action_event.js';
 import {
 	filer_change_action_spec,
 	completion_progress_action_spec,
 	ollama_progress_action_spec,
-} from '$lib/action_specs.js';
+} from '../action_specs.js';
 import {
 	map_watcher_change_to_diskfile_change,
 	to_serializable_disknode,
-} from '$lib/diskfile_helpers.js';
-import {Diskfile_Path, Serializable_Disknode} from '$lib/diskfile_types.js';
+} from '../diskfile_helpers.js';
+import {DiskfilePath, SerializableDisknode} from '../diskfile_types.js';
 
 // TODO very unfinished/hacky
 
@@ -23,16 +23,16 @@ import {Diskfile_Path, Serializable_Disknode} from '$lib/diskfile_types.js';
 // without blowing the budgets for complexity and performance,
 // think about unification with frontend_actions_api.ts and see it for better patterns
 
-export interface Backend_Actions_Api {
-	filer_change: (input: Action_Inputs['filer_change']) => Promise<void>;
-	completion_progress: (input: Action_Inputs['completion_progress']) => Promise<void>;
-	ollama_progress: (input: Action_Inputs['ollama_progress']) => Promise<void>;
+export interface BackendActionsApi {
+	filer_change: (input: ActionInputs['filer_change']) => Promise<void>;
+	completion_progress: (input: ActionInputs['completion_progress']) => Promise<void>;
+	ollama_progress: (input: ActionInputs['ollama_progress']) => Promise<void>;
 }
 
-export const create_backend_actions_api = (backend: Backend): Backend_Actions_Api => {
+export const create_backend_actions_api = (backend: Backend): BackendActionsApi => {
 	// TODO extend logger to add labels to the below
 	return {
-		filer_change: async (input: Action_Inputs['filer_change']) => {
+		filer_change: async (input: ActionInputs['filer_change']) => {
 			// TODO @api think about symmetry and generic handling, see how the frontend actions does it
 
 			// TODO cleaner way to do this?
@@ -73,7 +73,7 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 				);
 			}
 		},
-		completion_progress: async (input: Action_Inputs['completion_progress']) => {
+		completion_progress: async (input: ActionInputs['completion_progress']) => {
 			try {
 				const event = create_action_event(backend, completion_progress_action_spec, input, 'send');
 
@@ -101,7 +101,7 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 				);
 			}
 		},
-		ollama_progress: async (input: Action_Inputs['ollama_progress']) => {
+		ollama_progress: async (input: ActionInputs['ollama_progress']) => {
 			try {
 				const event = create_action_event(backend, ollama_progress_action_spec, input, 'send');
 
@@ -132,14 +132,14 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 	};
 };
 
-// TODO where does this belong? it calls into the `Backend_Actions_Api`
+// TODO where does this belong? it calls into the `BackendActionsApi`
 /**
  * Handle file system changes and notify clients.
  */
-export const handle_filer_change: Filer_Change_Handler = (change, disknode, backend, dir): void => {
+export const handle_filer_change: FilerChangeHandler = (change, disknode, backend, dir): void => {
 	const api_change = {
 		type: map_watcher_change_to_diskfile_change(change.type),
-		path: Diskfile_Path.parse(change.path),
+		path: DiskfilePath.parse(change.path),
 	};
 	const serializable_disknode = to_serializable_disknode(disknode, dir);
 
@@ -147,7 +147,7 @@ export const handle_filer_change: Filer_Change_Handler = (change, disknode, back
 	// This is less of a need in production because we control both sides,
 	// but maybe it should be optional or even required.
 	if (DEV) {
-		Serializable_Disknode.parse(serializable_disknode);
+		SerializableDisknode.parse(serializable_disknode);
 
 		// TODO can this be moved to the schema?
 		if (!serializable_disknode.id.startsWith(serializable_disknode.source_dir)) {

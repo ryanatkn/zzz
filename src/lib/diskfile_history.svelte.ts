@@ -3,16 +3,16 @@
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
-import {Diskfile_Path} from '$lib/diskfile_types.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {create_uuid, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {DiskfilePath} from './diskfile_types.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import {create_uuid, Uuid, UuidWithDefault} from './zod_helpers.js';
 
 /**
  * Schema for history entries.
  */
-export const History_Entry = z.strictObject({
-	id: Uuid_With_Default,
+export const HistoryEntry = z.strictObject({
+	id: UuidWithDefault,
 	created: z.number(),
 	content: z.string(),
 	label: z.string(),
@@ -20,27 +20,27 @@ export const History_Entry = z.strictObject({
 	is_unsaved_edit: z.boolean().default(false), // Indicates entries containing unsaved user edits
 	is_original_state: z.boolean().default(false), // Indicates if this entry represents the original disk state
 });
-export type History_Entry = z.infer<typeof History_Entry>;
+export type HistoryEntry = z.infer<typeof HistoryEntry>;
 
 /**
- * Schema for the Diskfile_History cell.
+ * Schema for the DiskfileHistory cell.
  */
-export const Diskfile_History_Json = Cell_Json.extend({
-	path: Diskfile_Path,
-	entries: z.array(History_Entry).default(() => []),
+export const DiskfileHistoryJson = CellJson.extend({
+	path: DiskfilePath,
+	entries: z.array(HistoryEntry).default(() => []),
 	max_entries: z.number().default(100), // TODO rename? `history_size`? `max_size`? `capacity`?
-}).meta({cell_class_name: 'Diskfile_History'});
-export type Diskfile_History_Json = z.infer<typeof Diskfile_History_Json>;
-export type Diskfile_History_Json_Input = z.input<typeof Diskfile_History_Json>;
+}).meta({cell_class_name: 'DiskfileHistory'});
+export type DiskfileHistoryJson = z.infer<typeof DiskfileHistoryJson>;
+export type DiskfileHistoryJsonInput = z.input<typeof DiskfileHistoryJson>;
 
-export type Diskfile_History_Options = Cell_Options<typeof Diskfile_History_Json>;
+export type DiskfileHistoryOptions = CellOptions<typeof DiskfileHistoryJson>;
 
 /**
  * Stores edit history for a single diskfile.
  */
-export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
-	path: Diskfile_Path = $state()!;
-	entries: Array<History_Entry> = $state()!;
+export class DiskfileHistory extends Cell<typeof DiskfileHistoryJson> {
+	path: DiskfilePath = $state()!;
+	entries: Array<HistoryEntry> = $state()!;
 	max_entries: number = $state()!;
 
 	/**
@@ -48,10 +48,10 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	 * Since entries are always kept sorted by creation time (newest first),
 	 * the most recent is always the first element.
 	 */
-	readonly current_entry: History_Entry | null = $derived(this.entries[0] ?? null);
+	readonly current_entry: HistoryEntry | null = $derived(this.entries[0] ?? null);
 
-	constructor(options: Diskfile_History_Options) {
-		super(Diskfile_History_Json, options);
+	constructor(options: DiskfileHistoryOptions) {
+		super(DiskfileHistoryJson, options);
 		this.init();
 	}
 
@@ -67,17 +67,16 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 			label?: string;
 			created?: number;
 		} = EMPTY_OBJECT,
-	): History_Entry {
+	): HistoryEntry {
 		// Don't add duplicate entries with the same content and metadata back-to-back
 		if (
-			this.current_entry &&
-			this.current_entry.content === content &&
+			this.current_entry?.content === content &&
 			this.#has_same_metadata(this.current_entry, options)
 		) {
 			return this.current_entry;
 		}
 
-		const entry: History_Entry = {
+		const entry: HistoryEntry = {
 			id: create_uuid(),
 			created: options.created ?? Date.now(),
 			content,
@@ -118,7 +117,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	 * Compare entry metadata flags with options
 	 */
 	#has_same_metadata(
-		entry: History_Entry,
+		entry: HistoryEntry,
 		options: {
 			is_disk_change?: boolean;
 			is_unsaved_edit?: boolean;
@@ -138,7 +137,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	/**
 	 * Find a history entry by id.
 	 */
-	find_entry_by_id(id: Uuid): History_Entry | undefined {
+	find_entry_by_id(id: Uuid): HistoryEntry | undefined {
 		return this.entries.find((entry) => entry.id === id);
 	}
 
@@ -154,7 +153,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	 * Clear all history entries except the most recent one by creation time
 	 * and any entries that match the optional keep predicate.
 	 */
-	clear_except_current(keep?: (entry: History_Entry) => boolean): void {
+	clear_except_current(keep?: (entry: HistoryEntry) => boolean): void {
 		if (this.entries.length <= 1) return;
 
 		// Get the current (most recent) entry

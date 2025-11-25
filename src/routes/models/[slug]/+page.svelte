@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Alert from '@ryanatkn/fuz/Alert.svelte';
-	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 	import {resolve} from '$app/paths';
 
-	import Model_Detail from '$lib/Model_Detail.svelte';
+	import ModelDetail from '$lib/ModelDetail.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	const {params} = $props();
@@ -25,13 +25,13 @@
 
 <div class="p_sm">
 	{#if loading}
-		<Pending_Animation />
+		<PendingAnimation />
 	{:else if has_error}
 		<Alert status="error">
 			error loading models: {error_message}
 		</Alert>
 	{:else if model}
-		<Model_Detail {model} />
+		<ModelDetail {model} />
 	{:else}
 		<Alert status="error">
 			no model found with name "{model_name}", maybe

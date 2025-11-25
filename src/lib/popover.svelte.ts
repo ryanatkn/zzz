@@ -6,8 +6,8 @@ import {on} from 'svelte/events';
 import {swallow} from '@ryanatkn/belt/dom.js';
 import type {TransitionConfig} from 'svelte/transition';
 
-import {type Position, type Alignment, generate_position_styles} from '$lib/position_helpers.js';
-import {create_client_id} from '$lib/helpers.js';
+import {type Position, type Alignment, generate_position_styles} from './position_helpers.js';
+import {create_client_id} from './helpers.js';
 
 // TODO refactor to use the builtin Popover API, but needs to use absolute positioning still because the anchor API isn't supported enough yet
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/popover
@@ -17,7 +17,7 @@ import {create_client_id} from '$lib/helpers.js';
 /**
  * Parameters for configuring the popover.
  */
-export interface Popover_Parameters {
+export interface PopoverParameters {
 	/** Position of the popover relative to its trigger. */
 	position?: Position;
 	/** Alignment along the position edge. */
@@ -37,7 +37,7 @@ export interface Popover_Parameters {
 /**
  * Parameters for the popover trigger action.
  */
-export interface Popover_Trigger_Parameters extends Popover_Parameters {
+export interface PopoverTriggerParameters extends PopoverParameters {
 	/** Content to render in the popover (as a snippet). */
 	content?: Snippet;
 }
@@ -45,13 +45,13 @@ export interface Popover_Trigger_Parameters extends Popover_Parameters {
 /**
  * Support both Svelte transitions and custom transitions.
  */
-export type Transition_Function = (node: HTMLElement) => TransitionConfig | {destroy?: () => void};
+export type TransitionFunction = (node: HTMLElement) => TransitionConfig | {destroy?: () => void};
 
 /**
  * Parameters for the popover content action.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Popover_Content_Parameters extends Popover_Parameters {
+export interface PopoverContentParameters extends PopoverParameters {
 	// Container reference is managed internally through the container action
 }
 
@@ -95,7 +95,7 @@ export class Popover {
 	/** Cleanup function for document click handler. */
 	#document_click_cleanup: (() => void) | undefined = undefined;
 
-	constructor(params?: Popover_Parameters) {
+	constructor(params?: PopoverParameters) {
 		if (params) {
 			this.update(params);
 		}
@@ -131,7 +131,7 @@ export class Popover {
 	/**
 	 * Updates the popover configuration.
 	 */
-	update(params: Popover_Parameters): void {
+	update(params: PopoverParameters): void {
 		// Store the old class before updating
 		const old_class = this.popover_class;
 		const old_disable_outside_click = this.disable_outside_click;
@@ -250,7 +250,7 @@ export class Popover {
 	/**
 	 * Attachment factory for the trigger element that shows/hides the popover.
 	 */
-	trigger = (params?: Popover_Trigger_Parameters): Attachment<HTMLElement> => {
+	trigger = (params?: PopoverTriggerParameters): Attachment<HTMLElement> => {
 		return (node) => {
 			this.#trigger_element = node;
 
@@ -277,7 +277,7 @@ export class Popover {
 	/**
 	 * Attachment factory for the popover content element.
 	 */
-	content = (params?: Popover_Content_Parameters): Attachment<HTMLElement> => {
+	content = (params?: PopoverContentParameters): Attachment<HTMLElement> => {
 		return (node) => {
 			this.#content_element = node;
 

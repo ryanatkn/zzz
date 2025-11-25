@@ -4,12 +4,12 @@
 	import {resolve} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
-	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
-	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
-	import Pages_Sidebar from '$routes/projects/Pages_Sidebar.svelte';
+	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
+	import SectionSidebar from '$routes/projects/SectionSidebar.svelte';
+	import PagesSidebar from '$routes/projects/PagesSidebar.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_ADD} from '$lib/glyphs.js';
-	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
+	import ProjectNotFound from '$routes/projects/ProjectNotFound.svelte';
 
 	const projects = projects_context.get();
 
@@ -20,10 +20,10 @@
 
 <div class="project_layout">
 	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
-	<Project_Sidebar />
+	<ProjectSidebar />
 	{#if projects.current_project}
-		<Section_Sidebar project={projects.current_project} section="pages" />
-		<Pages_Sidebar />
+		<SectionSidebar project={projects.current_project} section="pages" />
+		<PagesSidebar />
 	{/if}
 
 	<div class="project_content">
@@ -80,7 +80,7 @@
 				{/if}
 			</div>
 		{:else}
-			<Project_Not_Found />
+			<ProjectNotFound />
 		{/if}
 	</div>
 </div>

@@ -1,13 +1,13 @@
 import {z} from 'zod';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
 
-import type {Model} from '$lib/model.svelte.js';
-import {Provider_Name, type Provider_Status} from '$lib/provider_types.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import type {Model} from './model.svelte.js';
+import {ProviderName, type ProviderStatus} from './provider_types.js';
+import {CellJson} from './cell_types.js';
 
 // TODO optional/defaults?
-export const Provider_Json = Cell_Json.extend({
-	name: Provider_Name,
+export const ProviderJson = CellJson.extend({
+	name: ProviderName,
 	title: z.string(),
 	// TODO maybe change this to `docs_url` and add `url` for the homepage? and/or some other homepage url property?
 	url: z.string(),
@@ -15,13 +15,13 @@ export const Provider_Json = Cell_Json.extend({
 	company: z.string(),
 	api_key_url: z.string().nullable(),
 }).meta({cell_class_name: 'Provider'});
-export type Provider_Json = z.infer<typeof Provider_Json>;
-export type Provider_Json_Input = z.input<typeof Provider_Json>;
+export type ProviderJson = z.infer<typeof ProviderJson>;
+export type ProviderJsonInput = z.input<typeof ProviderJson>;
 
-export interface Provider_Options extends Cell_Options<typeof Provider_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface ProviderOptions extends CellOptions<typeof ProviderJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Provider extends Cell<typeof Provider_Json> {
-	name: Provider_Name = $state()!;
+export class Provider extends Cell<typeof ProviderJson> {
+	name: ProviderName = $state()!;
 	title: string = $state()!;
 	url: string = $state()!; // TODO @many should these be optional? or just default to `''`? need init patterns
 	homepage: string = $state()!; // TODO @many should these be optional? or just default to `''`? need init patterns
@@ -33,15 +33,15 @@ export class Provider extends Cell<typeof Provider_Json> {
 	/**
 	 * Status for this provider (availability, error messages, etc.).
 	 */
-	readonly status: Provider_Status | null = $derived(this.app.lookup_provider_status(this.name));
+	readonly status: ProviderStatus | null = $derived(this.app.lookup_provider_status(this.name));
 
 	/**
 	 * Whether this provider is available (configured with API keys, etc.).
 	 */
 	readonly available: boolean = $derived(this.status?.available ?? false);
 
-	constructor(options: Provider_Options) {
-		super(Provider_Json, options);
+	constructor(options: ProviderOptions) {
+		super(ProviderJson, options);
 		this.init();
 	}
 }

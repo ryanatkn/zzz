@@ -1,23 +1,20 @@
 import ollama, {Ollama} from 'ollama';
 import {find_cli} from '@ryanatkn/gro/cli.js';
 
-import {
-	Backend_Provider_Local,
-	type Completion_Handler_Options,
-} from '$lib/server/backend_provider.js';
-import {to_completion_result} from '$lib/response_helpers.js';
-import {Action_Inputs, type Action_Outputs} from '$lib/action_collections.js';
-import type {Completion_Message} from '$lib/completion_types.js';
-import {type Provider_Status, PROVIDER_ERROR_NOT_INSTALLED} from '$lib/provider_types.js';
+import {BackendProviderLocal, type CompletionHandlerOptions} from './backend_provider.js';
+import {to_completion_result} from '../response_helpers.js';
+import {ActionInputs, type ActionOutputs} from '../action_collections.js';
+import type {CompletionMessage} from '../completion_types.js';
+import {type ProviderStatus, PROVIDER_ERROR_NOT_INSTALLED} from '../provider_types.js';
 
-export class Backend_Provider_Ollama extends Backend_Provider_Local<Ollama> {
+export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 	readonly name = 'ollama';
 
 	protected override create_client(): void {
 		this.client = find_cli('ollama') ? ollama : null;
 	}
 
-	override async load_status(reload: boolean = false): Promise<Provider_Status> {
+	override async load_status(reload: boolean = false): Promise<ProviderStatus> {
 		// Return cached status if available and reload not requested
 		if (!reload && this.provider_status !== null) {
 			return this.provider_status;
@@ -25,7 +22,7 @@ export class Backend_Provider_Ollama extends Backend_Provider_Local<Ollama> {
 
 		const cli = find_cli('ollama');
 		if (!cli) {
-			const status: Provider_Status = {
+			const status: ProviderStatus = {
 				name: this.name,
 				available: false,
 				error: PROVIDER_ERROR_NOT_INSTALLED,
@@ -37,7 +34,7 @@ export class Backend_Provider_Ollama extends Backend_Provider_Local<Ollama> {
 
 		try {
 			await this.client!.list();
-			const status: Provider_Status = {
+			const status: ProviderStatus = {
 				name: this.name,
 				available: true,
 				checked_at: Date.now(),
@@ -47,7 +44,7 @@ export class Backend_Provider_Ollama extends Backend_Provider_Local<Ollama> {
 		} catch (error) {
 			console.error('[ollama_backend_provider] error checking availability:', error);
 			const error_message = error instanceof Error ? error.message : String(error);
-			const status: Provider_Status = {
+			const status: ProviderStatus = {
 				name: this.name,
 				available: false,
 				error: error_message,
@@ -59,8 +56,8 @@ export class Backend_Provider_Ollama extends Backend_Provider_Local<Ollama> {
 	}
 
 	async handle_streaming_completion(
-		options: Completion_Handler_Options,
-	): Promise<Action_Outputs['completion_create']> {
+		options: CompletionHandlerOptions,
+	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
@@ -89,7 +86,7 @@ export class Backend_Provider_Ollama extends Backend_Provider_Local<Ollama> {
 			void this.send_streaming_progress(
 				progress_token,
 				// TODO see the other patterns, maybe the API should be parsing and this takes the input schema (same issue on frontend)
-				Action_Inputs.completion_progress.shape.chunk.parse(chunk),
+				ActionInputs.completion_progress.shape.chunk.parse(chunk),
 			);
 
 			// Store the final response data
@@ -112,8 +109,8 @@ export class Backend_Provider_Ollama extends Backend_Provider_Local<Ollama> {
 	}
 
 	async handle_non_streaming_completion(
-		options: Completion_Handler_Options,
-	): Promise<Action_Outputs['completion_create']> {
+		options: CompletionHandlerOptions,
+	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt} = options;
 
 		// TODO @many is this what we want to do? or error? needs to stream progress in the streaming case
@@ -143,8 +140,8 @@ export class Backend_Provider_Ollama extends Backend_Provider_Local<Ollama> {
 
 const create_ollama_chat_options = <T extends boolean>(
 	model: string,
-	completion_options: Completion_Handler_Options['completion_options'],
-	completion_messages: Array<Completion_Message> | undefined,
+	completion_options: CompletionHandlerOptions['completion_options'],
+	completion_messages: Array<CompletionMessage> | undefined,
 	prompt: string,
 	stream: T,
 ) => ({
@@ -170,7 +167,7 @@ const create_ollama_chat_options = <T extends boolean>(
 
 const to_messages = (
 	system_message: string,
-	completion_messages: Array<Completion_Message> | undefined,
+	completion_messages: Array<CompletionMessage> | undefined,
 	prompt: string,
 ): Array<{role: string; content: string}> => {
 	return [

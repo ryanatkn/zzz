@@ -5,8 +5,8 @@
 import {test, expect, describe} from 'vitest';
 
 import {create_action_event, create_action_event_from_json} from '$lib/action_event.js';
-import type {Action_Event_Environment} from '$lib/action_event_types.js';
-import type {Action_Spec_Union} from '$lib/action_spec.js';
+import type {ActionEventEnvironment} from '$lib/action_event_types.js';
+import type {ActionSpecUnion} from '$lib/action_spec.js';
 import {
 	ping_action_spec,
 	filer_change_action_spec,
@@ -14,16 +14,16 @@ import {
 	completion_create_action_spec,
 } from '$lib/action_specs.js';
 import {create_uuid} from '$lib/zod_helpers.js';
-import type {Action_Executor} from '$lib/action_types.js';
+import type {ActionExecutor} from '$lib/action_types.js';
 
 // Mock environment for testing
-class Test_Environment implements Action_Event_Environment {
-	executor: Action_Executor = 'frontend';
+class TestEnvironment implements ActionEventEnvironment {
+	executor: ActionExecutor = 'frontend';
 	peer: any = {}; // Mock peer, not used in tests
 	handlers: Map<string, Map<string, (event: any) => any>> = new Map();
-	specs: Map<string, Action_Spec_Union> = new Map();
+	specs: Map<string, ActionSpecUnion> = new Map();
 
-	constructor(specs: Array<Action_Spec_Union> = []) {
+	constructor(specs: Array<ActionSpecUnion> = []) {
 		for (const spec of specs) {
 			this.specs.set(spec.method, spec);
 		}
@@ -33,7 +33,7 @@ class Test_Environment implements Action_Event_Environment {
 		return this.handlers.get(method)?.get(phase);
 	}
 
-	lookup_action_spec(method: string): Action_Spec_Union | undefined {
+	lookup_action_spec(method: string): ActionSpecUnion | undefined {
 		return this.specs.get(method);
 	}
 
@@ -45,10 +45,10 @@ class Test_Environment implements Action_Event_Environment {
 	}
 }
 
-describe('Action_Event', () => {
+describe('ActionEvent', () => {
 	describe('creation', () => {
 		test('creates event with initial state', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			expect(event.data.kind).toBe('request_response');
@@ -65,7 +65,7 @@ describe('Action_Event', () => {
 		});
 
 		test('creates event with input data', () => {
-			const env = new Test_Environment([completion_create_action_spec]);
+			const env = new TestEnvironment([completion_create_action_spec]);
 			const input = {
 				completion_request: {
 					created: '2024-01-01T00:00:00Z',
@@ -82,14 +82,14 @@ describe('Action_Event', () => {
 		});
 
 		test('creates event with specified initial phase', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined, 'receive_request');
 
 			expect(event.data.phase).toBe('receive_request');
 		});
 
 		test('throws for invalid executor/initiator combination', () => {
-			const env = new Test_Environment([filer_change_action_spec]);
+			const env = new TestEnvironment([filer_change_action_spec]);
 			env.executor = 'frontend';
 
 			// filer_change has initiator: 'backend', so frontend can't initiate send
@@ -101,7 +101,7 @@ describe('Action_Event', () => {
 
 	describe('parse()', () => {
 		test('parses valid input successfully', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			event.parse();
@@ -112,7 +112,7 @@ describe('Action_Event', () => {
 		});
 
 		test('parses complex input with validation', () => {
-			const env = new Test_Environment([completion_create_action_spec]);
+			const env = new TestEnvironment([completion_create_action_spec]);
 			const input = {
 				completion_request: {
 					created: '2024-01-01T00:00:00Z',
@@ -131,7 +131,7 @@ describe('Action_Event', () => {
 		});
 
 		test('fails on invalid input', () => {
-			const env = new Test_Environment([completion_create_action_spec]);
+			const env = new TestEnvironment([completion_create_action_spec]);
 			const invalid_input = {
 				completion_request: {
 					// Missing required fields
@@ -149,7 +149,7 @@ describe('Action_Event', () => {
 		});
 
 		test('throws when not in initial step', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			event.parse(); // First parse succeeds
@@ -161,7 +161,7 @@ describe('Action_Event', () => {
 
 	describe('handle_async()', () => {
 		test('executes handler successfully', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 
 			env.add_handler('ping', 'send_request', async () => {
 				// Handler logic
@@ -181,7 +181,7 @@ describe('Action_Event', () => {
 		});
 
 		test('handles missing handler gracefully', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			// No handler registered
 
 			const event = create_action_event(env, ping_action_spec, undefined);
@@ -193,7 +193,7 @@ describe('Action_Event', () => {
 		});
 
 		test('captures handler errors', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 
 			env.add_handler('ping', 'send_request', () => {
 				throw new Error('handler error');
@@ -213,7 +213,7 @@ describe('Action_Event', () => {
 		});
 
 		test('send_error handler can handle errors gracefully', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			let error_logged = false;
 
 			// Primary handler throws
@@ -248,7 +248,7 @@ describe('Action_Event', () => {
 		});
 
 		test('receive_error handler can handle errors gracefully', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			let error_handled = false;
 
 			// Error handler can inspect and handle the error
@@ -298,7 +298,7 @@ describe('Action_Event', () => {
 		});
 
 		test('validates output for phases that expect it', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			env.executor = 'backend';
 
 			env.add_handler('ping', 'receive_request', () => {
@@ -316,7 +316,7 @@ describe('Action_Event', () => {
 		});
 
 		test('throws when not in parsed step', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			// Not parsed yet
@@ -326,7 +326,7 @@ describe('Action_Event', () => {
 		});
 
 		test('is no-op when already failed', async () => {
-			const env = new Test_Environment([completion_create_action_spec]);
+			const env = new TestEnvironment([completion_create_action_spec]);
 			const invalid_input = {
 				completion_request: {
 					// Missing required fields
@@ -352,7 +352,7 @@ describe('Action_Event', () => {
 
 	describe('handle_sync()', () => {
 		test('executes synchronous local_call', () => {
-			const env = new Test_Environment([toggle_main_menu_action_spec]);
+			const env = new TestEnvironment([toggle_main_menu_action_spec]);
 			const output = {show: true};
 
 			env.add_handler('toggle_main_menu', 'execute', () => output);
@@ -367,7 +367,7 @@ describe('Action_Event', () => {
 		});
 
 		test('throws for async actions', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 			event.parse();
 
@@ -377,7 +377,7 @@ describe('Action_Event', () => {
 		});
 
 		test('is no-op when already failed', () => {
-			const env = new Test_Environment([toggle_main_menu_action_spec]);
+			const env = new TestEnvironment([toggle_main_menu_action_spec]);
 
 			// Force a failure by providing invalid input - show must be boolean
 			const event = create_action_event(env, toggle_main_menu_action_spec, {show: 'not-a-boolean'});
@@ -398,7 +398,7 @@ describe('Action_Event', () => {
 
 	describe('transition()', () => {
 		test('transitions between valid phases', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 
 			// Start in send_request
 			const event = create_action_event(env, ping_action_spec, undefined);
@@ -418,7 +418,7 @@ describe('Action_Event', () => {
 		});
 
 		test('throws for invalid phase transition', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 
 			const event = create_action_event(env, ping_action_spec, undefined);
 			event.parse();
@@ -431,7 +431,7 @@ describe('Action_Event', () => {
 		});
 
 		test('throws when not in handled step', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			// Still in initial step
@@ -441,7 +441,7 @@ describe('Action_Event', () => {
 		});
 
 		test('carries data forward in transitions', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			env.executor = 'backend';
 
 			const event = create_action_event(env, ping_action_spec, undefined, 'receive_request');
@@ -468,7 +468,7 @@ describe('Action_Event', () => {
 		});
 
 		test('is no-op when already failed', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 
 			// First handler throws, transitions to send_error
 			env.add_handler('ping', 'send_request', () => {
@@ -508,7 +508,7 @@ describe('Action_Event', () => {
 
 	describe('protocol setters', () => {
 		test('set_request() sets request data', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			env.executor = 'backend';
 
 			const event = create_action_event(env, ping_action_spec, undefined, 'receive_request');
@@ -524,7 +524,7 @@ describe('Action_Event', () => {
 		});
 
 		test('set_response() sets response and extracts output', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 
 			const event = create_action_event(env, ping_action_spec, undefined);
 			event.parse();
@@ -554,7 +554,7 @@ describe('Action_Event', () => {
 		});
 
 		test('error response transitions to receive_error phase on parse', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 
 			const event = create_action_event(env, ping_action_spec, undefined);
 			event.parse();
@@ -594,7 +594,7 @@ describe('Action_Event', () => {
 		});
 
 		test('set_notification() sets notification data', () => {
-			const env = new Test_Environment([filer_change_action_spec]);
+			const env = new TestEnvironment([filer_change_action_spec]);
 			env.executor = 'frontend';
 
 			const event = create_action_event(env, filer_change_action_spec, {}, 'receive');
@@ -613,7 +613,7 @@ describe('Action_Event', () => {
 		});
 
 		test('setters throw for wrong phase/kind', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			expect(() => event.set_request({} as any)).toThrow(
@@ -628,7 +628,7 @@ describe('Action_Event', () => {
 
 	describe('is_complete()', () => {
 		test('returns true for terminal phases', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 
 			const event = create_action_event(env, ping_action_spec, undefined);
 
@@ -652,7 +652,7 @@ describe('Action_Event', () => {
 		});
 
 		test('returns true for failed state', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, {invalid: 'input'});
 
 			event.parse(); // Will fail due to invalid input
@@ -662,7 +662,7 @@ describe('Action_Event', () => {
 		});
 
 		test('returns false for non-terminal phases', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			event.parse();
@@ -674,7 +674,7 @@ describe('Action_Event', () => {
 
 	describe('observe()', () => {
 		test('notifies listeners of state changes', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			const changes: Array<{old_step: string; new_step: string}> = [];
@@ -696,7 +696,7 @@ describe('Action_Event', () => {
 		});
 
 		test('cleanup function removes listener', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			let call_count = 0;
@@ -714,7 +714,7 @@ describe('Action_Event', () => {
 		});
 
 		test('multiple listeners work independently', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			const listener1_calls: Array<string> = [];
@@ -737,7 +737,7 @@ describe('Action_Event', () => {
 
 	describe('toJSON() and from_json()', () => {
 		test('serializes and deserializes event state', async () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			event.parse();
@@ -757,7 +757,7 @@ describe('Action_Event', () => {
 		});
 
 		test('throws when spec not found for deserialization', () => {
-			const env = new Test_Environment(); // No specs registered
+			const env = new TestEnvironment(); // No specs registered
 
 			const json = {
 				kind: 'request_response',
@@ -781,7 +781,7 @@ describe('Action_Event', () => {
 
 	describe('environment helpers', () => {
 		test('app getter works for frontend environment', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			env.executor = 'frontend';
 
 			const event = create_action_event(env, ping_action_spec, undefined);
@@ -790,7 +790,7 @@ describe('Action_Event', () => {
 		});
 
 		test('backend getter works for backend environment', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			env.executor = 'backend';
 
 			const event = create_action_event(env, ping_action_spec, undefined);
@@ -799,7 +799,7 @@ describe('Action_Event', () => {
 		});
 
 		test('app getter throws for backend environment', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			env.executor = 'backend';
 
 			const event = create_action_event(env, ping_action_spec, undefined);
@@ -810,7 +810,7 @@ describe('Action_Event', () => {
 		});
 
 		test('backend getter throws for frontend environment', () => {
-			const env = new Test_Environment([ping_action_spec]);
+			const env = new TestEnvironment([ping_action_spec]);
 			env.executor = 'frontend';
 
 			const event = create_action_event(env, ping_action_spec, undefined);
@@ -823,7 +823,7 @@ describe('Action_Event', () => {
 
 	describe('different action kinds', () => {
 		test('remote_notification fails parsing with invalid input', async () => {
-			const env = new Test_Environment([filer_change_action_spec]);
+			const env = new TestEnvironment([filer_change_action_spec]);
 			env.executor = 'backend';
 
 			const invalid_input = {
@@ -846,7 +846,7 @@ describe('Action_Event', () => {
 		});
 
 		test('remote_notification creates notification in send phase', async () => {
-			const env = new Test_Environment([filer_change_action_spec]);
+			const env = new TestEnvironment([filer_change_action_spec]);
 			env.executor = 'backend';
 
 			const input = {
@@ -872,7 +872,7 @@ describe('Action_Event', () => {
 		});
 
 		test('local_call completes in single phase', () => {
-			const env = new Test_Environment([toggle_main_menu_action_spec]);
+			const env = new TestEnvironment([toggle_main_menu_action_spec]);
 
 			env.add_handler('toggle_main_menu', 'execute', () => ({show: false}));
 

@@ -1,17 +1,17 @@
 // @slop Claude Sonnet 3.7
 
 import {z} from 'zod';
-import type {Async_Status} from '@ryanatkn/belt/async.js';
+import type {AsyncStatus} from '@ryanatkn/belt/async.js';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
+import {Cell, type CellOptions} from './cell.svelte.js';
+import {CellJson} from './cell_types.js';
+import type {JsonrpcRequestId} from './jsonrpc.js';
 import type {
-	Ollama_List_Response,
-	Ollama_List_Response_Item,
-	Ollama_Ps_Response,
-} from '$lib/ollama_helpers.js';
-import type {Diskfile_Directory_Path} from '$lib/diskfile_types.js';
+	OllamaListResponse,
+	OllamaListResponseItem,
+	OllamaPsResponse,
+} from './ollama_helpers.js';
+import type {DiskfileDirectoryPath} from './diskfile_types.js';
 
 // TODO namerbot capability, uses backend+(at least one provider) (or rethink its role in a bigger picture, not just names)
 
@@ -20,9 +20,9 @@ import type {Diskfile_Directory_Path} from '$lib/diskfile_types.js';
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
 
-export const Capabilities_Json = Cell_Json.extend({}).meta({cell_class_name: 'Capabilities'});
-export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
-export type Capabilities_Json_Input = z.input<typeof Capabilities_Json>;
+export const CapabilitiesJson = CellJson.extend({}).meta({cell_class_name: 'Capabilities'});
+export type CapabilitiesJson = z.infer<typeof CapabilitiesJson>;
+export type CapabilitiesJsonInput = z.input<typeof CapabilitiesJson>;
 
 /**
  * Generic interface for a capability with standardized status tracking.
@@ -33,32 +33,32 @@ export interface Capability<T> {
 	/** The capability's status: undefined=not initialized, null=checking, otherwise available or not. */
 	data: T;
 	/** Async status tracking the connection/check state. */
-	status: Async_Status;
+	status: AsyncStatus;
 	// TODO maybe rename to `request_id` as it's used elsewhere?
 	/** Message id of the last request for this capability's info, if any. */
-	message_id: Jsonrpc_Request_Id | null;
+	message_id: JsonrpcRequestId | null;
 	/** Error message if any */
 	error_message: string | null;
 	/** Timestamp when the capability was last checked. */
 	updated: number | null;
 }
 
-export interface Ping_Data {
-	ping_id: Jsonrpc_Request_Id;
+export interface PingData {
+	ping_id: JsonrpcRequestId;
 	completed: boolean;
 	sent_time: number;
 	received_time: number | null;
 	round_trip_time: number | null;
 }
 
-export interface Server_Capability_Data {
+export interface ServerCapabilityData {
 	// TODO think about a special endpoint that isn't `ping` with more info, maybe in .well-known as a json file - server.json?
 	// name: string;
 	// version: string;
 	round_trip_time: number;
 }
 
-export interface Websocket_Capability_Data {
+export interface WebsocketCapabilityData {
 	url: string | null;
 	connected: boolean;
 	reconnect_count: number;
@@ -69,13 +69,13 @@ export interface Websocket_Capability_Data {
 	pending_pings: number;
 }
 
-export interface Filesystem_Capability_Data {
-	zzz_cache_dir: Diskfile_Directory_Path | null | undefined;
+export interface FilesystemCapabilityData {
+	zzz_cache_dir: DiskfileDirectoryPath | null | undefined;
 }
 
-export interface Ollama_Capability_Data {
-	list_response: Ollama_List_Response | null;
-	ps_response: Ollama_Ps_Response | null;
+export interface OllamaCapabilityData {
+	list_response: OllamaListResponse | null;
+	ps_response: OllamaPsResponse | null;
 	round_trip_time: number | null;
 }
 
@@ -84,8 +84,8 @@ export interface Ollama_Capability_Data {
  * This is NOT generic or extensible - it contains hardcoded logic for
  * all capabilities the system supports.
  */
-export class Capabilities extends Cell<typeof Capabilities_Json> {
-	backend: Capability<Server_Capability_Data | null | undefined> = $state.raw({
+export class Capabilities extends Cell<typeof CapabilitiesJson> {
+	backend: Capability<ServerCapabilityData | null | undefined> = $state.raw({
 		name: 'backend',
 		data: undefined,
 		status: 'initial',
@@ -97,7 +97,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * WebSocket capability that derives its state from the socket.
 	 */
-	readonly websocket: Capability<Websocket_Capability_Data | null | undefined> = $derived.by(() => {
+	readonly websocket: Capability<WebsocketCapabilityData | null | undefined> = $derived.by(() => {
 		// Map socket status to capability status, but consider connection state
 		const {socket} = this.app;
 		const {status} = socket;
@@ -131,43 +131,41 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * The filesystem capability derives its state from the backend and `zzz_cache_dir`.
 	 */
-	readonly filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(
-		() => {
-			const {zzz_cache_dir} = this.app;
-			let status: Async_Status;
+	readonly filesystem: Capability<FilesystemCapabilityData | null | undefined> = $derived.by(() => {
+		const {zzz_cache_dir} = this.app;
+		let status: AsyncStatus;
 
-			if (this.backend.status !== 'success') {
-				// Server is not available, so mirror its status
-				status = this.backend.status;
+		if (this.backend.status !== 'success') {
+			// Server is not available, so mirror its status
+			status = this.backend.status;
+		} else {
+			// TODO hacky, should be explicit
+			if (zzz_cache_dir === undefined) {
+				status = 'initial';
+			} else if (zzz_cache_dir === null) {
+				status = 'pending';
+			} else if (zzz_cache_dir === '') {
+				status = 'failure';
 			} else {
-				// TODO hacky, should be explicit
-				if (zzz_cache_dir === undefined) {
-					status = 'initial';
-				} else if (zzz_cache_dir === null) {
-					status = 'pending';
-				} else if (zzz_cache_dir === '') {
-					status = 'failure';
-				} else {
-					status = 'success';
-				}
+				status = 'success';
 			}
+		}
 
-			return {
-				name: 'filesystem',
-				data: status === 'success' ? {zzz_cache_dir} : undefined,
-				status,
-				message_id: null,
-				error_message: null,
-				updated: Date.now(),
-			};
-		},
-	);
+		return {
+			name: 'filesystem',
+			data: status === 'success' ? {zzz_cache_dir} : undefined,
+			status,
+			message_id: null,
+			error_message: null,
+			updated: Date.now(),
+		};
+	});
 
 	/**
 	 * Ollama capability that derives its state from provider_status (authoritative)
 	 * and app.ollama (for richer data when available).
 	 */
-	readonly ollama: Capability<Ollama_Capability_Data | null | undefined> = $derived.by(() => {
+	readonly ollama: Capability<OllamaCapabilityData | null | undefined> = $derived.by(() => {
 		const {ollama} = this.app;
 		const provider_status = this.app.lookup_provider_status('ollama');
 
@@ -311,7 +309,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Store pings - both pending and completed.
 	 */
-	pings: Array<Ping_Data> = $state([]);
+	pings: Array<PingData> = $state([]);
 
 	/**
 	 * Most recent completed ping round trip time in milliseconds.
@@ -323,7 +321,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Completed pings (for display).
 	 */
-	readonly completed_pings: Array<Ping_Data> = $derived(this.pings.filter((p) => p.completed));
+	readonly completed_pings: Array<PingData> = $derived(this.pings.filter((p) => p.completed));
 
 	/**
 	 * Number of pending pings.
@@ -393,7 +391,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	readonly ollama_models: Array<{
 		name: string;
 		size: number;
-		model_response: Ollama_List_Response_Item;
+		model_response: OllamaListResponseItem;
 	}> = $derived(
 		this.app.ollama.models_downloaded
 			.filter((m) => !!m.ollama_list_response_item)
@@ -404,8 +402,8 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			})),
 	);
 
-	constructor(options: Cell_Options<typeof Capabilities_Json>) {
-		super(Capabilities_Json, options);
+	constructor(options: CellOptions<typeof CapabilitiesJson>) {
+		super(CapabilitiesJson, options);
 	}
 
 	/**
@@ -452,10 +450,10 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	// TODO refactor maybe to a `Pings` class
-	handle_ping_sent(request_id: Jsonrpc_Request_Id): void {
+	handle_ping_sent(request_id: JsonrpcRequestId): void {
 		console.log(`[capabilities] [handle_ping_sent] request_id`, request_id);
 		// Create a new pending ping
-		const new_ping: Ping_Data = {
+		const new_ping: PingData = {
 			ping_id: request_id,
 			completed: false,
 			sent_time: Date.now(),
@@ -479,7 +477,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	// TODO @many refactor mutations
-	handle_ping_received(ping_id: Jsonrpc_Request_Id): void {
+	handle_ping_received(ping_id: JsonrpcRequestId): void {
 		console.log(`[capabilities] [handle_ping_received] ping_id`, ping_id);
 		const ping = this.pings.find((p) => p.ping_id === ping_id);
 		// If we can't find the ping, we can safely ignore it
@@ -508,7 +506,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		}
 	}
 
-	handle_ping_error(ping_id: Jsonrpc_Request_Id, error_message: string): void {
+	handle_ping_error(ping_id: JsonrpcRequestId, error_message: string): void {
 		console.error(`[capabilities] [handle_ping_error] ping_id`, ping_id, error_message);
 
 		// Mark the ping as completed (failed)

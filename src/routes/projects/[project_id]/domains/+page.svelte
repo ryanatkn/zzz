@@ -4,12 +4,12 @@
 	import {resolve} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
-	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
-	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
-	import Domains_Sidebar from '$routes/projects/Domains_Sidebar.svelte';
+	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
+	import SectionSidebar from '$routes/projects/SectionSidebar.svelte';
+	import DomainsSidebar from '$routes/projects/DomainsSidebar.svelte';
 	import {GLYPH_ADD, GLYPH_CHECKMARK} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
+	import ProjectNotFound from '$routes/projects/ProjectNotFound.svelte';
 
 	const projects = projects_context.get();
 
@@ -18,10 +18,10 @@
 
 <div class="project_layout">
 	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
-	<Project_Sidebar />
+	<ProjectSidebar />
 	{#if projects.current_project}
-		<Section_Sidebar project={projects.current_project} section="domains" />
-		<Domains_Sidebar />
+		<SectionSidebar project={projects.current_project} section="domains" />
+		<DomainsSidebar />
 	{/if}
 
 	<div class="project_content">
@@ -96,7 +96,7 @@
 				</div>
 			</div>
 		{:else}
-			<Project_Not_Found />
+			<ProjectNotFound />
 		{/if}
 	</div>
 </div>

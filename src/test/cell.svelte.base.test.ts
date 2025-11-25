@@ -5,9 +5,9 @@
 import {test, expect, vi, beforeEach, describe} from 'vitest';
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {create_uuid, get_datetime_now, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
+import {create_uuid, get_datetime_now, UuidWithDefault} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -15,8 +15,8 @@ import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 const TEST_ID = create_uuid();
 const TEST_DATETIME = get_datetime_now();
 
-// Basic schema for testing that extends Cell_Json
-const Test_Schema = Cell_Json.extend({
+// Basic schema for testing that extends CellJson
+const TestSchema = CellJson.extend({
 	text: z.string().default(''),
 	number: z.number().default(0),
 	items: z.array(z.string()).default(() => []),
@@ -24,14 +24,14 @@ const Test_Schema = Cell_Json.extend({
 });
 
 // Basic test cell implementation
-class Basic_Test_Cell extends Cell<typeof Test_Schema> {
+class BasicTestCell extends Cell<typeof TestSchema> {
 	text: string = $state()!;
 	number: number = $state()!;
 	items: Array<string> = $state()!;
 	flag: boolean = $state()!;
 
-	constructor(options: Cell_Options<typeof Test_Schema>) {
-		super(Test_Schema, options);
+	constructor(options: CellOptions<typeof TestSchema>) {
+		super(TestSchema, options);
 		this.init();
 	}
 }
@@ -47,7 +47,7 @@ beforeEach(() => {
 
 describe('Cell initialization', () => {
 	test('initializes with provided json', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -72,7 +72,7 @@ describe('Cell initialization', () => {
 	});
 
 	test('uses default values when json is empty', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 		});
 
@@ -87,7 +87,7 @@ describe('Cell initialization', () => {
 	});
 
 	test('derived schema properties are correctly calculated', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -121,7 +121,7 @@ describe('Cell registry lifecycle', () => {
 	test('cell is automatically registered on initialization', () => {
 		const cell_id = create_uuid();
 
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: cell_id,
@@ -137,7 +137,7 @@ describe('Cell registry lifecycle', () => {
 	test('dispose removes from registry', () => {
 		const cell_id = create_uuid();
 
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: cell_id,
@@ -158,7 +158,7 @@ describe('Cell registry lifecycle', () => {
 	test('dispose is safe to call multiple times', () => {
 		const cell_id = create_uuid();
 
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: cell_id,
@@ -176,28 +176,28 @@ describe('Cell registry lifecycle', () => {
 
 describe('Cell id handling', () => {
 	// Define a test schema with required type field for these tests
-	const Id_Test_Schema = z.object({
-		id: Uuid_With_Default,
+	const IdTestSchema = z.object({
+		id: UuidWithDefault,
 		type: z.literal('test').default('test'),
 		content: z.string().default(''),
 		version: z.number().default(0),
 	});
 
 	// Test implementation of the Cell class with id-specific tests
-	class Id_Test_Cell extends Cell<typeof Id_Test_Schema> {
+	class IdTestCell extends Cell<typeof IdTestSchema> {
 		type: string = $state()!;
 		content: string = $state()!;
 		version: number = $state()!;
 
 		constructor(options: {app: Frontend; json?: any}) {
-			super(Id_Test_Schema, options);
+			super(IdTestSchema, options);
 			this.init();
 		}
 	}
 
 	test('set_json overwrites id when provided in input', () => {
 		// Create initial cell
-		const cell = new Id_Test_Cell({app});
+		const cell = new IdTestCell({app});
 		const initial_id = cell.id;
 
 		// Verify initial state
@@ -222,7 +222,7 @@ describe('Cell id handling', () => {
 
 	test('set_json_partial updates id when included in partial update', () => {
 		// Create initial cell
-		const cell = new Id_Test_Cell({app});
+		const cell = new IdTestCell({app});
 		const initial_id = cell.id;
 
 		// Create a new id to set
@@ -244,7 +244,7 @@ describe('Cell id handling', () => {
 
 	test('set_json_partial preserves id when not included in partial update', () => {
 		// Create initial cell
-		const cell = new Id_Test_Cell({app});
+		const cell = new IdTestCell({app});
 		const initial_id = cell.id;
 		const initial_content = '';
 
@@ -261,7 +261,7 @@ describe('Cell id handling', () => {
 
 	test('schema validation rejects invalid id formats', () => {
 		// Create initial cell
-		const cell = new Id_Test_Cell({app});
+		const cell = new IdTestCell({app});
 
 		// Attempt to set invalid id
 		expect(() => {
@@ -273,7 +273,7 @@ describe('Cell id handling', () => {
 
 	test('clone creates a new id instead of copying the original', () => {
 		// Create cell with initial values
-		const cell = new Id_Test_Cell({
+		const cell = new IdTestCell({
 			app,
 			json: {
 				type: 'test',
@@ -299,7 +299,7 @@ describe('Cell id handling', () => {
 
 describe('Cell serialization', () => {
 	test('to_json creates correct representation', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -320,7 +320,7 @@ describe('Cell serialization', () => {
 	});
 
 	test('toJSON method works with JSON.stringify', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -336,7 +336,7 @@ describe('Cell serialization', () => {
 	});
 
 	test('derived json properties update when cell changes', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -366,7 +366,7 @@ describe('Cell serialization', () => {
 
 describe('Cell modification methods', () => {
 	test('set_json updates properties', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -388,14 +388,14 @@ describe('Cell modification methods', () => {
 	});
 
 	test('set_json rejects invalid data', () => {
-		const test_cell = new Basic_Test_Cell({app});
+		const test_cell = new BasicTestCell({app});
 
 		// Should reject invalid data with a schema error
 		expect(() => test_cell.set_json({number: 'not a number' as any})).toThrow();
 	});
 
 	test('set_json_partial updates only specified properties', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -423,7 +423,7 @@ describe('Cell modification methods', () => {
 	});
 
 	test('set_json_partial handles null or undefined input', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -441,7 +441,7 @@ describe('Cell modification methods', () => {
 	});
 
 	test('set_json_partial validates merged data against schema', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -463,7 +463,7 @@ describe('Cell date formatting', () => {
 		const created = now.toISOString();
 		const updated = new Date(now.getTime() + 10000).toISOString();
 
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -487,7 +487,7 @@ describe('Cell date formatting', () => {
 	});
 
 	test('handles null updated date', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -505,7 +505,7 @@ describe('Cell date formatting', () => {
 
 describe('Cell cloning', () => {
 	test('clone creates independent copy', () => {
-		const original = new Basic_Test_Cell({
+		const original = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -537,7 +537,7 @@ describe('Cell cloning', () => {
 	});
 
 	test('clone registers new instance in registry', () => {
-		const original = new Basic_Test_Cell({
+		const original = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -555,7 +555,7 @@ describe('Cell cloning', () => {
 
 describe('Schema validation', () => {
 	test('json_parsed validates cell state', () => {
-		const test_cell = new Basic_Test_Cell({
+		const test_cell = new BasicTestCell({
 			app,
 			json: {
 				id: TEST_ID,
@@ -569,7 +569,7 @@ describe('Schema validation', () => {
 		// Invalid initialization should throw
 		expect(
 			() =>
-				new Basic_Test_Cell({
+				new BasicTestCell({
 					app,
 					json: {
 						id: TEST_ID,

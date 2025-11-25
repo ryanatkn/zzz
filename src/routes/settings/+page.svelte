@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Dashboard_Settings from '$lib/Dashboard_Settings.svelte';
+	import DashboardSettings from '$lib/DashboardSettings.svelte';
 </script>
 
-<Dashboard_Settings />
+<DashboardSettings />

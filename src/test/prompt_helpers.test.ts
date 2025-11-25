@@ -6,7 +6,7 @@ import {format_prompt_content} from '$lib/prompt_helpers.js';
 
 // Instead of mocking modules, we'll create a simplified part structure
 // that mirrors the interface we need for the tests
-interface Simple_Part {
+interface SimplePart {
 	enabled: boolean;
 	content: string;
 	has_xml_tag: boolean;
@@ -22,7 +22,7 @@ interface Simple_Part {
 }
 
 // Helper to create a part with default values
-const create_part = (partial: Partial<Simple_Part> = {}): Simple_Part => {
+const create_part = (partial: Partial<SimplePart> = {}): SimplePart => {
 	const type = partial.type || 'text';
 
 	return {
@@ -325,7 +325,7 @@ test('format_prompt_content - trims whitespace from XML tag name', () => {
 
 // Test that diskfile parts get the path attribute by default
 test('format_prompt_content - ensures diskfile parts have path attribute', () => {
-	// Create a mock Diskfile_Part with a path
+	// Create a mock DiskfilePart with a path
 	const diskfile_part = create_part({
 		type: 'diskfile',
 		content: 'File content with path',

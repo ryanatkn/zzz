@@ -79,41 +79,41 @@ describe('get_schema_class_info', () => {
 
 	test('detects class names set with cell_class', () => {
 		const schema = z.object({id: z.string()});
-		const schema_with_class = schema.meta({cell_class_name: 'Test_Class'});
+		const schema_with_class = schema.meta({cell_class_name: 'TestClass'});
 
 		const info = get_schema_class_info(schema_with_class);
-		expect(info?.class_name).toBe('Test_Class');
+		expect(info?.class_name).toBe('TestClass');
 	});
 
 	test('detects element classes from element metadata', () => {
-		const element_schema = z.string().meta({cell_class_name: 'Element_Class'});
+		const element_schema = z.string().meta({cell_class_name: 'ElementClass'});
 		const array_schema = z.array(element_schema);
 
 		const info = get_schema_class_info(array_schema);
 		expect(info?.is_array).toBe(true);
-		expect(info?.element_class).toBe('Element_Class');
+		expect(info?.element_class).toBe('ElementClass');
 	});
 
 	test('handles default-wrapped array with element metadata', () => {
-		const element_schema = z.string().meta({cell_class_name: 'Element_Class'});
+		const element_schema = z.string().meta({cell_class_name: 'ElementClass'});
 		const array_schema = z.array(element_schema).default([]);
 
 		const info = get_schema_class_info(array_schema);
 		expect(info?.is_array).toBe(true);
-		expect(info?.element_class).toBe('Element_Class');
+		expect(info?.element_class).toBe('ElementClass');
 	});
 
 	test('reads element class from nested element schema', () => {
 		// Test that metadata on element schema is properly read
 		const element_schema = z
 			.object({name: z.string()})
-			.meta({cell_class_name: 'Direct_Element_Class'});
+			.meta({cell_class_name: 'DirectElementClass'});
 		const array_schema = z.array(element_schema);
 
 		// Verify that get_schema_class_info can read element metadata
 		const info = get_schema_class_info(array_schema);
 		expect(info?.is_array).toBe(true);
-		expect(info?.element_class).toBe('Direct_Element_Class');
+		expect(info?.element_class).toBe('DirectElementClass');
 	});
 
 	test('handles ZodDefault containing a ZodArray', () => {
@@ -188,7 +188,7 @@ describe('get_schema_class_info', () => {
 
 	test('recursive unwrapping preserves metadata through wrappers', () => {
 		// Create an array with element that has metadata
-		const element = z.string().meta({cell_class_name: 'Test_Element'});
+		const element = z.string().meta({cell_class_name: 'TestElement'});
 		const array_with_class = z.array(element);
 
 		// Wrap it multiple times
@@ -196,35 +196,35 @@ describe('get_schema_class_info', () => {
 
 		// Check that metadata is preserved
 		const info = get_schema_class_info(wrapped_array);
-		expect(info?.element_class).toBe('Test_Element');
+		expect(info?.element_class).toBe('TestElement');
 		expect(info?.is_array).toBe(true);
 	});
 
 	test('handles deeply nested schemas with element metadata', () => {
 		// Create a deeply nested schema with element metadata
-		const element = z.string().meta({cell_class_name: 'Nested_Element'});
+		const element = z.string().meta({cell_class_name: 'NestedElement'});
 		const nested_schema = z.array(element).optional().default([]);
 
 		// Verify metadata is found correctly through the wrappers
 		const info = get_schema_class_info(nested_schema);
 		expect(info?.is_array).toBe(true);
-		expect(info?.element_class).toBe('Nested_Element');
+		expect(info?.element_class).toBe('NestedElement');
 	});
 });
 
 describe('cell_class', () => {
 	test('adds class name metadata to schemas', () => {
 		const schema = z.object({name: z.string()});
-		const result = schema.meta({cell_class_name: 'Test_Cell_Class'});
+		const result = schema.meta({cell_class_name: 'TestCellClass'});
 
 		// Should add the metadata via .meta()
-		expect(result.meta()?.cell_class_name).toBe('Test_Cell_Class');
+		expect(result.meta()?.cell_class_name).toBe('TestCellClass');
 
 		// Should return a new schema instance (due to .meta() creating a new instance)
 		expect(result).not.toBe(schema);
 
 		// Get schema info should report it correctly
 		const info = get_schema_class_info(result);
-		expect(info?.class_name).toBe('Test_Cell_Class');
+		expect(info?.class_name).toBe('TestCellClass');
 	});
 });

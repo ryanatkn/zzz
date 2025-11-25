@@ -6,9 +6,9 @@ import {test, expect, vi, describe, beforeEach, afterEach} from 'vitest';
 
 import {
 	Reorderable,
-	type Reorderable_Item_Id,
-	type Reorderable_Item_Params,
-	type Reorderable_List_Params,
+	type ReorderableItemId,
+	type ReorderableItemParams,
+	type ReorderableListParams,
 } from '$lib/reorderable.svelte.js';
 
 // Mock helper function for DOM testing
@@ -81,7 +81,7 @@ const force_initialize = (reorderable: Reorderable): void => {
 const attach_list = (
 	reorderable: Reorderable,
 	list: HTMLElement,
-	params: Reorderable_List_Params,
+	params: ReorderableListParams,
 ): (() => void) => {
 	const attachment = reorderable.list(params);
 	const cleanup = attachment(list);
@@ -92,7 +92,7 @@ const attach_list = (
 const attach_item = (
 	reorderable: Reorderable,
 	item: HTMLElement,
-	params: Reorderable_Item_Params,
+	params: ReorderableItemParams,
 ): (() => void) => {
 	const attachment = reorderable.item(params);
 	const cleanup = attachment(item);
@@ -139,14 +139,14 @@ describe('Reorderable', () => {
 	describe('list attachment', () => {
 		let list: HTMLElement;
 		let reorderable: Reorderable;
-		let mock_callback: ReturnType<typeof vi.fn>;
+		let mock_callback: (from_index: number, to_index: number) => void;
 		let cleanup_fn: (() => void) | undefined;
 
 		beforeEach(() => {
 			const elements = create_elements();
 			list = elements.list;
 			reorderable = new Reorderable();
-			mock_callback = vi.fn();
+			mock_callback = vi.fn() as typeof mock_callback;
 		});
 
 		afterEach(() => {
@@ -225,7 +225,7 @@ describe('Reorderable', () => {
 			expect(item.dataset.reorderable_list_id).toBe(reorderable.id);
 
 			// Either in pending items or regular maps
-			const item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const item_id = item.dataset.reorderable_item_id as ReorderableItemId;
 			const is_indexed = reorderable.initialized
 				? reorderable.indices.has(item_id)
 				: reorderable.pending_items.some((p) => p.id === item_id);
@@ -237,7 +237,7 @@ describe('Reorderable', () => {
 			const cleanup1 = attach_item(reorderable, item, {index: 0});
 
 			// Get the item id
-			const item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const item_id = item.dataset.reorderable_item_id as ReorderableItemId;
 
 			// Check initial index
 			if (reorderable.initialized) {
@@ -252,7 +252,7 @@ describe('Reorderable', () => {
 			cleanup_fn = attach_item(reorderable, item, {index: 5});
 
 			// Get the new item id after re-attachment
-			const new_item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const new_item_id = item.dataset.reorderable_item_id as ReorderableItemId;
 
 			// Check if index was updated in the appropriate storage
 			if (reorderable.initialized) {
@@ -266,7 +266,7 @@ describe('Reorderable', () => {
 		test('destroy cleans up', () => {
 			cleanup_fn = attach_item(reorderable, item, {index: 0});
 
-			const item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const item_id = item.dataset.reorderable_item_id as ReorderableItemId;
 
 			// Before destroy
 			expect(item.classList.contains(reorderable.item_class!)).toBe(true);
@@ -293,7 +293,7 @@ describe('Reorderable', () => {
 		let items: Array<HTMLElement>;
 		let reorderable: Reorderable;
 		let item: HTMLElement;
-		let item_id: Reorderable_Item_Id;
+		let item_id: ReorderableItemId;
 		let cleanup_fn: (() => void) | undefined;
 
 		beforeEach(() => {
@@ -306,7 +306,7 @@ describe('Reorderable', () => {
 
 			// Set up item
 			cleanup_fn = attach_item(reorderable, item, {index: 0});
-			item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			item_id = item.dataset.reorderable_item_id as ReorderableItemId;
 
 			// Manually add the element to the elements map to fix the test
 			reorderable.elements.set(item_id, item);
@@ -381,7 +381,7 @@ describe('Reorderable', () => {
 			if (!first_item) throw new Error('Expected first item');
 
 			// Get item id
-			const item_id = first_item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const item_id = first_item.dataset.reorderable_item_id as ReorderableItemId;
 
 			// Create mock event
 			const mock_data_transfer = {
@@ -406,7 +406,7 @@ describe('Reorderable', () => {
 			if (!first_item) throw new Error('Expected first item');
 
 			// Set up drag state manually
-			const item_id = first_item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const item_id = first_item.dataset.reorderable_item_id as ReorderableItemId;
 			reorderable.source_index = 0;
 			reorderable.source_item_id = item_id;
 			first_item.classList.add(reorderable.dragging_class!);
@@ -480,7 +480,7 @@ describe('Reorderable', () => {
 			const outer_action = {destroy: outer_cleanup};
 
 			// Get outer item id
-			const outer_id = outer_item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const outer_id = outer_item.dataset.reorderable_item_id as ReorderableItemId;
 
 			// Force initialization
 			force_initialize(reorderable);
@@ -530,7 +530,7 @@ describe('Reorderable', () => {
 			if (!source_item || !target_item) throw new Error('Expected source and target items');
 
 			reorderable.source_index = 0;
-			reorderable.source_item_id = source_item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			reorderable.source_item_id = source_item.dataset.reorderable_item_id as ReorderableItemId;
 
 			// Mock drop event on item 1 (should be prevented)
 			const drop_event1 = create_mock_drag_event('drop', target_item);
@@ -570,12 +570,12 @@ describe('Reorderable', () => {
 			const other_item = items[1];
 			if (!source_item || !other_item) throw new Error('Expected source and other items');
 
-			const source_id = source_item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const source_id = source_item.dataset.reorderable_item_id as ReorderableItemId;
 			reorderable.source_index = 0;
 			reorderable.source_item_id = source_id;
 
 			// Apply indicators to another item
-			const other_id = other_item.dataset.reorderable_item_id as Reorderable_Item_Id;
+			const other_id = other_item.dataset.reorderable_item_id as ReorderableItemId;
 			reorderable.update_indicator(other_id, 'bottom');
 
 			expect(other_item.classList.contains(reorderable.drag_over_class!)).toBe(true);

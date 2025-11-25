@@ -2,14 +2,13 @@
 
 import {z} from 'zod';
 import type {Result} from '@ryanatkn/belt/result.js';
-
-import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
-import type {Jsonrpc_Error_Json} from '$lib/jsonrpc.js';
+import type {ActionInputs, ActionOutputs} from './action_collections.js';
+import type {JsonrpcErrorJson} from './jsonrpc.js';
 
 /**
  * All action method names. Request/response actions have two types per method.
  */
-export const Action_Method = z.enum([
+export const ActionMethod = z.enum([
 	'completion_create',
 	'completion_progress',
 	'directory_create',
@@ -31,12 +30,12 @@ export const Action_Method = z.enum([
 	'session_load',
 	'toggle_main_menu',
 ]);
-export type Action_Method = z.infer<typeof Action_Method>;
+export type ActionMethod = z.infer<typeof ActionMethod>;
 
 /**
  * Names of all request_response actions.
  */
-export const Request_Response_Action_Method = z.enum([
+export const RequestResponseActionMethod = z.enum([
 	'completion_create',
 	'directory_create',
 	'diskfile_delete',
@@ -54,28 +53,28 @@ export const Request_Response_Action_Method = z.enum([
 	'provider_update_api_key',
 	'session_load',
 ]);
-export type Request_Response_Action_Method = z.infer<typeof Request_Response_Action_Method>;
+export type RequestResponseActionMethod = z.infer<typeof RequestResponseActionMethod>;
 
 /**
  * Names of all remote_notification actions.
  */
-export const Remote_Notification_Action_Method = z.enum([
+export const RemoteNotificationActionMethod = z.enum([
 	'completion_progress',
 	'filer_change',
 	'ollama_progress',
 ]);
-export type Remote_Notification_Action_Method = z.infer<typeof Remote_Notification_Action_Method>;
+export type RemoteNotificationActionMethod = z.infer<typeof RemoteNotificationActionMethod>;
 
 /**
  * Names of all local_call actions.
  */
-export const Local_Call_Action_Method = z.enum(['toggle_main_menu']);
-export type Local_Call_Action_Method = z.infer<typeof Local_Call_Action_Method>;
+export const LocalCallActionMethod = z.enum(['toggle_main_menu']);
+export type LocalCallActionMethod = z.infer<typeof LocalCallActionMethod>;
 
 /**
  * Names of all actions that may be handled on the client.
  */
-export const Frontend_Action_Method = z.enum([
+export const FrontendActionMethod = z.enum([
 	'completion_create',
 	'completion_progress',
 	'directory_create',
@@ -97,12 +96,12 @@ export const Frontend_Action_Method = z.enum([
 	'session_load',
 	'toggle_main_menu',
 ]);
-export type Frontend_Action_Method = z.infer<typeof Frontend_Action_Method>;
+export type FrontendActionMethod = z.infer<typeof FrontendActionMethod>;
 
 /**
  * Names of all actions that may be handled on the server.
  */
-export const Backend_Action_Method = z.enum([
+export const BackendActionMethod = z.enum([
 	'completion_create',
 	'completion_progress',
 	'directory_create',
@@ -123,78 +122,74 @@ export const Backend_Action_Method = z.enum([
 	'provider_update_api_key',
 	'session_load',
 ]);
-export type Backend_Action_Method = z.infer<typeof Backend_Action_Method>;
+export type BackendActionMethod = z.infer<typeof BackendActionMethod>;
 
 /**
  * Interface for action dispatch functions.
  * All async methods return Result types for type-safe error handling.
  * Sync methods (like toggle_main_menu) return values directly.
  */
-export interface Actions_Api {
+export interface ActionsApi {
 	completion_create: (
-		input: Action_Inputs['completion_create'],
-	) => Promise<Result<{value: Action_Outputs['completion_create']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['completion_create'],
+	) => Promise<Result<{value: ActionOutputs['completion_create']}, {error: JsonrpcErrorJson}>>;
 	completion_progress: (
-		input: Action_Inputs['completion_progress'],
-	) => Promise<Result<{value: Action_Outputs['completion_progress']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['completion_progress'],
+	) => Promise<Result<{value: ActionOutputs['completion_progress']}, {error: JsonrpcErrorJson}>>;
 	directory_create: (
-		input: Action_Inputs['directory_create'],
-	) => Promise<Result<{value: Action_Outputs['directory_create']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['directory_create'],
+	) => Promise<Result<{value: ActionOutputs['directory_create']}, {error: JsonrpcErrorJson}>>;
 	diskfile_delete: (
-		input: Action_Inputs['diskfile_delete'],
-	) => Promise<Result<{value: Action_Outputs['diskfile_delete']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['diskfile_delete'],
+	) => Promise<Result<{value: ActionOutputs['diskfile_delete']}, {error: JsonrpcErrorJson}>>;
 	diskfile_update: (
-		input: Action_Inputs['diskfile_update'],
-	) => Promise<Result<{value: Action_Outputs['diskfile_update']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['diskfile_update'],
+	) => Promise<Result<{value: ActionOutputs['diskfile_update']}, {error: JsonrpcErrorJson}>>;
 	filer_change: (
-		input: Action_Inputs['filer_change'],
-	) => Promise<Result<{value: Action_Outputs['filer_change']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['filer_change'],
+	) => Promise<Result<{value: ActionOutputs['filer_change']}, {error: JsonrpcErrorJson}>>;
 	ollama_copy: (
-		input: Action_Inputs['ollama_copy'],
-	) => Promise<Result<{value: Action_Outputs['ollama_copy']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['ollama_copy'],
+	) => Promise<Result<{value: ActionOutputs['ollama_copy']}, {error: JsonrpcErrorJson}>>;
 	ollama_create: (
-		input: Action_Inputs['ollama_create'],
-	) => Promise<Result<{value: Action_Outputs['ollama_create']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['ollama_create'],
+	) => Promise<Result<{value: ActionOutputs['ollama_create']}, {error: JsonrpcErrorJson}>>;
 	ollama_delete: (
-		input: Action_Inputs['ollama_delete'],
-	) => Promise<Result<{value: Action_Outputs['ollama_delete']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['ollama_delete'],
+	) => Promise<Result<{value: ActionOutputs['ollama_delete']}, {error: JsonrpcErrorJson}>>;
 	ollama_list: (
 		input?: void,
-	) => Promise<Result<{value: Action_Outputs['ollama_list']}, {error: Jsonrpc_Error_Json}>>;
+	) => Promise<Result<{value: ActionOutputs['ollama_list']}, {error: JsonrpcErrorJson}>>;
 	ollama_progress: (
-		input: Action_Inputs['ollama_progress'],
-	) => Promise<Result<{value: Action_Outputs['ollama_progress']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['ollama_progress'],
+	) => Promise<Result<{value: ActionOutputs['ollama_progress']}, {error: JsonrpcErrorJson}>>;
 	ollama_ps: (
 		input?: void,
-	) => Promise<Result<{value: Action_Outputs['ollama_ps']}, {error: Jsonrpc_Error_Json}>>;
+	) => Promise<Result<{value: ActionOutputs['ollama_ps']}, {error: JsonrpcErrorJson}>>;
 	ollama_pull: (
-		input: Action_Inputs['ollama_pull'],
-	) => Promise<Result<{value: Action_Outputs['ollama_pull']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['ollama_pull'],
+	) => Promise<Result<{value: ActionOutputs['ollama_pull']}, {error: JsonrpcErrorJson}>>;
 	ollama_show: (
-		input: Action_Inputs['ollama_show'],
-	) => Promise<Result<{value: Action_Outputs['ollama_show']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['ollama_show'],
+	) => Promise<Result<{value: ActionOutputs['ollama_show']}, {error: JsonrpcErrorJson}>>;
 	ollama_unload: (
-		input: Action_Inputs['ollama_unload'],
-	) => Promise<Result<{value: Action_Outputs['ollama_unload']}, {error: Jsonrpc_Error_Json}>>;
+		input: ActionInputs['ollama_unload'],
+	) => Promise<Result<{value: ActionOutputs['ollama_unload']}, {error: JsonrpcErrorJson}>>;
 	ping: (
 		input?: void,
-	) => Promise<Result<{value: Action_Outputs['ping']}, {error: Jsonrpc_Error_Json}>>;
+	) => Promise<Result<{value: ActionOutputs['ping']}, {error: JsonrpcErrorJson}>>;
 	provider_load_status: (
-		input: Action_Inputs['provider_load_status'],
-	) => Promise<
-		Result<{value: Action_Outputs['provider_load_status']}, {error: Jsonrpc_Error_Json}>
-	>;
+		input: ActionInputs['provider_load_status'],
+	) => Promise<Result<{value: ActionOutputs['provider_load_status']}, {error: JsonrpcErrorJson}>>;
 	provider_update_api_key: (
-		input: Action_Inputs['provider_update_api_key'],
+		input: ActionInputs['provider_update_api_key'],
 	) => Promise<
-		Result<{value: Action_Outputs['provider_update_api_key']}, {error: Jsonrpc_Error_Json}>
+		Result<{value: ActionOutputs['provider_update_api_key']}, {error: JsonrpcErrorJson}>
 	>;
 	session_load: (
 		input?: void,
-	) => Promise<Result<{value: Action_Outputs['session_load']}, {error: Jsonrpc_Error_Json}>>;
-	toggle_main_menu: (
-		input?: Action_Inputs['toggle_main_menu'],
-	) => Action_Outputs['toggle_main_menu'];
+	) => Promise<Result<{value: ActionOutputs['session_load']}, {error: JsonrpcErrorJson}>>;
+	toggle_main_menu: (input?: ActionInputs['toggle_main_menu']) => ActionOutputs['toggle_main_menu'];
 }
 
 // generated by src/lib/action_metatypes.gen.ts - DO NOT EDIT OR RISK LOST DATA

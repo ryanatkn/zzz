@@ -6,23 +6,23 @@ import {test, expect, describe, beforeEach} from 'vitest';
 
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
-import {Diskfile_Path, Serializable_Disknode} from '$lib/diskfile_types.js';
+import {DiskfilePath, SerializableDisknode} from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
-const TEST_DIR = Serializable_Disknode.shape.source_dir.parse('/test/');
+const TEST_DIR = SerializableDisknode.shape.source_dir.parse('/test/');
 
 // Test data constants for reuse
 const TEST_PATHS = {
-	BASIC: Diskfile_Path.parse(TEST_DIR + 'file.txt'),
-	CONFIG: Diskfile_Path.parse(TEST_DIR + 'config.json'),
-	EMPTY: Diskfile_Path.parse(TEST_DIR + 'empty.txt'),
-	DOCUMENT: Diskfile_Path.parse(TEST_DIR + 'document.txt'),
-	EDITABLE: Diskfile_Path.parse(TEST_DIR + 'editable.txt'),
-	NONEXISTENT: Diskfile_Path.parse('/nonexistent/file.txt'),
-	SPECIAL_CHARS: Diskfile_Path.parse(TEST_DIR + 'path with spaces & special chars!.txt'),
-	BINARY: Diskfile_Path.parse(TEST_DIR + 'binary.bin'),
-	REACTIVE: Diskfile_Path.parse(TEST_DIR + 'reactive.txt'),
+	BASIC: DiskfilePath.parse(TEST_DIR + 'file.txt'),
+	CONFIG: DiskfilePath.parse(TEST_DIR + 'config.json'),
+	EMPTY: DiskfilePath.parse(TEST_DIR + 'empty.txt'),
+	DOCUMENT: DiskfilePath.parse(TEST_DIR + 'document.txt'),
+	EDITABLE: DiskfilePath.parse(TEST_DIR + 'editable.txt'),
+	NONEXISTENT: DiskfilePath.parse('/nonexistent/file.txt'),
+	SPECIAL_CHARS: DiskfilePath.parse(TEST_DIR + 'path with spaces & special chars!.txt'),
+	BINARY: DiskfilePath.parse(TEST_DIR + 'binary.bin'),
+	REACTIVE: DiskfilePath.parse(TEST_DIR + 'reactive.txt'),
 };
 
 const TEST_CONTENT = {
@@ -43,7 +43,7 @@ const TEST_CONTENT = {
 
 // Test suite variables
 let app: Frontend;
-let test_diskfiles: Map<Diskfile_Path, Diskfile>;
+let test_diskfiles: Map<DiskfilePath, Diskfile>;
 
 // Setup function to create a real Zzz instance and test diskfiles
 beforeEach(() => {
@@ -78,11 +78,11 @@ beforeEach(() => {
 	}
 });
 
-describe('Diskfile_Part initialization', () => {
+describe('DiskfilePart initialization', () => {
 	test('creates with minimal values when only path provided', () => {
 		const path = TEST_PATHS.BASIC;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -103,7 +103,7 @@ describe('Diskfile_Part initialization', () => {
 		const test_path = TEST_PATHS.CONFIG;
 		const test_date = get_datetime_now();
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			id: test_id,
 			created: test_date,
 			type: 'diskfile',
@@ -138,7 +138,7 @@ describe('Diskfile_Part initialization', () => {
 	});
 
 	test('initializes with null path', () => {
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: null,
 		});
@@ -149,12 +149,12 @@ describe('Diskfile_Part initialization', () => {
 	});
 });
 
-describe('Diskfile_Part content access', () => {
+describe('DiskfilePart content access', () => {
 	test('content getter returns diskfile content', () => {
 		const path = TEST_PATHS.DOCUMENT;
 		const content = TEST_CONTENT.DOCUMENT;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -168,7 +168,7 @@ describe('Diskfile_Part content access', () => {
 		const initial_content = TEST_CONTENT.EDITABLE.INITIAL;
 		const updated_content = TEST_CONTENT.EDITABLE.UPDATED;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -190,7 +190,7 @@ describe('Diskfile_Part content access', () => {
 		const initial_content = TEST_CONTENT.EDITABLE.INITIAL;
 		const updated_content = TEST_CONTENT.EDITABLE.UPDATED;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -210,7 +210,7 @@ describe('Diskfile_Part content access', () => {
 	test('content is undefined when diskfile not found', () => {
 		const path = TEST_PATHS.NONEXISTENT;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -221,7 +221,7 @@ describe('Diskfile_Part content access', () => {
 
 	test('setting content to null logs error in development', () => {
 		const path = TEST_PATHS.BASIC;
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -250,13 +250,13 @@ describe('Diskfile_Part content access', () => {
 	});
 });
 
-describe('Diskfile_Part reactive properties', () => {
+describe('DiskfilePart reactive properties', () => {
 	test('derived properties update when diskfile content changes', () => {
 		const path = TEST_PATHS.REACTIVE;
 		const initial_content = TEST_CONTENT.REACTIVE.INITIAL;
 		const updated_content = TEST_CONTENT.REACTIVE.UPDATED;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -277,7 +277,7 @@ describe('Diskfile_Part reactive properties', () => {
 		const path1 = TEST_PATHS.BASIC;
 		const path2 = TEST_PATHS.CONFIG;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: path1,
 		});
@@ -294,13 +294,13 @@ describe('Diskfile_Part reactive properties', () => {
 	});
 });
 
-describe('Diskfile_Part serialization', () => {
+describe('DiskfilePart serialization', () => {
 	test('to_json includes all properties with correct values', () => {
 		const test_id = create_uuid();
 		const path = TEST_PATHS.BASIC;
 		const created = get_datetime_now();
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			id: test_id,
 			created,
 			type: 'diskfile',
@@ -327,7 +327,7 @@ describe('Diskfile_Part serialization', () => {
 		const original_path = TEST_PATHS.BASIC;
 		const modified_path = TEST_PATHS.CONFIG;
 
-		const original = app.cell_registry.instantiate('Diskfile_Part', {
+		const original = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: original_path,
 			name: 'Original name',
@@ -351,11 +351,11 @@ describe('Diskfile_Part serialization', () => {
 	});
 });
 
-describe('Diskfile_Part edge cases', () => {
+describe('DiskfilePart edge cases', () => {
 	test('handles special characters in path', () => {
 		const path = TEST_PATHS.SPECIAL_CHARS;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -370,7 +370,7 @@ describe('Diskfile_Part edge cases', () => {
 		const diskfile = test_diskfiles.get(path)!;
 		diskfile.content = '';
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -386,7 +386,7 @@ describe('Diskfile_Part edge cases', () => {
 		const diskfile = test_diskfiles.get(path)!;
 		diskfile.content = binary_content;
 
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -396,7 +396,7 @@ describe('Diskfile_Part edge cases', () => {
 	});
 
 	test('handles changing from null path to valid path', () => {
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: null,
 		});
@@ -418,7 +418,7 @@ describe('Diskfile_Part edge cases', () => {
 
 	test('handles changing from valid path to null path', () => {
 		const path = TEST_PATHS.BASIC;
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path,
 		});
@@ -437,9 +437,9 @@ describe('Diskfile_Part edge cases', () => {
 	});
 });
 
-describe('Diskfile_Part attribute management', () => {
+describe('DiskfilePart attribute management', () => {
 	test('can add, update and remove attributes', () => {
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 		});
@@ -472,7 +472,7 @@ describe('Diskfile_Part attribute management', () => {
 	});
 
 	test('updates attribute key and value together', () => {
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 		});
@@ -492,7 +492,7 @@ describe('Diskfile_Part attribute management', () => {
 	});
 
 	test('attributes are preserved when serializing to JSON', () => {
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 		});
@@ -510,7 +510,7 @@ describe('Diskfile_Part attribute management', () => {
 		expect(json_attr1.key).toBe('class');
 
 		// Verify they're properly restored
-		const new_part = app.cell_registry.instantiate('Diskfile_Part', json);
+		const new_part = app.cell_registry.instantiate('DiskfilePart', json);
 
 		expect(new_part.attributes).toHaveLength(2);
 		const new_attr0 = new_part.attributes[0];
@@ -521,9 +521,9 @@ describe('Diskfile_Part attribute management', () => {
 	});
 });
 
-describe('Diskfile_Part position markers', () => {
+describe('DiskfilePart position markers', () => {
 	test('start and end positions are initialized properly', () => {
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 			start: 10,
@@ -535,7 +535,7 @@ describe('Diskfile_Part position markers', () => {
 	});
 
 	test('start and end positions can be updated', () => {
-		const part = app.cell_registry.instantiate('Diskfile_Part', {
+		const part = app.cell_registry.instantiate('DiskfilePart', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 		});

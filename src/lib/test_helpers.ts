@@ -1,5 +1,5 @@
-import type {Frontend} from '$lib/frontend.svelte.js';
-import type {Diskfile_Path} from '$lib/diskfile_types.js';
+import type {Frontend} from './frontend.svelte.js';
+import type {DiskfilePath} from './diskfile_types.js';
 
 // TODO these aren't used, should they be for improved type safety?
 
@@ -51,7 +51,7 @@ export const monkeypatch_zzz_for_tests = <T extends Frontend>(app: T): T => {
 	// Override diskfiles.update to be synchronous.
 	// In the real implementation, this would make a server request.
 	// Probably want to mock differently than this but it's fine for now.
-	app.diskfiles.update = (path: Diskfile_Path, content: string) => {
+	app.diskfiles.update = (path: DiskfilePath, content: string) => {
 		const diskfile = app.diskfiles.get_by_path(path);
 		if (diskfile) {
 			diskfile.content = content;
