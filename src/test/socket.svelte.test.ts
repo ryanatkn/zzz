@@ -101,11 +101,13 @@ describe('Socket', () => {
 			interval: 1000,
 		} as any;
 
-		// Mock WebSocket class
-		globalThis.WebSocket = vi.fn().mockImplementation((url) => {
+		// Mock WebSocket class - must be a real class for `new` to work
+		// eslint-disable-next-line prefer-arrow-callback
+		const MockWebSocket = vi.fn(function (this: Mocket, url: string) {
 			mock_socket.url = url;
 			return mock_socket;
-		}) as any;
+		}) as unknown as typeof WebSocket;
+		globalThis.WebSocket = MockWebSocket;
 
 		// Use fake timers for timing control
 		vi.useFakeTimers();
