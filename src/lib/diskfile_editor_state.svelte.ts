@@ -2,16 +2,16 @@
 
 import {estimate_token_count} from '$lib/helpers.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
-import type {Diskfile_Path} from '$lib/diskfile_types.js';
+import type {DiskfilePath} from '$lib/diskfile_types.js';
 import type {Frontend} from '$lib/frontend.svelte.js';
-import type {Diskfile_History, History_Entry} from '$lib/diskfile_history.svelte.js';
+import type {DiskfileHistory, HistoryEntry} from '$lib/diskfile_history.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 
 // TODO maybe should be a cell?
 /**
  * Manages the editor state for a diskfile.
  */
-export class Diskfile_Editor_State {
+export class DiskfileEditorState {
 	app: Frontend;
 	diskfile: Diskfile = $state()!; // TODO maybe should be nullable to make initialization easier?
 
@@ -29,7 +29,7 @@ export class Diskfile_Editor_State {
 
 	// Basic derived states
 	readonly original_content: string | null = $derived(this.diskfile.content);
-	readonly path: Diskfile_Path = $derived.by(() => this.diskfile.path);
+	readonly path: DiskfilePath = $derived.by(() => this.diskfile.path);
 	readonly has_changes = $derived.by(() => {
 		// For null content files, empty content is the baseline so we shouldn't show changes
 		if (this.original_content === null) {
@@ -39,7 +39,7 @@ export class Diskfile_Editor_State {
 	});
 
 	// History-related derived states
-	readonly history: Diskfile_History | undefined = $derived.by(() =>
+	readonly history: DiskfileHistory | undefined = $derived.by(() =>
 		this.app.get_diskfile_history(this.diskfile.path),
 	);
 	readonly selected_history_entry = $derived.by(() =>
@@ -47,11 +47,11 @@ export class Diskfile_Editor_State {
 			? this.history.find_entry_by_id(this.selected_history_entry_id)
 			: null,
 	);
-	readonly content_history: Array<History_Entry> = $derived(this.history?.entries || []);
-	readonly saved_history_entries: Array<History_Entry> = $derived(
+	readonly content_history: Array<HistoryEntry> = $derived(this.history?.entries || []);
+	readonly saved_history_entries: Array<HistoryEntry> = $derived(
 		this.content_history.filter((entry) => !entry.is_unsaved_edit),
 	);
-	readonly unsaved_history_entries: Array<History_Entry> = $derived(
+	readonly unsaved_history_entries: Array<HistoryEntry> = $derived(
 		this.content_history.filter((entry) => entry.is_unsaved_edit),
 	);
 
@@ -138,7 +138,7 @@ export class Diskfile_Editor_State {
 	/**
 	 * Ensures a history object exists for the current file.
 	 */
-	#ensure_history(): Diskfile_History {
+	#ensure_history(): DiskfileHistory {
 		let history = this.app.get_diskfile_history(this.path);
 		if (!history) {
 			history = this.app.create_diskfile_history(this.path);

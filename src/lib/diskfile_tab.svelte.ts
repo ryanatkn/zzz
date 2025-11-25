@@ -1,22 +1,22 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {CellJson} from '$lib/cell_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
-import type {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
+import type {DiskfileTabs} from '$lib/diskfile_tabs.svelte.js';
 
-export const Diskfile_Tab_Json = Cell_Json.extend({
+export const DiskfileTabJson = CellJson.extend({
 	diskfile_id: Uuid,
-}).meta({cell_class_name: 'Diskfile_Tab'});
-export type Diskfile_Tab_Json = z.infer<typeof Diskfile_Tab_Json>;
-export type Diskfile_Tab_Json_Input = z.input<typeof Diskfile_Tab_Json>;
+}).meta({cell_class_name: 'DiskfileTab'});
+export type DiskfileTabJson = z.infer<typeof DiskfileTabJson>;
+export type DiskfileTabJsonInput = z.input<typeof DiskfileTabJson>;
 
-export interface Diskfile_Tab_Options extends Cell_Options<typeof Diskfile_Tab_Json> {
-	tabs: Diskfile_Tabs;
+export interface DiskfileTabOptions extends CellOptions<typeof DiskfileTabJson> {
+	tabs: DiskfileTabs;
 }
 
-export class Diskfile_Tab extends Cell<typeof Diskfile_Tab_Json> {
+export class DiskfileTab extends Cell<typeof DiskfileTabJson> {
 	diskfile_id: Uuid = $state()!;
 
 	/**
@@ -29,7 +29,7 @@ export class Diskfile_Tab extends Cell<typeof Diskfile_Tab_Json> {
 	 * like the "preview" or "selected" tabs be state on the collection,
 	 * so it doesn't need to be separately managed as state on each tab.
 	 */
-	readonly tabs: Diskfile_Tabs;
+	readonly tabs: DiskfileTabs;
 
 	/** Derived from parent collection's state */
 	readonly is_preview: boolean = $derived.by(() => this.tabs.preview_tab_id === this.id);
@@ -41,11 +41,11 @@ export class Diskfile_Tab extends Cell<typeof Diskfile_Tab_Json> {
 		this.app.diskfiles.items.by_id.get(this.diskfile_id),
 	);
 
-	constructor(options: Diskfile_Tab_Options) {
-		super(Diskfile_Tab_Json, options);
+	constructor(options: DiskfileTabOptions) {
+		super(DiskfileTabJson, options);
 		this.tabs = options.tabs;
 		this.init();
 	}
 }
 
-export const Diskfile_Tab_Schema = z.instanceof(Diskfile_Tab);
+export const DiskfileTabSchema = z.instanceof(DiskfileTab);

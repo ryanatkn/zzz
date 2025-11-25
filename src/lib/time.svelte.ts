@@ -2,8 +2,8 @@ import {z} from 'zod';
 import {SvelteDate} from 'svelte/reactivity';
 import {BROWSER} from 'esm-env';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
 import {
 	format_datetime,
 	format_short_date,
@@ -11,14 +11,14 @@ import {
 	format_timestamp,
 } from '$lib/time_helpers.js';
 
-export const Time_Json = Cell_Json.extend({}).meta({cell_class_name: 'Time'});
-export type Time_Json = z.infer<typeof Time_Json>;
-export type Time_Json_Input = z.input<typeof Time_Json>;
+export const TimeJson = CellJson.extend({}).meta({cell_class_name: 'Time'});
+export type TimeJson = z.infer<typeof TimeJson>;
+export type TimeJsonInput = z.input<typeof TimeJson>;
 
 /**
  * Options for configuring a Time instance.
  */
-export interface Time_Options extends Cell_Options<typeof Time_Json> {
+export interface TimeOptions extends CellOptions<typeof TimeJson> {
 	/**
 	 * Interval in milliseconds for updating now.
 	 * @default 60_000 (1 minute)
@@ -38,7 +38,7 @@ export interface Time_Options extends Cell_Options<typeof Time_Json> {
  * a full minute to minimize wasteful reactivity,
  * so it's suitable for any cases that need at best 1-minute precision, unless reconfigured.
  */
-export class Time extends Cell<typeof Time_Json> {
+export class Time extends Cell<typeof TimeJson> {
 	/**
 	 * Default update interval in milliseconds (1 minute).
 	 * The idea is to minimize reactivity and CPU usage for a common use case.
@@ -68,9 +68,9 @@ export class Time extends Cell<typeof Time_Json> {
 
 	#timer?: NodeJS.Timeout;
 
-	constructor(options: Time_Options) {
+	constructor(options: TimeOptions) {
 		// Pass schema and options to base constructor
-		super(Time_Json, options);
+		super(TimeJson, options);
 
 		// Auto-start based on options or default to browser environment
 		const autostart = options.autostart ?? BROWSER;

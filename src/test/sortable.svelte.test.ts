@@ -7,26 +7,26 @@ import {z} from 'zod';
 
 import {Sortable, type Sorter, sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 import {Cell} from '$lib/cell.svelte.js';
-import {Uuid_With_Default, type Uuid, Datetime_Now, create_uuid} from '$lib/zod_helpers.js';
+import {UuidWithDefault, type Uuid, DatetimeNow, create_uuid} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Create a schema for our test cell
-const Test_Cell_Schema = z.object({
-	id: Uuid_With_Default,
-	created: Datetime_Now,
-	updated: Datetime_Now,
+const TestCellSchema = z.object({
+	id: UuidWithDefault,
+	created: DatetimeNow,
+	updated: DatetimeNow,
 	name: z.string(),
 	value: z.number(),
 });
 
 // Real cell class for testing - extends the Cell base class
-class Test_Cell extends Cell<typeof Test_Cell_Schema> {
+class TestCell extends Cell<typeof TestCellSchema> {
 	name: string = $state('');
 	value: number = $state(0);
 
 	constructor(app: Frontend, id: Uuid, name: string, value: number, override_cid?: number) {
-		super(Test_Cell_Schema, {
+		super(TestCellSchema, {
 			app,
 			json: {
 				id,
@@ -45,8 +45,8 @@ class Test_Cell extends Cell<typeof Test_Cell_Schema> {
 }
 
 describe('Sortable', () => {
-	let items: Array<Test_Cell>;
-	let sorters: Array<Sorter<Test_Cell>>;
+	let items: Array<TestCell>;
+	let sorters: Array<Sorter<TestCell>>;
 	let app: Frontend;
 
 	const id1 = create_uuid();
@@ -60,10 +60,10 @@ describe('Sortable', () => {
 
 		// Create test items with intentional name collisions to test stable sorting
 		items = [
-			new Test_Cell(app, id3, 'Banana', 10, 30),
-			new Test_Cell(app, id1, 'Apple', 5, 10),
-			new Test_Cell(app, id2, 'Cherry', 15, 20),
-			new Test_Cell(app, id4, 'Apple', 20, 40), // Same name as item with id1
+			new TestCell(app, id3, 'Banana', 10, 30),
+			new TestCell(app, id1, 'Apple', 5, 10),
+			new TestCell(app, id2, 'Cherry', 15, 20),
+			new TestCell(app, id4, 'Apple', 20, 40), // Same name as item with id1
 		];
 
 		sorters = [
@@ -285,12 +285,12 @@ describe('Sortable', () => {
 		test('maintains stable sort order with equal values using cid', () => {
 			// Create items with equal values but different cids
 			const equal_items = [
-				new Test_Cell(app, create_uuid(), 'Item3', 10, 300),
-				new Test_Cell(app, create_uuid(), 'Item1', 10, 100),
-				new Test_Cell(app, create_uuid(), 'Item2', 10, 200),
+				new TestCell(app, create_uuid(), 'Item3', 10, 300),
+				new TestCell(app, create_uuid(), 'Item1', 10, 100),
+				new TestCell(app, create_uuid(), 'Item2', 10, 200),
 			];
 
-			const equal_sorter = sort_by_numeric<Test_Cell>('value', 'Value', 'value');
+			const equal_sorter = sort_by_numeric<TestCell>('value', 'Value', 'value');
 			const sortable = new Sortable(
 				() => equal_items,
 				() => [equal_sorter],
@@ -324,7 +324,7 @@ describe('Sortable', () => {
 			expect(sortable.sorted_items.length).toBe(4);
 
 			// Add a new item
-			const new_item = new Test_Cell(app, create_uuid(), 'Dragonfruit', 25, 50);
+			const new_item = new TestCell(app, create_uuid(), 'Dragonfruit', 25, 50);
 
 			// Update the items array reference so the derived getter gets the new value
 			current_items = [...current_items, new_item];

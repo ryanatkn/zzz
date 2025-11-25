@@ -1,45 +1,45 @@
 import {Filer} from '@ryanatkn/gro/filer.js';
 import type {Disknode} from '@ryanatkn/gro/disknode.js';
-import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
+import type {WatcherChange} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
-import type {Backend_Provider_Ollama} from '$lib/server/backend_provider_ollama.js';
-import type {Backend_Provider_Gemini} from '$lib/server/backend_provider_gemini.js';
-import type {Backend_Provider_Chatgpt} from '$lib/server/backend_provider_chatgpt.js';
-import type {Backend_Provider_Claude} from '$lib/server/backend_provider_claude.js';
+import type {BackendProviderOllama} from '$lib/server/backend_provider_ollama.js';
+import type {BackendProviderGemini} from '$lib/server/backend_provider_gemini.js';
+import type {BackendProviderChatgpt} from '$lib/server/backend_provider_chatgpt.js';
+import type {BackendProviderClaude} from '$lib/server/backend_provider_claude.js';
 
-import type {Action_Spec_Union} from '$lib/action_spec.js';
-import type {Zzz_Config} from '$lib/config_helpers.js';
-import {Diskfile_Directory_Path} from '$lib/diskfile_types.js';
-import {Scoped_Fs} from '$lib/server/scoped_fs.js';
-import {Action_Registry} from '$lib/action_registry.js';
+import type {ActionSpecUnion} from '$lib/action_spec.js';
+import type {ZzzConfig} from '$lib/config_helpers.js';
+import {DiskfileDirectoryPath} from '$lib/diskfile_types.js';
+import {ScopedFs} from '$lib/server/scoped_fs.js';
+import {ActionRegistry} from '$lib/action_registry.js';
 import {ZZZ_CACHE_DIR} from '$lib/constants.js';
-import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
-import type {Action_Event_Phase, Action_Event_Environment} from '$lib/action_event_types.js';
-import type {Action_Method} from '$lib/action_metatypes.js';
+import type {BackendActionHandlers} from '$lib/server/backend_action_types.js';
+import type {ActionEventPhase, ActionEventEnvironment} from '$lib/action_event_types.js';
+import type {ActionMethod} from '$lib/action_metatypes.js';
 import {
 	create_backend_actions_api,
-	type Backend_Actions_Api,
+	type BackendActionsApi,
 } from '$lib/server/backend_actions_api.js';
-import {Action_Peer} from '$lib/action_peer.js';
-import type {Jsonrpc_Message_From_Server_To_Client} from '$lib/jsonrpc.js';
-import type {Action_Executor} from '$lib/action_types.js';
-import type {Backend_Provider} from '$lib/server/backend_provider.js';
+import {ActionPeer} from '$lib/action_peer.js';
+import type {JsonrpcMessageFromServerToClient} from '$lib/jsonrpc.js';
+import type {ActionExecutor} from '$lib/action_types.js';
+import type {BackendProvider} from '$lib/server/backend_provider.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
 // TODO refactor for extensibility
-interface Backend_Providers {
-	ollama: Backend_Provider_Ollama;
-	gemini: Backend_Provider_Gemini;
-	chatgpt: Backend_Provider_Chatgpt;
-	claude: Backend_Provider_Claude;
+interface BackendProviders {
+	ollama: BackendProviderOllama;
+	gemini: BackendProviderGemini;
+	chatgpt: BackendProviderChatgpt;
+	claude: BackendProviderClaude;
 }
 
 /**
  * Function type for handling file system changes.
  */
-export type Filer_Change_Handler = (
-	change: Watcher_Change,
+export type FilerChangeHandler = (
+	change: WatcherChange,
 	disknode: Disknode,
 	backend: Backend,
 	dir: string,
@@ -48,12 +48,12 @@ export type Filer_Change_Handler = (
 /**
  * Structure to hold a Filer and its cleanup function.
  */
-export interface Filer_Instance {
+export interface FilerInstance {
 	filer: Filer;
 	cleanup_promise: Promise<() => void>;
 }
 
-export interface Backend_Options {
+export interface BackendOptions {
 	/**
 	 * Directory path for the Zzz cache.
 	 */
@@ -61,19 +61,19 @@ export interface Backend_Options {
 	/**
 	 * Configuration for the backend and AI providers.
 	 */
-	config: Zzz_Config;
+	config: ZzzConfig;
 	/**
 	 * Action specifications that determine what the backend can do.
 	 */
-	action_specs: Array<Action_Spec_Union>;
+	action_specs: Array<ActionSpecUnion>;
 	/**
 	 * Handler function for processing client messages.
 	 */
-	action_handlers: Backend_Action_Handlers;
+	action_handlers: BackendActionHandlers;
 	/**
 	 * Handler function for file system changes.
 	 */
-	handle_filer_change: Filer_Change_Handler;
+	handle_filer_change: FilerChangeHandler;
 	/**
 	 * Optional logger instance.
 	 * Disabled when `null`, and `undefined` falls back to a new `Logger` instance.
@@ -84,60 +84,60 @@ export interface Backend_Options {
 /**
  * Server for managing the Zzz application state and handling client messages.
  */
-export class Backend implements Action_Event_Environment {
-	readonly executor: Action_Executor = 'backend';
+export class Backend implements ActionEventEnvironment {
+	readonly executor: ActionExecutor = 'backend';
 
 	/** The full path to the Zzz cache directory. */
-	readonly zzz_cache_dir: Diskfile_Directory_Path;
+	readonly zzz_cache_dir: DiskfileDirectoryPath;
 
-	readonly config: Zzz_Config;
+	readonly config: ZzzConfig;
 
 	// TODO @many make transports an option?
-	readonly peer: Action_Peer = new Action_Peer({environment: this});
+	readonly peer: ActionPeer = new ActionPeer({environment: this});
 
 	/**
 	 * API for backend-initiated actions.
 	 */
-	readonly api: Backend_Actions_Api = create_backend_actions_api(this);
+	readonly api: BackendActionsApi = create_backend_actions_api(this);
 
 	/**
 	 * Scoped filesystem interface that restricts operations to allowed directories.
 	 */
-	readonly scoped_fs: Scoped_Fs;
+	readonly scoped_fs: ScopedFs;
 
 	readonly log: Logger | null;
 
 	// TODO probably extract a `Filers` class to manage these
 	// Map of directory paths to their respective Filer instances
-	readonly filers: Map<string, Filer_Instance> = new Map();
+	readonly filers: Map<string, FilerInstance> = new Map();
 
 	readonly action_registry;
 
 	/** Available actions. */
-	get action_specs(): Array<Action_Spec_Union> {
+	get action_specs(): Array<ActionSpecUnion> {
 		return this.action_registry.specs;
 	}
 
-	readonly #action_handlers: Backend_Action_Handlers;
+	readonly #action_handlers: BackendActionHandlers;
 
 	// TODO wrapper class?
 	/** Available AI providers. */
-	readonly providers: Array<Backend_Provider> = [];
+	readonly providers: Array<BackendProvider> = [];
 
-	readonly #handle_filer_change: Filer_Change_Handler;
+	readonly #handle_filer_change: FilerChangeHandler;
 
-	constructor(options: Backend_Options) {
-		this.zzz_cache_dir = Diskfile_Directory_Path.parse(
+	constructor(options: BackendOptions) {
+		this.zzz_cache_dir = DiskfileDirectoryPath.parse(
 			resolve(options.zzz_cache_dir || ZZZ_CACHE_DIR),
 		);
 
 		this.config = options.config;
 
-		this.action_registry = new Action_Registry(options.action_specs);
+		this.action_registry = new ActionRegistry(options.action_specs);
 		this.#action_handlers = options.action_handlers;
 		this.#handle_filer_change = options.handle_filer_change;
 
-		this.scoped_fs = new Scoped_Fs([this.zzz_cache_dir]); // TODO pass filter through on options
+		this.scoped_fs = new ScopedFs([this.zzz_cache_dir]); // TODO pass filter through on options
 
 		this.log = options.log === undefined ? new Logger('[backend]') : options.log;
 
@@ -152,31 +152,31 @@ export class Backend implements Action_Event_Environment {
 
 	// TODO @api better type safety
 	lookup_action_handler(
-		method: Action_Method,
-		phase: Action_Event_Phase,
+		method: ActionMethod,
+		phase: ActionEventPhase,
 	): ((event: any) => any) | undefined {
-		const method_handlers = this.#action_handlers[method as keyof Backend_Action_Handlers];
+		const method_handlers = this.#action_handlers[method as keyof BackendActionHandlers];
 		if (!method_handlers) return undefined;
-		return method_handlers[phase as keyof Backend_Action_Handlers[keyof Backend_Action_Handlers]];
+		return method_handlers[phase as keyof BackendActionHandlers[keyof BackendActionHandlers]];
 	}
 
-	lookup_action_spec(method: Action_Method): Action_Spec_Union | undefined {
+	lookup_action_spec(method: ActionMethod): ActionSpecUnion | undefined {
 		return this.action_registry.spec_by_method.get(method);
 	}
 
-	lookup_provider<T extends keyof Backend_Providers>(provider_name: T): Backend_Providers[T] {
+	lookup_provider<T extends keyof BackendProviders>(provider_name: T): BackendProviders[T] {
 		const provider = this.providers.find((p) => p.name === provider_name);
 		if (!provider) {
 			throw jsonrpc_errors.invalid_params(`unsupported provider: ${provider_name}`);
 		}
-		return provider as Backend_Providers[T];
+		return provider as BackendProviders[T];
 	}
 
 	/**
 	 * Process a singular JSON-RPC message and return a response.
 	 * Like MCP, Zzz breaks from JSON-RPC by not supporting batching.
 	 */
-	async receive(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+	async receive(message: unknown): Promise<JsonrpcMessageFromServerToClient | null> {
 		this.#check_destroyed();
 		return this.peer.receive(message);
 	}
@@ -216,7 +216,7 @@ export class Backend implements Action_Event_Environment {
 		await Promise.all(cleanup_promises);
 	}
 
-	add_provider(provider: Backend_Provider): void {
+	add_provider(provider: BackendProvider): void {
 		if (this.providers.some((p) => p.name === provider.name)) {
 			throw new Error(`provider with name ${provider.name} already exists`);
 		}

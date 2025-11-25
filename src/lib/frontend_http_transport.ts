@@ -1,7 +1,7 @@
 // @slop Claude Opus 4
 
 import {DEV} from 'esm-env';
-import {Thrown_Jsonrpc_Error, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import {ThrownJsonrpcError, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import {
 	create_jsonrpc_error_message,
 	to_jsonrpc_message_id,
@@ -10,16 +10,16 @@ import {
 } from '$lib/jsonrpc_helpers.js';
 import type {Transport} from '$lib/transports.js';
 import type {
-	Jsonrpc_Message_From_Client_To_Server,
-	Jsonrpc_Message_From_Server_To_Client,
-	Jsonrpc_Notification,
-	Jsonrpc_Request,
-	Jsonrpc_Response_Or_Error,
-	Jsonrpc_Error_Message,
+	JsonrpcMessageFromClientToServer,
+	JsonrpcMessageFromServerToClient,
+	JsonrpcNotification,
+	JsonrpcRequest,
+	JsonrpcResponseOrError,
+	JsonrpcErrorMessage,
 } from '$lib/jsonrpc.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
-export class Frontend_Http_Transport implements Transport {
+export class FrontendHttpTransport implements Transport {
 	readonly transport_name = 'frontend_http_rpc' as const;
 
 	#url: string;
@@ -30,11 +30,11 @@ export class Frontend_Http_Transport implements Transport {
 		this.#headers = headers ?? {'content-type': 'application/json', accept: 'application/json'};
 	}
 
-	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
+	async send(message: JsonrpcRequest): Promise<JsonrpcResponseOrError>;
+	async send(message: JsonrpcNotification): Promise<JsonrpcErrorMessage | null>;
 	async send(
-		message: Jsonrpc_Message_From_Client_To_Server,
-	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+		message: JsonrpcMessageFromClientToServer,
+	): Promise<JsonrpcMessageFromServerToClient | null> {
 		try {
 			const response = await fetch(this.#url, {
 				method: 'POST', // TODO support GET when `!spec.side_effects`
@@ -70,7 +70,7 @@ export class Frontend_Http_Transport implements Transport {
 
 			return result;
 		} catch (error) {
-			if (error instanceof Thrown_Jsonrpc_Error) {
+			if (error instanceof ThrownJsonrpcError) {
 				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
 					code: error.code,
 					message: error.message,

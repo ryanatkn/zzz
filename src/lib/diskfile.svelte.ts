@@ -1,43 +1,43 @@
 import {z} from 'zod';
 import {strip_start} from '@ryanatkn/belt/string.js';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
 import {
-	Diskfile_Directory_Path,
-	Diskfile_Json,
-	type Diskfile_Path,
-	type Serializable_Disknode,
+	DiskfileDirectoryPath,
+	DiskfileJson,
+	type DiskfilePath,
+	type SerializableDisknode,
 } from '$lib/diskfile_types.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
-import type {Part_Union} from '$lib/part.svelte.js';
+import type {PartUnion} from '$lib/part.svelte.js';
 
 // TODO support directories/folders
 
-export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface DiskfileOptions extends CellOptions<typeof DiskfileJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Diskfile extends Cell<typeof Diskfile_Json> {
-	path: Diskfile_Path = $state()!;
-	source_dir: Diskfile_Directory_Path = $state()!;
+export class Diskfile extends Cell<typeof DiskfileJson> {
+	path: DiskfilePath = $state()!;
+	source_dir: DiskfileDirectoryPath = $state()!;
 
 	content: string | null = $state()!;
 
-	readonly part: Part_Union | undefined = $derived(
+	readonly part: PartUnion | undefined = $derived(
 		this.app.parts.find_part_by_diskfile_path(this.path),
 	);
 
 	// TODO @many add UI support for deps for module diskfiles (TS, Svelte, etc)
-	dependents: Array<[Diskfile_Path, Serializable_Disknode]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
-	dependencies: Array<[Diskfile_Path, Serializable_Disknode]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
+	dependents: Array<[DiskfilePath, SerializableDisknode]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
+	dependencies: Array<[DiskfilePath, SerializableDisknode]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
 
-	readonly dependencies_by_id: Map<Diskfile_Path, Serializable_Disknode> = $derived(
+	readonly dependencies_by_id: Map<DiskfilePath, SerializableDisknode> = $derived(
 		new Map(this.dependencies),
 	);
-	readonly dependents_by_id: Map<Diskfile_Path, Serializable_Disknode> = $derived(
+	readonly dependents_by_id: Map<DiskfilePath, SerializableDisknode> = $derived(
 		new Map(this.dependents),
 	);
 
-	readonly dependency_ids: Array<Diskfile_Path> = $derived(this.dependencies.map(([id]) => id));
-	readonly dependent_ids: Array<Diskfile_Path> = $derived(this.dependents.map(([id]) => id));
+	readonly dependency_ids: Array<DiskfilePath> = $derived(this.dependencies.map(([id]) => id));
+	readonly dependent_ids: Array<DiskfilePath> = $derived(this.dependents.map(([id]) => id));
 
 	readonly has_dependencies: boolean = $derived(this.dependencies.length > 0);
 	readonly has_dependents: boolean = $derived(this.dependents.length > 0);
@@ -60,10 +60,10 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 	);
 	readonly content_preview: string = $derived(to_preview(this.content));
 
-	constructor(options: Diskfile_Options) {
-		super(Diskfile_Json, options);
+	constructor(options: DiskfileOptions) {
+		super(DiskfileJson, options);
 		this.init();
 	}
 }
 
-export const Diskfile_Schema = z.instanceof(Diskfile);
+export const DiskfileSchema = z.instanceof(Diskfile);

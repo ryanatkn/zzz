@@ -1,14 +1,14 @@
-import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
+import type {WatcherChangeType} from '@ryanatkn/gro/watch_dir.js';
 import type {Disknode} from '@ryanatkn/gro/disknode.js';
 import {strip_start} from '@ryanatkn/belt/string.js';
 
-import {Uuid, Datetime, Datetime_Now, create_uuid} from '$lib/zod_helpers.js';
+import {Uuid, Datetime, DatetimeNow, create_uuid} from '$lib/zod_helpers.js';
 import {
-	Diskfile_Change_Type,
-	Diskfile_Directory_Path,
-	Diskfile_Path,
-	Serializable_Disknode,
-	type Diskfile_Json,
+	DiskfileChangeType,
+	DiskfileDirectoryPath,
+	DiskfilePath,
+	SerializableDisknode,
+	type DiskfileJson,
 } from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 
@@ -23,23 +23,23 @@ export const to_relative_path = (path: string, parent: string): string =>
  * Maps watcher change types to diskfile change types
  */
 export const map_watcher_change_to_diskfile_change = (
-	type: Watcher_Change_Type,
-): Diskfile_Change_Type => {
+	type: WatcherChangeType,
+): DiskfileChangeType => {
 	if (type === 'update') return 'change';
-	return type as Diskfile_Change_Type;
+	return type as DiskfileChangeType;
 };
 
 // TODO @many refactor source/disk files with Gro Disknode too
 /**
- * Helper function to convert a `Serializable_Disknode` to the `Diskfile_Json` format.
+ * Helper function to convert a `SerializableDisknode` to the `DiskfileJson` format.
  * @param disknode The source file to convert
  * @param existing_id Optional existing UUID to preserve id stability across updates
  */
 export const disknode_to_diskfile_json = (
-	disknode: Serializable_Disknode,
+	disknode: SerializableDisknode,
 	existing_id: Uuid = create_uuid(),
-): Diskfile_Json => {
-	const created = Datetime_Now.parse(
+): DiskfileJson => {
+	const created = DatetimeNow.parse(
 		disknode.ctime == null ? undefined : new Date(disknode.ctime).toISOString(),
 	);
 	return {
@@ -66,14 +66,12 @@ export const has_dependencies = (diskfile: Diskfile): boolean =>
 export const to_serializable_disknode = (
 	disknode: Disknode,
 	dir: string,
-): Serializable_Disknode => ({
-	id: disknode.id as Diskfile_Path,
-	source_dir: dir as Diskfile_Directory_Path,
+): SerializableDisknode => ({
+	id: disknode.id as DiskfilePath,
+	source_dir: dir as DiskfileDirectoryPath,
 	contents: disknode.contents,
 	ctime: disknode.ctime,
 	mtime: disknode.mtime,
-	dependents: Array.from(disknode.dependents.entries()) as Serializable_Disknode['dependents'],
-	dependencies: Array.from(
-		disknode.dependencies.entries(),
-	) as Serializable_Disknode['dependencies'],
+	dependents: Array.from(disknode.dependents.entries()) as SerializableDisknode['dependents'],
+	dependencies: Array.from(disknode.dependencies.entries()) as SerializableDisknode['dependencies'],
 }); // TODO @many refactor source/disk files with Gro Disknode too

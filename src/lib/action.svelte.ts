@@ -2,42 +2,42 @@
 
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Action_Method} from '$lib/action_metatypes.js';
-import {Action_Kind} from '$lib/action_types.js';
-import {Action_Specs} from '$lib/action_collections.js';
-import type {Action_Spec_Union} from '$lib/action_spec.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {Action_Event_Data} from '$lib/action_event_data.js';
-import type {Action_Event} from '$lib/action_event.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {ActionMethod} from '$lib/action_metatypes.js';
+import {ActionKind} from '$lib/action_types.js';
+import {ActionSpecs} from '$lib/action_collections.js';
+import type {ActionSpecUnion} from '$lib/action_spec.js';
+import {CellJson} from '$lib/cell_types.js';
+import {ActionEventData} from '$lib/action_event_data.js';
+import type {ActionEvent} from '$lib/action_event.js';
 import {is_action_complete} from '$lib/action_event_helpers.js';
 
 // TODO this isnt in action_types.ts because of circular dependencies, idk what pattern is best yet
-export const Action_Json = Cell_Json.extend({
-	method: Action_Method,
-	action_event_data: Action_Event_Data.optional(),
+export const ActionJson = CellJson.extend({
+	method: ActionMethod,
+	action_event_data: ActionEventData.optional(),
 }).meta({cell_class_name: 'Action'});
-export type Action_Json = z.infer<typeof Action_Json>;
-export type Action_Json_Input = z.input<typeof Action_Json>;
+export type ActionJson = z.infer<typeof ActionJson>;
+export type ActionJsonInput = z.input<typeof ActionJson>;
 
-export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface ActionOptions extends CellOptions<typeof ActionJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * Represents a single action in the system, tracking its full lifecycle through action events.
  */
-export class Action extends Cell<typeof Action_Json> {
-	method: Action_Method = $state()!;
+export class Action extends Cell<typeof ActionJson> {
+	method: ActionMethod = $state()!;
 
-	// TODO maybe use a decoder to make this an `Action_Event`
-	action_event_data: Action_Event_Data | undefined = $state.raw();
+	// TODO maybe use a decoder to make this an `ActionEvent`
+	action_event_data: ActionEventData | undefined = $state.raw();
 
-	readonly spec: Action_Spec_Union = $derived.by(() => {
-		const s = Action_Specs[this.method] as Action_Spec_Union | undefined; // TODO refactor
+	readonly spec: ActionSpecUnion = $derived.by(() => {
+		const s = ActionSpecs[this.method] as ActionSpecUnion | undefined; // TODO refactor
 		if (!s) throw new Error(`Missing action spec for method '${this.method}'`);
 		return s;
 	});
 
-	readonly kind: Action_Kind = $derived(this.spec.kind);
+	readonly kind: ActionKind = $derived(this.spec.kind);
 
 	readonly has_error = $derived(!!this.action_event_data?.error);
 
@@ -72,15 +72,15 @@ export class Action extends Cell<typeof Action_Json> {
 		return is_action_complete(this.action_event_data) && step === 'handled' && !error;
 	});
 
-	constructor(options: Action_Options) {
-		super(Action_Json, options);
+	constructor(options: ActionOptions) {
+		super(ActionJson, options);
 		this.init();
 	}
 
 	// TODO @api temporary hacking this, rethink the reactivity/action_event usage with this class
 	unlisten_to_action_event: (() => void) | undefined;
-	action_event: Action_Event | undefined;
-	listen_to_action_event(action_event: Action_Event): () => void {
+	action_event: ActionEvent | undefined;
+	listen_to_action_event(action_event: ActionEvent): () => void {
 		this.unlisten_to_action_event?.();
 		this.action_event = action_event;
 		const unobserve = action_event.observe((new_data) => {
@@ -101,4 +101,4 @@ export class Action extends Cell<typeof Action_Json> {
 	}
 }
 
-export const Action_Schema = z.instanceof(Action);
+export const ActionSchema = z.instanceof(Action);

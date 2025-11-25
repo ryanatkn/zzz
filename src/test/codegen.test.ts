@@ -5,7 +5,7 @@
 import {test, expect, describe} from 'vitest';
 
 import {
-	Import_Builder,
+	ImportBuilder,
 	get_executor_phases,
 	get_handler_return_type,
 	generate_phase_handlers,
@@ -18,10 +18,10 @@ import {
 	completion_create_action_spec,
 } from '$lib/action_specs.js';
 
-describe('Import_Builder', () => {
+describe('ImportBuilder', () => {
 	describe('type-only imports', () => {
 		test('single module with type imports becomes import type', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_type('$lib/types.js', 'Foo');
 			imports.add_type('$lib/types.js', 'Bar');
@@ -30,15 +30,15 @@ describe('Import_Builder', () => {
 		});
 
 		test('add_types helper adds multiple types at once', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
-			imports.add_types('$lib/types.js', 'Type_A', 'Type_B', 'Type_C');
+			imports.add_types('$lib/types.js', 'TypeA', 'TypeB', 'TypeC');
 
-			expect(imports.build()).toBe(`import type {Type_A, Type_B, Type_C} from '$lib/types.js';`);
+			expect(imports.build()).toBe(`import type {TypeA, TypeB, TypeC} from '$lib/types.js';`);
 		});
 
 		test('empty imports returns empty string', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			expect(imports.build()).toBe('');
 			expect(imports.has_imports()).toBe(false);
@@ -48,51 +48,51 @@ describe('Import_Builder', () => {
 
 	describe('mixed imports', () => {
 		test('mixed types and values use individual type annotations', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add('$lib/utils.js', 'helper');
-			imports.add_type('$lib/utils.js', 'Helper_Type');
+			imports.add_type('$lib/utils.js', 'HelperType');
 			imports.add('$lib/utils.js', 'another_helper');
 
 			expect(imports.build()).toBe(
-				`import {another_helper, helper, type Helper_Type} from '$lib/utils.js';`,
+				`import {another_helper, helper, type HelperType} from '$lib/utils.js';`,
 			);
 		});
 
 		test('value import prevents module from being type-only', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
-			imports.add_type('$lib/mixed.js', 'Type_A');
-			imports.add_type('$lib/mixed.js', 'Type_B');
+			imports.add_type('$lib/mixed.js', 'TypeA');
+			imports.add_type('$lib/mixed.js', 'TypeB');
 			imports.add('$lib/mixed.js', 'value'); // This makes it mixed
-			imports.add_type('$lib/mixed.js', 'Type_C');
+			imports.add_type('$lib/mixed.js', 'TypeC');
 
 			expect(imports.build()).toBe(
-				`import {value, type Type_A, type Type_B, type Type_C} from '$lib/mixed.js';`,
+				`import {value, type TypeA, type TypeB, type TypeC} from '$lib/mixed.js';`,
 			);
 		});
 
 		test('multiple values and types are sorted correctly', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			// Add in random order
-			imports.add_type('$lib/mixed.js', 'Z_Type');
+			imports.add_type('$lib/mixed.js', 'ZType');
 			imports.add('$lib/mixed.js', 'z_value');
-			imports.add_type('$lib/mixed.js', 'A_Type');
+			imports.add_type('$lib/mixed.js', 'AType');
 			imports.add('$lib/mixed.js', 'a_value');
-			imports.add_type('$lib/mixed.js', 'M_Type');
+			imports.add_type('$lib/mixed.js', 'MType');
 			imports.add('$lib/mixed.js', 'm_value');
 
 			// Should sort values first (alphabetically), then types (alphabetically)
 			expect(imports.build()).toBe(
-				`import {a_value, m_value, z_value, type A_Type, type M_Type, type Z_Type} from '$lib/mixed.js';`,
+				`import {a_value, m_value, z_value, type AType, type MType, type ZType} from '$lib/mixed.js';`,
 			);
 		});
 	});
 
 	describe('namespace imports', () => {
 		test('namespace import is handled correctly', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add('$lib/action_specs.js', '* as specs');
 
@@ -100,7 +100,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('namespace import with other imports from same module', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add('$lib/utils.js', '* as utils');
 			imports.add('$lib/other.js', 'something');
@@ -114,7 +114,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('add_many with namespace import', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_many('$lib/helpers.js', '* as helpers');
 
@@ -122,7 +122,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('namespace imports are not mixed with regular imports', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			// These should create separate import statements
 			imports.add('$lib/module.js', '* as mod');
@@ -135,7 +135,7 @@ describe('Import_Builder', () => {
 
 	describe('import precedence', () => {
 		test('value import takes precedence over type import', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_type('$lib/utils.js', 'Item');
 			imports.add('$lib/utils.js', 'Item'); // Upgrades to value
@@ -144,7 +144,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('type import does not downgrade existing value import', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add('$lib/utils.js', 'Item');
 			imports.add_type('$lib/utils.js', 'Item'); // Should not downgrade
@@ -153,7 +153,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('duplicate imports are deduplicated', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_type('$lib/types.js', 'Foo');
 			imports.add_type('$lib/types.js', 'Foo');
@@ -163,7 +163,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('namespace imports override previous imports', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add('$lib/module.js', 'foo');
 			imports.add('$lib/module.js', '* as module'); // Should override
@@ -174,23 +174,23 @@ describe('Import_Builder', () => {
 
 	describe('multiple modules', () => {
 		test('generates separate import statements per module', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
-			imports.add_types('$lib/types.js', 'Type_A', 'Type_B');
+			imports.add_types('$lib/types.js', 'TypeA', 'TypeB');
 			imports.add('$lib/utils.js', 'util');
-			imports.add_types('$lib/schemas.js', 'Schema_A', 'Schema_B');
+			imports.add_types('$lib/schemas.js', 'SchemaA', 'SchemaB');
 
 			const result = imports.build();
 			const lines = result.split('\n');
 
 			expect(lines).toHaveLength(3);
-			expect(lines).toContain(`import type {Type_A, Type_B} from '$lib/types.js';`);
+			expect(lines).toContain(`import type {TypeA, TypeB} from '$lib/types.js';`);
 			expect(lines).toContain(`import {util} from '$lib/utils.js';`);
-			expect(lines).toContain(`import type {Schema_A, Schema_B} from '$lib/schemas.js';`);
+			expect(lines).toContain(`import type {SchemaA, SchemaB} from '$lib/schemas.js';`);
 		});
 
 		test('imports are sorted alphabetically within modules', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_type('$lib/types.js', 'Zebra');
 			imports.add_type('$lib/types.js', 'Apple');
@@ -200,7 +200,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('handles imports with underscores and numbers correctly', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_type('$lib/types.js', '_Private_Type');
 			imports.add_type('$lib/types.js', 'Type_1');
@@ -214,7 +214,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('maintains module order based on first addition', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			// Add in specific order
 			imports.add_type('$lib/third.js', 'Type3');
@@ -238,10 +238,10 @@ describe('Import_Builder', () => {
 		});
 
 		test('handles mixed namespace and regular imports across modules', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add('$lib/specs.js', '* as specs');
-			imports.add_type('$lib/types.js', 'Type_A');
+			imports.add_type('$lib/types.js', 'TypeA');
 			imports.add('$lib/utils.js', 'helper');
 			imports.add('$lib/schemas.js', '* as schemas');
 
@@ -249,7 +249,7 @@ describe('Import_Builder', () => {
 
 			expect(lines).toHaveLength(4);
 			expect(lines).toContain(`import * as specs from '$lib/specs.js';`);
-			expect(lines).toContain(`import type {Type_A} from '$lib/types.js';`);
+			expect(lines).toContain(`import type {TypeA} from '$lib/types.js';`);
 			expect(lines).toContain(`import {helper} from '$lib/utils.js';`);
 			expect(lines).toContain(`import * as schemas from '$lib/schemas.js';`);
 		});
@@ -257,7 +257,7 @@ describe('Import_Builder', () => {
 
 	describe('utility methods', () => {
 		test('has_imports returns correct state', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			expect(imports.has_imports()).toBe(false);
 
@@ -267,7 +267,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('import_count returns correct count', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			expect(imports.import_count).toBe(0);
 
@@ -283,7 +283,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('preview returns array of import statements', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_types('$lib/types.js', 'Foo', 'Bar');
 			imports.add('$lib/utils.js', 'helper');
@@ -296,7 +296,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('clear removes all imports', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_types('$lib/types.js', 'Foo', 'Bar');
 			imports.add('$lib/utils.js', 'helper');
@@ -310,7 +310,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('chaining works correctly', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			const result = imports
 				.add_type('$lib/types.js', 'Foo')
@@ -326,7 +326,7 @@ describe('Import_Builder', () => {
 
 	describe('add_many helper', () => {
 		test('adds multiple value imports', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_many('$lib/utils.js', 'util_a', 'util_b', 'util_c');
 
@@ -334,7 +334,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('add_many can handle namespace imports', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add_many('$lib/all.js', '* as all', 'specific');
 
@@ -345,7 +345,7 @@ describe('Import_Builder', () => {
 
 	describe('edge cases', () => {
 		test('handles empty string imports gracefully', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add('$lib/module.js', '');
 
@@ -355,7 +355,7 @@ describe('Import_Builder', () => {
 		});
 
 		test('handles special characters in import names', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			imports.add('$lib/module.js', '$special');
 			imports.add('$lib/module.js', '_underscore');
@@ -456,20 +456,20 @@ describe('get_executor_phases', () => {
 describe('get_handler_return_type', () => {
 	describe('request_response actions', () => {
 		test('receive_request phase returns output with Promise and adds import', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			// ping_action_spec is a request/response action
 			const result = get_handler_return_type(ping_action_spec, 'receive_request', imports);
-			expect(result).toBe(`Action_Outputs['ping'] | Promise<Action_Outputs['ping']>`);
+			expect(result).toBe(`ActionOutputs['ping'] | Promise<ActionOutputs['ping']>`);
 
-			// Check that Action_Outputs was added to imports
+			// Check that ActionOutputs was added to imports
 			const built = imports.build();
-			expect(built).toContain('Action_Outputs');
+			expect(built).toContain('ActionOutputs');
 			expect(built).toContain('$lib/action_collections.js');
 		});
 
 		test('other phases return void and do not add imports', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			expect(get_handler_return_type(session_load_action_spec, 'send_request', imports)).toBe(
 				'void | Promise<void>',
@@ -481,25 +481,25 @@ describe('get_handler_return_type', () => {
 				'void | Promise<void>',
 			);
 
-			// Should not add Action_Outputs for void returns
+			// Should not add ActionOutputs for void returns
 			expect(imports.build()).toBe('');
 		});
 	});
 
 	describe('local_call actions', () => {
 		test('execute phase returns output for sync action', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			// toggle_main_menu is a sync local_call (async: false)
 			const result = get_handler_return_type(toggle_main_menu_action_spec, 'execute', imports);
-			expect(result).toBe(`Action_Outputs['toggle_main_menu']`);
+			expect(result).toBe(`ActionOutputs['toggle_main_menu']`);
 
-			// Should add Action_Outputs import
-			expect(imports.build()).toContain('Action_Outputs');
+			// Should add ActionOutputs import
+			expect(imports.build()).toContain('ActionOutputs');
 		});
 
 		test('execute phase returns Promise for async local_call', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			// Create an async local_call spec
 			const async_local_spec = {
@@ -509,14 +509,14 @@ describe('get_handler_return_type', () => {
 
 			const result = get_handler_return_type(async_local_spec, 'execute', imports);
 			expect(result).toBe(
-				`Action_Outputs['toggle_main_menu'] | Promise<Action_Outputs['toggle_main_menu']>`,
+				`ActionOutputs['toggle_main_menu'] | Promise<ActionOutputs['toggle_main_menu']>`,
 			);
 		});
 	});
 
 	describe('remote_notification actions', () => {
 		test('all phases return void', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			expect(get_handler_return_type(filer_change_action_spec, 'send', imports)).toBe(
 				'void | Promise<void>',
@@ -532,7 +532,7 @@ describe('get_handler_return_type', () => {
 
 	describe('import management', () => {
 		test('adds imports only when needed', () => {
-			const imports = new Import_Builder();
+			const imports = new ImportBuilder();
 
 			// First call adds import
 			get_handler_return_type(ping_action_spec, 'receive_request', imports);
@@ -552,7 +552,7 @@ describe('get_handler_return_type', () => {
 describe('generate_phase_handlers', () => {
 	test('generates never for actions with no valid phases', () => {
 		// toggle_main_menu on backend should have no valid phases
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 		const result = generate_phase_handlers(toggle_main_menu_action_spec, 'backend', imports);
 
 		expect(result).toBe('toggle_main_menu?: never');
@@ -560,7 +560,7 @@ describe('generate_phase_handlers', () => {
 	});
 
 	test('generates handlers for request_response action', () => {
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 		const result = generate_phase_handlers(session_load_action_spec, 'frontend', imports);
 
 		expect(result).toContain('session_load?: {');
@@ -571,12 +571,12 @@ describe('generate_phase_handlers', () => {
 		// Check imports were added
 		expect(imports.has_imports()).toBe(true);
 		const import_str = imports.build();
-		expect(import_str).toContain('Action_Event');
+		expect(import_str).toContain('ActionEvent');
 		expect(import_str).toContain('Frontend');
 	});
 
 	test('generates handlers for notification action', () => {
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 		const result = generate_phase_handlers(filer_change_action_spec, 'backend', imports);
 
 		expect(result).toContain('filer_change?: {');
@@ -584,27 +584,27 @@ describe('generate_phase_handlers', () => {
 		expect(result).not.toContain('receive?:');
 
 		const import_str = imports.build();
-		expect(import_str).toContain('Action_Event');
+		expect(import_str).toContain('ActionEvent');
 		expect(import_str).toContain('Backend');
 	});
 
 	test('generates handlers for local_call action', () => {
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 		const result = generate_phase_handlers(toggle_main_menu_action_spec, 'frontend', imports);
 
 		expect(result).toContain('toggle_main_menu?: {');
 		expect(result).toContain('execute?:');
-		expect(result).toContain(`Action_Outputs['toggle_main_menu']`);
+		expect(result).toContain(`ActionOutputs['toggle_main_menu']`);
 		expect(result).not.toContain('Promise'); // It's a sync action
 
 		const import_str = imports.build();
-		expect(import_str).toContain('Action_Event');
-		expect(import_str).toContain('Action_Outputs'); // Added by get_handler_return_type
+		expect(import_str).toContain('ActionEvent');
+		expect(import_str).toContain('ActionOutputs'); // Added by get_handler_return_type
 		expect(import_str).toContain('Frontend');
 	});
 
 	test('uses type-only imports when appropriate', () => {
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 		generate_phase_handlers(completion_create_action_spec, 'backend', imports);
 
 		const import_str = imports.build();
@@ -618,7 +618,7 @@ describe('generate_phase_handlers', () => {
 	});
 
 	test('generates all phases for both initiator', () => {
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 		const result = generate_phase_handlers(ping_action_spec, 'frontend', imports);
 
 		expect(result).toContain('send_request?:');
@@ -628,39 +628,39 @@ describe('generate_phase_handlers', () => {
 	});
 
 	test('uses phase and step type parameters in handler signature', () => {
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 		const result = generate_phase_handlers(ping_action_spec, 'frontend', imports);
 
 		// Should use the new type parameter syntax instead of data override
 		expect(result).toContain(
-			`action_event: Action_Event<'ping', Frontend, 'send_request', 'handling'>`,
+			`action_event: ActionEvent<'ping', Frontend, 'send_request', 'handling'>`,
 		);
 		expect(result).toContain(
-			`action_event: Action_Event<'ping', Frontend, 'receive_response', 'handling'>`,
+			`action_event: ActionEvent<'ping', Frontend, 'receive_response', 'handling'>`,
 		);
 		expect(result).toContain(
-			`action_event: Action_Event<'ping', Frontend, 'receive_request', 'handling'>`,
+			`action_event: ActionEvent<'ping', Frontend, 'receive_request', 'handling'>`,
 		);
 		expect(result).toContain(
-			`action_event: Action_Event<'ping', Frontend, 'send_response', 'handling'>`,
+			`action_event: ActionEvent<'ping', Frontend, 'send_response', 'handling'>`,
 		);
 	});
 
-	test('handles Action_Outputs import for handlers that return values', () => {
-		const imports = new Import_Builder();
+	test('handles ActionOutputs import for handlers that return values', () => {
+		const imports = new ImportBuilder();
 		// ping has receive_request handler on backend which returns output
 		const result = generate_phase_handlers(ping_action_spec, 'backend', imports);
 
 		expect(result).toContain('receive_request?:');
-		expect(result).toContain(`Action_Outputs['ping'] | Promise<Action_Outputs['ping']>`);
+		expect(result).toContain(`ActionOutputs['ping'] | Promise<ActionOutputs['ping']>`);
 
-		// Check that Action_Outputs was imported
+		// Check that ActionOutputs was imported
 		const import_str = imports.build();
-		expect(import_str).toContain('Action_Outputs');
+		expect(import_str).toContain('ActionOutputs');
 	});
 
 	test('handler formatting is consistent', () => {
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 		const result = generate_phase_handlers(ping_action_spec, 'frontend', imports);
 
 		// Check indentation and formatting
@@ -671,7 +671,7 @@ describe('generate_phase_handlers', () => {
 	});
 
 	test('imports are deduplicated across multiple specs', () => {
-		const imports = new Import_Builder();
+		const imports = new ImportBuilder();
 
 		// Generate handlers for multiple specs
 		generate_phase_handlers(ping_action_spec, 'frontend', imports);
@@ -681,8 +681,8 @@ describe('generate_phase_handlers', () => {
 		const import_str = imports.build();
 
 		// Should have exactly one import of each type
-		expect(import_str.match(/Action_Event/g)?.length).toBe(1);
+		expect(import_str.match(/ActionEvent/g)?.length).toBe(1);
 		expect(import_str.match(/Frontend/g)?.length).toBe(1);
-		expect(import_str.match(/Action_Outputs/g)?.length).toBe(1);
+		expect(import_str.match(/ActionOutputs/g)?.length).toBe(1);
 	});
 });

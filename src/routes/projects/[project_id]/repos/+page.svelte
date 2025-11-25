@@ -2,13 +2,13 @@
 	// @slop Claude Opus 4
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
-	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
-	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
-	import Repos_Sidebar from '$routes/projects/Repos_Sidebar.svelte';
+	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
+	import SectionSidebar from '$routes/projects/SectionSidebar.svelte';
+	import ReposSidebar from '$routes/projects/ReposSidebar.svelte';
 	import {GLYPH_ADD} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Repo_Table_Row from '$routes/projects/Repo_Table_Row.svelte';
-	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
+	import RepoTableRow from '$routes/projects/RepoTableRow.svelte';
+	import ProjectNotFound from '$routes/projects/ProjectNotFound.svelte';
 
 	const projects = projects_context.get();
 
@@ -18,10 +18,10 @@
 
 <div class="project_layout">
 	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
-	<Project_Sidebar />
+	<ProjectSidebar />
 	{#if project}
-		<Section_Sidebar {project} section="repos" />
-		<Repos_Sidebar />
+		<SectionSidebar {project} section="repos" />
+		<ReposSidebar />
 	{/if}
 
 	<div class="project_content">
@@ -54,7 +54,7 @@
 						</thead>
 						<tbody>
 							{#each project_viewmodel.project.repos as repo (repo.id)}
-								<Repo_Table_Row {repo} project_id={project_viewmodel.project_id} />
+								<RepoTableRow {repo} project_id={project_viewmodel.project_id} />
 							{/each}
 						</tbody>
 					</table>
@@ -67,7 +67,7 @@
 				</div>
 			</div>
 		{:else}
-			<Project_Not_Found />
+			<ProjectNotFound />
 		{/if}
 	</div>
 </div>

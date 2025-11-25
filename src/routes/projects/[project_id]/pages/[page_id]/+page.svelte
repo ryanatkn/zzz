@@ -5,10 +5,10 @@
 	import {resolve} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
-	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
-	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
-	import Pages_Sidebar from '$routes/projects/Pages_Sidebar.svelte';
-	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
+	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
+	import SectionSidebar from '$routes/projects/SectionSidebar.svelte';
+	import PagesSidebar from '$routes/projects/PagesSidebar.svelte';
+	import ProjectNotFound from '$routes/projects/ProjectNotFound.svelte';
 	import {GLYPH_DELETE, GLYPH_PREVIEW, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
@@ -67,10 +67,10 @@
 {:else}
 	<div class="editor_layout">
 		<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
-		<Project_Sidebar />
+		<ProjectSidebar />
 		{#if project}
-			<Section_Sidebar {project} section="pages" />
-			<Pages_Sidebar />
+			<SectionSidebar {project} section="pages" />
+			<PagesSidebar />
 		{/if}
 
 		<div class="editor_content">
@@ -149,7 +149,7 @@
 					</div>
 				</div>
 			{:else}
-				<Project_Not_Found />
+				<ProjectNotFound />
 			{/if}
 		</div>
 	</div>

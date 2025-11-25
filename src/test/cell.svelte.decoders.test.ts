@@ -5,9 +5,9 @@
 import {test, expect, vi, beforeEach} from 'vitest';
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {Datetime_Now, get_datetime_now, create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
+import {DatetimeNow, get_datetime_now, create_uuid, UuidWithDefault} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
@@ -26,19 +26,19 @@ beforeEach(() => {
 });
 
 test('Cell allows schema keys with no properties if a decoder is provided', () => {
-	const Virtual_Property_Schema = Cell_Json.extend({
+	const VirtualPropertySchema = CellJson.extend({
 		real_prop: z.string().default(''),
 		virtual_prop: z.number().default(42), // Won't exist on class
 	});
 
-	class Virtual_Property_Cell extends Cell<typeof Virtual_Property_Schema> {
+	class VirtualPropertyCell extends Cell<typeof VirtualPropertySchema> {
 		real_prop: string = $state()!;
 		// No 'virtual_prop', will be handled by decoder
 
 		captured_value = 0; // For verification
 
-		constructor(options: Cell_Options<typeof Virtual_Property_Schema>) {
-			super(Virtual_Property_Schema, options);
+		constructor(options: CellOptions<typeof VirtualPropertySchema>) {
+			super(VirtualPropertySchema, options);
 
 			this.decoders = {
 				virtual_prop: (value) => {
@@ -51,7 +51,7 @@ test('Cell allows schema keys with no properties if a decoder is provided', () =
 		}
 	}
 
-	const cell = new Virtual_Property_Cell({
+	const cell = new VirtualPropertyCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -64,22 +64,22 @@ test('Cell allows schema keys with no properties if a decoder is provided', () =
 });
 
 test('Cell supports virtual properties with custom handling', () => {
-	const Virtual_Handler_Schema = z.object({
-		id: Uuid_With_Default,
-		created: Datetime_Now,
+	const VirtualHandlerSchema = z.object({
+		id: UuidWithDefault,
+		created: DatetimeNow,
 		updated: z.string().nullable().default(null),
 		visible_prop: z.string(),
 		hidden_prop: z.number().default(0),
 	});
 
-	class Virtual_Handler_Cell extends Cell<typeof Virtual_Handler_Schema> {
+	class VirtualHandlerCell extends Cell<typeof VirtualHandlerSchema> {
 		visible_prop: string = $state()!;
 		// No hidden_prop property
 
 		processed_value = 0;
 
-		constructor(options: Cell_Options<typeof Virtual_Handler_Schema>) {
-			super(Virtual_Handler_Schema, options);
+		constructor(options: CellOptions<typeof VirtualHandlerSchema>) {
+			super(VirtualHandlerSchema, options);
 
 			this.decoders = {
 				hidden_prop: (value) => {
@@ -94,7 +94,7 @@ test('Cell supports virtual properties with custom handling', () => {
 		}
 	}
 
-	const cell = new Virtual_Handler_Cell({
+	const cell = new VirtualHandlerCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -110,21 +110,21 @@ test('Cell supports virtual properties with custom handling', () => {
 });
 
 test('Cell handles sentinel values with proper precedence', () => {
-	const Sentinel_Schema = Cell_Json.extend({
+	const SentinelSchema = CellJson.extend({
 		handled_field: z.string().default(''),
 		default_field: z.number().default(0),
 		normal_field: z.boolean().default(false),
 	});
 
-	class Sentinel_Test_Cell extends Cell<typeof Sentinel_Schema> {
+	class SentinelTestCell extends Cell<typeof SentinelSchema> {
 		handled_field: string = $state('initial_value');
 		default_field: number = $state(-1);
 		normal_field: boolean = $state()!;
 
 		decoder_calls: Array<string> = [];
 
-		constructor(options: Cell_Options<typeof Sentinel_Schema>) {
-			super(Sentinel_Schema, options);
+		constructor(options: CellOptions<typeof SentinelSchema>) {
+			super(SentinelSchema, options);
 
 			this.decoders = {
 				handled_field: (_value) => {
@@ -148,7 +148,7 @@ test('Cell handles sentinel values with proper precedence', () => {
 		}
 	}
 
-	const cell = new Sentinel_Test_Cell({
+	const cell = new SentinelTestCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -169,18 +169,18 @@ test('Cell handles sentinel values with proper precedence', () => {
 });
 
 test('Cell parser defaults take precedence over schema defaults', () => {
-	const Default_Precedence_Schema = z.object({
+	const DefaultPrecedenceSchema = z.object({
 		id: z.string().default('schema_default_id'),
-		created: Datetime_Now,
+		created: DatetimeNow,
 		updated: z.string().nullable().default(null),
 		text: z.string().default('schema_default_text'),
 	});
 
-	class Default_Precedence_Cell extends Cell<typeof Default_Precedence_Schema> {
+	class DefaultPrecedenceCell extends Cell<typeof DefaultPrecedenceSchema> {
 		text: string = $state()!;
 
-		constructor(options: Cell_Options<typeof Default_Precedence_Schema>) {
-			super(Default_Precedence_Schema, options);
+		constructor(options: CellOptions<typeof DefaultPrecedenceSchema>) {
+			super(DefaultPrecedenceSchema, options);
 
 			this.decoders = {
 				id: (value) => {
@@ -196,7 +196,7 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 		}
 	}
 
-	const cell = new Default_Precedence_Cell({
+	const cell = new DefaultPrecedenceCell({
 		app,
 		json: {},
 	});

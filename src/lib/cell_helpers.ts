@@ -12,7 +12,7 @@ export const FILE_TIME_FORMAT = 'HH:mm:ss';
 /**
  * Schema class information extracted from a Zod schema.
  */
-export interface Schema_Class_Info {
+export interface SchemaClassInfo {
 	type: string;
 	is_array: boolean;
 	class_name?: string;
@@ -20,23 +20,23 @@ export interface Schema_Class_Info {
 }
 
 // A type helper that makes it easier to define value parsers with correct input types
-export type Value_Parser<
-	T_Schema extends z.ZodType,
-	T_Key extends keyof z.infer<T_Schema> = keyof z.infer<T_Schema>,
+export type ValueParser<
+	TSchema extends z.ZodType,
+	TKey extends keyof z.infer<TSchema> = keyof z.infer<TSchema>,
 > = {
-	[K in T_Key]?: (value: unknown) => z.infer<T_Schema>[K] | undefined;
+	[K in TKey]?: (value: unknown) => z.infer<TSchema>[K] | undefined;
 };
 
 /**
  * Type helper for decoders that includes base schema properties.
- * Use this instead of Value_Parser when creating decoders for cells
+ * Use this instead of ValueParser when creating decoders for cells
  * to properly type the base properties.
  */
-export type Cell_Value_Decoder<
-	T_Schema extends z.ZodType,
-	T_Key extends keyof z.infer<T_Schema> = keyof z.infer<T_Schema>,
+export type CellValueDecoder<
+	TSchema extends z.ZodType,
+	TKey extends keyof z.infer<TSchema> = keyof z.infer<TSchema>,
 > = {
-	[K in T_Key]?: (value: unknown) => z.infer<T_Schema>[K] | undefined | typeof HANDLED;
+	[K in TKey]?: (value: unknown) => z.infer<TSchema>[K] | undefined | typeof HANDLED;
 };
 
 /**
@@ -45,7 +45,7 @@ export type Cell_Value_Decoder<
  */
 export const get_schema_class_info = (
 	schema: z.ZodType | null | undefined,
-): Schema_Class_Info | null => {
+): SchemaClassInfo | null => {
 	if (!schema) return null;
 
 	// Unwrap to get the core schema

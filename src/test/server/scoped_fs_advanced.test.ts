@@ -4,7 +4,7 @@ import {test, expect, vi, beforeEach, afterEach, describe} from 'vitest';
 import * as fs from 'node:fs/promises';
 import * as fs_sync from 'node:fs';
 
-import {Scoped_Fs, Symlink_Not_Allowed_Error} from '$lib/server/scoped_fs.js';
+import {ScopedFs, SymlinkNotAllowedError} from '$lib/server/scoped_fs.js';
 
 /* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-empty-function, no-await-in-loop */
 
@@ -46,7 +46,7 @@ const DIR_PATHS = {
 	NESTED: '/allowed/path/nested/directory/structure',
 };
 
-const create_test_instance = () => new Scoped_Fs(TEST_ALLOWED_PATHS);
+const create_test_instance = () => new ScopedFs(TEST_ALLOWED_PATHS);
 
 // Setup/cleanup for each test
 let console_spy: any;
@@ -107,7 +107,7 @@ const setup_mock_filesystem = () => {
 	return filesystem;
 };
 
-describe('Scoped_Fs - Advanced Path Validation', () => {
+describe('ScopedFs - Advanced Path Validation', () => {
 	test('should handle paths with special characters correctly', () => {
 		const scoped_fs = create_test_instance();
 
@@ -176,7 +176,7 @@ describe('Scoped_Fs - Advanced Path Validation', () => {
 	});
 });
 
-describe('Scoped_Fs - Advanced Directory Operations', () => {
+describe('ScopedFs - Advanced Directory Operations', () => {
 	test('readdir - should handle different option combinations', async () => {
 		const scoped_fs = create_test_instance();
 		setup_mock_filesystem();
@@ -259,7 +259,7 @@ describe('Scoped_Fs - Advanced Directory Operations', () => {
 	});
 });
 
-describe('Scoped_Fs - Advanced Security Features', () => {
+describe('ScopedFs - Advanced Security Features', () => {
 	test('should reject all symlinks in path hierarchy', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -303,8 +303,8 @@ describe('Scoped_Fs - Advanced Security Features', () => {
 				} as any;
 			});
 
-			// Each case should be rejected with a Symlink_Not_Allowed_Error
-			await expect(scoped_fs.read_file(path)).rejects.toThrow(Symlink_Not_Allowed_Error);
+			// Each case should be rejected with a SymlinkNotAllowedError
+			await expect(scoped_fs.read_file(path)).rejects.toThrow(SymlinkNotAllowedError);
 			expect(fs.readFile).not.toHaveBeenCalled();
 		}
 	});
@@ -345,7 +345,7 @@ describe('Scoped_Fs - Advanced Security Features', () => {
 	});
 });
 
-describe('Scoped_Fs - Error Handling and Edge Cases', () => {
+describe('ScopedFs - Error Handling and Edge Cases', () => {
 	test('should handle filesystem errors during path validation gracefully', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -436,7 +436,7 @@ describe('Scoped_Fs - Error Handling and Edge Cases', () => {
 	});
 });
 
-describe('Scoped_Fs - Advanced Use Cases', () => {
+describe('ScopedFs - Advanced Use Cases', () => {
 	test('should handle complex workflows with multiple operations', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -539,11 +539,11 @@ describe('Scoped_Fs - Advanced Use Cases', () => {
 	});
 });
 
-describe('Scoped_Fs - Directory Path Trailing Slash Handling', () => {
+describe('ScopedFs - Directory Path Trailing Slash Handling', () => {
 	test('should ensure all allowed paths have trailing slashes internally', () => {
 		// Create instances with a mix of slashed and unslashed paths
 		const paths_with_mix = ['/path1', '/path2/', '/path3/subdir', '/path4/subdir/'];
-		const scoped_fs = new Scoped_Fs(paths_with_mix);
+		const scoped_fs = new ScopedFs(paths_with_mix);
 
 		// All paths should have trailing slashes internally
 		for (const path of scoped_fs.allowed_paths) {
@@ -555,8 +555,8 @@ describe('Scoped_Fs - Directory Path Trailing Slash Handling', () => {
 	});
 
 	test('should correctly validate paths regardless of trailing slashes', () => {
-		// Create Scoped_Fs with paths that don't have trailing slashes
-		const scoped_fs = new Scoped_Fs(['/dir1', '/dir2/subdir']);
+		// Create ScopedFs with paths that don't have trailing slashes
+		const scoped_fs = new ScopedFs(['/dir1', '/dir2/subdir']);
 
 		// These paths should all be allowed, with or without trailing slashes
 		const valid_paths = [
@@ -586,8 +586,8 @@ describe('Scoped_Fs - Directory Path Trailing Slash Handling', () => {
 	});
 
 	test('should handle filesystem operations consistently with or without trailing slashes', async () => {
-		// Create Scoped_Fs with a mix of slashed and unslashed paths
-		const scoped_fs = new Scoped_Fs(['/allowed/path', '/other/dir/']);
+		// Create ScopedFs with a mix of slashed and unslashed paths
+		const scoped_fs = new ScopedFs(['/allowed/path', '/other/dir/']);
 
 		// Mock filesystem operations
 		vi.mocked(fs.readFile).mockResolvedValue('content' as any);
@@ -618,8 +618,8 @@ describe('Scoped_Fs - Directory Path Trailing Slash Handling', () => {
 	});
 
 	test('should maintain path boundaries correctly with trailing slash normalization', async () => {
-		// Create Scoped_Fs with specific paths
-		const scoped_fs = new Scoped_Fs(['/data/users', '/data/public/']);
+		// Create ScopedFs with specific paths
+		const scoped_fs = new ScopedFs(['/data/users', '/data/public/']);
 
 		// These paths should be valid
 		const valid_paths = [
@@ -653,8 +653,8 @@ describe('Scoped_Fs - Directory Path Trailing Slash Handling', () => {
 	});
 
 	test('should continue to handle root directory as a special case', async () => {
-		// Create Scoped_Fs with root directory
-		const scoped_fs = new Scoped_Fs(['/']);
+		// Create ScopedFs with root directory
+		const scoped_fs = new ScopedFs(['/']);
 
 		// All paths should be allowed when root is specified
 		const test_paths = ['/', '/etc', '/usr/bin', '/home/user/file.txt'];

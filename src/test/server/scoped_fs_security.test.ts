@@ -4,11 +4,7 @@ import {test, expect, vi, beforeEach, afterEach, describe} from 'vitest';
 import * as fs from 'node:fs/promises';
 import * as fs_sync from 'node:fs';
 
-import {
-	Scoped_Fs,
-	Path_Not_Allowed_Error,
-	Symlink_Not_Allowed_Error,
-} from '$lib/server/scoped_fs.js';
+import {ScopedFs, PathNotAllowedError, SymlinkNotAllowedError} from '$lib/server/scoped_fs.js';
 
 /* eslint-disable no-await-in-loop, @typescript-eslint/no-empty-function, @typescript-eslint/require-await */
 
@@ -50,7 +46,7 @@ const DIR_PATHS = {
 	GRANDPARENT_SYMLINK_DIR: '/allowed/path/normal-dir/symlink-parent/subdir',
 };
 
-const create_test_instance = () => new Scoped_Fs(TEST_ALLOWED_PATHS);
+const create_test_instance = () => new ScopedFs(TEST_ALLOWED_PATHS);
 
 // Setup/cleanup for each test
 let console_spy: any;
@@ -76,7 +72,7 @@ afterEach(() => {
 	console_spy.mockRestore();
 });
 
-describe('Scoped_Fs - Symlink Security', () => {
+describe('ScopedFs - Symlink Security', () => {
 	test('should reject symlinks in target path', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -109,7 +105,7 @@ describe('Scoped_Fs - Symlink Security', () => {
 				} as any),
 			);
 
-			await expect(operation()).rejects.toThrow(Symlink_Not_Allowed_Error);
+			await expect(operation()).rejects.toThrow(SymlinkNotAllowedError);
 		}
 
 		// Test exists() separately
@@ -165,12 +161,12 @@ describe('Scoped_Fs - Symlink Security', () => {
 
 		// Should throw for any operation on a file in a symlinked parent directory
 		await expect(scoped_fs.read_file(FILE_PATHS.PARENT_SYMLINK)).rejects.toThrow(
-			Symlink_Not_Allowed_Error,
+			SymlinkNotAllowedError,
 		);
 
 		// Should also throw for mkdir in a symlinked directory
 		await expect(scoped_fs.mkdir('/allowed/path/symlink-dir/subdir')).rejects.toThrow(
-			Symlink_Not_Allowed_Error,
+			SymlinkNotAllowedError,
 		);
 	});
 
@@ -210,7 +206,7 @@ describe('Scoped_Fs - Symlink Security', () => {
 		// Should detect the symlink even when it's not the immediate parent
 		await expect(
 			scoped_fs.read_file(`${DIR_PATHS.GRANDPARENT_SYMLINK_DIR}/file.txt`),
-		).rejects.toThrow(Symlink_Not_Allowed_Error);
+		).rejects.toThrow(SymlinkNotAllowedError);
 	});
 
 	test('should detect symlinks consistently across all operations', async () => {
@@ -248,7 +244,7 @@ describe('Scoped_Fs - Symlink Security', () => {
 
 		// All operations should detect the symlink
 		for (const operation of operations) {
-			await expect(operation()).rejects.toThrow(Symlink_Not_Allowed_Error);
+			await expect(operation()).rejects.toThrow(SymlinkNotAllowedError);
 		}
 	});
 
@@ -307,7 +303,7 @@ describe('Scoped_Fs - Symlink Security', () => {
 	});
 });
 
-describe('Scoped_Fs - Path Traversal Security', () => {
+describe('ScopedFs - Path Traversal Security', () => {
 	test('should reject standard path traversal attempts', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -328,7 +324,7 @@ describe('Scoped_Fs - Path Traversal Security', () => {
 			expect(await scoped_fs.is_path_safe(path)).toBe(false);
 
 			// Operations should throw
-			await expect(scoped_fs.read_file(path)).rejects.toThrow(Path_Not_Allowed_Error);
+			await expect(scoped_fs.read_file(path)).rejects.toThrow(PathNotAllowedError);
 		}
 	});
 
@@ -358,7 +354,7 @@ describe('Scoped_Fs - Path Traversal Security', () => {
 	});
 });
 
-describe('Scoped_Fs - Access Control Security', () => {
+describe('ScopedFs - Access Control Security', () => {
 	test('should enforce strict path boundaries', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -389,14 +385,14 @@ describe('Scoped_Fs - Access Control Security', () => {
 				const content = await scoped_fs.read_file(path);
 				expect(content).toBe('content');
 			} else {
-				await expect(scoped_fs.read_file(path)).rejects.toThrow(Path_Not_Allowed_Error);
+				await expect(scoped_fs.read_file(path)).rejects.toThrow(PathNotAllowedError);
 			}
 		}
 	});
 
 	test('should properly handle root directory permissions', async () => {
 		// Create instance with root as allowed path
-		const root_scoped_fs = new Scoped_Fs(['/']);
+		const root_scoped_fs = new ScopedFs(['/']);
 
 		// Should allow any path
 		const root_test_paths = [
@@ -422,12 +418,12 @@ describe('Scoped_Fs - Access Control Security', () => {
 
 		// Non-absolute paths should still be rejected
 		expect(root_scoped_fs.is_path_allowed('relative/path')).toBe(false);
-		await expect(root_scoped_fs.read_file('relative/path')).rejects.toThrow(Path_Not_Allowed_Error);
+		await expect(root_scoped_fs.read_file('relative/path')).rejects.toThrow(PathNotAllowedError);
 	});
 
 	test('should properly isolate between allowed paths', async () => {
 		// Create instance with multiple distinct allowed paths
-		const complex_scoped_fs = new Scoped_Fs(['/home/user1/data', '/var/app/logs']);
+		const complex_scoped_fs = new ScopedFs(['/home/user1/data', '/var/app/logs']);
 
 		// Paths that should be allowed
 		const allowed_paths = [
@@ -455,7 +451,7 @@ describe('Scoped_Fs - Access Control Security', () => {
 		// Check disallowed paths
 		for (const path of disallowed_paths) {
 			expect(complex_scoped_fs.is_path_allowed(path)).toBe(false);
-			await expect(complex_scoped_fs.read_file(path)).rejects.toThrow(Path_Not_Allowed_Error);
+			await expect(complex_scoped_fs.read_file(path)).rejects.toThrow(PathNotAllowedError);
 		}
 	});
 
@@ -463,11 +459,11 @@ describe('Scoped_Fs - Access Control Security', () => {
 		const scoped_fs = create_test_instance();
 
 		// Empty path should be rejected by all operations
-		await expect(scoped_fs.read_file('')).rejects.toThrow(Path_Not_Allowed_Error);
-		await expect(scoped_fs.write_file('', 'content')).rejects.toThrow(Path_Not_Allowed_Error);
-		await expect(scoped_fs.stat('')).rejects.toThrow(Path_Not_Allowed_Error);
-		await expect(scoped_fs.mkdir('')).rejects.toThrow(Path_Not_Allowed_Error);
-		await expect(scoped_fs.readdir('')).rejects.toThrow(Path_Not_Allowed_Error);
+		await expect(scoped_fs.read_file('')).rejects.toThrow(PathNotAllowedError);
+		await expect(scoped_fs.write_file('', 'content')).rejects.toThrow(PathNotAllowedError);
+		await expect(scoped_fs.stat('')).rejects.toThrow(PathNotAllowedError);
+		await expect(scoped_fs.mkdir('')).rejects.toThrow(PathNotAllowedError);
+		await expect(scoped_fs.readdir('')).rejects.toThrow(PathNotAllowedError);
 
 		// exists() should return false for empty path
 		expect(await scoped_fs.exists('')).toBe(false);
@@ -483,32 +479,32 @@ describe('Scoped_Fs - Access Control Security', () => {
 		// Invalid source
 		await expect(
 			scoped_fs.copy_file('/not/allowed/source.txt', '/allowed/path/dest.txt'),
-		).rejects.toThrow(Path_Not_Allowed_Error);
+		).rejects.toThrow(PathNotAllowedError);
 
 		// Invalid destination
 		await expect(
 			scoped_fs.copy_file('/allowed/path/source.txt', '/not/allowed/dest.txt'),
-		).rejects.toThrow(Path_Not_Allowed_Error);
+		).rejects.toThrow(PathNotAllowedError);
 
 		// Both invalid
 		await expect(
 			scoped_fs.copy_file('/not/allowed/source.txt', '/not/allowed/dest.txt'),
-		).rejects.toThrow(Path_Not_Allowed_Error);
+		).rejects.toThrow(PathNotAllowedError);
 
 		// Path traversal in source
 		await expect(
 			scoped_fs.copy_file('/allowed/path/../../../etc/passwd', '/allowed/path/dest.txt'),
-		).rejects.toThrow(Path_Not_Allowed_Error);
+		).rejects.toThrow(PathNotAllowedError);
 
 		// Path traversal in destination
 		await expect(
 			scoped_fs.copy_file('/allowed/path/source.txt', '/allowed/path/../../../etc/passwd'),
-		).rejects.toThrow(Path_Not_Allowed_Error);
+		).rejects.toThrow(PathNotAllowedError);
 	});
 });
 
-describe('Scoped_Fs - Security Error Handling', () => {
-	test('Path_Not_Allowed_Error should properly format path in message', () => {
+describe('ScopedFs - Security Error Handling', () => {
+	test('PathNotAllowedError should properly format path in message', () => {
 		const test_paths = [
 			'/etc/passwd',
 			'/var/log/auth.log',
@@ -519,19 +515,19 @@ describe('Scoped_Fs - Security Error Handling', () => {
 		];
 
 		for (const path of test_paths) {
-			const error = new Path_Not_Allowed_Error(path);
+			const error = new PathNotAllowedError(path);
 			expect(error.message).toBe(`Path is not allowed: ${path}`);
-			expect(error.name).toBe('Path_Not_Allowed_Error');
+			expect(error.name).toBe('PathNotAllowedError');
 		}
 	});
 
-	test('Symlink_Not_Allowed_Error should properly format path in message', () => {
+	test('SymlinkNotAllowedError should properly format path in message', () => {
 		const test_paths = ['/allowed/path/symlink', '/allowed/path/symlink-dir'];
 
 		for (const path of test_paths) {
-			const error = new Symlink_Not_Allowed_Error(path);
+			const error = new SymlinkNotAllowedError(path);
 			expect(error.message).toBe(`Path is a symlink which is not allowed: ${path}`);
-			expect(error.name).toBe('Symlink_Not_Allowed_Error');
+			expect(error.name).toBe('SymlinkNotAllowedError');
 		}
 	});
 

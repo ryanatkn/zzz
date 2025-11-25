@@ -2,33 +2,33 @@ import {z} from 'zod';
 import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {ensure_end, ensure_start, strip_end, strip_start} from '@ryanatkn/belt/string.js';
-import type {Schema_Keys} from '$lib/cell_types.js';
+import type {SchemaKeys} from '$lib/cell_types.js';
 
 export const Any = z.any();
 export type Any = z.infer<typeof Any>;
 
-export const Http_Status = z.number().int();
-export type Http_Status = z.infer<typeof Http_Status>;
+export const HttpStatus = z.number().int();
+export type HttpStatus = z.infer<typeof HttpStatus>;
 
-export const Type_Literal = z.string().min(1).brand('Type_Literal');
-export type Type_Literal = z.infer<typeof Type_Literal>;
+export const TypeLiteral = z.string().min(1).brand('TypeLiteral');
+export type TypeLiteral = z.infer<typeof TypeLiteral>;
 
 // TODO @many how to handle paths? need some more structure to the way they're normalized and joined
 // TODO rethink with ensure/turn usages, normally we'd want to validate these not transform
-export const Path_With_Trailing_Slash = z.string().transform((v) => ensure_end(v, '/'));
-export type Path_With_Trailing_Slash = z.infer<typeof Path_With_Trailing_Slash>;
+export const PathWithTrailingSlash = z.string().transform((v) => ensure_end(v, '/'));
+export type PathWithTrailingSlash = z.infer<typeof PathWithTrailingSlash>;
 
-export const Path_Without_Trailing_Slash = z.string().transform((v) => strip_end(v, '/'));
-export type Path_Without_Trailing_Slash = z.infer<typeof Path_Without_Trailing_Slash>;
+export const PathWithoutTrailingSlash = z.string().transform((v) => strip_end(v, '/'));
+export type PathWithoutTrailingSlash = z.infer<typeof PathWithoutTrailingSlash>;
 
-export const Path_With_Leading_Slash = z.string().transform((v) => ensure_start(v, '/'));
-export type Path_With_Leading_Slash = z.infer<typeof Path_With_Leading_Slash>;
+export const PathWithLeadingSlash = z.string().transform((v) => ensure_start(v, '/'));
+export type PathWithLeadingSlash = z.infer<typeof PathWithLeadingSlash>;
 
-export const Path_Without_Leading_Slash = z.string().transform((v) => strip_start(v, '/'));
-export type Path_Without_Leading_Slash = z.infer<typeof Path_Without_Leading_Slash>;
+export const PathWithoutLeadingSlash = z.string().transform((v) => strip_start(v, '/'));
+export type PathWithoutLeadingSlash = z.infer<typeof PathWithoutLeadingSlash>;
 
-export const Svelte_Map_Schema = z.instanceof(SvelteMap);
-export type Svelte_Map_Schema = z.infer<typeof Svelte_Map_Schema>;
+export const SvelteMapSchema = z.instanceof(SvelteMap);
+export type SvelteMapSchema = z.infer<typeof SvelteMapSchema>;
 
 /**
  * Returns an ISO datetime string that is guaranteed to be monotonically increasing.
@@ -40,15 +40,15 @@ export const get_datetime_now = (): Datetime => new Date().toISOString() as Date
 // TODO move these? helpers at least - maybe `types.ts`? is belt going to use zod?
 export const Datetime = z.iso.datetime().brand('Datetime');
 export type Datetime = z.infer<typeof Datetime>;
-export const Datetime_Now = Datetime.default(get_datetime_now);
-export type Datetime_Now = z.infer<typeof Datetime_Now>;
+export const DatetimeNow = Datetime.default(get_datetime_now);
+export type DatetimeNow = z.infer<typeof DatetimeNow>;
 
 export const create_uuid = (): Uuid => crypto.randomUUID() as Uuid;
 
 export const Uuid = z.uuid().brand('Uuid');
 export type Uuid = z.infer<typeof Uuid>;
-export const Uuid_With_Default = Uuid.default(create_uuid);
-export type Uuid_With_Default = z.infer<typeof Uuid_With_Default>;
+export const UuidWithDefault = Uuid.default(create_uuid);
+export type UuidWithDefault = z.infer<typeof UuidWithDefault>;
 
 /**
  * Helper to extract subschema from a Zod def, following Zod 4 patterns.
@@ -104,10 +104,10 @@ export const get_innermost_type_name = (schema: z.ZodType): string => {
 /**
  * Gets all property keys from a Zod object schema.
  */
-export const zod_get_schema_keys = <T extends z.ZodType>(schema: T): Array<Schema_Keys<T>> => {
+export const zod_get_schema_keys = <T extends z.ZodType>(schema: T): Array<SchemaKeys<T>> => {
 	const inner = get_innermost_type(schema);
 	if (inner instanceof z.ZodObject) {
-		return Object.keys(inner.shape) as Array<Schema_Keys<T>>;
+		return Object.keys(inner.shape) as Array<SchemaKeys<T>>;
 	}
 	return EMPTY_ARRAY;
 };

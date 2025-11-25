@@ -14,12 +14,12 @@
 
 	import {parse_url_param_uuid} from '$lib/url_params_helpers.js';
 	import {App} from '$lib/app.svelte.js';
-	import Frontend_Root from '$lib/Frontend_Root.svelte';
+	import FrontendRoot from '$lib/FrontendRoot.svelte';
 	import {pkg_context} from '$lib/pkg.js';
 	import {package_json, src_json} from '$lib/package.js';
-	import {Provider_Json} from '$lib/provider.svelte.js';
+	import {ProviderJson} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
-	import {Model_Json} from '$lib/model.svelte.js';
+	import {ModelJson} from '$lib/model.svelte.js';
 
 	const {children, params} = $props();
 
@@ -29,8 +29,8 @@
 		const zzz_config = create_zzz_config();
 
 		// TODO note the difference between these two APIs, look at both of them and see which makes more sense
-		app.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
-		app.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
+		app.add_providers(zzz_config.providers.map((p) => ProviderJson.parse(p))); // TODO handle errors
+		app.models.add_many(zzz_config.models.map((m) => ModelJson.parse(m))); // TODO handle errors
 
 		// init the session
 		if (BROWSER) {
@@ -99,6 +99,6 @@
 	]}
 />
 
-<Frontend_Root {app}>
+<FrontendRoot {app}>
 	{@render children()}
-</Frontend_Root>
+</FrontendRoot>

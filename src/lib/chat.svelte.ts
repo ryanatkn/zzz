@@ -1,37 +1,37 @@
 import {z} from 'zod';
-import type {Async_Status} from '@ryanatkn/belt/async.js';
+import type {AsyncStatus} from '@ryanatkn/belt/async.js';
 
 import type {Model} from '$lib/model.svelte.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Thread} from '$lib/thread.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
 import {get_unique_name, estimate_token_count} from '$lib/helpers.js';
-import {Completion_Request} from '$lib/completion_types.js';
+import {CompletionRequest} from '$lib/completion_types.js';
 import {render_message_with_role} from '$lib/thread_helpers.js';
 
-const Chat_View_Mode = z.enum(['simple', 'multi']).default('simple');
-export type Chat_View_Mode = z.infer<typeof Chat_View_Mode>;
+const ChatViewMode = z.enum(['simple', 'multi']).default('simple');
+export type ChatViewMode = z.infer<typeof ChatViewMode>;
 
-export const Chat_Json = Cell_Json.extend({
+export const ChatJson = CellJson.extend({
 	name: z.string().default(''),
 	thread_ids: z.array(Uuid).default(() => []),
 	main_input: z.string().default(''),
-	view_mode: Chat_View_Mode,
+	view_mode: ChatViewMode,
 	selected_thread_id: Uuid.nullable().default(null),
 }).meta({cell_class_name: 'Chat'});
-export type Chat_Json = z.infer<typeof Chat_Json>;
-export type Chat_Json_Input = z.input<typeof Chat_Json>;
+export type ChatJson = z.infer<typeof ChatJson>;
+export type ChatJsonInput = z.input<typeof ChatJson>;
 
-export interface Chat_Options extends Cell_Options<typeof Chat_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface ChatOptions extends CellOptions<typeof ChatJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Chat extends Cell<typeof Chat_Json> {
+export class Chat extends Cell<typeof ChatJson> {
 	name: string = $state()!;
 	thread_ids: Array<Uuid> = $state()!;
 	main_input: string = $state()!;
-	view_mode: Chat_View_Mode = $state()!;
+	view_mode: ChatViewMode = $state()!;
 	selected_thread_id: Uuid | null = $state()!;
 
 	readonly main_input_length: number = $derived(this.main_input.length);
@@ -63,10 +63,10 @@ export class Chat extends Cell<typeof Chat_Json> {
 	);
 
 	// TODO refactor
-	init_name_status: Async_Status = $state('initial');
+	init_name_status: AsyncStatus = $state('initial');
 
-	constructor(options: Chat_Options) {
-		super(Chat_Json, options);
+	constructor(options: ChatOptions) {
+		super(ChatJson, options);
 		this.init();
 	}
 
@@ -136,7 +136,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	 */
 	async init_name_from_turns(user_content: string, assistant_content: string): Promise<void> {
 		// TODO better abstraction for this kind of thing including de-duping the request,
-		// returning the current promise, see `Request_Tracker/Request_Tracker_Item`
+		// returning the current promise, see `RequestTracker/RequestTrackerItem`
 		if (this.init_name_status !== 'initial') return;
 
 		// Check if namerbot's provider is available before attempting to name
@@ -171,7 +171,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 			const name_response = await this.app.api.completion_create({
 				// TODO @many should parsing be automatic, so the types change to schema input types? makes sense yeah?
 				// I think perf is maybe the main reason not to do this?
-				completion_request: Completion_Request.parse({
+				completion_request: CompletionRequest.parse({
 					provider_name: namerbot_model.provider_name,
 					model: this.app.bots.namerbot,
 					prompt: p,
@@ -216,4 +216,4 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 }
 
-export const Chat_Schema = z.instanceof(Chat);
+export const ChatSchema = z.instanceof(Chat);

@@ -3,9 +3,9 @@
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import Page_Footer from '$routes/Page_Footer.svelte';
+	import PageFooter from '$routes/PageFooter.svelte';
 
-	import Dashboard_Home from '$lib/Dashboard_Home.svelte';
+	import DashboardHome from '$lib/DashboardHome.svelte';
 </script>
 
 <section class="row gap_xl5 mb_xl5">
@@ -21,6 +21,6 @@
 	</div>
 </section>
 
-<Dashboard_Home />
+<DashboardHome />
 
-<Page_Footer />
+<PageFooter />

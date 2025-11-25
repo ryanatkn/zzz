@@ -3,18 +3,18 @@ import type * as google from '@google/generative-ai';
 import {SECRET_GOOGLE_API_KEY} from '$env/static/private';
 
 import {
-	Backend_Provider_Remote,
-	type Backend_Provider_Options,
-	type Completion_Handler_Options,
+	BackendProviderRemote,
+	type BackendProviderOptions,
+	type CompletionHandlerOptions,
 } from '$lib/server/backend_provider.js';
 import {to_completion_result} from '$lib/response_helpers.js';
-import type {Action_Outputs} from '$lib/action_collections.js';
-import type {Completion_Message} from '$lib/completion_types.js';
+import type {ActionOutputs} from '$lib/action_collections.js';
+import type {CompletionMessage} from '$lib/completion_types.js';
 
-export class Backend_Provider_Gemini extends Backend_Provider_Remote<GoogleGenerativeAI> {
+export class BackendProviderGemini extends BackendProviderRemote<GoogleGenerativeAI> {
 	readonly name = 'gemini';
 
-	constructor(options: Backend_Provider_Options) {
+	constructor(options: BackendProviderOptions) {
 		super({...options, api_key: options.api_key ?? (SECRET_GOOGLE_API_KEY || null)});
 	}
 
@@ -23,8 +23,8 @@ export class Backend_Provider_Gemini extends Backend_Provider_Remote<GoogleGener
 	}
 
 	async handle_streaming_completion(
-		options: Completion_Handler_Options,
-	): Promise<Action_Outputs['completion_create']> {
+		options: CompletionHandlerOptions,
+	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
@@ -88,8 +88,8 @@ export class Backend_Provider_Gemini extends Backend_Provider_Remote<GoogleGener
 	}
 
 	async handle_non_streaming_completion(
-		options: Completion_Handler_Options,
-	): Promise<Action_Outputs['completion_create']> {
+		options: CompletionHandlerOptions,
+	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt} = options;
 
 		// TODO cache this by model?
@@ -123,7 +123,7 @@ export class Backend_Provider_Gemini extends Backend_Provider_Remote<GoogleGener
 
 const create_gemini_model_options = (
 	model: string,
-	completion_options: Completion_Handler_Options['completion_options'],
+	completion_options: CompletionHandlerOptions['completion_options'],
 ) => ({
 	model,
 	systemInstruction: completion_options.system_message,
@@ -143,7 +143,7 @@ const create_gemini_model_options = (
 
 // TODO @many cleanup with better data structures/helpers
 const to_contents = (
-	completion_messages: Array<Completion_Message> | undefined,
+	completion_messages: Array<CompletionMessage> | undefined,
 	prompt: string,
 ): Array<google.Content> => {
 	const prompt_message = {role: 'user', parts: [{text: prompt}]};

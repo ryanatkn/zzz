@@ -1,0 +1,31 @@
+<script lang="ts">
+	import {GLYPH_MODEL} from '$lib/glyphs.js';
+	import ModelSummary from '$lib/ModelSummary.svelte';
+	import Glyph from '$lib/Glyph.svelte';
+	import {frontend_context} from '$lib/frontend.svelte.js';
+
+	const app = frontend_context.get();
+
+	// TODO make this a table
+
+	// TODO add search/filtering/sorting
+</script>
+
+<div class="p_lg">
+	<h1><Glyph glyph={GLYPH_MODEL} /> models</h1>
+	<aside>⚠️ This information is incomplete and may be incorrect or outdated.</aside>
+	<div class="models_grid">
+		{#each app.models.ordered_by_name as model (model)}
+			<ModelSummary {model} />
+		{/each}
+	</div>
+</div>
+
+<style>
+	.models_grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: var(--space_lg);
+		width: 100%;
+	}
+</style>

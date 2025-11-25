@@ -1,25 +1,25 @@
 import {z} from 'zod';
 import {resolve} from '$app/paths';
 
-import {Provider_Name} from '$lib/provider_types.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {Ollama_Show_Response, Ollama_List_Response_Item} from '$lib/ollama_helpers.js';
+import {ProviderName} from '$lib/provider_types.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
+import {OllamaShowResponse, OllamaListResponseItem} from '$lib/ollama_helpers.js';
 import {goto_unless_current} from '$lib/navigation_helpers.js';
 import type {Provider} from '$lib/provider.svelte.js';
 
-export const Model_Name = z.string().trim();
-export type Model_Name = z.infer<typeof Model_Name>;
+export const ModelName = z.string().trim();
+export type ModelName = z.infer<typeof ModelName>;
 
-export const Model_Json = Cell_Json.extend({
+export const ModelJson = CellJson.extend({
 	// TODO consider whether we should support one model with multiple providers,
 	// or individual models per provider, currently we expect
 	// `name` to be unique across providers and this needs to change,
 	// I think it's like chats/prompts/etc, names should not be unique,
 	// unless we think they're more like file paths? `provider_name/model_name` seems good for `path`?
 	// that would make model/provider name like filenames, makes sense
-	name: Model_Name,
-	provider_name: Provider_Name,
+	name: ModelName,
+	provider_name: ProviderName,
 	tags: z.array(z.string()).default(() => []),
 
 	// TODO expand/improve these
@@ -35,20 +35,20 @@ export const Model_Json = Cell_Json.extend({
 	cost_output: z.number().optional(),
 	training_cutoff: z.string().optional(),
 	// TODO @many maybe have a single `ollama` object?
-	ollama_list_response_item: Ollama_List_Response_Item.optional(),
-	ollama_show_response: Ollama_Show_Response.optional(),
+	ollama_list_response_item: OllamaListResponseItem.optional(),
+	ollama_show_response: OllamaShowResponse.optional(),
 	ollama_show_response_loaded: z.boolean().default(false),
 	ollama_show_response_loading: z.boolean().default(false),
 	ollama_show_response_error: z.string().optional(),
 }).meta({cell_class_name: 'Model'});
-export type Model_Json = z.infer<typeof Model_Json>;
-export type Model_Json_Input = z.input<typeof Model_Json>;
+export type ModelJson = z.infer<typeof ModelJson>;
+export type ModelJsonInput = z.input<typeof ModelJson>;
 
-export interface Model_Options extends Cell_Options<typeof Model_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface ModelOptions extends CellOptions<typeof ModelJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Model extends Cell<typeof Model_Json> {
-	name: Model_Name = $state()!;
-	provider_name: Provider_Name = $state()!;
+export class Model extends Cell<typeof ModelJson> {
+	name: ModelName = $state()!;
+	provider_name: ProviderName = $state()!;
 	tags: Array<string> = $state()!;
 	architecture: string | undefined = $state();
 	parameter_count: number | undefined = $state();
@@ -63,8 +63,8 @@ export class Model extends Cell<typeof Model_Json> {
 
 	// TODO @many maybe have a single `ollama` object?
 	// in Ollamaland, list is the metadata and show is the full details
-	ollama_list_response_item: Ollama_List_Response_Item | undefined = $state.raw();
-	ollama_show_response: Ollama_Show_Response | undefined = $state.raw();
+	ollama_list_response_item: OllamaListResponseItem | undefined = $state.raw();
+	ollama_show_response: OllamaShowResponse | undefined = $state.raw();
 	ollama_show_response_loaded: boolean = $state(false);
 	ollama_show_response_loading: boolean = $state(false);
 	ollama_show_response_error: string | undefined = $state();
@@ -118,8 +118,8 @@ export class Model extends Cell<typeof Model_Json> {
 		this.provider_name === 'ollama' ? this.app.ollama.running_model_names.has(this.name) : false,
 	);
 
-	constructor(options: Model_Options) {
-		super(Model_Json, options);
+	constructor(options: ModelOptions) {
+		super(ModelJson, options);
 		this.init();
 	}
 
@@ -162,4 +162,4 @@ export class Model extends Cell<typeof Model_Json> {
 	}
 }
 
-export const Model_Schema = z.instanceof(Model);
+export const ModelSchema = z.instanceof(Model);

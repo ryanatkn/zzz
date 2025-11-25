@@ -20,11 +20,11 @@ import {
 } from '$lib/constants.js';
 import {parse_allowed_origins, verify_request_source} from '$lib/server/security.js';
 import {handle_filer_change} from '$lib/server/backend_actions_api.js';
-import {Backend_Provider_Ollama} from '$lib/server/backend_provider_ollama.js';
-import {Backend_Provider_Claude} from '$lib/server/backend_provider_claude.js';
-import {Backend_Provider_Chatgpt} from '$lib/server/backend_provider_chatgpt.js';
-import {Backend_Provider_Gemini} from '$lib/server/backend_provider_gemini.js';
-import type {Backend_Provider_Options} from './backend_provider.js';
+import {BackendProviderOllama} from '$lib/server/backend_provider_ollama.js';
+import {BackendProviderClaude} from '$lib/server/backend_provider_claude.js';
+import {BackendProviderChatgpt} from '$lib/server/backend_provider_chatgpt.js';
+import {BackendProviderGemini} from '$lib/server/backend_provider_gemini.js';
+import type {BackendProviderOptions} from './backend_provider.js';
 
 const log = new Logger('[server]');
 
@@ -67,13 +67,13 @@ const create_server = async (): Promise<void> => {
 	});
 
 	// TODO manage these dynamically, init from config/state
-	const provider_options: Backend_Provider_Options = {
+	const provider_options: BackendProviderOptions = {
 		on_completion_progress: backend.api.completion_progress,
 	};
-	backend.add_provider(new Backend_Provider_Ollama(provider_options));
-	backend.add_provider(new Backend_Provider_Claude(provider_options));
-	backend.add_provider(new Backend_Provider_Chatgpt(provider_options));
-	backend.add_provider(new Backend_Provider_Gemini(provider_options));
+	backend.add_provider(new BackendProviderOllama(provider_options));
+	backend.add_provider(new BackendProviderClaude(provider_options));
+	backend.add_provider(new BackendProviderChatgpt(provider_options));
+	backend.add_provider(new BackendProviderGemini(provider_options));
 
 	// TODO options for everything, maybe a nullable array and an enable/disable flag
 

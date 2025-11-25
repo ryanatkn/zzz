@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Alert from '@ryanatkn/fuz/Alert.svelte';
 	import {BROWSER} from 'esm-env';
-	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
 
-	import Provider_Detail from '$lib/Provider_Detail.svelte';
+	import ProviderDetail from '$lib/ProviderDetail.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	const {params} = $props();
@@ -19,13 +19,13 @@
 
 <div class="p_sm">
 	{#if provider}
-		<Provider_Detail {provider} />
+		<ProviderDetail {provider} />
 	{:else if BROWSER}
 		<Alert status="error">
 			no provider found with name "{params.slug}"
 		</Alert>
 	{:else}
 		<!-- for SSR - is the animation what we want? better than nothing? -->
-		<Pending_Animation running />
+		<PendingAnimation running />
 	{/if}
 </div>

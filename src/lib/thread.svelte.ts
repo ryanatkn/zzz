@@ -1,24 +1,24 @@
 import type {Model} from '$lib/model.svelte.js';
 import {Turn, create_turn_from_text, create_turn_from_part} from '$lib/turn.svelte.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Thread_Json} from '$lib/thread_types.js';
-import {Completion_Request, Completion_Role} from '$lib/completion_types.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {ThreadJson} from '$lib/thread_types.js';
+import {CompletionRequest, CompletionRole} from '$lib/completion_types.js';
 import {render_messages_to_string, render_completion_messages} from '$lib/thread_helpers.js';
-import type {Part_Union} from '$lib/part.svelte.js';
+import type {PartUnion} from '$lib/part.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
-import type {Turn_Json} from '$lib/turn_types.js';
+import type {TurnJson} from '$lib/turn_types.js';
 
 // TODO add `thread.name` and lots of other things probably
 
-export interface Thread_Options extends Cell_Options<typeof Thread_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface ThreadOptions extends CellOptions<typeof ThreadJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 /**
  * A thread is a linear sequence of turns that maintains a chronological
  * record of interactions between the user and the AI.
  */
-export class Thread extends Cell<typeof Thread_Json> {
+export class Thread extends Cell<typeof ThreadJson> {
 	model_name: string = $state()!;
 	readonly model: Model = $derived.by(() => {
 		const model = this.app.models.find_by_name(this.model_name);
@@ -26,7 +26,7 @@ export class Thread extends Cell<typeof Thread_Json> {
 		return model;
 	});
 
-	readonly turns: Indexed_Collection<Turn> = new Indexed_Collection();
+	readonly turns: IndexedCollection<Turn> = new IndexedCollection();
 
 	enabled: boolean = $state()!;
 
@@ -35,8 +35,8 @@ export class Thread extends Cell<typeof Thread_Json> {
 	readonly token_count: number = $derived(estimate_token_count(this.content));
 	readonly content_preview: string = $derived(to_preview(this.content));
 
-	constructor(options: Thread_Options) {
-		super(Thread_Json, options);
+	constructor(options: ThreadOptions) {
+		super(ThreadJson, options);
 
 		this.decoders = {
 			turns: (items) => {
@@ -64,7 +64,7 @@ export class Thread extends Cell<typeof Thread_Json> {
 	/**
 	 * Create and add a user turn with the given content.
 	 */
-	add_user_turn(content: string, request?: Completion_Request): Turn {
+	add_user_turn(content: string, request?: CompletionRequest): Turn {
 		const turn = create_turn_from_text(content, 'user', {thread_id: this.id, request}, this.app);
 		this.add_turn(turn);
 		return turn;
@@ -73,7 +73,7 @@ export class Thread extends Cell<typeof Thread_Json> {
 	/**
 	 * Create and add an assistant turn with the given content.
 	 */
-	add_assistant_turn(content: string, json?: Partial<Turn_Json>): Turn {
+	add_assistant_turn(content: string, json?: Partial<TurnJson>): Turn {
 		const turn = create_turn_from_text(
 			content,
 			'assistant',
@@ -96,7 +96,7 @@ export class Thread extends Cell<typeof Thread_Json> {
 	/**
 	 * Create and add a turn from a part.
 	 */
-	add_turn_from_part(part: Part_Union, role: Completion_Role): Turn {
+	add_turn_from_part(part: PartUnion, role: CompletionRole): Turn {
 		const turn = create_turn_from_part(part, role, {
 			thread_id: this.id,
 		});
@@ -132,7 +132,7 @@ export class Thread extends Cell<typeof Thread_Json> {
 
 		const user_turn = this.add_user_turn(content);
 
-		const completion_request = Completion_Request.parse({
+		const completion_request = CompletionRequest.parse({
 			created: user_turn.created,
 			provider_name: this.model.provider_name,
 			model: this.model.name,

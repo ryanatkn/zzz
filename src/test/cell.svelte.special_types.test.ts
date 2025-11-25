@@ -5,9 +5,9 @@
 import {test, expect, vi, beforeEach} from 'vitest';
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
-import {Datetime_Now, get_datetime_now, create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson, type SchemaKeys} from '$lib/cell_types.js';
+import {DatetimeNow, get_datetime_now, create_uuid, UuidWithDefault} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -26,15 +26,15 @@ beforeEach(() => {
 });
 
 test('Cell uses registry for instantiating class relationships', () => {
-	const Registry_Schema = Cell_Json.extend({
+	const RegistrySchema = CellJson.extend({
 		text: z.string().default(''),
 	});
 
-	class Registry_Test_Cell extends Cell<typeof Registry_Schema> {
+	class RegistryTestCell extends Cell<typeof RegistrySchema> {
 		text: string = $state()!;
 
-		constructor(options: Cell_Options<typeof Registry_Schema>) {
-			super(Registry_Schema, options);
+		constructor(options: CellOptions<typeof RegistrySchema>) {
+			super(RegistrySchema, options);
 			this.init();
 		}
 
@@ -43,7 +43,7 @@ test('Cell uses registry for instantiating class relationships', () => {
 		}
 	}
 
-	const cell = new Registry_Test_Cell({
+	const cell = new RegistryTestCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -55,32 +55,32 @@ test('Cell uses registry for instantiating class relationships', () => {
 	const mock_instantiate = vi
 		.spyOn(app.cell_registry, 'instantiate')
 		.mockImplementation((name: any, json) => {
-			if (name === 'Test_Type') {
-				return {type: 'Test_Type', ...((json as any) || {})};
+			if (name === 'TestType') {
+				return {type: 'TestType', ...((json as any) || {})};
 			}
 			return null;
 		});
 
 	const test_object = {key: 'value'};
-	const result = cell.test_instantiate(test_object, 'Test_Type');
+	const result = cell.test_instantiate(test_object, 'TestType');
 
-	expect(mock_instantiate).toHaveBeenCalledWith('Test_Type', test_object);
-	expect(result).toEqual({type: 'Test_Type', key: 'value'});
+	expect(mock_instantiate).toHaveBeenCalledWith('TestType', test_object);
+	expect(result).toEqual({type: 'TestType', key: 'value'});
 
 	// Clean up
 	mock_instantiate.mockRestore();
 });
 
 test('Cell.encode_property uses $state.snapshot for values', () => {
-	const Test_Schema = Cell_Json.extend({
+	const TestSchema = CellJson.extend({
 		text: z.string().default(''),
 	});
 
-	class Encoding_Test_Cell extends Cell<typeof Test_Schema> {
+	class EncodingTestCell extends Cell<typeof TestSchema> {
 		text: string = $state()!;
 
-		constructor(options: Cell_Options<typeof Test_Schema>) {
-			super(Test_Schema, options);
+		constructor(options: CellOptions<typeof TestSchema>) {
+			super(TestSchema, options);
 			this.init();
 		}
 
@@ -89,7 +89,7 @@ test('Cell.encode_property uses $state.snapshot for values', () => {
 		}
 	}
 
-	const cell = new Encoding_Test_Cell({
+	const cell = new EncodingTestCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -110,9 +110,9 @@ test('Cell.encode_property uses $state.snapshot for values', () => {
 });
 
 test('Cell handles special types like Map and Set', () => {
-	const Collections_Schema = z.object({
-		id: Uuid_With_Default,
-		created: Datetime_Now,
+	const CollectionsSchema = z.object({
+		id: UuidWithDefault,
+		created: DatetimeNow,
 		updated: z.string().nullable().default(null),
 		// Test map collection
 		map_field: z.preprocess(
@@ -126,16 +126,16 @@ test('Cell handles special types like Map and Set', () => {
 		),
 	});
 
-	class Collections_Test_Cell extends Cell<typeof Collections_Schema> {
+	class CollectionsTestCell extends Cell<typeof CollectionsSchema> {
 		map_field: Map<string, number> = $state(new Map());
 		set_field: Set<string> = $state(new Set());
 
-		constructor(options: Cell_Options<typeof Collections_Schema>) {
-			super(Collections_Schema, options);
+		constructor(options: CellOptions<typeof CollectionsSchema>) {
+			super(CollectionsSchema, options);
 			this.init();
 		}
 
-		test_decode<K extends Schema_Keys<typeof Collections_Schema>>(value: unknown, key: K): this[K] {
+		test_decode<K extends SchemaKeys<typeof CollectionsSchema>>(value: unknown, key: K): this[K] {
 			// For Map/Set fields, we need to parse through the schema to trigger preprocess
 			const field_schema = this.field_schemas.get(key);
 			if (field_schema) {
@@ -146,7 +146,7 @@ test('Cell handles special types like Map and Set', () => {
 		}
 	}
 
-	const cell = new Collections_Test_Cell({
+	const cell = new CollectionsTestCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -182,7 +182,7 @@ test('Cell handles special types like Map and Set', () => {
 });
 
 test('Cell - JSON serialization excludes undefined values correctly', () => {
-	const Serialization_Schema = Cell_Json.extend({
+	const SerializationSchema = CellJson.extend({
 		type: z.enum(['type1', 'type2']),
 		name: z.string().optional(),
 		data: z
@@ -195,21 +195,21 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 		state: z.enum(['on', 'off']).optional(),
 	});
 
-	class Serialization_Test_Cell extends Cell<typeof Serialization_Schema> {
+	class SerializationTestCell extends Cell<typeof SerializationSchema> {
 		type: 'type1' | 'type2' = $state()!;
 		name?: string = $state();
 		data?: {code?: string; value?: number} = $state();
 		items?: Array<string> = $state();
 		state?: 'on' | 'off' = $state();
 
-		constructor(options: Cell_Options<typeof Serialization_Schema>) {
-			super(Serialization_Schema, options);
+		constructor(options: CellOptions<typeof SerializationSchema>) {
+			super(SerializationSchema, options);
 			this.init();
 		}
 	}
 
 	// Cell with minimal required fields
-	const minimal_cell = new Serialization_Test_Cell({
+	const minimal_cell = new SerializationTestCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -219,7 +219,7 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 	});
 
 	// Cell with optional fields
-	const complete_cell = new Serialization_Test_Cell({
+	const complete_cell = new SerializationTestCell({
 		app,
 		json: {
 			id: TEST_ID,

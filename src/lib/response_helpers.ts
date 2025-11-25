@@ -1,7 +1,7 @@
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import type {Action_Outputs} from '$lib/action_collections.js';
-import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
-import type {Model_Name} from '$lib/model.svelte.js';
+import type {ActionOutputs} from '$lib/action_collections.js';
+import type {ProviderName, ProviderData} from '$lib/provider_types.js';
+import type {ModelName} from '$lib/model.svelte.js';
 
 // TODO refactor these
 
@@ -10,10 +10,7 @@ import type {Model_Name} from '$lib/model.svelte.js';
  * Extracts the text content from a completion response
  */
 export const to_completion_response_text = (
-	completion_response:
-		| Action_Outputs['completion_create']['completion_response']
-		| null
-		| undefined,
+	completion_response: ActionOutputs['completion_create']['completion_response'] | null | undefined,
 ): string | null => {
 	if (!completion_response) return null;
 
@@ -39,12 +36,12 @@ export const to_completion_response_text = (
  * Creates a standardized completion response message from provider-specific responses.
  */
 export const to_completion_result = (
-	provider_name: Provider_Name,
-	model: Model_Name,
+	provider_name: ProviderName,
+	model: ModelName,
 	api_response: unknown, // TODO types
 	progress_token?: Uuid,
-): Action_Outputs['completion_create'] => {
-	let provider_data: Provider_Data;
+): ActionOutputs['completion_create'] => {
+	let provider_data: ProviderData;
 
 	// Convert provider-specific response format to our standard format
 	switch (provider_name) {
@@ -86,7 +83,7 @@ export const to_completion_result = (
 
 	const created = get_datetime_now();
 
-	const output: Action_Outputs['completion_create'] = {
+	const output: ActionOutputs['completion_create'] = {
 		completion_response: {
 			created,
 			provider_name,

@@ -18,14 +18,14 @@ Zzz (pronounced "zees") is a fullstack web toolkit for power users and developer
 
 ### Action system
 
-The action system is **symmetric and peer-to-peer**, running the same code in any environment. Both frontend and backend use `Action_Peer` for send/receive operations. Actions and handlers (queries and side effects) are abstracted into declarative configuration, enabling flexible communication patterns without coupling to client/server roles.
+The action system is **symmetric and peer-to-peer**, running the same code in any environment. Both frontend and backend use `ActionPeer` for send/receive operations. Actions and handlers (queries and side effects) are abstracted into declarative configuration, enabling flexible communication patterns without coupling to client/server roles.
 
 #### Key components:
 
-- `Action_Peer`: Manages send/receive for both frontend and backend
-- `Action_Event`: Lifecycle management with phases (init → send → receive → complete)
-- `Action_Registry`: Type-safe action registration
-- `Action_Spec`: Defines action metadata (kind, initiator, auth, side_effects)
+- `ActionPeer`: Manages send/receive for both frontend and backend
+- `ActionEvent`: Lifecycle management with phases (init → send → receive → complete)
+- `ActionRegistry`: Type-safe action registration
+- `ActionSpec`: Defines action metadata (kind, initiator, auth, side_effects)
 
 #### Action kinds:
 
@@ -36,8 +36,8 @@ The action system is **symmetric and peer-to-peer**, running the same code in an
 #### Transport layer:
 
 - Abstract `Transport` interface supporting multiple implementations
-- `Frontend_Http_Transport` and `Frontend_Websocket_Transport` for client
-- `Backend_Websocket_Transport` for server WebSocket handling
+- `FrontendHttpTransport` and `FrontendWebsocketTransport` for client
+- `BackendWebsocketTransport` for server WebSocket handling
 - Automatic fallback between transports when configured
 
 ### Protocol strategy
@@ -54,8 +54,8 @@ Internal abstractions are designed as supersets that can map to these protocols,
 
 - **Reactive state**: Svelte 5 runes in `.svelte.ts` files
 - **Cell system**: Base class for schema-driven reactive models with lifecycle
-- **Indexed_Collection**: Queryable collections with multiple index types
-- **Cell_Registry**: Runtime type registration and instantiation
+- **IndexedCollection**: Queryable collections with multiple index types
+- **CellRegistry**: Runtime type registration and instantiation
 
 ## Tech stack
 
@@ -136,7 +136,7 @@ All actions are declared in `src/lib/action_specs.ts` with full type definitions
 ### Naming conventions
 
 - **TS files and Svelte 5 TS modules**: `snake_case.ts`, `snake_case.svelte.ts`
-- **Svelte components**: `Upper_Snake_Case.svelte` (e.g., `Chat_View`, `Diskfile_Editor`)
+- **Svelte components**: `Upper_Snake_Case.svelte` (e.g., `ChatView`, `DiskfileEditor`)
 - **Actions**: `action_method_name` in collections
 - **Tests**: `module_name.test.ts` alongside implementation
 
@@ -164,7 +164,7 @@ export class MyThing extends Cell<typeof MyThing_Json> {
 }
 
 // Companion Zod schema
-export const MyThing_Json = Cell_Json.extend({
+export const MyThing_Json = CellJson.extend({
 	value: z.number(),
 });
 ```
@@ -181,9 +181,9 @@ export const MyThing_Json = Cell_Json.extend({
 
 Type-safe bidirectional RPC system:
 
-- Defined via `Action_Spec` with metadata
-- Handled by registered `Action_Handlers`
-- Lifecycle managed by `Action_Event`
+- Defined via `ActionSpec` with metadata
+- Handled by registered `ActionHandlers`
+- Lifecycle managed by `ActionEvent`
 - Transport-agnostic via `Transport` interface
 
 ### Cells
@@ -197,14 +197,14 @@ Schema-driven reactive data models:
 
 ### Collections
 
-- **Indexed_Collection**: Queryable collections with indexing
+- **IndexedCollection**: Queryable collections with indexing
 - **Models/Chats/Prompts/etc**: Domain-specific collections extending base patterns
 
 ### Content types
 
 Zzz's content architecture enables flexible composition with A2A protocol compatibility:
 
-- **Parts**: Reusable content entities (`Text_Part` for direct content, `Diskfile_Part` for file references)
+- **Parts**: Reusable content entities (`TextPart` for direct content, `DiskfilePart` for file references)
 - **Turns**: Conversation turns that reference part IDs with role context (user/assistant/system)
 - **Threads**: Ordered conversation threads with turns, model config, and enable/disable controls
 - **Chats**: UI containers with multiple threads for model comparison
@@ -214,7 +214,7 @@ Parts can be shared across multiple turns, enabling content reuse without duplic
 
 ### AI providers
 
-- **Backend_Provider**: Base class for AI service integration
+- **BackendProvider**: Base class for AI service integration
 - Implementations: Ollama, Claude, ChatGPT, Gemini
 - Unified completion interface
 - Provider-specific configuration
@@ -224,10 +224,10 @@ Parts can be shared across multiple turns, enabling content reuse without duplic
 ### Provider architecture
 
 ```typescript
-abstract class Backend_Provider {
-	abstract handle_streaming_completion(options: Completion_Handler_Options): Promise<...>;
-	abstract handle_non_streaming_completion(options: Completion_Handler_Options): Promise<...>;
-	get_handler(streaming: boolean): Completion_Handler;
+abstract class BackendProvider {
+	abstract handle_streaming_completion(options: CompletionHandlerOptions): Promise<...>;
+	abstract handle_non_streaming_completion(options: CompletionHandlerOptions): Promise<...>;
+	get_handler(streaming: boolean): CompletionHandler;
 }
 ```
 
@@ -249,7 +249,7 @@ abstract class Backend_Provider {
 
 ### Filesystem Security
 
-- **Scoped_Fs**: Restricts access to `.zzz` cache directory
+- **ScopedFs**: Restricts access to `.zzz` cache directory
 - No symlink following
 - Path traversal protection
 - Configurable base directory via `PUBLIC_ZZZ_CACHE_DIR`
@@ -295,8 +295,8 @@ gro typecheck    # or npm run typecheck
 ### Extension points
 
 - **Custom Cells**: Extend `Cell` class with schemas
-- **Action Handlers**: Register new actions via `Action_Registry`
-- **Providers**: Implement `Backend_Provider` interface
+- **Action Handlers**: Register new actions via `ActionRegistry`
+- **Providers**: Implement `BackendProvider` interface
 - **Components**: Standard Svelte components
 - **Routes**: SvelteKit file-based routing
 

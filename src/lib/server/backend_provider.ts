@@ -1,9 +1,9 @@
-import type {Completion_Message} from '$lib/completion_types.js';
-import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
+import type {CompletionMessage} from '$lib/completion_types.js';
+import type {ActionInputs, ActionOutputs} from '$lib/action_collections.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import {
-	type Provider_Status,
+	type ProviderStatus,
 	PROVIDER_ERROR_NEEDS_API_KEY,
 	PROVIDER_ERROR_NOT_INSTALLED,
 } from '$lib/provider_types.js';
@@ -12,12 +12,12 @@ import {
 
 // TODO centralized error messages for i18n
 
-export type Completion_Handler = (
-	options: Completion_Handler_Options,
-) => Promise<Action_Outputs['completion_create']>;
+export type CompletionHandler = (
+	options: CompletionHandlerOptions,
+) => Promise<ActionOutputs['completion_create']>;
 
 // TODO refactor, how?
-export interface Completion_Options {
+export interface CompletionOptions {
 	frequency_penalty?: number;
 	output_token_max: number;
 	presence_penalty?: number;
@@ -30,19 +30,19 @@ export interface Completion_Options {
 }
 
 // TODO refactor, how?
-export interface Completion_Handler_Options {
+export interface CompletionHandlerOptions {
 	model: string;
-	completion_options: Completion_Options;
-	completion_messages: Array<Completion_Message> | undefined;
+	completion_options: CompletionOptions;
+	completion_messages: Array<CompletionMessage> | undefined;
 	prompt: string;
 	/** Opts into streaming notifications when provided. */
 	progress_token?: Uuid;
 }
 
-export type On_Completion_Progress = (input: Action_Inputs['completion_progress']) => Promise<void>;
+export type OnCompletionProgress = (input: ActionInputs['completion_progress']) => Promise<void>;
 
-export interface Backend_Provider_Options {
-	on_completion_progress: On_Completion_Progress;
+export interface BackendProviderOptions {
+	on_completion_progress: OnCompletionProgress;
 	api_key?: string | null;
 }
 
@@ -50,26 +50,26 @@ export interface Backend_Provider_Options {
  * Base class for all backend AI providers.
  * Provides shared functionality for completion handlers and logging.
  */
-export abstract class Backend_Provider<T_Client = unknown> {
+export abstract class BackendProvider<TClient = unknown> {
 	abstract readonly name: string;
 
-	protected client: T_Client | null = null;
-	protected provider_status: Provider_Status | null = null;
+	protected client: TClient | null = null;
+	protected provider_status: ProviderStatus | null = null;
 
-	protected readonly on_completion_progress: On_Completion_Progress;
+	protected readonly on_completion_progress: OnCompletionProgress;
 
-	constructor(options: Backend_Provider_Options) {
+	constructor(options: BackendProviderOptions) {
 		this.on_completion_progress = options.on_completion_progress;
 	}
 
 	abstract handle_streaming_completion(
-		options: Completion_Handler_Options,
-	): Promise<Action_Outputs['completion_create']>;
+		options: CompletionHandlerOptions,
+	): Promise<ActionOutputs['completion_create']>;
 	abstract handle_non_streaming_completion(
-		options: Completion_Handler_Options,
-	): Promise<Action_Outputs['completion_create']>;
+		options: CompletionHandlerOptions,
+	): Promise<ActionOutputs['completion_create']>;
 
-	get_handler(streaming: boolean): Completion_Handler {
+	get_handler(streaming: boolean): CompletionHandler {
 		return streaming
 			? this.handle_streaming_completion.bind(this)
 			: this.handle_non_streaming_completion.bind(this);
@@ -78,10 +78,10 @@ export abstract class Backend_Provider<T_Client = unknown> {
 	protected abstract create_client(): void;
 
 	/** Get the client, throwing an error if not configured. */
-	abstract get_client(): T_Client;
+	abstract get_client(): TClient;
 
 	/** Get status for this provider. Override for custom availability checks. */
-	abstract load_status(reload?: boolean): Promise<Provider_Status>;
+	abstract load_status(reload?: boolean): Promise<ProviderStatus>;
 
 	/** Invalidate cached status, forcing next load to fetch fresh data. */
 	invalidate_status(): void {
@@ -98,7 +98,7 @@ export abstract class Backend_Provider<T_Client = unknown> {
 	/** Sends streaming progress notification to frontend */
 	protected async send_streaming_progress(
 		progress_token: Uuid,
-		chunk: Action_Inputs['completion_progress']['chunk'],
+		chunk: ActionInputs['completion_progress']['chunk'],
 	): Promise<void> {
 		await this.on_completion_progress({
 			chunk,
@@ -134,12 +134,10 @@ export abstract class Backend_Provider<T_Client = unknown> {
  * Base class for remote API-based providers (Claude, ChatGPT, Gemini).
  * Handles API key management and provides default error handling for missing keys.
  */
-export abstract class Backend_Provider_Remote<
-	T_Client = unknown,
-> extends Backend_Provider<T_Client> {
+export abstract class BackendProviderRemote<TClient = unknown> extends BackendProvider<TClient> {
 	protected api_key: string | null = null;
 
-	constructor(options: Backend_Provider_Options) {
+	constructor(options: BackendProviderOptions) {
 		super(options);
 		this.set_api_key(options.api_key ?? null);
 	}
@@ -151,7 +149,7 @@ export abstract class Backend_Provider_Remote<
 		this.create_client();
 	}
 
-	override get_client(): T_Client {
+	override get_client(): TClient {
 		if (!this.client) {
 			throw jsonrpc_errors.ai_provider_error(this.name, PROVIDER_ERROR_NEEDS_API_KEY);
 		}
@@ -159,12 +157,12 @@ export abstract class Backend_Provider_Remote<
 	}
 
 	// eslint-disable-next-line @typescript-eslint/require-await
-	override async load_status(reload = false): Promise<Provider_Status> {
+	override async load_status(reload = false): Promise<ProviderStatus> {
 		if (!reload && this.provider_status !== null) {
 			return this.provider_status;
 		}
 
-		const status: Provider_Status = this.client
+		const status: ProviderStatus = this.client
 			? {name: this.name, available: true, checked_at: Date.now()}
 			: {
 					name: this.name,
@@ -182,15 +180,13 @@ export abstract class Backend_Provider_Remote<
  * Base class for locally-installed providers (Ollama).
  * Handles installation checking and provides default error handling for missing installations.
  */
-export abstract class Backend_Provider_Local<
-	T_Client = unknown,
-> extends Backend_Provider<T_Client> {
-	constructor(options: Backend_Provider_Options) {
+export abstract class BackendProviderLocal<TClient = unknown> extends BackendProvider<TClient> {
+	constructor(options: BackendProviderOptions) {
 		super(options);
 		this.create_client();
 	}
 
-	override get_client(): T_Client {
+	override get_client(): TClient {
 		if (!this.client) {
 			throw jsonrpc_errors.ai_provider_error(this.name, PROVIDER_ERROR_NOT_INSTALLED);
 		}

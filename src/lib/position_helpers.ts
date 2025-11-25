@@ -1,18 +1,18 @@
 // @slop Claude Sonnet 3.7
 
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+import {UnreachableError} from '@ryanatkn/belt/error.js';
 
 // TODO zod schemas
 
 /**
  * Basic position options for UI elements (cardinal directions).
  */
-export type Cardinal_Position = 'left' | 'right' | 'top' | 'bottom';
+export type CardinalPosition = 'left' | 'right' | 'top' | 'bottom';
 
 /**
  * Extended position options including overlay and center.
  */
-export type Position = Cardinal_Position | 'overlay' | 'center';
+export type Position = CardinalPosition | 'overlay' | 'center';
 
 /**
  * Alignment options for positioned elements.
@@ -92,7 +92,7 @@ export const generate_position_styles = (
 			styles['transform-origin'] = 'center';
 			break;
 		default:
-			throw new Unreachable_Error(position);
+			throw new UnreachableError(position);
 	}
 
 	return styles;

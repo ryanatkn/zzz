@@ -1,13 +1,13 @@
 // @slop Claude Opus 4
 
-import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_Spec_Union} from '$lib/action_spec.js';
+import type {ActionMethod} from '$lib/action_metatypes.js';
+import type {ActionSpecUnion} from '$lib/action_spec.js';
 import type {
-	Action_Event_Environment,
-	Action_Event_Phase,
-	Action_Event_Step,
+	ActionEventEnvironment,
+	ActionEventPhase,
+	ActionEventStep,
 } from '$lib/action_event_types.js';
-import {Action_Event_Data} from '$lib/action_event_data.js';
+import {ActionEventData} from '$lib/action_event_data.js';
 import {
 	validate_step_transition,
 	validate_phase_transition,
@@ -19,7 +19,7 @@ import {
 	is_send_request_with_parsed_input,
 	is_notification_send_with_parsed_input,
 } from '$lib/action_event_helpers.js';
-import type {Action_Event_Datas} from '$lib/action_collections.js';
+import type {ActionEventDatas} from '$lib/action_collections.js';
 import {safe_parse_action_input, safe_parse_action_output} from '$lib/action_collection_helpers.js';
 import {
 	create_jsonrpc_request,
@@ -31,80 +31,76 @@ import {
 	is_jsonrpc_error_message,
 } from '$lib/jsonrpc_helpers.js';
 import {create_uuid, format_zod_validation_error} from '$lib/zod_helpers.js';
-import {jsonrpc_error_messages, Thrown_Jsonrpc_Error} from '$lib/jsonrpc_errors.js';
+import {jsonrpc_error_messages, ThrownJsonrpcError} from '$lib/jsonrpc_errors.js';
 import type {
-	Jsonrpc_Request,
-	Jsonrpc_Response_Or_Error,
-	Jsonrpc_Notification,
-	Jsonrpc_Error_Json,
+	JsonrpcRequest,
+	JsonrpcResponseOrError,
+	JsonrpcNotification,
+	JsonrpcErrorJson,
 } from '$lib/jsonrpc.js';
-import type {Action_Kind} from '$lib/action_types.js';
+import type {ActionKind} from '$lib/action_types.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO maybe just use runes in this module and remove `observe`
-export type Action_Event_Change_Observer<T_Method extends Action_Method> = (
-	new_data: Action_Event_Datas[T_Method],
-	old_data: Action_Event_Datas[T_Method],
-	event: Action_Event<T_Method>,
+export type ActionEventChangeObserver<TMethod extends ActionMethod> = (
+	new_data: ActionEventDatas[TMethod],
+	old_data: ActionEventDatas[TMethod],
+	event: ActionEvent<TMethod>,
 ) => void;
 
 /**
  * Action event that manages the lifecycle of an action through its state machine.
  */
-export class Action_Event<
-	T_Method extends Action_Method = Action_Method,
-	T_Environment extends Action_Event_Environment = Action_Event_Environment,
-	T_Phase extends Action_Event_Phase = Action_Event_Phase,
-	T_Step extends Action_Event_Step = Action_Event_Step,
+export class ActionEvent<
+	TMethod extends ActionMethod = ActionMethod,
+	TEnvironment extends ActionEventEnvironment = ActionEventEnvironment,
+	TPhase extends ActionEventPhase = ActionEventPhase,
+	TStep extends ActionEventStep = ActionEventStep,
 > {
-	#data: Action_Event_Datas[T_Method];
-	#listeners: Set<Action_Event_Change_Observer<T_Method>> = new Set();
+	#data: ActionEventDatas[TMethod];
+	#listeners: Set<ActionEventChangeObserver<TMethod>> = new Set();
 
-	readonly environment: T_Environment;
-	readonly spec: Action_Spec_Union;
+	readonly environment: TEnvironment;
+	readonly spec: ActionSpecUnion;
 
-	get data(): Action_Event_Datas[T_Method] & {phase: T_Phase; step: T_Step} {
-		return this.#data as Action_Event_Datas[T_Method] & {phase: T_Phase; step: T_Step};
+	get data(): ActionEventDatas[TMethod] & {phase: TPhase; step: TStep} {
+		return this.#data as ActionEventDatas[TMethod] & {phase: TPhase; step: TStep};
 	}
 
 	// TODO hacky but preserves the API
 	// TODO maybe app/server should be frontend/backend?
-	get app(): T_Environment {
+	get app(): TEnvironment {
 		if (this.environment.executor !== 'frontend') {
 			throw new Error('`action_event.app` can only be accessed in frontend environments');
 		}
 		return this.environment;
 	}
 
-	get backend(): T_Environment {
+	get backend(): TEnvironment {
 		if (this.environment.executor !== 'backend') {
 			throw new Error('`action_event.backend` can only be accessed in backend environments');
 		}
 		return this.environment;
 	}
 
-	constructor(
-		environment: T_Environment,
-		spec: Action_Spec_Union,
-		data: Action_Event_Datas[T_Method],
-	) {
+	constructor(environment: TEnvironment, spec: ActionSpecUnion, data: ActionEventDatas[TMethod]) {
 		this.environment = environment;
 		this.spec = spec;
 		this.#data = data;
 	}
 
-	toJSON(): Action_Event_Datas[T_Method] {
+	toJSON(): ActionEventDatas[TMethod] {
 		return structuredClone(this.#data);
 	}
 
 	// TODO rethink the reactivity of this class, maybe just use `$state` or `$state.raw`?
 	// does that have any negative implications when used on the backend?
-	observe(listener: Action_Event_Change_Observer<T_Method>): () => void {
+	observe(listener: ActionEventChangeObserver<TMethod>): () => void {
 		this.#listeners.add(listener);
 		return () => this.#listeners.delete(listener);
 	}
 
-	set_data(new_data: Action_Event_Datas[T_Method]): void {
+	set_data(new_data: ActionEventDatas[TMethod]): void {
 		const old_data = this.#data;
 		this.#data = new_data;
 
@@ -179,9 +175,9 @@ export class Action_Event<
 			const result = await handler(this);
 			this.#complete_handling(result);
 		} catch (error) {
-			// Preserve Thrown_Jsonrpc_Error structure, wrap others as internal_error
+			// Preserve ThrownJsonrpcError structure, wrap others as internal_error
 			const error_json =
-				error instanceof Thrown_Jsonrpc_Error
+				error instanceof ThrownJsonrpcError
 					? {code: error.code, message: error.message, data: error.data}
 					: jsonrpc_error_messages.internal_error(UNKNOWN_ERROR_MESSAGE);
 
@@ -228,9 +224,9 @@ export class Action_Event<
 			const result = handler(this);
 			this.#complete_handling(result);
 		} catch (error) {
-			// Preserve Thrown_Jsonrpc_Error structure, wrap others as internal_error
+			// Preserve ThrownJsonrpcError structure, wrap others as internal_error
 			const error_json =
-				error instanceof Thrown_Jsonrpc_Error
+				error instanceof ThrownJsonrpcError
 					? {code: error.code, message: error.message, data: error.data}
 					: jsonrpc_error_messages.internal_error(UNKNOWN_ERROR_MESSAGE);
 
@@ -241,7 +237,7 @@ export class Action_Event<
 	/**
 	 * Transition to a new phase.
 	 */
-	transition(phase: Action_Event_Phase): void {
+	transition(phase: ActionEventPhase): void {
 		if (this.#data.step === 'failed') {
 			return; // already failed, no-op
 		}
@@ -264,7 +260,7 @@ export class Action_Event<
 		this.#update_data({progress});
 	}
 
-	set_request(request: Jsonrpc_Request): void {
+	set_request(request: JsonrpcRequest): void {
 		this.#validate_protocol_setter('request', {
 			kind: 'request_response',
 			phase: 'receive_request',
@@ -272,7 +268,7 @@ export class Action_Event<
 		this.#update_data({request});
 	}
 
-	set_response(response: Jsonrpc_Response_Or_Error): void {
+	set_response(response: JsonrpcResponseOrError): void {
 		this.#validate_protocol_setter('response', {
 			kind: 'request_response',
 			phase: 'receive_response',
@@ -282,7 +278,7 @@ export class Action_Event<
 		this.#update_data({response, output});
 	}
 
-	set_notification(notification: Jsonrpc_Notification): void {
+	set_notification(notification: JsonrpcNotification): void {
 		this.#validate_protocol_setter('notification', {
 			kind: 'remote_notification',
 			phase: 'receive',
@@ -290,19 +286,19 @@ export class Action_Event<
 		this.#update_data({notification});
 	}
 
-	#transition_step(step: Action_Event_Step, updates?: Partial<Action_Event_Data>): void {
+	#transition_step(step: ActionEventStep, updates?: Partial<ActionEventData>): void {
 		validate_step_transition(this.#data.step, step);
 		this.#update_data({...updates, step});
 	}
 
 	/** Shallowly merge `updates` with the current data immutably. */
-	#update_data(updates: Partial<Action_Event_Data>): void {
-		const new_data = {...this.#data, ...updates} as Action_Event_Datas[T_Method];
+	#update_data(updates: Partial<ActionEventData>): void {
+		const new_data = {...this.#data, ...updates} as ActionEventDatas[TMethod];
 		this.set_data(new_data);
 	}
 
 	// TODO usage of this in this module is silently swallowing errors, maybe log on the environment?
-	#fail(error: Jsonrpc_Error_Json): void {
+	#fail(error: JsonrpcErrorJson): void {
 		this.#transition_step('failed', {error});
 	}
 
@@ -326,10 +322,7 @@ export class Action_Event<
 	/**
 	 * Transition to an error phase instead of failing.
 	 */
-	#transition_to_error_phase(
-		phase: 'send_error' | 'receive_error',
-		error: Jsonrpc_Error_Json,
-	): void {
+	#transition_to_error_phase(phase: 'send_error' | 'receive_error', error: JsonrpcErrorJson): void {
 		const new_data = {
 			...this.#data,
 			phase,
@@ -337,12 +330,12 @@ export class Action_Event<
 			error,
 			output: null,
 		};
-		this.set_data(new_data as Action_Event_Datas[T_Method]);
+		this.set_data(new_data as ActionEventDatas[TMethod]);
 	}
 
 	#validate_protocol_setter(
 		field: string,
-		requirements: {kind: Action_Kind; phase: Action_Event_Phase},
+		requirements: {kind: ActionKind; phase: ActionEventPhase},
 	): void {
 		if (this.#data.kind !== requirements.kind || this.#data.phase !== requirements.phase) {
 			throw new Error(`can only set ${field} in ${requirements.phase} phase`);
@@ -352,7 +345,7 @@ export class Action_Event<
 		}
 	}
 
-	#create_handling_updates(): Partial<Action_Event_Data> | undefined {
+	#create_handling_updates(): Partial<ActionEventData> | undefined {
 		// Create protocol messages when transitioning to 'handling' step
 		// We check for 'parsed' state since this method is called before the transition
 		if (is_send_request_with_parsed_input(this.#data)) {
@@ -395,7 +388,7 @@ export class Action_Event<
 		}
 	}
 
-	#create_phase_data(phase: Action_Event_Phase): Action_Event_Datas[T_Method] {
+	#create_phase_data(phase: ActionEventPhase): ActionEventDatas[TMethod] {
 		const base_data = create_initial_data(
 			this.#data.kind,
 			phase,
@@ -408,7 +401,7 @@ export class Action_Event<
 		if (is_request_response(this.#data)) {
 			if (phase === 'receive_response' && this.#data.request) {
 				// Carry forward the request when transitioning to receive_response
-				return {...base_data, request: this.#data.request} as Action_Event_Datas[T_Method];
+				return {...base_data, request: this.#data.request} as ActionEventDatas[TMethod];
 			} else if (phase === 'send_response' && this.#data.request) {
 				// Create the response when transitioning to send_response
 				const response = this.#create_response_from_data();
@@ -417,14 +410,14 @@ export class Action_Event<
 					output: this.#data.output,
 					request: this.#data.request,
 					response,
-				} as Action_Event_Datas[T_Method];
+				} as ActionEventDatas[TMethod];
 			} else if (phase === 'send_error' && this.#data.error) {
 				// Carry forward error and request (if available) when transitioning to send_error
 				return {
 					...base_data,
 					error: this.#data.error,
 					request: this.#data.request || null,
-				} as Action_Event_Datas[T_Method];
+				} as ActionEventDatas[TMethod];
 			} else if (phase === 'receive_error' && this.#data.error) {
 				// Carry forward error, request, and response when transitioning to receive_error
 				return {
@@ -432,14 +425,14 @@ export class Action_Event<
 					error: this.#data.error,
 					request: this.#data.request,
 					response: this.#data.response,
-				} as Action_Event_Datas[T_Method];
+				} as ActionEventDatas[TMethod];
 			}
 		}
 
-		return base_data as Action_Event_Datas[T_Method];
+		return base_data as ActionEventDatas[TMethod];
 	}
 
-	#create_response_from_data(): Jsonrpc_Response_Or_Error {
+	#create_response_from_data(): JsonrpcResponseOrError {
 		if (!is_request_response(this.#data) || !this.#data.request) {
 			throw new Error('cannot create response without request');
 		}
@@ -457,12 +450,12 @@ export class Action_Event<
 /**
  * Create an action event from a spec and initial input.
  */
-export const create_action_event = <T_Method extends Action_Method>(
-	environment: Action_Event_Environment,
-	spec: Action_Spec_Union,
+export const create_action_event = <TMethod extends ActionMethod>(
+	environment: ActionEventEnvironment,
+	spec: ActionSpecUnion,
 	input: unknown,
-	initial_phase?: Action_Event_Phase,
-): Action_Event<T_Method> => {
+	initial_phase?: ActionEventPhase,
+): ActionEvent<TMethod> => {
 	const phase = initial_phase || get_initial_phase(spec.kind, spec.initiator, environment.executor);
 	if (!phase) {
 		throw new Error(
@@ -476,32 +469,32 @@ export const create_action_event = <T_Method extends Action_Method>(
 		spec.method,
 		environment.executor,
 		input,
-	) as Action_Event_Datas[T_Method];
+	) as ActionEventDatas[TMethod];
 
-	return new Action_Event(environment, spec, initial_data);
+	return new ActionEvent(environment, spec, initial_data);
 };
 
 /**
  * Reconstruct an action event from serialized JSON data.
  */
-export const create_action_event_from_json = <T_Method extends Action_Method>(
-	json: Action_Event_Datas[T_Method],
-	environment: Action_Event_Environment,
-): Action_Event<T_Method> => {
+export const create_action_event_from_json = <TMethod extends ActionMethod>(
+	json: ActionEventDatas[TMethod],
+	environment: ActionEventEnvironment,
+): ActionEvent<TMethod> => {
 	const spec = environment.lookup_action_spec(json.method);
 	if (!spec) {
 		throw new Error(`no spec found for method '${json.method}'`);
 	}
 
-	return new Action_Event(environment, spec, json);
+	return new ActionEvent(environment, spec, json);
 };
 
 // TODO this and the above one arent used atm, see the comment on `create_action_event` too
 // TODO how to avoid casting? this should generally be safe but we dont have schemas for each possible action event state
 export const parse_action_event = (
 	raw_json: unknown,
-	environment: Action_Event_Environment,
-): Action_Event => {
-	const json = Action_Event_Data.parse(raw_json);
-	return create_action_event_from_json(json as Action_Event_Datas[typeof json.method], environment);
+	environment: ActionEventEnvironment,
+): ActionEvent => {
+	const json = ActionEventData.parse(raw_json);
+	return create_action_event_from_json(json as ActionEventDatas[typeof json.method], environment);
 };

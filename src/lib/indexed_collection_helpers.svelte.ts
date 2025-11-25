@@ -3,8 +3,8 @@
 import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
 
-import type {Index_Definition, Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {Uuid_With_Default} from '$lib/zod_helpers.js';
+import type {IndexDefinition, IndexedCollection} from '$lib/indexed_collection.svelte.js';
+import {UuidWithDefault} from '$lib/zod_helpers.js';
 
 // TODO @many rethink the indexed collection API -
 // particularly type safety, performance, and integration with Svelte patterns -
@@ -13,10 +13,10 @@ import {Uuid_With_Default} from '$lib/zod_helpers.js';
 /**
  * Interface for objects that can be stored in an indexed collection.
  */
-export const Indexed_Item = z.strictObject({
-	id: Uuid_With_Default,
+export const IndexedItem = z.strictObject({
+	id: UuidWithDefault,
 });
-export type Indexed_Item = z.infer<typeof Indexed_Item>;
+export type IndexedItem = z.infer<typeof IndexedItem>;
 
 // TODO I think these helpers should be on the base cell for type inference, `this.create_single_index`,
 // but the extracted logic could still be here if it made the base class cleaner, or if these are usefully reusable
@@ -24,7 +24,7 @@ export type Indexed_Item = z.infer<typeof Indexed_Item>;
 /**
  * Common options interface for all index types.
  */
-export interface Index_Options<T extends Indexed_Item, T_Query = any> {
+export interface IndexOptions<T extends IndexedItem, TQuery = any> {
 	/** Unique key for this index. */
 	key: string;
 
@@ -32,13 +32,13 @@ export interface Index_Options<T extends Indexed_Item, T_Query = any> {
 	matches?: (item: T) => boolean;
 
 	/** Schema for query input validation and typing. */
-	query_schema?: z.ZodType<T_Query>;
+	query_schema?: z.ZodType<TQuery>;
 }
 
 /**
  * Options for single-value indexes.
  */
-export interface Single_Index_Options<T extends Indexed_Item, K> extends Index_Options<T, K> {
+export interface SingleIndexOptions<T extends IndexedItem, K> extends IndexOptions<T, K> {
 	/** Function that extracts the key from an item */
 	extractor: (item: T) => K;
 }
@@ -46,9 +46,9 @@ export interface Single_Index_Options<T extends Indexed_Item, K> extends Index_O
 /**
  * Create a single-value index (one key maps to one item).
  */
-export const create_single_index = <T extends Indexed_Item, K>(
-	options: Single_Index_Options<T, K>,
-): Index_Definition<T, SvelteMap<K, T>, K> => {
+export const create_single_index = <T extends IndexedItem, K>(
+	options: SingleIndexOptions<T, K>,
+): IndexDefinition<T, SvelteMap<K, T>, K> => {
 	return {
 		key: options.key,
 		type: 'single',
@@ -114,7 +114,7 @@ export const create_single_index = <T extends Indexed_Item, K>(
 /**
  * Options for multi-value indexes.
  */
-export interface Multi_Index_Options<T extends Indexed_Item, K> extends Index_Options<T, K> {
+export interface MultiIndexOptions<T extends IndexedItem, K> extends IndexOptions<T, K> {
 	/** Function that extracts the key(s) from an item. */
 	extractor: (item: T) => K | Array<K> | undefined;
 
@@ -125,9 +125,9 @@ export interface Multi_Index_Options<T extends Indexed_Item, K> extends Index_Op
 /**
  * Create a multi-value index (one key maps to many items).
  */
-export const create_multi_index = <T extends Indexed_Item, K>(
-	options: Multi_Index_Options<T, K>,
-): Index_Definition<T, SvelteMap<K, Array<T>>, K> => {
+export const create_multi_index = <T extends IndexedItem, K>(
+	options: MultiIndexOptions<T, K>,
+): IndexDefinition<T, SvelteMap<K, Array<T>>, K> => {
 	return {
 		key: options.key,
 		type: 'multi',
@@ -192,27 +192,27 @@ export const create_multi_index = <T extends Indexed_Item, K>(
 /**
  * Options for derived indexes.
  */
-export interface Derived_Index_Options<T extends Indexed_Item, T_Result extends Array<T> = Array<T>>
-	extends Index_Options<T, void> {
+export interface DerivedIndexOptions<T extends IndexedItem, TResult extends Array<T> = Array<T>>
+	extends IndexOptions<T, void> {
 	/** Function that computes the derived collection from the full collection. */
-	compute: (collection: Indexed_Collection<T>) => T_Result;
+	compute: (collection: IndexedCollection<T>) => TResult;
 
 	/** Optional sort function for the derived array. */
 	sort?: (a: T, b: T) => number;
 
 	/** Optional custom add handler. */
-	onadd?: (items: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
+	onadd?: (items: TResult, item: T, collection: IndexedCollection<T>) => TResult;
 
 	/** Optional custom remove handler. */
-	onremove?: (items: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
+	onremove?: (items: TResult, item: T, collection: IndexedCollection<T>) => TResult;
 }
 
 /**
  * Create an incremental derived collection index.
  */
-export const create_derived_index = <T extends Indexed_Item, T_Result extends Array<T> = Array<T>>(
-	options: Derived_Index_Options<T, T_Result>,
-): Index_Definition<T, T_Result, void> => {
+export const create_derived_index = <T extends IndexedItem, TResult extends Array<T> = Array<T>>(
+	options: DerivedIndexOptions<T, TResult>,
+): IndexDefinition<T, TResult, void> => {
 	return {
 		key: options.key,
 		type: 'derived',
@@ -261,29 +261,24 @@ export const create_derived_index = <T extends Indexed_Item, T_Result extends Ar
 /**
  * Options for dynamic indexes.
  */
-export interface Dynamic_Index_Options<
-	T extends Indexed_Item,
-	F extends (...args: Array<any>) => any,
-> extends Index_Options<T, Parameters<F>[0]> {
+export interface DynamicIndexOptions<T extends IndexedItem, F extends (...args: Array<any>) => any>
+	extends IndexOptions<T, Parameters<F>[0]> {
 	/** Function that creates a query function from the collection */
-	factory: (collection: Indexed_Collection<T>) => F;
+	factory: (collection: IndexedCollection<T>) => F;
 
 	/** Optional custom add handler */
-	onadd?: (fn: F, item: T, collection: Indexed_Collection<T>) => F;
+	onadd?: (fn: F, item: T, collection: IndexedCollection<T>) => F;
 
 	/** Optional custom remove handler */
-	onremove?: (fn: F, item: T, collection: Indexed_Collection<T>) => F;
+	onremove?: (fn: F, item: T, collection: IndexedCollection<T>) => F;
 }
 
 /**
  * Create a dynamic index that computes results on-demand based on query parameters.
  */
-export const create_dynamic_index = <
-	T extends Indexed_Item,
-	F extends (...args: Array<any>) => any,
->(
-	options: Dynamic_Index_Options<T, F>,
-): Index_Definition<T, F, Parameters<F>[0]> => {
+export const create_dynamic_index = <T extends IndexedItem, F extends (...args: Array<any>) => any>(
+	options: DynamicIndexOptions<T, F>,
+): IndexDefinition<T, F, Parameters<F>[0]> => {
 	return {
 		key: options.key,
 		compute: options.factory,
@@ -299,7 +294,7 @@ export const create_dynamic_index = <
 /**
  * Helper function to check if an item matches the index criteria.
  */
-const should_include_item = <T extends Indexed_Item>(
+const should_include_item = <T extends IndexedItem>(
 	item: T,
 	matches?: (item: T) => boolean,
 ): boolean => !matches || matches(item);
@@ -307,7 +302,7 @@ const should_include_item = <T extends Indexed_Item>(
 /**
  * Helper function to add an item to a multi-value map.
  */
-const add_to_multi_map = <T extends Indexed_Item, K>(
+const add_to_multi_map = <T extends IndexedItem, K>(
 	map: SvelteMap<K, Array<T>>,
 	key: K,
 	item: T,
@@ -330,7 +325,7 @@ const add_to_multi_map = <T extends Indexed_Item, K>(
 /**
  * Helper function to remove an item from a multi-value map.
  */
-const remove_from_multi_map = <T extends Indexed_Item, K>(
+const remove_from_multi_map = <T extends IndexedItem, K>(
 	map: SvelteMap<K, Array<T>>,
 	key: K,
 	item: T,

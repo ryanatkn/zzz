@@ -1,26 +1,26 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Model, Model_Json, type Model_Json_Input} from '$lib/model.svelte.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {Model, ModelJson, type ModelJsonInput} from '$lib/model.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
 	create_derived_index,
 } from '$lib/indexed_collection_helpers.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {CellJson} from '$lib/cell_types.js';
 
-export const Models_Json = Cell_Json.extend({
-	items: z.array(Model_Json).default(() => []),
+export const ModelsJson = CellJson.extend({
+	items: z.array(ModelJson).default(() => []),
 }).meta({cell_class_name: 'Models'});
-export type Models_Json = z.infer<typeof Models_Json>;
-export type Models_Json_Input = z.input<typeof Models_Json>;
+export type ModelsJson = z.infer<typeof ModelsJson>;
+export type ModelsJsonInput = z.input<typeof ModelsJson>;
 
-export interface Models_Options extends Cell_Options<typeof Models_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface ModelsOptions extends CellOptions<typeof ModelsJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Models extends Cell<typeof Models_Json> {
-	readonly items: Indexed_Collection<Model> = new Indexed_Collection({
+export class Models extends Cell<typeof ModelsJson> {
+	readonly items: IndexedCollection<Model> = new IndexedCollection({
 		indexes: [
 			// TODO this is a mistake to have `name` be unique,
 			// unless we prefix with `${provider_name}/${model_name}` and have some other property -
@@ -57,8 +57,8 @@ export class Models extends Cell<typeof Models_Json> {
 	/** Get all models ordered alphabetically by name. */
 	readonly ordered_by_name: Array<Model> = $derived(this.items.derived_index('ordered_by_name'));
 
-	constructor(options: Models_Options) {
-		super(Models_Json, options);
+	constructor(options: ModelsOptions) {
+		super(ModelsJson, options);
 
 		// Add custom decoder for the items property,
 		// which also prevents it from automatically overwriting our collection
@@ -78,12 +78,12 @@ export class Models extends Cell<typeof Models_Json> {
 		this.init();
 	}
 
-	add(model_json: Model_Json_Input): void {
+	add(model_json: ModelJsonInput): void {
 		const model = new Model({app: this.app, json: model_json});
 		this.items.add(model);
 	}
 
-	add_many(models_json: Array<Model_Json_Input>): void {
+	add_many(models_json: Array<ModelJsonInput>): void {
 		const models = models_json.map((json) => new Model({app: this.app, json}));
 		this.items.add_many(models);
 	}

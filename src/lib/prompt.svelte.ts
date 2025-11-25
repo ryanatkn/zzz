@@ -2,33 +2,33 @@ import {z} from 'zod';
 
 import {Uuid} from '$lib/zod_helpers.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
-import {Part_Json, type Part_Union} from '$lib/part.svelte.js';
+import {PartJson, type PartUnion} from '$lib/part.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
 import {format_prompt_content} from '$lib/prompt_helpers.js';
 
-export interface Prompt_Message {
+export interface PromptMessage {
 	role: 'user' | 'system'; // TODO assistant? string? eh?
-	content: Array<Prompt_Action_Content>;
+	content: Array<PromptActionContent>;
 }
 
-export type Prompt_Action_Content = string; // TODO ?
+export type PromptActionContent = string; // TODO ?
 
-export const Prompt_Json = Cell_Json.extend({
+export const PromptJson = CellJson.extend({
 	name: z.string().default(''),
-	parts: z.array(Part_Json).default(() => []),
+	parts: z.array(PartJson).default(() => []),
 }).meta({cell_class_name: 'Prompt'});
-export type Prompt_Json = z.infer<typeof Prompt_Json>;
-export type Prompt_Json_Input = z.input<typeof Prompt_Json>;
+export type PromptJson = z.infer<typeof PromptJson>;
+export type PromptJsonInput = z.input<typeof PromptJson>;
 
-export interface Prompt_Options extends Cell_Options<typeof Prompt_Json> {
+export interface PromptOptions extends CellOptions<typeof PromptJson> {
 	name?: string;
 }
 
-export class Prompt extends Cell<typeof Prompt_Json> {
+export class Prompt extends Cell<typeof PromptJson> {
 	name: string = $state()!;
-	parts: Array<Part_Union> = $state()!;
+	parts: Array<PartUnion> = $state()!;
 
 	readonly content: string = $derived(format_prompt_content(this.parts));
 
@@ -36,15 +36,15 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	readonly token_count: number = $derived(estimate_token_count(this.content));
 	readonly content_preview: string = $derived(to_preview(this.content));
 
-	constructor(options: Prompt_Options) {
-		super(Prompt_Json, options);
+	constructor(options: PromptOptions) {
+		super(PromptJson, options);
 		this.init();
 	}
 
 	/**
 	 * Add a part to this prompt.
 	 */
-	add_part(part: Part_Union): Part_Union {
+	add_part(part: PartUnion): PartUnion {
 		this.parts.push(part);
 		return part;
 	}
@@ -67,4 +67,4 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	}
 }
 
-export const Prompt_Schema = z.instanceof(Prompt);
+export const PromptSchema = z.instanceof(Prompt);

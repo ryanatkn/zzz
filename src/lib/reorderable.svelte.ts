@@ -15,19 +15,19 @@ import {
 } from '$lib/reorderable_helpers.js';
 import {create_client_id} from '$lib/helpers.js';
 
-export type Reorderable_Id = Flavored<string, 'Reorderable_Id'>;
-export type Reorderable_Item_Id = Flavored<string, 'Reorderable_Item_Id'>;
+export type ReorderableId = Flavored<string, 'ReorderableId'>;
+export type ReorderableItemId = Flavored<string, 'ReorderableItemId'>;
 
-export type Reorderable_Direction = 'horizontal' | 'vertical';
+export type ReorderableDirection = 'horizontal' | 'vertical';
 
-export type Reorderable_Drop_Position = 'none' | 'top' | 'bottom' | 'left' | 'right';
+export type ReorderableDropPosition = 'none' | 'top' | 'bottom' | 'left' | 'right';
 
-export type Reorderable_Valid_Drop_Position = Exclude<Reorderable_Drop_Position, 'none'>;
+export type ReorderableValidDropPosition = Exclude<ReorderableDropPosition, 'none'>;
 
 /**
  * Styling configuration for reorderable components.
  */
-export interface Reorderable_Style_Config {
+export interface ReorderableStyleConfig {
 	list_class: string | null;
 	item_class: string | null;
 	dragging_class: string | null;
@@ -53,28 +53,28 @@ export const INVALID_DROP_CLASS_DEFAULT = 'invalid_drop';
 /**
  * Parameters for list attachment.
  */
-export interface Reorderable_List_Params {
+export interface ReorderableListParams {
 	onreorder: (from_index: number, to_index: number) => void;
 	can_reorder?: (from_index: number, to_index: number) => boolean;
-	direction?: Reorderable_Direction;
+	direction?: ReorderableDirection;
 }
 
 /**
  * Parameters for item attachment.
  */
-export interface Reorderable_Item_Params {
+export interface ReorderableItemParams {
 	index: number;
 }
 
 /**
  * Additional configuration options for Reorderable.
  */
-export interface Reorderable_Options {
+export interface ReorderableOptions {
 	/**
 	 * Forces a specific direction for the reorderable list.
 	 * Defaults to auto-detection, `'vertical'` as the fallback.
 	 */
-	direction?: Reorderable_Direction;
+	direction?: ReorderableDirection;
 	list_class?: string | null;
 	item_class?: string | null;
 	dragging_class?: string | null;
@@ -86,16 +86,16 @@ export interface Reorderable_Options {
 	invalid_drop_class?: string | null;
 }
 
-export class Reorderable implements Reorderable_Style_Config {
+export class Reorderable implements ReorderableStyleConfig {
 	initialized = false;
 
 	source_index = -1;
-	source_item_id: Reorderable_Item_Id | null = null;
-	active_indicator_item_id: Reorderable_Item_Id | null = null;
-	current_indicator: Reorderable_Drop_Position = 'none';
-	direction: Reorderable_Direction = 'vertical';
+	source_item_id: ReorderableItemId | null = null;
+	active_indicator_item_id: ReorderableItemId | null = null;
+	current_indicator: ReorderableDropPosition = 'none';
+	direction: ReorderableDirection = 'vertical';
 
-	readonly id: Reorderable_Id = `r${create_client_id()}`;
+	readonly id: ReorderableId = `r${create_client_id()}`;
 
 	readonly list_class: string | null;
 	readonly item_class: string | null;
@@ -120,21 +120,21 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	list_node: HTMLElement | null = null;
-	list_params: Reorderable_List_Params | null = null;
+	list_params: ReorderableListParams | null = null;
 
-	readonly indices: Map<Reorderable_Item_Id, number> = new Map();
-	readonly elements: Map<Reorderable_Item_Id, HTMLElement> = new Map();
+	readonly indices: Map<ReorderableItemId, number> = new Map();
+	readonly elements: Map<ReorderableItemId, HTMLElement> = new Map();
 
 	#cleanup: (() => void) | null = null;
 	#pending_init_frame: number | null = null;
 
 	pending_items: Array<{
-		id: Reorderable_Item_Id;
+		id: ReorderableItemId;
 		index: number;
 		element: HTMLElement;
 	}> = [];
 
-	constructor(options: Reorderable_Options = EMPTY_OBJECT) {
+	constructor(options: ReorderableOptions = EMPTY_OBJECT) {
 		const {
 			list_class = LIST_CLASS_DEFAULT,
 			item_class = ITEM_CLASS_DEFAULT,
@@ -204,8 +204,8 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	update_indicator(
-		item_id: Reorderable_Item_Id,
-		new_indicator: Reorderable_Drop_Position,
+		item_id: ReorderableItemId,
+		new_indicator: ReorderableDropPosition,
 		is_valid = true,
 	): void {
 		if (this.source_item_id === item_id || new_indicator === 'none') {
@@ -243,13 +243,13 @@ export class Reorderable implements Reorderable_Style_Config {
 
 	#find_item_from_event(
 		event: Event,
-	): [item_id: Reorderable_Item_Id, index: number, item: HTMLElement] | null {
+	): [item_id: ReorderableItemId, index: number, item: HTMLElement] | null {
 		const target = event.target as HTMLElement | null;
 		if (!target || !this.list_node) return null;
 
 		let current: HTMLElement | null = target;
 		while (current && current !== this.list_node) {
-			const item_id = current.dataset.reorderable_item_id as Reorderable_Item_Id | undefined;
+			const item_id = current.dataset.reorderable_item_id as ReorderableItemId | undefined;
 			if (item_id) {
 				const index = this.indices.get(item_id);
 				const element = this.elements.get(item_id);
@@ -420,7 +420,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		}
 	}
 
-	list = (params: Reorderable_List_Params): Attachment<HTMLElement> => {
+	list = (params: ReorderableListParams): Attachment<HTMLElement> => {
 		return (node) => {
 			if (this.list_node && this.list_node !== node) {
 				throw new Error('reorderable instance is already attached to a different list element');
@@ -472,11 +472,11 @@ export class Reorderable implements Reorderable_Style_Config {
 		};
 	};
 
-	item = (params: Reorderable_Item_Params): Attachment<HTMLElement> => {
+	item = (params: ReorderableItemParams): Attachment<HTMLElement> => {
 		return (node) => {
 			const {index} = params;
 
-			let item_id = node.dataset.reorderable_item_id as Reorderable_Item_Id | undefined;
+			let item_id = node.dataset.reorderable_item_id as ReorderableItemId | undefined;
 			if (!item_id) {
 				item_id = `i${create_client_id()}`;
 				node.dataset.reorderable_item_id = item_id;

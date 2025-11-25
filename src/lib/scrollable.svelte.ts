@@ -7,7 +7,7 @@ import {on} from 'svelte/events';
 
 // TODO maybe make this more generic than just always adding a class?
 
-export interface Scrollable_Parameters {
+export interface ScrollableParameters {
 	/** CSS class to apply to the target element when scrolled. Defaults to 'scrolled'. */
 	target_class?: string;
 	/** Threshold in pixels before considering the element scrolled. Defaults to 0. */
@@ -30,7 +30,7 @@ export class Scrollable {
 	/** Whether element is scrolled past threshold. */
 	readonly scrolled: boolean = $derived(this.scroll_y > this.threshold);
 
-	constructor(params?: Scrollable_Parameters) {
+	constructor(params?: ScrollableParameters) {
 		this.target_class = params?.target_class ?? 'scrolled';
 		this.threshold = params?.threshold ?? 0;
 	}

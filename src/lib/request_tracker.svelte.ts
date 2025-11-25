@@ -1,35 +1,35 @@
 // @slop Claude Opus 4
 
-import {create_deferred, type Deferred, type Async_Status} from '@ryanatkn/belt/async.js';
+import {create_deferred, type Deferred, type AsyncStatus} from '@ryanatkn/belt/async.js';
 import {SvelteMap} from 'svelte/reactivity';
 
 import {Datetime, get_datetime_now} from '$lib/zod_helpers.js';
 import {
 	JSONRPC_INTERNAL_ERROR,
-	type Jsonrpc_Error_Message,
-	type Jsonrpc_Request_Id,
-	type Jsonrpc_Response_Or_Error,
+	type JsonrpcErrorMessage,
+	type JsonrpcRequestId,
+	type JsonrpcResponseOrError,
 } from '$lib/jsonrpc.js';
-import {Thrown_Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
+import {ThrownJsonrpcError, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
 // TODO what if this uses a tracker id param that's an opaque UUID but can be used for action association?
 
-// TODO name, like `Tracked_Request`? or is this implicit namespacing and generic name preferred
+// TODO name, like `TrackedRequest`? or is this implicit namespacing and generic name preferred
 /**
  * Represents a pending request with its associated state.
  */
-export class Request_Tracker_Item {
-	readonly id: Jsonrpc_Request_Id;
-	readonly deferred: Deferred<Jsonrpc_Response_Or_Error>;
+export class RequestTrackerItem {
+	readonly id: JsonrpcRequestId;
+	readonly deferred: Deferred<JsonrpcResponseOrError>;
 	readonly created: Datetime;
-	status: Async_Status = $state()!;
+	status: AsyncStatus = $state()!;
 	timeout: NodeJS.Timeout | undefined = $state();
 
 	constructor(
-		id: Jsonrpc_Request_Id,
-		deferred: Deferred<Jsonrpc_Response_Or_Error>,
+		id: JsonrpcRequestId,
+		deferred: Deferred<JsonrpcResponseOrError>,
 		created: Datetime,
-		status: Async_Status,
+		status: AsyncStatus,
 		timeout: NodeJS.Timeout | undefined,
 	) {
 		this.id = id;
@@ -44,8 +44,8 @@ export class Request_Tracker_Item {
  * Tracks RPC requests and their responses to manage promises and timeouts.
  * Used by transports to handle the request-response lifecycle.
  */
-export class Request_Tracker {
-	readonly pending_requests: SvelteMap<Jsonrpc_Request_Id, Request_Tracker_Item> = new SvelteMap();
+export class RequestTracker {
+	readonly pending_requests: SvelteMap<JsonrpcRequestId, RequestTrackerItem> = new SvelteMap();
 	readonly request_timeout_ms: number;
 
 	constructor(request_timeout_ms = 120_000) {
@@ -57,8 +57,8 @@ export class Request_Tracker {
 	 * @param id The request id
 	 * @returns A deferred promise that will be resolved when the response is received
 	 */
-	track_request(id: Jsonrpc_Request_Id): Deferred<Jsonrpc_Response_Or_Error> {
-		const deferred = create_deferred<Jsonrpc_Response_Or_Error>();
+	track_request(id: JsonrpcRequestId): Deferred<JsonrpcResponseOrError> {
+		const deferred = create_deferred<JsonrpcResponseOrError>();
 		const created = get_datetime_now();
 
 		// If we're tracking a request with the same id, clean up the previous one first
@@ -80,7 +80,7 @@ export class Request_Tracker {
 		// Store the request tracker using the new class
 		this.pending_requests.set(
 			id,
-			new Request_Tracker_Item(id, deferred, created, 'pending', timeout),
+			new RequestTrackerItem(id, deferred, created, 'pending', timeout),
 		);
 
 		return deferred;
@@ -91,7 +91,7 @@ export class Request_Tracker {
 	 * @param id The request id
 	 * @param response The response data
 	 */
-	resolve_request(id: Jsonrpc_Request_Id, response: Jsonrpc_Response_Or_Error): void {
+	resolve_request(id: JsonrpcRequestId, response: JsonrpcResponseOrError): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`received response for unknown request: ${id}`);
@@ -112,9 +112,9 @@ export class Request_Tracker {
 	/**
 	 * Reject a pending request with the given error.
 	 * @param id The request id
-	 * @param error_message The complete Jsonrpc_Error_Message object
+	 * @param error_message The complete JsonrpcErrorMessage object
 	 */
-	reject_request(id: Jsonrpc_Request_Id, error_message: Jsonrpc_Error_Message): void {
+	reject_request(id: JsonrpcRequestId, error_message: JsonrpcErrorMessage): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`received error for unknown request: ${id}`);
@@ -128,7 +128,7 @@ export class Request_Tracker {
 		}
 
 		request.status = 'failure';
-		const error = new Thrown_Jsonrpc_Error(
+		const error = new ThrownJsonrpcError(
 			error_message.error.code,
 			error_message.error.message,
 			error_message.error.data,
@@ -162,7 +162,7 @@ export class Request_Tracker {
 	 * Cancel a pending request.
 	 * @param id The request id
 	 */
-	cancel_request(id: Jsonrpc_Request_Id): void {
+	cancel_request(id: JsonrpcRequestId): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			return;
@@ -190,7 +190,7 @@ export class Request_Tracker {
 
 			request.status = 'failure';
 			request.deferred.reject(
-				new Thrown_Jsonrpc_Error(
+				new ThrownJsonrpcError(
 					JSONRPC_ERROR_CODES.internal_error, // TODO canceled error?
 					reason || 'request cancelled',
 				),

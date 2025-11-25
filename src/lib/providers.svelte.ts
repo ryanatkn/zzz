@@ -1,24 +1,24 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Provider, Provider_Json} from '$lib/provider.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import type {Provider_Name} from '$lib/provider_types.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {Provider, ProviderJson} from '$lib/provider.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
+import type {ProviderName} from '$lib/provider_types.js';
 
-export const Providers_Json = Cell_Json.extend({
-	items: z.array(Provider_Json).default(() => []),
+export const ProvidersJson = CellJson.extend({
+	items: z.array(ProviderJson).default(() => []),
 }).meta({cell_class_name: 'Providers'});
-export type Providers_Json = z.infer<typeof Providers_Json>;
-export type Providers_Json_Input = z.input<typeof Providers_Json>;
+export type ProvidersJson = z.infer<typeof ProvidersJson>;
+export type ProvidersJsonInput = z.input<typeof ProvidersJson>;
 
-export interface Providers_Options extends Cell_Options<typeof Providers_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
-export class Providers extends Cell<typeof Providers_Json> {
+export interface ProvidersOptions extends CellOptions<typeof ProvidersJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export class Providers extends Cell<typeof ProvidersJson> {
 	items: Array<Provider> = $state()!; // TODO probably make an indexed collection for convenient querying, despite small N
 
-	readonly names: ReadonlyArray<Provider_Name> = $derived(this.items.map((p) => p.name));
+	readonly names: ReadonlyArray<ProviderName> = $derived(this.items.map((p) => p.name));
 
-	constructor(options: Providers_Options) {
-		super(Providers_Json, options);
+	constructor(options: ProvidersOptions) {
+		super(ProvidersJson, options);
 		this.init();
 	}
 

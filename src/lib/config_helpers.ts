@@ -1,17 +1,17 @@
-import type {Provider_Json_Input} from '$lib/provider.svelte.js';
-import type {Model_Json_Input, Model_Name} from '$lib/model.svelte.js';
+import type {ProviderJsonInput} from '$lib/provider.svelte.js';
+import type {ModelJsonInput, ModelName} from '$lib/model.svelte.js';
 
 // TODO expand similar to gitops/gro config
 
 // TODO is currently synchronous because it's imported on the client, could be made async if the client uses a different sourcing strategy
-export type Zzz_Config_Creator = () => Zzz_Config;
+export type ZzzConfigCreator = () => ZzzConfig;
 
 /**
  * @json
  */
-export interface Zzz_Config {
-	providers: Array<Provider_Json_Input>;
-	models: Array<Model_Json_Input>;
+export interface ZzzConfig {
+	providers: Array<ProviderJsonInput>;
+	models: Array<ModelJsonInput>;
 	system_message: string;
 	output_token_max: number;
 	temperature: number | undefined;
@@ -26,6 +26,6 @@ export interface Zzz_Config {
 		/**
 		 * Names things.
 		 */
-		namerbot: Model_Name;
+		namerbot: ModelName;
 	};
 }

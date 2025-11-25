@@ -5,7 +5,7 @@
 import {test, expect, describe, vi} from 'vitest';
 import {z} from 'zod';
 
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
@@ -16,8 +16,8 @@ import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-// Mock item type that implements Indexed_Item
-interface Test_Item {
+// Mock item type that implements IndexedItem
+interface TestItem {
 	id: Uuid;
 	string_a: string;
 	number_a: number | null;
@@ -31,7 +31,7 @@ const create_test_item = (
 	number_a: number | null = 0,
 	array_a: Array<string> = [],
 	boolean_a = true,
-): Test_Item => ({
+): TestItem => ({
 	id: create_uuid(),
 	string_a,
 	number_a,
@@ -39,10 +39,10 @@ const create_test_item = (
 	boolean_a,
 });
 
-describe('Indexed_Collection - Edge Cases', () => {
+describe('IndexedCollection - Edge Cases', () => {
 	test('handling null/undefined values in index extractors', () => {
 		// Create indexes that handle null/undefined values explicitly
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				// Single index that filters out null values
 				create_single_index({
@@ -100,7 +100,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Create a single index where multiple items might share the same key
 		const console_warn_spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_prefix',
@@ -145,7 +145,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('batch operations performance', {timeout: 10000}, () => {
 		// Create a collection with multiple indexes to stress test performance
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_string_a',
@@ -215,7 +215,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('error handling for invalid index type access', () => {
 		// Create a collection with mix of index types
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_string_a',
@@ -247,7 +247,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Create a collection with strict schema validation
 		const console_error_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_single_index({
 					key: 'by_number_a',
@@ -313,9 +313,9 @@ describe('Indexed_Collection - Edge Cases', () => {
 			};
 		});
 
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
-				create_dynamic_index<Test_Item, (query: string) => Array<Test_Item>>({
+				create_dynamic_index<TestItem, (query: string) => Array<TestItem>>({
 					key: 'search',
 					factory: (collection) => {
 						return (query: string) => {
@@ -346,7 +346,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		collection.add(item2);
 
 		// Test the search index
-		const search_fn = collection.get_index<(q: string) => Array<Test_Item>>('search');
+		const search_fn = collection.get_index<(q: string) => Array<TestItem>>('search');
 
 		// Search functions should work
 		const x_results = search_fn('x');
@@ -367,7 +367,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('custom complex index behaviors', () => {
 		// Create a collection with a custom index that has advanced logic
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				// Add explicit string_a index for lookup
 				create_single_index({
@@ -393,7 +393,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 							}, {}),
 						};
 					},
-					onadd: (stats: any, item: Test_Item) => {
+					onadd: (stats: any, item: TestItem) => {
 						stats.count++;
 						if (item.boolean_a) stats.boolean_a_true_count++;
 						else stats.boolean_a_false_count++;
@@ -406,7 +406,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 						return stats;
 					},
-					onremove: (stats: any, item: Test_Item) => {
+					onremove: (stats: any, item: TestItem) => {
 						stats.count--;
 						if (item.boolean_a) stats.boolean_a_true_count--;
 						else stats.boolean_a_false_count--;
@@ -479,7 +479,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index array instance consistency', () => {
 		// Test that multi-indexes return the same array instance for the same key
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_boolean_a',
@@ -513,7 +513,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index reactivity behavior outside reactive context', () => {
 		// Test that arrays are updated but we can't observe reactively outside Svelte components
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_number_group',
@@ -561,7 +561,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index maintains same array with complex extractors', () => {
 		// Test reactivity with extractors that return arrays or undefined
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_tags',
@@ -608,7 +608,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index sort functionality', () => {
 		// Test that sorted multi-indexes maintain order
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_boolean_sorted',
@@ -651,7 +651,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index empty bucket behavior', () => {
 		// Test creation and deletion of empty buckets
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_category',
@@ -693,7 +693,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index behavior with bucket deletion and recreation', () => {
 		// Test that buckets are deleted when empty and recreated as needed
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_prefix',
@@ -724,7 +724,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index with undefined extractor results', () => {
 		// Test indexes that conditionally return undefined
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_even_numbers',
@@ -757,7 +757,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index preserves array reference consistency', () => {
 		// Comprehensive test of array reference preservation
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_category',
@@ -804,7 +804,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('reactive context tracking with $derived', () => {
 		// Test that reactivity works properly in reactive contexts
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_boolean_a',
@@ -843,7 +843,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 	test('multi-index with $state creates reactive arrays', () => {
 		// Test that the $state([]) in add_to_multi_map creates reactive arrays
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_multi_index({
 					key: 'by_tags',

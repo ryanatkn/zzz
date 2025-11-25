@@ -1,10 +1,10 @@
-import type {Part_Union} from '$lib/part.svelte.js';
+import type {PartUnion} from '$lib/part.svelte.js';
 
 /**
  * Formats a collection of parts into a prompt string,
  * applying XML tags and attributes where specified.
  */
-export const format_prompt_content = (parts: Array<Part_Union>): string => {
+export const format_prompt_content = (parts: Array<PartUnion>): string => {
 	const formatted_contents = [];
 
 	for (const part of parts) {

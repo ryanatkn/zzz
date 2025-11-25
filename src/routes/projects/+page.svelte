@@ -3,8 +3,8 @@
 
 	import {GLYPH_PROJECT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Project_List from '$routes/projects/Project_List.svelte';
-	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
+	import ProjectList from '$routes/projects/ProjectList.svelte';
+	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 
 	const projects = projects_context.get();
@@ -12,10 +12,10 @@
 
 {#if projects.previewing}
 	<div class="display_flex">
-		<Project_Sidebar />
+		<ProjectSidebar />
 		<main class="flex_1 p_md overflow_auto">
 			{@render content()}
-			<Project_List />
+			<ProjectList />
 		</main>
 	</div>
 {:else}

@@ -2,13 +2,13 @@
 	// @slop Claude Opus 4
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
-	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
-	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
-	import Domains_Sidebar from '$routes/projects/Domains_Sidebar.svelte';
+	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
+	import SectionSidebar from '$routes/projects/SectionSidebar.svelte';
+	import DomainsSidebar from '$routes/projects/DomainsSidebar.svelte';
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
-	import External_Link from '$lib/External_Link.svelte';
+	import ExternalLink from '$lib/ExternalLink.svelte';
 	import Glyph from '$lib/Glyph.svelte';
-	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
+	import ProjectNotFound from '$routes/projects/ProjectNotFound.svelte';
 
 	const projects = projects_context.get();
 
@@ -19,10 +19,10 @@
 
 <div class="domain_layout">
 	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
-	<Project_Sidebar />
+	<ProjectSidebar />
 	{#if project}
-		<Section_Sidebar {project} section="domains" />
-		<Domains_Sidebar />
+		<SectionSidebar {project} section="domains" />
+		<DomainsSidebar />
 	{/if}
 
 	<div class="domain_content">
@@ -32,9 +32,9 @@
 
 				<p>
 					{#if domains_viewmodel.domain_name}
-						<External_Link href={`https://${domains_viewmodel.domain_name}`}>
+						<ExternalLink href={`https://${domains_viewmodel.domain_name}`}>
 							{domains_viewmodel.domain_name}
-						</External_Link>
+						</ExternalLink>
 					{:else}
 						[no domain name]
 					{/if}
@@ -142,7 +142,7 @@
 				</div>
 			</div>
 		{:else}
-			<Project_Not_Found />
+			<ProjectNotFound />
 		{/if}
 	</div>
 </div>

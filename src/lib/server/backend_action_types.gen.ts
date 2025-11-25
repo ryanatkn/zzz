@@ -4,8 +4,8 @@ import type {Gen} from '@ryanatkn/gro/gen.js';
 
 import * as action_specs from '$lib/action_specs.js';
 import {is_action_spec} from '$lib/action_spec.js';
-import {Action_Registry} from '$lib/action_registry.js';
-import {Import_Builder, generate_phase_handlers, create_banner} from '$lib/codegen.js';
+import {ActionRegistry} from '$lib/action_registry.js';
+import {ImportBuilder, generate_phase_handlers, create_banner} from '$lib/codegen.js';
 
 /**
  * Generates backend action handler types based on spec.initiator.
@@ -15,17 +15,15 @@ import {Import_Builder, generate_phase_handlers, create_banner} from '$lib/codeg
  *
  * Example generated imports:
  * ```typescript
- * import type {Action_Event} from '$lib/action_event.js';
- * import type {Action_Outputs} from '$lib/action_collections.js';
+ * import type {ActionEvent} from '$lib/action_event.js';
+ * import type {ActionOutputs} from '$lib/action_collections.js';
  * import type {Backend} from '$lib/server/backend.js';
  * ```
  */
 export const gen: Gen = ({origin_path}) => {
-	const registry = new Action_Registry(
-		Object.values(action_specs).filter((s) => is_action_spec(s)),
-	);
+	const registry = new ActionRegistry(Object.values(action_specs).filter((s) => is_action_spec(s)));
 	const banner = create_banner(origin_path);
-	const imports = new Import_Builder();
+	const imports = new ImportBuilder();
 
 	// Generate handlers for each spec, building imports on demand.
 	// Note this must be done before generating the imports.
@@ -45,7 +43,7 @@ export const gen: Gen = ({origin_path}) => {
 		 * - initiator: 'frontend' → receive phases
 		 * - initiator: 'both' → all valid phases
 		 */
-		export interface Backend_Action_Handlers {
+		export interface BackendActionHandlers {
 			${backend_action_handlers}
 		}
 

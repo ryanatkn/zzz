@@ -1,16 +1,16 @@
 // @slop Claude Sonnet 3.7
 
 import type {
-	Reorderable_Direction,
-	Reorderable_Valid_Drop_Position,
-	Reorderable_Item_Id,
+	ReorderableDirection,
+	ReorderableValidDropPosition,
+	ReorderableItemId,
 } from '$lib/reorderable.svelte.js';
 
 // TODO maybe make this a DOM helper? in Belt?
 /**
  * Detect layout direction from an element - supports flex and grid.
  */
-export const detect_reorderable_direction = (element: HTMLElement): Reorderable_Direction => {
+export const detect_reorderable_direction = (element: HTMLElement): ReorderableDirection => {
 	const computed_style = window.getComputedStyle(element);
 	const display = computed_style.display;
 
@@ -36,10 +36,10 @@ export const detect_reorderable_direction = (element: HTMLElement): Reorderable_
  * Determine the drop position based on source and target indices and layout direction.
  */
 export const get_reorderable_drop_position = (
-	direction: Reorderable_Direction,
+	direction: ReorderableDirection,
 	source_index: number,
 	target_index: number,
-): Reorderable_Valid_Drop_Position => {
+): ReorderableValidDropPosition => {
 	if (direction === 'horizontal') {
 		// For horizontal layouts
 		return source_index > target_index ? 'left' : 'right';
@@ -55,7 +55,7 @@ export const get_reorderable_drop_position = (
 export const calculate_reorderable_target_index = (
 	source_index: number,
 	current_index: number,
-	position: Reorderable_Valid_Drop_Position,
+	position: ReorderableValidDropPosition,
 ): number => {
 	let target_index = current_index;
 
@@ -99,7 +99,7 @@ export const validate_reorderable_target_index = (
  */
 export const set_reorderable_drag_data_transfer = (
 	dataTransfer: DataTransfer,
-	item_id: Reorderable_Item_Id,
+	item_id: ReorderableItemId,
 ): void => {
 	dataTransfer.effectAllowed = 'move';
 	dataTransfer.setData('text/plain', item_id);

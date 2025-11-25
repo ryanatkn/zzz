@@ -1,8 +1,8 @@
 import type {z} from 'zod';
 
-import type {Provider_Json_Input} from '$lib/provider.svelte.js';
-import type {Model_Json} from '$lib/model.svelte.js';
-import type {Chat_Template} from '$lib/chat_template.js';
+import type {ProviderJsonInput} from '$lib/provider.svelte.js';
+import type {ModelJson} from '$lib/model.svelte.js';
+import type {ChatTemplate} from '$lib/chat_template.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 
 // TODO this is a temporary source of truth, use APIs instead
@@ -25,7 +25,7 @@ export const BOTS_DEFAULT = {
 
 // TODO needs work, hardcoding a bunch of stuff for now, and needs more support for different providers
 
-export const providers_default: Array<Provider_Json_Input> = [
+export const providers_default: Array<ProviderJsonInput> = [
 	{
 		name: 'ollama',
 		title: 'Ollama',
@@ -62,7 +62,7 @@ export const providers_default: Array<Provider_Json_Input> = [
 
 // TODO any data here beyond name/provider_name/tags (and probably some future ones) should be fetched from the provider API
 // TODO @db refactor with db
-export const models_default: Array<z.input<typeof Model_Json>> = [
+export const models_default: Array<z.input<typeof ModelJson>> = [
 	// https://ollama.com/search
 	{name: 'gemma3n:e2b', provider_name: 'ollama', tags: ['small']},
 	{name: 'gemma3n:e4b', provider_name: 'ollama', tags: ['small']},
@@ -102,7 +102,7 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 /**
  * Default chat templates available in the application
  */
-export const chat_template_defaults: Array<Chat_Template> = [
+export const chat_template_defaults: Array<ChatTemplate> = [
 	{
 		id: create_uuid(),
 		name: 'frontier',

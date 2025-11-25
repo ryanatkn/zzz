@@ -4,7 +4,7 @@
 
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import type {Sorter} from '$lib/sortable.svelte.js';
-	import Sortable_List from '$lib/Sortable_List.svelte';
+	import SortableList from '$lib/SortableList.svelte';
 
 	const {
 		items,
@@ -48,7 +48,7 @@
 	<h2 class="mt_lg text_align_center">{heading}</h2>
 {/if}
 
-<Sortable_List
+<SortableList
 	{items}
 	{filter}
 	{exclude_ids}
@@ -60,4 +60,4 @@
 	{#snippet children(item)}
 		{@render children_prop(item, pick)}
 	{/snippet}
-</Sortable_List>
+</SortableList>

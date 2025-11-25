@@ -1,25 +1,25 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Part, Part_Json, type Part_Json_Input, type Part_Union} from '$lib/part.svelte.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {Part, PartJson, type PartJsonInput, type PartUnion} from '$lib/part.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {CellJson} from '$lib/cell_types.js';
 
-export const Parts_Json = Cell_Json.extend({
-	items: z.array(Part_Json).default(() => []),
+export const PartsJson = CellJson.extend({
+	items: z.array(PartJson).default(() => []),
 }).meta({cell_class_name: 'Parts'});
-export type Parts_Json = z.infer<typeof Parts_Json>;
-export type Parts_Json_Input = z.input<typeof Parts_Json>;
+export type PartsJson = z.infer<typeof PartsJson>;
+export type PartsJsonInput = z.input<typeof PartsJson>;
 
-export interface Parts_Options extends Cell_Options<typeof Parts_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface PartsOptions extends CellOptions<typeof PartsJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Parts extends Cell<typeof Parts_Json> {
+export class Parts extends Cell<typeof PartsJson> {
 	// Initialize items with proper typing and unified indexes
-	readonly items: Indexed_Collection<Part_Union> = new Indexed_Collection({
+	readonly items: IndexedCollection<PartUnion> = new IndexedCollection({
 		indexes: [
 			create_single_index({
 				key: 'by_name',
@@ -35,8 +35,8 @@ export class Parts extends Cell<typeof Parts_Json> {
 		],
 	});
 
-	constructor(options: Parts_Options) {
-		super(Parts_Json, options);
+	constructor(options: PartsOptions) {
+		super(PartsJson, options);
 
 		this.decoders = {
 			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
@@ -58,7 +58,7 @@ export class Parts extends Cell<typeof Parts_Json> {
 	/**
 	 * Add a part to the collection.
 	 */
-	add(json: Part_Json_Input): Part_Union {
+	add(json: PartJsonInput): PartUnion {
 		const j = !json.name ? {...json, name: this.generate_unique_name('new part')} : json;
 		const part = Part.create(this.app, j);
 		this.items.add(part);
@@ -82,7 +82,7 @@ export class Parts extends Cell<typeof Parts_Json> {
 	/**
 	 * Find a part that references a specific file path.
 	 */
-	find_part_by_diskfile_path(path: string): Part_Union | undefined {
+	find_part_by_diskfile_path(path: string): PartUnion | undefined {
 		return this.items.single_index('by_diskfile_path').get(path);
 	}
 }

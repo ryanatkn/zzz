@@ -1,5 +1,5 @@
 import type {Turn} from '$lib/turn.svelte.js';
-import type {Completion_Message, Completion_Role} from '$lib/completion_types.js';
+import type {CompletionMessage, CompletionRole} from '$lib/completion_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 
 // TODO refactor where?
@@ -7,13 +7,13 @@ import {to_completion_response_text} from '$lib/response_helpers.js';
  * Renders a single message with an XML tag that includes the role attribute.
  */
 export const render_message_with_role = (
-	role: Completion_Role,
+	role: CompletionRole,
 	content: string,
 	tag = 'message',
 ): string => `<${tag} role="${role}">${content}</${tag}>`;
 
 export const render_messages_to_string = (
-	turns: Iterable<{role: Completion_Role; content: string; enabled?: boolean}>,
+	turns: Iterable<{role: CompletionRole; content: string; enabled?: boolean}>,
 	tag = 'message',
 ): string => {
 	let s = '';
@@ -34,8 +34,8 @@ export const render_messages_to_string = (
  */
 export const render_completion_messages = (
 	turns: Iterable<Turn>,
-	completion_messages: Array<Completion_Message> = [],
-): Array<Completion_Message> => {
+	completion_messages: Array<CompletionMessage> = [],
+): Array<CompletionMessage> => {
 	for (const turn of turns) {
 		if (!turn.enabled) continue;
 

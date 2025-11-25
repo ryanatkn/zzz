@@ -1,32 +1,32 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
 import {Thread} from '$lib/thread.svelte.js';
-import {Thread_Json, type Thread_Json_Input} from '$lib/thread_types.js';
+import {ThreadJson, type ThreadJsonInput} from '$lib/thread_types.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
-import {Model_Name} from '$lib/model.svelte.js';
+import {ModelName} from '$lib/model.svelte.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {CellJson} from '$lib/cell_types.js';
 
-export const Threads_Json = Cell_Json.extend({
-	items: z.array(Thread_Json).default(() => []),
+export const ThreadsJson = CellJson.extend({
+	items: z.array(ThreadJson).default(() => []),
 	selected_id: z.string().nullable().default(null),
 }).meta({cell_class_name: 'Threads'});
-export type Threads_Json = z.infer<typeof Threads_Json>;
-export type Threads_Json_Input = z.input<typeof Threads_Json>;
+export type ThreadsJson = z.infer<typeof ThreadsJson>;
+export type ThreadsJsonInput = z.input<typeof ThreadsJson>;
 
-export interface Threads_Options extends Cell_Options<typeof Threads_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface ThreadsOptions extends CellOptions<typeof ThreadsJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Threads extends Cell<typeof Threads_Json> {
-	readonly items: Indexed_Collection<Thread> = new Indexed_Collection({
+export class Threads extends Cell<typeof ThreadsJson> {
+	readonly items: IndexedCollection<Thread> = new IndexedCollection({
 		indexes: [
 			create_multi_index({
 				key: 'by_model_name',
 				extractor: (thread) => thread.model_name,
-				query_schema: Model_Name,
+				query_schema: ModelName,
 			}),
 			create_derived_index({
 				key: 'manual_order',
@@ -46,8 +46,8 @@ export class Threads extends Cell<typeof Threads_Json> {
 	/** Ordered array of threads derived from the `manual_order` index. */
 	readonly ordered_items: Array<Thread> = $derived(this.items.derived_index('manual_order'));
 
-	constructor(options: Threads_Options) {
-		super(Threads_Json, options);
+	constructor(options: ThreadsOptions) {
+		super(ThreadsJson, options);
 
 		this.decoders = {
 			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
@@ -66,7 +66,7 @@ export class Threads extends Cell<typeof Threads_Json> {
 		this.init();
 	}
 
-	add(json?: Thread_Json_Input, select?: boolean): Thread {
+	add(json?: ThreadJsonInput, select?: boolean): Thread {
 		const thread = new Thread({app: this.app, json});
 		return this.add_thread(thread, select);
 	}
@@ -81,7 +81,7 @@ export class Threads extends Cell<typeof Threads_Json> {
 		return thread;
 	}
 
-	add_many(threads_json: Array<Thread_Json_Input>, select?: boolean | number): Array<Thread> {
+	add_many(threads_json: Array<ThreadJsonInput>, select?: boolean | number): Array<Thread> {
 		const threads = threads_json.map((json) => new Thread({app: this.app, json}));
 		this.items.add_many(threads);
 

@@ -1,5 +1,5 @@
-import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_Kind} from '$lib/action_types.js';
+import type {ActionMethod} from '$lib/action_metatypes.js';
+import type {ActionKind} from '$lib/action_types.js';
 
 export const GLYPH_UNKNOWN = '⁇'; // ⍰
 export const GLYPH_IMPORTANT = '⁈';
@@ -92,7 +92,7 @@ export const GLYPH_EXTERNAL_LINK = '🡵';
 export const GLYPH_ARROW_RIGHT = '→'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⭆ ⭈ ⤞ ⤠
 export const GLYPH_ARROW_LEFT = '←'; // ← ⭠
 
-export const get_glyph_for_action_method = (method: Action_Method): string => {
+export const get_glyph_for_action_method = (method: ActionMethod): string => {
 	switch (method) {
 		case 'ping':
 			return GLYPH_PING;
@@ -109,7 +109,7 @@ export const get_glyph_for_action_method = (method: Action_Method): string => {
 	}
 };
 
-export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
+export const get_glyph_for_action_kind = (kind: ActionKind): string => {
 	switch (kind) {
 		case 'local_call':
 			return GLYPH_ACTION_TYPE_LOCAL_CALL;

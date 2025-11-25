@@ -5,8 +5,8 @@
 import {test, expect, vi, beforeEach} from 'vitest';
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson, type SchemaKeys} from '$lib/cell_types.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
@@ -25,8 +25,8 @@ beforeEach(() => {
 	vi.clearAllMocks();
 });
 
-// Base test schema that extends Cell_Json
-const Test_Schema = Cell_Json.extend({
+// Base test schema that extends CellJson
+const TestSchema = CellJson.extend({
 	text: z.string().default(''),
 	number: z.number().optional(),
 	list: z
@@ -37,7 +37,7 @@ const Test_Schema = Cell_Json.extend({
 });
 
 test('Cell supports overriding assign_property', () => {
-	class Custom_Assignment_Cell extends Cell<typeof Test_Schema> {
+	class CustomAssignmentCell extends Cell<typeof TestSchema> {
 		text: string = $state()!;
 		number: number | undefined = $state();
 		list: Array<string> = $state()!;
@@ -45,12 +45,12 @@ test('Cell supports overriding assign_property', () => {
 
 		assignment_log: Array<string> = [];
 
-		constructor(options: Cell_Options<typeof Test_Schema>) {
-			super(Test_Schema, options);
+		constructor(options: CellOptions<typeof TestSchema>) {
+			super(TestSchema, options);
 			this.init();
 		}
 
-		protected override assign_property<K extends Schema_Keys<typeof Test_Schema>>(
+		protected override assign_property<K extends SchemaKeys<typeof TestSchema>>(
 			key: K,
 			value: this[K],
 		): void {
@@ -65,7 +65,7 @@ test('Cell supports overriding assign_property', () => {
 		}
 	}
 
-	const cell = new Custom_Assignment_Cell({
+	const cell = new CustomAssignmentCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -82,7 +82,7 @@ test('Cell supports overriding assign_property', () => {
 });
 
 test('Cell assign_property returns after handling property correctly', () => {
-	class Return_Behavior_Cell extends Cell<typeof Test_Schema> {
+	class ReturnBehaviorCell extends Cell<typeof TestSchema> {
 		text: string = $state()!;
 		number: number | undefined = $state();
 		list: Array<string> = $state()!;
@@ -90,12 +90,12 @@ test('Cell assign_property returns after handling property correctly', () => {
 
 		execution_path: Array<string> = [];
 
-		constructor(options: Cell_Options<typeof Test_Schema>) {
-			super(Test_Schema, options);
+		constructor(options: CellOptions<typeof TestSchema>) {
+			super(TestSchema, options);
 			this.init();
 		}
 
-		protected override assign_property<K extends Schema_Keys<typeof Test_Schema>>(
+		protected override assign_property<K extends SchemaKeys<typeof TestSchema>>(
 			key: K,
 			value: this[K],
 		): void {
@@ -112,7 +112,7 @@ test('Cell assign_property returns after handling property correctly', () => {
 		}
 	}
 
-	const cell = new Return_Behavior_Cell({
+	const cell = new ReturnBehaviorCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -134,20 +134,20 @@ test('Cell assign_property returns after handling property correctly', () => {
 });
 
 test('Cell handles inherited properties correctly', () => {
-	class Base_Test_Cell extends Cell<typeof Test_Schema> {
+	class BaseTestCell extends Cell<typeof TestSchema> {
 		text: string = $state()!;
 
 		base_method() {
 			return 'base_result';
 		}
 
-		constructor(options: Cell_Options<typeof Test_Schema>) {
-			super(Test_Schema, options);
+		constructor(options: CellOptions<typeof TestSchema>) {
+			super(TestSchema, options);
 			// Let derived class handle initialization
 		}
 	}
 
-	class Derived_Test_Cell extends Base_Test_Cell {
+	class DerivedTestCell extends BaseTestCell {
 		number: number | undefined = $state();
 		list: Array<string> = $state()!;
 		flag: boolean = $state()!;
@@ -160,13 +160,13 @@ test('Cell handles inherited properties correctly', () => {
 			return 'overridden_result';
 		}
 
-		constructor(options: Cell_Options<typeof Test_Schema>) {
+		constructor(options: CellOptions<typeof TestSchema>) {
 			super(options);
 			this.init();
 		}
 	}
 
-	const cell = new Derived_Test_Cell({
+	const cell = new DerivedTestCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -194,20 +194,20 @@ test('Cell handles inherited properties correctly', () => {
 });
 
 test('Cell properly handles collections with HANDLED sentinel', () => {
-	const Virtual_Collection_Schema = Cell_Json.extend({
+	const VirtualCollectionSchema = CellJson.extend({
 		collection: z.array(z.string()).default(() => []),
 		text: z.string().default(''),
 	});
 
-	class Virtual_Collection_Cell extends Cell<typeof Virtual_Collection_Schema> {
+	class VirtualCollectionCell extends Cell<typeof VirtualCollectionSchema> {
 		text: string = $state()!;
 		// No direct collection property
 
 		// Separately managed collection
 		stored_items: Array<string> = [];
 
-		constructor(options: Cell_Options<typeof Virtual_Collection_Schema>) {
-			super(Virtual_Collection_Schema, options);
+		constructor(options: CellOptions<typeof VirtualCollectionSchema>) {
+			super(VirtualCollectionSchema, options);
 
 			this.decoders = {
 				collection: (value) => {
@@ -223,7 +223,7 @@ test('Cell properly handles collections with HANDLED sentinel', () => {
 			this.init();
 		}
 
-		override to_json(): z.output<typeof Virtual_Collection_Schema> {
+		override to_json(): z.output<typeof VirtualCollectionSchema> {
 			const base = super.to_json();
 			return {
 				...base,
@@ -232,7 +232,7 @@ test('Cell properly handles collections with HANDLED sentinel', () => {
 		}
 	}
 
-	const cell = new Virtual_Collection_Cell({
+	const cell = new VirtualCollectionCell({
 		app,
 		json: {
 			id: TEST_ID,
@@ -249,19 +249,19 @@ test('Cell properly handles collections with HANDLED sentinel', () => {
 test('Cell registration and unregistration works correctly', () => {
 	const cell_id = create_uuid();
 
-	class Registration_Test_Cell extends Cell<typeof Test_Schema> {
+	class RegistrationTestCell extends Cell<typeof TestSchema> {
 		text: string = $state()!;
 		number: number | undefined = $state();
 		list: Array<string> = $state()!;
 		flag: boolean = $state()!;
 
-		constructor(options: Cell_Options<typeof Test_Schema>) {
-			super(Test_Schema, options);
+		constructor(options: CellOptions<typeof TestSchema>) {
+			super(TestSchema, options);
 			this.init();
 		}
 	}
 
-	const cell = new Registration_Test_Cell({
+	const cell = new RegistrationTestCell({
 		app,
 		json: {
 			id: cell_id,

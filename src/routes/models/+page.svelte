@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Dashboard_Models from '$lib/Dashboard_Models.svelte';
-	import Page_Footer from '$routes/Page_Footer.svelte';
+	import DashboardModels from '$lib/DashboardModels.svelte';
+	import PageFooter from '$routes/PageFooter.svelte';
 
 	// TODO @many consider namespacing under `/llms/`
 </script>
 
-<Dashboard_Models />
+<DashboardModels />
 
-<Page_Footer />
+<PageFooter />

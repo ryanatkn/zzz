@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
-	import Docs_Footer from '@ryanatkn/fuz/Docs_Footer.svelte';
+	import DocsFooter from '@ryanatkn/fuz/DocsFooter.svelte';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 	import {page} from '$app/state';
@@ -11,7 +11,7 @@
 	const pkg = pkg_context.get();
 </script>
 
-<Docs_Footer {pkg}>
+<DocsFooter {pkg}>
 	<div class="mb_xl5">
 		{#if page.url.pathname === resolve('/')}
 			<a href={resolve('/about')}>{@render icon()}</a>
@@ -19,6 +19,6 @@
 			<Breadcrumb>{@render icon()}</Breadcrumb>
 		{/if}
 	</div>
-</Docs_Footer>
+</DocsFooter>
 
 {#snippet icon()}<Svg data={zzz_logo} size="var(--icon_size_sm)" />{/snippet}

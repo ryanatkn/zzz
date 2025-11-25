@@ -2,31 +2,31 @@
 
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {DiskfileTabs} from '$lib/diskfile_tabs.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {CellJson} from '$lib/cell_types.js';
 
-export const Diskfiles_Editor_Json = Cell_Json.extend({
+export const DiskfilesEditorJson = CellJson.extend({
 	show_sort_controls: z.boolean().default(false),
-}).meta({cell_class_name: 'Diskfiles_Editor'});
-export type Diskfiles_Editor_Json = z.infer<typeof Diskfiles_Editor_Json>;
-export type Diskfiles_Editor_Json_Input = z.input<typeof Diskfiles_Editor_Json>;
+}).meta({cell_class_name: 'DiskfilesEditor'});
+export type DiskfilesEditorJson = z.infer<typeof DiskfilesEditorJson>;
+export type DiskfilesEditorJsonInput = z.input<typeof DiskfilesEditorJson>;
 
-export type Diskfiles_Editor_Options = Cell_Options<typeof Diskfiles_Editor_Json>;
+export type DiskfilesEditorOptions = CellOptions<typeof DiskfilesEditorJson>;
 
 /**
  * Editor state management for diskfiles.
  */
-export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
+export class DiskfilesEditor extends Cell<typeof DiskfilesEditorJson> {
 	/** Controls visibility of sort controls in the file explorer. */
 	show_sort_controls: boolean = $state(false);
 
 	/** Tabs for managing the open diskfiles. */
-	readonly tabs: Diskfile_Tabs = new Diskfile_Tabs({app: this.app});
+	readonly tabs: DiskfileTabs = new DiskfileTabs({app: this.app});
 
-	constructor(options: Diskfiles_Editor_Options) {
-		super(Diskfiles_Editor_Json, options);
+	constructor(options: DiskfilesEditorOptions) {
+		super(DiskfilesEditorJson, options);
 		this.init();
 	}
 
@@ -34,7 +34,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Opens a diskfile in preview mode.
 	 */
 	preview_diskfile(diskfile_id: Uuid): void {
-		console.log('Diskfiles_Editor.preview_diskfile', {diskfile_id});
+		console.log('DiskfilesEditor.preview_diskfile', {diskfile_id});
 		this.tabs.preview_diskfile(diskfile_id);
 	}
 
@@ -42,7 +42,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Opens a diskfile in permanent mode.
 	 */
 	open_diskfile(diskfile_id: Uuid): void {
-		console.log('Diskfiles_Editor.open_diskfile', {diskfile_id});
+		console.log('DiskfilesEditor.open_diskfile', {diskfile_id});
 		this.tabs.open_diskfile(diskfile_id);
 	}
 
@@ -50,7 +50,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Reorders tabs.
 	 */
 	reorder_tabs(from_index: number, to_index: number): void {
-		console.log('Diskfiles_Editor.reorder_tabs', {from_index, to_index});
+		console.log('DiskfilesEditor.reorder_tabs', {from_index, to_index});
 		this.tabs.reorder_tabs(from_index, to_index);
 	}
 
@@ -58,7 +58,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Selects a tab by id.
 	 */
 	select_tab(tab_id: Uuid): void {
-		console.log('Diskfiles_Editor.select_tab', {tab_id});
+		console.log('DiskfilesEditor.select_tab', {tab_id});
 		this.tabs.select_tab(tab_id);
 	}
 
@@ -66,7 +66,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Closes a tab by id.
 	 */
 	close_tab(tab_id: Uuid): void {
-		console.log('Diskfiles_Editor.close_tab', {tab_id});
+		console.log('DiskfilesEditor.close_tab', {tab_id});
 		this.tabs.close_tab(tab_id);
 	}
 
@@ -74,7 +74,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Reopens the last closed tab.
 	 */
 	reopen_last_closed_tab(): void {
-		console.log('Diskfiles_Editor.reopen_last_closed_tab');
+		console.log('DiskfilesEditor.reopen_last_closed_tab');
 		this.tabs.reopen_last_closed_tab();
 	}
 
@@ -82,7 +82,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Promotes the current preview tab to permanent.
 	 */
 	promote_preview_tab(): void {
-		console.log('Diskfiles_Editor.promote_preview_tab');
+		console.log('DiskfilesEditor.promote_preview_tab');
 		this.tabs.promote_preview_to_permanent();
 	}
 
@@ -90,7 +90,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Opens (makes permanent) a tab by id.
 	 */
 	open_tab(tab_id: Uuid): void {
-		console.log('Diskfiles_Editor.open_tab', {tab_id});
+		console.log('DiskfilesEditor.open_tab', {tab_id});
 		this.tabs.open_tab(tab_id);
 	}
 
@@ -98,7 +98,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Handles when a diskfile's content is modified.
 	 */
 	handle_file_modified(diskfile_id: Uuid): void {
-		console.log('Diskfiles_Editor.handle_file_modified', {diskfile_id});
+		console.log('DiskfilesEditor.handle_file_modified', {diskfile_id});
 		// If the modified file is in a preview tab, promote it to permanent
 		const tab = this.tabs.by_diskfile_id.get(diskfile_id);
 		if (tab?.id === this.tabs.preview_tab_id) {
@@ -110,7 +110,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	 * Syncs the selected diskfile in diskfiles with the selected tab.
 	 */
 	sync_selected_file(): void {
-		console.log('Diskfiles_Editor.sync_selected_file');
+		console.log('DiskfilesEditor.sync_selected_file');
 		const selected_diskfile_id = this.tabs.selected_diskfile_id;
 		if (selected_diskfile_id) {
 			this.app.diskfiles.selected_file_id = selected_diskfile_id;
@@ -125,4 +125,4 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	}
 }
 
-export const Diskfiles_Editor_Schema = z.instanceof(Diskfiles_Editor);
+export const DiskfilesEditorSchema = z.instanceof(DiskfilesEditor);

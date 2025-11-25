@@ -36,9 +36,9 @@ beforeEach(() => {
 	app = monkeypatch_zzz_for_tests(new Frontend());
 });
 
-describe('Text_Part initialization', () => {
+describe('TextPart initialization', () => {
 	test('creates with default values when no options provided', () => {
-		const part = app.cell_registry.instantiate('Text_Part');
+		const part = app.cell_registry.instantiate('TextPart');
 
 		expect(part.type).toBe('text');
 		expect(part.content).toBe(TEST_CONTENT.EMPTY);
@@ -55,7 +55,7 @@ describe('Text_Part initialization', () => {
 
 	test('initializes with direct content property', () => {
 		const content = TEST_CONTENT.INITIAL;
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content,
 		});
@@ -69,7 +69,7 @@ describe('Text_Part initialization', () => {
 		const test_id = create_uuid();
 		const test_date = get_datetime_now();
 
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			id: test_id,
 			created: test_date,
 			type: 'text',
@@ -104,9 +104,9 @@ describe('Text_Part initialization', () => {
 	});
 });
 
-describe('Text_Part reactive properties', () => {
+describe('TextPart reactive properties', () => {
 	test('derived properties update when content changes', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.INITIAL,
 		});
@@ -127,7 +127,7 @@ describe('Text_Part reactive properties', () => {
 	});
 
 	test('length is zero when content is empty', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.EMPTY,
 		});
@@ -143,12 +143,12 @@ describe('Text_Part reactive properties', () => {
 	});
 });
 
-describe('Text_Part serialization', () => {
+describe('TextPart serialization', () => {
 	test('to_json includes all properties with correct values', () => {
 		const test_id = create_uuid();
 		const created = get_datetime_now();
 
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			id: test_id,
 			created,
 			type: 'text',
@@ -181,7 +181,7 @@ describe('Text_Part serialization', () => {
 			NAME: 'Modified name',
 		};
 
-		const original = app.cell_registry.instantiate('Text_Part', {
+		const original = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: ORIGINAL.CONTENT,
 			name: ORIGINAL.NAME,
@@ -205,9 +205,9 @@ describe('Text_Part serialization', () => {
 	});
 });
 
-describe('Text_Part content modification', () => {
+describe('TextPart content modification', () => {
 	test('update_content method directly updates content', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.INITIAL,
 		});
@@ -223,7 +223,7 @@ describe('Text_Part content modification', () => {
 	});
 
 	test('content setter directly updates content', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.INITIAL,
 		});
@@ -239,9 +239,9 @@ describe('Text_Part content modification', () => {
 	});
 });
 
-describe('Text_Part content edge cases', () => {
+describe('TextPart content edge cases', () => {
 	test('handles long content correctly', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.LONG,
 		});
@@ -252,7 +252,7 @@ describe('Text_Part content edge cases', () => {
 	});
 
 	test('handles unicode characters correctly', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.UNICODE,
 		});
@@ -263,7 +263,7 @@ describe('Text_Part content edge cases', () => {
 	});
 
 	test('handles special characters correctly', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.SPECIAL_CHARS,
 		});
@@ -274,7 +274,7 @@ describe('Text_Part content edge cases', () => {
 	});
 
 	test('handles code and markup content correctly', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: TEST_CONTENT.CODE,
 		});
@@ -285,9 +285,9 @@ describe('Text_Part content edge cases', () => {
 	});
 });
 
-describe('Text_Part attribute management', () => {
+describe('TextPart attribute management', () => {
 	test('can add, update and remove attributes', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: 'Test content',
 		});
@@ -320,7 +320,7 @@ describe('Text_Part attribute management', () => {
 	});
 
 	test('updates attribute key and value together', () => {
-		const part = app.cell_registry.instantiate('Text_Part');
+		const part = app.cell_registry.instantiate('TextPart');
 
 		part.add_attribute({key: 'class', value: 'highlight'});
 		const first_attr = part.attributes[0];
@@ -337,7 +337,7 @@ describe('Text_Part attribute management', () => {
 	});
 
 	test('attributes are preserved when serializing to JSON', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: 'Test content',
 		});
@@ -355,7 +355,7 @@ describe('Text_Part attribute management', () => {
 		expect(json_attr1.key).toBe('class');
 
 		// Verify they're properly restored
-		const new_part = app.cell_registry.instantiate('Text_Part', json);
+		const new_part = app.cell_registry.instantiate('TextPart', json);
 
 		expect(new_part.attributes).toHaveLength(2);
 		const new_attr0 = new_part.attributes[0];
@@ -366,10 +366,10 @@ describe('Text_Part attribute management', () => {
 	});
 });
 
-describe('Text_Part instance management', () => {
+describe('TextPart instance management', () => {
 	test('part is added to registry when created', () => {
 		// Create a part
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: 'Registry test content',
 		});
@@ -384,7 +384,7 @@ describe('Text_Part instance management', () => {
 
 	test('part is removed from registry when requested', () => {
 		// Create a part and add to registry
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: 'Removable content',
 		});
@@ -402,9 +402,9 @@ describe('Text_Part instance management', () => {
 	});
 });
 
-describe('Text_Part start and end position markers', () => {
+describe('TextPart start and end position markers', () => {
 	test('start and end positions are initialized properly', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: 'Position test',
 			start: 10,
@@ -416,7 +416,7 @@ describe('Text_Part start and end position markers', () => {
 	});
 
 	test('start and end positions can be updated', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: 'Position test',
 		});
@@ -434,7 +434,7 @@ describe('Text_Part start and end position markers', () => {
 	});
 
 	test('positions are preserved when serializing and deserializing', () => {
-		const part = app.cell_registry.instantiate('Text_Part', {
+		const part = app.cell_registry.instantiate('TextPart', {
 			type: 'text',
 			content: 'Position preservation test',
 			start: 8,
@@ -445,7 +445,7 @@ describe('Text_Part start and end position markers', () => {
 		const json = part.to_json();
 
 		// Create new part from JSON
-		const new_part = app.cell_registry.instantiate('Text_Part', json);
+		const new_part = app.cell_registry.instantiate('TextPart', json);
 
 		// Verify positions were preserved
 		expect(new_part.start).toBe(8);

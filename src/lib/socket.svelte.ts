@@ -2,11 +2,11 @@
 
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
-import type {Async_Status} from '@ryanatkn/belt/async.js';
+import type {AsyncStatus} from '@ryanatkn/belt/async.js';
 import {BROWSER} from 'esm-env';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {
 	DEFAULT_HEARTBEAT_INTERVAL,
@@ -19,7 +19,7 @@ import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO the plan here is to make websockets one of multiple transports, this just gets the proof of concept working
 
-export const Socket_Json = Cell_Json.extend({
+export const SocketJson = CellJson.extend({
 	url: z.string().nullable().default(null),
 	url_input: z.string().default(''),
 	heartbeat_interval: z.number().int().positive().default(DEFAULT_HEARTBEAT_INTERVAL),
@@ -27,20 +27,20 @@ export const Socket_Json = Cell_Json.extend({
 	reconnect_delay_max: z.number().int().positive().default(DEFAULT_RECONNECT_DELAY_MAX),
 	auto_reconnect: z.boolean().default(DEFAULT_AUTO_RECONNECT),
 }).meta({cell_class_name: 'Socket'});
-export type Socket_Json = z.infer<typeof Socket_Json>;
-export type Socket_Json_Input = z.input<typeof Socket_Json>;
+export type SocketJson = z.infer<typeof SocketJson>;
+export type SocketJsonInput = z.input<typeof SocketJson>;
 
-export interface Socket_Options extends Cell_Options<typeof Socket_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface SocketOptions extends CellOptions<typeof SocketJson> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export type Socket_Action_Handler = (event: MessageEvent) => void;
-export type Socket_Error_Handler = (event: Event) => void;
+export type SocketActionHandler = (event: MessageEvent) => void;
+export type SocketErrorHandler = (event: Event) => void;
 
 // TODO add schemas following the other cell patterns so it can be serialized (so the full state can be snapshotted, and all queued/failed messages restored)
 
 /**
  * Queued message that couldn't be sent immediately.
  */
-export interface Queued_Message {
+export interface QueuedMessage {
 	id: Uuid;
 	data: any;
 	created: number;
@@ -49,7 +49,7 @@ export interface Queued_Message {
 /**
  * Failed message that exceeded retry count.
  */
-export interface Failed_Message extends Queued_Message {
+export interface FailedMessage extends QueuedMessage {
 	failed: number;
 	reason: string;
 }
@@ -57,7 +57,7 @@ export interface Failed_Message extends Queued_Message {
 /**
  * Socket class for WebSocket connection management with auto-reconnect and message queueing.
  */
-export class Socket extends Cell<typeof Socket_Json> {
+export class Socket extends Cell<typeof SocketJson> {
 	// Private serializable state with getters/setters
 	#url: string | null = $state()!;
 	#url_input: string = $state()!; // TODO better name? is ambiguous, it's un-applied (not quite unsaved/temporary)
@@ -69,7 +69,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	// Runtime-only state (not serialized)
 	ws: WebSocket | null = $state(null);
 	open: boolean = $state(false);
-	status: Async_Status = $state('initial'); // 'initial' | 'pending' | 'success' | 'failure'
+	status: AsyncStatus = $state('initial'); // 'initial' | 'pending' | 'success' | 'failure'
 	last_send_time: number | null = $state(null);
 	last_receive_time: number | null = $state(null);
 	last_connect_time: number | null = $state(null);
@@ -83,12 +83,12 @@ export class Socket extends Cell<typeof Socket_Json> {
 
 	// TODO need to think about garbage cleanup
 	// Message handling
-	message_queue: Array<Queued_Message> = $state([]);
-	failed_messages: SvelteMap<string, Failed_Message> = new SvelteMap();
+	message_queue: Array<QueuedMessage> = $state([]);
+	failed_messages: SvelteMap<string, FailedMessage> = new SvelteMap();
 
 	// Event handlers
-	#message_handlers: Set<Socket_Action_Handler> = new Set();
-	#error_handlers: Set<Socket_Error_Handler> = new Set();
+	#message_handlers: Set<SocketActionHandler> = new Set();
+	#error_handlers: Set<SocketErrorHandler> = new Set();
 
 	// Derived properties
 	readonly connected: boolean = $derived(this.open && this.status === 'success');
@@ -114,46 +114,46 @@ export class Socket extends Cell<typeof Socket_Json> {
 		return this.#url;
 	}
 	set url(value: string | null) {
-		this.#url = Socket_Json.shape.url.parse(value);
+		this.#url = SocketJson.shape.url.parse(value);
 	}
 
 	get url_input(): string {
 		return this.#url_input;
 	}
 	set url_input(value: string) {
-		this.#url_input = Socket_Json.shape.url_input.parse(value);
+		this.#url_input = SocketJson.shape.url_input.parse(value);
 	}
 
 	get heartbeat_interval(): number {
 		return this.#heartbeat_interval;
 	}
 	set heartbeat_interval(value: number) {
-		this.#heartbeat_interval = Socket_Json.shape.heartbeat_interval.parse(value);
+		this.#heartbeat_interval = SocketJson.shape.heartbeat_interval.parse(value);
 	}
 
 	get reconnect_delay(): number {
 		return this.#reconnect_delay;
 	}
 	set reconnect_delay(value: number) {
-		this.#reconnect_delay = Socket_Json.shape.reconnect_delay.parse(value);
+		this.#reconnect_delay = SocketJson.shape.reconnect_delay.parse(value);
 	}
 
 	get reconnect_delay_max(): number {
 		return this.#reconnect_delay_max;
 	}
 	set reconnect_delay_max(value: number) {
-		this.#reconnect_delay_max = Socket_Json.shape.reconnect_delay_max.parse(value);
+		this.#reconnect_delay_max = SocketJson.shape.reconnect_delay_max.parse(value);
 	}
 
 	get auto_reconnect(): boolean {
 		return this.#auto_reconnect;
 	}
 	set auto_reconnect(value: boolean) {
-		this.#auto_reconnect = Socket_Json.shape.auto_reconnect.parse(value);
+		this.#auto_reconnect = SocketJson.shape.auto_reconnect.parse(value);
 	}
 
-	constructor(options: Socket_Options) {
-		super(Socket_Json, options);
+	constructor(options: SocketOptions) {
+		super(SocketJson, options);
 		this.init();
 
 		// Initialize url_input if url exists
@@ -307,7 +307,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	// Private methods
 
 	#queue_message(data: object): void {
-		const message: Queued_Message = {
+		const message: QueuedMessage = {
 			id: create_uuid(),
 			data,
 			created: Date.now(),
@@ -320,7 +320,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 		}
 	}
 
-	#process_queued_message(message: Queued_Message): void {
+	#process_queued_message(message: QueuedMessage): void {
 		if (!this.can_send) {
 			// Put back in queue if we can't send now
 			this.message_queue.push(message);
@@ -333,7 +333,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 			this.last_send_time = Date.now();
 		} catch (error) {
 			// Mark as failed immediately since we don't have retry count anymore
-			const failed_message: Failed_Message = {
+			const failed_message: FailedMessage = {
 				...message,
 				failed: Date.now(),
 				reason: error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE,
@@ -416,7 +416,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 * @param handler The message handler to add
 	 * @returns A function that removes the handler when called
 	 */
-	add_message_handler(handler: Socket_Action_Handler): () => void {
+	add_message_handler(handler: SocketActionHandler): () => void {
 		this.#message_handlers.add(handler);
 		return () => this.#message_handlers.delete(handler);
 	}
@@ -426,7 +426,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 * @param handler The error handler to add
 	 * @returns A function that removes the handler when called
 	 */
-	add_error_handler(handler: Socket_Error_Handler): () => void {
+	add_error_handler(handler: SocketErrorHandler): () => void {
 		this.#error_handlers.add(handler);
 		return () => this.#error_handlers.delete(handler);
 	}

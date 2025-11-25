@@ -5,7 +5,7 @@
 import {test, expect, vi, describe} from 'vitest';
 import {z} from 'zod';
 
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {IndexedCollection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_derived_index,
 	create_dynamic_index,
@@ -13,8 +13,8 @@ import {
 } from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
-// Mock item type that implements Indexed_Item
-interface Test_Item {
+// Mock item type that implements IndexedItem
+interface TestItem {
 	id: Uuid;
 	string_a: string;
 	string_b: string;
@@ -28,7 +28,7 @@ const create_item = (
 	string_b: string,
 	array: Array<string> = [],
 	number: number = 0,
-): Test_Item => ({
+): TestItem => ({
 	id: create_uuid(),
 	string_a,
 	string_b,
@@ -36,7 +36,7 @@ const create_item = (
 	number,
 });
 
-describe('Indexed_Collection - Optimization Tests', () => {
+describe('IndexedCollection - Optimization Tests', () => {
 	test('indexes are computed only once during initialization', () => {
 		// Create spy functions to count compute calls
 		const compute_spy = vi.fn((collection) => {
@@ -47,7 +47,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 			return map;
 		});
 
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				{
 					key: 'test_index',
@@ -81,7 +81,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 			return items;
 		});
 
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				create_derived_index({
 					key: 'high_number',
@@ -125,7 +125,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 			return map;
 		});
 
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
 				{
 					key: 'by_string_b',
@@ -188,9 +188,9 @@ describe('Indexed_Collection - Optimization Tests', () => {
 
 	test('dynamic indexes avoid redundant storage', () => {
 		// Create a collection with a dynamic index that computes on-demand
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [
-				create_dynamic_index<Test_Item, (min_n: string) => Array<Test_Item>>({
+				create_dynamic_index<TestItem, (min_n: string) => Array<TestItem>>({
 					key: 'by_min_number',
 					factory: (collection) => {
 						return (min_n: string) => {
@@ -217,8 +217,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 		}
 
 		// Verify function index produces different results based on input
-		const number_fn =
-			collection.get_index<(threshold: string) => Array<Test_Item>>('by_min_number');
+		const number_fn = collection.get_index<(threshold: string) => Array<TestItem>>('by_min_number');
 
 		// These should return different filtered subsets without storing separate copies
 		expect(number_fn('10').length).not.toBe(number_fn('50').length);
@@ -230,14 +229,14 @@ describe('Indexed_Collection - Optimization Tests', () => {
 	test('memory usage with large datasets', () => {
 		// This test creates a large dataset and verifies indexes work efficiently
 		// Create index using the helper function
-		const by_string_b_index = create_multi_index<Test_Item, string>({
+		const by_string_b_index = create_multi_index<TestItem, string>({
 			key: 'by_string_b',
 			extractor: (item) => item.string_b,
 			query_schema: z.string(),
 		});
 
 		// Create a collection with the proper index
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: IndexedCollection<TestItem> = new IndexedCollection({
 			indexes: [by_string_b_index],
 		});
 
@@ -251,7 +250,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 		// console.log(`collection.indexes`, $state.snapshot(collection.indexes));
 
 		// Verify the index contains the expected number of categories
-		const b_index = collection.get_index<Map<string, Array<Test_Item>>>('by_string_b');
+		const b_index = collection.get_index<Map<string, Array<TestItem>>>('by_string_b');
 		// console.log(`b_index`, $state.snapshot(b_index));
 		expect(b_index.size).toBe(10); // 10 unique categories
 

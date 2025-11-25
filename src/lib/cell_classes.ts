@@ -1,14 +1,14 @@
 import {Parts} from '$lib/parts.svelte.js';
-import {Text_Part, Diskfile_Part} from '$lib/part.svelte.js';
+import {TextPart, DiskfilePart} from '$lib/part.svelte.js';
 import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
-import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
-import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
-import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
+import {DiskfileTab} from '$lib/diskfile_tab.svelte.js';
+import {DiskfileTabs} from '$lib/diskfile_tabs.svelte.js';
+import {DiskfileHistory} from '$lib/diskfile_history.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
-import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
+import {DiskfilesEditor} from '$lib/diskfiles_editor.svelte.js';
 import {Model} from '$lib/model.svelte.js';
 import {Models} from '$lib/models.svelte.js';
 import {Action} from '$lib/action.svelte.js';
@@ -31,12 +31,12 @@ export const cell_classes = {
 	Chat,
 	Chats,
 	Diskfile,
-	Diskfile_Tab,
-	Diskfile_Tabs,
-	Diskfile_Part,
-	Diskfile_History,
+	DiskfileTab,
+	DiskfileTabs,
+	DiskfilePart,
+	DiskfileHistory,
 	Diskfiles,
-	Diskfiles_Editor,
+	DiskfilesEditor,
 	Model,
 	Models,
 	Action,
@@ -50,28 +50,28 @@ export const cell_classes = {
 	Thread,
 	Threads,
 	Time,
-	Text_Part,
+	TextPart,
 	Ui,
 } satisfies Record<string, typeof Cell<any>>;
 
-export type Cell_Classes = typeof cell_classes;
+export type CellClasses = typeof cell_classes;
 
-export type Cell_Class_Names = keyof Cell_Classes;
+export type CellClassNames = keyof CellClasses;
 
-export type Cell_Registry_Map = {
-	[K in Cell_Class_Names]: InstanceType<Cell_Classes[K]>;
+export type CellRegistryMap = {
+	[K in CellClassNames]: InstanceType<CellClasses[K]>;
 };
 
 /**
  * Type guard to check if a cell is an instance of a specific cell class.
  */
-export const is_cell_type = <K extends Cell_Class_Names>(
+export const is_cell_type = <K extends CellClassNames>(
 	cell: Cell<any> | null | undefined,
 	class_name: K,
-): cell is Cell_Registry_Map[K] => cell?.constructor.name === class_name;
+): cell is CellRegistryMap[K] => cell?.constructor.name === class_name;
 
 /**
  * Get a list of all registered cell class names.
  */
-export const get_cell_class_names = (): Array<Cell_Class_Names> =>
-	Object.keys(cell_classes) as Array<Cell_Class_Names>;
+export const get_cell_class_names = (): Array<CellClassNames> =>
+	Object.keys(cell_classes) as Array<CellClassNames>;

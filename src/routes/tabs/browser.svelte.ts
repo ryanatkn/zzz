@@ -2,32 +2,32 @@
 
 import {z} from 'zod';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {Browser_Tabs} from '$routes/tabs/browser_tabs.svelte.js';
-import {Browser_Tab_Json} from '$routes/tabs/browser_tab.svelte.js';
+import {Cell, type CellOptions} from '$lib/cell.svelte.js';
+import {CellJson} from '$lib/cell_types.js';
+import {BrowserTabs} from '$routes/tabs/browser_tabs.svelte.js';
+import {BrowserTabJson} from '$routes/tabs/browser_tab.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 
-export const Browser_Json = Cell_Json.extend({
-	tabs: z.array(Browser_Tab_Json).default(() => []),
+export const BrowserJson = CellJson.extend({
+	tabs: z.array(BrowserTabJson).default(() => []),
 	edited_url: z.string().default(''),
 	browserified: z.boolean().default(false),
 }).meta({cell_class_name: 'Browser'});
-export type Browser_Json = z.infer<typeof Browser_Json>;
-export type Browser_Json_Input = z.input<typeof Browser_Json>;
+export type BrowserJson = z.infer<typeof BrowserJson>;
+export type BrowserJsonInput = z.input<typeof BrowserJson>;
 
-export type Browser_Options = Cell_Options<typeof Browser_Json>;
+export type BrowserOptions = CellOptions<typeof BrowserJson>;
 
-export class Browser extends Cell<typeof Browser_Json> {
-	tabs: Browser_Tabs = new Browser_Tabs({app: this.app});
+export class Browser extends Cell<typeof BrowserJson> {
+	tabs: BrowserTabs = new BrowserTabs({app: this.app});
 	edited_url: string = $state()!;
 	browserified: boolean = $state()!;
 
 	/** True when the edited URL differs from the selected tab's URL. */
 	readonly url_edited: boolean = $derived(this.edited_url !== this.tabs.selected_url);
 
-	constructor(options: Browser_Options) {
-		super(Browser_Json, options);
+	constructor(options: BrowserOptions) {
+		super(BrowserJson, options);
 
 		this.decoders = {
 			tabs: (tabs) => {
@@ -105,4 +105,4 @@ export class Browser extends Cell<typeof Browser_Json> {
 	}
 }
 
-export const Browser_Schema = z.instanceof(Browser);
+export const BrowserSchema = z.instanceof(Browser);
