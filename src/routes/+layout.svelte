@@ -6,7 +6,7 @@
 
 	import {onMount} from 'svelte';
 	import {contextmenu_attachment} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
-	import {Pkg} from '@ryanatkn/fuz/pkg.svelte.js';
+	import {Library} from '@ryanatkn/fuz/library.svelte.js';
 	import {BROWSER} from 'esm-env';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
@@ -15,8 +15,8 @@
 	import {parse_url_param_uuid} from '$lib/url_params_helpers.js';
 	import {App} from '$lib/app.svelte.js';
 	import FrontendRoot from '$lib/FrontendRoot.svelte';
-	import {pkg_context} from '$lib/pkg.js';
-	import {package_json, src_json} from '$routes/package.js';
+	import {library_context} from '$lib/library.js';
+	import {library_json} from '$routes/library.js';
 	import {ProviderJson} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {ModelJson} from '$lib/model.svelte.js';
@@ -43,7 +43,7 @@
 		}
 	});
 
-	pkg_context.set(new Pkg(package_json, src_json));
+	library_context.set(new Library(library_json));
 
 	// Create the frontend's App, which extends Frontend
 	const app = new App();
