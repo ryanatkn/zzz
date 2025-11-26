@@ -6,12 +6,12 @@
 	import {page} from '$app/state';
 	import {resolve} from '$app/paths';
 
-	import {pkg_context} from './pkg.js';
+	import {library_context} from './library.js';
 
-	const pkg = pkg_context.get();
+	const library = library_context.get();
 </script>
 
-<DocsFooter {pkg}>
+<DocsFooter {library}>
 	<div class="mb_xl5">
 		{#if page.url.pathname === resolve('/')}
 			<a href={resolve('/about')}>{@render icon()}</a>

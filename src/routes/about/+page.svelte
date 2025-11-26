@@ -1,18 +1,18 @@
 <script lang="ts">
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import PackageDetail from '@ryanatkn/fuz/PackageDetail.svelte';
+	import LibraryDetail from '@ryanatkn/fuz/LibraryDetail.svelte';
 	import EcosystemLinksPanel from '@ryanatkn/fuz/EcosystemLinksPanel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 	import {resolve} from '$app/paths';
 	import Details from '@ryanatkn/fuz/Details.svelte';
 	import {DEV} from 'esm-env';
 
-	import {pkg_context} from '$lib/pkg.js';
+	import {library_context} from '$lib/library.js';
 	import ExternalLink from '$lib/ExternalLink.svelte';
 	import PageFooter from '$routes/PageFooter.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	const pkg = pkg_context.get();
+	const library = library_context.get();
 	const app = frontend_context.get();
 
 	// TODO probably link to a blog post that's more approachable and less technical
@@ -294,7 +294,7 @@
 				Zzz, an AI UI, make dumb predictable errors with LLMs or be designed to encourage us to make
 				them. MCP's utility is high, but it can be used in <ExternalLink
 					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
-					title="Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication"
+					title="Simon Willison's Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication"
 					>insecure ways</ExternalLink
 				> that I want to account for before integrating. Zzz will integrate LLMs into its own functionality
 				slowly and carefully -- currently the only in-app LLM integration is using a local model to name
@@ -319,7 +319,7 @@
 		<Details>
 			{#snippet summary()}package details{/snippet}
 			<div class="panel p_md width_upto_md">
-				<PackageDetail {pkg} />
+				<LibraryDetail {library} />
 			</div>
 		</Details>
 	</section>
