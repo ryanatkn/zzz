@@ -1,4 +1,4 @@
-import ollama, {Ollama} from 'ollama';
+import {Ollama} from 'ollama';
 import {find_cli} from '@ryanatkn/gro/cli.js';
 
 import {BackendProviderLocal, type CompletionHandlerOptions} from './backend_provider.js';
@@ -11,7 +11,8 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 	readonly name = 'ollama';
 
 	protected override create_client(): void {
-		this.client = find_cli('ollama') ? ollama : null;
+		// {fetch, headers, host, proxy}
+		this.client = new Ollama();
 	}
 
 	override async load_status(reload: boolean = false): Promise<ProviderStatus> {
@@ -20,8 +21,8 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 			return this.provider_status;
 		}
 
-		const cli = find_cli('ollama');
-		if (!cli) {
+		// Check if ollama CLI is installed
+		if (!(await find_cli('ollama'))) {
 			const status: ProviderStatus = {
 				name: this.name,
 				available: false,
@@ -33,7 +34,7 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 		}
 
 		try {
-			await this.client!.list();
+			await this.get_client().list();
 			const status: ProviderStatus = {
 				name: this.name,
 				available: true,
@@ -42,7 +43,7 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 			this.provider_status = status;
 			return status;
 		} catch (error) {
-			console.error('[ollama_backend_provider] error checking availability:', error);
+			console.error('[BackendProviderOllama] error checking availability:', error);
 			const error_message = error instanceof Error ? error.message : String(error);
 			const status: ProviderStatus = {
 				name: this.name,
@@ -55,21 +56,25 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 		}
 	}
 
+	/** Ensure the model is available locally, pulling if needed. */
+	private async ensure_model(model: string): Promise<void> {
+		// TODO @many is this what we want to do? or error? needs to stream progress in the streaming case
+		const listed = await this.get_client().list();
+		if (!listed.models.some((m) => m.name === model)) {
+			await this.get_client().pull({model}); // TODO handle stream
+		}
+	}
+
 	async handle_streaming_completion(
 		options: CompletionHandlerOptions,
 	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
-		// TODO @many is this what we want to do? or error? needs to stream progress in the streaming case
-		const listed = await ollama.list();
-		if (!listed.models.some((m) => m.name === model)) {
-			await ollama.pull({model}); // TODO handle stream
-		}
+		await this.ensure_model(model);
 
-		// TODO should we support this?
-		// ollama.generate({prompt})
-		const response = await ollama.chat(
+		// TODO should we support generate({prompt})?
+		const response = await this.get_client().chat(
 			create_ollama_chat_options(model, completion_options, completion_messages, prompt, true),
 		);
 
@@ -113,13 +118,9 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt} = options;
 
-		// TODO @many is this what we want to do? or error? needs to stream progress in the streaming case
-		const listed = await ollama.list();
-		if (!listed.models.some((m) => m.name === model)) {
-			await ollama.pull({model}); // TODO handle stream
-		}
+		await this.ensure_model(model);
 
-		const response = await ollama.chat(
+		const response = await this.get_client().chat(
 			create_ollama_chat_options(model, completion_options, completion_messages, prompt, false),
 		);
 

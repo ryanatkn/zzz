@@ -44,13 +44,13 @@ export const library_json: LibraryJson = {
 		devDependencies: {
 			'@changesets/changelog-git': '^0.2.1',
 			'@ryanatkn/eslint-config': '^0.9.0',
-			'@ryanatkn/fuz': '^0.165.0',
-			'@ryanatkn/gro': '^0.179.0',
+			'@ryanatkn/fuz': '^0.168.0',
+			'@ryanatkn/gro': '^0.180.0',
 			'@ryanatkn/moss': '^0.39.0',
 			'@sveltejs/adapter-node': '^5.4.0',
 			'@sveltejs/adapter-static': '^3.0.10',
 			'@sveltejs/kit': '^2.49.0',
-			'@sveltejs/package': '^2.5.6',
+			'@sveltejs/package': '^2.5.7',
 			'@sveltejs/vite-plugin-svelte': '^6.2.1',
 			'@types/node': '^24.10.1',
 			eslint: '^9.39.1',
@@ -59,7 +59,7 @@ export const library_json: LibraryJson = {
 			ollama: '^0.6.3',
 			prettier: '^3.6.2',
 			'prettier-plugin-svelte': '^3.4.0',
-			svelte: '^5.44.1',
+			svelte: '^5.45.2',
 			'svelte-check': '^4.3.4',
 			tslib: '^2.8.1',
 			typescript: '^5.9.3',
@@ -72,7 +72,7 @@ export const library_json: LibraryJson = {
 			'@google/generative-ai': '^0.24.1',
 			'@hono/node-server': '^1.19.6',
 			'@hono/node-ws': '^1.2.0',
-			'@ryanatkn/belt': '^0.40.0',
+			'@ryanatkn/belt': '^0.41.1',
 			'date-fns': '^4.1.0',
 			'esm-env': '^1.2.2',
 			hono: '^4.10.7',
@@ -131,12 +131,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: 'TMethod',
-								optional: false,
 							},
 							{
 								name: 'data',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -152,12 +150,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: 'TMethod',
-								optional: false,
 							},
 							{
 								name: 'data',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -173,12 +169,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: 'TMethod',
-								optional: false,
 							},
 							{
 								name: 'data',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -194,12 +188,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: 'TMethod',
-								optional: false,
 							},
 							{
 								name: 'data',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -469,7 +461,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -484,7 +475,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -499,7 +489,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -514,7 +503,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -529,7 +517,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -544,7 +531,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -559,7 +545,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -574,7 +559,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -589,7 +573,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -604,7 +587,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -619,7 +601,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -634,7 +615,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -649,7 +629,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -664,7 +643,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -679,7 +657,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -694,7 +671,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -709,7 +685,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -724,12 +699,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'from',
 								type: '"initial" | "parsed" | "handling" | "handled" | "failed"',
-								optional: false,
 							},
 							{
 								name: 'to',
 								type: '"initial" | "parsed" | "handling" | "handled" | "failed"',
-								optional: false,
 							},
 						],
 					},
@@ -744,12 +717,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'kind',
 								type: '"request_response" | "remote_notification" | "local_call"',
-								optional: false,
 							},
 							{
 								name: 'phase',
 								type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-								optional: false,
 							},
 						],
 					},
@@ -764,12 +735,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'from',
 								type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-								optional: false,
 							},
 							{
 								name: 'to',
 								type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-								optional: false,
 							},
 						],
 					},
@@ -785,17 +754,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'kind',
 								type: '"request_response" | "remote_notification" | "local_call"',
-								optional: false,
 							},
 							{
 								name: 'initiator',
 								type: '"frontend" | "backend" | "both"',
-								optional: false,
 							},
 							{
 								name: 'executor',
 								type: '"frontend" | "backend"',
-								optional: false,
 							},
 						],
 					},
@@ -810,12 +776,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'kind',
 								type: '"request_response" | "remote_notification" | "local_call"',
-								optional: false,
 							},
 							{
 								name: 'phase',
 								type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-								optional: false,
 							},
 						],
 					},
@@ -830,7 +794,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'data',
 								type: '{ kind: "request_response" | "remote_notification" | "local_call"; phase: "send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"; ... 9 more ...; notification: { ...; } | null; }',
-								optional: false,
 							},
 						],
 					},
@@ -846,27 +809,22 @@ export const library_json: LibraryJson = {
 							{
 								name: 'kind',
 								type: '"request_response" | "remote_notification" | "local_call"',
-								optional: false,
 							},
 							{
 								name: 'phase',
 								type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-								optional: false,
 							},
 							{
 								name: 'method',
 								type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-								optional: false,
 							},
 							{
 								name: 'executor',
 								type: '"frontend" | "backend"',
-								optional: false,
 							},
 							{
 								name: 'input',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -882,7 +840,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'event',
 								type: 'ActionEvent<"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu", ActionEventEnvironment, "send_request" | ... 7 more ... | "execute", "initial" | ... 3 more...',
-								optional: false,
 							},
 						],
 					},
@@ -1037,17 +994,14 @@ export const library_json: LibraryJson = {
 									{
 										name: 'environment',
 										type: 'TEnvironment',
-										optional: false,
 									},
 									{
 										name: 'spec',
 										type: '{ method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; }',
-										optional: false,
 									},
 									{
 										name: 'data',
 										type: 'ActionEventDatas[TMethod]',
-										optional: false,
 									},
 								],
 							},
@@ -1067,7 +1021,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'listener',
 										type: 'ActionEventChangeObserver<TMethod>',
-										optional: false,
 									},
 								],
 							},
@@ -1080,7 +1033,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'new_data',
 										type: 'ActionEventDatas[TMethod]',
-										optional: false,
 									},
 								],
 							},
@@ -1119,7 +1071,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'phase',
 										type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-										optional: false,
 									},
 								],
 							},
@@ -1139,7 +1090,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'progress',
 										type: 'unknown',
-										optional: false,
 									},
 								],
 							},
@@ -1153,7 +1103,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'request',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -1167,7 +1116,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'response',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; result: { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; }; } | { [x: string]: unknown; jsonrpc: "2.0"; id: string | number | null; error: { [x: string]: unknown; code: -32700 | ... 4 more ... | (number & $brand<...>); message: string...',
-										optional: false,
 									},
 								],
 							},
@@ -1181,7 +1129,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'notification',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -1200,17 +1147,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'environment',
 								type: 'ActionEventEnvironment',
-								optional: false,
 							},
 							{
 								name: 'spec',
 								type: '{ method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; }',
-								optional: false,
 							},
 							{
 								name: 'input',
 								type: 'unknown',
-								optional: false,
 							},
 							{
 								name: 'initial_phase',
@@ -1232,12 +1176,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'json',
 								type: 'ActionEventDatas[TMethod]',
-								optional: false,
 							},
 							{
 								name: 'environment',
 								type: 'ActionEventEnvironment',
-								optional: false,
 							},
 						],
 					},
@@ -1253,12 +1195,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'raw_json',
 								type: 'unknown',
-								optional: false,
 							},
 							{
 								name: 'environment',
 								type: 'ActionEventEnvironment',
-								optional: false,
 							},
 						],
 					},
@@ -1300,7 +1240,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-								optional: false,
 							},
 						],
 					},
@@ -1315,7 +1254,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-								optional: false,
 							},
 						],
 					},
@@ -1330,7 +1268,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-								optional: false,
 							},
 						],
 					},
@@ -1608,7 +1545,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ActionPeerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -1623,7 +1559,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -1643,7 +1578,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -1663,7 +1597,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -1683,7 +1616,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: 'unknown',
-										optional: false,
 									},
 								],
 							},
@@ -1724,7 +1656,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'specs',
 										type: '({ method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; })[]',
-										optional: false,
 									},
 								],
 							},
@@ -1799,7 +1730,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -2005,7 +1935,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'v',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -2134,7 +2063,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ActionOptions',
-										optional: false,
 									},
 								],
 							},
@@ -2158,7 +2086,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'action_event',
 										type: 'ActionEvent<"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu", ActionEventEnvironment, "send_request" | ... 7 more ... | "execute", "initial" | ... 3 more...',
-										optional: false,
 									},
 								],
 							},
@@ -2199,7 +2126,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'action',
 								type: 'Action',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -2223,7 +2149,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'action',
 								type: 'Action',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -2281,7 +2206,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'action',
 								type: 'Action',
-								optional: false,
 							},
 							{
 								name: 'selected',
@@ -2370,7 +2294,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ActionsOptions',
-										optional: false,
 									},
 								],
 							},
@@ -2398,7 +2321,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'action',
 										type: 'Action',
-										optional: false,
 									},
 								],
 							},
@@ -2412,7 +2334,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'action_json',
 										type: '{ method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"; id?: string | undefined; created?: string | undefined; updated?: string | undefined; action_e...',
-										optional: false,
 									},
 								],
 							},
@@ -2828,7 +2749,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CellOptions<ZodObject<{ id: ZodDefault<$ZodBranded<ZodUUID, "Uuid">>; created: ZodDefault<$ZodBranded<ZodISODateTime, "Datetime">>; updated: ZodDefault<...>; }, $strict>>',
-										optional: false,
 									},
 								],
 							},
@@ -2876,7 +2796,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'request_id',
 										type: 'string | number',
-										optional: false,
 									},
 								],
 							},
@@ -2889,7 +2808,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'ping_id',
 										type: 'string | number',
-										optional: false,
 									},
 								],
 							},
@@ -2902,12 +2820,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'ping_id',
 										type: 'string | number',
-										optional: false,
 									},
 									{
 										name: 'error_message',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -3036,7 +2952,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'provider_name',
 								type: 'ProviderName',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -3055,7 +2970,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'provider_name',
 								type: "'claude' | 'chatgpt' | 'gemini'",
-								optional: false,
 							},
 							{
 								name: 'show_info',
@@ -3179,12 +3093,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'cell',
 								type: 'Cell<any> | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'class_name',
 								type: 'K',
-								optional: false,
 							},
 						],
 					},
@@ -3335,7 +3247,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'schema',
 								type: 'ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>> | null | undefined',
-								optional: false,
 							},
 						],
 					},
@@ -3387,12 +3298,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'class_name',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'available_classes',
 										type: 'string[]',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -3436,7 +3345,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'app',
 										type: 'Frontend',
-										optional: false,
 									},
 								],
 							},
@@ -3451,7 +3359,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'constructor',
 										type: 'ClassConstructor<Cell<ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>>>',
-										optional: false,
 									},
 								],
 							},
@@ -3465,7 +3372,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'class_name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -3481,7 +3387,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'class_name',
 										type: 'K',
-										optional: false,
 									},
 									{
 										name: 'json',
@@ -3507,7 +3412,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'class_name',
 										type: 'K',
-										optional: false,
 									},
 									{
 										name: 'json',
@@ -3530,7 +3434,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'cell',
 										type: 'Cell<any>',
-										optional: false,
 									},
 								],
 							},
@@ -3543,7 +3446,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -3820,12 +3722,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'schema',
 										type: 'TSchema',
-										optional: false,
 									},
 									{
 										name: 'options',
 										type: 'CellOptions<TSchema>',
-										optional: false,
 									},
 								],
 							},
@@ -3904,7 +3804,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'input<TSchema> | undefined',
-										optional: false,
 									},
 								],
 							},
@@ -3919,7 +3818,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'partial_value',
 										type: 'Partial<input<TSchema>>',
-										optional: false,
 									},
 								],
 							},
@@ -3934,12 +3832,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'unknown',
-										optional: false,
 									},
 									{
 										name: '_key',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -3954,12 +3850,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'unknown',
-										optional: false,
 									},
 									{
 										name: 'key',
 										type: 'K',
-										optional: false,
 									},
 								],
 							},
@@ -3975,12 +3869,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'key',
 										type: 'SchemaKeys<TSchema>',
-										optional: false,
 									},
 									{
 										name: 'value',
 										type: 'unknown',
-										optional: false,
 									},
 								],
 							},
@@ -4182,7 +4074,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ChatOptions',
-										optional: false,
 									},
 								],
 							},
@@ -4195,7 +4086,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'model',
 										type: 'Model',
-										optional: false,
 									},
 									{
 										name: 'select',
@@ -4213,7 +4103,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tag',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -4226,7 +4115,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -4239,7 +4127,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'ids',
 										type: '(string & $brand<"Uuid">)[]',
-										optional: false,
 									},
 								],
 							},
@@ -4252,7 +4139,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tag',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -4272,7 +4158,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -4286,12 +4171,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'thread_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -4306,12 +4189,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'user_content',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'assistant_content',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -4325,7 +4206,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'thread_id',
 										type: '(string & $brand<"Uuid">) | null',
-										optional: false,
 									},
 								],
 							},
@@ -4338,12 +4218,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from_index',
 										type: 'number',
-										optional: false,
 									},
 									{
 										name: 'to_index',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -4385,7 +4263,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat',
 								type: 'Chat',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -4461,7 +4338,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat',
 								type: 'Chat',
-								optional: false,
 							},
 							{
 								name: 'selected',
@@ -4556,7 +4432,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ChatsOptions',
-										optional: false,
 									},
 								],
 							},
@@ -4588,7 +4463,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'base_name',
 										type: 'string',
-										optional: false,
 										default_value: "'new chat'",
 									},
 								],
@@ -4602,7 +4476,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'chat',
 										type: 'Chat',
-										optional: false,
 									},
 									{
 										name: 'select',
@@ -4621,7 +4494,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'chats_json',
 										type: '{ id?: string | undefined; created?: string | undefined; updated?: string | undefined; name?: string | undefined; thread_ids?: string[] | undefined; main_input?: string | undefined; view_mode?: "simple" | ... 1 more ... | undefined; selected_thread_id?: string | ... 1 more ... | undefined; }[]',
-										optional: false,
 									},
 									{
 										name: 'select',
@@ -4639,7 +4511,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -4652,7 +4523,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'ids',
 										type: '(string & $brand<"Uuid">)[]',
-										optional: false,
 									},
 								],
 							},
@@ -4665,7 +4535,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'chat_id',
 										type: '(string & $brand<"Uuid">) | null',
-										optional: false,
 									},
 								],
 							},
@@ -4686,12 +4555,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'chat_id',
 										type: '(string & $brand<"Uuid">) | null',
-										optional: false,
 									},
 									{
 										name: 'force',
 										type: 'boolean',
-										optional: false,
 										default_value: 'false',
 									},
 								],
@@ -4705,12 +4572,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from_index',
 										type: 'number',
-										optional: false,
 									},
 									{
 										name: 'to_index',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -4724,7 +4589,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'boolean',
-										optional: false,
 										default_value: '!this.show_sort_controls',
 									},
 								],
@@ -4742,7 +4606,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -4799,12 +4662,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'thread',
 								type: 'Thread',
-								optional: false,
 							},
 							{
 								name: 'onsend',
 								type: '(input: string) => Promise<void>',
-								optional: false,
 							},
 							{
 								name: 'focus_key',
@@ -4854,7 +4715,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat',
 								type: 'Chat',
-								optional: false,
 							},
 							{
 								name: 'attrs',
@@ -4883,7 +4743,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat',
 								type: 'Chat',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -4902,7 +4761,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat',
 								type: 'Chat',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -4935,7 +4793,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat',
 								type: 'Chat',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -4962,12 +4819,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat',
 								type: 'Chat',
-								optional: false,
 							},
 							{
 								name: 'thread',
 								type: 'Thread | undefined',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -4990,7 +4845,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'string',
-								optional: false,
 								bindable: true,
 							},
 							{
@@ -5038,13 +4892,11 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from',
 										type: 'string',
-										optional: false,
 										description: 'The module to import from',
 									},
 									{
 										name: 'what',
 										type: 'string',
-										optional: false,
 										description: 'What to import (value)',
 									},
 								],
@@ -5059,13 +4911,11 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from',
 										type: 'string',
-										optional: false,
 										description: 'The module to import from',
 									},
 									{
 										name: 'what',
 										type: 'string',
-										optional: false,
 										description: 'What to import (type)',
 									},
 								],
@@ -5080,12 +4930,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'items',
 										type: 'string[]',
-										optional: false,
 									},
 								],
 							},
@@ -5099,12 +4947,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'items',
 										type: 'string[]',
-										optional: false,
 									},
 								],
 							},
@@ -5157,12 +5003,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'spec',
 								type: '{ method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; }',
-								optional: false,
 							},
 							{
 								name: 'executor',
 								type: '"frontend" | "backend"',
-								optional: false,
 							},
 						],
 					},
@@ -5179,22 +5023,18 @@ export const library_json: LibraryJson = {
 							{
 								name: 'spec',
 								type: '{ method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; }',
-								optional: false,
 							},
 							{
 								name: 'phase',
 								type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-								optional: false,
 							},
 							{
 								name: 'imports',
 								type: 'ImportBuilder',
-								optional: false,
 							},
 							{
 								name: 'path_prefix',
 								type: 'string',
-								optional: false,
 							},
 						],
 					},
@@ -5211,17 +5051,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'spec',
 								type: '{ method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; }',
-								optional: false,
 							},
 							{
 								name: 'executor',
 								type: '"frontend" | "backend"',
-								optional: false,
 							},
 							{
 								name: 'imports',
 								type: 'ImportBuilder',
-								optional: false,
 							},
 						],
 					},
@@ -5236,7 +5073,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'origin_path',
 								type: 'string',
-								optional: false,
 							},
 						],
 					},
@@ -5475,7 +5311,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onconfirm',
 								type: '(popover: Popover) => void',
-								optional: false,
 							},
 							{
 								name: 'popover_button_attrs',
@@ -5658,7 +5493,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'content',
 								type: 'string',
-								optional: false,
 								bindable: true,
 							},
 							{
@@ -5752,7 +5586,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'content',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'height',
@@ -5790,7 +5623,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'token_count',
 								type: 'number',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -5808,7 +5640,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'content',
 								type: 'string | Thunk<string> | undefined',
-								optional: false,
 							},
 							{
 								name: 'label',
@@ -5861,7 +5692,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'enabled',
 								type: 'boolean',
-								optional: false,
 								bindable: true,
 							},
 							{
@@ -5891,7 +5721,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'children',
 								type: 'Snippet',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -5995,12 +5824,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'header',
 								type: 'Snippet',
-								optional: false,
 							},
 							{
 								name: 'children',
 								type: 'Snippet',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -6274,7 +6101,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: '{ app: Frontend; diskfile: Diskfile; }',
-										optional: false,
 									},
 								],
 							},
@@ -6314,7 +6140,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6329,7 +6154,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'diskfile',
 										type: 'Diskfile',
-										optional: false,
 									},
 								],
 							},
@@ -6370,7 +6194,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'path',
 								type: 'string',
-								optional: false,
 							},
 						],
 					},
@@ -6384,12 +6207,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'path',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'parent',
 								type: 'string',
-								optional: false,
 							},
 						],
 					},
@@ -6404,7 +6225,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'type',
 								type: 'WatcherChangeType',
-								optional: false,
 							},
 						],
 					},
@@ -6422,13 +6242,11 @@ export const library_json: LibraryJson = {
 							{
 								name: 'disknode',
 								type: '{ id: string & $brand<"DiskfilePath">; source_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; contents: string | null; ctime: number | null; mtime: number | null; dependents: [...][]; dependencies: [...][]; }',
-								optional: false,
 								description: 'The source file to convert',
 							},
 							{
 								name: 'existing_id',
 								type: 'string & $brand<"Uuid">',
-								optional: false,
 								description: 'Optional existing UUID to preserve id stability across updates',
 								default_value: 'create_uuid()',
 							},
@@ -6450,7 +6268,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'diskfile',
 								type: 'Diskfile',
-								optional: false,
 							},
 						],
 					},
@@ -6466,12 +6283,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'disknode',
 								type: 'Disknode',
-								optional: false,
 							},
 							{
 								name: 'dir',
 								type: 'string',
-								optional: false,
 							},
 						],
 					},
@@ -6556,7 +6371,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'DiskfileHistoryOptions',
-										optional: false,
 									},
 								],
 							},
@@ -6572,12 +6386,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
 										type: '{ is_disk_change?: boolean | undefined; is_unsaved_edit?: boolean | undefined; is_original_state?: boolean | undefined; label?: string | undefined; created?: number | undefined; }',
-										optional: false,
 										default_value: 'EMPTY_OBJECT',
 									},
 								],
@@ -6594,7 +6406,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6608,7 +6419,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6713,7 +6523,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'DiskfileTabOptions',
-										optional: false,
 									},
 								],
 							},
@@ -6854,7 +6663,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'DiskfileTabsOptions',
-										optional: false,
 									},
 								],
 							},
@@ -6870,7 +6678,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'exclude_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6884,7 +6691,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tab_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6899,7 +6705,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'diskfile_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6914,7 +6719,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'diskfile_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6937,7 +6741,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tab_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6956,7 +6759,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tab_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 										description: 'The tab id to navigate to',
 									},
 								],
@@ -6971,7 +6773,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tab_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -6985,12 +6786,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from_index',
 										type: 'number',
-										optional: false,
 									},
 									{
 										name: 'to_index',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -7234,7 +7033,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'DiskfileOptions',
-										optional: false,
 									},
 								],
 							},
@@ -7260,12 +7058,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'diskfile',
 								type: 'Diskfile',
-								optional: false,
 							},
 							{
 								name: 'editor_state',
 								type: 'DiskfileEditorState',
-								optional: false,
 							},
 							{
 								name: 'readonly',
@@ -7300,12 +7096,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'diskfile',
 								type: 'Diskfile | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'children',
 								type: 'Snippet',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -7333,7 +7127,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'editor_state',
 								type: 'DiskfileEditorState',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -7352,7 +7145,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'diskfile',
 								type: 'Diskfile',
-								optional: false,
 							},
 							{
 								name: 'onmodified',
@@ -7414,12 +7206,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'editor_state',
 								type: 'DiskfileEditorState',
-								optional: false,
 							},
 							{
 								name: 'onselectentry',
 								type: '(entry_id: Uuid) => void',
-								optional: false,
 							},
 							{
 								name: 'attrs',
@@ -7443,12 +7233,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'diskfile',
 								type: 'Diskfile',
-								optional: false,
 							},
 							{
 								name: 'editor_state',
 								type: 'DiskfileEditorState',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -7473,7 +7261,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'diskfile',
 								type: 'Diskfile',
-								optional: false,
 							},
 							{
 								name: 'selected',
@@ -7513,7 +7300,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'editor_state',
 								type: 'DiskfileEditorState',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -7532,7 +7318,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'diskfile',
 								type: 'Diskfile',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -7551,7 +7336,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onpick',
 								type: '(diskfile: Diskfile | undefined) => boolean | void',
-								optional: false,
 							},
 							{
 								name: 'filter',
@@ -7589,7 +7373,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onpick',
 								type: '(diskfile: Diskfile | undefined) => boolean | void',
-								optional: false,
 							},
 							{
 								name: 'show',
@@ -7686,7 +7469,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'DiskfilesEditorOptions',
-										optional: false,
 									},
 								],
 							},
@@ -7700,7 +7482,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'diskfile_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -7714,7 +7495,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'diskfile_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -7728,12 +7508,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from_index',
 										type: 'number',
-										optional: false,
 									},
 									{
 										name: 'to_index',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -7747,7 +7525,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tab_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -7761,7 +7538,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tab_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -7791,7 +7567,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tab_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -7805,7 +7580,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'diskfile_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -7827,7 +7601,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'boolean',
-										optional: false,
 										default_value: '!this.show_sort_controls',
 									},
 								],
@@ -7913,7 +7686,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'DiskfilesOptions',
-										optional: false,
 									},
 								],
 							},
@@ -7927,7 +7699,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'params',
 										type: '{ change: { type: "add" | "change" | "delete"; path: string & $brand<"DiskfilePath">; }; disknode: { id: string & $brand<"DiskfilePath">; source_dir: string & $brand<"DiskfilePath"> & $brand<...>; ... 4 more ...; dependencies: [...][]; }; }',
-										optional: false,
 									},
 								],
 							},
@@ -7941,12 +7712,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'json',
 										type: '{ source_dir: string; id?: string | undefined; created?: string | undefined; updated?: string | undefined; path?: string | null | undefined; content?: string | null | undefined; dependents?: [...][] | ... 1 more ... | undefined; dependencies?: [...][] | ... 1 more ... | undefined; }',
-										optional: false,
 									},
 									{
 										name: 'auto_select',
 										type: 'boolean',
-										optional: false,
 										default_value: 'true',
 									},
 								],
@@ -7961,12 +7730,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string & $brand<"DiskfilePath">',
-										optional: false,
 									},
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -7979,7 +7746,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string & $brand<"DiskfilePath">',
-										optional: false,
 									},
 								],
 							},
@@ -7992,12 +7758,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'filename',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 										default_value: "''",
 									},
 								],
@@ -8011,7 +7775,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'dirname',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -8024,7 +7787,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string & $brand<"DiskfilePath">',
-										optional: false,
 									},
 								],
 							},
@@ -8039,7 +7801,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -8055,12 +7816,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: '(string & $brand<"Uuid">) | null | undefined',
-										optional: false,
 									},
 									{
 										name: 'open_not_preview',
 										type: 'boolean',
-										optional: false,
 										default_value: 'false',
 									},
 								],
@@ -8099,22 +7858,18 @@ export const library_json: LibraryJson = {
 							{
 								name: 'tab',
 								type: 'DiskfileTab',
-								optional: false,
 							},
 							{
 								name: 'onselect',
 								type: '(tab: DiskfileTab) => void',
-								optional: false,
 							},
 							{
 								name: 'onclose',
 								type: '(tab: DiskfileTab) => void',
-								optional: false,
 							},
 							{
 								name: 'onopen',
 								type: '(tab: DiskfileTab) => void',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -8133,7 +7888,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'string',
-								optional: false,
 								bindable: true,
 							},
 							{
@@ -8193,7 +7947,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'children',
 								type: 'Snippet',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -8212,7 +7965,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'href',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'open_externally',
@@ -8290,12 +8042,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'bytes',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'decimals',
 								type: 'number',
-								optional: false,
 								default_value: '1',
 							},
 						],
@@ -8310,7 +8060,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'gb',
 								type: 'number',
-								optional: false,
 							},
 						],
 					},
@@ -8325,17 +8074,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'total',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'decimals',
 								type: 'number',
-								optional: false,
 								default_value: '1',
 							},
 						],
@@ -8351,7 +8097,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ms',
 								type: 'number',
-								optional: false,
 							},
 						],
 					},
@@ -8531,7 +8276,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'environment',
 								type: 'T',
-								optional: false,
 							},
 						],
 					},
@@ -8563,7 +8307,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'url',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'headers',
@@ -8583,7 +8326,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -8598,7 +8340,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -8613,7 +8354,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -8654,7 +8394,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'socket',
 										type: 'Socket',
-										optional: false,
 									},
 									{
 										name: 'request_timeout_ms',
@@ -8674,7 +8413,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -8689,7 +8427,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -8704,7 +8441,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -8979,7 +8715,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'FrontendOptions',
-										optional: false,
 										default_value: 'EMPTY_OBJECT',
 									},
 								],
@@ -8994,7 +8729,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'data',
 										type: '{ zzz_cache_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; files: { id: string & $brand<"DiskfilePath">; source_dir: string & $brand<...> & $brand<...>; ... 4 more ...; dependencies: [...][]; }[]; provider_status: ({ ...; } | { ...; })[]; }',
-										optional: false,
 									},
 								],
 							},
@@ -9008,7 +8742,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'providers_json',
 										type: '{ name: "ollama" | "claude" | "chatgpt" | "gemini"; title: string; url: string; homepage: string; company: string; api_key_url: string | null; id?: string | undefined; created?: string | undefined; updated?: string | undefined; }[]',
-										optional: false,
 									},
 								],
 							},
@@ -9022,7 +8755,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'provider_json',
 										type: '{ name: "ollama" | "claude" | "chatgpt" | "gemini"; title: string; url: string; homepage: string; company: string; api_key_url: string | null; id?: string | undefined; created?: string | undefined; updated?: string | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -9037,7 +8769,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'provider_name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -9051,7 +8782,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'status',
 										type: '{ name: string; available: true; checked_at: number; } | { name: string; available: false; error: string; checked_at: number; }',
-										optional: false,
 									},
 								],
 							},
@@ -9065,7 +8795,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string & $brand<"DiskfilePath">',
-										optional: false,
 									},
 								],
 							},
@@ -9078,7 +8807,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string & $brand<"DiskfilePath">',
-										optional: false,
 									},
 								],
 							},
@@ -9092,12 +8820,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'method',
 										type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-										optional: false,
 									},
 									{
 										name: 'phase',
 										type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-										optional: false,
 									},
 								],
 							},
@@ -9112,7 +8838,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'method',
 										type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-										optional: false,
 									},
 								],
 							},
@@ -9127,7 +8852,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'method',
 										type: 'TMethod',
-										optional: false,
 									},
 								],
 							},
@@ -9142,7 +8866,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'method',
 										type: 'TMethod',
-										optional: false,
 									},
 								],
 							},
@@ -9156,12 +8879,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'method',
 										type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-										optional: false,
 									},
 									{
 										name: 'phase',
 										type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-										optional: false,
 									},
 								],
 							},
@@ -9271,12 +8992,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'app',
 								type: 'Frontend',
-								optional: false,
 							},
 							{
 								name: 'children',
 								type: 'Snippet<[zzz: Frontend]>',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -9294,7 +9013,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'glyph',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'size',
@@ -9797,7 +9515,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-								optional: false,
 							},
 						],
 					},
@@ -9812,7 +9529,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'kind',
 								type: '"request_response" | "remote_notification" | "local_call"',
-								optional: false,
 							},
 						],
 					},
@@ -9921,7 +9637,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'text',
 								type: 'string',
-								optional: false,
 							},
 						],
 					},
@@ -9946,12 +9661,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'name',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'existing_names',
 								type: '{ has: (name: string) => boolean; } | { includes: (name: string) => boolean; }',
-								optional: false,
 							},
 						],
 					},
@@ -9965,7 +9678,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'T | undefined',
-								optional: false,
 							},
 						],
 					},
@@ -9979,12 +9691,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'content',
 								type: 'string | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'max_length',
 								type: 'number',
-								optional: false,
 								default_value: 'CONTENT_PREVIEW_LENGTH',
 							},
 						],
@@ -10100,7 +9810,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'options',
 								type: 'SingleIndexOptions<T, K>',
-								optional: false,
 							},
 						],
 					},
@@ -10147,7 +9856,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'options',
 								type: 'MultiIndexOptions<T, K>',
-								optional: false,
 							},
 						],
 					},
@@ -10211,7 +9919,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'options',
 								type: 'DerivedIndexOptions<T, TResult>',
-								optional: false,
 							},
 						],
 					},
@@ -10266,7 +9973,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'options',
 								type: 'DynamicIndexOptions<T, F>',
-								optional: false,
 							},
 						],
 					},
@@ -10519,7 +10225,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'key',
 										type: 'TKeySingle | TKeyMulti | TKeyDerived | TKeyDynamic',
-										optional: false,
 									},
 								],
 							},
@@ -10533,7 +10238,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'key',
 										type: 'TKeySingle',
-										optional: false,
 									},
 								],
 							},
@@ -10547,7 +10251,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'key',
 										type: 'TKeyMulti',
-										optional: false,
 									},
 								],
 							},
@@ -10561,7 +10264,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'key',
 										type: 'TKeyDerived',
-										optional: false,
 									},
 								],
 							},
@@ -10575,7 +10277,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'key',
 										type: 'TKeyDynamic',
-										optional: false,
 									},
 								],
 							},
@@ -10591,12 +10292,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'key',
 										type: 'TKeySingle | TKeyMulti | TKeyDerived | TKeyDynamic',
-										optional: false,
 									},
 									{
 										name: 'query',
 										type: 'TQuery',
-										optional: false,
 									},
 								],
 							},
@@ -10610,7 +10309,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'item',
 										type: 'T',
-										optional: false,
 									},
 								],
 							},
@@ -10625,7 +10323,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'items',
 										type: 'T[]',
-										optional: false,
 									},
 								],
 							},
@@ -10639,7 +10336,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -10653,7 +10349,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'ids',
 										type: '(string & $brand<"Uuid">)[]',
-										optional: false,
 									},
 								],
 							},
@@ -10667,7 +10362,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -10681,7 +10375,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -10704,12 +10397,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'index_key',
 										type: 'TKeyMulti',
-										optional: false,
 									},
 									{
 										name: 'value',
 										type: 'V',
-										optional: false,
 									},
 								],
 							},
@@ -10724,17 +10415,14 @@ export const library_json: LibraryJson = {
 									{
 										name: 'index_key',
 										type: 'TKeyMulti',
-										optional: false,
 									},
 									{
 										name: 'value',
 										type: 'V',
-										optional: false,
 									},
 									{
 										name: 'limit',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -10749,17 +10437,14 @@ export const library_json: LibraryJson = {
 									{
 										name: 'index_key',
 										type: 'TKeyMulti',
-										optional: false,
 									},
 									{
 										name: 'value',
 										type: 'V',
-										optional: false,
 									},
 									{
 										name: 'limit',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -10774,12 +10459,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'index_key',
 										type: 'TKeySingle',
-										optional: false,
 									},
 									{
 										name: 'value',
 										type: 'V',
-										optional: false,
 									},
 								],
 							},
@@ -10794,12 +10477,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'index_key',
 										type: 'TKeySingle',
-										optional: false,
 									},
 									{
 										name: 'value',
 										type: 'V',
-										optional: false,
 									},
 								],
 							},
@@ -10833,12 +10514,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'items',
 								type: 'Iterable<T>',
-								optional: false,
 							},
 							{
 								name: 'property',
 								type: 'K',
-								optional: false,
 							},
 						],
 					},
@@ -10897,12 +10576,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'code',
 										type: '-32700 | -32600 | -32601 | -32602 | -32603 | (number & $brand<"JsonrpcServerErrorCode">)',
-										optional: false,
 									},
 									{
 										name: 'message',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'data',
@@ -10957,17 +10634,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'params',
 								type: '{ [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined',
-								optional: false,
 							},
 							{
 								name: 'id',
 								type: 'string | number',
-								optional: false,
 							},
 						],
 					},
@@ -10983,12 +10657,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'id',
 								type: 'string | number',
-								optional: false,
 							},
 							{
 								name: 'result',
 								type: '{ [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; }',
-								optional: false,
 							},
 						],
 					},
@@ -11004,12 +10676,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'method',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'params',
 								type: '{ [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; } | undefined',
-								optional: false,
 							},
 						],
 					},
@@ -11025,12 +10695,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'id',
 								type: 'string | number | null',
-								optional: false,
 							},
 							{
 								name: 'error',
 								type: '{ [x: string]: unknown; code: -32700 | -32600 | -32601 | -32602 | -32603 | (number & $brand<"JsonrpcServerErrorCode">); message: string; data?: unknown; }',
-								optional: false,
 							},
 						],
 					},
@@ -11048,12 +10716,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'id',
 								type: 'string | number | null',
-								optional: false,
 							},
 							{
 								name: 'error',
 								type: 'any',
-								optional: false,
 							},
 						],
 					},
@@ -11067,7 +10733,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'message_or_id',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11081,7 +10746,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'id',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11095,7 +10759,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'message',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11110,7 +10773,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'message',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11125,7 +10787,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'message',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11140,7 +10801,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'message',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11155,7 +10815,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'message',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11170,7 +10829,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'message',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11185,7 +10843,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'message',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11201,7 +10858,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'input',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11217,7 +10873,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'output',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -11248,7 +10903,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'code',
 								type: '-32700 | -32600 | -32601 | -32602 | -32603 | (number & $brand<"JsonrpcServerErrorCode">)',
-								optional: false,
 							},
 						],
 					},
@@ -11264,7 +10918,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'status',
 								type: 'number',
-								optional: false,
 							},
 						],
 					},
@@ -11530,17 +11183,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'items',
 								type: 'any[]',
-								optional: false,
 							},
 							{
 								name: 'from_index',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'to_index',
 								type: 'number',
-								optional: false,
 							},
 						],
 					},
@@ -11555,17 +11205,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'items',
 								type: 'T[]',
-								optional: false,
 							},
 							{
 								name: 'from_index',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'to_index',
 								type: 'number',
-								optional: false,
 							},
 						],
 					},
@@ -11773,7 +11420,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ModelOptions',
-										optional: false,
 									},
 								],
 							},
@@ -11827,7 +11473,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'model',
 								type: 'Model',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -11854,7 +11499,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'model',
 								type: 'Model',
-								optional: false,
 							},
 							{
 								name: 'attrs',
@@ -11885,7 +11529,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'model',
 								type: 'Model',
-								optional: false,
 							},
 							{
 								name: 'icon',
@@ -11928,7 +11571,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'model',
 								type: 'Model',
-								optional: false,
 							},
 							{
 								name: 'show_tags',
@@ -11952,7 +11594,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onpick',
 								type: '(model: Model | undefined) => boolean | void',
-								optional: false,
 							},
 							{
 								name: 'items',
@@ -11991,13 +11632,11 @@ export const library_json: LibraryJson = {
 							{
 								name: 'show',
 								type: 'boolean',
-								optional: false,
 								bindable: true,
 							},
 							{
 								name: 'onpick',
 								type: '(model: Model | undefined) => boolean | void',
-								optional: false,
 							},
 							{
 								name: 'filter',
@@ -12084,7 +11723,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ModelsOptions',
-										optional: false,
 									},
 								],
 							},
@@ -12098,7 +11736,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'model_json',
 										type: '{ name: string; provider_name: "ollama" | "claude" | "chatgpt" | "gemini"; id?: string | undefined; created?: string | undefined; updated?: string | undefined; tags?: string[] | undefined; ... 13 more ...; ollama_show_response_error?: string | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -12112,7 +11749,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'models_json',
 										type: '{ name: string; provider_name: "ollama" | "claude" | "chatgpt" | "gemini"; id?: string | undefined; created?: string | undefined; updated?: string | undefined; tags?: string[] | undefined; ... 13 more ...; ollama_show_response_error?: string | undefined; }[]',
-										optional: false,
 									},
 								],
 							},
@@ -12125,7 +11761,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -12138,7 +11773,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'names',
 										type: 'string[]',
-										optional: false,
 									},
 								],
 							},
@@ -12151,7 +11785,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'tag',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -12164,7 +11797,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -12198,7 +11830,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'selected_model',
 								type: 'Model',
-								optional: false,
 								bindable: true,
 							},
 							{
@@ -12222,7 +11853,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'model',
 								type: 'Model',
-								optional: false,
 							},
 							{
 								name: 'omit_provider',
@@ -12262,7 +11892,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat_id',
 								type: '(string & $brand<"Uuid">) | null',
-								optional: false,
 							},
 						],
 					},
@@ -12276,7 +11905,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'chat_id',
 								type: '(string & $brand<"Uuid">) | null',
-								optional: false,
 							},
 						],
 					},
@@ -12337,17 +11965,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'app',
 								type: 'Frontend',
-								optional: false,
 							},
 							{
 								name: 'label',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'href',
 								type: 'string',
-								optional: false,
 							},
 						],
 					},
@@ -12377,7 +12002,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'path',
 								type: 'string | URL',
-								optional: false,
 							},
 							{
 								name: 'options',
@@ -12399,7 +12023,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'href',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'selected',
@@ -12414,7 +12037,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'children',
 								type: 'Snippet<[selected: boolean, selected_descendent: boolean]>',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -12550,7 +12172,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'parameter_size',
 								type: 'string | undefined',
-								optional: false,
 							},
 						],
 					},
@@ -12825,7 +12446,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'model_name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -12879,7 +12499,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'OllamaOptions',
-										optional: false,
 									},
 								],
 							},
@@ -12945,7 +12564,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'response',
 										type: '{ [x: string]: unknown; models: { [x: string]: unknown; digest: string; model: string; modified_at: string; name: string; size: number; details?: { [x: string]: unknown; families: string[]; family: string; format: string; parameter_size: string; parent_model: string; quantization_level: string; } | undefined; }[]; }...',
-										optional: false,
 									},
 								],
 							},
@@ -12968,7 +12586,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'response',
 										type: '{ [x: string]: unknown; models: { [x: string]: unknown; digest: string; expires_at: string; model: string; name: string; size: number; size_vram: number; details?: { [x: string]: unknown; families: string[]; family: string; format: string; parameter_size: string; parent_model: string; quantization_level: string; } |...',
-										optional: false,
 									},
 								],
 							},
@@ -12983,12 +12600,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'request',
 										type: '{ [x: string]: unknown; model: string; system?: string | undefined; template?: string | undefined; options?: any; }',
-										optional: false,
 									},
 									{
 										name: 'response',
 										type: '{ [x: string]: unknown; capabilities?: string[] | undefined; details?: { [x: string]: unknown; families: string[]; family: string; format: string; parameter_size: string; parent_model: string; quantization_level: string; } | undefined; ... 5 more ...; tensors?: any[] | undefined; } | null',
-										optional: false,
 									},
 								],
 							},
@@ -13003,7 +12618,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'request',
 										type: '{ [x: string]: unknown; model: string; }',
-										optional: false,
 									},
 								],
 							},
@@ -13017,7 +12631,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'model',
 										type: 'Model',
-										optional: false,
 									},
 								],
 							},
@@ -13063,7 +12676,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'model_name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -13077,7 +12689,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'model_name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -13091,7 +12702,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'model',
 										type: 'Model',
-										optional: false,
 									},
 								],
 							},
@@ -13114,7 +12724,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'view',
 										type: '"model" | "configure" | "pull" | "copy" | "create"',
-										optional: false,
 									},
 									{
 										name: 'model',
@@ -13155,7 +12764,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'action',
 								type: 'Action',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -13174,7 +12782,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ollama',
 								type: 'Ollama',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -13193,17 +12800,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ollama',
 								type: 'Ollama',
-								optional: false,
 							},
 							{
 								name: 'last_active_view',
 								type: 'string | null',
-								optional: false,
 							},
 							{
 								name: 'onshowpull',
 								type: '() => void',
-								optional: false,
 							},
 							{
 								name: 'onback',
@@ -13235,12 +12839,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ollama',
 								type: 'Ollama',
-								optional: false,
 							},
 							{
 								name: 'onclose',
 								type: '() => void',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -13259,17 +12861,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ollama',
 								type: 'Ollama',
-								optional: false,
 							},
 							{
 								name: 'onclose',
 								type: '() => void',
-								optional: false,
 							},
 							{
 								name: 'onshowpull',
 								type: '() => void',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -13288,7 +12887,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ollama',
 								type: 'Ollama',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -13318,12 +12916,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'model',
 								type: 'Model',
-								optional: false,
 							},
 							{
 								name: 'onshow',
 								type: '(model: Model) => void',
-								optional: false,
 							},
 							{
 								name: 'onclose',
@@ -13365,7 +12961,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'model',
 								type: 'Model',
-								optional: false,
 							},
 							{
 								name: 'onclick',
@@ -13389,12 +12984,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'model',
 								type: 'Model',
-								optional: false,
 							},
 							{
 								name: 'ollama',
 								type: 'Ollama',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -13412,7 +13005,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ollama',
 								type: 'Ollama',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -13431,7 +13023,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ollama',
 								type: 'Ollama',
-								optional: false,
 							},
 							{
 								name: 'onclose',
@@ -13475,7 +13066,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 						],
 					},
@@ -13695,7 +13285,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'partial',
 										type: '{ id?: string | undefined; key?: string | undefined; value?: string | undefined; }',
-										optional: false,
 										default_value: 'EMPTY_OBJECT',
 									},
 								],
@@ -13713,12 +13302,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 									{
 										name: 'updates',
 										type: 'Partial<OmitStrict<{ id: string & $brand<"Uuid">; key: string; value: string; }, "id">>',
-										optional: false,
 									},
 								],
 							},
@@ -13731,7 +13318,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -13746,12 +13332,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'app',
 										type: 'Frontend',
-										optional: false,
 									},
 									{
 										name: 'json',
 										type: '{ id?: string | undefined; created?: string | undefined; updated?: string | undefined; name?: string | undefined; start?: number | null | undefined; end?: number | null | undefined; has_xml_tag?: boolean | undefined; ... 6 more ...; content?: string | undefined; }',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -13771,12 +13355,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'app',
 										type: 'Frontend',
-										optional: false,
 									},
 									{
 										name: 'json',
 										type: '{ id?: string | undefined; created?: string | undefined; updated?: string | undefined; name?: string | undefined; start?: number | null | undefined; end?: number | null | undefined; has_xml_tag?: boolean | undefined; ... 6 more ...; content?: string | undefined; }',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -13796,12 +13378,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'app',
 										type: 'Frontend',
-										optional: false,
 									},
 									{
 										name: 'json',
 										type: '{ id?: string | undefined; created?: string | undefined; updated?: string | undefined; name?: string | undefined; start?: number | null | undefined; end?: number | null | undefined; has_xml_tag?: boolean | undefined; ... 6 more ...; content?: string | undefined; }',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -13821,12 +13401,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'app',
 										type: 'Frontend',
-										optional: false,
 									},
 									{
 										name: 'json',
 										type: '{ id?: string | undefined; created?: string | undefined; updated?: string | undefined; name?: string | undefined; start?: number | null | undefined; end?: number | null | undefined; has_xml_tag?: boolean | undefined; ... 6 more ...; content?: string | undefined; }',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -13870,7 +13448,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'TextPartOptions',
-										optional: false,
 									},
 								],
 							},
@@ -13914,7 +13491,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'DiskfilePartOptions',
-										optional: false,
 									},
 								],
 							},
@@ -13928,7 +13504,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'editor_state',
 										type: '{ current_content: string; } | null',
-										optional: false,
 									},
 								],
 							},
@@ -13970,7 +13545,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -13997,7 +13571,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'diskfile_part',
 								type: 'DiskfilePart',
-								optional: false,
 							},
 							{
 								name: 'show_actions',
@@ -14032,7 +13605,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'text_part',
 								type: 'TextPart',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -14051,7 +13623,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'parts',
 								type: 'Array<PartUnion>',
-								optional: false,
 							},
 							{
 								name: 'prompt',
@@ -14100,7 +13671,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 							{
 								name: 'selected',
@@ -14139,7 +13709,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onpick',
 								type: '(part: PartUnion | undefined) => boolean | void',
-								optional: false,
 							},
 							{
 								name: 'filter',
@@ -14172,7 +13741,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onpick',
 								type: '(part: PartUnion | undefined) => boolean | void',
-								optional: false,
 							},
 							{
 								name: 'show',
@@ -14216,7 +13784,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 							{
 								name: 'prompt',
@@ -14281,7 +13848,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'PartsOptions',
-										optional: false,
 									},
 								],
 							},
@@ -14296,7 +13862,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'json',
 										type: '{ id?: string | undefined; created?: string | undefined; updated?: string | undefined; name?: string | undefined; start?: number | null | undefined; end?: number | null | undefined; ... 7 more ...; content?: string | undefined; } | { ...; }',
-										optional: false,
 									},
 								],
 							},
@@ -14310,7 +13875,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'base_name',
 										type: 'string',
-										optional: false,
 										default_value: "'new part'",
 									},
 								],
@@ -14325,7 +13889,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -14339,7 +13902,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -14368,7 +13930,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -14387,7 +13948,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 							{
 								name: 'prompt',
@@ -14417,7 +13977,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 							{
 								name: 'attrs',
@@ -14440,7 +13999,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 							{
 								name: 'show_actions',
@@ -14569,7 +14127,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'PollerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -14607,7 +14164,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'interval',
 										type: 'number | undefined',
-										optional: false,
 									},
 								],
 							},
@@ -14770,7 +14326,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'params',
 										type: 'PopoverParameters',
-										optional: false,
 									},
 								],
 							},
@@ -14800,7 +14355,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'visible',
 										type: 'boolean',
-										optional: false,
 										default_value: '!this.visible',
 									},
 								],
@@ -14863,7 +14417,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'popover_content',
 								type: 'Snippet<[popover: Popover]>',
-								optional: false,
 							},
 							{
 								name: 'popover_container_attrs',
@@ -14924,21 +14477,18 @@ export const library_json: LibraryJson = {
 							{
 								name: 'position',
 								type: 'Position',
-								optional: false,
 								description: "- Where to position the element ('left', 'right', etc.)",
 								default_value: "'center'",
 							},
 							{
 								name: 'align',
 								type: 'Alignment',
-								optional: false,
 								description: "- Alignment along the position edge ('start', 'center', 'end')",
 								default_value: "'center'",
 							},
 							{
 								name: 'offset',
 								type: 'string',
-								optional: false,
 								description: '- Distance from the position (CSS value)',
 								default_value: "'0'",
 							},
@@ -14957,7 +14507,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'number',
-								optional: false,
 								description: 'The percentage value of the progress bar, 0-100.',
 							},
 							{
@@ -14986,7 +14535,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'parts',
 								type: 'PartUnion[]',
-								optional: false,
 							},
 						],
 					},
@@ -15097,7 +14645,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'PromptOptions',
-										optional: false,
 									},
 								],
 							},
@@ -15111,7 +14658,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'part',
 										type: 'PartUnion',
-										optional: false,
 									},
 								],
 							},
@@ -15124,7 +14670,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -15144,12 +14689,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from_index',
 										type: 'number',
-										optional: false,
 									},
 									{
 										name: 'to_index',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -15183,7 +14726,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'prompt',
 								type: 'Prompt',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -15226,7 +14768,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'prompt',
 								type: 'Prompt',
-								optional: false,
 							},
 							{
 								name: 'selected',
@@ -15250,7 +14791,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onpick',
 								type: '(prompt: Prompt | undefined) => boolean | void',
-								optional: false,
 							},
 							{
 								name: 'filter',
@@ -15288,7 +14828,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onpick',
 								type: '(prompt: Prompt | undefined) => boolean | void',
-								optional: false,
 							},
 							{
 								name: 'show',
@@ -15397,7 +14936,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'PromptsOptions',
-										optional: false,
 									},
 								],
 							},
@@ -15410,7 +14948,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'part',
 										type: 'PartUnion',
-										optional: false,
 									},
 								],
 							},
@@ -15437,7 +14974,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'base_name',
 										type: 'string',
-										optional: false,
 										default_value: "'new prompt'",
 									},
 								],
@@ -15452,7 +14988,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'prompts_json',
 										type: '{ id?: string | undefined; created?: string | undefined; updated?: string | undefined; name?: string | undefined; parts?: ({ id?: string | undefined; created?: string | undefined; updated?: string | undefined; ... 10 more ...; content?: string | undefined; } | { ...; })[] | undefined; }[]',
-										optional: false,
 									},
 								],
 							},
@@ -15465,7 +15000,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'prompt',
 										type: 'Prompt',
-										optional: false,
 									},
 								],
 							},
@@ -15478,7 +15012,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'prompt_ids',
 										type: '(string & $brand<"Uuid">)[]',
-										optional: false,
 									},
 								],
 							},
@@ -15491,7 +15024,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'prompt_id',
 										type: '(string & $brand<"Uuid">) | null',
-										optional: false,
 									},
 								],
 							},
@@ -15512,12 +15044,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'prompt_id',
 										type: '(string & $brand<"Uuid">) | null',
-										optional: false,
 									},
 									{
 										name: 'force',
 										type: 'boolean',
-										optional: false,
 										default_value: 'false',
 									},
 								],
@@ -15531,12 +15061,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from_index',
 										type: 'number',
-										optional: false,
 									},
 									{
 										name: 'to_index',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -15549,7 +15077,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'part_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -15563,7 +15090,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'boolean',
-										optional: false,
 										default_value: '!this.show_sort_controls',
 									},
 								],
@@ -15601,7 +15127,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'prompt',
 								type: 'Prompt',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -15620,7 +15145,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'prompt',
 								type: 'Prompt',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -15800,7 +15324,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ProviderOptions',
-										optional: false,
 									},
 								],
 							},
@@ -15820,7 +15343,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'provider',
 								type: 'Provider',
-								optional: false,
 							},
 							{
 								name: 'attrs',
@@ -15852,7 +15374,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'provider',
 								type: 'Provider | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'icon',
@@ -15904,7 +15425,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'name',
 								type: 'ProviderName',
-								optional: false,
 							},
 							{
 								name: 'fill',
@@ -15989,7 +15509,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ProvidersOptions',
-										optional: false,
 									},
 								],
 							},
@@ -16002,7 +15521,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'provider',
 										type: 'Provider',
-										optional: false,
 									},
 								],
 							},
@@ -16015,7 +15533,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -16028,7 +15545,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -16055,7 +15571,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'provider',
 								type: 'Provider',
-								optional: false,
 							},
 							{
 								name: 'attrs',
@@ -16082,7 +15597,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'element',
 								type: 'HTMLElement',
-								optional: false,
 							},
 						],
 					},
@@ -16099,17 +15613,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'direction',
 								type: 'ReorderableDirection',
-								optional: false,
 							},
 							{
 								name: 'source_index',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'target_index',
 								type: 'number',
-								optional: false,
 							},
 						],
 					},
@@ -16125,17 +15636,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'source_index',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'current_index',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'position',
 								type: 'ReorderableValidDropPosition',
-								optional: false,
 							},
 						],
 					},
@@ -16151,17 +15659,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'can_reorder',
 								type: '((from_index: number, to_index: number) => boolean) | undefined',
-								optional: false,
 							},
 							{
 								name: 'source_index',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'target_index',
 								type: 'number',
-								optional: false,
 							},
 						],
 					},
@@ -16176,12 +15681,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'target_index',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'max_index',
 								type: 'number',
-								optional: false,
 							},
 						],
 					},
@@ -16197,12 +15700,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'dataTransfer',
 								type: 'DataTransfer',
-								optional: false,
 							},
 							{
 								name: 'item_id',
 								type: 'ReorderableItemId',
-								optional: false,
 							},
 						],
 					},
@@ -16580,7 +16081,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ReorderableOptions',
-										optional: false,
 										default_value: 'EMPTY_OBJECT',
 									},
 								],
@@ -16610,17 +16110,14 @@ export const library_json: LibraryJson = {
 									{
 										name: 'item_id',
 										type: 'ReorderableItemId',
-										optional: false,
 									},
 									{
 										name: 'new_indicator',
 										type: 'ReorderableDropPosition',
-										optional: false,
 									},
 									{
 										name: 'is_valid',
 										type: 'boolean',
-										optional: false,
 										default_value: 'true',
 									},
 								],
@@ -16685,27 +16182,22 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string | number',
-										optional: false,
 									},
 									{
 										name: 'deferred',
 										type: 'Deferred<{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; result: { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; }; } | { [x: string]: unknown; jsonrpc: "2.0"; id: string | number | null; error: { [x: string]: unknown; code: -32700 | ... 4 more ... | (number & $brand<...>); messag...',
-										optional: false,
 									},
 									{
 										name: 'created',
 										type: 'string & $brand<"Datetime">',
-										optional: false,
 									},
 									{
 										name: 'status',
 										type: 'AsyncStatus',
-										optional: false,
 									},
 									{
 										name: 'timeout',
 										type: 'Timeout | undefined',
-										optional: false,
 									},
 								],
 							},
@@ -16738,7 +16230,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'request_timeout_ms',
 										type: 'number',
-										optional: false,
 										default_value: '120_000',
 									},
 								],
@@ -16757,7 +16248,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string | number',
-										optional: false,
 										description: 'The request id',
 									},
 								],
@@ -16773,13 +16263,11 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string | number',
-										optional: false,
 										description: 'The request id',
 									},
 									{
 										name: 'response',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; result: { [x: string]: unknown; _meta?: { [x: string]: unknown; } | undefined; }; } | { [x: string]: unknown; jsonrpc: "2.0"; id: string | number | null; error: { [x: string]: unknown; code: -32700 | ... 4 more ... | (number & $brand<...>); message: string...',
-										optional: false,
 										description: 'The response data',
 									},
 								],
@@ -16795,13 +16283,11 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string | number',
-										optional: false,
 										description: 'The request id',
 									},
 									{
 										name: 'error_message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number | null; error: { [x: string]: unknown; code: -32700 | -32600 | -32601 | -32602 | -32603 | (number & $brand<"JsonrpcServerErrorCode">); message: string; data?: unknown; }; }',
-										optional: false,
 										description: 'The complete JsonrpcErrorMessage object',
 									},
 								],
@@ -16817,7 +16303,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: 'any',
-										optional: false,
 									},
 								],
 							},
@@ -16831,7 +16316,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string | number',
-										optional: false,
 										description: 'The request id',
 									},
 								],
@@ -16872,7 +16356,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'completion_response',
 								type: '{ created: string & $brand<"Datetime">; provider_name: "ollama" | "claude" | "chatgpt" | "gemini"; model: string; data: { type: "ollama"; value: any; } | { type: "claude"; value: any; } | { ...; } | { ...; }; } | null | undefined',
-								optional: false,
 							},
 						],
 					},
@@ -16890,17 +16373,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'provider_name',
 								type: '"ollama" | "claude" | "chatgpt" | "gemini"',
-								optional: false,
 							},
 							{
 								name: 'model',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'api_response',
 								type: 'unknown',
-								optional: false,
 							},
 							{
 								name: 'progress_token',
@@ -16919,48 +16399,6 @@ export const library_json: LibraryJson = {
 					'server/backend_provider_gemini.ts',
 					'server/backend_provider_ollama.ts',
 					'thread_helpers.ts',
-				],
-			},
-			{
-				path: 'schema_helpers.ts',
-				declarations: [
-					{
-						name: 'camel_to_snake_case',
-						kind: 'function',
-						doc_comment: 'Convert a string from camelCase to snake_case.',
-						source_line: 6,
-						type_signature: '(str: string): string',
-						return_type: 'string',
-						parameters: [
-							{
-								name: 'str',
-								type: 'string',
-								optional: false,
-							},
-						],
-					},
-					{
-						name: 'to_pascalsnake_case',
-						kind: 'function',
-						doc_comment:
-							'Convert each segment of a snake_case identifier to Pascalsnake case,\ne.g., "create_directory" -> "CreateDirectory".',
-						source_line: 16,
-						type_signature: '(str: string, from_camel?: boolean): string',
-						return_type: 'string',
-						parameters: [
-							{
-								name: 'str',
-								type: 'string',
-								optional: false,
-							},
-							{
-								name: 'from_camel',
-								type: 'boolean',
-								optional: false,
-								default_value: 'false',
-							},
-						],
-					},
 				],
 			},
 			{
@@ -17058,12 +16496,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'name',
 										type: 'VocabName',
-										optional: false,
 									},
 									{
 										name: 'schema',
 										type: '{ method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; } | ZodType<...>',
-										optional: false,
 									},
 								],
 							},
@@ -17077,7 +16513,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'schemas',
 										type: 'Record<string, any>',
-										optional: false,
 									},
 								],
 							},
@@ -17092,7 +16527,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'schema',
 										type: 'ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>',
-										optional: false,
 									},
 								],
 							},
@@ -17108,7 +16542,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'method',
 										type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-										optional: false,
 									},
 								],
 							},
@@ -17124,7 +16557,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'name',
 										type: 'VocabName',
-										optional: false,
 									},
 								],
 							},
@@ -17424,7 +16856,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'backend',
 								type: 'Backend',
-								optional: false,
 							},
 						],
 					},
@@ -17440,22 +16871,18 @@ export const library_json: LibraryJson = {
 							{
 								name: 'change',
 								type: 'WatcherChange',
-								optional: false,
 							},
 							{
 								name: 'disknode',
 								type: 'Disknode',
-								optional: false,
 							},
 							{
 								name: 'backend',
 								type: 'Backend',
-								optional: false,
 							},
 							{
 								name: 'dir',
 								type: 'string',
-								optional: false,
 							},
 						],
 					},
@@ -17491,7 +16918,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'BackendProviderOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17514,7 +16940,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17529,7 +16954,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17562,7 +16986,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'BackendProviderOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17585,7 +17008,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17600,7 +17022,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17633,7 +17054,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'BackendProviderOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17656,7 +17076,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17671,7 +17090,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17715,8 +17133,21 @@ export const library_json: LibraryJson = {
 									{
 										name: 'reload',
 										type: 'boolean',
-										optional: false,
 										default_value: 'false',
+									},
+								],
+							},
+							{
+								name: 'ensure_model',
+								kind: 'function',
+								modifiers: ['private'],
+								doc_comment: 'Ensure the model is available locally, pulling if needed.',
+								type_signature: '(model: string): Promise<void>',
+								return_type: 'Promise<void>',
+								parameters: [
+									{
+										name: 'model',
+										type: 'string',
 									},
 								],
 							},
@@ -17731,7 +17162,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17746,7 +17176,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17927,7 +17356,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'BackendProviderOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17943,7 +17371,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17959,7 +17386,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'CompletionHandlerOptions',
-										optional: false,
 									},
 								],
 							},
@@ -17972,7 +17398,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'streaming',
 										type: 'boolean',
-										optional: false,
 									},
 								],
 							},
@@ -18047,12 +17472,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'progress_token',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 									{
 										name: 'chunk',
 										type: '{ [x: string]: unknown; model?: string | undefined; created_at?: string | undefined; done?: boolean | undefined; message?: { [x: string]: unknown; role: string; content: string; } | undefined; } | undefined',
-										optional: false,
 									},
 								],
 							},
@@ -18067,7 +17490,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'chunk',
 										type: 'unknown',
-										optional: false,
 									},
 								],
 							},
@@ -18082,7 +17504,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'accumulated_length',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -18097,7 +17518,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'response',
 										type: 'unknown',
-										optional: false,
 									},
 								],
 							},
@@ -18112,7 +17532,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'api_response',
 										type: 'unknown',
-										optional: false,
 									},
 								],
 							},
@@ -18148,7 +17567,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'BackendProviderOptions',
-										optional: false,
 									},
 								],
 							},
@@ -18162,7 +17580,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'api_key',
 										type: 'string | null',
-										optional: false,
 									},
 								],
 							},
@@ -18184,7 +17601,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'reload',
 										type: 'boolean',
-										optional: false,
 										default_value: 'false',
 									},
 								],
@@ -18215,7 +17631,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'BackendProviderOptions',
-										optional: false,
 									},
 								],
 							},
@@ -18262,7 +17677,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'ws',
 										type: 'WSContext<unknown>',
-										optional: false,
 									},
 								],
 							},
@@ -18276,7 +17690,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'ws',
 										type: 'WSContext<unknown>',
-										optional: false,
 									},
 								],
 							},
@@ -18291,7 +17704,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -18306,7 +17718,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -18321,7 +17732,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: '{ [x: string]: unknown; jsonrpc: "2.0"; id: string | number; method: string; params?: { [x: string]: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; } | undefined; } | undefined; }',
-										optional: false,
 									},
 								],
 							},
@@ -18493,7 +17903,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'BackendOptions',
-										optional: false,
 									},
 								],
 							},
@@ -18507,12 +17916,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'method',
 										type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-										optional: false,
 									},
 									{
 										name: 'phase',
 										type: '"send_request" | "receive_request" | "send_response" | "receive_response" | "send_error" | "receive_error" | "send" | "receive" | "execute"',
-										optional: false,
 									},
 								],
 							},
@@ -18527,7 +17934,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'method',
 										type: '"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | "filer_change" | "ollama_copy" | "ollama_create" | "ollama_delete" | ... 10 more ... | "toggle_main_menu"',
-										optional: false,
 									},
 								],
 							},
@@ -18541,7 +17947,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'provider_name',
 										type: 'T',
-										optional: false,
 									},
 								],
 							},
@@ -18558,7 +17963,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'message',
 										type: 'unknown',
-										optional: false,
 									},
 								],
 							},
@@ -18579,7 +17983,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'provider',
 										type: 'BackendProvider<unknown>',
-										optional: false,
 									},
 								],
 							},
@@ -18613,19 +18016,16 @@ export const library_json: LibraryJson = {
 							{
 								name: 'key',
 								type: 'string',
-								optional: false,
 								description: "- The environment variable name (e.g., 'SOME_CONFIGURATION_KEY')",
 							},
 							{
 								name: 'value',
 								type: 'string',
-								optional: false,
 								description: '- The new value for the environment variable',
 							},
 							{
 								name: 'options',
 								type: 'UpdateEnvVariableOptions',
-								optional: false,
 								description: '- Optional configuration for file path and operations',
 								default_value: '{}',
 							},
@@ -18678,22 +18078,18 @@ export const library_json: LibraryJson = {
 							{
 								name: 'input',
 								type: '{ completion_request: { created: string & $brand<"Datetime">; provider_name: "ollama" | "claude" | "chatgpt" | "gemini"; model: string; prompt: string; completion_messages?: { ...; }[] | undefined; }; _meta?: { ...; } | undefined; }',
-								optional: false,
 							},
 							{
 								name: 'output',
 								type: '{ completion_response: { created: string & $brand<"Datetime">; provider_name: "ollama" | "claude" | "chatgpt" | "gemini"; model: string; data: { type: "ollama"; value: any; } | { ...; } | { ...; } | { ...; }; }; _meta?: { ...; } | undefined; }',
-								optional: false,
 							},
 							{
 								name: 'dir',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'scoped_fs',
 								type: 'ScopedFs',
-								optional: false,
 							},
 						],
 					},
@@ -18738,7 +18134,6 @@ export const library_json: LibraryJson = {
 							{
 								name: '__0',
 								type: 'RegisterActionsOptions',
-								optional: false,
 							},
 						],
 					},
@@ -18796,7 +18191,6 @@ export const library_json: LibraryJson = {
 							{
 								name: '__0',
 								type: 'RegisterWebsocketActionsOptions',
-								optional: false,
 							},
 						],
 					},
@@ -18842,7 +18236,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'allowed_paths',
 										type: 'readonly string[] | string[]',
-										optional: false,
 										description: 'Array of absolute paths that operations will be restricted to',
 									},
 								],
@@ -18858,7 +18251,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path_to_check',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -18873,7 +18265,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path_to_check',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -18887,12 +18278,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'file_path',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
 										type: '(ObjectEncodingOptions & Abortable & { flag?: OpenMode | undefined; }) | BufferEncoding | null | undefined',
-										optional: false,
 										default_value: "'utf8'",
 									},
 								],
@@ -18907,17 +18296,14 @@ export const library_json: LibraryJson = {
 									{
 										name: 'file_path',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'data',
 										type: 'string | ArrayBufferView<ArrayBufferLike> | Iterable<string | ArrayBufferView<ArrayBufferLike>> | AsyncIterable<...> | Stream',
-										optional: false,
 									},
 									{
 										name: 'options',
 										type: 'BufferEncoding | (ObjectEncodingOptions & { mode?: Mode | undefined; flag?: OpenMode | undefined; flush?: boolean | undefined; } & Abortable) | null | undefined',
-										optional: false,
 										default_value: "'utf8'",
 									},
 								],
@@ -18932,7 +18318,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path_to_remove',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -18951,7 +18336,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'dir_path',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -18970,7 +18354,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'PathLike',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -18989,7 +18372,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'PathLike',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -19008,7 +18390,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'PathLike',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -19027,7 +18408,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path_to_stat',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -19046,7 +18426,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path_to_stat',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -19065,7 +18444,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path_to_stat',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -19084,12 +18462,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'source',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'destination',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'mode',
@@ -19107,7 +18483,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path_to_check',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -19134,7 +18509,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -19166,7 +18540,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'path',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'options',
@@ -19195,7 +18568,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'env_value',
 								type: 'string | undefined',
-								optional: false,
 							},
 						],
 					},
@@ -19211,12 +18583,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'origin',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'allowed_patterns',
 								type: 'RegExp[]',
-								optional: false,
 							},
 						],
 					},
@@ -19232,7 +18602,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'allowed_patterns',
 								type: 'RegExp[]',
-								optional: false,
 								description: '- Array of compiled regex patterns from parse_allowed_origins',
 							},
 						],
@@ -19253,12 +18622,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'c',
 								type: 'Context<any, any, BlankInput>',
-								optional: false,
 							},
 							{
 								name: 'next',
 								type: 'Next',
-								optional: false,
 							},
 						],
 					},
@@ -19542,7 +18909,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'SocketOptions',
-										optional: false,
 									},
 								],
 							},
@@ -19556,7 +18922,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'url',
 										type: 'string | null',
-										optional: false,
 										description: 'The WebSocket URL to connect to',
 										default_value: 'null',
 									},
@@ -19572,7 +18937,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'code',
 										type: 'number',
-										optional: false,
 										description: 'The close code to use (default: 1000 - normal closure)',
 										default_value: 'DEFAULT_CLOSE_CODE',
 									},
@@ -19590,7 +18954,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'data',
 										type: 'object',
-										optional: false,
 										description: 'The data to send',
 									},
 								],
@@ -19605,7 +18968,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'url',
 										type: 'string',
-										optional: false,
 										description: 'The new WebSocket URL',
 									},
 								],
@@ -19660,7 +19022,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'handler',
 										type: 'SocketActionHandler',
-										optional: false,
 										description: 'The message handler to add',
 									},
 								],
@@ -19676,7 +19037,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'handler',
 										type: 'SocketErrorHandler',
-										optional: false,
 										description: 'The error handler to add',
 									},
 								],
@@ -19703,12 +19063,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'socket',
 								type: 'Socket',
-								optional: false,
 							},
 							{
 								name: 'type',
 								type: "'queued' | 'failed'",
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -19822,13 +19180,11 @@ export const library_json: LibraryJson = {
 									{
 										name: 'items_getter',
 										type: 'Thunk<T[]>',
-										optional: false,
 										description: 'Function that returns the current items array',
 									},
 									{
 										name: 'sorters_getter',
 										type: 'Thunk<Sorter<T>[]>',
-										optional: false,
 										description: 'Function that returns the current sorters',
 									},
 									{
@@ -19863,22 +19219,18 @@ export const library_json: LibraryJson = {
 							{
 								name: 'key',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'label',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'field',
 								type: 'keyof T',
-								optional: false,
 							},
 							{
 								name: 'direction',
 								type: '"asc" | "desc"',
-								optional: false,
 								default_value: "'asc'",
 							},
 						],
@@ -19896,22 +19248,18 @@ export const library_json: LibraryJson = {
 							{
 								name: 'key',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'label',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'field',
 								type: 'keyof T',
-								optional: false,
 							},
 							{
 								name: 'direction',
 								type: '"asc" | "desc"',
-								optional: false,
 								default_value: "'asc'",
 							},
 						],
@@ -19966,7 +19314,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'T',
-								optional: false,
 							},
 							{
 								name: 'message',
@@ -19989,7 +19336,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'T | undefined',
-								optional: false,
 							},
 							{
 								name: 'message',
@@ -20011,7 +19357,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'T | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'message',
@@ -20031,7 +19376,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'app',
 								type: 'T',
-								optional: false,
 							},
 						],
 					},
@@ -20054,17 +19398,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'role',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'content',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'tag',
 								type: 'string',
-								optional: false,
 								default_value: "'message'",
 							},
 						],
@@ -20080,12 +19421,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'turns',
 								type: 'Iterable<{ role: string; content: string; enabled?: boolean | undefined; }>',
-								optional: false,
 							},
 							{
 								name: 'tag',
 								type: 'string',
-								optional: false,
 								default_value: "'message'",
 							},
 						],
@@ -20103,12 +19442,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'turns',
 								type: 'Iterable<Turn>',
-								optional: false,
 							},
 							{
 								name: 'completion_messages',
 								type: '{ [x: string]: unknown; role: string; content: string; }[]',
-								optional: false,
 								default_value: '[]',
 							},
 						],
@@ -20212,7 +19549,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ThreadOptions',
-										optional: false,
 									},
 								],
 							},
@@ -20226,7 +19562,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'turn',
 										type: 'Turn',
-										optional: false,
 									},
 								],
 							},
@@ -20241,7 +19576,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'request',
@@ -20261,7 +19595,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 									},
 									{
 										name: 'json',
@@ -20280,7 +19613,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -20294,12 +19626,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'part',
 										type: 'PartUnion',
-										optional: false,
 									},
 									{
 										name: 'role',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -20322,7 +19652,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'content',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -20335,7 +19664,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'model_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -20364,7 +19692,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'thread',
 								type: 'Thread',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -20409,12 +19736,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'thread',
 								type: 'Thread',
-								optional: false,
 							},
 							{
 								name: 'chat',
 								type: 'Chat',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -20500,7 +19825,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'ThreadsOptions',
-										optional: false,
 									},
 								],
 							},
@@ -20532,7 +19856,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'thread',
 										type: 'Thread',
-										optional: false,
 									},
 									{
 										name: 'select',
@@ -20551,7 +19874,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'threads_json',
 										type: '{ id?: string | undefined; created?: string | undefined; updated?: string | undefined; model_name?: string | undefined; turns?: { role: string; id?: string | undefined; created?: string | undefined; ... 5 more ...; error_message?: string | undefined; }[] | undefined; enabled?: boolean | undefined; }[]',
-										optional: false,
 									},
 									{
 										name: 'select',
@@ -20569,7 +19891,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -20582,7 +19903,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'ids',
 										type: '(string & $brand<"Uuid">)[]',
-										optional: false,
 									},
 								],
 							},
@@ -20595,7 +19915,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'thread_id',
 										type: '(string & $brand<"Uuid">) | null',
-										optional: false,
 									},
 								],
 							},
@@ -20615,12 +19934,10 @@ export const library_json: LibraryJson = {
 									{
 										name: 'from_index',
 										type: 'number',
-										optional: false,
 									},
 									{
 										name: 'to_index',
 										type: 'number',
-										optional: false,
 									},
 								],
 							},
@@ -20650,7 +19967,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'thread',
 								type: 'Thread',
-								optional: false,
 							},
 							{
 								name: 'attrs',
@@ -20682,12 +19998,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'TimeValue | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'fallback',
 								type: 'string',
-								optional: false,
 								default_value: "''",
 							},
 						],
@@ -20702,12 +20016,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'TimeValue | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'fallback',
 								type: 'string',
-								optional: false,
 								default_value: "''",
 							},
 						],
@@ -20722,12 +20034,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'TimeValue | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'fallback',
 								type: 'string',
-								optional: false,
 								default_value: "''",
 							},
 						],
@@ -20742,12 +20052,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'TimeValue | null | undefined',
-								optional: false,
 							},
 							{
 								name: 'fallback',
 								type: 'string',
-								optional: false,
 								default_value: "''",
 							},
 						],
@@ -20762,12 +20070,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'ms',
 								type: 'number',
-								optional: false,
 							},
 							{
 								name: 'decimals',
 								type: 'number',
-								optional: false,
 								default_value: '0',
 							},
 						],
@@ -20897,7 +20203,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'TimeOptions',
-										optional: false,
 									},
 								],
 							},
@@ -20941,7 +20246,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'number',
-										optional: false,
 										default_value: 'Date.now()',
 									},
 								],
@@ -20970,7 +20274,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'Date',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -20993,20 +20296,17 @@ export const library_json: LibraryJson = {
 							{
 								name: 'active',
 								type: 'boolean',
-								optional: false,
 								description: 'Current state of the toggle',
 								bindable: true,
 							},
 							{
 								name: 'active_content',
 								type: 'Snippet | string',
-								optional: false,
 								description: 'Content to display when toggle is active',
 							},
 							{
 								name: 'inactive_content',
 								type: 'Snippet | string',
-								optional: false,
 								description: 'Content to display when toggle is inactive',
 							},
 						],
@@ -21064,7 +20364,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'transport',
 										type: 'Transport',
-										optional: false,
 									},
 								],
 							},
@@ -21077,7 +20376,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'transport_name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -21133,7 +20431,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'transport_name',
 										type: 'string',
-										optional: false,
 									},
 								],
 							},
@@ -21272,7 +20569,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'TurnOptions',
-										optional: false,
 									},
 								],
 							},
@@ -21285,7 +20581,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'part',
 										type: 'PartUnion',
-										optional: false,
 									},
 								],
 							},
@@ -21298,7 +20593,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'part',
 										type: 'PartUnion',
-										optional: false,
 									},
 								],
 							},
@@ -21311,7 +20605,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'part_id',
 										type: 'string & $brand<"Uuid">',
-										optional: false,
 									},
 								],
 							},
@@ -21328,17 +20621,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 							{
 								name: 'role',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'json',
 								type: 'Partial<OmitStrict<{ id: string & $brand<"Uuid">; created: string & $brand<"Datetime">; updated: string & $brand<"Datetime">; part_ids: (string & $brand<"Uuid">)[]; ... 4 more ...; error_message?: string | undefined; }, "role" | "part_ids">>',
-								optional: false,
 							},
 						],
 					},
@@ -21353,22 +20643,18 @@ export const library_json: LibraryJson = {
 							{
 								name: 'content',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'role',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'json',
 								type: 'Partial<OmitStrict<{ id: string & $brand<"Uuid">; created: string & $brand<"Datetime">; updated: string & $brand<"Datetime">; part_ids: (string & $brand<"Uuid">)[]; ... 4 more ...; error_message?: string | undefined; }, "role" | "part_ids">>',
-								optional: false,
 							},
 							{
 								name: 'app',
 								type: 'Frontend',
-								optional: false,
 							},
 						],
 					},
@@ -21383,17 +20669,14 @@ export const library_json: LibraryJson = {
 							{
 								name: 'parts',
 								type: 'PartUnion[]',
-								optional: false,
 							},
 							{
 								name: 'role',
 								type: 'string',
-								optional: false,
 							},
 							{
 								name: 'json',
 								type: 'Partial<OmitStrict<{ id: string & $brand<"Uuid">; created: string & $brand<"Datetime">; updated: string & $brand<"Datetime">; part_ids: (string & $brand<"Uuid">)[]; ... 4 more ...; error_message?: string | undefined; }, "role" | "part_ids">>',
-								optional: false,
 							},
 						],
 					},
@@ -21411,7 +20694,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'turn',
 								type: 'Turn',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -21435,7 +20717,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'thread',
 								type: 'Thread',
-								optional: false,
 							},
 							{
 								name: 'attrs',
@@ -21459,7 +20740,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'turn',
 								type: 'Turn',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -21478,7 +20758,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'turn',
 								type: 'Turn',
-								optional: false,
 							},
 							{
 								name: 'show_actions',
@@ -21626,7 +20905,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'options',
 										type: 'UiOptions',
-										optional: false,
 									},
 								],
 							},
@@ -21640,7 +20918,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'boolean',
-										optional: false,
 										default_value: '!this.show_main_dialog',
 									},
 								],
@@ -21655,7 +20932,6 @@ export const library_json: LibraryJson = {
 									{
 										name: 'value',
 										type: 'boolean',
-										optional: false,
 										default_value: '!this.show_sidebar',
 									},
 								],
@@ -21680,7 +20956,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'value',
 								type: 'unknown',
-								optional: false,
 							},
 						],
 					},
@@ -21743,7 +21018,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'attribute',
 								type: 'XmlAttributeWithDefaults',
-								optional: false,
 							},
 							{
 								name: 'dormant',
@@ -21753,12 +21027,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'onupdate',
 								type: "(updates: Partial<OmitStrict<XmlAttributeWithDefaults, 'id'>>) => void",
-								optional: false,
 							},
 							{
 								name: 'onremove',
 								type: '() => void',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -21777,7 +21049,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'part',
 								type: 'PartUnion',
-								optional: false,
 							},
 						],
 						source_line: 1,
@@ -21892,7 +21163,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'def',
 								type: '$ZodTypeDef',
-								optional: false,
 							},
 						],
 					},
@@ -21910,7 +21180,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'schema',
 								type: 'ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>',
-								optional: false,
 								description: 'The schema to unwrap',
 							},
 						],
@@ -21926,7 +21195,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'schema',
 								type: 'ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>',
-								optional: false,
 							},
 						],
 					},
@@ -21941,7 +21209,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'schema',
 								type: 'T',
-								optional: false,
 							},
 						],
 					},
@@ -21958,13 +21225,11 @@ export const library_json: LibraryJson = {
 							{
 								name: 'schema',
 								type: 'ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>',
-								optional: false,
 								description: 'The object schema',
 							},
 							{
 								name: 'key',
 								type: 'string',
-								optional: false,
 								description: 'The property name',
 							},
 						],
@@ -21984,13 +21249,11 @@ export const library_json: LibraryJson = {
 							{
 								name: 'schema',
 								type: 'ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>',
-								optional: false,
 								description: 'The object schema',
 							},
 							{
 								name: 'key',
 								type: 'string',
-								optional: false,
 								description: 'The property name',
 							},
 						],
@@ -22008,7 +21271,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'schema',
 								type: 'ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>',
-								optional: false,
 							},
 						],
 					},
@@ -22025,7 +21287,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'schema',
 								type: 'ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>',
-								optional: false,
 							},
 						],
 					},
@@ -22041,7 +21302,6 @@ export const library_json: LibraryJson = {
 							{
 								name: 'error',
 								type: 'ZodError<unknown>',
-								optional: false,
 							},
 						],
 					},
