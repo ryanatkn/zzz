@@ -98,7 +98,7 @@
 	>
 		<!-- TODO refactor -->
 		<div class="p_sm">
-			<!-- TODO support `max_height_100` in Moss -->
+			<!-- TODO support `max_height_100` in Fuz CSS -->
 			<nav class="font_size_lg">
 				{#each dashboard_nav_items as section (section.group)}
 					{#if section.group === 'main'}

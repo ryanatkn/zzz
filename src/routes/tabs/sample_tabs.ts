@@ -61,7 +61,7 @@ export const sample_tabs: Array<BrowserTabJson> = [
 	},
 	{
 		id: create_uuid(),
-		title: 'Moss',
+		title: 'Fuz CSS',
 		selected: false,
 		url: 'https://css.fuz.dev/',
 		type: 'external_url',
@@ -71,9 +71,9 @@ export const sample_tabs: Array<BrowserTabJson> = [
 	},
 	{
 		id: create_uuid(),
-		title: 'Fuz',
+		title: 'Fuz UI',
 		selected: false,
-		url: 'https://fuz.dev/',
+		url: 'https://ui.fuz.dev/',
 		type: 'external_url',
 		refresh_counter: 0,
 		created,

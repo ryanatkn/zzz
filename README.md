@@ -79,7 +79,7 @@ Zzz builds on a great deal of software.
     but slop module internals may be low quality,
     and in general they should be less trusted for correctness and style
   - for the important parts, I consider the code quality up to par with my norm
-    (my normal being [Fuz](https://github.com/fuzdev/fuz_ui)/[Moss](https://github.com/fuzdev/fuz_css)/[Gro](https://github.com/ryanatkn/gro)/[Belt](https://github.com/fuzdev/fuz_util)),
+    (my normal being [Fuz](https://github.com/fuzdev/fuz_ui)/[Fuz CSS](https://github.com/fuzdev/fuz_css)/[Gro](https://github.com/ryanatkn/gro)/[Belt](https://github.com/fuzdev/fuz_util)),
     with the caveat that this initial proof of concept
     is intentionally slapdash in places for speed and to experiment,
     and LLMs make this mindset easy to indulge
