@@ -1,6 +1,6 @@
 import type {WatcherChangeType} from '@ryanatkn/gro/watch_dir.js';
 import type {Disknode} from '@ryanatkn/gro/disknode.js';
-import {strip_start} from '@ryanatkn/belt/string.js';
+import {strip_start} from '@fuzdev/fuz_util/string.js';
 
 import {Uuid, Datetime, DatetimeNow, create_uuid} from './zod_helpers.js';
 import {
@@ -12,10 +12,10 @@ import {
 } from './diskfile_types.js';
 import type {Diskfile} from './diskfile.svelte.js';
 
-// TODO probably extract to `@ryanatkn/belt/path.js`
+// TODO probably extract to `@fuzdev/fuz_util/path.js`
 export const is_path_absolute = (path: string): boolean => path[0] === '/';
 
-// TODO hacky, refactor path helpers with `@ryanatkn/belt/path.js`
+// TODO hacky, refactor path helpers with `@fuzdev/fuz_util/path.js`
 export const to_relative_path = (path: string, parent: string): string =>
 	strip_start(strip_start(path, parent), '/');
 

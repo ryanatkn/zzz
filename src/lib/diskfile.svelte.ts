@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {strip_start} from '@ryanatkn/belt/string.js';
+import {strip_start} from '@fuzdev/fuz_util/string.js';
 
 import {Cell, type CellOptions} from './cell.svelte.js';
 import {

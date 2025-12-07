@@ -1,7 +1,7 @@
 // @slop Claude Sonnet 3.7
 
 import {z} from 'zod';
-import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
+import {EMPTY_OBJECT} from '@fuzdev/fuz_util/object.js';
 
 import {DiskfilePath} from './diskfile_types.js';
 import {Cell, type CellOptions} from './cell.svelte.js';

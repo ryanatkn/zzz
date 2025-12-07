@@ -1,6 +1,6 @@
 <script lang="ts" generics="T extends {id: Uuid}">
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
-	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
+	import Dialog from '@fuzdev/fuz_ui/Dialog.svelte';
 	import type {ComponentProps} from 'svelte';
 
 	import type {Uuid} from './zod_helpers.js';

@@ -1,7 +1,7 @@
 // @slop Claude Opus 4
 
 import {z} from 'zod';
-import type {ArrayElement} from '@ryanatkn/belt/types.js';
+import type {ArrayElement} from '@fuzdev/fuz_util/types.js';
 
 import {Cell, type CellOptions} from '$lib/cell.svelte.js';
 import {ProjectJson} from '$routes/projects/projects_schema.js';

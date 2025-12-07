@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
-	import DocsFooter from '@ryanatkn/fuz/DocsFooter.svelte';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import Breadcrumb from '@fuzdev/fuz_ui/Breadcrumb.svelte';
+	import DocsFooter from '@fuzdev/fuz_ui/DocsFooter.svelte';
+	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
+	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 	import {page} from '$app/state';
 	import {resolve} from '$app/paths';
 

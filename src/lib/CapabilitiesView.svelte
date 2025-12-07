@@ -1,6 +1,6 @@
 <script lang="ts">
-	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
+	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
+	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
 
 	import CapabilityWebsocket from './CapabilityWebsocket.svelte';
 	import CapabilityFilesystem from './CapabilityFilesystem.svelte';

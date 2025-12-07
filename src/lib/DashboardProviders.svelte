@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {format_url} from '@ryanatkn/belt/url.js';
+	import {format_url} from '@fuzdev/fuz_util/url.js';
 
 	import ProviderLink from './ProviderLink.svelte';
 	import ModelLink from './ModelLink.svelte';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 	import type {Snippet} from 'svelte';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 
 	import {frontend_context} from './frontend.svelte.js';
 	import {GLYPH_ACTION_TYPE_REQUEST_RESPONSE} from './glyphs.js';

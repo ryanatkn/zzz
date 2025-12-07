@@ -1,6 +1,6 @@
 <script lang="ts" generics="T extends {id: Uuid}">
 	import type {Snippet} from 'svelte';
-	import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
+	import {EMPTY_ARRAY} from '@fuzdev/fuz_util/array.js';
 	import {slide} from 'svelte/transition';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 

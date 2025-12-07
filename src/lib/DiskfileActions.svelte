@@ -1,6 +1,6 @@
 <script lang="ts">
-	import CopyToClipboard from '@ryanatkn/fuz/CopyToClipboard.svelte';
-	import PasteFromClipboard from '@ryanatkn/fuz/PasteFromClipboard.svelte';
+	import CopyToClipboard from '@fuzdev/fuz_ui/CopyToClipboard.svelte';
+	import PasteFromClipboard from '@fuzdev/fuz_ui/PasteFromClipboard.svelte';
 	import {slide} from 'svelte/transition';
 
 	import ConfirmButton from './ConfirmButton.svelte';

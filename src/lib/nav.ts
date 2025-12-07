@@ -1,6 +1,6 @@
-import type {SvgData} from '@ryanatkn/fuz/Svg.svelte';
+import type {SvgData} from '@fuzdev/fuz_ui/Svg.svelte';
 import {resolve} from '$app/paths';
-import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 import {page} from '$app/state';
 
 import {

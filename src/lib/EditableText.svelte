@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {tick} from 'svelte';
-	import {swallow} from '@ryanatkn/belt/dom.js';
+	import {swallow} from '@fuzdev/fuz_util/dom.js';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	// TODO either refactor to support Textarea or make that a separate EditableTextarea

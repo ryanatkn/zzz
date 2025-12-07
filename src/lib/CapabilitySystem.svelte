@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {DEV} from 'esm-env';
 	import {resolve} from '$app/paths';
-	import {format_url} from '@ryanatkn/belt/url.js';
+	import {format_url} from '@fuzdev/fuz_util/url.js';
 
 	import {library_context} from './library.js';
 	import ExternalLink from './ExternalLink.svelte';

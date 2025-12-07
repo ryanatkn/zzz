@@ -1,4 +1,4 @@
-import {escape_regexp} from '@ryanatkn/belt/regexp.js';
+import {escape_regexp} from '@fuzdev/fuz_util/regexp.js';
 import type {Handler} from 'hono';
 
 /**

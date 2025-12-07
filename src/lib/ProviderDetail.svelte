@@ -2,7 +2,7 @@
 	import {resolve} from '$app/paths';
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
-	import {format_url} from '@ryanatkn/belt/url.js';
+	import {format_url} from '@fuzdev/fuz_util/url.js';
 
 	import type {Provider} from './provider.svelte.js';
 	import ProviderLogo from './ProviderLogo.svelte';

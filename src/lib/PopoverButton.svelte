@@ -3,7 +3,7 @@
 	import type {Snippet} from 'svelte';
 	import {scale} from 'svelte/transition';
 	import {DEV} from 'esm-env';
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 
 	import {Popover} from './popover.svelte.js';
 	import type {Position, Alignment} from './position_helpers.js';

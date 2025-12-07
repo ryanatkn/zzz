@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 
 	import ErrorMessageInline from './ErrorMessageInline.svelte';
 	import type {Turn} from './turn.svelte.js';

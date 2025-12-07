@@ -7,7 +7,7 @@
 	import type {Action} from './action.svelte.js';
 	import {app_context} from './app.svelte.js';
 	import TimeWidget from './TimeWidget.svelte';
-	import {random_item} from '@ryanatkn/belt/random.js';
+	import {random_item} from '@fuzdev/fuz_util/random.js';
 
 	const app = app_context.get();
 

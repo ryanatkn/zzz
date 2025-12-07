@@ -1,7 +1,7 @@
 <script lang="ts">
 	// @slop Claude Opus 4
 
-	import {swallow, is_editable} from '@ryanatkn/belt/dom.js';
+	import {swallow, is_editable} from '@fuzdev/fuz_util/dom.js';
 	import type {Snippet} from 'svelte';
 
 	import {

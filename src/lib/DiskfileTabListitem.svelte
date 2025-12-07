@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {swallow} from '@ryanatkn/belt/dom.js';
+	import {swallow} from '@fuzdev/fuz_util/dom.js';
 
 	import {GLYPH_REMOVE} from './glyphs.js';
 	import type {DiskfileTab} from './diskfile_tab.svelte.js';

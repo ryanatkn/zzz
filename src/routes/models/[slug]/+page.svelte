@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Alert from '@ryanatkn/fuz/Alert.svelte';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import Alert from '@fuzdev/fuz_ui/Alert.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 	import {resolve} from '$app/paths';
 
 	import ModelDetail from '$lib/ModelDetail.svelte';

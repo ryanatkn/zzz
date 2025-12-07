@@ -1,4 +1,4 @@
-import type {OmitStrict} from '@ryanatkn/belt/types.js';
+import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 
 import {estimate_token_count} from './helpers.js';
 import {Cell, type CellOptions} from './cell.svelte.js';

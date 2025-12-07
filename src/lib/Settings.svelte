@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ColorSchemeInput from '@ryanatkn/fuz/ColorSchemeInput.svelte';
-	import ThemeInput from '@ryanatkn/fuz/ThemeInput.svelte';
+	import ColorSchemeInput from '@fuzdev/fuz_ui/ColorSchemeInput.svelte';
+	import ThemeInput from '@fuzdev/fuz_ui/ThemeInput.svelte';
 
 	import ExternalLink from './ExternalLink.svelte';
 </script>
@@ -18,7 +18,7 @@
 <h3>theme</h3>
 <aside>
 	⚠️ Themes are a proof of concept, not ready for production. For technical docs see <ExternalLink
-		href="https://moss.ryanatkn.com/docs/themes">Moss</ExternalLink
+		href="https://css.fuz.dev/docs/themes">Moss</ExternalLink
 	>.
 </aside>
 <div class="width_upto_sm box">

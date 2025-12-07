@@ -1,7 +1,7 @@
 <script lang="ts">
 	// @slop Claude Opus 4
 
-	import {swallow} from '@ryanatkn/belt/dom.js';
+	import {swallow} from '@fuzdev/fuz_util/dom.js';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 
 	import Glyph from './Glyph.svelte';
 	import ProgressBar from './ProgressBar.svelte';

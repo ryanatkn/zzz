@@ -2,7 +2,7 @@
 	import {slide} from 'svelte/transition';
 	import {format} from 'date-fns';
 	import {SvelteMap} from 'svelte/reactivity';
-	import CopyToClipboard from '@ryanatkn/fuz/CopyToClipboard.svelte';
+	import CopyToClipboard from '@fuzdev/fuz_ui/CopyToClipboard.svelte';
 
 	import type {Socket, QueuedMessage, FailedMessage} from './socket.svelte.js';
 	import Glyph from './Glyph.svelte';

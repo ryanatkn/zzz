@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends {id: Uuid}">
-	import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
+	import {EMPTY_ARRAY} from '@fuzdev/fuz_util/array.js';
 	import type {Snippet} from 'svelte';
 
 	import type {Uuid} from './zod_helpers.js';

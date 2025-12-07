@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {swallow} from '@ryanatkn/belt/dom.js';
+	import {swallow} from '@fuzdev/fuz_util/dom.js';
 
 	import type {Diskfile} from './diskfile.svelte.js';
 	import DiskfileContextmenu from './DiskfileContextmenu.svelte';

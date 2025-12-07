@@ -13,7 +13,7 @@ import type {
 	ActionEventRemoteNotificationData,
 	ActionEventLocalCallData,
 } from './action_event_data.js';
-import type {Result} from '@ryanatkn/belt/result.js';
+import type {Result} from '@fuzdev/fuz_util/result.js';
 
 import type {ActionMethod} from './action_metatypes.js';
 import type {ActionInputs} from './action_collections.js';

@@ -1,7 +1,7 @@
 import {z} from 'zod';
-import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
+import {EMPTY_ARRAY} from '@fuzdev/fuz_util/array.js';
 import {SvelteMap} from 'svelte/reactivity';
-import {ensure_end, ensure_start, strip_end, strip_start} from '@ryanatkn/belt/string.js';
+import {ensure_end, ensure_start, strip_end, strip_start} from '@fuzdev/fuz_util/string.js';
 import type {SchemaKeys} from './cell_types.js';
 
 export const Any = z.any();

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 
 	import type {PartUnion} from './part.svelte.js';
 	import type {Prompt} from './prompt.svelte.js';

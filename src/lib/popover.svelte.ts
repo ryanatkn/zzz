@@ -3,7 +3,7 @@
 import type {Attachment} from 'svelte/attachments';
 import type {Snippet} from 'svelte';
 import {on} from 'svelte/events';
-import {swallow} from '@ryanatkn/belt/dom.js';
+import {swallow} from '@fuzdev/fuz_util/dom.js';
 import type {TransitionConfig} from 'svelte/transition';
 
 import {type Position, type Alignment, generate_position_styles} from './position_helpers.js';

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import {random_item} from '@ryanatkn/belt/random.js';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import {random_item} from '@fuzdev/fuz_util/random.js';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 	import {onMount} from 'svelte';
 
 	import ChatList from './ChatList.svelte';

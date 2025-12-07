@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type {ComponentProps} from 'svelte';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import {chatgpt_logo, claude_logo, gemini_logo} from '@ryanatkn/fuz/logos.js';
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
+	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
+	import {chatgpt_logo, claude_logo, gemini_logo} from '@fuzdev/fuz_ui/logos.js';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 
 	import type {ProviderName} from './provider_types.js';
 	import {ollama_logo} from './ollama_helpers.js';

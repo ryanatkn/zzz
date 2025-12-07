@@ -1,6 +1,6 @@
 // @slop Claude Sonnet 3.7
 
-import {UnreachableError} from '@ryanatkn/belt/error.js';
+import {UnreachableError} from '@fuzdev/fuz_util/error.js';
 
 // TODO zod schemas
 

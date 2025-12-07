@@ -1,6 +1,6 @@
 import {vitePreprocess} from '@sveltejs/vite-plugin-svelte';
-import {create_csp_directives} from '@ryanatkn/fuz/csp.js';
-import {csp_trusted_sources_of_ryanatkn} from '@ryanatkn/fuz/csp_of_ryanatkn.js';
+import {create_csp_directives} from '@fuzdev/fuz_ui/csp.js';
+import {csp_trusted_sources_of_ryanatkn} from '@fuzdev/fuz_ui/csp_of_ryanatkn.js';
 
 // Dynamically import adapter based on the ZZZ_BUILD env var.
 // ZZZ_BUILD=node for production Node server, otherwise static for GitHub Pages.
@@ -34,7 +34,7 @@ export default {
 					'frame-src': [
 						'self',
 						// enable iframing for the example sites
-						'https://moss.ryanatkn.com/',
+						'https://css.fuz.dev/',
 						'https://fuz.dev/',
 						'https://*.fuz.dev/',
 					],

@@ -2,9 +2,9 @@
 	// @slop Claude Sonnet 3.7
 
 	import {slide} from 'svelte/transition';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 	import {onMount} from 'svelte';
-	import {plural} from '@ryanatkn/belt/string.js';
+	import {plural} from '@fuzdev/fuz_util/string.js';
 
 	import {frontend_context} from './frontend.svelte.js';
 	import Glyph from './Glyph.svelte';

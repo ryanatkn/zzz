@@ -1,6 +1,6 @@
 // @slop Claude Opus 4
 
-import {UnreachableError} from '@ryanatkn/belt/error.js';
+import {UnreachableError} from '@fuzdev/fuz_util/error.js';
 
 import type {ActionSpecUnion} from './action_spec.js';
 import {is_action_initiator} from './action_types.js';

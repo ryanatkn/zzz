@@ -2,7 +2,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {ComponentProps, Snippet} from 'svelte';
 	import {DEV} from 'esm-env';
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 
 	import PopoverButton from './PopoverButton.svelte';
 	import {GLYPH_REMOVE} from './glyphs.js';

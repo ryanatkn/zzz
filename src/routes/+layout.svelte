@@ -1,12 +1,12 @@
 <script lang="ts">
-	import '@ryanatkn/moss/style.css';
-	import '@ryanatkn/moss/theme.css';
+	import '@fuzdev/fuz_css/style.css';
+	import '@fuzdev/fuz_css/theme.css';
 	import '$routes/moss.css';
 	import '$routes/style.css';
 
 	import {onMount} from 'svelte';
-	import {contextmenu_attachment} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
-	import {Library} from '@ryanatkn/fuz/library.svelte.js';
+	import {contextmenu_attachment} from '@fuzdev/fuz_ui/contextmenu_state.svelte.js';
+	import {Library} from '@fuzdev/fuz_ui/library.svelte.js';
 	import {BROWSER} from 'esm-env';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';

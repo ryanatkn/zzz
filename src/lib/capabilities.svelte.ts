@@ -1,7 +1,7 @@
 // @slop Claude Sonnet 3.7
 
 import {z} from 'zod';
-import type {AsyncStatus} from '@ryanatkn/belt/async.js';
+import type {AsyncStatus} from '@fuzdev/fuz_util/async.js';
 
 import {Cell, type CellOptions} from './cell.svelte.js';
 import {CellJson} from './cell_types.js';

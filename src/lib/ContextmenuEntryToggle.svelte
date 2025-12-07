@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {ComponentProps, Snippet} from 'svelte';
-	import ContextmenuEntry from '@ryanatkn/fuz/ContextmenuEntry.svelte';
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
+	import ContextmenuEntry from '@fuzdev/fuz_ui/ContextmenuEntry.svelte';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 	import {DEV} from 'esm-env';
 
 	import {GLYPH_CHECKMARK} from './glyphs.js';

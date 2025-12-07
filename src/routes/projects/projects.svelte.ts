@@ -1,7 +1,7 @@
 // @slop Claude Opus 4
 
 import {z} from 'zod';
-import {create_context} from '@ryanatkn/fuz/context_helpers.js';
+import {create_context} from '@fuzdev/fuz_ui/context_helpers.js';
 import {page} from '$app/state';
 
 import {Cell, type CellOptions} from '$lib/cell.svelte.js';

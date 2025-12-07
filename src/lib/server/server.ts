@@ -1,7 +1,7 @@
 import {Hono} from 'hono';
 import {serve, type HttpBindings} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
-import {Logger} from '@ryanatkn/belt/log.js';
+import {Logger} from '@fuzdev/fuz_util/log.js';
 import {ALLOWED_ORIGINS} from '$env/static/private';
 import {DEV} from 'esm-env';
 

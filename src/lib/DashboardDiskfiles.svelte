@@ -1,7 +1,7 @@
 <script lang="ts">
-	import {swallow, is_editable} from '@ryanatkn/belt/dom.js';
-	import {random_item} from '@ryanatkn/belt/random.js';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import {swallow, is_editable} from '@fuzdev/fuz_util/dom.js';
+	import {random_item} from '@fuzdev/fuz_util/random.js';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 	import {onMount} from 'svelte';
 
 	import {frontend_context} from './frontend.svelte.js';

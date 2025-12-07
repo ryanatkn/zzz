@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import type {SvgData} from '@ryanatkn/fuz/Svg.svelte.js';
+import type {SvgData} from '@fuzdev/fuz_ui/Svg.svelte.js';
 
 export const OLLAMA_URL = 'http://127.0.0.1:11434'; // TODO config
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {swallow} from '@ryanatkn/belt/dom.js';
+	import {swallow} from '@fuzdev/fuz_util/dom.js';
 
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
