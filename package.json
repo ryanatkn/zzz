@@ -38,10 +38,10 @@
   },
   "devDependencies": {
     "@changesets/changelog-git": "^0.2.1",
-    "@ryanatkn/eslint-config": "^0.9.0",
-    "@fuzdev/fuz_ui": "^0.168.0",
-    "@ryanatkn/gro": "^0.180.0",
     "@fuzdev/fuz_css": "^0.39.0",
+    "@fuzdev/fuz_ui": "^0.168.0",
+    "@ryanatkn/eslint-config": "^0.9.0",
+    "@ryanatkn/gro": "^0.180.0",
     "@sveltejs/adapter-node": "^5.4.0",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.49.0",
