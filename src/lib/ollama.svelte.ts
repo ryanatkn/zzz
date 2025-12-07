@@ -1,7 +1,7 @@
 // @slop claude_sonnet_4
 
 import {z} from 'zod';
-import type {AsyncStatus} from '@ryanatkn/belt/async.js';
+import type {AsyncStatus} from '@fuzdev/fuz_util/async.js';
 import {BROWSER, DEV} from 'esm-env';
 import {SvelteSet} from 'svelte/reactivity';
 

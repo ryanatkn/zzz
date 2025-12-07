@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
+	import Dialog from '@fuzdev/fuz_ui/Dialog.svelte';
 	import {onNavigate} from '$app/navigation';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
+	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
 	import {resolve} from '$app/paths';
-	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 
 	import {frontend_context} from './frontend.svelte.js';
 

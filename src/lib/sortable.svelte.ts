@@ -1,6 +1,6 @@
 // @slop Claude Sonnet 3.7
 
-import type {Thunk} from '@ryanatkn/belt/function.js';
+import type {Thunk} from '@fuzdev/fuz_util/function.js';
 import type {Cell} from './cell.svelte.js';
 
 export interface Sorter<T> {

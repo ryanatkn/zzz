@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import type {AsyncStatus} from '@ryanatkn/belt/async.js';
+import type {AsyncStatus} from '@fuzdev/fuz_util/async.js';
 
 import type {Model} from './model.svelte.js';
 import {to_completion_response_text} from './response_helpers.js';

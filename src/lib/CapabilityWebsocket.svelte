@@ -4,7 +4,7 @@
 	import {slide} from 'svelte/transition';
 	import {formatDuration, intervalToDuration} from 'date-fns';
 	import {BROWSER} from 'esm-env';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 
 	import {frontend_context} from './frontend.svelte.js';
 	import type {Socket} from './socket.svelte.js';

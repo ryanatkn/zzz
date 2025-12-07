@@ -1,8 +1,8 @@
-import {create_context} from '@ryanatkn/fuz/context_helpers.js';
+import {create_context} from '@fuzdev/fuz_ui/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
-import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
-import type {Assignable, ClassConstructor, OmitStrict} from '@ryanatkn/belt/types.js';
+import {EMPTY_OBJECT} from '@fuzdev/fuz_util/object.js';
+import type {Assignable, ClassConstructor, OmitStrict} from '@fuzdev/fuz_util/types.js';
 
 import {Provider, type ProviderJsonInput} from './provider.svelte.js';
 import type {ProviderStatus} from './provider_types.js';

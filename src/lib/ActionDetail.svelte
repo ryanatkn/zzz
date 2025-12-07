@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CopyToClipboard from '@ryanatkn/fuz/CopyToClipboard.svelte';
+	import CopyToClipboard from '@fuzdev/fuz_ui/CopyToClipboard.svelte';
 
 	import Glyph from './Glyph.svelte';
 	import {get_glyph_for_action_kind} from './glyphs.js';

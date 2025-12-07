@@ -1,4 +1,4 @@
-import {create_context} from '@ryanatkn/fuz/context_helpers.js';
+import {create_context} from '@fuzdev/fuz_ui/context_helpers.js';
 
 import {Frontend, frontend_context, type FrontendOptions} from './frontend.svelte.js';
 import {cell_classes} from './cell_classes.js';

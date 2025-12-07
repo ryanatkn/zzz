@@ -2,8 +2,8 @@
 
 import type {Attachment} from 'svelte/attachments';
 import {on} from 'svelte/events';
-import type {Flavored} from '@ryanatkn/belt/types.js';
-import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
+import type {Flavored} from '@fuzdev/fuz_util/types.js';
+import {EMPTY_OBJECT} from '@fuzdev/fuz_util/object.js';
 
 import {
 	detect_reorderable_direction,

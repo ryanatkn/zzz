@@ -1,8 +1,8 @@
 <script lang="ts">
 	// @slop claude_sonnet_4
 
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
-	import Details from '@ryanatkn/fuz/Details.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
+	import Details from '@fuzdev/fuz_ui/Details.svelte';
 	import type {Snippet} from 'svelte';
 
 	import Glyph from './Glyph.svelte';

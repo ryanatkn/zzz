@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
-	import Themed from '@ryanatkn/fuz/Themed.svelte';
-	import ContextmenuRoot from '@ryanatkn/fuz/ContextmenuRoot.svelte';
+	import Themed from '@fuzdev/fuz_ui/Themed.svelte';
+	import ContextmenuRoot from '@fuzdev/fuz_ui/ContextmenuRoot.svelte';
 
 	import {Frontend, frontend_context} from './frontend.svelte.js';
 	import Dashboard from './Dashboard.svelte';

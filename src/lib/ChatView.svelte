@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
-	import Details from '@ryanatkn/fuz/Details.svelte';
+	import Details from '@fuzdev/fuz_ui/Details.svelte';
 
 	import Glyph from './Glyph.svelte';
 	import ConfirmButton from './ConfirmButton.svelte';

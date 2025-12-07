@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {resolve} from '$app/paths';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
+	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 
 	import PageFooter from '$routes/PageFooter.svelte';
 

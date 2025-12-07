@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
-	import CopyToClipboard from '@ryanatkn/fuz/CopyToClipboard.svelte';
-	import PasteFromClipboard from '@ryanatkn/fuz/PasteFromClipboard.svelte';
-	import {swallow} from '@ryanatkn/belt/dom.js';
+	import CopyToClipboard from '@fuzdev/fuz_ui/CopyToClipboard.svelte';
+	import PasteFromClipboard from '@fuzdev/fuz_ui/PasteFromClipboard.svelte';
+	import {swallow} from '@fuzdev/fuz_util/dom.js';
 
 	import {estimate_token_count} from './helpers.js';
 	import ContentStats from './ContentStats.svelte';

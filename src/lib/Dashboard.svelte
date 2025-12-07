@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {resolve} from '$app/paths';
 	import type {Snippet} from 'svelte';
-	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
+	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
+	import {is_editable, swallow} from '@fuzdev/fuz_util/dom.js';
 	import {slide} from 'svelte/transition';
 
 	import NavLink from './NavLink.svelte';

@@ -19,7 +19,7 @@ export const gen: Gen = ({origin_path}) => {
 	const imports = new ImportBuilder();
 
 	imports.add('zod', 'z');
-	imports.add_type('@ryanatkn/belt/result.js', 'Result');
+	imports.add_type('@fuzdev/fuz_util/result.js', 'Result');
 	imports.add_types('./action_collections.js', 'ActionInputs', 'ActionOutputs');
 	imports.add_type('./jsonrpc.js', 'JsonrpcErrorJson');
 

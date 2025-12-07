@@ -2,7 +2,7 @@
 	// @slop claude_sonnet_4
 
 	import {slide} from 'svelte/transition';
-	import {plural} from '@ryanatkn/belt/string.js';
+	import {plural} from '@fuzdev/fuz_util/string.js';
 
 	import Glyph from './Glyph.svelte';
 	import {

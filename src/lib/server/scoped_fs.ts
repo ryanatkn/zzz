@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import type * as fs_types from 'node:fs';
 import {dirname, normalize} from 'node:path';
-import {ensure_end} from '@ryanatkn/belt/string.js';
+import {ensure_end} from '@fuzdev/fuz_util/string.js';
 import {z} from 'zod';
 
 // TODO probably need configuration to e.g. allow symlinks, this starting point prioritizes locking things down

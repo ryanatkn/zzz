@@ -1,8 +1,8 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 	import type {Snippet} from 'svelte';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
-	import PendingButton from '@ryanatkn/fuz/PendingButton.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
+	import PendingButton from '@fuzdev/fuz_ui/PendingButton.svelte';
 
 	import {frontend_context} from './frontend.svelte.js';
 	import type {Diskfile} from './diskfile.svelte.js';

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Alert from '@ryanatkn/fuz/Alert.svelte';
+	import Alert from '@fuzdev/fuz_ui/Alert.svelte';
 	import {BROWSER} from 'esm-env';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 
 	import ProviderDetail from '$lib/ProviderDetail.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';

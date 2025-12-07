@@ -63,10 +63,7 @@ export class ActionEvent<
 	readonly environment: TEnvironment;
 	readonly spec: ActionSpecUnion;
 
-	// TODO type?
-	// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 	get data(): ActionEventDatas[TMethod] & {phase: TPhase; step: TStep} {
-		// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 		return this.#data as ActionEventDatas[TMethod] & {phase: TPhase; step: TStep};
 	}
 

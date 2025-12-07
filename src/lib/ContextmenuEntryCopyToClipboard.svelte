@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type {ComponentProps, Snippet} from 'svelte';
-	import ContextmenuEntry from '@ryanatkn/fuz/ContextmenuEntry.svelte';
-	import type {Thunk} from '@ryanatkn/belt/function.js';
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
+	import ContextmenuEntry from '@fuzdev/fuz_ui/ContextmenuEntry.svelte';
+	import type {Thunk} from '@fuzdev/fuz_util/function.js';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 
 	import {GLYPH_COPY} from './glyphs.js';
 	import {to_preview} from './helpers.js';

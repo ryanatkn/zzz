@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import LibraryDetail from '@ryanatkn/fuz/LibraryDetail.svelte';
-	import EcosystemLinksPanel from '@ryanatkn/fuz/EcosystemLinksPanel.svelte';
-	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
+	import LibraryDetail from '@fuzdev/fuz_ui/LibraryDetail.svelte';
+	import EcosystemLinksPanel from '@fuzdev/fuz_ui/EcosystemLinksPanel.svelte';
+	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 	import {resolve} from '$app/paths';
-	import Details from '@ryanatkn/fuz/Details.svelte';
+	import Details from '@fuzdev/fuz_ui/Details.svelte';
 	import {DEV} from 'esm-env';
 
 	import {library_context} from '$lib/library.js';
@@ -110,7 +110,7 @@
 					>AT Protocol</ExternalLink
 				> and <ExternalLink href="https://activitypub.rocks/">ActivityPub</ExternalLink> -- probably
 				both but they're not immediate prioritie (I have an initial <ExternalLink
-					href="https://github.com/ryanatkn/fuz_mastodon">Mastodon integration</ExternalLink
+					href="https://github.com/fuzdev/fuz_mastodon">Mastodon integration</ExternalLink
 				> with readonly embedded posts)
 			</li>
 			<li>
@@ -216,7 +216,7 @@
 			> to run and there is no auth yet
 		</aside>
 		<p>
-			My current plan is to extract <ExternalLink href="https://github.com/ryanatkn/fuz"
+			My current plan is to extract <ExternalLink href="https://github.com/fuzdev/fuz_ui"
 				>a reusable framework</ExternalLink
 			> out of Zzz that prioritizes security from the first commit. More on that soon. For now Zzz is
 			insecure and should definitely not be run in production, and it should be used with caution in
@@ -259,7 +259,7 @@
 				the CSP config in <ExternalLink
 					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
 					>svelte.config.js</ExternalLink
-				> and the <ExternalLink href="https://www.fuz.dev/docs/csp">Fuz CSP docs</ExternalLink>.
+				> and the <ExternalLink href="https://ui.fuz.dev/docs/csp">Fuz CSP docs</ExternalLink>.
 				Configuration will be needed for many usecases, unlocking shenanigans good and bad, so we'll
 				tread carefully.
 			</li>
@@ -279,7 +279,7 @@
 					<li>
 						any modules you install from npm/jsr, or any code you add to the src directory, carry
 						the normal elevated risks associated with development and code execution -- I try to
-						practice good <ExternalLink href="https://github.com/ryanatkn/fuz_template/issues/1"
+						practice good <ExternalLink href="https://github.com/fuzdev/fuz_template/issues/1"
 							>dependency hygiene</ExternalLink
 						>
 					</li>

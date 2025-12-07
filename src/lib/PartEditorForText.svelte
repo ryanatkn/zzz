@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 	import type {ComponentProps} from 'svelte';
 
 	import {TextPart} from './part.svelte.js';

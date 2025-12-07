@@ -1,6 +1,6 @@
 // @slop Claude Opus 4
 
-import {create_deferred, type Deferred, type AsyncStatus} from '@ryanatkn/belt/async.js';
+import {create_deferred, type Deferred, type AsyncStatus} from '@fuzdev/fuz_util/async.js';
 import {SvelteMap} from 'svelte/reactivity';
 
 import {Datetime, get_datetime_now} from './zod_helpers.js';

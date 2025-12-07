@@ -1,8 +1,8 @@
 // @slop Claude Opus 4
 
 import type {z} from 'zod';
-import type {Flavored} from '@ryanatkn/belt/types.js';
-import {UnreachableError} from '@ryanatkn/belt/error.js';
+import type {Flavored} from '@fuzdev/fuz_util/types.js';
+import {UnreachableError} from '@fuzdev/fuz_util/error.js';
 
 import type {
 	ActionSpecUnion,

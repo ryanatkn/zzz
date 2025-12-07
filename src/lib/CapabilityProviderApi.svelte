@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 	import {onMount} from 'svelte';
 
 	import {frontend_context} from './frontend.svelte.js';

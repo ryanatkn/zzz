@@ -2,7 +2,7 @@ import {Filer} from '@ryanatkn/gro/filer.js';
 import type {Disknode} from '@ryanatkn/gro/disknode.js';
 import type {WatcherChange} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
-import {Logger} from '@ryanatkn/belt/log.js';
+import {Logger} from '@fuzdev/fuz_util/log.js';
 import type {BackendProviderOllama} from './backend_provider_ollama.js';
 import type {BackendProviderGemini} from './backend_provider_gemini.js';
 import type {BackendProviderChatgpt} from './backend_provider_chatgpt.js';

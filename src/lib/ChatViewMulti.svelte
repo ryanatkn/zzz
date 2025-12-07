@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PendingButton from '@ryanatkn/fuz/PendingButton.svelte';
+	import PendingButton from '@fuzdev/fuz_ui/PendingButton.svelte';
 	import {slide} from 'svelte/transition';
 
 	import ConfirmButton from './ConfirmButton.svelte';

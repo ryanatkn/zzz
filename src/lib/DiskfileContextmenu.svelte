@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type {ComponentProps, Snippet} from 'svelte';
-	import Contextmenu from '@ryanatkn/fuz/Contextmenu.svelte';
-	import ContextmenuEntry from '@ryanatkn/fuz/ContextmenuEntry.svelte';
-	import ContextmenuSubmenu from '@ryanatkn/fuz/ContextmenuSubmenu.svelte';
-	import type {OmitStrict} from '@ryanatkn/belt/types.js';
+	import Contextmenu from '@fuzdev/fuz_ui/Contextmenu.svelte';
+	import ContextmenuEntry from '@fuzdev/fuz_ui/ContextmenuEntry.svelte';
+	import ContextmenuSubmenu from '@fuzdev/fuz_ui/ContextmenuSubmenu.svelte';
+	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 
 	import type {Diskfile} from './diskfile.svelte.js';
 	import {GLYPH_DELETE, GLYPH_FILE, GLYPH_REMOVE} from './glyphs.js';

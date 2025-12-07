@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {fade} from 'svelte/transition';
-	import CopyToClipboard from '@ryanatkn/fuz/CopyToClipboard.svelte';
-	import {random_item} from '@ryanatkn/belt/random.js';
+	import CopyToClipboard from '@fuzdev/fuz_ui/CopyToClipboard.svelte';
+	import {random_item} from '@fuzdev/fuz_util/random.js';
 
 	import ConfirmButton from './ConfirmButton.svelte';
 	import Glyph from './Glyph.svelte';

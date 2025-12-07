@@ -64,15 +64,15 @@ Internal abstractions are designed as supersets that can map to these protocols,
 - **Frontend**: SvelteKit + TypeScript + Vite + Svelte 5
 - **Backend**: Hono server + Node.js runtime
 - **Build**: @ryanatkn/gro toolkit
-- **UI**: @ryanatkn/fuz components, @ryanatkn/moss styling
+- **UI**: @fuzdev/fuz_ui components, @fuzdev/fuz_css styling
 - **Validation**: Zod schemas throughout
 
 ### Key dependencies
 
 - `@ryanatkn/gro`: Build tooling and development utilities
-- `@ryanatkn/fuz`: UI component library
-- `@ryanatkn/moss`: CSS framework and theming
-- `@ryanatkn/belt`: Utility functions
+- `@fuzdev/fuz_ui`: UI component library
+- `@fuzdev/fuz_css`: CSS framework and theming
+- `@fuzdev/fuz_util`: Utility functions
 - `hono`: Web server framework
 - `zod`: Schema validation
 

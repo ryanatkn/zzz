@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 	import {formatDistance} from 'date-fns';
 	import {slide} from 'svelte/transition';
 

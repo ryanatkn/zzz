@@ -1,7 +1,7 @@
 // @slop Claude Opus 4
 
 import {z} from 'zod';
-import type {Logger} from '@ryanatkn/belt/log.js';
+import type {Logger} from '@fuzdev/fuz_util/log.js';
 
 import type {ActionMethod} from './action_metatypes.js';
 import type {ActionExecutor, ActionKind} from './action_types.js';

@@ -9,8 +9,8 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
-	import {chatgpt_logo, claude_logo, gemini_logo, github_logo} from '@ryanatkn/fuz/logos.js';
-	import Svg, {type SvgData} from '@ryanatkn/fuz/Svg.svelte';
+	import {chatgpt_logo, claude_logo, gemini_logo, github_logo} from '@fuzdev/fuz_ui/logos.js';
+	import Svg, {type SvgData} from '@fuzdev/fuz_ui/Svg.svelte';
 
 	import ExternalLinkIcon from './ExternalLinkIcon.svelte';
 

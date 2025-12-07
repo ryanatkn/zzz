@@ -63,7 +63,7 @@ export const sample_tabs: Array<BrowserTabJson> = [
 		id: create_uuid(),
 		title: 'Moss',
 		selected: false,
-		url: 'https://moss.ryanatkn.com/',
+		url: 'https://css.fuz.dev/',
 		type: 'external_url',
 		refresh_counter: 0,
 		created,

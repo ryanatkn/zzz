@@ -1,5 +1,5 @@
 import {Hono} from 'hono';
-import {wait} from '@ryanatkn/belt/async.js';
+import {wait} from '@fuzdev/fuz_util/async.js';
 import type {ContentfulStatusCode} from 'hono/utils/http-status';
 
 import type {Backend} from './backend.js';

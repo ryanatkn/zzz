@@ -3,7 +3,7 @@
 import {SvelteMap} from 'svelte/reactivity';
 import type {z} from 'zod';
 import {DEV} from 'esm-env';
-import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
+import {EMPTY_ARRAY} from '@fuzdev/fuz_util/array.js';
 
 import {Uuid} from './zod_helpers.js';
 import type {IndexedItem} from './indexed_collection_helpers.svelte.js';

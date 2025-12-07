@@ -1,6 +1,6 @@
 import type {Hono} from 'hono';
 import type {createNodeWebSocket} from '@hono/node-ws';
-import {wait} from '@ryanatkn/belt/async.js';
+import {wait} from '@fuzdev/fuz_util/async.js';
 
 import type {Backend} from './backend.js';
 import {BACKEND_ARTIFICIAL_RESPONSE_DELAY} from '../constants.js';

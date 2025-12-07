@@ -2,9 +2,9 @@
 	// @slop claude_sonnet_4
 
 	import {slide} from 'svelte/transition';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 	import {onMount} from 'svelte';
-	import {plural} from '@ryanatkn/belt/string.js';
+	import {plural} from '@fuzdev/fuz_util/string.js';
 
 	import Glyph from './Glyph.svelte';
 	import ExternalLink from './ExternalLink.svelte';

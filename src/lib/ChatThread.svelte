@@ -1,6 +1,6 @@
 <script lang="ts">
-	import PendingButton from '@ryanatkn/fuz/PendingButton.svelte';
-	import PendingAnimation from '@ryanatkn/fuz/PendingAnimation.svelte';
+	import PendingButton from '@fuzdev/fuz_ui/PendingButton.svelte';
+	import PendingAnimation from '@fuzdev/fuz_ui/PendingAnimation.svelte';
 	import {tick} from 'svelte';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 

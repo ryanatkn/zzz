@@ -1,4 +1,4 @@
-import type {ClassConstructor} from '@ryanatkn/belt/types.js';
+import type {ClassConstructor} from '@fuzdev/fuz_util/types.js';
 import type {z} from 'zod';
 import {DEV} from 'esm-env';
 
