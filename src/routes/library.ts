@@ -1138,7 +1138,7 @@ export const library_json: LibraryJson = {
 						name: 'create_action_event',
 						kind: 'function',
 						doc_comment: 'Create an action event from a spec and initial input.',
-						source_line: 456,
+						source_line: 453,
 						type_signature:
 							'<TMethod extends ActionMethod>(environment: ActionEventEnvironment, spec: { method: "completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | ... 15 more ... | "toggle_main_menu"; ... 6 more ...; async: true; } | { ...; } | { ...; }, input: unknown, initial_phase?: "send_request" | ... 8 more ... | undefined): ActionEvent<...>',
 						return_type:
@@ -1167,7 +1167,7 @@ export const library_json: LibraryJson = {
 						name: 'create_action_event_from_json',
 						kind: 'function',
 						doc_comment: 'Reconstruct an action event from serialized JSON data.',
-						source_line: 483,
+						source_line: 480,
 						type_signature:
 							'<TMethod extends ActionMethod>(json: ActionEventDatas[TMethod], environment: ActionEventEnvironment): ActionEvent<TMethod, ActionEventEnvironment, "send_request" | ... 7 more ... | "execute", "initial" | ... 3 more ... | "failed">',
 						return_type:
@@ -1186,7 +1186,7 @@ export const library_json: LibraryJson = {
 					{
 						name: 'parse_action_event',
 						kind: 'function',
-						source_line: 497,
+						source_line: 494,
 						type_signature:
 							'(raw_json: unknown, environment: ActionEventEnvironment): ActionEvent<"completion_create" | "completion_progress" | "directory_create" | "diskfile_delete" | "diskfile_update" | ... 14 more ... | "toggle_main_menu", ActionEventEnvironment, "send_request" | ... 7 more ... | "execute", "initial" | ... 3 more ... | "failed">',
 						return_type:
