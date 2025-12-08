@@ -2,11 +2,11 @@
 	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
 	import LibraryDetail from '@fuzdev/fuz_ui/LibraryDetail.svelte';
 	import EcosystemLinksPanel from '@fuzdev/fuz_ui/EcosystemLinksPanel.svelte';
-	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 	import {resolve} from '$app/paths';
 	import Details from '@fuzdev/fuz_ui/Details.svelte';
 	import {DEV} from 'esm-env';
 
+	import {logo_zzz} from '$lib/logos.js';
 	import {library_context} from '$lib/library.js';
 	import ExternalLink from '$lib/ExternalLink.svelte';
 	import PageFooter from '$routes/PageFooter.svelte';
@@ -23,7 +23,7 @@
 		<header class="mb_xl5" style:--font_size="var(--font_size_xl)">
 			<h1 class="row">
 				<Svg
-					data={zzz_logo}
+					data={logo_zzz}
 					fill="var(--text_color)"
 					size="var(--icon_size_sm)"
 					attrs={{class: 'ml_xs mr_xl'}}
@@ -168,7 +168,7 @@
 			}}
 		>
 			<Svg
-				data={zzz_logo}
+				data={logo_zzz}
 				size="var(--icon_size_sm)"
 				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
 				attrs={{
@@ -183,7 +183,7 @@
 				futuremode</span
 			>
 			<Svg
-				data={zzz_logo}
+				data={logo_zzz}
 				size="var(--icon_size_sm)"
 				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
 				attrs={{

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
 
+	import {logo_zzz} from './logos.js';
 	import CapabilityWebsocket from './CapabilityWebsocket.svelte';
 	import CapabilityFilesystem from './CapabilityFilesystem.svelte';
 	import Glyph from './Glyph.svelte';
@@ -51,7 +51,7 @@
 		</section>
 		<section class="mb_xl12">
 			<h2>
-				<Svg data={zzz_logo} size="var(--icon_size_sm)" fill="var(--text_color)" inline /> system
+				<Svg data={logo_zzz} size="var(--icon_size_sm)" fill="var(--text_color)" inline /> system
 			</h2>
 			<CapabilitySystem />
 		</section>

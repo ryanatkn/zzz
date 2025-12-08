@@ -371,11 +371,29 @@ a.chip {
 .fg_1 {
 	background-color: var(--fg_1);
 }
+.color_a_5 {
+	color: var(--color_a_5);
+}
 .color_b_5 {
 	color: var(--color_b_5);
 }
 .color_c_5 {
 	color: var(--color_c_5);
+}
+.color_d_5 {
+	color: var(--color_d_5);
+}
+.color_e_5 {
+	color: var(--color_e_5);
+}
+.color_f_5 {
+	color: var(--color_f_5);
+}
+.color_g_5 {
+	color: var(--color_g_5);
+}
+.color_h_5 {
+	color: var(--color_h_5);
 }
 .color_i_5 {
 	color: var(--color_i_5);
@@ -406,6 +424,9 @@ a.chip {
 }
 .border_radius_xs {
 	border-radius: var(--border_radius_xs);
+}
+.border_radius_sm {
+	border-radius: var(--border_radius_sm);
 }
 .border_radius_md {
 	border-radius: var(--border_radius_md);
@@ -515,6 +536,9 @@ a.chip {
 }
 .pl_md {
 	padding-left: var(--space_md);
+}
+.pl_lg {
+	padding-left: var(--space_lg);
 }
 .pl_xl {
 	padding-left: var(--space_xl);
@@ -630,6 +654,9 @@ a.chip {
 }
 .mb_xl {
 	margin-bottom: var(--space_xl);
+}
+.mb_xl2 {
+	margin-bottom: var(--space_xl2);
 }
 .mb_xl3 {
 	margin-bottom: var(--space_xl3);

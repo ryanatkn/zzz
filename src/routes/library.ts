@@ -43,8 +43,8 @@ export const library_json: LibraryJson = {
 		},
 		devDependencies: {
 			'@changesets/changelog-git': '^0.2.1',
-			'@fuzdev/fuz_css': '^0.42.0',
-			'@fuzdev/fuz_ui': '^0.171.0',
+			'@fuzdev/fuz_css': '^0.42.1',
+			'@fuzdev/fuz_ui': '^0.172.0',
 			'@ryanatkn/eslint-config': '^0.9.0',
 			'@ryanatkn/gro': '^0.181.0',
 			'@sveltejs/adapter-node': '^5.4.0',
@@ -2907,6 +2907,7 @@ export const library_json: LibraryJson = {
 					'Glyph.svelte',
 					'ProviderLogo.svelte',
 					'glyphs.ts',
+					'logos.ts',
 				],
 				dependents: ['DashboardCapabilities.svelte'],
 			},
@@ -5731,6 +5732,7 @@ export const library_json: LibraryJson = {
 					'NavLink.svelte',
 					'frontend.svelte.ts',
 					'glyphs.ts',
+					'logos.ts',
 					'nav.ts',
 				],
 				dependents: ['FrontendRoot.svelte'],
@@ -7981,7 +7983,7 @@ export const library_json: LibraryJson = {
 						source_line: 1,
 					},
 				],
-				dependencies: ['ExternalLinkIcon.svelte'],
+				dependencies: ['ExternalLinkIcon.svelte', 'logos.ts'],
 				dependents: [
 					'CapabilityBackend.svelte',
 					'CapabilityProviderApi.svelte',
@@ -8025,7 +8027,7 @@ export const library_json: LibraryJson = {
 						source_line: 1,
 					},
 				],
-				dependencies: ['library.ts'],
+				dependencies: ['library.ts', 'logos.ts'],
 				dependents: ['DashboardCapabilities.svelte', 'DashboardSettings.svelte'],
 			},
 			{
@@ -11227,6 +11229,45 @@ export const library_json: LibraryJson = {
 				],
 			},
 			{
+				path: 'logos.ts',
+				declarations: [
+					{
+						name: 'logo_zzz',
+						kind: 'variable',
+						source_line: 3,
+						type_signature: '{ label: string; fill: string; paths: { d: string; }[]; }',
+					},
+					{
+						name: 'logo_chatgpt',
+						kind: 'variable',
+						source_line: 19,
+						type_signature: '{ label: string; paths: { d: string; }[]; }',
+					},
+					{
+						name: 'logo_claude',
+						kind: 'variable',
+						source_line: 28,
+						type_signature: '{ label: string; fill: string; paths: { d: string; }[]; }',
+					},
+					{
+						name: 'logo_gemini',
+						kind: 'variable',
+						source_line: 38,
+						type_signature:
+							'{ label: string; fill: string; raw: string; paths: { d: string; }[]; }',
+					},
+				],
+				dependents: [
+					'CapabilitiesView.svelte',
+					'Dashboard.svelte',
+					'ExternalLink.svelte',
+					'Footer.svelte',
+					'MainDialog.svelte',
+					'ProviderLogo.svelte',
+					'nav.ts',
+				],
+			},
+			{
 				path: 'MainDialog.svelte',
 				declarations: [
 					{
@@ -11242,7 +11283,7 @@ export const library_json: LibraryJson = {
 						source_line: 1,
 					},
 				],
-				dependencies: ['frontend.svelte.ts'],
+				dependencies: ['frontend.svelte.ts', 'logos.ts'],
 				dependents: ['FrontendRoot.svelte'],
 			},
 			{
@@ -11983,7 +12024,7 @@ export const library_json: LibraryJson = {
 						type_signature: 'NavItem[]',
 					},
 				],
-				dependencies: ['glyphs.ts'],
+				dependencies: ['glyphs.ts', 'logos.ts'],
 				dependents: ['Dashboard.svelte', 'DashboardHome.svelte'],
 			},
 			{
@@ -15445,7 +15486,7 @@ export const library_json: LibraryJson = {
 						source_line: 1,
 					},
 				],
-				dependencies: ['ollama_helpers.ts'],
+				dependencies: ['logos.ts', 'ollama_helpers.ts'],
 				dependents: [
 					'CapabilitiesView.svelte',
 					'ChatInitializer.svelte',

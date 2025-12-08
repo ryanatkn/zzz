@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type {ComponentProps} from 'svelte';
 	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
-	import {chatgpt_logo, claude_logo, gemini_logo} from '@fuzdev/fuz_ui/logos.js';
 	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 
+	import {logo_chatgpt, logo_claude, logo_gemini} from './logos.js';
 	import type {ProviderName} from './provider_types.js';
 	import {ollama_logo} from './ollama_helpers.js';
 
@@ -21,9 +21,9 @@
 	} = $props();
 
 	const provider_logos = {
-		chatgpt: chatgpt_logo,
-		claude: claude_logo,
-		gemini: gemini_logo,
+		chatgpt: logo_chatgpt,
+		claude: logo_claude,
+		gemini: logo_gemini,
 		ollama: ollama_logo,
 	};
 </script>

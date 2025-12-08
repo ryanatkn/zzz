@@ -1,13 +1,13 @@
 <script lang="ts">
 	import {resolve} from '$app/paths';
 	import type {Snippet} from 'svelte';
-	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
 	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
 	import {is_editable, swallow} from '@fuzdev/fuz_util/dom.js';
 	import {slide} from 'svelte/transition';
 
+	import {logo_zzz} from './logos.js';
 	import NavLink from './NavLink.svelte';
 	import Glyph from './Glyph.svelte';
 	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_PROJECT, GLYPH_TAB} from './glyphs.js';
@@ -123,7 +123,7 @@
 								}}
 							>
 								<Svg
-									data={zzz_logo}
+									data={logo_zzz}
 									size="var(--icon_size_md)"
 									fill={app.futuremode ? 'var(--color_h_5)' : undefined}
 									attrs={{

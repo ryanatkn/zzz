@@ -9,9 +9,10 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
-	import {chatgpt_logo, claude_logo, gemini_logo, github_logo} from '@fuzdev/fuz_ui/logos.js';
+	import {logo_github} from '@fuzdev/fuz_ui/logos.js';
 	import Svg, {type SvgData} from '@fuzdev/fuz_ui/Svg.svelte';
 
+	import {logo_chatgpt, logo_claude, logo_gemini} from './logos.js';
 	import ExternalLinkIcon from './ExternalLinkIcon.svelte';
 
 	// TODO maybe make this `Link` and infer optional prop `external`?
@@ -32,13 +33,13 @@
 
 	const known_logo: SvgData | null = $derived(
 		github_regex.test(href)
-			? github_logo
+			? logo_github
 			: openai_regex.test(href)
-				? chatgpt_logo
+				? logo_chatgpt
 				: anthropic_regex.test(href)
-					? claude_logo
+					? logo_claude
 					: google_regex.test(href)
-						? gemini_logo
+						? logo_gemini
 						: null,
 	);
 </script>

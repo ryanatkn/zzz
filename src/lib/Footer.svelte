@@ -2,10 +2,10 @@
 	import Breadcrumb from '@fuzdev/fuz_ui/Breadcrumb.svelte';
 	import DocsFooter from '@fuzdev/fuz_ui/DocsFooter.svelte';
 	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
-	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 	import {page} from '$app/state';
 	import {resolve} from '$app/paths';
 
+	import {logo_zzz} from './logos.js';
 	import {library_context} from './library.js';
 
 	const library = library_context.get();
@@ -21,4 +21,4 @@
 	</div>
 </DocsFooter>
 
-{#snippet icon()}<Svg data={zzz_logo} size="var(--icon_size_sm)" />{/snippet}
+{#snippet icon()}<Svg data={logo_zzz} size="var(--icon_size_sm)" />{/snippet}

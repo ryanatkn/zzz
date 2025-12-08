@@ -1,8 +1,8 @@
 import type {SvgData} from '@fuzdev/fuz_ui/Svg.svelte';
 import {resolve} from '$app/paths';
-import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 import {page} from '$app/state';
 
+import {logo_zzz} from './logos.js';
 import {
 	GLYPH_CAPABILITY,
 	GLYPH_CHAT,
@@ -69,7 +69,7 @@ export const main_nav_items_default: Array<NavItem> = [
 	{
 		group: 'system',
 		items: [
-			{label: 'about', href: resolve('/about'), icon: zzz_logo},
+			{label: 'about', href: resolve('/about'), icon: logo_zzz},
 			{label: 'capabilities', href: resolve('/capabilities'), icon: GLYPH_CAPABILITY},
 			{label: 'actions', href: resolve('/actions'), icon: GLYPH_LOG},
 			{label: 'settings', href: resolve('/settings'), icon: GLYPH_SETTINGS},

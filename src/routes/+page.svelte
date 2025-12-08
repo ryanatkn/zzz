@@ -1,16 +1,16 @@
 <script lang="ts">
 	import {resolve} from '$app/paths';
 	import Svg from '@fuzdev/fuz_ui/Svg.svelte';
-	import {zzz_logo} from '@fuzdev/fuz_ui/logos.js';
 
 	import PageFooter from '$routes/PageFooter.svelte';
 
+	import {logo_zzz} from '$lib/logos.js';
 	import DashboardHome from '$lib/DashboardHome.svelte';
 </script>
 
 <section class="row gap_xl5 mb_xl5">
 	<div>
-		<Svg data={zzz_logo} size="var(--icon_size_xl2)" attrs={{class: 'mt_xl5'}} />
+		<Svg data={logo_zzz} size="var(--icon_size_xl2)" attrs={{class: 'mt_xl5'}} />
 	</div>
 	<div>
 		<div class="row mt_xl5 mb_lg">
