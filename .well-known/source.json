@@ -1943,6 +1943,27 @@
       ]
     },
     {
+      "path": "logos.ts",
+      "declarations": [
+        {
+          "name": "logo_zzz",
+          "kind": "variable"
+        },
+        {
+          "name": "logo_chatgpt",
+          "kind": "variable"
+        },
+        {
+          "name": "logo_claude",
+          "kind": "variable"
+        },
+        {
+          "name": "logo_gemini",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
       "path": "model.svelte.ts",
       "declarations": [
         {
