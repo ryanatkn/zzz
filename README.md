@@ -27,7 +27,8 @@ or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 This project is in its early stages, and installing it
 currently requires some basic technical skills.
 Eventually there will be a desktop app but
-for now you'll need Node 22.15+ (YMMV with Deno/Bun/etc)
+for now you'll need Node 22.15+
+(YMMV with Deno/Bun/etc, although Deno will be used for deployment soon)
 and Git to clone the repo.
 
 Running Zzz locally in development with Node is the supported way to use it right now.
