@@ -17179,20 +17179,6 @@ export const library_json: LibraryJson = {
 								],
 							},
 							{
-								name: 'ensure_model',
-								kind: 'function',
-								modifiers: ['private'],
-								doc_comment: 'Ensure the model is available locally, pulling if needed.',
-								type_signature: '(model: string): Promise<void>',
-								return_type: 'Promise<void>',
-								parameters: [
-									{
-										name: 'model',
-										type: 'string',
-									},
-								],
-							},
-							{
 								name: 'handle_streaming_completion',
 								kind: 'function',
 								type_signature:

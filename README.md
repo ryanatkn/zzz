@@ -70,19 +70,10 @@ Browse to the location is says, probably `localhost:5173`.
 Zzz builds on a great deal of software.
 
 - see the deps in [package.json](package.json)
-- I started using [Claude](https://claude.ai/) after making the initial prototype,
-  and and I've continued to use it to varying but sufficient success
-  to shape its outputs into my usual style
-  - I'm meticulous with most things, but there's low quality code
-    marked with `// @slop` in lower prioritity areas like tests and peripheral utilities
-  - I care about the interfaces and general patterns of `// @slop` modules like all other code,
-    but slop module internals may be low quality,
-    and in general they should be less trusted for correctness and style
-  - for the important parts, I consider the code quality up to par with my norm
-    (my normal being [Fuz](https://github.com/fuzdev/fuz_ui)/[Fuz CSS](https://github.com/fuzdev/fuz_css)/[Gro](https://github.com/ryanatkn/gro)/[Belt](https://github.com/fuzdev/fuz_util)),
-    with the caveat that this initial proof of concept
-    is intentionally slapdash in places for speed and to experiment,
-    and LLMs make this mindset easy to indulge
+- I started using [Claude](https://claude.ai/) in late 2024 after making the initial prototype,
+  and in late 2025 I started doing much of the coding with Claude Code, Opus 4.5
+  being the first over some threshold for me for this project
+  - see `⚠️ AI generated` and similar disclaimers
 
 ## License 🐦
 

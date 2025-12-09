@@ -1,321 +1,230 @@
-# Zzz - LLM Agent Guide
+# Zzz
 
-## Core values
+> nice web things for the tired 💤
 
-- User agency and control over tools and data
-- Fullstack unification with single TypeScript runtime
-- Protocol agnosticism with broad compatibility goals
-- Extensibility without prescription
-- Open standards and interoperability
-
-## Overview
-
-Zzz (pronounced "zees") is a fullstack web toolkit for power users and developers, combining LLM UI capabilities, file editing, and extensible web platform features. It provides both a customizable web UI for power users and a flexible toolkit for building UX-maximizing websites. Future plans include expanded IDE features like terminal access.
+Zzz (pronounced "zees") is a local-first IDE + CMS + browser + AI UI for power users and developers. It runs as a server on your machine with a PostgreSQL database backing a Svelte web frontend.
 
 **Status**: Early pre-release, development use only (no auth yet)
 
-## Architecture
+## Contents
 
-### Action system
+- [Quick Reference](#quick-reference)
+- [What is Zzz?](#what-is-zzz)
+- [Architecture Overview](#architecture-overview)
+- [Tech Stack](#tech-stack)
+- [Directory Structure](#directory-structure)
+- [Development](#development)
+- [Documentation](#documentation)
 
-The action system is **symmetric and peer-to-peer**, running the same code in any environment. Both frontend and backend use `ActionPeer` for send/receive operations. Actions and handlers (queries and side effects) are abstracted into declarative configuration, enabling flexible communication patterns without coupling to client/server roles.
+## Quick Reference
 
-#### Key components:
+| What | Where |
+|------|-------|
+| **Start dev server** | `gro dev` or `npm run dev` |
+| **Run tests** | `gro test` or `npm run test` |
+| **Type check** | `gro typecheck` or `npm run typecheck` |
+| **Build** | `gro build` or `npm run build` |
+| **Action specs** | `src/lib/action_specs.ts` |
+| **State classes** | `src/lib/*.svelte.ts` |
+| **UI components** | `src/lib/*.svelte` |
+| **Backend handlers** | `src/lib/server/backend_action_handlers.ts` |
+| **AI providers** | `src/lib/server/backend_provider_*.ts` |
 
-- `ActionPeer`: Manages send/receive for both frontend and backend
-- `ActionEvent`: Lifecycle management with phases (init → send → receive → complete)
-- `ActionRegistry`: Type-safe action registration
-- `ActionSpec`: Defines action metadata (kind, initiator, auth, side_effects)
+## What is Zzz?
 
-#### Action kinds:
+Zzz combines multiple tools into one integrated environment:
 
-- `request_response`: Traditional RPC pattern
-- `remote_notification`: Fire-and-forget messages from backend
-- `local_call`: Frontend-only calls
+- **IDE**: File editing with syntax highlighting, multi-tab support
+- **CMS**: Content management with prompts, parts, and structured content
+- **Browser**: Planned tabbed browsing integrated with the workspace (see `/tabs`)
+- **AI UI**: Chat interface supporting multiple models and providers
+- **Projects**: Website/app building with git integration (see `/projects`)
 
-#### Transport layer:
+### Design Priorities
 
-- Abstract `Transport` interface supporting multiple implementations
-- `FrontendHttpTransport` and `FrontendWebsocketTransport` for client
-- `BackendWebsocketTransport` for server WebSocket handling
-- Automatic fallback between transports when configured
+1. **Solo offline developer first**: Works without network, local PostgreSQL (pglite), local AI (Ollama)
+2. **User agency**: Full control over tools and data, no third-party lock-in
+3. **Local-first**: Sensitive data stays on your machine
+4. **Protocol agnosticism**: JSON-RPC 2.0 foundation, planned MCP/A2A compatibility
+5. **Extensibility**: Devs can extend without artificial restrictions
 
-### Protocol strategy
+### Relationship to Fuz
 
-Zzz uses JSON-RPC 2.0 as its foundation with planned compatibility for:
+Zzz demonstrates how far you can go in one direction with [Fuz](https://github.com/fuzdev/fuz_ui) - it's a maximal exploration of the stack for power users. The current Hono/Node backend is a **reference implementation**. The Fuz ecosystem includes a Rust daemon (`fuzd`) that will become the primary backend interface. Zzz's TypeScript backend demonstrates the architecture and may be deprecated once the Rust implementation matures.
 
-- **MCP (Model Context Protocol)**: Subset of JSON-RPC, no batching
-- **A2A (Agent2Agent)**: Google's agent communication protocol
-- **OpenAI Completions API**: For broader AI service compatibility
+## Architecture Overview
 
-Internal abstractions are designed as supersets that can map to these protocols, allowing broad interoperability while maintaining internal flexibility.
+### Core Abstractions
 
-### State management
+| Abstraction | Purpose | Key Files |
+|-------------|---------|-----------|
+| **Cell** | Schema-driven reactive state with Svelte 5 runes | `cell.svelte.ts` |
+| **Action** | Symmetric RPC (frontend ↔ backend) | `action_*.ts` |
+| **IndexedCollection** | Queryable collections with multiple indexes | `indexed_collection.svelte.ts` |
+| **Transport** | Protocol-agnostic communication | `transports.ts` |
 
-- **Reactive state**: Svelte 5 runes in `.svelte.ts` files
-- **Cell system**: Base class for schema-driven reactive models with lifecycle
-- **IndexedCollection**: Queryable collections with multiple index types
-- **CellRegistry**: Runtime type registration and instantiation
-
-## Tech stack
-
-### Core technologies
-
-- **Frontend**: SvelteKit + TypeScript + Vite + Svelte 5
-- **Backend**: Hono server + Node.js runtime
-- **Build**: @ryanatkn/gro toolkit
-- **UI**: @fuzdev/fuz_ui components, @fuzdev/fuz_css styling
-- **Validation**: Zod schemas throughout
-
-### Key dependencies
-
-- `@ryanatkn/gro`: Build tooling and development utilities
-- `@fuzdev/fuz_ui`: UI component library
-- `@fuzdev/fuz_css`: CSS framework and theming
-- `@fuzdev/fuz_util`: Utility functions
-- `hono`: Web server framework
-- `zod`: Schema validation
-
-## Directory structure
-
-### src/lib/ (published as @ryanatkn/zzz)
+### Content Model
 
 ```
-src/lib/
-├── server/                    # Backend functionality
-│   ├── backend.ts            # Core backend class
-│   ├── backend_action_*.ts   # Action handling
-│   ├── *_backend_provider.ts # AI provider implementations
-│   ├── scoped_fs.ts          # Secure filesystem access
-│   ├── security.ts           # Origin verification, access control
-│   └── server.ts             # Hono server setup
-│
-├── *.svelte.ts               # Reactive state classes
-│   ├── frontend.svelte.ts    # Main frontend state
-│   ├── cell.svelte.ts        # Base reactive model
-│   ├── chat.svelte.ts        # Chat state
-│   ├── thread.svelte.ts      # Thread state
-│   ├── turn.svelte.ts        # Turn state
-│   ├── part.svelte.ts        # Part state
-│   ├── model.svelte.ts       # AI model state
-│   └── diskfile.svelte.ts    # File state
-│
-├── action_*.ts               # Action system core
-│   ├── action_event.ts       # Event lifecycle
-│   ├── action_peer.ts        # Peer communication
-│   ├── action_registry.ts    # Type registration
-│   └── action_spec.ts        # Action metadata
-│
-├── *.svelte        # UI components (Upper_Snake_Case)
-│   ├── Chat_*.svelte         # Chat components
-│   ├── Diskfile_*.svelte     # File components
-│   ├── Model_*.svelte        # Model components
-│   └── Ollama_*.svelte       # Ollama-specific
-│
-└── *.ts                      # Core utilities
-    ├── jsonrpc.ts            # JSON-RPC implementation
-    ├── transports.ts         # Transport abstraction
-    └── constants.ts          # Configuration
+Chat → Thread[] → Turn[] → Part[]
+                            ├── TextPart (direct content)
+                            └── DiskfilePart (file reference)
+
+Prompt → Part[] (reusable content templates)
 ```
 
-### src/routes/ (SvelteKit routes)
+- **Parts**: Content units that can be shared across turns
+- **Turns**: Conversation messages with role (user/assistant/system)
+- **Threads**: Linear conversation with a specific model
+- **Chats**: Container for comparing multiple threads/models
 
-Key routes include:
+### Action System
 
-- `/chats` - Chat interface with AI models
-- `/prompts` - Prompt builder and management
-- `/models` - Model configuration
-- `/files` - File editor (IDE-like functionality)
-- `/providers` - Provider configuration
-- `/actions` - View all action specs (see `src/lib/action_specs.ts`)
-
-All actions are declared in `src/lib/action_specs.ts` with full type definitions.
-
-## Core patterns
-
-### Naming conventions
-
-- **TS files and Svelte 5 TS modules**: `snake_case.ts`, `snake_case.svelte.ts`
-- **Svelte components**: `Upper_Snake_Case.svelte` (e.g., `ChatView`, `DiskfileEditor`)
-- **Actions**: `action_method_name` in collections
-- **Tests**: `module_name.test.ts` alongside implementation
-
-### Component organization
-
-Components are prefixed by domain:
-
-- `Chat_*`: Chat/conversation UI
-- `Diskfile_*`: File management UI
-- `Model_*`: AI model UI
-- `Ollama_*`: Ollama-specific UI
-- `Part_*`: Content part UI
-- `Prompt_*`: Prompt management UI
-- `Thread_*`: Conversation thread UI
-- `Turn_*`: Conversation turn UI
-
-### State patterns
+The action system is **symmetric and peer-to-peer**:
 
 ```typescript
-// State class with schema
-export class MyThing extends Cell<typeof MyThing_Json> {
-	// Reactive properties use Svelte 5 runes
-	value = $state(0);
-	derived = $derived(this.value * 2);
-}
-
-// Companion Zod schema
-export const MyThing_Json = CellJson.extend({
-	value: z.number(),
-});
+// Both frontend and backend use ActionPeer
+Frontend.peer.send(request)  →  Backend.peer.receive(message)
+Backend.peer.send(notification)  →  Frontend.peer.receive(message)
 ```
 
-### Code quality markers
+**Action kinds**:
+- `request_response`: Traditional RPC with response
+- `remote_notification`: Fire-and-forget (backend → frontend for streaming)
+- `local_call`: Frontend-only actions
 
-- `// @slop [Model]`: Marks LLM-generated code for review
-- Test files may contain LLM-generated tests
-- Core interfaces are hand-crafted, implementations may use LLM assistance
+See [docs/architecture.md](docs/architecture.md) for details.
 
-## Key abstractions
+## Tech Stack
 
-### Actions
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | SvelteKit + Svelte 5 + TypeScript + Vite |
+| **Backend** | Hono + Node.js (reference impl) |
+| **Database** | PostgreSQL (pglite for local, full Postgres for production) - planned |
+| **Build** | @ryanatkn/gro |
+| **UI** | @fuzdev/fuz_ui components, @fuzdev/fuz_css styling |
+| **Validation** | Zod schemas |
+| **AI** | Ollama (local), Claude/ChatGPT/Gemini (BYOK) |
 
-Type-safe bidirectional RPC system:
+## Directory Structure
 
-- Defined via `ActionSpec` with metadata
-- Handled by registered `ActionHandlers`
-- Lifecycle managed by `ActionEvent`
-- Transport-agnostic via `Transport` interface
-
-### Cells
-
-Schema-driven reactive data models:
-
-- Base class for all stateful entities
-- Automatic JSON serialization/deserialization
-- Lifecycle hooks (init, dispose)
-- Type-safe property access via Zod schemas
-
-### Collections
-
-- **IndexedCollection**: Queryable collections with indexing
-- **Models/Chats/Prompts/etc**: Domain-specific collections extending base patterns
-
-### Content types
-
-Zzz's content architecture enables flexible composition with A2A protocol compatibility:
-
-- **Parts**: Reusable content entities (`TextPart` for direct content, `DiskfilePart` for file references)
-- **Turns**: Conversation turns that reference part IDs with role context (user/assistant/system)
-- **Threads**: Ordered conversation threads with turns, model config, and enable/disable controls
-- **Chats**: UI containers with multiple threads for model comparison
-- **Prompts**: Reusable part collections for context composition
-
-Parts can be shared across multiple turns, enabling content reuse without duplication.
-
-### AI providers
-
-- **BackendProvider**: Base class for AI service integration
-- Implementations: Ollama, Claude, ChatGPT, Gemini
-- Unified completion interface
-- Provider-specific configuration
-
-## AI integration
-
-### Provider architecture
-
-```typescript
-abstract class BackendProvider {
-	abstract handle_streaming_completion(options: CompletionHandlerOptions): Promise<...>;
-	abstract handle_non_streaming_completion(options: CompletionHandlerOptions): Promise<...>;
-	get_handler(streaming: boolean): CompletionHandler;
-}
 ```
-
-### Supported providers
-
-- **Ollama**: Local model execution (primary integration)
-- **Claude**: Anthropic API (BYOK)
-- **ChatGPT**: OpenAI API (BYOK)
-- **Gemini**: Google AI API (BYOK)
-
-### Configuration
-
-- API keys via `.env.development`/`.env.production`
-- Provider selection per chat/prompt
-- Model configuration with defaults
-- Streaming response support
-
-## Security & deployment
-
-### Filesystem Security
-
-- **ScopedFs**: Restricts access to `.zzz` cache directory
-- No symlink following
-- Path traversal protection
-- Configurable base directory via `PUBLIC_ZZZ_CACHE_DIR`
-
-### Web security
-
-- **CSP**: Strict Content Security Policy
-- **CORS**: Origin-based access control via `ALLOWED_ORIGINS`
-- **No Auth**: Currently development-only (auth planned)
-
-### Deployment modes
-
-- **Development**: `gro dev` with hot reload
-- **Preview**: Static build via SvelteKit adapter-static
-- **Production**: Node server (coming soon)
+src/
+├── lib/                      # Published as @ryanatkn/zzz
+│   ├── server/              # Backend (reference implementation)
+│   │   ├── backend.ts       # Core backend class
+│   │   ├── server.ts        # Hono server setup
+│   │   ├── backend_provider_*.ts  # AI providers
+│   │   ├── scoped_fs.ts     # Secure filesystem
+│   │   └── security.ts      # Origin verification
+│   │
+│   ├── *.svelte.ts          # State classes (Cell subclasses)
+│   │   ├── frontend.svelte.ts   # Root app state
+│   │   ├── chat.svelte.ts       # Chat state
+│   │   ├── thread.svelte.ts     # Thread state
+│   │   ├── turn.svelte.ts       # Turn state
+│   │   └── part.svelte.ts       # Content parts
+│   │
+│   ├── action_*.ts          # Action system
+│   │   ├── action_spec.ts   # Action metadata schemas
+│   │   ├── action_specs.ts  # All action definitions
+│   │   ├── action_event.ts  # Lifecycle state machine
+│   │   └── action_peer.ts   # Symmetric communication
+│   │
+│   └── *.svelte             # UI components (Upper_Snake_Case)
+│       ├── Chat*.svelte     # Chat UI
+│       ├── Diskfile*.svelte # File editor UI
+│       ├── Model*.svelte    # Model management UI
+│       └── ...
+│
+└── routes/                  # SvelteKit routes
+    ├── chats/              # AI chat interface
+    ├── files/              # File editor
+    ├── models/             # Model catalog
+    ├── prompts/            # Prompt builder
+    ├── providers/          # AI provider config
+    ├── projects/           # Project management (futuremode)
+    ├── tabs/               # Browser tabs (futuremode)
+    └── about/              # About page
+```
 
 ## Development
 
-### Quick start
+### Setup
 
 ```bash
-# Setup
+# Copy env template
 cp src/lib/server/.env.development.example .env.development
+
+# Install dependencies
 npm install
 
-# Development
-gro dev          # or npm run dev
-
-# Build & Test
-gro build        # or npm run build
-gro test         # or npm run test
-gro typecheck    # or npm run typecheck
+# Start development server
+gro dev
 ```
 
-### Key commands
+### Commands
 
-- `gro dev`: Start development server with HMR
-- `gro build`: Production build
-- `gro test`: Run test suite
-- `gro typecheck`: Type checking
-- `gro deploy`: Deploy to production
+| Command | Description |
+|---------|-------------|
+| `gro dev` | Development server with HMR |
+| `gro build` | Production build |
+| `gro test` | Run test suite |
+| `gro typecheck` | Type checking |
+| `gro check` | All checks (types, lint, test) |
+| `gro deploy` | Deploy to production |
 
-### Extension points
+### Naming Conventions
 
-- **Custom Cells**: Extend `Cell` class with schemas
-- **Action Handlers**: Register new actions via `ActionRegistry`
-- **Providers**: Implement `BackendProvider` interface
-- **Components**: Standard Svelte components
-- **Routes**: SvelteKit file-based routing
+| Type | Convention | Example |
+|------|------------|---------|
+| TypeScript files | `snake_case.ts` | `action_peer.ts` |
+| Svelte 5 modules | `snake_case.svelte.ts` | `chat.svelte.ts` |
+| Components | `Upper_Snake_Case.svelte` | `ChatView.svelte` |
+| Tests | `*.test.ts` | `cell.test.ts` |
 
-## Project structure notes
+### Code Markers
 
-### Circular dependencies
+- `// @slop [Model]`: LLM-generated code for review
+- Core interfaces are hand-crafted; implementations may use LLM assistance
 
-The architecture intentionally uses circular references between Frontend and App, managed via TypeScript's type system and runtime initialization patterns.
+## Documentation
 
-### Monolithic library
+| Document | Contents |
+|----------|----------|
+| [docs/architecture.md](docs/architecture.md) | Action system, Cell system, content model, data flow |
+| [docs/development.md](docs/development.md) | Development workflow, extension points, patterns |
+| [docs/providers.md](docs/providers.md) | AI provider integration, adding new providers |
 
-`src/lib/` is published as a single package to simplify versioning and dependencies, though internally it's well-organized by concern.
+## Values
 
-### Future directions
+- **User agency**: Control over tools and data
+- **Fullstack unification**: Single TypeScript runtime (frontend + backend)
+- **Protocol agnosticism**: Broad compatibility (JSON-RPC, MCP, A2A)
+- **Extensibility**: Without prescription
+- **Open standards**: Interoperability with the web ecosystem
+- **Security by design**: UX makes safe choices easy
 
-- Database integration (PostgreSQL via pglite)
+## Planned Features
+
+- Database integration (PostgreSQL via pglite) - [#7](https://github.com/ryanatkn/zzz/issues/7)
+- Undo/history system - [#8](https://github.com/ryanatkn/zzz/issues/8)
 - Authentication system
-- Plugin API for npm-distributed extensions
-- Full OpenAI API compatibility for broad remote AI API support
-- MCP/A2A protocol implementation
-- Enhanced terminal/system capabilities
-- Migrate to Deno and publish with `deno compile`
+- MCP/A2A protocol support
+- Terminal integration
+- Git integration
+- RSS/Atom/JSON Feed support
+- Native app with browser engine integration
+
+## Security
+
+⚠️ **No authentication yet** - development use only
+
+Current security measures:
+- **ScopedFs**: Filesystem restricted to `.zzz` cache directory
+- **Origin verification**: CORS-like checks via `ALLOWED_ORIGINS`
+- **CSP**: Strict Content Security Policy
+- **No symlinks**: Path traversal protection
+
+See the [security section](/about) for detailed information.

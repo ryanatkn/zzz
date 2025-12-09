@@ -33,9 +33,8 @@
 		{#if browser.browserified}
 			<aside>
 				⚠️⚠️ This is just a demo of planned functionality, nothing works like it should. Zzz needs a
-				native installation to function like a real browser. The initial version will use Chromium
-				via Electron, and long term, a user-friendly design would allow choosing your engine among
-				Chromium, Firefox, Safari, Ladybird, etc.
+				native installation to function like a real browser. Long term, a user-friendly design would
+				allow choosing your engine among Chromium, Firefox, Safari, Servo, Ladybird, etc.
 			</aside>
 		{/if}
 		<p>
@@ -47,7 +46,7 @@
 				class:color_i={!browser.browserified}
 				class:color_h={browser.browserified}
 				class="inline compact">{browser.browserified ? 'un' : ''}browserify!</button
-			> I'm planning to make an Electron-based version of Zzz first.
+			> I'm planning to make a native version of Zzz.
 		</p>
 		<p>
 			And users don't have to buy in, either -- the basic browser UX is unchanged. Press <code

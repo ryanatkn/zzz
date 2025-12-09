@@ -6,7 +6,7 @@ import type {
 	ReorderableItemId,
 } from './reorderable.svelte.js';
 
-// TODO maybe make this a DOM helper? in Belt?
+// TODO maybe make this a DOM helper? in fuz_util?
 /**
  * Detect layout direction from an element - supports flex and grid.
  */

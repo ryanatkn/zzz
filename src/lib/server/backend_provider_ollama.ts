@@ -57,7 +57,7 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 	}
 
 	/** Ensure the model is available locally, pulling if needed. */
-	private async ensure_model(model: string): Promise<void> {
+	async #ensure_model(model: string): Promise<void> {
 		// TODO @many is this what we want to do? or error? needs to stream progress in the streaming case
 		const listed = await this.get_client().list();
 		if (!listed.models.some((m) => m.name === model)) {
@@ -71,7 +71,7 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
-		await this.ensure_model(model);
+		await this.#ensure_model(model);
 
 		// TODO should we support generate({prompt})?
 		const response = await this.get_client().chat(
@@ -118,7 +118,7 @@ export class BackendProviderOllama extends BackendProviderLocal<Ollama> {
 	): Promise<ActionOutputs['completion_create']> {
 		const {model, completion_options, completion_messages, prompt} = options;
 
-		await this.ensure_model(model);
+		await this.#ensure_model(model);
 
 		const response = await this.get_client().chat(
 			create_ollama_chat_options(model, completion_options, completion_messages, prompt, false),
