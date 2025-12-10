@@ -132,7 +132,7 @@ src/
 │   │   ├── action_event.ts  # Lifecycle state machine
 │   │   └── action_peer.ts   # Symmetric communication
 │   │
-│   └── *.svelte             # UI components (Upper_Snake_Case)
+│   └── *.svelte             # UI components
 │       ├── Chat*.svelte     # Chat UI
 │       ├── Diskfile*.svelte # File editor UI
 │       ├── Model*.svelte    # Model management UI
@@ -181,7 +181,7 @@ gro dev
 |------|------------|---------|
 | TypeScript files | `snake_case.ts` | `action_peer.ts` |
 | Svelte 5 modules | `snake_case.svelte.ts` | `chat.svelte.ts` |
-| Components | `Upper_Snake_Case.svelte` | `ChatView.svelte` |
+| Components | `PascalCase.svelte` | `ChatView.svelte` |
 | Tests | `*.test.ts` | `cell.test.ts` |
 
 ### Code Markers

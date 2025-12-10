@@ -117,18 +117,18 @@ src/
 
 ### Component Naming
 
-Components use `Upper_Snake_Case` with domain prefixes:
+Components use `PascalCase` with domain prefixes:
 
 | Prefix | Domain | Examples |
 |--------|--------|----------|
-| `Chat_` | Chat UI | `ChatView`, `ChatListitem` |
-| `Diskfile_` | File editor | `DiskfileEditorView`, `DiskfileExplorer` |
-| `Model_` | Model management | `ModelListitem`, `ModelPickerDialog` |
-| `Ollama_` | Ollama-specific | `OllamaManager`, `OllamaPullModel` |
-| `Part_` | Content parts | `PartView`, `PartEditorForText` |
-| `Prompt_` | Prompts | `PromptList`, `PromptPickerDialog` |
-| `Thread_` | Threads | `ThreadList`, `ThreadContextmenu` |
-| `Turn_` | Turns | `TurnView`, `TurnListitem` |
+| `Chat` | Chat UI | `ChatView`, `ChatListitem` |
+| `Diskfile` | File editor | `DiskfileEditorView`, `DiskfileExplorer` |
+| `Model` | Model management | `ModelListitem`, `ModelPickerDialog` |
+| `Ollama` | Ollama-specific | `OllamaManager`, `OllamaPullModel` |
+| `Part` | Content parts | `PartView`, `PartEditorForText` |
+| `Prompt` | Prompts | `PromptList`, `PromptPickerDialog` |
+| `Thread` | Threads | `ThreadList`, `ThreadContextmenu` |
+| `Turn` | Turns | `TurnView`, `TurnListitem` |
 
 ## Extension Points
 
