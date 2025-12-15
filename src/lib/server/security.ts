@@ -99,39 +99,56 @@ export const verify_request_source =
  * - No wildcards in IPv6 addresses
  * - Port wildcards must be `:*` exactly
  *
+ * Note: Patterns are normalized via URL constructor. IPv4-mapped IPv6 addresses
+ * like `[::ffff:127.0.0.1]` will be normalized to `[::ffff:7f00:1]`. IPv6 zone
+ * identifiers (e.g., `%eth0`) are not supported.
+ *
  * @throws {Error} If pattern format is invalid
  */
 const origin_pattern_to_regexp = (pattern: string): RegExp => {
-	// Parse pattern with support for IPv6 addresses in brackets
-	const parts = /^(https?:\/\/)(\[[^\]]+\]|[^:/]+)(:\*|:\d+)?(\/.*)?$/.exec(pattern);
-	if (!parts) {
+	// Quick validation: no paths, query strings, or fragments allowed
+	const protocol_idx = pattern.indexOf('://');
+	if (protocol_idx === -1) {
 		throw new Error(`Invalid origin pattern: ${pattern}`);
 	}
-
-	const protocol = parts[1];
-	const hostname = parts[2];
-	const port = parts[3] ?? '';
-	const path = parts[4] ?? '';
-
-	// These should always exist if the regex matched, but check defensively
-	if (!protocol || !hostname) {
-		throw new Error(`Failed to parse origin pattern: ${pattern}`);
-	}
-
-	// Origins cannot have paths
-	if (path) {
+	const after_protocol = pattern.slice(protocol_idx + 3);
+	if (/[/?#]/.test(after_protocol)) {
 		throw new Error(`Paths not allowed in origin patterns: ${pattern}`);
 	}
 
-	// IPv6 addresses cannot contain wildcards
-	if (hostname.startsWith('[') && hostname.includes('*')) {
+	// Check for wildcards in IPv6 before URL parsing (URL rejects these with unhelpful error)
+	const ipv6_match = /^\[([^\]]+)\]/.exec(after_protocol);
+	if (ipv6_match?.[1]?.includes('*')) {
 		throw new Error(`Wildcards not allowed in IPv6 addresses: ${pattern}`);
 	}
 
+	// Handle port wildcard - must be at the end
+	let port_wildcard = false;
+	let parse_pattern = pattern;
+	if (pattern.endsWith(':*')) {
+		port_wildcard = true;
+		parse_pattern = pattern.slice(0, -2);
+	}
+
+	// Parse with URL constructor for robust handling of protocol, hostname, port, IPv6
+	let url: URL;
+	try {
+		url = new URL(parse_pattern);
+	} catch {
+		throw new Error(`Invalid origin pattern: ${pattern}`);
+	}
+
+	// Validate protocol is http or https
+	if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+		throw new Error(`Invalid origin pattern: ${pattern}`);
+	}
+
+	const hostname = url.hostname;
+	const is_ipv6 = hostname.startsWith('[');
+
 	// For regular hostnames, wildcards must be complete labels
-	if (!hostname.startsWith('[')) {
-		const labels = hostname.split('.');
-		for (const label of labels) {
+	if (!is_ipv6) {
+		for (const label of hostname.split('.')) {
 			if (label.includes('*') && label !== '*') {
 				throw new Error(
 					`Wildcards must be complete labels (e.g., *.example.com, not *example.com): ${pattern}`,
@@ -140,39 +157,38 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 		}
 	}
 
-	// Port wildcards must be exactly :*
-	if (port.includes('*') && port !== ':*') {
-		throw new Error(`Invalid port wildcard: ${pattern}`);
-	}
-
 	// Build regex pattern
-	let regex_pattern = '^';
-	regex_pattern += escape_regexp(protocol);
+	let regex_pattern = '^' + escape_regexp(url.protocol) + '//';
 
 	// Handle hostname
-	if (hostname.startsWith('[')) {
-		// IPv6 address - escape brackets and contents
+	if (is_ipv6) {
+		// IPv6 address - URL.hostname includes brackets
 		regex_pattern += escape_regexp(hostname);
 	} else {
 		// Regular hostname - process wildcards
 		const labels = hostname.split('.');
-		const regex_labels = labels.map((label) => {
-			if (label === '*') {
-				// Match exactly one label (no dots, colons, or slashes)
-				return '[^./:]+';
-			} else {
-				return escape_regexp(label);
-			}
-		});
-		regex_pattern += regex_labels.join('\\.');
+		regex_pattern += labels
+			.map((label) => (label === '*' ? '[^./:]+' : escape_regexp(label)))
+			.join('\\.');
 	}
 
 	// Handle port
-	if (port === ':*') {
+	if (port_wildcard) {
 		// Optional port (matches both with and without port)
 		regex_pattern += '(:\\d+)?';
 	} else {
-		regex_pattern += escape_regexp(port);
+		// URL normalizes default ports (80 for HTTP, 443 for HTTPS) away,
+		// so check original pattern for explicit port when url.port is empty
+		let port = url.port;
+		if (!port) {
+			const port_match = /:(\d+)$/.exec(parse_pattern);
+			if (port_match?.[1]) {
+				port = port_match[1];
+			}
+		}
+		if (port) {
+			regex_pattern += ':' + escape_regexp(port);
+		}
 	}
 
 	regex_pattern += '$';
@@ -182,27 +198,17 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 };
 
 /**
- * Efficiently extracts the origin from a referer URL, removing the path.
+ * Extracts the origin from a referer URL, removing the path, query string, and fragment.
  *
- * @param referer - The referer URL (e.g., `https://example.com/path/to/page`)
+ * @param referer - The referer URL (e.g., `https://example.com/path?query#hash`)
  * @returns The origin part (e.g., `https://example.com`)
  */
 const extract_origin_from_referer = (referer: string): string => {
-	// Extract origin from referer by finding the third slash
-	// Format: protocol://host[:port]/path...
-	let slash_count = 0;
-	let origin_end = -1;
-
-	for (let i = 0; i < referer.length; i++) {
-		if (referer[i] === '/') {
-			slash_count++;
-			if (slash_count === 3) {
-				origin_end = i;
-				break;
-			}
-		}
+	try {
+		return new URL(referer).origin;
+	} catch {
+		// If URL parsing fails, return the original string
+		// (it will likely fail pattern matching anyway)
+		return referer;
 	}
-
-	// If we found the third slash, extract origin; otherwise use the whole referer
-	return origin_end !== -1 ? referer.substring(0, origin_end) : referer;
 };
