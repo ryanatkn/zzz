@@ -35,8 +35,8 @@
 			Zzz, pronounced "zees" like bees, is a fullstack app and toolkit for power users and
 			developers. The idea is to make an integrated cross-platform environment that adapts to your
 			needs and intent while remaining fully open, aligned, and in your control. It's both a
-			customizable local-first web UI for power users, and a flexible library for crafting
-			UX-maximizing websites with a streamlined developer experience.
+			customizable local-first web UI and backend for power users, and a flexible library for
+			crafting UX-maximizing websites with a streamlined developer experience.
 		</p>
 		<aside>
 			⚠️ This is an early pre-release, see the
