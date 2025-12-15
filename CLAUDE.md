@@ -13,6 +13,7 @@ Zzz (pronounced "zees") is a local-first IDE + CMS + browser + AI UI for power u
 - [Architecture Overview](#architecture-overview)
 - [Tech Stack](#tech-stack)
 - [Directory Structure](#directory-structure)
+- [Zzz App Directory](#zzz-app-directory)
 - [Development](#development)
 - [Documentation](#documentation)
 
@@ -148,6 +149,24 @@ src/
     ├── tabs/               # Browser tabs (futuremode)
     └── about/              # About page
 ```
+
+## Zzz App Directory
+
+The `.zzz/` directory stores Zzz's app data. Configured via `PUBLIC_ZZZ_DIR` env var.
+
+```
+.zzz/
+├── state/                   # Persistent data
+│   └── completions/         # AI completion logs
+├── cache/                   # Regenerable data (future)
+└── run/                     # Runtime ephemeral (future)
+```
+
+| Directory | Semantics |
+|-----------|-----------|
+| `state/` | Persistent user data, survives restarts |
+| `cache/` | Regenerable data, safe to delete |
+| `run/` | Runtime/ephemeral (PIDs, locks) |
 
 ## Development
 

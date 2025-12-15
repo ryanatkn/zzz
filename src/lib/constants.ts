@@ -45,6 +45,12 @@ export const BACKEND_ARTIFICIAL_RESPONSE_DELAY =
  */
 export const ZZZ_DIR = PathWithTrailingSlash.parse(PUBLIC_ZZZ_DIR || '.zzz');
 
+// Zzz directory subdirectories
+export const ZZZ_DIR_STATE = 'state';
+export const ZZZ_DIR_STATE_COMPLETIONS = 'completions';
+export const ZZZ_DIR_RUN = 'run';
+export const ZZZ_DIR_CACHE = 'cache';
+
 export const CONTENT_PREVIEW_LENGTH = 100;
 
 /**

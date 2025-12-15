@@ -88,7 +88,11 @@ Generated files (do not edit manually):
 ```
 build/                   # SvelteKit build output
 dist/                    # Library distribution
-.zzz/                    # Zzz directory (runtime data)
+.zzz/                    # Zzz app directory
+├── state/               # Persistent data
+│   └── completions/     # AI completion logs
+├── cache/               # Regenerable data (future)
+└── run/                 # Runtime ephemeral (future)
 ```
 
 ## Project Structure
