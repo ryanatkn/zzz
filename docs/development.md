@@ -88,7 +88,12 @@ Generated files (do not edit manually):
 ```
 build/                   # SvelteKit build output
 dist/                    # Library distribution
-.zzz/                    # Zzz directory (runtime data)
+.zzz/                    # Zzz app directory
+├── state/               # Persistent data
+│   └── completions/     # AI completion logs
+├── cache/               # Regenerable data (future)
+└── run/                 # Runtime ephemeral
+    └── server.json      # PID, port, version
 ```
 
 ## Project Structure
@@ -272,12 +277,10 @@ src/routes/my_route/
 <script lang="ts">
   import type {Snippet} from 'svelte';
 
-  interface Props {
+  const {title, children}: {
     title: string;
     children?: Snippet;
-  }
-
-  const {title, children}: Props = $props();
+  } = $props();
 </script>
 
 <div class="my-component">

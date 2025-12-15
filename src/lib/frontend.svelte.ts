@@ -122,6 +122,18 @@ export class Frontend extends Cell<typeof FrontendJson> implements ActionEventEn
 		this.#zzz_dir = parsed == null ? parsed : parsed.data;
 	}
 
+	#scoped_dirs: ReadonlyArray<DiskfileDirectoryPath> = $state([]);
+
+	/**
+	 * Additional filesystem paths the server can access for user files.
+	 */
+	get scoped_dirs(): ReadonlyArray<DiskfileDirectoryPath> {
+		return this.#scoped_dirs;
+	}
+	set scoped_dirs(value: ReadonlyArray<string>) {
+		this.#scoped_dirs = value.map((p) => DiskfileDirectoryPath.parse(p));
+	}
+
 	/**
 	 * Tracks which providers are available (configured with API keys).
 	 */
@@ -220,6 +232,7 @@ export class Frontend extends Cell<typeof FrontendJson> implements ActionEventEn
 	// TODO refactor, probably `app.session`
 	receive_session(data: ActionOutputs['session_load']['data']): void {
 		this.zzz_dir = data.zzz_dir;
+		this.scoped_dirs = data.scoped_dirs;
 		this.provider_status = data.provider_status;
 
 		if (Array.isArray(data.files)) {

@@ -136,7 +136,13 @@ export const create_backend_actions_api = (backend: Backend): BackendActionsApi 
 /**
  * Handle file system changes and notify clients.
  */
-export const handle_filer_change: FilerChangeHandler = (change, disknode, backend, dir): void => {
+export const handle_filer_change: FilerChangeHandler = (
+	change,
+	disknode,
+	backend,
+	dir,
+	_filer,
+): void => {
 	const api_change = {
 		type: map_watcher_change_to_diskfile_change(change.type),
 		path: DiskfilePath.parse(change.path),

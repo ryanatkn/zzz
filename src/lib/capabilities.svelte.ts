@@ -71,6 +71,7 @@ export interface WebsocketCapabilityData {
 
 export interface FilesystemCapabilityData {
 	zzz_dir: DiskfileDirectoryPath | null | undefined;
+	scoped_dirs: ReadonlyArray<DiskfileDirectoryPath>;
 }
 
 export interface OllamaCapabilityData {
@@ -132,7 +133,7 @@ export class Capabilities extends Cell<typeof CapabilitiesJson> {
 	 * The filesystem capability derives its state from the backend and `zzz_dir`.
 	 */
 	readonly filesystem: Capability<FilesystemCapabilityData | null | undefined> = $derived.by(() => {
-		const {zzz_dir} = this.app;
+		const {zzz_dir, scoped_dirs} = this.app;
 		let status: AsyncStatus;
 
 		if (this.backend.status !== 'success') {
@@ -153,7 +154,7 @@ export class Capabilities extends Cell<typeof CapabilitiesJson> {
 
 		return {
 			name: 'filesystem',
-			data: status === 'success' ? {zzz_dir} : undefined,
+			data: status === 'success' ? {zzz_dir, scoped_dirs} : undefined,
 			status,
 			message_id: null,
 			error_message: null,

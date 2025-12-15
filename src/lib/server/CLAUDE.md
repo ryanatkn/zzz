@@ -405,23 +405,28 @@ my_notification: async (input) => {
 
 ## Environment Variables
 
-| Variable                   | Purpose                         |
-| -------------------------- | ------------------------------- |
-| `ALLOWED_ORIGINS`          | Comma-separated origin patterns |
-| `SECRET_ANTHROPIC_API_KEY` | Claude API key                  |
-| `SECRET_OPENAI_API_KEY`    | OpenAI API key                  |
-| `SECRET_GOOGLE_API_KEY`    | Google Gemini API key           |
-| `PUBLIC_ZZZ_DIR`           | Base directory for `.zzz` |
+| Variable                   | Purpose                                         |
+| -------------------------- | ----------------------------------------------- |
+| `ALLOWED_ORIGINS`          | Comma-separated origin patterns                 |
+| `SECRET_ANTHROPIC_API_KEY` | Claude API key                                  |
+| `SECRET_OPENAI_API_KEY`    | OpenAI API key                                  |
+| `SECRET_GOOGLE_API_KEY`    | Google Gemini API key                           |
+| `PUBLIC_ZZZ_DIR`           | Zzz app directory (default `.zzz`)              |
+| `PUBLIC_ZZZ_SCOPED_DIRS`   | Comma-separated filesystem paths for user files |
 
 ## Constants
 
 From `../constants.ts`:
 
-| Constant                            | Purpose                 |
-| ----------------------------------- | ----------------------- |
-| `SERVER_HOST`                       | Server hostname         |
-| `SERVER_PROXIED_PORT`               | Server port             |
-| `WEBSOCKET_PATH`                    | WebSocket endpoint path |
-| `API_PATH_FOR_HTTP_RPC`             | HTTP RPC endpoint path  |
-| `ZZZ_DIR`                           | Default directory       |
-| `BACKEND_ARTIFICIAL_RESPONSE_DELAY` | Testing delay (ms)      |
+| Constant                            | Purpose                  |
+| ----------------------------------- | ------------------------ |
+| `SERVER_HOST`                       | Server hostname          |
+| `SERVER_PROXIED_PORT`               | Server port              |
+| `WEBSOCKET_PATH`                    | WebSocket endpoint path  |
+| `API_PATH_FOR_HTTP_RPC`             | HTTP RPC endpoint path   |
+| `ZZZ_DIR`                           | Zzz app directory        |
+| `ZZZ_SCOPED_DIRS`                   | Parsed scoped dirs array |
+| `ZZZ_DIR_STATE`                     | `state` subdirectory     |
+| `ZZZ_DIR_RUN`                       | `run` subdirectory       |
+| `ZZZ_DIR_CACHE`                     | `cache` subdirectory     |
+| `BACKEND_ARTIFICIAL_RESPONSE_DELAY` | Testing delay (ms)       |

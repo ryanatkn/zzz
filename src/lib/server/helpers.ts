@@ -3,18 +3,19 @@ import {format_file} from '@ryanatkn/gro/format_file.js';
 
 import {ScopedFs} from './scoped_fs.js';
 import {ActionInputs, type ActionOutputs} from '../action_collections.js';
+import {ZZZ_DIR_STATE, ZZZ_DIR_STATE_COMPLETIONS} from '../constants.js';
 
 // TODO @db refactor
 export const save_completion_response_to_disk = async (
 	input: ActionInputs['completion_create'],
 	output: ActionOutputs['completion_create'],
-	dir: string,
+	zzz_dir: string,
 	scoped_fs: ScopedFs,
 ): Promise<void> => {
 	// includes `Date.now()` for sorting purposes
 	const filename = `${input.completion_request.provider_name}__${Date.now()}__${input.completion_request.model}.json`; // TODO include model data in these
 
-	const path = join(dir, filename);
+	const path = join(zzz_dir, ZZZ_DIR_STATE, ZZZ_DIR_STATE_COMPLETIONS, filename);
 
 	const json = {input, output};
 

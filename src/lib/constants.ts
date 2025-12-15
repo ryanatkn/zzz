@@ -7,6 +7,7 @@ import {
 	PUBLIC_SERVER_API_PATH,
 	PUBLIC_WEBSOCKET_URL,
 	PUBLIC_ZZZ_DIR,
+	PUBLIC_ZZZ_SCOPED_DIRS,
 } from '$env/static/public';
 
 import {
@@ -44,6 +45,22 @@ export const BACKEND_ARTIFICIAL_RESPONSE_DELAY =
  * @trailing_slash
  */
 export const ZZZ_DIR = PathWithTrailingSlash.parse(PUBLIC_ZZZ_DIR || '.zzz');
+
+// Zzz directory subdirectories
+export const ZZZ_DIR_STATE = 'state';
+export const ZZZ_DIR_STATE_COMPLETIONS = 'completions';
+export const ZZZ_DIR_RUN = 'run';
+export const ZZZ_DIR_CACHE = 'cache'; // TODO implement
+
+/**
+ * Comma-separated list of filesystem paths that Zzz can access.
+ * Empty array means no scoped filesystem access.
+ */
+export const ZZZ_SCOPED_DIRS: Array<string> = PUBLIC_ZZZ_SCOPED_DIRS
+	? PUBLIC_ZZZ_SCOPED_DIRS.split(',')
+			.map((p) => p.trim())
+			.filter(Boolean)
+	: [];
 
 export const CONTENT_PREVIEW_LENGTH = 100;
 
