@@ -222,7 +222,7 @@ gro dev
 ⚠️ **No authentication yet** - development use only
 
 Current security measures:
-- **ScopedFs**: Filesystem restricted to `.zzz` cache directory
+- **ScopedFs**: Filesystem restricted to `.zzz` directory
 - **Origin verification**: CORS-like checks via `ALLOWED_ORIGINS`
 - **CSP**: Strict Content Security Policy
 - **No symlinks**: Path traversal protection

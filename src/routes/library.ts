@@ -1757,7 +1757,7 @@ export const library_json: LibraryJson = {
 						kind: 'variable',
 						source_line: 47,
 						type_signature:
-							'{ method: "session_load"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: null; input: ZodOptional<ZodVoid>; output: ZodObject<{ data: ZodObject<{ zzz_cache_dir: $ZodBranded<...>; files: ZodArray<...>; provider_status: ZodArray<...>; }, $strict>; }, $strict>; async: true; }',
+							'{ method: "session_load"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: null; input: ZodOptional<ZodVoid>; output: ZodObject<{ data: ZodObject<{ zzz_dir: $ZodBranded<...>; files: ZodArray<...>; provider_status: ZodArray<...>; }, $strict>; }, $strict>; async: true; }',
 					},
 					{
 						name: 'filer_change_action_spec',
@@ -2579,7 +2579,7 @@ export const library_json: LibraryJson = {
 						type_signature: 'FilesystemCapabilityData',
 						properties: [
 							{
-								name: 'zzz_cache_dir',
+								name: 'zzz_dir',
 								kind: 'variable',
 								type_signature: 'DiskfileDirectoryPath | null | undefined',
 							},
@@ -2634,7 +2634,7 @@ export const library_json: LibraryJson = {
 								kind: 'variable',
 								modifiers: ['readonly'],
 								doc_comment:
-									'The filesystem capability derives its state from the backend and `zzz_cache_dir`.',
+									'The filesystem capability derives its state from the backend and `zzz_dir`.',
 								type_signature: 'Capability<FilesystemCapabilityData | null | undefined>',
 							},
 							{
@@ -5396,7 +5396,7 @@ export const library_json: LibraryJson = {
 						type_signature: 'number',
 					},
 					{
-						name: 'ZZZ_CACHE_DIR',
+						name: 'ZZZ_DIR',
 						kind: 'variable',
 						doc_comment: '',
 						source_line: 46,
@@ -8725,12 +8725,12 @@ export const library_json: LibraryJson = {
 								name: 'receive_session',
 								kind: 'function',
 								type_signature:
-									'(data: { zzz_cache_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; files: { id: string & $brand<"DiskfilePath">; source_dir: string & $brand<...> & $brand<...>; ... 4 more ...; dependencies: [...][]; }[]; provider_status: ({ ...; } | { ...; })[]; }): void',
+									'(data: { zzz_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; files: { id: string & $brand<"DiskfilePath">; source_dir: string & $brand<...> & $brand<...>; ... 4 more ...; dependencies: [...][]; }[]; provider_status: ({ ...; } | { ...; })[]; }): void',
 								return_type: 'void',
 								parameters: [
 									{
 										name: 'data',
-										type: '{ zzz_cache_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; files: { id: string & $brand<"DiskfilePath">; source_dir: string & $brand<...> & $brand<...>; ... 4 more ...; dependencies: [...][]; }[]; provider_status: ({ ...; } | { ...; })[]; }',
+										type: '{ zzz_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; files: { id: string & $brand<"DiskfilePath">; source_dir: string & $brand<"DiskfilePath"> & $brand<...>; ... 4 more ...; dependencies: [...][]; }[]; provider_status: ({ ...; } | { ...; })[]; }',
 									},
 								],
 							},
@@ -17811,10 +17811,10 @@ export const library_json: LibraryJson = {
 						type_signature: 'BackendOptions',
 						properties: [
 							{
-								name: 'zzz_cache_dir',
+								name: 'zzz_dir',
 								kind: 'variable',
 								type_signature: 'string',
-								doc_comment: 'Directory path for the Zzz cache.',
+								doc_comment: 'Zzz directory path, defaults to `.zzz`.',
 							},
 							{
 								name: 'config',
@@ -17865,10 +17865,10 @@ export const library_json: LibraryJson = {
 								type_signature: 'ActionExecutor',
 							},
 							{
-								name: 'zzz_cache_dir',
+								name: 'zzz_dir',
 								kind: 'variable',
 								modifiers: ['readonly'],
-								doc_comment: 'The full path to the Zzz cache directory.',
+								doc_comment: 'The full path to the Zzz directory.',
 								type_signature: 'DiskfileDirectoryPath',
 							},
 							{

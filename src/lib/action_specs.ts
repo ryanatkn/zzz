@@ -56,7 +56,7 @@ export const session_load_action_spec = {
 	output: z.strictObject({
 		data: z.strictObject({
 			// TODO extract this schema to diskfile_types or something
-			zzz_cache_dir: DiskfileDirectoryPath,
+			zzz_dir: DiskfileDirectoryPath,
 			files: z.array(SerializableDisknode),
 			provider_status: z.array(ProviderStatus),
 		}),

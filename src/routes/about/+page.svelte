@@ -229,11 +229,11 @@
 				<ul>
 					<li>
 						read and write to the configured filesystem directory, defaults to <code>./.zzz</code>
-						in the <code>PUBLIC_ZZZ_CACHE_DIR</code> (which defaults to <code>./</code>), and is
-						securely scoped (does not follow symlinks) -- this opens a significant surface area for
-						both you and attackers to use, and writing untrusted data to it could lead to arbitrary
-						code execution if, for example, you're running a hot reloading dev server in that
-						directory (Zzz does not do this by default)
+						in the <code>PUBLIC_ZZZ_DIR</code> (which defaults to <code>./</code>), and is securely
+						scoped (does not follow symlinks) -- this opens a significant surface area for both you
+						and attackers to use, and writing untrusted data to it could lead to arbitrary code
+						execution if, for example, you're running a hot reloading dev server in that directory
+						(Zzz does not do this by default)
 					</li>
 					<li>
 						use your API keys for calls to Claude, ChatGPT, and Gemini, and write them to <code

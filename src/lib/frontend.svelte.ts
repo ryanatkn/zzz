@@ -106,20 +106,20 @@ export class Frontend extends Cell<typeof FrontendJson> implements ActionEventEn
 	readonly bots: ZzzConfig['bots'];
 
 	// TODO maybe instead of this pattern with getters/setters, using an encoder?
-	#zzz_cache_dir: DiskfileDirectoryPath | null | undefined = $state(null); // TODO should this be undefined?
+	#zzz_dir: DiskfileDirectoryPath | null | undefined = $state(null); // TODO should this be undefined?
 
 	/**
-	 * The `zzz_cache_dir` is the path to Zzz's primary directory on the server's filesystem.
+	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
 	 * The server's `scoped_fs` instance restricts operations to this directory.
 	 * The value is `undefined` when uninitialized,
 	 * `null` when loading, and `''` when disabled or no server.
 	 */
-	get zzz_cache_dir(): DiskfileDirectoryPath | null | undefined {
-		return this.#zzz_cache_dir;
+	get zzz_dir(): DiskfileDirectoryPath | null | undefined {
+		return this.#zzz_dir;
 	}
-	set zzz_cache_dir(value: string | null | undefined) {
+	set zzz_dir(value: string | null | undefined) {
 		const parsed = value == null ? value : DiskfileDirectoryPath.safeParse(value);
-		this.#zzz_cache_dir = parsed == null ? parsed : parsed.data;
+		this.#zzz_dir = parsed == null ? parsed : parsed.data;
 	}
 
 	/**
@@ -219,7 +219,7 @@ export class Frontend extends Cell<typeof FrontendJson> implements ActionEventEn
 
 	// TODO refactor, probably `app.session`
 	receive_session(data: ActionOutputs['session_load']['data']): void {
-		this.zzz_cache_dir = data.zzz_cache_dir;
+		this.zzz_dir = data.zzz_dir;
 		this.provider_status = data.provider_status;
 
 		if (Array.isArray(data.files)) {

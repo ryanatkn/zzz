@@ -32,7 +32,7 @@
 	// TODO @many this is very hacky and duplicated, refactor into cell methods
 	// TODO @many improve UX to not use alert/prompt
 	const create_file = async () => {
-		if (!app.zzz_cache_dir) {
+		if (!app.zzz_dir) {
 			alert('cannot create file: filesystem is not available'); // eslint-disable-line no-alert
 			return;
 		}

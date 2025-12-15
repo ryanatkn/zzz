@@ -64,7 +64,7 @@ server.ts: create_server()
     ├── Setup WebSocket via @hono/node-ws
     │
     ├── Create Backend instance
-    │   ├── Initialize ScopedFs with cache directory
+    │   ├── Initialize ScopedFs with directory
     │   ├── Setup Filer for file watching
     │   └── Register action handlers
     │
@@ -83,7 +83,7 @@ The `Backend` class implements `ActionEventEnvironment`:
 ```typescript
 class Backend implements ActionEventEnvironment {
 	readonly executor = 'backend';
-	readonly zzz_cache_dir: DiskfileDirectoryPath;
+	readonly zzz_dir: DiskfileDirectoryPath;
 	readonly config: ZzzConfig;
 	readonly peer: ActionPeer;
 	readonly api: BackendActionsApi;
@@ -411,7 +411,7 @@ my_notification: async (input) => {
 | `SECRET_ANTHROPIC_API_KEY` | Claude API key                  |
 | `SECRET_OPENAI_API_KEY`    | OpenAI API key                  |
 | `SECRET_GOOGLE_API_KEY`    | Google Gemini API key           |
-| `PUBLIC_ZZZ_CACHE_DIR`     | Base directory for `.zzz` cache |
+| `PUBLIC_ZZZ_DIR`           | Base directory for `.zzz` |
 
 ## Constants
 
@@ -423,5 +423,5 @@ From `../constants.ts`:
 | `SERVER_PROXIED_PORT`               | Server port             |
 | `WEBSOCKET_PATH`                    | WebSocket endpoint path |
 | `API_PATH_FOR_HTTP_RPC`             | HTTP RPC endpoint path  |
-| `ZZZ_CACHE_DIR`                     | Default cache directory |
+| `ZZZ_DIR`                           | Default directory       |
 | `BACKEND_ARTIFICIAL_RESPONSE_DELAY` | Testing delay (ms)      |

@@ -22,7 +22,7 @@
 	const {diskfiles} = app;
 	const {editor} = diskfiles;
 
-	const {zzz_cache_dir} = $derived(app);
+	const {zzz_dir} = $derived(app);
 
 	// TODO need awaitable websocket calls?
 	const TODO_create_file_pending = false;
@@ -31,7 +31,7 @@
 	// TODO @many this is very hacky and duplicated, refactor into cell methods
 	// TODO @many improve UX to not use alert/prompt
 	const create_file = async () => {
-		if (!zzz_cache_dir) {
+		if (!zzz_dir) {
 			alert('cannot create file: filesystem is not available'); // eslint-disable-line no-alert
 			return;
 		}
@@ -48,7 +48,7 @@
 	};
 
 	const create_folder = async () => {
-		if (!zzz_cache_dir) {
+		if (!zzz_dir) {
 			alert('cannot create folder: filesystem is not available'); // eslint-disable-line no-alert
 			return;
 		}
@@ -66,18 +66,18 @@
 </script>
 
 <div class="height_100 overflow_auto scrollbar_width_thin">
-	{#if zzz_cache_dir === undefined}
+	{#if zzz_dir === undefined}
 		<div>&nbsp;</div>
-	{:else if zzz_cache_dir === null}
+	{:else if zzz_dir === null}
 		<div class="row height_input_height"><PendingAnimation /></div>
 	{:else}
 		<div class="row height_input_height justify_content_space_between px_xs">
-			<small class="ellipsis"><Glyph glyph={GLYPH_DIRECTORY} /> {zzz_cache_dir}</small>
+			<small class="ellipsis"><Glyph glyph={GLYPH_DIRECTORY} /> {zzz_dir}</small>
 			<div class="display_flex gap_xs2">
 				<PendingButton
 					pending={TODO_create_file_pending}
 					class="plain compact"
-					title="create file in {zzz_cache_dir}"
+					title="create file in {zzz_dir}"
 					onclick={create_file}
 				>
 					<Glyph glyph={GLYPH_CREATE_FILE} />
@@ -85,7 +85,7 @@
 				<PendingButton
 					pending={TODO_create_folder_pending}
 					class="plain compact"
-					title="create folder in {zzz_cache_dir}"
+					title="create folder in {zzz_dir}"
 					onclick={create_folder}
 				>
 					<Glyph glyph={GLYPH_CREATE_FOLDER} />

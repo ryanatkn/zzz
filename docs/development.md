@@ -49,7 +49,7 @@ SECRET_OPENAI_API_KEY=sk-...
 SECRET_GOOGLE_API_KEY=AIza...
 
 # Server Configuration
-PUBLIC_ZZZ_CACHE_DIR=./           # Base for .zzz cache directory
+PUBLIC_ZZZ_DIR=./           # Base for .zzz directory
 ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 ```
 
@@ -88,7 +88,7 @@ Generated files (do not edit manually):
 ```
 build/                   # SvelteKit build output
 dist/                    # Library distribution
-.zzz/                    # Cache directory (runtime data)
+.zzz/                    # Zzz directory (runtime data)
 ```
 
 ## Project Structure

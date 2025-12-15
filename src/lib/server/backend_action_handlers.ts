@@ -43,7 +43,7 @@ export const backend_action_handlers: BackendActionHandlers = {
 			// Iterate through all filers and collect their files
 			for (const filer of backend.filers.values()) {
 				for (const file of filer.filer.files.values()) {
-					files_array.push(to_serializable_disknode(file, backend.zzz_cache_dir)); // TODO dir is a hack
+					files_array.push(to_serializable_disknode(file, backend.zzz_dir)); // TODO dir is a hack
 				}
 			}
 
@@ -53,7 +53,7 @@ export const backend_action_handlers: BackendActionHandlers = {
 			return {
 				data: {
 					files: files_array,
-					zzz_cache_dir: backend.zzz_cache_dir,
+					zzz_dir: backend.zzz_dir,
 					provider_status,
 				},
 			};
@@ -134,12 +134,7 @@ export const backend_action_handlers: BackendActionHandlers = {
 
 			// TODO @db temporary, do better action tracking
 			// We don't need to wait for this to finish
-			void save_completion_response_to_disk(
-				input,
-				result,
-				backend.zzz_cache_dir,
-				backend.scoped_fs,
-			);
+			void save_completion_response_to_disk(input, result, backend.zzz_dir, backend.scoped_fs);
 
 			console.log(
 				`[backend_action_handlers.completion_create.receive_request] got ${provider_name} message`,

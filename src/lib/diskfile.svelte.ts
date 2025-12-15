@@ -47,7 +47,7 @@ export class Diskfile extends Cell<typeof DiskfileJson> {
 
 	/** e.g. .zzz/foo/bar.json */
 	readonly pathname: string | null | undefined = $derived(
-		this.path && this.app.zzz_cache_dir && strip_start(this.path, this.app.zzz_cache_dir),
+		this.path && this.app.zzz_dir && strip_start(this.path, this.app.zzz_dir),
 	);
 	/** e.g. bar/foo.json */
 	readonly path_relative: string | null | undefined = $derived(

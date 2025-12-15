@@ -6,7 +6,7 @@
 	const app = frontend_context.get();
 	const {capabilities} = app;
 
-	const zzz_cache_dir = $derived(app.zzz_cache_dir);
+	const zzz_dir = $derived(app.zzz_dir);
 </script>
 
 <div
@@ -33,12 +33,12 @@
 			{/if}
 		</div>
 		<small class="font_family_mono">
-			{#if zzz_cache_dir === undefined || zzz_cache_dir === null}
+			{#if zzz_dir === undefined || zzz_dir === null}
 				&nbsp;
-			{:else if zzz_cache_dir === ''}
+			{:else if zzz_dir === ''}
 				no backend directory configured
 			{:else}
-				{zzz_cache_dir}
+				{zzz_dir}
 			{/if}
 		</small>
 	</div>
@@ -48,5 +48,5 @@
 	This is the backend's filesystem directory. For security reasons, filesystem operations are scoped
 	to this directory and symlinks are not followed. Defaults to <code>.zzz</code> in the backend's
 	current working directory. To configure it set the .env variable
-	<code class="font_size_sm">PUBLIC_ZZZ_CACHE_DIR</code>. Configure at your own risk.
+	<code class="font_size_sm">PUBLIC_ZZZ_DIR</code>. Configure at your own risk.
 </p>

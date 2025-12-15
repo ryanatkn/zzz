@@ -16,7 +16,7 @@ import {
 	SERVER_HOST,
 	SERVER_PROXIED_PORT,
 	WEBSOCKET_PATH,
-	ZZZ_CACHE_DIR,
+	ZZZ_DIR,
 } from '../constants.js';
 import {parse_allowed_origins, verify_request_source} from './security.js';
 import {handle_filer_change} from './backend_actions_api.js';
@@ -38,7 +38,7 @@ const create_server = async (): Promise<void> => {
 	// TODO better logging
 	log.info('creating server', {
 		config,
-		ZZZ_CACHE_DIR,
+		ZZZ_DIR,
 		allowed_origins,
 	});
 
@@ -59,7 +59,7 @@ const create_server = async (): Promise<void> => {
 	const {injectWebSocket, upgradeWebSocket} = createNodeWebSocket({app});
 
 	const backend = new Backend({
-		zzz_cache_dir: ZZZ_CACHE_DIR, // is the default
+		zzz_dir: ZZZ_DIR, // is the default
 		config,
 		action_specs,
 		action_handlers: backend_action_handlers,

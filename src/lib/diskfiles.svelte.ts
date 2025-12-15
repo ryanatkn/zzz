@@ -130,25 +130,23 @@ export class Diskfiles extends Cell<typeof DiskfilesJson> {
 	}
 
 	async create_file(filename: string, content: string = ''): Promise<void> {
-		if (!this.app.zzz_cache_dir) {
-			throw new Error('cannot create file: zzz_cache_dir is not set');
+		if (!this.app.zzz_dir) {
+			throw new Error('cannot create file: zzz_dir is not set');
 		}
 
 		// TODO @many how to handle paths? need some more structure to the way they're normalized and joined
-		const path = DiskfilePath.parse(
-			`${this.app.zzz_cache_dir}${PathWithLeadingSlash.parse(filename)}`,
-		);
+		const path = DiskfilePath.parse(`${this.app.zzz_dir}${PathWithLeadingSlash.parse(filename)}`);
 
 		// Reuse `update` which creates or updates files
 		await this.update(path, content);
 	}
 
 	async create_directory(dirname: string): Promise<void> {
-		if (!this.app.zzz_cache_dir) {
-			throw new Error('cannot create directory: zzz_cache_dir is not set');
+		if (!this.app.zzz_dir) {
+			throw new Error('cannot create directory: zzz_dir is not set');
 		}
 
-		const path = DiskfilePath.parse(`${this.app.zzz_cache_dir}${dirname}`);
+		const path = DiskfilePath.parse(`${this.app.zzz_dir}${dirname}`);
 
 		const result = await this.app.api.directory_create({path});
 		// Handler already updated state on error
@@ -162,8 +160,8 @@ export class Diskfiles extends Cell<typeof DiskfilesJson> {
 	// TODO make this a derived property?
 	/** The value `undefined` means uninitialized, `null` means loading, `''` means none */
 	to_relative_path(path: string): string | null | undefined {
-		const {zzz_cache_dir} = this.app;
-		return zzz_cache_dir && to_relative_path(path, zzz_cache_dir);
+		const {zzz_dir} = this.app;
+		return zzz_dir && to_relative_path(path, zzz_dir);
 	}
 
 	/**

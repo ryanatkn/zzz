@@ -6,7 +6,7 @@ import {
 	PUBLIC_BACKEND_ARTIFICIAL_RESPONSE_DELAY,
 	PUBLIC_SERVER_API_PATH,
 	PUBLIC_WEBSOCKET_URL,
-	PUBLIC_ZZZ_CACHE_DIR,
+	PUBLIC_ZZZ_DIR,
 } from '$env/static/public';
 
 import {
@@ -43,7 +43,7 @@ export const BACKEND_ARTIFICIAL_RESPONSE_DELAY =
 /**
  * @trailing_slash
  */
-export const ZZZ_CACHE_DIR = PathWithTrailingSlash.parse(PUBLIC_ZZZ_CACHE_DIR || '.zzz');
+export const ZZZ_DIR = PathWithTrailingSlash.parse(PUBLIC_ZZZ_DIR || '.zzz');
 
 export const CONTENT_PREVIEW_LENGTH = 100;
 
