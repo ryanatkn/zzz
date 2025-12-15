@@ -72,7 +72,7 @@ afterEach(() => {
 	console_spy.mockRestore();
 });
 
-describe('ScopedFs - Symlink Security', () => {
+describe('ScopedFs - symlink security', () => {
 	test('should reject symlinks in target path', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -303,7 +303,7 @@ describe('ScopedFs - Symlink Security', () => {
 	});
 });
 
-describe('ScopedFs - Path Traversal Security', () => {
+describe('ScopedFs - path traversal security', () => {
 	test('should reject standard path traversal attempts', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -354,7 +354,7 @@ describe('ScopedFs - Path Traversal Security', () => {
 	});
 });
 
-describe('ScopedFs - Access Control Security', () => {
+describe('ScopedFs - access control security', () => {
 	test('should enforce strict path boundaries', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -503,7 +503,7 @@ describe('ScopedFs - Access Control Security', () => {
 	});
 });
 
-describe('ScopedFs - Security Error Handling', () => {
+describe('ScopedFs - security error handling', () => {
 	test('PathNotAllowedError should properly format path in message', () => {
 		const test_paths = [
 			'/etc/passwd',

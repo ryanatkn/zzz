@@ -72,6 +72,18 @@ afterEach(() => {
 	console_spy.mockRestore();
 });
 
+// Helper to create ENOENT error with proper code property
+const create_enoent_error = (path: string): NodeJS.ErrnoException => {
+	const error = new Error(
+		`ENOENT: no such file or directory, lstat '${path}'`,
+	) as NodeJS.ErrnoException;
+	error.code = 'ENOENT';
+	error.errno = -2;
+	error.syscall = 'lstat';
+	error.path = path;
+	return error;
+};
+
 // Helper to set up mock filesystem structure
 const setup_mock_filesystem = () => {
 	const filesystem = {
@@ -84,6 +96,14 @@ const setup_mock_filesystem = () => {
 		'/allowed/path/subdir/file.txt': {isDir: false, isSymlink: false},
 		'/allowed/path/файл.txt': {isDir: false, isSymlink: false},
 		'/allowed/path/file with spaces!@#.txt': {isDir: false, isSymlink: false},
+		// Add parent directories to avoid ENOENT during parent checks
+		'/allowed': {isDir: true, isSymlink: false},
+		'/': {isDir: true, isSymlink: false},
+		'/allowed/other': {isDir: true, isSymlink: false},
+		'/allowed/other/path': {isDir: true, isSymlink: false},
+		'/another': {isDir: true, isSymlink: false},
+		'/another/allowed': {isDir: true, isSymlink: false},
+		'/another/allowed/directory': {isDir: true, isSymlink: false},
 	};
 
 	vi.mocked(fs_sync.existsSync).mockImplementation((pathStr) => {
@@ -94,7 +114,7 @@ const setup_mock_filesystem = () => {
 	vi.mocked(fs.lstat).mockImplementation(async (pathStr) => {
 		const entry = (filesystem as any)[pathStr as string];
 		if (!entry) {
-			throw new Error('ENOENT: no such file or directory');
+			throw create_enoent_error(pathStr as string);
 		}
 
 		return {
@@ -107,7 +127,40 @@ const setup_mock_filesystem = () => {
 	return filesystem;
 };
 
-describe('ScopedFs - Advanced Path Validation', () => {
+describe('ScopedFs - constructor edge cases', () => {
+	test('should filter out empty strings and falsy values from allowed paths', () => {
+		const paths_with_empty = ['/valid/path', '', '/another/path', '', ''];
+		const scoped_fs = new ScopedFs(paths_with_empty);
+
+		// Should only have 2 allowed paths (empty strings filtered)
+		expect(scoped_fs.allowed_paths.length).toBe(2);
+
+		// Valid paths should be allowed
+		expect(scoped_fs.is_path_allowed('/valid/path/file.txt')).toBe(true);
+		expect(scoped_fs.is_path_allowed('/another/path/file.txt')).toBe(true);
+	});
+
+	test('should filter out null and undefined values from allowed paths', () => {
+		const paths_with_nullish = ['/valid/path', null, '/another/path', undefined] as Array<string>;
+		const scoped_fs = new ScopedFs(paths_with_nullish);
+
+		// Should only have 2 allowed paths (nullish values filtered)
+		expect(scoped_fs.allowed_paths.length).toBe(2);
+	});
+
+	test('should handle array with only empty/falsy values', () => {
+		const empty_array = ['', null, undefined, ''] as Array<string>;
+		const scoped_fs = new ScopedFs(empty_array);
+
+		// Should have no allowed paths
+		expect(scoped_fs.allowed_paths.length).toBe(0);
+
+		// No paths should be allowed
+		expect(scoped_fs.is_path_allowed('/any/path')).toBe(false);
+	});
+});
+
+describe('ScopedFs - advanced path validation', () => {
 	test('should handle paths with special characters correctly', () => {
 		const scoped_fs = create_test_instance();
 
@@ -176,7 +229,7 @@ describe('ScopedFs - Advanced Path Validation', () => {
 	});
 });
 
-describe('ScopedFs - Advanced Directory Operations', () => {
+describe('ScopedFs - advanced directory operations', () => {
 	test('readdir - should handle different option combinations', async () => {
 		const scoped_fs = create_test_instance();
 		setup_mock_filesystem();
@@ -259,7 +312,7 @@ describe('ScopedFs - Advanced Directory Operations', () => {
 	});
 });
 
-describe('ScopedFs - Advanced Security Features', () => {
+describe('ScopedFs - advanced security features', () => {
 	test('should reject all symlinks in path hierarchy', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -345,7 +398,7 @@ describe('ScopedFs - Advanced Security Features', () => {
 	});
 });
 
-describe('ScopedFs - Error Handling and Edge Cases', () => {
+describe('ScopedFs - error handling and edge cases', () => {
 	test('should handle filesystem errors during path validation gracefully', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -356,6 +409,85 @@ describe('ScopedFs - Error Handling and Edge Cases', () => {
 		await expect(scoped_fs.read_file(FILE_PATHS.ALLOWED)).rejects.toThrow(
 			'Unknown filesystem error',
 		);
+		expect(fs.readFile).not.toHaveBeenCalled();
+	});
+
+	test('should ignore ENOENT errors when checking target path', async () => {
+		const scoped_fs = create_test_instance();
+
+		// Setup lstat to throw ENOENT for nonexistent target
+		const enoent_error = new Error('ENOENT: no such file or directory') as NodeJS.ErrnoException;
+		enoent_error.code = 'ENOENT';
+		vi.mocked(fs.lstat).mockRejectedValueOnce(enoent_error);
+
+		// Setup successful write (file doesn't exist yet, that's ok)
+		vi.mocked(fs.writeFile).mockResolvedValueOnce();
+
+		// Should proceed despite ENOENT - file may not exist yet
+		await scoped_fs.write_file(FILE_PATHS.NONEXISTENT, 'new content');
+		expect(fs.writeFile).toHaveBeenCalledWith(FILE_PATHS.NONEXISTENT, 'new content', 'utf8');
+	});
+
+	test('should ignore ENOENT errors when checking parent directories', async () => {
+		const scoped_fs = create_test_instance();
+		const deep_path = '/allowed/path/new/nested/dirs/file.txt';
+
+		// First call for target path - ENOENT (doesn't exist)
+		const enoent_error = new Error('ENOENT: no such file or directory') as NodeJS.ErrnoException;
+		enoent_error.code = 'ENOENT';
+
+		vi.mocked(fs.lstat).mockImplementation(async (path) => {
+			// Root allowed path exists
+			if (path === '/allowed/path' || path === '/allowed' || path === '/') {
+				return {
+					isSymbolicLink: () => false,
+					isDirectory: () => true,
+					isFile: () => false,
+				} as any;
+			}
+			// Everything else doesn't exist yet
+			throw enoent_error;
+		});
+
+		// Setup successful write
+		vi.mocked(fs.writeFile).mockResolvedValueOnce();
+
+		// Should proceed despite parent directories not existing
+		await scoped_fs.write_file(deep_path, 'content');
+		expect(fs.writeFile).toHaveBeenCalledWith(deep_path, 'content', 'utf8');
+	});
+
+	test('should NOT ignore non-ENOENT errors when checking paths', async () => {
+		const scoped_fs = create_test_instance();
+
+		// Setup lstat to throw EACCES (permission denied)
+		const eacces_error = new Error('EACCES: permission denied') as NodeJS.ErrnoException;
+		eacces_error.code = 'EACCES';
+		vi.mocked(fs.lstat).mockRejectedValueOnce(eacces_error);
+
+		// Should throw the EACCES error, not ignore it
+		await expect(scoped_fs.read_file(FILE_PATHS.ALLOWED)).rejects.toThrow('EACCES');
+		expect(fs.readFile).not.toHaveBeenCalled();
+	});
+
+	test('should NOT ignore non-ENOENT errors when checking parent directories', async () => {
+		const scoped_fs = create_test_instance();
+		const nested_path = '/allowed/path/subdir/file.txt';
+
+		// First call succeeds for target
+		vi.mocked(fs.lstat).mockResolvedValueOnce({
+			isSymbolicLink: () => false,
+			isDirectory: () => false,
+			isFile: () => true,
+		} as any);
+
+		// Second call for parent throws EACCES
+		const eacces_error = new Error('EACCES: permission denied') as NodeJS.ErrnoException;
+		eacces_error.code = 'EACCES';
+		vi.mocked(fs.lstat).mockRejectedValueOnce(eacces_error);
+
+		// Should throw the EACCES error from parent check
+		await expect(scoped_fs.read_file(nested_path)).rejects.toThrow('EACCES');
 		expect(fs.readFile).not.toHaveBeenCalled();
 	});
 
@@ -436,7 +568,7 @@ describe('ScopedFs - Error Handling and Edge Cases', () => {
 	});
 });
 
-describe('ScopedFs - Advanced Use Cases', () => {
+describe('ScopedFs - advanced use cases', () => {
 	test('should handle complex workflows with multiple operations', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -504,6 +636,8 @@ describe('ScopedFs - Advanced Use Cases', () => {
 		vi.mocked(fs.mkdir).mockResolvedValue(undefined);
 		vi.mocked(fs.writeFile).mockResolvedValue();
 		vi.mocked(fs.readdir).mockResolvedValue(['file1.txt', 'file2.txt'] as any);
+		// Reset readFile to ensure clean state, then set up expected responses
+		vi.mocked(fs.readFile).mockReset();
 		vi.mocked(fs.readFile)
 			.mockResolvedValueOnce('content1' as any)
 			.mockResolvedValueOnce('content2' as any);
@@ -539,7 +673,7 @@ describe('ScopedFs - Advanced Use Cases', () => {
 	});
 });
 
-describe('ScopedFs - Directory Path Trailing Slash Handling', () => {
+describe('ScopedFs - directory path trailing slash handling', () => {
 	test('should ensure all allowed paths have trailing slashes internally', () => {
 		// Create instances with a mix of slashed and unslashed paths
 		const paths_with_mix = ['/path1', '/path2/', '/path3/subdir', '/path4/subdir/'];
