@@ -1,7 +1,7 @@
 /**
  * Server info file utilities (server.json)
  *
- * server.json lives at `{zzz_dir}/run/server.json` and tracks the running server.
+ * server.json lives at `{zzz_dir}/{ZZZ_DIR_RUN}/server.json` and tracks the running server.
  * Written on startup, removed on clean shutdown.
  * Following the private_fuz daemon.rs pattern.
  */
@@ -15,7 +15,7 @@ import {ZZZ_DIR_RUN} from '../constants.js';
 /** Current server.json schema version */
 const SERVER_INFO_VERSION = 1;
 
-/** File name for server info */
+/** File name for server info in `ZZZ_DIR_RUN` */
 const SERVER_INFO_FILE = 'server.json';
 
 /**
@@ -36,17 +36,14 @@ export const Server_Info = z.strictObject({
 export type Server_Info = z.infer<typeof Server_Info>;
 
 /**
- * Get path to server.json
+ * Returns the full path to server.json
  */
 export const server_info_get_path = (zzz_dir: string): string => {
 	return join(zzz_dir, ZZZ_DIR_RUN, SERVER_INFO_FILE);
 };
 
 /**
- * Read server info from server.json
- *
- * Returns `null` if the file doesn't exist or is invalid.
- * Deletes the file if it's corrupt or has wrong version.
+ * Reads and validates server.json, deleting and returning null if corrupt or wrong version
  */
 export const server_info_read = async (zzz_dir: string): Promise<Server_Info | null> => {
 	const path = server_info_get_path(zzz_dir);
@@ -80,7 +77,7 @@ export const server_info_read = async (zzz_dir: string): Promise<Server_Info | n
 };
 
 /**
- * Check if there's a stale server.json (process no longer running)
+ * Returns server info if running, otherwise deletes stale file and returns null
  */
 export const server_info_check_stale = async (zzz_dir: string): Promise<Server_Info | null> => {
 	const info = await server_info_read(zzz_dir);
@@ -102,9 +99,7 @@ export interface Server_Info_Write_Options {
 }
 
 /**
- * Write server info to server.json atomically
- *
- * Uses write-to-temp + fsync + rename for atomicity.
+ * Writes server info to server.json atomically, returns the path
  */
 export const server_info_write = async (options: Server_Info_Write_Options): Promise<string> => {
 	const {zzz_dir, port, zzz_version} = options;
