@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '@fuzdev/fuz_css/style.css';
 	import '@fuzdev/fuz_css/theme.css';
+	import '@fuzdev/fuz_code/theme.css';
 	import '$routes/fuz.css';
 	import '$routes/style.css';
 
@@ -20,6 +21,7 @@
 	import {ProviderJson} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {ModelJson} from '$lib/model.svelte.js';
+	import {DOCS_PATH} from '@fuzdev/fuz_ui/docs_helpers.svelte.js';
 
 	const {children, params} = $props();
 
@@ -99,6 +101,11 @@
 	])}
 />
 
-<FrontendRoot {app}>
+<!-- TODO hacky, docs need to nest gracefully with abosolute positioning, or at least support offset vars -->
+{#if page.url.pathname === DOCS_PATH || page.url.pathname.startsWith(DOCS_PATH + '/')}
 	{@render children()}
-</FrontendRoot>
+{:else}
+	<FrontendRoot {app}>
+		{@render children()}
+	</FrontendRoot>
+{/if}

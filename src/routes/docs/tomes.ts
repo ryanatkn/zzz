@@ -1,4 +1,5 @@
 import type {Tome} from '@fuzdev/fuz_ui/tome.js';
+
 import ApiPage from '$routes/docs/api/+page.svelte';
 import LibraryPage from '$routes/docs/library/+page.svelte';
 

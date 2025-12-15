@@ -7,17 +7,17 @@ import type {Handler} from 'hono';
  * that verifies requests are coming from expected sources.
  *
  * Accepts comma-separated patterns with limited wildcards:
- * - Exact origins: "https://api.example.com"
- * - Wildcard subdomains: "https://*.example.com" (matches exactly one subdomain level)
- * - Multiple wildcards: "https://*.staging.*.example.com" (for deep subdomains)
- * - Wildcard ports: "http://localhost:*" (matches any port or no port)
- * - IPv6 addresses: "http://[::1]:3000", "https://[2001:db8::1]"
- * - Combined: "https://*.example.com:*"
+ * - Exact origins: `https://api.example.com`
+ * - Wildcard subdomains: `https://*.example.com` (matches exactly one subdomain level)
+ * - Multiple wildcards: `https://*.staging.*.example.com` (for deep subdomains)
+ * - Wildcard ports: `http://localhost:*` (matches any port or no port)
+ * - IPv6 addresses: `http://[::1]:3000`, `https://[2001:db8::1]`
+ * - Combined: `https://*.example.com:*`
  *
  * Examples:
- * - "http://localhost:3000,https://prod.example.com"
- * - "https://*.api.example.com,http://127.0.0.1:*"
- * - "http://[::1]:*,https://*.*.corp.example.com:*"
+ * - `http://localhost:3000,https://prod.example.com`
+ * - `https://*.api.example.com,http://127.0.0.1:*`
+ * - `http://[::1]:*,https://*.*.corp.example.com:*`
  */
 export const parse_allowed_origins = (env_value: string | undefined): Array<RegExp> =>
 	env_value
@@ -88,16 +88,16 @@ export const verify_request_source =
  * Pattern format: protocol://hostname[:port]
  *
  * Wildcard support:
- * - Subdomain wildcards: *.example.com matches sub.example.com (NOT example.com)
- * - Multiple wildcards: *.*.example.com matches api.staging.example.com
- * - Port wildcards: example.com:* matches any port or no port
- * - IPv6 support: [::1], [2001:db8::1] (no wildcards in IPv6)
+ * - Subdomain wildcards: `*.example.com` matches `sub.example.com` (NOT `example.com`)
+ * - Multiple wildcards: `*.*.example.com` matches `api.staging.example.com`
+ * - Port wildcards: `example.com:*` matches any port or no port
+ * - IPv6 support: `[::1]`, `[2001:db8::1]` (no wildcards in IPv6)
  *
  * Restrictions:
  * - No paths allowed (origins don't include paths)
- * - Wildcards must be complete labels (*.example.com, not ex*ample.com)
+ * - Wildcards must be complete labels (`*.example.com`, not `*example.com`)
  * - No wildcards in IPv6 addresses
- * - Port wildcards must be :* exactly
+ * - Port wildcards must be `:*` exactly
  *
  * @throws {Error} If pattern format is invalid
  */
@@ -184,8 +184,8 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 /**
  * Efficiently extracts the origin from a referer URL, removing the path.
  *
- * @param referer - The referer URL (e.g., "https://example.com/path/to/page")
- * @returns The origin part (e.g., "https://example.com")
+ * @param referer - The referer URL (e.g., `https://example.com/path/to/page`)
+ * @returns The origin part (e.g., `https://example.com`)
  */
 const extract_origin_from_referer = (referer: string): string => {
 	// Extract origin from referer by finding the third slash

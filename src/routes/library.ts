@@ -11998,7 +11998,7 @@ export const library_json: LibraryJson = {
 					{
 						name: 'NavLinkItem',
 						kind: 'type',
-						source_line: 18,
+						source_line: 19,
 						type_signature: 'NavLinkItem',
 						properties: [
 							{
@@ -12021,7 +12021,7 @@ export const library_json: LibraryJson = {
 					{
 						name: 'NavItem',
 						kind: 'type',
-						source_line: 25,
+						source_line: 26,
 						type_signature: 'NavItem',
 						properties: [
 							{
@@ -12039,7 +12039,7 @@ export const library_json: LibraryJson = {
 					{
 						name: 'to_nav_link_href',
 						kind: 'function',
-						source_line: 35,
+						source_line: 36,
 						type_signature: '(app: Frontend, label: string, href: string): string',
 						return_type: 'string',
 						parameters: [
@@ -12060,7 +12060,7 @@ export const library_json: LibraryJson = {
 					{
 						name: 'main_nav_items_default',
 						kind: 'variable',
-						source_line: 53,
+						source_line: 54,
 						type_signature: 'NavItem[]',
 					},
 				],
@@ -18645,7 +18645,7 @@ export const library_json: LibraryJson = {
 						name: 'parse_allowed_origins',
 						kind: 'function',
 						doc_comment:
-							'Parses ALLOWED_ORIGINS env var into regex matchers for request source verification.\nThis is NOT a CSRF protection mechanism - it\'s a simple origin/referer allowlist\nthat verifies requests are coming from expected sources.\n\nAccepts comma-separated patterns with limited wildcards:\n- Exact origins: "https://api.example.com"\n- Wildcard subdomains: "https://*.example.com" (matches exactly one subdomain level)\n- Multiple wildcards: "https://*.staging.*.example.com" (for deep subdomains)\n- Wildcard ports: "http://localhost:*" (matches any port or no port)\n- IPv6 addresses: "http://[::1]:3000", "https://[2001:db8::1]"\n- Combined: "https://*.example.com:*"\n\nExamples:\n- "http://localhost:3000,https://prod.example.com"\n- "https://*.api.example.com,http://127.0.0.1:*"\n- "http://[::1]:*,https://*.*.corp.example.com:*"',
+							"Parses ALLOWED_ORIGINS env var into regex matchers for request source verification.\nThis is NOT a CSRF protection mechanism - it's a simple origin/referer allowlist\nthat verifies requests are coming from expected sources.\n\nAccepts comma-separated patterns with limited wildcards:\n- Exact origins: `https://api.example.com`\n- Wildcard subdomains: `https://*.example.com` (matches exactly one subdomain level)\n- Multiple wildcards: `https://*.staging.*.example.com` (for deep subdomains)\n- Wildcard ports: `http://localhost:*` (matches any port or no port)\n- IPv6 addresses: `http://[::1]:3000`, `https://[2001:db8::1]`\n- Combined: `https://*.example.com:*`\n\nExamples:\n- `http://localhost:3000,https://prod.example.com`\n- `https://*.api.example.com,http://127.0.0.1:*`\n- `http://[::1]:*,https://*.*.corp.example.com:*`",
 						source_line: 22,
 						type_signature: '(env_value: string | undefined): RegExp[]',
 						return_type: 'RegExp[]',
