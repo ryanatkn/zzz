@@ -74,7 +74,9 @@ afterEach(() => {
 
 // Helper to create ENOENT error with proper code property
 const create_enoent_error = (path: string): NodeJS.ErrnoException => {
-	const error = new Error(`ENOENT: no such file or directory, lstat '${path}'`) as NodeJS.ErrnoException;
+	const error = new Error(
+		`ENOENT: no such file or directory, lstat '${path}'`,
+	) as NodeJS.ErrnoException;
 	error.code = 'ENOENT';
 	error.errno = -2;
 	error.syscall = 'lstat';
