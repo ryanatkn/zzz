@@ -961,13 +961,22 @@ describe('integration scenarios', () => {
 });
 
 describe('normalize_origin', () => {
-	test('handles URL normalization edge cases', () => {
+	test('handles explicit default port 443 for HTTPS', () => {
 		const patterns = parse_allowed_origins('https://example.com:443');
 
 		// The pattern explicitly includes :443
 		expect(should_allow_origin('https://example.com:443', patterns)).toBe(true);
 		// Without the port, it won't match (we don't normalize)
 		expect(should_allow_origin('https://example.com', patterns)).toBe(false);
+	});
+
+	test('handles explicit default port 80 for HTTP', () => {
+		const patterns = parse_allowed_origins('http://example.com:80');
+
+		// The pattern explicitly includes :80
+		expect(should_allow_origin('http://example.com:80', patterns)).toBe(true);
+		// Without the port, it won't match (we don't normalize)
+		expect(should_allow_origin('http://example.com', patterns)).toBe(false);
 	});
 
 	test('preserves non-standard ports', () => {
