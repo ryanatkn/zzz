@@ -1,0 +1,22 @@
+<script lang="ts">
+	import LibraryDetail from '@fuzdev/fuz_ui/LibraryDetail.svelte';
+	import TomeContent from '@fuzdev/fuz_ui/TomeContent.svelte';
+	import {get_tome_by_name} from '@fuzdev/fuz_ui/tome.js';
+	import {library_context} from '@fuzdev/fuz_ui/library.svelte.js';
+	import {resolve} from '$app/paths';
+
+	const tome = get_tome_by_name('library');
+
+	const library = library_context.get();
+</script>
+
+<TomeContent {tome}>
+	<section>
+		<p>
+			This is an early work in progress, see <a href={resolve('/about')}>/about</a> for more.
+		</p>
+	</section>
+	<section>
+		<LibraryDetail {library} />
+	</section>
+</TomeContent>

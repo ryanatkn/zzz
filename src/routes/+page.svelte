@@ -17,7 +17,10 @@
 			<blockquote>nice web things for the tired 💤</blockquote>
 		</div>
 		<p>Zzz is a fullstack web toolkit for power users and devs.</p>
-		<p>It's an early work in progress, see the <a href={resolve('/about')}>about page</a>.</p>
+		<p>
+			It's an early work in progress, see the <a href={resolve('/about')}>about page</a> and
+			<a href={resolve('/docs')}>docs</a>.
+		</p>
 	</div>
 </section>
 

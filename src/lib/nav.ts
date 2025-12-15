@@ -7,6 +7,7 @@ import {
 	GLYPH_CAPABILITY,
 	GLYPH_CHAT,
 	GLYPH_FILE,
+	GLYPH_INFO,
 	GLYPH_LOG,
 	GLYPH_MODEL,
 	GLYPH_PROMPT,
@@ -71,6 +72,7 @@ export const main_nav_items_default: Array<NavItem> = [
 		items: [
 			{label: 'about', href: resolve('/about'), icon: logo_zzz},
 			{label: 'capabilities', href: resolve('/capabilities'), icon: GLYPH_CAPABILITY},
+			{label: 'docs', href: resolve('/docs'), icon: GLYPH_INFO},
 			{label: 'actions', href: resolve('/actions'), icon: GLYPH_LOG},
 			{label: 'settings', href: resolve('/settings'), icon: GLYPH_SETTINGS},
 		],

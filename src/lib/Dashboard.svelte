@@ -71,8 +71,6 @@
 	const sidebar_button_title = $derived(
 		(app.ui.show_sidebar ? 'hide sidebar' : 'show sidebar') + ' [backtick `]',
 	);
-
-	// TODO consider the
 </script>
 
 <svelte:window
