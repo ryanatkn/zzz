@@ -65,7 +65,7 @@ afterEach(() => {
 	console_spy.mockRestore();
 });
 
-describe('ScopedFs - Construction and Initialization', () => {
+describe('ScopedFs - construction and initialization', () => {
 	test('constructor - should accept an array of allowed paths', () => {
 		const scoped_fs = create_test_instance();
 		expect(scoped_fs).toBeInstanceOf(ScopedFs);
@@ -92,7 +92,7 @@ describe('ScopedFs - Construction and Initialization', () => {
 	});
 });
 
-describe('ScopedFs - Path Validation', () => {
+describe('ScopedFs - path validation', () => {
 	test('is_path_allowed - should return true for paths within allowed directories', () => {
 		const scoped_fs = create_test_instance();
 
@@ -184,7 +184,7 @@ describe('ScopedFs - Path Validation', () => {
 	});
 });
 
-describe('ScopedFs - File Operations', () => {
+describe('ScopedFs - file operations', () => {
 	test('read_file - should read files in allowed paths', async () => {
 		const scoped_fs = create_test_instance();
 		const test_content = 'test file content';
@@ -194,6 +194,36 @@ describe('ScopedFs - File Operations', () => {
 		const content = await scoped_fs.read_file(FILE_PATHS.ALLOWED);
 		expect(content).toBe(test_content);
 		expect(fs.readFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, 'utf8');
+	});
+
+	test('read_file - should return Buffer when options specify buffer encoding', async () => {
+		const scoped_fs = create_test_instance();
+		const test_buffer = Buffer.from('binary content');
+
+		vi.mocked(fs.readFile).mockResolvedValueOnce(test_buffer);
+
+		const content = await scoped_fs.read_file(FILE_PATHS.ALLOWED, null);
+		expect(content).toBe(test_buffer);
+		expect(fs.readFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, null);
+	});
+
+	test('read_file - should pass through various encoding options', async () => {
+		const scoped_fs = create_test_instance();
+
+		const encoding_options = [
+			{options: 'utf8', expected: 'utf8'},
+			{options: 'ascii', expected: 'ascii'},
+			{options: {encoding: 'utf8'}, expected: {encoding: 'utf8'}},
+			{options: {encoding: null}, expected: {encoding: null}},
+		];
+
+		for (const {options, expected} of encoding_options) {
+			vi.mocked(fs.readFile).mockReset();
+			vi.mocked(fs.readFile).mockResolvedValueOnce('content' as any);
+
+			await scoped_fs.read_file(FILE_PATHS.ALLOWED, options as any);
+			expect(fs.readFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, expected);
+		}
 	});
 
 	test('read_file - should throw for paths outside allowed directories', async () => {
@@ -223,7 +253,7 @@ describe('ScopedFs - File Operations', () => {
 	});
 });
 
-describe('ScopedFs - Directory Operations', () => {
+describe('ScopedFs - directory operations', () => {
 	test('mkdir - should create directories in allowed paths', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -275,7 +305,7 @@ describe('ScopedFs - Directory Operations', () => {
 	});
 });
 
-describe('ScopedFs - Stat Operations', () => {
+describe('ScopedFs - stat operations', () => {
 	test('stat - should get stats for paths in allowed directories', async () => {
 		const scoped_fs = create_test_instance();
 		const mock_stats = {
@@ -314,9 +344,26 @@ describe('ScopedFs - Stat Operations', () => {
 			expect(fs.stat).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, expected_options);
 		}
 	});
+
+	test('stat - should return BigIntStats when bigint option is true', async () => {
+		const scoped_fs = create_test_instance();
+
+		const bigint_stats = {
+			size: BigInt(1024),
+			mtimeMs: BigInt(Date.now()),
+			isFile: () => true,
+			isDirectory: () => false,
+		} as unknown as fs_sync.BigIntStats;
+
+		vi.mocked(fs.stat).mockResolvedValueOnce(bigint_stats);
+
+		const result = await scoped_fs.stat(FILE_PATHS.ALLOWED, {bigint: true});
+		expect(result).toBe(bigint_stats);
+		expect(typeof (result as unknown as fs_sync.BigIntStats).size).toBe('bigint');
+	});
 });
 
-describe('ScopedFs - Existence Checking', () => {
+describe('ScopedFs - existence checking', () => {
 	test('exists - should check existence for paths in allowed directories', async () => {
 		const scoped_fs = create_test_instance();
 
@@ -344,7 +391,7 @@ describe('ScopedFs - Existence Checking', () => {
 	});
 });
 
-describe('ScopedFs - Copy Operations', () => {
+describe('ScopedFs - copy operations', () => {
 	test('copy_file - should copy files between allowed paths', async () => {
 		const scoped_fs = create_test_instance();
 		const source = FILE_PATHS.ALLOWED;
@@ -354,6 +401,26 @@ describe('ScopedFs - Copy Operations', () => {
 
 		await scoped_fs.copy_file(source, destination);
 		expect(fs.copyFile).toHaveBeenCalledWith(source, destination, undefined);
+	});
+
+	test('copy_file - should pass through mode parameter', async () => {
+		const scoped_fs = create_test_instance();
+		const source = FILE_PATHS.ALLOWED;
+		const destination = '/allowed/path/destination.txt';
+
+		// Test with COPYFILE_EXCL mode (fail if destination exists)
+		const COPYFILE_EXCL = 1;
+		vi.mocked(fs.copyFile).mockResolvedValueOnce();
+
+		await scoped_fs.copy_file(source, destination, COPYFILE_EXCL);
+		expect(fs.copyFile).toHaveBeenCalledWith(source, destination, COPYFILE_EXCL);
+
+		// Test with COPYFILE_FICLONE mode
+		const COPYFILE_FICLONE = 2;
+		vi.mocked(fs.copyFile).mockResolvedValueOnce();
+
+		await scoped_fs.copy_file(source, destination, COPYFILE_FICLONE);
+		expect(fs.copyFile).toHaveBeenCalledWith(source, destination, COPYFILE_FICLONE);
 	});
 
 	test('copy_file - should throw if either source or destination is outside allowed paths', async () => {
@@ -371,7 +438,7 @@ describe('ScopedFs - Copy Operations', () => {
 	});
 });
 
-describe('ScopedFs - Symlink Detection', () => {
+describe('ScopedFs - symlink detection', () => {
 	test('should reject operations on paths containing symlinks', async () => {
 		const scoped_fs = create_test_instance();
 

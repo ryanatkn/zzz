@@ -208,7 +208,7 @@ export class ScopedFs {
 			}
 		} catch (error) {
 			// If error is due to non-existence, ignore
-			if (!(error instanceof Error && error.message.includes('ENOENT'))) {
+			if (!((error as NodeJS.ErrnoException).code === 'ENOENT')) {
 				throw error;
 			}
 		}
@@ -225,7 +225,7 @@ export class ScopedFs {
 					throw new SymlinkNotAllowedError(parent);
 				}
 			} catch (error) {
-				if (!(error instanceof Error && error.message.includes('ENOENT'))) {
+				if (!((error as NodeJS.ErrnoException).code === 'ENOENT')) {
 					throw error;
 				}
 			}
