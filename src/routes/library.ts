@@ -43,6 +43,7 @@ export const library_json: LibraryJson = {
 		},
 		devDependencies: {
 			'@changesets/changelog-git': '^0.2.1',
+			'@fuzdev/fuz_code': '^0.38.0',
 			'@fuzdev/fuz_css': '^0.42.1',
 			'@fuzdev/fuz_ui': '^0.172.0',
 			'@ryanatkn/eslint-config': '^0.9.0',
