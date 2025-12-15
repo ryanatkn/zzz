@@ -537,11 +537,7 @@ describe('pattern_to_regexp', () => {
 			// Note: URL normalizes [::ffff:127.0.0.1] to [::ffff:7f00:1]
 			test_pattern(
 				'http://[::ffff:7f00:1]:*',
-				[
-					'http://[::ffff:7f00:1]',
-					'http://[::ffff:7f00:1]:3000',
-					'http://[::ffff:7f00:1]:8080',
-				],
+				['http://[::ffff:7f00:1]', 'http://[::ffff:7f00:1]:3000', 'http://[::ffff:7f00:1]:8080'],
 				['http://[::ffff:7f00:2]:3000', 'https://[::ffff:7f00:1]:3000'],
 			);
 
