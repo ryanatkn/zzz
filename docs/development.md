@@ -277,12 +277,10 @@ src/routes/my_route/
 <script lang="ts">
   import type {Snippet} from 'svelte';
 
-  interface Props {
+  const {title, children}: {
     title: string;
     children?: Snippet;
-  }
-
-  const {title, children}: Props = $props();
+  } = $props();
 </script>
 
 <div class="my-component">
