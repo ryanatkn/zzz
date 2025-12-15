@@ -18729,7 +18729,7 @@ export const library_json: LibraryJson = {
 					{
 						name: 'server_info_get_path',
 						kind: 'function',
-						doc_comment: 'Get path to server.json',
+						doc_comment: 'Returns the full path to server.json',
 						source_line: 41,
 						type_signature: '(zzz_dir: string): string',
 						return_type: 'string',
@@ -18744,8 +18744,8 @@ export const library_json: LibraryJson = {
 						name: 'server_info_read',
 						kind: 'function',
 						doc_comment:
-							"Read server info from server.json\n\nReturns `null` if the file doesn't exist or is invalid.\nDeletes the file if it's corrupt or has wrong version.",
-						source_line: 51,
+							'Reads and validates server.json, deleting and returning null if corrupt or wrong version',
+						source_line: 48,
 						type_signature:
 							'(zzz_dir: string): Promise<{ version: number; pid: number; port: number; started: string; zzz_version: string; } | null>',
 						return_type:
@@ -18760,8 +18760,9 @@ export const library_json: LibraryJson = {
 					{
 						name: 'server_info_check_stale',
 						kind: 'function',
-						doc_comment: "Check if there's a stale server.json (process no longer running)",
-						source_line: 85,
+						doc_comment:
+							'Returns server info if running, otherwise deletes stale file and returns null',
+						source_line: 82,
 						type_signature:
 							'(zzz_dir: string): Promise<{ version: number; pid: number; port: number; started: string; zzz_version: string; } | null>',
 						return_type:
@@ -18776,7 +18777,7 @@ export const library_json: LibraryJson = {
 					{
 						name: 'Server_Info_Write_Options',
 						kind: 'type',
-						source_line: 98,
+						source_line: 95,
 						type_signature: 'Server_Info_Write_Options',
 						properties: [
 							{
@@ -18799,9 +18800,8 @@ export const library_json: LibraryJson = {
 					{
 						name: 'server_info_write',
 						kind: 'function',
-						doc_comment:
-							'Write server info to server.json atomically\n\nUses write-to-temp + fsync + rename for atomicity.',
-						source_line: 109,
+						doc_comment: 'Writes server info to server.json atomically, returns the path',
+						source_line: 104,
 						type_signature: '(options: Server_Info_Write_Options): Promise<string>',
 						return_type: 'Promise<string>',
 						parameters: [
@@ -18815,7 +18815,7 @@ export const library_json: LibraryJson = {
 						name: 'server_info_remove',
 						kind: 'function',
 						doc_comment: 'Remove server info file (idempotent - ignores if already removed)',
-						source_line: 147,
+						source_line: 142,
 						type_signature: '(zzz_dir: string): Promise<void>',
 						return_type: 'Promise<void>',
 						parameters: [
