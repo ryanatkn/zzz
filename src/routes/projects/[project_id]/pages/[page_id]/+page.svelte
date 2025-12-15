@@ -3,6 +3,7 @@
 
 	import {goto} from '$app/navigation';
 	import {resolve} from '$app/paths';
+	import Mdz from '@fuzdev/fuz_ui/Mdz.svelte';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import ProjectSidebar from '$routes/projects/ProjectSidebar.svelte';
@@ -49,8 +50,7 @@
 {#if preview_mode}
 	<div class="preview_fullscreen" class:offset_for_sidebar={app.ui.show_sidebar}>
 		<div class="markdown_preview p_lg">
-			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-			{@html page_viewmodel?.formatted_content}
+			<Mdz content={page_viewmodel?.content ?? ''} />
 		</div>
 
 		<!-- preview toggle button in top-right corner -->
@@ -142,9 +142,7 @@
 						</div>
 
 						<div class="panel p_md preview_area">
-							<!-- TODO hacky, replace with safe markdown -->
-							<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-							<div class="markdown_preview">{@html page_viewmodel.formatted_content}</div>
+							<div class="markdown_preview"><Mdz content={page_viewmodel.content} /></div>
 						</div>
 					</div>
 				</div>

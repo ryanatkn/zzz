@@ -134,7 +134,7 @@ export class ProjectViewmodel {
 				id: page_id,
 				title: unique_title,
 				path: '/new-page',
-				content: `# ${unique_title}\n\nAdd your content here.`,
+				content: `# ${unique_title}\n\nAdd your **content** here.`,
 				created,
 				updated: created,
 			},

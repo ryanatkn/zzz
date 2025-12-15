@@ -13,7 +13,7 @@ export type DomainJsonInput = z.input<typeof DomainJson>;
 export const PageJson = CellJson.extend({
 	path: z.string().default('/'),
 	title: z.string().default('New page'),
-	content: z.string().default('# New page\n\nAdd your content here.'),
+	content: z.string().default('# New page\n\nAdd your **content** here.'),
 }).meta({cell_class_name: 'Page'});
 export type PageJson = z.infer<typeof PageJson>;
 export type PageJsonInput = z.input<typeof PageJson>;
