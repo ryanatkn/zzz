@@ -5,7 +5,9 @@ import {Logger} from '@fuzdev/fuz_util/log.js';
 import {ALLOWED_ORIGINS} from '$env/static/private';
 import {DEV} from 'esm-env';
 
+import pkg from '../../../package.json' with {type: 'json'};
 import {Backend} from './backend.js';
+import {server_info_write, server_info_remove, server_info_check_stale} from './server_info.js';
 import {backend_action_handlers} from './backend_action_handlers.js';
 import {register_http_actions} from './register_http_actions.js';
 import {register_websocket_actions} from './register_websocket_actions.js';
@@ -17,6 +19,7 @@ import {
 	SERVER_PROXIED_PORT,
 	WEBSOCKET_PATH,
 	ZZZ_DIR,
+	ZZZ_SCOPED_DIRS,
 } from '../constants.js';
 import {parse_allowed_origins, verify_request_source} from './security.js';
 import {handle_filer_change} from './backend_actions_api.js';
@@ -39,8 +42,16 @@ const create_server = async (): Promise<void> => {
 	log.info('creating server', {
 		config,
 		ZZZ_DIR,
+		ZZZ_SCOPED_DIRS,
 		allowed_origins,
 	});
+
+	// Check for stale server info from a previous crash
+	// TODO do anything differently?
+	const stale_info = await server_info_check_stale(ZZZ_DIR);
+	if (stale_info) {
+		log.warn('found running server', stale_info);
+	}
 
 	const app = new Hono();
 
@@ -132,12 +143,30 @@ const create_server = async (): Promise<void> => {
 			port: SERVER_PROXIED_PORT,
 			fetch: app.fetch,
 		},
-		(info) => {
+		async (info) => {
 			log.info(`listening on http://${info.address}:${info.port}`);
+
+			// Write server info after successfully binding
+			await server_info_write({
+				zzz_dir: ZZZ_DIR,
+				port: info.port,
+				zzz_version: pkg.version,
+			});
 		},
 	);
 
 	injectWebSocket(hono);
+
+	// Shutdown handlers to clean up server info
+	const shutdown = async (signal: string): Promise<void> => {
+		log.info(`received ${signal}, shutting down...`);
+		await server_info_remove(ZZZ_DIR);
+		await backend.destroy();
+		process.exit(0);
+	};
+
+	process.on('SIGINT', () => void shutdown('SIGINT'));
+	process.on('SIGTERM', () => void shutdown('SIGTERM'));
 };
 
 void create_server().catch((error) => {

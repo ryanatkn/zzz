@@ -11,6 +11,7 @@ Deep dive into Zzz's core systems: actions, cells, content model, and data flow.
 - [Content Model](#content-model)
 - [Data Flow](#data-flow)
 - [IndexedCollection](#indexedcollection)
+- [Filesystem](#filesystem)
 
 ## Action System
 
@@ -565,3 +566,90 @@ export class Models extends Cell<typeof ModelsJson> {
   }
 }
 ```
+
+## Filesystem
+
+Zzz's filesystem architecture separates app data from user files.
+
+### Directory Structure
+
+```
+.zzz/                        # Zzz app directory (PUBLIC_ZZZ_DIR)
+├── state/                   # Persistent data
+│   └── completions/         # AI completion logs
+├── cache/                   # Regenerable data (future)
+└── run/                     # Runtime ephemeral
+    └── server.json          # PID, port, version
+```
+
+### Two Concerns
+
+| Concern | Env Var | Purpose |
+|---------|---------|---------|
+| App directory | `PUBLIC_ZZZ_DIR` | Zzz's own data (state, cache, run) |
+| Scoped dirs | `PUBLIC_ZZZ_SCOPED_DIRS` | User file access (comma-separated paths) |
+
+### ScopedFs
+
+All filesystem operations go through `ScopedFs` for security:
+
+```typescript
+class ScopedFs {
+  readonly allowed_paths: ReadonlyArray<ScopedFsPath>;
+
+  // Security checks
+  is_path_allowed(path: string): boolean;
+  is_path_safe(path: string): Promise<boolean>;  // includes symlink check
+
+  // Operations (all validate paths first)
+  read_file(path, options): Promise<Buffer | string>;
+  write_file(path, data, options): Promise<void>;
+  mkdir(path, options): Promise<string | undefined>;
+  readdir(path, options): Promise<Array<Dirent>>;
+  stat(path, options): Promise<Stats>;
+  rm(path, options): Promise<void>;
+  exists(path): Promise<boolean>;
+}
+```
+
+**Security features**:
+- Paths validated against allowed roots
+- Symlinks rejected (no traversal attacks)
+- All paths must be absolute
+- Parent directories checked for symlinks
+
+### Filer Integration
+
+Each scoped directory gets a `Filer` watcher:
+
+```typescript
+// In Backend constructor
+for (const dir of this.scoped_dirs) {
+  const filer = new Filer({watch_dir_options: {dir}});
+  filer.watch((change, disknode) => {
+    this.#handle_filer_change(change, disknode, this, dir, filer);
+  });
+  this.filers.set(dir, {filer, cleanup_promise});
+}
+```
+
+File changes are broadcast to clients via `filer_change` notifications.
+
+### Server Info
+
+The `run/server.json` file tracks the running server:
+
+```typescript
+interface ServerInfo {
+  version: number;      // Schema version
+  pid: number;          // Process ID
+  port: number;         // Server port
+  started: string;      // ISO timestamp
+  zzz_version: string;  // Package version
+}
+```
+
+**Lifecycle**:
+- Written atomically on startup (temp + fsync + rename)
+- Removed on clean shutdown (SIGINT/SIGTERM)
+- Stale detection via `process.kill(pid, 0)`

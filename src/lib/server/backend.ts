@@ -13,7 +13,7 @@ import type {ZzzConfig} from '../config_helpers.js';
 import {DiskfileDirectoryPath} from '../diskfile_types.js';
 import {ScopedFs} from './scoped_fs.js';
 import {ActionRegistry} from '../action_registry.js';
-import {ZZZ_DIR} from '../constants.js';
+import {ZZZ_DIR, ZZZ_SCOPED_DIRS} from '../constants.js';
 import type {BackendActionHandlers} from './backend_action_types.js';
 import type {ActionEventPhase, ActionEventEnvironment} from '../action_event_types.js';
 import type {ActionMethod} from '../action_metatypes.js';
@@ -40,6 +40,7 @@ export type FilerChangeHandler = (
 	disknode: Disknode,
 	backend: Backend,
 	dir: string,
+	filer: Filer,
 ) => void;
 
 /**
@@ -55,6 +56,11 @@ export interface BackendOptions {
 	 * Zzz directory path, defaults to `.zzz`.
 	 */
 	zzz_dir?: string; // TODO @many move this info to path schemas
+	/**
+	 * Filesystem paths that Zzz can access for user files.
+	 * Defaults to `ZZZ_SCOPED_DIRS` from env.
+	 */
+	scoped_dirs?: Array<string>;
 	/**
 	 * Configuration for the backend and AI providers.
 	 */
@@ -86,6 +92,9 @@ export class Backend implements ActionEventEnvironment {
 
 	/** The full path to the Zzz directory. */
 	readonly zzz_dir: DiskfileDirectoryPath;
+
+	/** Filesystem paths that Zzz can access for user files. */
+	readonly scoped_dirs: ReadonlyArray<DiskfileDirectoryPath>;
 
 	readonly config: ZzzConfig;
 
@@ -126,23 +135,41 @@ export class Backend implements ActionEventEnvironment {
 	constructor(options: BackendOptions) {
 		this.zzz_dir = DiskfileDirectoryPath.parse(resolve(options.zzz_dir || ZZZ_DIR));
 
+		// Resolve scoped_dirs to absolute paths and parse as DiskfileDirectoryPath
+		this.scoped_dirs = Object.freeze(
+			(options.scoped_dirs ?? ZZZ_SCOPED_DIRS).map((p) => DiskfileDirectoryPath.parse(resolve(p))),
+		);
+
 		this.config = options.config;
 
 		this.action_registry = new ActionRegistry(options.action_specs);
 		this.#action_handlers = options.action_handlers;
 		this.#handle_filer_change = options.handle_filer_change;
 
-		this.scoped_fs = new ScopedFs([this.zzz_dir]); // TODO pass filter through on options
+		// ScopedFs uses scoped_dirs for user file access, plus zzz_dir for app data
+		this.scoped_fs = new ScopedFs([this.zzz_dir, ...this.scoped_dirs]);
 
 		this.log = options.log === undefined ? new Logger('[backend]') : options.log;
 
 		// TODO maybe do this in an `init` method
-		// Set up the filer watcher for the zzz_dir
-		const filer = new Filer({watch_dir_options: {dir: this.zzz_dir}}); // TODO maybe filter out the db directory at this level? think about this when db is added
-		const cleanup_promise = filer.watch((change, disknode) => {
-			this.#handle_filer_change(change, disknode, this, this.zzz_dir);
+		// Set up filer watcher for zzz_dir (always watched for app data)
+		const zzz_filer = new Filer({watch_dir_options: {dir: this.zzz_dir}});
+		const zzz_cleanup = zzz_filer.watch((change, disknode) => {
+			this.#handle_filer_change(change, disknode, this, this.zzz_dir, zzz_filer);
 		});
-		this.filers.set(this.zzz_dir, {filer, cleanup_promise});
+		this.filers.set(this.zzz_dir, {filer: zzz_filer, cleanup_promise: zzz_cleanup});
+
+		// Set up filer watchers for each scoped directory (user files)
+		for (const dir of this.scoped_dirs) {
+			// Skip if same as zzz_dir (already watching)
+			if (dir === this.zzz_dir) continue;
+
+			const filer = new Filer({watch_dir_options: {dir}});
+			const cleanup_promise = filer.watch((change, disknode) => {
+				this.#handle_filer_change(change, disknode, this, dir, filer);
+			});
+			this.filers.set(dir, {filer, cleanup_promise});
+		}
 	}
 
 	// TODO @api better type safety

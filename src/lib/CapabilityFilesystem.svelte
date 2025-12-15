@@ -7,6 +7,7 @@
 	const {capabilities} = app;
 
 	const zzz_dir = $derived(app.zzz_dir);
+	const scoped_dirs = $derived(app.scoped_dirs);
 </script>
 
 <div
@@ -19,7 +20,7 @@
 	class:color_d={capabilities.filesystem.status === 'pending'}
 	class:color_e={capabilities.filesystem.status === 'initial'}
 >
-	<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
+	<div class="column justify_content_center gap_xs p_md" style:min-height="80px">
 		<div class="font_size_xl">
 			filesystem {capabilities.filesystem.status === 'success'
 				? 'available'
@@ -32,21 +33,26 @@
 				<PendingAnimation inline />
 			{/if}
 		</div>
-		<small class="font_family_mono">
+		<div class="column gap_xs3 font_family_mono">
 			{#if zzz_dir === undefined || zzz_dir === null}
-				&nbsp;
+				<small>&nbsp;</small>
 			{:else if zzz_dir === ''}
-				no backend directory configured
+				<small>no zzz directory configured</small>
 			{:else}
-				{zzz_dir}
+				<small>{zzz_dir}</small>
 			{/if}
-		</small>
+			{#each scoped_dirs as dir (dir)}
+				<small>{dir}</small>
+			{/each}
+		</div>
 	</div>
 </div>
 
-<p>
-	This is the backend's filesystem directory. For security reasons, filesystem operations are scoped
-	to this directory and symlinks are not followed. Defaults to <code>.zzz</code> in the backend's
-	current working directory. To configure it set the .env variable
-	<code class="font_size_sm">PUBLIC_ZZZ_DIR</code>. Configure at your own risk.
-</p>
+<section>
+	<p>
+		The backend's filesystem is scoped for security. Symlinks are not followed. Configure with <code
+			class="font_size_sm">PUBLIC_ZZZ_DIR</code
+		>
+		and <code class="font_size_sm">PUBLIC_ZZZ_SCOPED_DIRS</code>.
+	</p>
+</section>

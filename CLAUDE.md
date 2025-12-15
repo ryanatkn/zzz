@@ -159,7 +159,8 @@ The `.zzz/` directory stores Zzz's app data. Configured via `PUBLIC_ZZZ_DIR` env
 ├── state/                   # Persistent data
 │   └── completions/         # AI completion logs
 ├── cache/                   # Regenerable data (future)
-└── run/                     # Runtime ephemeral (future)
+└── run/                     # Runtime ephemeral
+    └── server.json          # PID, port, version
 ```
 
 | Directory | Semantics |
@@ -167,6 +168,25 @@ The `.zzz/` directory stores Zzz's app data. Configured via `PUBLIC_ZZZ_DIR` env
 | `state/` | Persistent user data, survives restarts |
 | `cache/` | Regenerable data, safe to delete |
 | `run/` | Runtime/ephemeral (PIDs, locks) |
+
+The `run/server.json` file is written on server startup and removed on clean shutdown. It contains PID, port, start time, and version for server discovery.
+
+### Scoped Filesystem
+
+Zzz separates two filesystem concerns:
+
+| Env Var | Purpose |
+|---------|---------|
+| `PUBLIC_ZZZ_DIR` | Zzz's app directory (default: `.zzz`) |
+| `PUBLIC_ZZZ_SCOPED_DIRS` | Comma-separated paths Zzz can access for user files |
+
+Example:
+```bash
+PUBLIC_ZZZ_DIR="./.zzz"
+PUBLIC_ZZZ_SCOPED_DIRS="./projects,~/code,/mnt/data"
+```
+
+The `zzz_dir` is always watched and accessible (for app data like completions). `scoped_dirs` adds additional paths for user files.
 
 ## Development
 

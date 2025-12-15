@@ -69,7 +69,7 @@ export const library_json: LibraryJson = {
 		},
 		dependencies: {
 			'@anthropic-ai/sdk': '^0.71.2',
-			'@fuzdev/fuz_util': '^0.42.0',
+			'@fuzdev/fuz_util': '^0.44.1',
 			'@google/generative-ai': '^0.24.1',
 			'@hono/node-server': '^1.19.6',
 			'@hono/node-ws': '^1.2.0',
@@ -1757,131 +1757,131 @@ export const library_json: LibraryJson = {
 						kind: 'variable',
 						source_line: 47,
 						type_signature:
-							'{ method: "session_load"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: null; input: ZodOptional<ZodVoid>; output: ZodObject<{ data: ZodObject<{ zzz_dir: $ZodBranded<...>; files: ZodArray<...>; provider_status: ZodArray<...>; }, $strict>; }, $strict>; async: true; }',
+							'{ method: "session_load"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: null; input: ZodOptional<ZodVoid>; output: ZodObject<{ data: ZodObject<{ zzz_dir: $ZodBranded<...>; scoped_dirs: ZodReadonly<...>; files: ZodArray<...>; provider_status: ZodArray<...>; }, $strict>; }, $strict>; a...',
 					},
 					{
 						name: 'filer_change_action_spec',
 						kind: 'variable',
-						source_line: 67,
+						source_line: 68,
 						type_signature:
 							'{ method: "filer_change"; kind: "remote_notification"; initiator: "backend"; auth: null; side_effects: true; input: ZodObject<{ change: ZodObject<{ type: ZodEnum<{ add: "add"; change: "change"; delete: "delete"; }>; path: $ZodBranded<...>; }, $strict>; disknode: ZodObject<...>; }, $strict>; output: ZodVoid; async: t...',
 					},
 					{
 						name: 'diskfile_update_action_spec',
 						kind: 'variable',
-						source_line: 81,
+						source_line: 82,
 						type_signature:
 							'{ method: "diskfile_update"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ path: $ZodBranded<ZodString, "DiskfilePath">; content: ZodString; }, $strict>; output: ZodNull; async: true; }',
 					},
 					{
 						name: 'diskfile_delete_action_spec',
 						kind: 'variable',
-						source_line: 95,
+						source_line: 96,
 						type_signature:
 							'{ method: "diskfile_delete"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ path: $ZodBranded<ZodString, "DiskfilePath">; }, $strict>; output: ZodNull; async: true; }',
 					},
 					{
 						name: 'directory_create_action_spec',
 						kind: 'variable',
-						source_line: 108,
+						source_line: 109,
 						type_signature:
 							'{ method: "directory_create"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ path: $ZodBranded<ZodString, "DiskfilePath">; }, $strict>; output: ZodNull; async: true; }',
 					},
 					{
 						name: 'completion_create_action_spec',
 						kind: 'variable',
-						source_line: 121,
+						source_line: 122,
 						type_signature:
 							'{ method: "completion_create"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ completion_request: ZodObject<{ created: ZodDefault<$ZodBranded<ZodISODateTime, "Datetime">>; provider_name: ZodEnum<...>; model: ZodString; prompt: ZodString; completion_messages: Z...',
 					},
 					{
 						name: 'completion_progress_action_spec',
 						kind: 'variable',
-						source_line: 138,
+						source_line: 139,
 						type_signature:
 							'{ method: "completion_progress"; kind: "remote_notification"; initiator: "backend"; auth: null; side_effects: true; input: ZodObject<{ chunk: ZodOptional<ZodObject<{ model: ZodOptional<ZodString>; created_at: ZodOptional<...>; done: ZodOptional<...>; message: ZodOptional<...>; }, $loose>>; _meta: ZodOptional<...>; }...',
 					},
 					{
 						name: 'ollama_progress_action_spec',
 						kind: 'variable',
-						source_line: 178,
+						source_line: 179,
 						type_signature:
 							'{ method: "ollama_progress"; kind: "remote_notification"; initiator: "backend"; auth: null; side_effects: true; input: ZodObject<{ status: ZodString; digest: ZodOptional<ZodString>; total: ZodOptional<...>; completed: ZodOptional<...>; _meta: ZodOptional<...>; }, $strict>; output: ZodVoid; async: true; }',
 					},
 					{
 						name: 'toggle_main_menu_action_spec',
 						kind: 'variable',
-						source_line: 194,
+						source_line: 195,
 						type_signature:
 							'{ method: "toggle_main_menu"; kind: "local_call"; initiator: "frontend"; auth: null; side_effects: true; input: ZodOptional<ZodObject<{ show: ZodOptional<ZodBoolean>; }, $strict>>; output: ZodObject<...>; async: false; }',
 					},
 					{
 						name: 'ollama_list_action_spec',
 						kind: 'variable',
-						source_line: 205,
+						source_line: 206,
 						type_signature:
 							'{ method: "ollama_list"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: null; input: ZodOptional<ZodVoid>; output: ZodUnion<readonly [ZodObject<{ models: ZodArray<...>; }, $loose>, ZodNull]>; async: true; }',
 					},
 					{
 						name: 'ollama_ps_action_spec',
 						kind: 'variable',
-						source_line: 216,
+						source_line: 217,
 						type_signature:
 							'{ method: "ollama_ps"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: null; input: ZodOptional<ZodVoid>; output: ZodUnion<readonly [ZodObject<{ models: ZodArray<ZodObject<...>>; }, $loose>, ZodNull]>; async: true; }',
 					},
 					{
 						name: 'ollama_show_action_spec',
 						kind: 'variable',
-						source_line: 227,
+						source_line: 228,
 						type_signature:
 							'{ method: "ollama_show"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: null; input: ZodObject<{ model: ZodString; system: ZodOptional<ZodString>; template: ZodOptional<...>; options: ZodOptional<...>; }, $loose>; output: ZodUnion<...>; async: true; }',
 					},
 					{
 						name: 'ollama_pull_action_spec',
 						kind: 'variable',
-						source_line: 238,
+						source_line: 239,
 						type_signature:
 							'{ method: "ollama_pull"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ model: ZodString; insecure: ZodOptional<ZodBoolean>; stream: ZodOptional<...>; _meta: ZodOptional<...>; }, $strict>; output: ZodOptional<...>; async: true; }',
 					},
 					{
 						name: 'ollama_delete_action_spec',
 						kind: 'variable',
-						source_line: 253,
+						source_line: 254,
 						type_signature:
 							'{ method: "ollama_delete"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ model: ZodString; }, $loose>; output: ZodOptional<...>; async: true; }',
 					},
 					{
 						name: 'ollama_copy_action_spec',
 						kind: 'variable',
-						source_line: 264,
+						source_line: 265,
 						type_signature:
 							'{ method: "ollama_copy"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ source: ZodString; destination: ZodString; }, $loose>; output: ZodOptional<...>; async: true; }',
 					},
 					{
 						name: 'ollama_create_action_spec',
 						kind: 'variable',
-						source_line: 275,
+						source_line: 276,
 						type_signature:
 							'{ method: "ollama_create"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ model: ZodString; from: ZodOptional<ZodString>; ... 8 more ...; _meta: ZodOptional<...>; }, $strict>; output: ZodOptional<...>; async: true; }',
 					},
 					{
 						name: 'ollama_unload_action_spec',
 						kind: 'variable',
-						source_line: 290,
+						source_line: 291,
 						type_signature:
 							'{ method: "ollama_unload"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ model: ZodString; }, $strict>; output: ZodOptional<...>; async: true; }',
 					},
 					{
 						name: 'provider_load_status_action_spec',
 						kind: 'variable',
-						source_line: 303,
+						source_line: 304,
 						type_signature:
 							'{ method: "provider_load_status"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: null; input: ZodObject<{ provider_name: ZodEnum<{ ollama: "ollama"; claude: "claude"; chatgpt: "chatgpt"; gemini: "gemini"; }>; reload: ZodOptional<...>; }, $strict>; output: ZodObject<...>; async: true; }',
 					},
 					{
 						name: 'provider_update_api_key_action_spec',
 						kind: 'variable',
-						source_line: 319,
+						source_line: 320,
 						type_signature:
 							'{ method: "provider_update_api_key"; kind: "request_response"; initiator: "frontend"; auth: "public"; side_effects: true; input: ZodObject<{ provider_name: ZodEnum<{ ollama: "ollama"; claude: "claude"; chatgpt: "chatgpt"; gemini: "gemini"; }>; api_key: ZodString; }, $strict>; output: ZodObject<...>; async: true; }',
 					},
@@ -2583,12 +2583,17 @@ export const library_json: LibraryJson = {
 								kind: 'variable',
 								type_signature: 'DiskfileDirectoryPath | null | undefined',
 							},
+							{
+								name: 'scoped_dirs',
+								kind: 'variable',
+								type_signature: 'ReadonlyArray<DiskfileDirectoryPath>',
+							},
 						],
 					},
 					{
 						name: 'OllamaCapabilityData',
 						kind: 'type',
-						source_line: 76,
+						source_line: 77,
 						type_signature: 'OllamaCapabilityData',
 						properties: [
 							{
@@ -2613,7 +2618,7 @@ export const library_json: LibraryJson = {
 						kind: 'class',
 						doc_comment:
 							'A class that encapsulates system capabilities detection and management.\nThis is NOT generic or extensible - it contains hardcoded logic for\nall capabilities the system supports.',
-						source_line: 87,
+						source_line: 88,
 						extends: ['Cell<typeof CapabilitiesJson>'],
 						implements: [],
 						members: [
@@ -5367,99 +5372,131 @@ export const library_json: LibraryJson = {
 					{
 						name: 'SERVER_PROTOCOL',
 						kind: 'variable',
-						source_line: 28,
+						source_line: 29,
 						type_signature: 'string',
 					},
 					{
 						name: 'SERVER_HOST',
 						kind: 'variable',
-						source_line: 30,
+						source_line: 31,
 						type_signature: 'string',
 					},
 					{
 						name: 'SERVER_URL',
 						kind: 'variable',
 						doc_comment: '',
-						source_line: 36,
+						source_line: 37,
 						type_signature: 'string',
 					},
 					{
 						name: 'SERVER_PROXIED_PORT',
 						kind: 'variable',
-						source_line: 38,
+						source_line: 39,
 						type_signature: 'number',
 					},
 					{
 						name: 'BACKEND_ARTIFICIAL_RESPONSE_DELAY',
 						kind: 'variable',
-						source_line: 40,
+						source_line: 41,
 						type_signature: 'number',
 					},
 					{
 						name: 'ZZZ_DIR',
 						kind: 'variable',
 						doc_comment: '',
-						source_line: 46,
+						source_line: 47,
 						type_signature: 'string',
+					},
+					{
+						name: 'ZZZ_DIR_STATE',
+						kind: 'variable',
+						source_line: 50,
+						type_signature: '"state"',
+					},
+					{
+						name: 'ZZZ_DIR_STATE_COMPLETIONS',
+						kind: 'variable',
+						source_line: 51,
+						type_signature: '"completions"',
+					},
+					{
+						name: 'ZZZ_DIR_RUN',
+						kind: 'variable',
+						source_line: 52,
+						type_signature: '"run"',
+					},
+					{
+						name: 'ZZZ_DIR_CACHE',
+						kind: 'variable',
+						source_line: 53,
+						type_signature: '"cache"',
+					},
+					{
+						name: 'ZZZ_SCOPED_DIRS',
+						kind: 'variable',
+						doc_comment:
+							'Comma-separated list of filesystem paths that Zzz can access.\nEmpty array means no scoped filesystem access.',
+						source_line: 59,
+						type_signature: 'string[]',
 					},
 					{
 						name: 'CONTENT_PREVIEW_LENGTH',
 						kind: 'variable',
-						source_line: 48,
+						source_line: 65,
 						type_signature: '100',
 					},
 					{
 						name: 'API_PATH',
 						kind: 'variable',
 						doc_comment: '',
-						source_line: 54,
+						source_line: 71,
 						type_signature: 'string',
 					},
 					{
 						name: 'API_URL',
 						kind: 'variable',
 						doc_comment: '',
-						source_line: 63,
+						source_line: 80,
 						type_signature: 'string',
 					},
 					{
 						name: 'API_PATH_FOR_HTTP_RPC',
 						kind: 'variable',
 						doc_comment: '',
-						source_line: 69,
+						source_line: 86,
 						type_signature: 'string',
 					},
 					{
 						name: 'API_URL_FOR_HTTP_RPC',
 						kind: 'variable',
 						doc_comment: '',
-						source_line: 75,
+						source_line: 92,
 						type_signature: 'string',
 					},
 					{
 						name: 'WEBSOCKET_URL',
 						kind: 'variable',
 						doc_comment: '',
-						source_line: 82,
+						source_line: 99,
 						type_signature: 'string',
 					},
 					{
 						name: 'WEBSOCKET_URL_OBJECT',
 						kind: 'variable',
-						source_line: 86,
+						source_line: 103,
 						type_signature: 'URL | null',
 					},
 					{
 						name: 'WEBSOCKET_PATH',
 						kind: 'variable',
 						doc_comment: '',
-						source_line: 92,
+						source_line: 109,
 						type_signature: 'string | undefined',
 					},
 					{
 						name: 'UNKNOWN_ERROR_MESSAGE',
 						kind: 'variable',
-						source_line: 94,
+						source_line: 111,
 						type_signature: 'string',
 					},
 				],
@@ -5477,9 +5514,11 @@ export const library_json: LibraryJson = {
 					'part.svelte.ts',
 					'server/backend.ts',
 					'server/backend_action_handlers.ts',
+					'server/helpers.ts',
 					'server/register_http_actions.ts',
 					'server/register_websocket_actions.ts',
 					'server/server.ts',
+					'server/server_info.ts',
 					'socket.svelte.ts',
 				],
 			},
@@ -8725,12 +8764,12 @@ export const library_json: LibraryJson = {
 								name: 'receive_session',
 								kind: 'function',
 								type_signature:
-									'(data: { zzz_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; files: { id: string & $brand<"DiskfilePath">; source_dir: string & $brand<...> & $brand<...>; ... 4 more ...; dependencies: [...][]; }[]; provider_status: ({ ...; } | { ...; })[]; }): void',
+									'(data: { zzz_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; scoped_dirs: readonly (string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">)[]; files: { ...; }[]; provider_status: ({ ...; } | { ...; })[]; }): void',
 								return_type: 'void',
 								parameters: [
 									{
 										name: 'data',
-										type: '{ zzz_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; files: { id: string & $brand<"DiskfilePath">; source_dir: string & $brand<"DiskfilePath"> & $brand<...>; ... 4 more ...; dependencies: [...][]; }[]; provider_status: ({ ...; } | { ...; })[]; }',
+										type: '{ zzz_dir: string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">; scoped_dirs: readonly (string & $brand<"DiskfilePath"> & $brand<"DiskfileDirectoryPath">)[]; files: { ...; }[]; provider_status: ({ ...; } | { ...; })[]; }',
 									},
 								],
 							},
@@ -16906,7 +16945,7 @@ export const library_json: LibraryJson = {
 						doc_comment: 'Handle file system changes and notify clients.',
 						source_line: 139,
 						type_signature:
-							'(change: WatcherChange, disknode: Disknode, backend: Backend, dir: string): void',
+							'(change: WatcherChange, disknode: Disknode, backend: Backend, dir: string, filer: Filer): void',
 						return_type: 'void',
 						parameters: [
 							{
@@ -16924,6 +16963,10 @@ export const library_json: LibraryJson = {
 							{
 								name: 'dir',
 								type: 'string',
+							},
+							{
+								name: 'filer',
+								type: 'Filer',
 							},
 						],
 					},
@@ -17789,7 +17832,7 @@ export const library_json: LibraryJson = {
 						name: 'FilerInstance',
 						kind: 'type',
 						doc_comment: 'Structure to hold a Filer and its cleanup function.',
-						source_line: 48,
+						source_line: 49,
 						type_signature: 'FilerInstance',
 						properties: [
 							{
@@ -17807,7 +17850,7 @@ export const library_json: LibraryJson = {
 					{
 						name: 'BackendOptions',
 						kind: 'type',
-						source_line: 53,
+						source_line: 54,
 						type_signature: 'BackendOptions',
 						properties: [
 							{
@@ -17815,6 +17858,13 @@ export const library_json: LibraryJson = {
 								kind: 'variable',
 								type_signature: 'string',
 								doc_comment: 'Zzz directory path, defaults to `.zzz`.',
+							},
+							{
+								name: 'scoped_dirs',
+								kind: 'variable',
+								type_signature: 'Array<string>',
+								doc_comment:
+									'Filesystem paths that Zzz can access for user files.\nDefaults to `ZZZ_SCOPED_DIRS` from env.',
 							},
 							{
 								name: 'config',
@@ -17854,7 +17904,7 @@ export const library_json: LibraryJson = {
 						kind: 'class',
 						doc_comment:
 							'Server for managing the Zzz application state and handling client messages.',
-						source_line: 84,
+						source_line: 90,
 						extends: [],
 						implements: ['ActionEventEnvironment'],
 						members: [
@@ -17870,6 +17920,13 @@ export const library_json: LibraryJson = {
 								modifiers: ['readonly'],
 								doc_comment: 'The full path to the Zzz directory.',
 								type_signature: 'DiskfileDirectoryPath',
+							},
+							{
+								name: 'scoped_dirs',
+								kind: 'variable',
+								modifiers: ['readonly'],
+								doc_comment: 'Filesystem paths that Zzz can access for user files.',
+								type_signature: 'ReadonlyArray<DiskfileDirectoryPath>',
 							},
 							{
 								name: 'config',
@@ -18097,9 +18154,9 @@ export const library_json: LibraryJson = {
 					{
 						name: 'save_completion_response_to_disk',
 						kind: 'function',
-						source_line: 8,
+						source_line: 9,
 						type_signature:
-							'(input: { completion_request: { created: string & $brand<"Datetime">; provider_name: "ollama" | "claude" | "chatgpt" | "gemini"; model: string; prompt: string; completion_messages?: { ...; }[] | undefined; }; _meta?: { ...; } | undefined; }, output: { ...; }, dir: string, scoped_fs: ScopedFs): Promise<...>',
+							'(input: { completion_request: { created: string & $brand<"Datetime">; provider_name: "ollama" | "claude" | "chatgpt" | "gemini"; model: string; prompt: string; completion_messages?: { ...; }[] | undefined; }; _meta?: { ...; } | undefined; }, output: { ...; }, zzz_dir: string, scoped_fs: ScopedFs): Promise<...>',
 						return_type: 'Promise<void>',
 						parameters: [
 							{
@@ -18111,7 +18168,7 @@ export const library_json: LibraryJson = {
 								type: '{ completion_response: { created: string & $brand<"Datetime">; provider_name: "ollama" | "claude" | "chatgpt" | "gemini"; model: string; data: { type: "ollama"; value: any; } | { ...; } | { ...; } | { ...; }; }; _meta?: { ...; } | undefined; }',
 							},
 							{
-								name: 'dir',
+								name: 'zzz_dir',
 								type: 'string',
 							},
 							{
@@ -18121,7 +18178,7 @@ export const library_json: LibraryJson = {
 						],
 					},
 				],
-				dependencies: ['action_collections.ts', 'server/scoped_fs.ts'],
+				dependencies: ['action_collections.ts', 'constants.ts', 'server/scoped_fs.ts'],
 				dependents: ['server/backend_action_handlers.ts'],
 			},
 			{
@@ -18659,6 +18716,120 @@ export const library_json: LibraryJson = {
 				],
 			},
 			{
+				path: 'server/server_info.ts',
+				declarations: [
+					{
+						name: 'Server_Info',
+						kind: 'type',
+						doc_comment: 'Information about the running server, stored in server.json',
+						source_line: 24,
+						type_signature:
+							'ZodObject<{ version: ZodNumber; pid: ZodNumber; port: ZodNumber; started: ZodString; zzz_version: ZodString; }, $strict>',
+					},
+					{
+						name: 'server_info_get_path',
+						kind: 'function',
+						doc_comment: 'Get path to server.json',
+						source_line: 41,
+						type_signature: '(zzz_dir: string): string',
+						return_type: 'string',
+						parameters: [
+							{
+								name: 'zzz_dir',
+								type: 'string',
+							},
+						],
+					},
+					{
+						name: 'server_info_read',
+						kind: 'function',
+						doc_comment:
+							"Read server info from server.json\n\nReturns `null` if the file doesn't exist or is invalid.\nDeletes the file if it's corrupt or has wrong version.",
+						source_line: 51,
+						type_signature:
+							'(zzz_dir: string): Promise<{ version: number; pid: number; port: number; started: string; zzz_version: string; } | null>',
+						return_type:
+							'Promise<{ version: number; pid: number; port: number; started: string; zzz_version: string; } | null>',
+						parameters: [
+							{
+								name: 'zzz_dir',
+								type: 'string',
+							},
+						],
+					},
+					{
+						name: 'server_info_check_stale',
+						kind: 'function',
+						doc_comment: "Check if there's a stale server.json (process no longer running)",
+						source_line: 85,
+						type_signature:
+							'(zzz_dir: string): Promise<{ version: number; pid: number; port: number; started: string; zzz_version: string; } | null>',
+						return_type:
+							'Promise<{ version: number; pid: number; port: number; started: string; zzz_version: string; } | null>',
+						parameters: [
+							{
+								name: 'zzz_dir',
+								type: 'string',
+							},
+						],
+					},
+					{
+						name: 'Server_Info_Write_Options',
+						kind: 'type',
+						source_line: 98,
+						type_signature: 'Server_Info_Write_Options',
+						properties: [
+							{
+								name: 'zzz_dir',
+								kind: 'variable',
+								type_signature: 'string',
+							},
+							{
+								name: 'port',
+								kind: 'variable',
+								type_signature: 'number',
+							},
+							{
+								name: 'zzz_version',
+								kind: 'variable',
+								type_signature: 'string',
+							},
+						],
+					},
+					{
+						name: 'server_info_write',
+						kind: 'function',
+						doc_comment:
+							'Write server info to server.json atomically\n\nUses write-to-temp + fsync + rename for atomicity.',
+						source_line: 109,
+						type_signature: '(options: Server_Info_Write_Options): Promise<string>',
+						return_type: 'Promise<string>',
+						parameters: [
+							{
+								name: 'options',
+								type: 'Server_Info_Write_Options',
+							},
+						],
+					},
+					{
+						name: 'server_info_remove',
+						kind: 'function',
+						doc_comment: 'Remove server info file (idempotent - ignores if already removed)',
+						source_line: 147,
+						type_signature: '(zzz_dir: string): Promise<void>',
+						return_type: 'Promise<void>',
+						parameters: [
+							{
+								name: 'zzz_dir',
+								type: 'string',
+							},
+						],
+					},
+				],
+				dependencies: ['constants.ts'],
+				dependents: ['server/server.ts'],
+			},
+			{
 				path: 'server/server.ts',
 				declarations: [],
 				dependencies: [
@@ -18675,6 +18846,7 @@ export const library_json: LibraryJson = {
 					'server/register_http_actions.ts',
 					'server/register_websocket_actions.ts',
 					'server/security.ts',
+					'server/server_info.ts',
 				],
 			},
 			{

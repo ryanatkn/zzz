@@ -92,7 +92,8 @@ dist/                    # Library distribution
 ├── state/               # Persistent data
 │   └── completions/     # AI completion logs
 ├── cache/               # Regenerable data (future)
-└── run/                 # Runtime ephemeral (future)
+└── run/                 # Runtime ephemeral
+    └── server.json      # PID, port, version
 ```
 
 ## Project Structure

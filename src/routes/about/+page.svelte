@@ -228,12 +228,13 @@
 				Zzz's Node server can do things like:
 				<ul>
 					<li>
-						read and write to the configured filesystem directory, defaults to <code>./.zzz</code>
-						in the <code>PUBLIC_ZZZ_DIR</code> (which defaults to <code>./</code>), and is securely
-						scoped (does not follow symlinks) -- this opens a significant surface area for both you
-						and attackers to use, and writing untrusted data to it could lead to arbitrary code
-						execution if, for example, you're running a hot reloading dev server in that directory
-						(Zzz does not do this by default)
+						read and write to the Zzz app directory (<code>PUBLIC_ZZZ_DIR</code>, defaults to
+						<code>./.zzz</code>) for app data like completions, plus any additional paths configured
+						in <code>PUBLIC_ZZZ_SCOPED_DIRS</code> for user files -- all filesystem operations are
+						securely scoped via <code>ScopedFs</code> (symlinks rejected, paths validated) -- this opens
+						a significant surface area for both you and attackers to use, and writing untrusted data
+						could lead to arbitrary code execution if, for example, you're running a hot reloading dev
+						server in a scoped directory (configure with care!)
 					</li>
 					<li>
 						use your API keys for calls to Claude, ChatGPT, and Gemini, and write them to <code

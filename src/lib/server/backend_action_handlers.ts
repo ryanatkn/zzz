@@ -41,9 +41,9 @@ export const backend_action_handlers: BackendActionHandlers = {
 			const files_array: Array<SerializableDisknode> = [];
 
 			// Iterate through all filers and collect their files
-			for (const filer of backend.filers.values()) {
-				for (const file of filer.filer.files.values()) {
-					files_array.push(to_serializable_disknode(file, backend.zzz_dir)); // TODO dir is a hack
+			for (const [dir, filer_instance] of backend.filers.entries()) {
+				for (const file of filer_instance.filer.files.values()) {
+					files_array.push(to_serializable_disknode(file, dir));
 				}
 			}
 
@@ -54,6 +54,7 @@ export const backend_action_handlers: BackendActionHandlers = {
 				data: {
 					files: files_array,
 					zzz_dir: backend.zzz_dir,
+					scoped_dirs: backend.scoped_dirs,
 					provider_status,
 				},
 			};
