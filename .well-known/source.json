@@ -1,0 +1,4283 @@
+{
+  "name": "@fuzdev/zzz",
+  "version": "0.0.1",
+  "modules": [
+    {
+      "path": "action_collection_helpers.ts",
+      "declarations": [
+        {
+          "name": "parse_action_input",
+          "kind": "function"
+        },
+        {
+          "name": "parse_action_output",
+          "kind": "function"
+        },
+        {
+          "name": "safe_parse_action_input",
+          "kind": "function"
+        },
+        {
+          "name": "safe_parse_action_output",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "action_collections.gen.ts",
+      "declarations": [
+        {
+          "name": "gen",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "action_collections.ts",
+      "declarations": [
+        {
+          "name": "ActionMethods",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionSpecs",
+          "kind": "variable"
+        },
+        {
+          "name": "action_specs",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionInputs",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionOutputs",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionEventDatas",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "action_event_data.ts",
+      "declarations": [
+        {
+          "name": "ActionEventData",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionEventRequestResponseData",
+          "kind": "type"
+        },
+        {
+          "name": "ActionEventRemoteNotificationData",
+          "kind": "type"
+        },
+        {
+          "name": "ActionEventLocalCallData",
+          "kind": "type"
+        },
+        {
+          "name": "ActionEventDataUnion",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "action_event_helpers.ts",
+      "declarations": [
+        {
+          "name": "is_request_response",
+          "kind": "function"
+        },
+        {
+          "name": "is_remote_notification",
+          "kind": "function"
+        },
+        {
+          "name": "is_local_call",
+          "kind": "function"
+        },
+        {
+          "name": "is_send_request",
+          "kind": "function"
+        },
+        {
+          "name": "is_receive_request",
+          "kind": "function"
+        },
+        {
+          "name": "is_send_response",
+          "kind": "function"
+        },
+        {
+          "name": "is_receive_response",
+          "kind": "function"
+        },
+        {
+          "name": "is_notification_send",
+          "kind": "function"
+        },
+        {
+          "name": "is_notification_receive",
+          "kind": "function"
+        },
+        {
+          "name": "is_execute",
+          "kind": "function"
+        },
+        {
+          "name": "is_initial",
+          "kind": "function"
+        },
+        {
+          "name": "is_parsed",
+          "kind": "function"
+        },
+        {
+          "name": "is_handling",
+          "kind": "function"
+        },
+        {
+          "name": "is_handled",
+          "kind": "function"
+        },
+        {
+          "name": "is_failed",
+          "kind": "function"
+        },
+        {
+          "name": "is_send_request_with_parsed_input",
+          "kind": "function"
+        },
+        {
+          "name": "is_notification_send_with_parsed_input",
+          "kind": "function"
+        },
+        {
+          "name": "validate_step_transition",
+          "kind": "function"
+        },
+        {
+          "name": "validate_phase_for_kind",
+          "kind": "function"
+        },
+        {
+          "name": "validate_phase_transition",
+          "kind": "function"
+        },
+        {
+          "name": "get_initial_phase",
+          "kind": "function"
+        },
+        {
+          "name": "should_validate_output",
+          "kind": "function"
+        },
+        {
+          "name": "is_action_complete",
+          "kind": "function"
+        },
+        {
+          "name": "create_initial_data",
+          "kind": "function"
+        },
+        {
+          "name": "extract_action_result",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "action_event_types.ts",
+      "declarations": [
+        {
+          "name": "ActionEventStep",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionEventPhase",
+          "kind": "variable"
+        },
+        {
+          "name": "ACTION_EVENT_STEP_TRANSITIONS",
+          "kind": "variable"
+        },
+        {
+          "name": "ACTION_EVENT_PHASE_BY_KIND",
+          "kind": "variable"
+        },
+        {
+          "name": "ACTION_EVENT_PHASE_TRANSITIONS",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionEventEnvironment",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "action_event.ts",
+      "declarations": [
+        {
+          "name": "ActionEventChangeObserver",
+          "kind": "type"
+        },
+        {
+          "name": "ActionEvent",
+          "kind": "class"
+        },
+        {
+          "name": "create_action_event",
+          "kind": "function"
+        },
+        {
+          "name": "create_action_event_from_json",
+          "kind": "function"
+        },
+        {
+          "name": "parse_action_event",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "action_helpers.ts",
+      "declarations": [
+        {
+          "name": "ACTION_DATE_FORMAT",
+          "kind": "variable"
+        },
+        {
+          "name": "ACTION_TIME_FORMAT",
+          "kind": "variable"
+        },
+        {
+          "name": "to_action_spec_identifier",
+          "kind": "function"
+        },
+        {
+          "name": "to_action_spec_input_identifier",
+          "kind": "function"
+        },
+        {
+          "name": "to_action_spec_output_identifier",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "action_metatypes.gen.ts",
+      "declarations": [
+        {
+          "name": "gen",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "action_metatypes.ts",
+      "declarations": [
+        {
+          "name": "ActionMethod",
+          "kind": "variable"
+        },
+        {
+          "name": "RequestResponseActionMethod",
+          "kind": "variable"
+        },
+        {
+          "name": "RemoteNotificationActionMethod",
+          "kind": "variable"
+        },
+        {
+          "name": "LocalCallActionMethod",
+          "kind": "variable"
+        },
+        {
+          "name": "FrontendActionMethod",
+          "kind": "variable"
+        },
+        {
+          "name": "BackendActionMethod",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionsApi",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "action_peer.ts",
+      "declarations": [
+        {
+          "name": "ActionPeerSendOptions",
+          "kind": "type"
+        },
+        {
+          "name": "ActionPeerOptions",
+          "kind": "type"
+        },
+        {
+          "name": "ActionPeer",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "action_registry.ts",
+      "declarations": [
+        {
+          "name": "ActionRegistry",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "action_spec.ts",
+      "declarations": [
+        {
+          "name": "ActionSpec",
+          "kind": "variable"
+        },
+        {
+          "name": "RequestResponseActionSpec",
+          "kind": "variable"
+        },
+        {
+          "name": "RemoteNotificationActionSpec",
+          "kind": "variable"
+        },
+        {
+          "name": "LocalCallActionSpec",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionSpecUnion",
+          "kind": "variable"
+        },
+        {
+          "name": "is_action_spec",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "action_specs.ts",
+      "declarations": [
+        {
+          "name": "ping_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "session_load_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "filer_change_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "diskfile_update_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "diskfile_delete_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "directory_create_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "completion_create_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "completion_progress_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_progress_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "toggle_main_menu_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_list_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_ps_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_show_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_pull_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_delete_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_copy_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_create_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "ollama_unload_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "provider_load_status_action_spec",
+          "kind": "variable"
+        },
+        {
+          "name": "provider_update_api_key_action_spec",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "action_types.ts",
+      "declarations": [
+        {
+          "name": "ActionKind",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionExecutor",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionInitiator",
+          "kind": "variable"
+        },
+        {
+          "name": "is_action_initiator",
+          "kind": "function"
+        },
+        {
+          "name": "ActionAuth",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionSideEffects",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionInput",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionOutput",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "action.svelte.ts",
+      "declarations": [
+        {
+          "name": "ActionJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ActionOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Action",
+          "kind": "class"
+        },
+        {
+          "name": "ActionSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "actions.svelte.ts",
+      "declarations": [
+        {
+          "name": "HISTORY_LIMIT_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "PONG_DISPLAY_LIMIT",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionsJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ActionsJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ActionsOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Actions",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "app.svelte.ts",
+      "declarations": [
+        {
+          "name": "app_context",
+          "kind": "variable"
+        },
+        {
+          "name": "AppOptions",
+          "kind": "type"
+        },
+        {
+          "name": "App",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "capabilities.svelte.ts",
+      "declarations": [
+        {
+          "name": "PING_HISTORY_MAX",
+          "kind": "variable"
+        },
+        {
+          "name": "CapabilitiesJson",
+          "kind": "variable"
+        },
+        {
+          "name": "CapabilitiesJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "Capability",
+          "kind": "type"
+        },
+        {
+          "name": "PingData",
+          "kind": "type"
+        },
+        {
+          "name": "ServerCapabilityData",
+          "kind": "type"
+        },
+        {
+          "name": "WebsocketCapabilityData",
+          "kind": "type"
+        },
+        {
+          "name": "FilesystemCapabilityData",
+          "kind": "type"
+        },
+        {
+          "name": "OllamaCapabilityData",
+          "kind": "type"
+        },
+        {
+          "name": "Capabilities",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "cell_classes.ts",
+      "declarations": [
+        {
+          "name": "cell_classes",
+          "kind": "variable"
+        },
+        {
+          "name": "CellClasses",
+          "kind": "type"
+        },
+        {
+          "name": "CellClassNames",
+          "kind": "type"
+        },
+        {
+          "name": "CellRegistryMap",
+          "kind": "type"
+        },
+        {
+          "name": "is_cell_type",
+          "kind": "function"
+        },
+        {
+          "name": "get_cell_class_names",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "cell_helpers.ts",
+      "declarations": [
+        {
+          "name": "HANDLED",
+          "kind": "variable"
+        },
+        {
+          "name": "FILE_SHORT_DATE_FORMAT",
+          "kind": "variable"
+        },
+        {
+          "name": "FILE_DATETIME_FORMAT",
+          "kind": "variable"
+        },
+        {
+          "name": "FILE_TIME_FORMAT",
+          "kind": "variable"
+        },
+        {
+          "name": "SchemaClassInfo",
+          "kind": "type"
+        },
+        {
+          "name": "ValueParser",
+          "kind": "type"
+        },
+        {
+          "name": "CellValueDecoder",
+          "kind": "type"
+        },
+        {
+          "name": "get_schema_class_info",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "cell_registry.svelte.ts",
+      "declarations": [
+        {
+          "name": "ClassNotRegisteredError",
+          "kind": "class"
+        },
+        {
+          "name": "CellRegistry",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "cell_types.ts",
+      "declarations": [
+        {
+          "name": "SchemaKeys",
+          "kind": "type"
+        },
+        {
+          "name": "SchemaValue",
+          "kind": "type"
+        },
+        {
+          "name": "CellJson",
+          "kind": "variable"
+        },
+        {
+          "name": "CellJsonInput",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "cell.svelte.ts",
+      "declarations": [
+        {
+          "name": "CellOptions",
+          "kind": "type"
+        },
+        {
+          "name": "get_global_cell_count",
+          "kind": "function"
+        },
+        {
+          "name": "Cell",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "chat_template.ts",
+      "declarations": [
+        {
+          "name": "ChatTemplate",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "chat.svelte.ts",
+      "declarations": [
+        {
+          "name": "ChatViewMode",
+          "kind": "type"
+        },
+        {
+          "name": "ChatJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ChatJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ChatOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Chat",
+          "kind": "class"
+        },
+        {
+          "name": "ChatSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "chats.svelte.ts",
+      "declarations": [
+        {
+          "name": "ChatsJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ChatsJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ChatsOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Chats",
+          "kind": "class"
+        },
+        {
+          "name": "ChatsSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "codegen.ts",
+      "declarations": [
+        {
+          "name": "ImportBuilder",
+          "kind": "class"
+        },
+        {
+          "name": "get_executor_phases",
+          "kind": "function"
+        },
+        {
+          "name": "get_handler_return_type",
+          "kind": "function"
+        },
+        {
+          "name": "generate_phase_handlers",
+          "kind": "function"
+        },
+        {
+          "name": "create_banner",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "completion_types.ts",
+      "declarations": [
+        {
+          "name": "CompletionRole",
+          "kind": "variable"
+        },
+        {
+          "name": "CompletionMessage",
+          "kind": "variable"
+        },
+        {
+          "name": "CompletionRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "CompletionResponse",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "config_defaults.ts",
+      "declarations": [
+        {
+          "name": "SYSTEM_MESSAGE_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "OUTPUT_TOKEN_MAX_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "TEMPERATURE_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "SEED_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "TOP_K_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "TOP_P_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "FREQUENCY_PENALTY_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "PRESENCE_PENALTY_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "STOP_SEQUENCES_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "BOTS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "providers_default",
+          "kind": "variable"
+        },
+        {
+          "name": "models_default",
+          "kind": "variable"
+        },
+        {
+          "name": "chat_template_defaults",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "config_helpers.ts",
+      "declarations": [
+        {
+          "name": "ZzzConfigCreator",
+          "kind": "type"
+        },
+        {
+          "name": "ZzzConfig",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "config.ts",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "constants.ts",
+      "declarations": [
+        {
+          "name": "SERVER_PROTOCOL",
+          "kind": "variable"
+        },
+        {
+          "name": "SERVER_HOST",
+          "kind": "variable"
+        },
+        {
+          "name": "SERVER_URL",
+          "kind": "variable"
+        },
+        {
+          "name": "SERVER_PROXIED_PORT",
+          "kind": "variable"
+        },
+        {
+          "name": "BACKEND_ARTIFICIAL_RESPONSE_DELAY",
+          "kind": "variable"
+        },
+        {
+          "name": "ZZZ_DIR",
+          "kind": "variable"
+        },
+        {
+          "name": "ZZZ_DIR_STATE",
+          "kind": "variable"
+        },
+        {
+          "name": "ZZZ_DIR_STATE_COMPLETIONS",
+          "kind": "variable"
+        },
+        {
+          "name": "ZZZ_DIR_RUN",
+          "kind": "variable"
+        },
+        {
+          "name": "ZZZ_DIR_CACHE",
+          "kind": "variable"
+        },
+        {
+          "name": "ZZZ_SCOPED_DIRS",
+          "kind": "variable"
+        },
+        {
+          "name": "CONTENT_PREVIEW_LENGTH",
+          "kind": "variable"
+        },
+        {
+          "name": "API_PATH",
+          "kind": "variable"
+        },
+        {
+          "name": "API_URL",
+          "kind": "variable"
+        },
+        {
+          "name": "API_PATH_FOR_HTTP_RPC",
+          "kind": "variable"
+        },
+        {
+          "name": "API_URL_FOR_HTTP_RPC",
+          "kind": "variable"
+        },
+        {
+          "name": "WEBSOCKET_URL",
+          "kind": "variable"
+        },
+        {
+          "name": "WEBSOCKET_URL_OBJECT",
+          "kind": "variable"
+        },
+        {
+          "name": "WEBSOCKET_PATH",
+          "kind": "variable"
+        },
+        {
+          "name": "UNKNOWN_ERROR_MESSAGE",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "diskfile_editor_state.svelte.ts",
+      "declarations": [
+        {
+          "name": "DiskfileEditorState",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "diskfile_helpers.ts",
+      "declarations": [
+        {
+          "name": "is_path_absolute",
+          "kind": "function"
+        },
+        {
+          "name": "to_relative_path",
+          "kind": "function"
+        },
+        {
+          "name": "map_watcher_change_to_diskfile_change",
+          "kind": "function"
+        },
+        {
+          "name": "disknode_to_diskfile_json",
+          "kind": "function"
+        },
+        {
+          "name": "SUPPORTED_CODE_FILETYPE_MATCHER",
+          "kind": "variable"
+        },
+        {
+          "name": "has_dependencies",
+          "kind": "function"
+        },
+        {
+          "name": "to_serializable_disknode",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "diskfile_history.svelte.ts",
+      "declarations": [
+        {
+          "name": "HistoryEntry",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfileHistoryJson",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfileHistoryJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfileHistoryOptions",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfileHistory",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "diskfile_tab.svelte.ts",
+      "declarations": [
+        {
+          "name": "DiskfileTabJson",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfileTabJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfileTabOptions",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfileTab",
+          "kind": "class"
+        },
+        {
+          "name": "DiskfileTabSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "diskfile_tabs.svelte.ts",
+      "declarations": [
+        {
+          "name": "DiskfileTabsJson",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfileTabsJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfileTabsOptions",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfileTabs",
+          "kind": "class"
+        },
+        {
+          "name": "DiskfileTabsSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "diskfile_types.ts",
+      "declarations": [
+        {
+          "name": "DiskfileChangeType",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfilePath",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfileDirectoryPath",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfileChange",
+          "kind": "variable"
+        },
+        {
+          "name": "SerializableDisknode",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfileJson",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfileJsonInput",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "diskfile.svelte.ts",
+      "declarations": [
+        {
+          "name": "DiskfileOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Diskfile",
+          "kind": "class"
+        },
+        {
+          "name": "DiskfileSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "diskfiles_editor.svelte.ts",
+      "declarations": [
+        {
+          "name": "DiskfilesEditorJson",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfilesEditorJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfilesEditorOptions",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfilesEditor",
+          "kind": "class"
+        },
+        {
+          "name": "DiskfilesEditorSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "diskfiles.svelte.ts",
+      "declarations": [
+        {
+          "name": "DiskfilesJson",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfilesJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfilesOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Diskfiles",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "format_helpers.ts",
+      "declarations": [
+        {
+          "name": "format_bytes",
+          "kind": "function"
+        },
+        {
+          "name": "format_gigabytes",
+          "kind": "function"
+        },
+        {
+          "name": "format_percentage",
+          "kind": "function"
+        },
+        {
+          "name": "format_duration",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "frontend_action_handlers.ts",
+      "declarations": [
+        {
+          "name": "frontend_action_handlers",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "frontend_action_types.gen.ts",
+      "declarations": [
+        {
+          "name": "gen",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "frontend_action_types.ts",
+      "declarations": [
+        {
+          "name": "FrontendActionHandlers",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "frontend_actions_api.ts",
+      "declarations": [
+        {
+          "name": "create_frontend_actions_api",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "frontend_http_transport.ts",
+      "declarations": [
+        {
+          "name": "FrontendHttpTransport",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "frontend_websocket_transport.ts",
+      "declarations": [
+        {
+          "name": "FrontendWebsocketTransport",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "frontend.svelte.ts",
+      "declarations": [
+        {
+          "name": "frontend_context",
+          "kind": "variable"
+        },
+        {
+          "name": "FrontendJson",
+          "kind": "variable"
+        },
+        {
+          "name": "FrontendJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "FrontendOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Frontend",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "glyphs.ts",
+      "declarations": [
+        {
+          "name": "GLYPH_UNKNOWN",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_IMPORTANT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_INFO",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_ADD",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_REMOVE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_DELETE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CLEAR",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_RESTORE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CANCEL",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_DRAG",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_COPY",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PASTE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_RESET",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_REFRESH",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CONNECT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_DISCONNECT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_RETRY",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PLACEHOLDER",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_SEND",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PLAY",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PAUSE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CHECKMARK",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_XMARK",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_XMARK_HEAVY",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_DOWNLOAD",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_ERROR",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CHEVRON_UP",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CHEVRON_RIGHT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CHEVRON_DOWN",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CHEVRON_LEFT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_DOUBLE_CHEVRON_LEFT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_DOUBLE_CHEVRON_RIGHT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_EDIT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_SORT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_BACKEND",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CHAT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_THREAD",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_TURN",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_FILE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_LIST",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_DIRECTORY",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CREATE_FILE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CREATE_FOLDER",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PROMPT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PART",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PROVIDER",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_MODEL",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_ACTION",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_VIEW",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PREVIEW",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_LOG",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_TAB",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PROJECT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_CAPABILITY",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_SETTINGS",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_DOMAIN",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PAGE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_IDEA",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_PING",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_HEARTBEAT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_RESPONSE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_SESSION",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_ACTION_TYPE_LOCAL_CALL",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_ACTION_TYPE_REMOTE_NOTIFICATION",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_ACTION_TYPE_REQUEST_RESPONSE",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_EXTERNAL_LINK",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_ARROW_RIGHT",
+          "kind": "variable"
+        },
+        {
+          "name": "GLYPH_ARROW_LEFT",
+          "kind": "variable"
+        },
+        {
+          "name": "get_glyph_for_action_method",
+          "kind": "function"
+        },
+        {
+          "name": "get_glyph_for_action_kind",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "helpers.ts",
+      "declarations": [
+        {
+          "name": "DURATION_LG",
+          "kind": "variable"
+        },
+        {
+          "name": "DURATION_SM",
+          "kind": "variable"
+        },
+        {
+          "name": "ESTIMATED_CHARS_PER_TOKEN",
+          "kind": "variable"
+        },
+        {
+          "name": "estimate_token_count",
+          "kind": "function"
+        },
+        {
+          "name": "create_client_id",
+          "kind": "function"
+        },
+        {
+          "name": "get_unique_name",
+          "kind": "function"
+        },
+        {
+          "name": "defined",
+          "kind": "function"
+        },
+        {
+          "name": "to_preview",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "indexed_collection_helpers.svelte.ts",
+      "declarations": [
+        {
+          "name": "IndexedItem",
+          "kind": "variable"
+        },
+        {
+          "name": "IndexOptions",
+          "kind": "type"
+        },
+        {
+          "name": "SingleIndexOptions",
+          "kind": "type"
+        },
+        {
+          "name": "create_single_index",
+          "kind": "function"
+        },
+        {
+          "name": "MultiIndexOptions",
+          "kind": "type"
+        },
+        {
+          "name": "create_multi_index",
+          "kind": "function"
+        },
+        {
+          "name": "DerivedIndexOptions",
+          "kind": "type"
+        },
+        {
+          "name": "create_derived_index",
+          "kind": "function"
+        },
+        {
+          "name": "DynamicIndexOptions",
+          "kind": "type"
+        },
+        {
+          "name": "create_dynamic_index",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "indexed_collection.svelte.ts",
+      "declarations": [
+        {
+          "name": "IndexType",
+          "kind": "type"
+        },
+        {
+          "name": "IndexDefinition",
+          "kind": "type"
+        },
+        {
+          "name": "IndexedCollectionOptions",
+          "kind": "type"
+        },
+        {
+          "name": "IndexedCollection",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "iterable_helpers.ts",
+      "declarations": [
+        {
+          "name": "create_map_by_property",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "jsonrpc_errors.ts",
+      "declarations": [
+        {
+          "name": "JsonrpcErrorName",
+          "kind": "type"
+        },
+        {
+          "name": "JSONRPC_ERROR_CODES",
+          "kind": "variable"
+        },
+        {
+          "name": "jsonrpc_error_messages",
+          "kind": "variable"
+        },
+        {
+          "name": "ThrownJsonrpcError",
+          "kind": "class"
+        },
+        {
+          "name": "jsonrpc_errors",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "jsonrpc_helpers.ts",
+      "declarations": [
+        {
+          "name": "create_jsonrpc_request",
+          "kind": "function"
+        },
+        {
+          "name": "create_jsonrpc_response",
+          "kind": "function"
+        },
+        {
+          "name": "create_jsonrpc_notification",
+          "kind": "function"
+        },
+        {
+          "name": "create_jsonrpc_error_message",
+          "kind": "function"
+        },
+        {
+          "name": "create_jsonrpc_error_message_from_thrown",
+          "kind": "function"
+        },
+        {
+          "name": "to_jsonrpc_message_id",
+          "kind": "function"
+        },
+        {
+          "name": "is_jsonrpc_request_id",
+          "kind": "function"
+        },
+        {
+          "name": "is_jsonrpc_object",
+          "kind": "function"
+        },
+        {
+          "name": "is_jsonrpc_message",
+          "kind": "function"
+        },
+        {
+          "name": "is_jsonrpc_request",
+          "kind": "function"
+        },
+        {
+          "name": "is_jsonrpc_notification",
+          "kind": "function"
+        },
+        {
+          "name": "is_jsonrpc_response",
+          "kind": "function"
+        },
+        {
+          "name": "is_jsonrpc_error_message",
+          "kind": "function"
+        },
+        {
+          "name": "is_jsonrpc_singular_message",
+          "kind": "function"
+        },
+        {
+          "name": "to_jsonrpc_params",
+          "kind": "function"
+        },
+        {
+          "name": "to_jsonrpc_result",
+          "kind": "function"
+        },
+        {
+          "name": "JSONRPC_ERROR_CODE_TO_HTTP_STATUS",
+          "kind": "variable"
+        },
+        {
+          "name": "HTTP_STATUS_TO_JSONRPC_ERROR_CODE",
+          "kind": "variable"
+        },
+        {
+          "name": "jsonrpc_error_code_to_http_status",
+          "kind": "function"
+        },
+        {
+          "name": "http_status_to_jsonrpc_error_code",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "jsonrpc.ts",
+      "declarations": [
+        {
+          "name": "JSONRPC_VERSION",
+          "kind": "variable"
+        },
+        {
+          "name": "JSONRPC_LATEST_PROTOCOL_VERSION",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcRequestId",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcMethod",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcProgressToken",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcMcpMeta",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcRequestParamsMeta",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcRequestParams",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcNotificationParams",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcParams",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcResult",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcNotification",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcResponse",
+          "kind": "variable"
+        },
+        {
+          "name": "JSONRPC_PARSE_ERROR",
+          "kind": "variable"
+        },
+        {
+          "name": "JSONRPC_INVALID_REQUEST",
+          "kind": "variable"
+        },
+        {
+          "name": "JSONRPC_METHOD_NOT_FOUND",
+          "kind": "variable"
+        },
+        {
+          "name": "JSONRPC_INVALID_PARAMS",
+          "kind": "variable"
+        },
+        {
+          "name": "JSONRPC_INTERNAL_ERROR",
+          "kind": "variable"
+        },
+        {
+          "name": "JSONRPC_SERVER_ERROR_START",
+          "kind": "variable"
+        },
+        {
+          "name": "JSONRPC_SERVER_ERROR_END",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcServerErrorCode",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcErrorCode",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcErrorJson",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcErrorMessage",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcResponseOrError",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcMessage",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcMessageFromClientToServer",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcMessageFromServerToClient",
+          "kind": "variable"
+        },
+        {
+          "name": "JsonrpcSingularMessage",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "library.ts",
+      "declarations": [
+        {
+          "name": "library_context",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "list_helpers.ts",
+      "declarations": [
+        {
+          "name": "reorder_list",
+          "kind": "function"
+        },
+        {
+          "name": "to_reordered_list",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "logos.ts",
+      "declarations": [
+        {
+          "name": "logo_zzz",
+          "kind": "variable"
+        },
+        {
+          "name": "logo_chatgpt",
+          "kind": "variable"
+        },
+        {
+          "name": "logo_claude",
+          "kind": "variable"
+        },
+        {
+          "name": "logo_gemini",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "model.svelte.ts",
+      "declarations": [
+        {
+          "name": "ModelName",
+          "kind": "variable"
+        },
+        {
+          "name": "ModelJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ModelJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ModelOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Model",
+          "kind": "class"
+        },
+        {
+          "name": "ModelSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "models.svelte.ts",
+      "declarations": [
+        {
+          "name": "ModelsJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ModelsJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ModelsOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Models",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "nav_helpers.ts",
+      "declarations": [
+        {
+          "name": "to_chats_url",
+          "kind": "function"
+        },
+        {
+          "name": "to_prompts_url",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "nav.ts",
+      "declarations": [
+        {
+          "name": "NavLinkItem",
+          "kind": "type"
+        },
+        {
+          "name": "NavItem",
+          "kind": "type"
+        },
+        {
+          "name": "to_nav_link_href",
+          "kind": "function"
+        },
+        {
+          "name": "main_nav_items_default",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "navigation_helpers.ts",
+      "declarations": [
+        {
+          "name": "goto_unless_current",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "ollama_helpers.ts",
+      "declarations": [
+        {
+          "name": "OLLAMA_URL",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaStatusResponse",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaProgressResponse",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaModelDetails",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaListResponseItem",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaListResponse",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaShowResponse",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaPsResponseItem",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaPsResponse",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaListRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaPsRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaShowRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaPullRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaPushRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaCreateRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaDeleteRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaCopyRequest",
+          "kind": "variable"
+        },
+        {
+          "name": "extract_parameter_count",
+          "kind": "function"
+        },
+        {
+          "name": "ollama_logo",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "ollama.svelte.ts",
+      "declarations": [
+        {
+          "name": "OllamaJson",
+          "kind": "variable"
+        },
+        {
+          "name": "OllamaJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "OllamaOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Ollama",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "part_helpers.ts",
+      "declarations": [
+        {
+          "name": "PART_GLYPHS",
+          "kind": "variable"
+        },
+        {
+          "name": "get_part_type_glyph",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "part.svelte.ts",
+      "declarations": [
+        {
+          "name": "PartJsonBase",
+          "kind": "variable"
+        },
+        {
+          "name": "TextPartJson",
+          "kind": "variable"
+        },
+        {
+          "name": "TextPartJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfilePartJson",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfilePartJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "PartJson",
+          "kind": "variable"
+        },
+        {
+          "name": "PartJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "PartUnion",
+          "kind": "type"
+        },
+        {
+          "name": "PartJsonType",
+          "kind": "type"
+        },
+        {
+          "name": "PartOptions",
+          "kind": "type"
+        },
+        {
+          "name": "TextPartOptions",
+          "kind": "type"
+        },
+        {
+          "name": "DiskfilePartOptions",
+          "kind": "type"
+        },
+        {
+          "name": "PartOptionsUnion",
+          "kind": "type"
+        },
+        {
+          "name": "Part",
+          "kind": "class"
+        },
+        {
+          "name": "PartSchema",
+          "kind": "variable"
+        },
+        {
+          "name": "TextPart",
+          "kind": "class"
+        },
+        {
+          "name": "TextPartSchema",
+          "kind": "variable"
+        },
+        {
+          "name": "DiskfilePart",
+          "kind": "class"
+        },
+        {
+          "name": "DiskfilePartSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "parts.svelte.ts",
+      "declarations": [
+        {
+          "name": "PartsJson",
+          "kind": "variable"
+        },
+        {
+          "name": "PartsJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "PartsOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Parts",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "poller.svelte.ts",
+      "declarations": [
+        {
+          "name": "PollerOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Poller",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "popover.svelte.ts",
+      "declarations": [
+        {
+          "name": "PopoverParameters",
+          "kind": "type"
+        },
+        {
+          "name": "PopoverTriggerParameters",
+          "kind": "type"
+        },
+        {
+          "name": "TransitionFunction",
+          "kind": "type"
+        },
+        {
+          "name": "PopoverContentParameters",
+          "kind": "type"
+        },
+        {
+          "name": "Popover",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "position_helpers.ts",
+      "declarations": [
+        {
+          "name": "CardinalPosition",
+          "kind": "type"
+        },
+        {
+          "name": "Position",
+          "kind": "type"
+        },
+        {
+          "name": "Alignment",
+          "kind": "type"
+        },
+        {
+          "name": "generate_position_styles",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "prompt_helpers.ts",
+      "declarations": [
+        {
+          "name": "format_prompt_content",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "prompt.svelte.ts",
+      "declarations": [
+        {
+          "name": "PromptMessage",
+          "kind": "type"
+        },
+        {
+          "name": "PromptActionContent",
+          "kind": "type"
+        },
+        {
+          "name": "PromptJson",
+          "kind": "variable"
+        },
+        {
+          "name": "PromptJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "PromptOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Prompt",
+          "kind": "class"
+        },
+        {
+          "name": "PromptSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "prompts.svelte.ts",
+      "declarations": [
+        {
+          "name": "PromptsJson",
+          "kind": "variable"
+        },
+        {
+          "name": "PromptsJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "PromptsOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Prompts",
+          "kind": "class"
+        },
+        {
+          "name": "PromptsSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "provider_types.ts",
+      "declarations": [
+        {
+          "name": "ProviderName",
+          "kind": "variable"
+        },
+        {
+          "name": "ProviderDataOllama",
+          "kind": "variable"
+        },
+        {
+          "name": "ProviderDataClaude",
+          "kind": "variable"
+        },
+        {
+          "name": "ProviderDataChatgpt",
+          "kind": "variable"
+        },
+        {
+          "name": "ProviderDataGemini",
+          "kind": "variable"
+        },
+        {
+          "name": "ProviderDataSchema",
+          "kind": "variable"
+        },
+        {
+          "name": "ProviderData",
+          "kind": "type"
+        },
+        {
+          "name": "PROVIDER_ERROR_NEEDS_API_KEY",
+          "kind": "variable"
+        },
+        {
+          "name": "PROVIDER_ERROR_NOT_INSTALLED",
+          "kind": "variable"
+        },
+        {
+          "name": "ProviderStatus",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "provider.svelte.ts",
+      "declarations": [
+        {
+          "name": "ProviderJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ProviderJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ProviderOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Provider",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "providers.svelte.ts",
+      "declarations": [
+        {
+          "name": "ProvidersJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ProvidersJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ProvidersOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Providers",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "reorderable_helpers.ts",
+      "declarations": [
+        {
+          "name": "detect_reorderable_direction",
+          "kind": "function"
+        },
+        {
+          "name": "get_reorderable_drop_position",
+          "kind": "function"
+        },
+        {
+          "name": "calculate_reorderable_target_index",
+          "kind": "function"
+        },
+        {
+          "name": "is_reorder_allowed",
+          "kind": "function"
+        },
+        {
+          "name": "validate_reorderable_target_index",
+          "kind": "function"
+        },
+        {
+          "name": "set_reorderable_drag_data_transfer",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "reorderable.svelte.ts",
+      "declarations": [
+        {
+          "name": "ReorderableId",
+          "kind": "type"
+        },
+        {
+          "name": "ReorderableItemId",
+          "kind": "type"
+        },
+        {
+          "name": "ReorderableDirection",
+          "kind": "type"
+        },
+        {
+          "name": "ReorderableDropPosition",
+          "kind": "type"
+        },
+        {
+          "name": "ReorderableValidDropPosition",
+          "kind": "type"
+        },
+        {
+          "name": "ReorderableStyleConfig",
+          "kind": "type"
+        },
+        {
+          "name": "LIST_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "ITEM_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "DRAGGING_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "DRAG_OVER_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "DRAG_OVER_TOP_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "DRAG_OVER_BOTTOM_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "DRAG_OVER_LEFT_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "DRAG_OVER_RIGHT_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "INVALID_DROP_CLASS_DEFAULT",
+          "kind": "variable"
+        },
+        {
+          "name": "ReorderableListParams",
+          "kind": "type"
+        },
+        {
+          "name": "ReorderableItemParams",
+          "kind": "type"
+        },
+        {
+          "name": "ReorderableOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Reorderable",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "request_tracker.svelte.ts",
+      "declarations": [
+        {
+          "name": "RequestTrackerItem",
+          "kind": "class"
+        },
+        {
+          "name": "RequestTracker",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "response_helpers.ts",
+      "declarations": [
+        {
+          "name": "to_completion_response_text",
+          "kind": "function"
+        },
+        {
+          "name": "to_completion_result",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "schema_registry.ts",
+      "declarations": [
+        {
+          "name": "VocabName",
+          "kind": "type"
+        },
+        {
+          "name": "SchemaRegistry",
+          "kind": "class"
+        },
+        {
+          "name": "global_schema_registry",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "scrollable.svelte.ts",
+      "declarations": [
+        {
+          "name": "ScrollableParameters",
+          "kind": "type"
+        },
+        {
+          "name": "Scrollable",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "socket_helpers.ts",
+      "declarations": [
+        {
+          "name": "DEFAULT_HEARTBEAT_INTERVAL",
+          "kind": "variable"
+        },
+        {
+          "name": "DEFAULT_RECONNECT_DELAY",
+          "kind": "variable"
+        },
+        {
+          "name": "DEFAULT_RECONNECT_DELAY_MAX",
+          "kind": "variable"
+        },
+        {
+          "name": "DEFAULT_AUTO_RECONNECT",
+          "kind": "variable"
+        },
+        {
+          "name": "DEFAULT_RETRY_COUNT",
+          "kind": "variable"
+        },
+        {
+          "name": "DEFAULT_CLOSE_CODE",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "socket.svelte.ts",
+      "declarations": [
+        {
+          "name": "SocketJson",
+          "kind": "variable"
+        },
+        {
+          "name": "SocketJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "SocketOptions",
+          "kind": "type"
+        },
+        {
+          "name": "SocketActionHandler",
+          "kind": "type"
+        },
+        {
+          "name": "SocketErrorHandler",
+          "kind": "type"
+        },
+        {
+          "name": "QueuedMessage",
+          "kind": "type"
+        },
+        {
+          "name": "FailedMessage",
+          "kind": "type"
+        },
+        {
+          "name": "Socket",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "sortable.svelte.ts",
+      "declarations": [
+        {
+          "name": "Sorter",
+          "kind": "type"
+        },
+        {
+          "name": "Sortable",
+          "kind": "class"
+        },
+        {
+          "name": "sort_by_text",
+          "kind": "function"
+        },
+        {
+          "name": "sort_by_numeric",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "test_helpers.ts",
+      "declarations": [
+        {
+          "name": "expect_ok",
+          "kind": "function"
+        },
+        {
+          "name": "expect_defined",
+          "kind": "function"
+        },
+        {
+          "name": "expect_nonnullish",
+          "kind": "function"
+        },
+        {
+          "name": "monkeypatch_zzz_for_tests",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "thread_helpers.ts",
+      "declarations": [
+        {
+          "name": "render_message_with_role",
+          "kind": "function"
+        },
+        {
+          "name": "render_messages_to_string",
+          "kind": "function"
+        },
+        {
+          "name": "render_completion_messages",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "thread_types.ts",
+      "declarations": [
+        {
+          "name": "ThreadJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ThreadJsonInput",
+          "kind": "type"
+        }
+      ]
+    },
+    {
+      "path": "thread.svelte.ts",
+      "declarations": [
+        {
+          "name": "ThreadOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Thread",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "threads.svelte.ts",
+      "declarations": [
+        {
+          "name": "ThreadsJson",
+          "kind": "variable"
+        },
+        {
+          "name": "ThreadsJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "ThreadsOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Threads",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "time_helpers.ts",
+      "declarations": [
+        {
+          "name": "TimeValue",
+          "kind": "type"
+        },
+        {
+          "name": "format_timestamp",
+          "kind": "function"
+        },
+        {
+          "name": "format_short_date",
+          "kind": "function"
+        },
+        {
+          "name": "format_datetime",
+          "kind": "function"
+        },
+        {
+          "name": "format_time",
+          "kind": "function"
+        },
+        {
+          "name": "format_ms_to_readable",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "time.svelte.ts",
+      "declarations": [
+        {
+          "name": "TimeJson",
+          "kind": "variable"
+        },
+        {
+          "name": "TimeJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "TimeOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Time",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "transports.ts",
+      "declarations": [
+        {
+          "name": "TransportName",
+          "kind": "variable"
+        },
+        {
+          "name": "Transport",
+          "kind": "type"
+        },
+        {
+          "name": "Transports",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "turn_types.ts",
+      "declarations": [
+        {
+          "name": "TurnJson",
+          "kind": "variable"
+        },
+        {
+          "name": "TurnJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "TurnSchema",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "turn.svelte.ts",
+      "declarations": [
+        {
+          "name": "TurnOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Turn",
+          "kind": "class"
+        },
+        {
+          "name": "create_turn_from_part",
+          "kind": "function"
+        },
+        {
+          "name": "create_turn_from_text",
+          "kind": "function"
+        },
+        {
+          "name": "create_turn_from_parts",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "ui.svelte.ts",
+      "declarations": [
+        {
+          "name": "UiJson",
+          "kind": "variable"
+        },
+        {
+          "name": "UiJsonInput",
+          "kind": "type"
+        },
+        {
+          "name": "UiOptions",
+          "kind": "type"
+        },
+        {
+          "name": "Ui",
+          "kind": "class"
+        }
+      ]
+    },
+    {
+      "path": "url_params_helpers.ts",
+      "declarations": [
+        {
+          "name": "parse_url_param_uuid",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "xml.ts",
+      "declarations": [
+        {
+          "name": "XmlAttributeKey",
+          "kind": "variable"
+        },
+        {
+          "name": "XmlAttributeKeyWithDefault",
+          "kind": "variable"
+        },
+        {
+          "name": "XmlAttributeValue",
+          "kind": "variable"
+        },
+        {
+          "name": "XmlAttributeValueWithDefault",
+          "kind": "variable"
+        },
+        {
+          "name": "XmlAttribute",
+          "kind": "variable"
+        },
+        {
+          "name": "XmlAttributeWithDefaults",
+          "kind": "variable"
+        }
+      ]
+    },
+    {
+      "path": "zod_helpers.ts",
+      "declarations": [
+        {
+          "name": "Any",
+          "kind": "variable"
+        },
+        {
+          "name": "HttpStatus",
+          "kind": "variable"
+        },
+        {
+          "name": "TypeLiteral",
+          "kind": "variable"
+        },
+        {
+          "name": "PathWithTrailingSlash",
+          "kind": "variable"
+        },
+        {
+          "name": "PathWithoutTrailingSlash",
+          "kind": "variable"
+        },
+        {
+          "name": "PathWithLeadingSlash",
+          "kind": "variable"
+        },
+        {
+          "name": "PathWithoutLeadingSlash",
+          "kind": "variable"
+        },
+        {
+          "name": "SvelteMapSchema",
+          "kind": "variable"
+        },
+        {
+          "name": "get_datetime_now",
+          "kind": "function"
+        },
+        {
+          "name": "Datetime",
+          "kind": "variable"
+        },
+        {
+          "name": "DatetimeNow",
+          "kind": "variable"
+        },
+        {
+          "name": "create_uuid",
+          "kind": "function"
+        },
+        {
+          "name": "Uuid",
+          "kind": "variable"
+        },
+        {
+          "name": "UuidWithDefault",
+          "kind": "variable"
+        },
+        {
+          "name": "to_subschema",
+          "kind": "function"
+        },
+        {
+          "name": "get_innermost_type",
+          "kind": "function"
+        },
+        {
+          "name": "get_innermost_type_name",
+          "kind": "function"
+        },
+        {
+          "name": "zod_get_schema_keys",
+          "kind": "function"
+        },
+        {
+          "name": "get_field_schema",
+          "kind": "function"
+        },
+        {
+          "name": "maybe_get_field_schema",
+          "kind": "function"
+        },
+        {
+          "name": "is_array_schema",
+          "kind": "function"
+        },
+        {
+          "name": "get_inner_array_schema",
+          "kind": "function"
+        },
+        {
+          "name": "format_zod_validation_error",
+          "kind": "function"
+        }
+      ]
+    },
+    {
+      "path": "ActionContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ActionDetail.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ActionList.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ActionListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "CapabilitiesView.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "CapabilityBackend.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "CapabilityFilesystem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "CapabilityProvider.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "CapabilityProviderApi.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "CapabilityProviderOllama.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "CapabilitySystem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "CapabilityWebsocket.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatInitializer.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatList.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatsContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatThread.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatThreadAddByModel.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatThreadManageByTag.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatView.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatViewMulti.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ChatViewSimple.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ClearRestoreButton.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ConfirmButton.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ContentEditor.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ContentPreview.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ContentStats.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ContextmenuEntryCopyToClipboard.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ContextmenuEntryToggle.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "Dashboard.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardActions.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardCapabilities.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardChats.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardDiskfiles.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardHeader.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardHome.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardModels.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardPrompts.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardProviders.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DashboardSettings.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileActions.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileEditorNav.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileEditorView.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileExplorer.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileHistoryView.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileInfo.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileMetrics.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfilePartView.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfilePicker.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfilePickerDialog.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "DiskfileTabListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "EditableText.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ErrorMessage.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ErrorMessageInline.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ExternalLink.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ExternalLinkIcon.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "Footer.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "FrontendRoot.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "Glyph.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "MainDialog.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ModelContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ModelDetail.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ModelLink.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ModelListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ModelPicker.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ModelPickerDialog.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ModelSelect.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ModelSummary.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "NavLink.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaActionItem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaActions.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaConfigure.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaCopyModel.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaCreateModel.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaManager.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaModelDetail.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaModelListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaModelStatus.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaPsStatus.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "OllamaPullModel.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartEditorForDiskfile.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartEditorForText.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartList.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartPicker.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartPickerDialog.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartRemoveButton.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartStats.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartSummary.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartToggleButton.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PartView.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "Picker.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PickerDialog.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PingForm.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PopoverButton.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ProgressBar.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PromptContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PromptList.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PromptListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PromptPicker.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PromptPickerDialog.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PromptStats.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "PromptSummary.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ProviderDetail.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ProviderLink.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ProviderLogo.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ProviderSummary.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "Settings.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "SocketMessageQueue.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "SortableList.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ThreadContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ThreadList.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ThreadListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ThreadToggleButton.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TimeWidget.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "ToggleButton.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TurnContextmenu.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TurnList.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TurnListitem.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TurnView.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TutorialForChats.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TutorialForDatabase.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TutorialForDiskfiles.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "TutorialForPrompts.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "XmlAttributeEditor.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    },
+    {
+      "path": "XmlTagControls.svelte",
+      "declarations": [
+        {
+          "name": "default",
+          "kind": "component"
+        }
+      ]
+    }
+  ]
+}
