@@ -40,9 +40,9 @@
 		</p>
 		<aside>
 			⚠️ This is an early pre-release, see the
-			<ExternalLink href="https://github.com/ryanatkn/zzz">repo</ExternalLink>
+			<ExternalLink href="https://github.com/fuzdev/zzz">repo</ExternalLink>
 			and
-			<ExternalLink href="https://github.com/ryanatkn/zzz/discussions">discussions</ExternalLink>
+			<ExternalLink href="https://github.com/fuzdev/zzz/discussions">discussions</ExternalLink>
 			or find me on <ExternalLink href="https://bsky.app/profile/ryanatkn.com">Bluesky</ExternalLink
 			> 💤
 		</aside>
@@ -84,7 +84,7 @@
 				using <ExternalLink href="https://github.com/porsager/postgres">Postgres.js</ExternalLink>
 				and probably <ExternalLink href="https://github.com/drizzle-team/drizzle-orm"
 					>Drizzle</ExternalLink
-				>, see <ExternalLink href="https://github.com/ryanatkn/zzz/issues/7">issue #7</ExternalLink>
+				>, see <ExternalLink href="https://github.com/fuzdev/zzz/issues/7">issue #7</ExternalLink>
 			</li>
 			<li>
 				<ExternalLink href="https://modelcontextprotocol.io/">Model Context Protocol</ExternalLink>,
@@ -136,8 +136,8 @@
 		<p>
 			If this sounds interesting and you would like to test out some rickety pre-release software,
 			feedback is appreciated to help make it work for you -- see the
-			<ExternalLink href="https://github.com/ryanatkn/zzz/issues">issues</ExternalLink> and
-			<ExternalLink href="https://github.com/ryanatkn/zzz/discussions">discussions</ExternalLink>.
+			<ExternalLink href="https://github.com/fuzdev/zzz/issues">issues</ExternalLink> and
+			<ExternalLink href="https://github.com/fuzdev/zzz/discussions">discussions</ExternalLink>.
 		</p>
 	</section>
 	<hr />
@@ -258,7 +258,7 @@
 					>CSP</ExternalLink
 				> is fairly locked down, including blocking all unknown network connections. For details, see
 				the CSP config in <ExternalLink
-					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
+					href="https://github.com/fuzdev/zzz/blob/main/svelte.config.js"
 					>svelte.config.js</ExternalLink
 				> and the <ExternalLink href="https://ui.fuz.dev/docs/csp">Fuz CSP docs</ExternalLink>.
 				Configuration will be needed for many usecases, unlocking shenanigans good and bad, so we'll
@@ -273,9 +273,9 @@
 						we'll develop a plugin API so people can make reusable integrations, and distribution
 						will be through npm/jsr, decentralized like a typical open source web ecosystem project
 						so the risks assumed by developers are unchanged and I gatekeep nothing -- I plan to
-						publish a number of <code>@ryanatkn/zzz_*</code> packages, and if people think it's worth
-						their time to make Zzz things, they can publish according to their taste and devs can vet
-						their code
+						publish a number of <code>@fuzdev/zzz_*</code> packages, and if people think it's worth their
+						time to make Zzz things, they can publish according to their taste and devs can vet their
+						code
 					</li>
 					<li>
 						any modules you install from npm/jsr, or any code you add to the src directory, carry

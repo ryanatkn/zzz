@@ -25,7 +25,7 @@ Development workflow, extension points, and common patterns for Zzz.
 
 ```bash
 # Clone repository
-git clone https://github.com/ryanatkn/zzz.git
+git clone https://github.com/fuzdev/zzz.git
 cd zzz
 
 # Copy environment template
@@ -57,17 +57,17 @@ ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 
 ### Commands
 
-| Command | Description |
-|---------|-------------|
-| `gro dev` | Start dev server with HMR |
-| `gro build` | Production build |
-| `gro test` | Run tests |
-| `gro test -- --watch` | Run tests in watch mode |
-| `gro typecheck` | TypeScript type checking |
-| `gro check` | Run all checks (types, lint, test) |
-| `gro lint` | ESLint checking |
-| `gro gen` | Run code generation |
-| `gro deploy` | Deploy to production |
+| Command               | Description                        |
+| --------------------- | ---------------------------------- |
+| `gro dev`             | Start dev server with HMR          |
+| `gro build`           | Production build                   |
+| `gro test`            | Run tests                          |
+| `gro test -- --watch` | Run tests in watch mode            |
+| `gro typecheck`       | TypeScript type checking           |
+| `gro check`           | Run all checks (types, lint, test) |
+| `gro lint`            | ESLint checking                    |
+| `gro gen`             | Run code generation                |
+| `gro deploy`          | Deploy to production               |
 
 ### Code Generation
 
@@ -78,6 +78,7 @@ gro gen
 ```
 
 Generated files (do not edit manually):
+
 - `src/lib/action_metatypes.gen.ts` - Action method types
 - `src/lib/action_collections.gen.ts` - Action spec collections
 - `src/lib/frontend_action_types.gen.ts` - Frontend handler types
@@ -102,7 +103,7 @@ dist/                    # Library distribution
 
 ```
 src/
-├── lib/                 # Core library (published as @ryanatkn/zzz)
+├── lib/                 # Core library (published as @fuzdev/zzz)
 │   ├── server/         # Backend code
 │   └── ...             # Shared code (frontend + backend)
 ├── routes/             # SvelteKit pages
@@ -111,29 +112,29 @@ src/
 
 ### File Naming
 
-| Pattern | Purpose | Example |
-|---------|---------|---------|
-| `*.ts` | TypeScript modules | `helpers.ts` |
-| `*.svelte.ts` | Svelte 5 reactive modules | `chat.svelte.ts` |
-| `*.svelte` | Svelte components | `ChatView.svelte` |
-| `*.test.ts` | Test files | `cell.test.ts` |
-| `*_types.ts` | Type definitions | `action_types.ts` |
-| `*_helpers.ts` | Utility functions | `jsonrpc_helpers.ts` |
+| Pattern        | Purpose                   | Example              |
+| -------------- | ------------------------- | -------------------- |
+| `*.ts`         | TypeScript modules        | `helpers.ts`         |
+| `*.svelte.ts`  | Svelte 5 reactive modules | `chat.svelte.ts`     |
+| `*.svelte`     | Svelte components         | `ChatView.svelte`    |
+| `*.test.ts`    | Test files                | `cell.test.ts`       |
+| `*_types.ts`   | Type definitions          | `action_types.ts`    |
+| `*_helpers.ts` | Utility functions         | `jsonrpc_helpers.ts` |
 
 ### Component Naming
 
 Components use `PascalCase` with domain prefixes:
 
-| Prefix | Domain | Examples |
-|--------|--------|----------|
-| `Chat` | Chat UI | `ChatView`, `ChatListitem` |
-| `Diskfile` | File editor | `DiskfileEditorView`, `DiskfileExplorer` |
-| `Model` | Model management | `ModelListitem`, `ModelPickerDialog` |
-| `Ollama` | Ollama-specific | `OllamaManager`, `OllamaPullModel` |
-| `Part` | Content parts | `PartView`, `PartEditorForText` |
-| `Prompt` | Prompts | `PromptList`, `PromptPickerDialog` |
-| `Thread` | Threads | `ThreadList`, `ThreadContextmenu` |
-| `Turn` | Turns | `TurnView`, `TurnListitem` |
+| Prefix     | Domain           | Examples                                 |
+| ---------- | ---------------- | ---------------------------------------- |
+| `Chat`     | Chat UI          | `ChatView`, `ChatListitem`               |
+| `Diskfile` | File editor      | `DiskfileEditorView`, `DiskfileExplorer` |
+| `Model`    | Model management | `ModelListitem`, `ModelPickerDialog`     |
+| `Ollama`   | Ollama-specific  | `OllamaManager`, `OllamaPullModel`       |
+| `Part`     | Content parts    | `PartView`, `PartEditorForText`          |
+| `Prompt`   | Prompts          | `PromptList`, `PromptPickerDialog`       |
+| `Thread`   | Threads          | `ThreadList`, `ThreadContextmenu`        |
+| `Turn`     | Turns            | `TurnView`, `TurnListitem`               |
 
 ## Extension Points
 
@@ -146,8 +147,8 @@ import {z} from 'zod';
 import {CellJson} from './cell_types.js';
 
 export const MyThingJson = CellJson.extend({
-  name: z.string().default(''),
-  value: z.number().default(0),
+	name: z.string().default(''),
+	value: z.number().default(0),
 }).meta({cell_class_name: 'MyThing'});
 ```
 
@@ -160,19 +161,19 @@ import {MyThingJson} from './my_thing_types.js';
 export interface MyThingOptions extends CellOptions<typeof MyThingJson> {}
 
 export class MyThing extends Cell<typeof MyThingJson> {
-  name: string = $state()!;
-  value: number = $state()!;
+	name: string = $state()!;
+	value: number = $state()!;
 
-  readonly doubled = $derived(this.value * 2);
+	readonly doubled = $derived(this.value * 2);
 
-  constructor(options: MyThingOptions) {
-    super(MyThingJson, options);
-    this.init();
-  }
+	constructor(options: MyThingOptions) {
+		super(MyThingJson, options);
+		this.init();
+	}
 
-  increment(): void {
-    this.value++;
-  }
+	increment(): void {
+		this.value++;
+	}
 }
 ```
 
@@ -188,18 +189,18 @@ this.cell_registry.register(MyThing);
 
 ```typescript
 export const my_action_spec = create_action_spec({
-  method: 'my_action',
-  kind: 'request_response',
-  initiator: 'frontend',
-  auth: 'authorize',
-  side_effects: true,
-  async: true,
-  input: z.object({
-    message: z.string(),
-  }),
-  output: z.object({
-    result: z.string(),
-  }),
+	method: 'my_action',
+	kind: 'request_response',
+	initiator: 'frontend',
+	auth: 'authorize',
+	side_effects: true,
+	async: true,
+	input: z.object({
+		message: z.string(),
+	}),
+	output: z.object({
+		result: z.string(),
+	}),
 });
 ```
 
@@ -207,8 +208,8 @@ export const my_action_spec = create_action_spec({
 
 ```typescript
 export const action_specs = [
-  // ... existing specs
-  my_action_spec,
+	// ... existing specs
+	my_action_spec,
 ];
 ```
 
@@ -260,9 +261,9 @@ src/routes/my_route/
 
 ```svelte
 <script lang="ts">
-  import {frontend_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
-  const app = frontend_context.get();
+	const app = frontend_context.get();
 </script>
 
 <h1>My Route</h1>
@@ -275,19 +276,22 @@ src/routes/my_route/
 
 ```svelte
 <script lang="ts">
-  import type {Snippet} from 'svelte';
+	import type {Snippet} from 'svelte';
 
-  const {title, children}: {
-    title: string;
-    children?: Snippet;
-  } = $props();
+	const {
+		title,
+		children,
+	}: {
+		title: string;
+		children?: Snippet;
+	} = $props();
 </script>
 
 <div class="my-component">
-  <h2>{title}</h2>
-  {#if children}
-    {@render children()}
-  {/if}
+	<h2>{title}</h2>
+	{#if children}
+		{@render children()}
+	{/if}
 </div>
 ```
 
@@ -297,15 +301,15 @@ src/routes/my_route/
 
 ```svelte
 <script lang="ts">
-  import {frontend_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
-  const app = frontend_context.get();
+	const app = frontend_context.get();
 
-  // Access collections
-  const {chats, models, prompts} = app;
+	// Access collections
+	const {chats, models, prompts} = app;
 
-  // Derived state
-  const selected_chat = $derived(chats.selected);
+	// Derived state
+	const selected_chat = $derived(chats.selected);
 </script>
 ```
 
@@ -326,7 +330,7 @@ const ollama_models = app.models.items.where('provider_name', 'ollama');
 
 // Iterate
 for (const chat of app.chats.items.values) {
-  console.log(chat.name);
+	console.log(chat.name);
 }
 ```
 
@@ -353,15 +357,15 @@ app.api.toggle_main_menu();
 
 ```svelte
 <script lang="ts">
-  // Effect that runs when dependencies change
-  $effect(() => {
-    console.log('Selected chat changed:', app.chats.selected?.name);
-  });
+	// Effect that runs when dependencies change
+	$effect(() => {
+		console.log('Selected chat changed:', app.chats.selected?.name);
+	});
 
-  // Pre-effect (runs before DOM updates)
-  $effect.pre(() => {
-    // URL synchronization, etc.
-  });
+	// Pre-effect (runs before DOM updates)
+	$effect.pre(() => {
+		// URL synchronization, etc.
+	});
 </script>
 ```
 
@@ -369,19 +373,17 @@ app.api.toggle_main_menu();
 
 ```svelte
 <script lang="ts">
-  import Contextmenu from '@fuzdev/fuz_ui/Contextmenu.svelte';
-  import ContextmenuEntry from '@fuzdev/fuz_ui/ContextmenuEntry.svelte';
+	import Contextmenu from '@fuzdev/fuz_ui/Contextmenu.svelte';
+	import ContextmenuEntry from '@fuzdev/fuz_ui/ContextmenuEntry.svelte';
 </script>
 
 <Contextmenu>
-  {#snippet entries()}
-    <ContextmenuEntry onclick={() => doSomething()}>
-      Action Label
-    </ContextmenuEntry>
-  {/snippet}
+	{#snippet entries()}
+		<ContextmenuEntry onclick={() => doSomething()}>Action Label</ContextmenuEntry>
+	{/snippet}
 
-  <!-- Wrapped content -->
-  <div>Right-click me</div>
+	<!-- Wrapped content -->
+	<div>Right-click me</div>
 </Contextmenu>
 ```
 
@@ -389,28 +391,24 @@ app.api.toggle_main_menu();
 
 ```svelte
 <script lang="ts">
-  import PickerDialog from '$lib/PickerDialog.svelte';
+	import PickerDialog from '$lib/PickerDialog.svelte';
 
-  let show = $state(false);
+	let show = $state(false);
 
-  function handle_pick(item: Item): void {
-    // Handle selection
-    show = false;
-  }
+	function handle_pick(item: Item): void {
+		// Handle selection
+		show = false;
+	}
 </script>
 
-<button onclick={() => show = true}>Open Picker</button>
+<button onclick={() => (show = true)}>Open Picker</button>
 
-<PickerDialog
-  bind:show
-  items={collection.values}
-  onpick={handle_pick}
->
-  {#snippet children(item, pick)}
-    <button onclick={() => pick(item)}>
-      {item.name}
-    </button>
-  {/snippet}
+<PickerDialog bind:show items={collection.values} onpick={handle_pick}>
+	{#snippet children(item, pick)}
+		<button onclick={() => pick(item)}>
+			{item.name}
+		</button>
+	{/snippet}
 </PickerDialog>
 ```
 
@@ -438,15 +436,15 @@ import * as assert from 'uvu/assert';
 import {MyThing} from './my_thing.svelte.js';
 
 test('MyThing initializes correctly', () => {
-  const thing = new MyThing({app: mock_app, json: {name: 'test'}});
-  assert.is(thing.name, 'test');
-  assert.is(thing.value, 0);  // default
+	const thing = new MyThing({app: mock_app, json: {name: 'test'}});
+	assert.is(thing.name, 'test');
+	assert.is(thing.value, 0); // default
 });
 
 test('MyThing.increment works', () => {
-  const thing = new MyThing({app: mock_app, json: {}});
-  thing.increment();
-  assert.is(thing.value, 1);
+	const thing = new MyThing({app: mock_app, json: {}});
+	thing.increment();
+	assert.is(thing.value, 1);
 });
 
 test.run();
@@ -456,14 +454,14 @@ test.run();
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Variables/functions | `snake_case` | `send_message`, `user_input` |
-| Classes | `PascalCase` | `ChatView`, `ActionPeer` |
-| Types/interfaces | `PascalCase` | `ChatOptions`, `ActionSpec` |
-| Constants | `SCREAMING_SNAKE_CASE` | `DEFAULT_TIMEOUT`, `API_PATH` |
-| Private fields | `#field` | `#internal_state` |
-| Zod schemas | `PascalCase` | `ChatJson`, `ActionSpec` |
+| Type                | Convention             | Example                       |
+| ------------------- | ---------------------- | ----------------------------- |
+| Variables/functions | `snake_case`           | `send_message`, `user_input`  |
+| Classes             | `PascalCase`           | `ChatView`, `ActionPeer`      |
+| Types/interfaces    | `PascalCase`           | `ChatOptions`, `ActionSpec`   |
+| Constants           | `SCREAMING_SNAKE_CASE` | `DEFAULT_TIMEOUT`, `API_PATH` |
+| Private fields      | `#field`               | `#internal_state`             |
+| Zod schemas         | `PascalCase`           | `ChatJson`, `ActionSpec`      |
 
 ### Code Quality Markers
 
@@ -515,18 +513,16 @@ response: Response = $state.raw();
 // Return Result type for actions
 const result = await app.api.some_action(input);
 if (!result.ok) {
-  console.error('Action failed:', result.error);
-  return;
+	console.error('Action failed:', result.error);
+	return;
 }
 const {value} = result;
 
 // Throw for unexpected errors
 if (!expectedCondition) {
-  throw new Error('Unexpected state');
+	throw new Error('Unexpected state');
 }
 
 // Use ThrownJsonrpcError for structured errors
-throw new ThrownJsonrpcError(
-  jsonrpc_error_messages.invalid_params('Missing required field'),
-);
+throw new ThrownJsonrpcError(jsonrpc_error_messages.invalid_params('Missing required field'));
 ```

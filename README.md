@@ -19,7 +19,7 @@ with a streamlined developer experience.
 More at [zzz.software/about](https://www.zzz.software/about).
 
 This is an early stage project and the ideas are still developing -
-see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions)
+see the issues and [discussions](https://github.com/fuzdev/zzz/discussions)
 or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 ## Setup
@@ -61,8 +61,8 @@ Browse to the location is says, probably `localhost:5173`.
 
 ## Roadmap
 
-- [#7 integrate database](https://github.com/ryanatkn/zzz/issues/7)
-- [#8 undo/history system](https://github.com/ryanatkn/zzz/issues/8)
+- [#7 integrate database](https://github.com/fuzdev/zzz/issues/7)
+- [#8 undo/history system](https://github.com/fuzdev/zzz/issues/8)
 - publish to npm
 - input welcome
 

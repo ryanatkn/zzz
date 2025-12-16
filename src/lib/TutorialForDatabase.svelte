@@ -16,7 +16,7 @@
 				<p>
 					⚠️ This is an early prototype and your prompts are not saved yet, they are gone when you
 					refresh the page. Soon the Node backend will persist data to a Postgres or pglite
-					database. (<ExternalLink href="https://github.com/ryanatkn/zzz/issues/7"
+					database. (<ExternalLink href="https://github.com/fuzdev/zzz/issues/7"
 						>issue 7</ExternalLink
 					>)
 				</p>

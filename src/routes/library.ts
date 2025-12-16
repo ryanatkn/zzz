@@ -4,7 +4,7 @@ import type {LibraryJson} from '@fuzdev/fuz_util/library_json.js';
 
 export const library_json: LibraryJson = {
 	package_json: {
-		name: '@ryanatkn/zzz',
+		name: '@fuzdev/zzz',
 		version: '0.0.1',
 		description: 'fullstack web toolkit for power users and devs',
 		motto: 'nice web things for the tired',
@@ -14,13 +14,13 @@ export const library_json: LibraryJson = {
 		public: true,
 		license: 'MIT',
 		homepage: 'https://www.zzz.software/',
-		repository: 'https://github.com/ryanatkn/zzz',
+		repository: 'https://github.com/fuzdev/zzz',
 		author: {
 			name: 'Ryan Atkinson',
 			email: 'mail@ryanatkn.com',
 			url: 'https://www.ryanatkn.com/',
 		},
-		bugs: 'https://github.com/ryanatkn/zzz/issues',
+		bugs: 'https://github.com/fuzdev/zzz/issues',
 		funding: 'https://www.ryanatkn.com/funding',
 		scripts: {
 			start: 'gro dev',
@@ -114,7 +114,7 @@ export const library_json: LibraryJson = {
 		},
 	},
 	source_json: {
-		name: '@ryanatkn/zzz',
+		name: '@fuzdev/zzz',
 		version: '0.0.1',
 		modules: [
 			{
@@ -21543,10 +21543,10 @@ export const library_json: LibraryJson = {
 			},
 		],
 	},
-	name: '@ryanatkn/zzz',
+	name: '@fuzdev/zzz',
 	repo_name: 'zzz',
-	repo_url: 'https://github.com/ryanatkn/zzz',
-	owner_name: 'ryanatkn',
+	repo_url: 'https://github.com/fuzdev/zzz',
+	owner_name: 'fuzdev',
 	homepage_url: 'https://www.zzz.software/',
 	logo_url: 'https://www.zzz.software/logo.svg',
 	logo_alt: "three sleepy z's",

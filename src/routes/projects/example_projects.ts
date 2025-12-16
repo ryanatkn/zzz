@@ -52,7 +52,7 @@ export const create_sample_projects = (app: Frontend): Array<Project> => {
 				repos: [
 					{
 						id: create_uuid(),
-						git_url: 'https://github.com/ryanatkn/zzz.git',
+						git_url: 'https://github.com/fuzdev/zzz.git',
 						checkouts: [
 							{
 								id: create_uuid(),

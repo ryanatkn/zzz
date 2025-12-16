@@ -15,7 +15,7 @@
 				<p>
 					This currently supports chatting with local models via Ollama, and if you bring your own
 					API key, it supports basic text chat with ChatGPT, Claude, and Gemini. It's still early,
-					share your ideas in the <ExternalLink href="https://github.com/ryanatkn/zzz/discussions"
+					share your ideas in the <ExternalLink href="https://github.com/fuzdev/zzz/discussions"
 						>discussions</ExternalLink
 					>.
 				</p>

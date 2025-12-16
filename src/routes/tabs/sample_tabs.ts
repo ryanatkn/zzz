@@ -11,7 +11,7 @@ export const fake_sites = {
 				<h1>new tab</h1>
 				<ul>
 					<li><a href="https://www.zzz.software/about" target="_blank" rel="noopener">about Zzz</a></li>
-					<li><a href="https://github.com/ryanatkn/zzz" target="_blank" rel="noopener">source code</a></li>
+					<li><a href="https://github.com/fuzdev/zzz" target="_blank" rel="noopener">source code</a></li>
 				</ul>
 			</div>
 		`,

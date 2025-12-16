@@ -45,6 +45,7 @@
 		}
 	});
 
+	// TODO should load granularly when needed (/docs, /about), but currently the capabilities page uses the package json data, how better to get that? generate a more minimal metadata file?
 	library_context.set(new Library(library_json));
 
 	// Create the frontend's App, which extends Frontend

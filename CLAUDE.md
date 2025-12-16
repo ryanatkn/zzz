@@ -19,17 +19,17 @@ Zzz (pronounced "zees") is a local-first IDE + CMS + browser + AI UI for power u
 
 ## Quick Reference
 
-| What | Where |
-|------|-------|
-| **Start dev server** | `gro dev` or `npm run dev` |
-| **Run tests** | `gro test` or `npm run test` |
-| **Type check** | `gro typecheck` or `npm run typecheck` |
-| **Build** | `gro build` or `npm run build` |
-| **Action specs** | `src/lib/action_specs.ts` |
-| **State classes** | `src/lib/*.svelte.ts` |
-| **UI components** | `src/lib/*.svelte` |
+| What                 | Where                                       |
+| -------------------- | ------------------------------------------- |
+| **Start dev server** | `gro dev` or `npm run dev`                  |
+| **Run tests**        | `gro test` or `npm run test`                |
+| **Type check**       | `gro typecheck` or `npm run typecheck`      |
+| **Build**            | `gro build` or `npm run build`              |
+| **Action specs**     | `src/lib/action_specs.ts`                   |
+| **State classes**    | `src/lib/*.svelte.ts`                       |
+| **UI components**    | `src/lib/*.svelte`                          |
 | **Backend handlers** | `src/lib/server/backend_action_handlers.ts` |
-| **AI providers** | `src/lib/server/backend_provider_*.ts` |
+| **AI providers**     | `src/lib/server/backend_provider_*.ts`      |
 
 ## What is Zzz?
 
@@ -57,12 +57,12 @@ Zzz demonstrates how far you can go in one direction with [Fuz](https://github.c
 
 ### Core Abstractions
 
-| Abstraction | Purpose | Key Files |
-|-------------|---------|-----------|
-| **Cell** | Schema-driven reactive state with Svelte 5 runes | `cell.svelte.ts` |
-| **Action** | Symmetric RPC (frontend ↔ backend) | `action_*.ts` |
-| **IndexedCollection** | Queryable collections with multiple indexes | `indexed_collection.svelte.ts` |
-| **Transport** | Protocol-agnostic communication | `transports.ts` |
+| Abstraction           | Purpose                                          | Key Files                      |
+| --------------------- | ------------------------------------------------ | ------------------------------ |
+| **Cell**              | Schema-driven reactive state with Svelte 5 runes | `cell.svelte.ts`               |
+| **Action**            | Symmetric RPC (frontend ↔ backend)              | `action_*.ts`                  |
+| **IndexedCollection** | Queryable collections with multiple indexes      | `indexed_collection.svelte.ts` |
+| **Transport**         | Protocol-agnostic communication                  | `transports.ts`                |
 
 ### Content Model
 
@@ -90,6 +90,7 @@ Backend.peer.send(notification)  →  Frontend.peer.receive(message)
 ```
 
 **Action kinds**:
+
 - `request_response`: Traditional RPC with response
 - `remote_notification`: Fire-and-forget (backend → frontend for streaming)
 - `local_call`: Frontend-only actions
@@ -98,21 +99,21 @@ See [docs/architecture.md](docs/architecture.md) for details.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | SvelteKit + Svelte 5 + TypeScript + Vite |
-| **Backend** | Hono + Node.js (reference impl) |
-| **Database** | PostgreSQL (pglite for local, full Postgres for production) - planned |
-| **Build** | @ryanatkn/gro |
-| **UI** | @fuzdev/fuz_ui components, @fuzdev/fuz_css styling |
-| **Validation** | Zod schemas |
-| **AI** | Ollama (local), Claude/ChatGPT/Gemini (BYOK) |
+| Layer          | Technology                                                            |
+| -------------- | --------------------------------------------------------------------- |
+| **Frontend**   | SvelteKit + Svelte 5 + TypeScript + Vite                              |
+| **Backend**    | Hono + Node.js (reference impl)                                       |
+| **Database**   | PostgreSQL (pglite for local, full Postgres for production) - planned |
+| **Build**      | @ryanatkn/gro                                                         |
+| **UI**         | @fuzdev/fuz_ui components, @fuzdev/fuz_css styling                    |
+| **Validation** | Zod schemas                                                           |
+| **AI**         | Ollama (local), Claude/ChatGPT/Gemini (BYOK)                          |
 
 ## Directory Structure
 
 ```
 src/
-├── lib/                      # Published as @ryanatkn/zzz
+├── lib/                      # Published as @fuzdev/zzz
 │   ├── server/              # Backend (reference implementation)
 │   │   ├── backend.ts       # Core backend class
 │   │   ├── server.ts        # Hono server setup
@@ -163,11 +164,11 @@ The `.zzz/` directory stores Zzz's app data. Configured via `PUBLIC_ZZZ_DIR` env
     └── server.json          # PID, port, version
 ```
 
-| Directory | Semantics |
-|-----------|-----------|
-| `state/` | Persistent user data, survives restarts |
-| `cache/` | Regenerable data, safe to delete |
-| `run/` | Runtime/ephemeral (PIDs, locks) |
+| Directory | Semantics                               |
+| --------- | --------------------------------------- |
+| `state/`  | Persistent user data, survives restarts |
+| `cache/`  | Regenerable data, safe to delete        |
+| `run/`    | Runtime/ephemeral (PIDs, locks)         |
 
 The `run/server.json` file is written on server startup and removed on clean shutdown. It contains PID, port, start time, and version for server discovery.
 
@@ -175,12 +176,13 @@ The `run/server.json` file is written on server startup and removed on clean shu
 
 Zzz separates two filesystem concerns:
 
-| Env Var | Purpose |
-|---------|---------|
-| `PUBLIC_ZZZ_DIR` | Zzz's app directory (default: `.zzz`) |
+| Env Var                  | Purpose                                             |
+| ------------------------ | --------------------------------------------------- |
+| `PUBLIC_ZZZ_DIR`         | Zzz's app directory (default: `.zzz`)               |
 | `PUBLIC_ZZZ_SCOPED_DIRS` | Comma-separated paths Zzz can access for user files |
 
 Example:
+
 ```bash
 PUBLIC_ZZZ_DIR="./.zzz"
 PUBLIC_ZZZ_SCOPED_DIRS="./projects,~/code,/mnt/data"
@@ -205,23 +207,23 @@ gro dev
 
 ### Commands
 
-| Command | Description |
-|---------|-------------|
-| `gro dev` | Development server with HMR |
-| `gro build` | Production build |
-| `gro test` | Run test suite |
-| `gro typecheck` | Type checking |
-| `gro check` | All checks (types, lint, test) |
-| `gro deploy` | Deploy to production |
+| Command         | Description                    |
+| --------------- | ------------------------------ |
+| `gro dev`       | Development server with HMR    |
+| `gro build`     | Production build               |
+| `gro test`      | Run test suite                 |
+| `gro typecheck` | Type checking                  |
+| `gro check`     | All checks (types, lint, test) |
+| `gro deploy`    | Deploy to production           |
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| TypeScript files | `snake_case.ts` | `action_peer.ts` |
-| Svelte 5 modules | `snake_case.svelte.ts` | `chat.svelte.ts` |
-| Components | `PascalCase.svelte` | `ChatView.svelte` |
-| Tests | `*.test.ts` | `cell.test.ts` |
+| Type             | Convention             | Example           |
+| ---------------- | ---------------------- | ----------------- |
+| TypeScript files | `snake_case.ts`        | `action_peer.ts`  |
+| Svelte 5 modules | `snake_case.svelte.ts` | `chat.svelte.ts`  |
+| Components       | `PascalCase.svelte`    | `ChatView.svelte` |
+| Tests            | `*.test.ts`            | `cell.test.ts`    |
 
 ### Code Markers
 
@@ -230,11 +232,11 @@ gro dev
 
 ## Documentation
 
-| Document | Contents |
-|----------|----------|
+| Document                                     | Contents                                             |
+| -------------------------------------------- | ---------------------------------------------------- |
 | [docs/architecture.md](docs/architecture.md) | Action system, Cell system, content model, data flow |
-| [docs/development.md](docs/development.md) | Development workflow, extension points, patterns |
-| [docs/providers.md](docs/providers.md) | AI provider integration, adding new providers |
+| [docs/development.md](docs/development.md)   | Development workflow, extension points, patterns     |
+| [docs/providers.md](docs/providers.md)       | AI provider integration, adding new providers        |
 
 ## Values
 
@@ -247,8 +249,8 @@ gro dev
 
 ## Planned Features
 
-- Database integration (PostgreSQL via pglite) - [#7](https://github.com/ryanatkn/zzz/issues/7)
-- Undo/history system - [#8](https://github.com/ryanatkn/zzz/issues/8)
+- Database integration (PostgreSQL via pglite) - [#7](https://github.com/fuzdev/zzz/issues/7)
+- Undo/history system - [#8](https://github.com/fuzdev/zzz/issues/8)
 - Authentication system
 - MCP/A2A protocol support
 - Terminal integration
@@ -261,6 +263,7 @@ gro dev
 ⚠️ **No authentication yet** - development use only
 
 Current security measures:
+
 - **ScopedFs**: Filesystem restricted to `.zzz` directory
 - **Origin verification**: CORS-like checks via `ALLOWED_ORIGINS`
 - **CSP**: Strict Content Security Policy
