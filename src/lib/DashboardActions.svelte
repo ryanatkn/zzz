@@ -29,7 +29,7 @@
 		This page shows the actions that have happened behind the scenes. It's a work in progress and
 		not too useful yet. The idea is to make the system visible, auditable, and manipulable.
 	</p>
-	<p>
+	<p class="row gap_sm">
 		<button
 			type="button"
 			class="compact"
@@ -41,6 +41,7 @@
 		>
 			clear action history
 		</button>
+		<button type="button" class="compact" onclick={() => app.api.ping()}>ping</button>
 	</p>
 
 	<div
