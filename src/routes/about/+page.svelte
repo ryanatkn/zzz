@@ -43,9 +43,7 @@
 			⚠️ This is an early pre-release, see the
 			<ExternalLink href="https://github.com/fuzdev/zzz">repo</ExternalLink>
 			and
-			<ExternalLink href="https://github.com/fuzdev/zzz/discussions">discussions</ExternalLink>
-			or find me on <ExternalLink href="https://bsky.app/profile/ryanatkn.com">Bluesky</ExternalLink
-			> 💤
+			<ExternalLink href="https://github.com/fuzdev/zzz/discussions">discussions</ExternalLink> 💤
 		</aside>
 		<p>Some early (rough) integrations include:</p>
 		<ul>

@@ -19,8 +19,7 @@ with a streamlined developer experience, eventually accessible to non-coders (he
 More at [zzz.software/about](https://www.zzz.software/about).
 
 This is an early stage project and the ideas are still developing -
-see the issues and [discussions](https://github.com/fuzdev/zzz/discussions)
-or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
+see the issues and [discussions](https://github.com/fuzdev/zzz/discussions).
 
 ## Setup
 
