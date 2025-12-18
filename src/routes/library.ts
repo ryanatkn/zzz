@@ -6,12 +6,11 @@ export const library_json: LibraryJson = {
 	package_json: {
 		name: '@fuzdev/zzz',
 		version: '0.0.1',
-		description: 'fullstack web toolkit for power users and devs',
+		description: 'local-first forge for power users and devs',
 		motto: 'nice web things for the tired',
 		glyph: '💤',
 		logo: 'logo.svg',
 		logo_alt: "three sleepy z's",
-		public: true,
 		license: 'MIT',
 		homepage: 'https://www.zzz.software/',
 		repository: 'https://github.com/fuzdev/zzz',

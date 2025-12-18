@@ -32,11 +32,12 @@
 		</header>
 		<blockquote>nice web things for the tired 💤</blockquote>
 		<p>
-			Zzz, pronounced "zees" like bees, is a fullstack app and toolkit for power users and
-			developers. The idea is to make an integrated cross-platform environment that adapts to your
-			needs and intent while remaining fully open, aligned, and in your control. It's both a
-			customizable local-first web UI and backend for power users, and a flexible library for
-			crafting UX-maximizing websites with a streamlined developer experience.
+			Zzz, pronounced "zees" like bees, is a local-first forge for power users and developers. The
+			idea is to make an integrated cross-platform environment that adapts to your needs and intent
+			while remaining fully open, aligned, and designed for your autonomy. It's both a customizable
+			web UI and local-first backend for power users, and a flexible tool for crafting UX-maximizing
+			websites with a streamlined developer experience, eventually accessible to non-coders (hence
+			all the AI).
 		</p>
 		<aside>
 			⚠️ This is an early pre-release, see the

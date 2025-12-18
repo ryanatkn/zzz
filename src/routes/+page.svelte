@@ -16,7 +16,7 @@
 		<div class="row mt_xl5 mb_lg">
 			<blockquote>nice web things for the tired 💤</blockquote>
 		</div>
-		<p>Zzz is a fullstack web toolkit for power users and devs.</p>
+		<p>Zzz is a local-first forge for power users and devs.</p>
 		<p>
 			It's an early work in progress, see the <a href={resolve('/about')}>about page</a> and
 			<a href={resolve('/docs')}>docs</a>.

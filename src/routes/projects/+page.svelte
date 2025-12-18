@@ -60,8 +60,8 @@
 			>.
 		</p>
 		<p>
-			For developers, Zzz is also an npm library for TypeScript/Svelte/SvelteKit/Vite that can be
-			used to make websites and servers with your current workflows.
+			For developers, Zzz is also an npm library for TypeScript/Svelte/SvelteKit that can be used to
+			make websites and servers with your current workflows.
 		</p>
 		<p>More <a href={resolve('/about')}>about</a> Zzz.</p>
 	</section>

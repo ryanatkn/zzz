@@ -9,12 +9,12 @@
 **[zzz.software](https://www.zzz.software/)**
 
 Zzz, pronounced "zees" like bees,
-is a fullstack web toolkit for power users and developers.
+is a local-first forge for power users and developers.
 The idea is to make an integrated cross-platform environment that adapts to
-your needs and intent while remaining fully open, aligned, and in your control.
-It's both a customizable local-first web UI and backend for power users,
+your needs and intent while remaining fully open, aligned, and designed for your autonomy.
+It's both a customizable web UI and local-first backend for power users,
 and a flexible tool for crafting UX-maximizing websites
-with a streamlined developer experience.
+with a streamlined developer experience, eventually accessible to non-coders (hence all the AI).
 
 More at [zzz.software/about](https://www.zzz.software/about).
 
