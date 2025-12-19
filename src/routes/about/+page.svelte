@@ -26,7 +26,7 @@
 					data={logo_zzz}
 					fill="var(--text_color)"
 					size="var(--icon_size_sm)"
-					attrs={{class: 'ml_xs mr_xl'}}
+					class="ml_xs mr_xl"
 				/> about
 			</h1>
 		</header>
@@ -170,10 +170,8 @@
 				data={logo_zzz}
 				size="var(--icon_size_sm)"
 				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
-				attrs={{
-					class: 'mr_md' + (app.futuremode ? ' flip_x' : ''),
-					style: 'transition: transform 200ms ease',
-				}}
+				class="mr_md {app.futuremode ? ' flip_x' : ''}"
+				style="transition: transform 200ms ease"
 			/>
 			<span
 				><span class="display_inline_block text_align_right" style:width="6ch"
@@ -185,10 +183,8 @@
 				data={logo_zzz}
 				size="var(--icon_size_sm)"
 				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
-				attrs={{
-					class: 'ml_md' + (app.futuremode ? '' : ' flip_x'),
-					style: 'transition: transform 200ms ease',
-				}}
+				class="ml_md {app.futuremode ? '' : ' flip_x'}"
+				style="transition: transform 200ms ease"
 			/>
 		</button>
 	</section>

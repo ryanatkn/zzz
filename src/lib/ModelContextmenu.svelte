@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {ComponentProps} from 'svelte';
+	import type {ComponentProps, Snippet} from 'svelte';
 	import Contextmenu from '@fuzdev/fuz_ui/Contextmenu.svelte';
 	import ContextmenuEntry from '@fuzdev/fuz_ui/ContextmenuEntry.svelte';
 	import ContextmenuSubmenu from '@fuzdev/fuz_ui/ContextmenuSubmenu.svelte';
@@ -16,6 +16,7 @@
 		...rest
 	}: OmitStrict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		model: Model;
+		children: Snippet;
 	} = $props();
 </script>
 

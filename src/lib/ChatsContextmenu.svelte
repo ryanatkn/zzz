@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {ComponentProps} from 'svelte';
+	import type {ComponentProps, Snippet} from 'svelte';
 	import Contextmenu from '@fuzdev/fuz_ui/Contextmenu.svelte';
 	import type {OmitStrict} from '@fuzdev/fuz_util/types.js';
 	import ContextmenuEntry from '@fuzdev/fuz_ui/ContextmenuEntry.svelte';
@@ -8,7 +8,8 @@
 	import {GLYPH_CHAT} from './glyphs.js';
 	import Glyph from './Glyph.svelte';
 
-	const props: OmitStrict<ComponentProps<typeof Contextmenu>, 'entries'> = $props();
+	const props: OmitStrict<ComponentProps<typeof Contextmenu>, 'entries'> & {children: Snippet} =
+		$props();
 
 	const app = frontend_context.get();
 </script>

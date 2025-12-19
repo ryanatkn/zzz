@@ -124,10 +124,8 @@
 									data={logo_zzz}
 									size="var(--icon_size_md)"
 									fill={app.futuremode ? 'var(--color_h_5)' : undefined}
-									attrs={{
-										style: 'transition: transform 200ms ease',
-										class: app.futuremode ? 'flip_x' : '',
-									}}
+									style="transition: transform 200ms ease"
+									class={app.futuremode ? 'flip_x' : ''}
 								/>
 							</NavLink>
 						</div>

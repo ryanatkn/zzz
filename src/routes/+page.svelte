@@ -10,7 +10,7 @@
 
 <section class="row gap_xl5 mb_xl5">
 	<div>
-		<Svg data={logo_zzz} size="var(--icon_size_xl2)" attrs={{class: 'mt_xl5'}} />
+		<Svg data={logo_zzz} size="var(--icon_size_xl2)" class="mt_xl5" />
 	</div>
 	<div>
 		<div class="row mt_xl5 mb_lg">
