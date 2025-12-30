@@ -192,8 +192,10 @@ export const create_multi_index = <T extends IndexedItem, K>(
 /**
  * Options for derived indexes.
  */
-export interface DerivedIndexOptions<T extends IndexedItem, TResult extends Array<T> = Array<T>>
-	extends IndexOptions<T, void> {
+export interface DerivedIndexOptions<
+	T extends IndexedItem,
+	TResult extends Array<T> = Array<T>,
+> extends IndexOptions<T, void> {
 	/** Function that computes the derived collection from the full collection. */
 	compute: (collection: IndexedCollection<T>) => TResult;
 
@@ -261,8 +263,10 @@ export const create_derived_index = <T extends IndexedItem, TResult extends Arra
 /**
  * Options for dynamic indexes.
  */
-export interface DynamicIndexOptions<T extends IndexedItem, F extends (...args: Array<any>) => any>
-	extends IndexOptions<T, Parameters<F>[0]> {
+export interface DynamicIndexOptions<
+	T extends IndexedItem,
+	F extends (...args: Array<any>) => any,
+> extends IndexOptions<T, Parameters<F>[0]> {
 	/** Function that creates a query function from the collection */
 	factory: (collection: IndexedCollection<T>) => F;
 

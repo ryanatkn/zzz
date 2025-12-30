@@ -63,8 +63,8 @@
 			"eslint-plugin-svelte": "^3.13.1",
 			"jsdom": "^27.2.0",
 			"ollama": "^0.6.3",
-			"prettier": "^3.6.2",
-			"prettier-plugin-svelte": "^3.4.0",
+			"prettier": "^3.7.4",
+			"prettier-plugin-svelte": "^3.4.1",
 			"svelte": "^5.45.6",
 			"svelte-check": "^4.3.4",
 			"tslib": "^2.8.1",
@@ -9636,7 +9636,7 @@
 						"name": "create_derived_index",
 						"kind": "function",
 						"doc_comment": "Create an incremental derived collection index.",
-						"source_line": 213,
+						"source_line": 215,
 						"type_signature": "<T extends IndexedItem, TResult extends Array<T> = T[]>(options: DerivedIndexOptions<T, TResult>): IndexDefinition<T, TResult, void>",
 						"return_type": "IndexDefinition<T, TResult, void>",
 						"parameters": [
@@ -9650,7 +9650,7 @@
 						"name": "DynamicIndexOptions",
 						"kind": "type",
 						"doc_comment": "Options for dynamic indexes.",
-						"source_line": 264,
+						"source_line": 266,
 						"type_signature": "DynamicIndexOptions<T, F>",
 						"generic_params": [
 							{
@@ -9688,7 +9688,7 @@
 						"name": "create_dynamic_index",
 						"kind": "function",
 						"doc_comment": "Create a dynamic index that computes results on-demand based on query parameters.",
-						"source_line": 279,
+						"source_line": 283,
 						"type_signature": "<T extends IndexedItem, F extends (...args: Array<any>) => any>(options: DynamicIndexOptions<T, F>): IndexDefinition<T, F, Parameters<F>[0]>",
 						"return_type": "IndexDefinition<T, F, Parameters<F>[0]>",
 						"parameters": [

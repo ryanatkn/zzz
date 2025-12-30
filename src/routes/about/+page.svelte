@@ -52,8 +52,8 @@
 				local system access. It's uses web standards and supports all JS server runtimes.
 			</li>
 			<li>
-				<ExternalLink href="https://svelte.dev/">SvelteKit</ExternalLink> is the frontend framework.
-				Hono integrates with its Node adapter, and it uses <ExternalLink href="https://vite.dev/"
+				<ExternalLink href="https://svelte.dev/">SvelteKit</ExternalLink> is the frontend framework. Hono
+				integrates with its Node adapter, and it uses <ExternalLink href="https://vite.dev/"
 					>Vite</ExternalLink
 				> in development.
 			</li>
@@ -107,8 +107,8 @@
 			<li>
 				when I regain an appetite for social, <ExternalLink href="https://atproto.com/"
 					>AT Protocol</ExternalLink
-				> and <ExternalLink href="https://activitypub.rocks/">ActivityPub</ExternalLink> -- probably
-				both but they're not immediate prioritie (I have an initial <ExternalLink
+				> and <ExternalLink href="https://activitypub.rocks/">ActivityPub</ExternalLink> -- probably both
+				but they're not immediate prioritie (I have an initial <ExternalLink
 					href="https://github.com/fuzdev/fuz_mastodon">Mastodon integration</ExternalLink
 				> with readonly embedded posts)
 			</li>
@@ -214,8 +214,7 @@
 			My current plan is to extract <ExternalLink href="https://github.com/fuzdev/fuz_ui"
 				>a reusable framework</ExternalLink
 			> out of Zzz that prioritizes security from the first commit. More on that soon. For now Zzz is
-			insecure and should definitely not be run in production, and it should be used with caution in
-			development.
+			insecure and should definitely not be run in production, and it should be used with caution in development.
 		</p>
 		<p>More thoughts about security:</p>
 		<ul>
@@ -227,9 +226,9 @@
 						<code>./.zzz</code>) for app data like completions, plus any additional paths configured
 						in <code>PUBLIC_ZZZ_SCOPED_DIRS</code> for user files -- all filesystem operations are
 						securely scoped via <code>ScopedFs</code> (symlinks rejected, paths validated) -- this opens
-						a significant surface area for both you and attackers to use, and writing untrusted data
-						could lead to arbitrary code execution if, for example, you're running a hot reloading dev
-						server in a scoped directory (configure with care!)
+						a significant surface area for both you and attackers to use, and writing untrusted data could
+						lead to arbitrary code execution if, for example, you're running a hot reloading dev server
+						in a scoped directory (configure with care!)
 					</li>
 					<li>
 						use your API keys for calls to Claude, ChatGPT, and Gemini, and write them to <code
