@@ -50,7 +50,7 @@
 			"@changesets/changelog-git": "^0.2.1",
 			"@fuzdev/fuz_code": "^0.38.0",
 			"@fuzdev/fuz_css": "^0.42.1",
-			"@fuzdev/fuz_ui": "^0.174.0",
+			"@fuzdev/fuz_ui": "^0.177.0",
 			"@ryanatkn/eslint-config": "^0.9.0",
 			"@ryanatkn/gro": "^0.184.0",
 			"@sveltejs/adapter-node": "^5.4.0",
@@ -63,8 +63,8 @@
 			"eslint-plugin-svelte": "^3.13.1",
 			"jsdom": "^27.2.0",
 			"ollama": "^0.6.3",
-			"prettier": "^3.6.2",
-			"prettier-plugin-svelte": "^3.4.0",
+			"prettier": "^3.7.4",
+			"prettier-plugin-svelte": "^3.4.1",
 			"svelte": "^5.45.6",
 			"svelte-check": "^4.3.4",
 			"tslib": "^2.8.1",
@@ -10331,7 +10331,7 @@
 						"name": "create_derived_index",
 						"kind": "function",
 						"doc_comment": "Create an incremental derived collection index.",
-						"source_line": 213,
+						"source_line": 215,
 						"type_signature": "<T extends IndexedItem, TResult extends Array<T> = T[]>(options: DerivedIndexOptions<T, TResult>): IndexDefinition<T, TResult, void>",
 						"return_type": "IndexDefinition<T, TResult, void>",
 						"parameters": [
@@ -10345,7 +10345,7 @@
 						"name": "DynamicIndexOptions",
 						"kind": "type",
 						"doc_comment": "Options for dynamic indexes.",
-						"source_line": 264,
+						"source_line": 266,
 						"type_signature": "DynamicIndexOptions<T, F>",
 						"generic_params": [
 							{
@@ -10385,7 +10385,7 @@
 						"name": "create_dynamic_index",
 						"kind": "function",
 						"doc_comment": "Create a dynamic index that computes results on-demand based on query parameters.",
-						"source_line": 279,
+						"source_line": 283,
 						"type_signature": "<T extends IndexedItem, F extends (...args: Array<any>) => any>(options: DynamicIndexOptions<T, F>): IndexDefinition<T, F, Parameters<F>[0]>",
 						"return_type": "IndexDefinition<T, F, Parameters<F>[0]>",
 						"parameters": [
@@ -11338,190 +11338,190 @@
 					{
 						"name": "JSONRPC_VERSION",
 						"kind": "variable",
-						"source_line": 47,
+						"source_line": 49,
 						"type_signature": "\"2.0\""
 					},
 					{
 						"name": "JSONRPC_LATEST_PROTOCOL_VERSION",
 						"kind": "variable",
-						"source_line": 48,
+						"source_line": 50,
 						"type_signature": "\"DRAFT-2025-v2\""
 					},
 					{
 						"name": "JsonrpcRequestId",
 						"kind": "type",
 						"doc_comment": "A uniquely identifying id for a request in JSON-RPC.\n\nLike MCP but unlike JSON-RPC, the type excludes null.",
-						"source_line": 55,
+						"source_line": 57,
 						"type_signature": "ZodUnion<readonly [ZodString, ZodNumber]>"
 					},
 					{
 						"name": "JsonrpcMethod",
 						"kind": "type",
 						"doc_comment": "A JSON-RPC method name, a string with no constraints.",
-						"source_line": 61,
+						"source_line": 63,
 						"type_signature": "ZodString"
 					},
 					{
 						"name": "JsonrpcProgressToken",
 						"kind": "type",
 						"doc_comment": "A progress token, used to associate progress notifications with the original request.",
-						"source_line": 67,
+						"source_line": 69,
 						"type_signature": "ZodUnion<readonly [ZodString, ZodNumber]>"
 					},
 					{
 						"name": "JsonrpcMcpMeta",
 						"kind": "type",
-						"source_line": 70,
+						"source_line": 72,
 						"type_signature": "ZodObject<{}, $loose>"
 					},
 					{
 						"name": "JsonrpcRequestParamsMeta",
 						"kind": "type",
-						"source_line": 73,
+						"source_line": 75,
 						"type_signature": "ZodObject<{ progressToken: ZodOptional<ZodUnion<readonly [ZodString, ZodNumber]>>; }, $loose>"
 					},
 					{
 						"name": "JsonrpcRequestParams",
 						"kind": "type",
-						"source_line": 85,
+						"source_line": 87,
 						"type_signature": "ZodObject<{ _meta: ZodOptional<ZodObject<{ progressToken: ZodOptional<ZodUnion<readonly [ZodString, ZodNumber]>>; }, $loose>>; }, $loose>"
 					},
 					{
 						"name": "JsonrpcNotificationParams",
 						"kind": "type",
-						"source_line": 90,
+						"source_line": 92,
 						"type_signature": "ZodObject<{ _meta: ZodOptional<ZodObject<{}, $loose>>; }, $loose>"
 					},
 					{
 						"name": "JsonrpcParams",
 						"kind": "type",
-						"source_line": 99,
+						"source_line": 101,
 						"type_signature": "ZodUnion<readonly [ZodObject<{ _meta: ZodOptional<ZodObject<{ progressToken: ZodOptional<ZodUnion<readonly [ZodString, ZodNumber]>>; }, $loose>>; }, $loose>, ZodObject<...>]>"
 					},
 					{
 						"name": "JsonrpcResult",
 						"kind": "type",
-						"source_line": 102,
+						"source_line": 104,
 						"type_signature": "ZodObject<{ _meta: ZodOptional<ZodObject<{}, $loose>>; }, $loose>"
 					},
 					{
 						"name": "JsonrpcRequest",
 						"kind": "type",
 						"doc_comment": "A request that expects a response.",
-						"source_line": 114,
+						"source_line": 116,
 						"type_signature": "ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; id: ZodUnion<readonly [ZodString, ZodNumber]>; method: ZodString; params: ZodOptional<ZodObject<{ _meta: ZodOptional<ZodObject<{ progressToken: ZodOptional<...>; }, $loose>>; }, $loose>>; }, $loose>"
 					},
 					{
 						"name": "JsonrpcNotification",
 						"kind": "type",
 						"doc_comment": "A notification which does not expect a response.",
-						"source_line": 125,
+						"source_line": 127,
 						"type_signature": "ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; method: ZodString; params: ZodOptional<ZodObject<{ _meta: ZodOptional<ZodObject<{}, $loose>>; }, $loose>>; }, $loose>"
 					},
 					{
 						"name": "JsonrpcResponse",
 						"kind": "type",
 						"doc_comment": "A successful (non-error) response to a request.",
-						"source_line": 135,
+						"source_line": 137,
 						"type_signature": "ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; id: ZodUnion<readonly [ZodString, ZodNumber]>; result: ZodObject<{ _meta: ZodOptional<ZodObject<{}, $loose>>; }, $loose>; }, $loose>"
 					},
 					{
 						"name": "JSONRPC_PARSE_ERROR",
 						"kind": "variable",
-						"source_line": 144,
+						"source_line": 146,
 						"type_signature": "-32700"
 					},
 					{
 						"name": "JSONRPC_INVALID_REQUEST",
 						"kind": "variable",
-						"source_line": 145,
+						"source_line": 147,
 						"type_signature": "-32600"
 					},
 					{
 						"name": "JSONRPC_METHOD_NOT_FOUND",
 						"kind": "variable",
-						"source_line": 146,
+						"source_line": 148,
 						"type_signature": "-32601"
 					},
 					{
 						"name": "JSONRPC_INVALID_PARAMS",
 						"kind": "variable",
-						"source_line": 147,
+						"source_line": 149,
 						"type_signature": "-32602"
 					},
 					{
 						"name": "JSONRPC_INTERNAL_ERROR",
 						"kind": "variable",
-						"source_line": 148,
+						"source_line": 150,
 						"type_signature": "-32603"
 					},
 					{
 						"name": "JSONRPC_SERVER_ERROR_START",
 						"kind": "variable",
-						"source_line": 149,
+						"source_line": 151,
 						"type_signature": "-32000"
 					},
 					{
 						"name": "JSONRPC_SERVER_ERROR_END",
 						"kind": "variable",
-						"source_line": 150,
+						"source_line": 152,
 						"type_signature": "-32099"
 					},
 					{
 						"name": "JsonrpcServerErrorCode",
 						"kind": "type",
-						"source_line": 153,
+						"source_line": 155,
 						"type_signature": "$ZodBranded<ZodNumber, \"JsonrpcServerErrorCode\">"
 					},
 					{
 						"name": "JsonrpcErrorCode",
 						"kind": "type",
-						"source_line": 160,
+						"source_line": 162,
 						"type_signature": "ZodUnion<readonly [ZodLiteral<-32700>, ZodLiteral<-32600>, ZodLiteral<-32601>, ZodLiteral<-32602>, ZodLiteral<-32603>, $ZodBranded<...>]>"
 					},
 					{
 						"name": "JsonrpcErrorJson",
 						"kind": "type",
-						"source_line": 170,
+						"source_line": 172,
 						"type_signature": "ZodObject<{ code: ZodUnion<readonly [ZodLiteral<-32700>, ZodLiteral<-32600>, ZodLiteral<-32601>, ZodLiteral<-32602>, ZodLiteral<-32603>, $ZodBranded<...>]>; message: ZodString; data: ZodOptional<...>; }, $loose>"
 					},
 					{
 						"name": "JsonrpcErrorMessage",
 						"kind": "type",
 						"doc_comment": "A response to a request that indicates an error occurred.",
-						"source_line": 190,
+						"source_line": 192,
 						"type_signature": "ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; id: ZodNullable<ZodUnion<readonly [ZodString, ZodNumber]>>; error: ZodObject<{ code: ZodUnion<readonly [ZodLiteral<-32700>, ... 4 more ..., $ZodBranded<...>]>; message: ZodString; data: ZodOptional<...>; }, $loose>; }, $loose>"
 					},
 					{
 						"name": "JsonrpcResponseOrError",
 						"kind": "type",
 						"doc_comment": "Convenience helper union.",
-						"source_line": 200,
+						"source_line": 202,
 						"type_signature": "ZodUnion<readonly [ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; id: ZodUnion<readonly [ZodString, ZodNumber]>; result: ZodObject<{ _meta: ZodOptional<ZodObject<{}, $loose>>; }, $loose>; }, $loose>, ZodObject<...>]>"
 					},
 					{
 						"name": "JsonrpcMessage",
 						"kind": "type",
 						"doc_comment": "Refers to any valid JSON-RPC object that can be decoded off the wire, or encoded to be sent.",
-						"source_line": 206,
+						"source_line": 208,
 						"type_signature": "ZodUnion<readonly [ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; id: ZodUnion<readonly [ZodString, ZodNumber]>; method: ZodString; params: ZodOptional<ZodObject<{ _meta: ZodOptional<ZodObject<{ progressToken: ZodOptional<...>; }, $loose>>; }, $loose>>; }, $loose>, ZodObject<...>, ZodObject<...>, ZodObject<...>]>"
 					},
 					{
 						"name": "JsonrpcMessageFromClientToServer",
 						"kind": "type",
-						"source_line": 217,
+						"source_line": 219,
 						"type_signature": "ZodUnion<readonly [ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; id: ZodUnion<readonly [ZodString, ZodNumber]>; method: ZodString; params: ZodOptional<ZodObject<{ _meta: ZodOptional<ZodObject<{ progressToken: ZodOptional<...>; }, $loose>>; }, $loose>>; }, $loose>, ZodObject<...>]>"
 					},
 					{
 						"name": "JsonrpcMessageFromServerToClient",
 						"kind": "type",
-						"source_line": 225,
+						"source_line": 227,
 						"type_signature": "ZodUnion<readonly [ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; method: ZodString; params: ZodOptional<ZodObject<{ _meta: ZodOptional<ZodObject<{}, $loose>>; }, $loose>>; }, $loose>, ZodObject<...>, ZodObject<...>]>"
 					},
 					{
 						"name": "JsonrpcSingularMessage",
 						"kind": "type",
-						"source_line": 234,
+						"source_line": 236,
 						"type_signature": "ZodUnion<readonly [ZodObject<{ jsonrpc: ZodLiteral<\"2.0\">; id: ZodUnion<readonly [ZodString, ZodNumber]>; method: ZodString; params: ZodOptional<ZodObject<{ _meta: ZodOptional<ZodObject<{ progressToken: ZodOptional<...>; }, $loose>>; }, $loose>>; }, $loose>, ZodObject<...>, ZodObject<...>, ZodObject<...>]>"
 					}
 				],
@@ -20264,92 +20264,6 @@
 					"Picker.svelte",
 					"PromptList.svelte"
 				]
-			},
-			{
-				"path": "test_helpers.ts",
-				"declarations": [
-					{
-						"name": "expect_ok",
-						"kind": "function",
-						"doc_comment": "Vitest's `expects` does not narrow types, this does for falsy values.",
-						"see_also": [
-							"https://github.com/vitest-dev/vitest/issues/2883"
-						],
-						"source_line": 12,
-						"type_signature": "<T>(value: T, message?: string | undefined): asserts value",
-						"return_type": "void",
-						"parameters": [
-							{
-								"name": "value",
-								"type": "T"
-							},
-							{
-								"name": "message",
-								"type": "string | undefined",
-								"optional": true
-							}
-						]
-					},
-					{
-						"name": "expect_defined",
-						"kind": "function",
-						"doc_comment": "Vitest's `expects` does not narrow types, this does for undefined values.",
-						"see_also": [
-							"https://github.com/vitest-dev/vitest/issues/2883"
-						],
-						"source_line": 23,
-						"type_signature": "<T>(value: T | undefined, message?: string | undefined): asserts value is T",
-						"return_type": "void",
-						"parameters": [
-							{
-								"name": "value",
-								"type": "T | undefined"
-							},
-							{
-								"name": "message",
-								"type": "string | undefined",
-								"optional": true
-							}
-						]
-					},
-					{
-						"name": "expect_nonnullish",
-						"kind": "function",
-						"doc_comment": "Vitest's `expects` does not narrow types, this does for nullish values.",
-						"see_also": [
-							"https://github.com/vitest-dev/vitest/issues/2883"
-						],
-						"source_line": 37,
-						"type_signature": "<T>(value: T | null | undefined, message?: string | undefined): asserts value is T",
-						"return_type": "void",
-						"parameters": [
-							{
-								"name": "value",
-								"type": "T | null | undefined"
-							},
-							{
-								"name": "message",
-								"type": "string | undefined",
-								"optional": true
-							}
-						]
-					},
-					{
-						"name": "monkeypatch_zzz_for_tests",
-						"kind": "function",
-						"doc_comment": "Applies testing-specific modifications to a Zzz instance.",
-						"source_line": 50,
-						"type_signature": "<T extends Frontend>(app: T): T",
-						"return_type": "T",
-						"parameters": [
-							{
-								"name": "app",
-								"type": "T"
-							}
-						]
-					}
-				],
-				"module_comment": "Vitest's `expects` does not narrow types, this does for falsy values.\n\n@see https://github.com/vitest-dev/vitest/issues/2883"
 			},
 			{
 				"path": "thread_helpers.ts",
