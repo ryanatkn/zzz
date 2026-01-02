@@ -9,7 +9,7 @@ import {Sortable, type Sorter, sort_by_text, sort_by_numeric} from '$lib/sortabl
 import {Cell} from '$lib/cell.svelte.js';
 import {UuidWithDefault, type Uuid, DatetimeNow, create_uuid} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
-import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
+import {monkeypatch_zzz_for_tests} from './test_helpers.ts';
 
 // Create a schema for our test cell
 const TestCellSchema = z.object({

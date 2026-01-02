@@ -7,7 +7,7 @@ import {test, expect, describe, beforeEach} from 'vitest';
 import {estimate_token_count} from '$lib/helpers.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
-import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
+import {monkeypatch_zzz_for_tests} from './test_helpers.ts';
 
 // Test suite variables
 let app: Frontend;

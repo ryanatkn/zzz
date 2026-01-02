@@ -1,5 +1,5 @@
-import type {Frontend} from './frontend.svelte.js';
-import type {DiskfilePath} from './diskfile_types.js';
+import type {Frontend} from '../lib/frontend.svelte.ts';
+import type {DiskfilePath} from '../lib/diskfile_types.ts';
 
 // TODO these aren't used, should they be for improved type safety?
 
@@ -8,7 +8,6 @@ import type {DiskfilePath} from './diskfile_types.js';
  *
  * @see https://github.com/vitest-dev/vitest/issues/2883
  */
-
 export const expect_ok: <T>(value: T, message?: string) => asserts value = (value, message) => {
 	if (!value) {
 		throw new Error(message ?? 'Expected value to be truthy');

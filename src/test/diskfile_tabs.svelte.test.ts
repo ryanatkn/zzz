@@ -6,7 +6,7 @@ import {DiskfileTabs} from '$lib/diskfile_tabs.svelte.js';
 import {DiskfileTab} from '$lib/diskfile_tab.svelte.js';
 import {create_uuid, UuidWithDefault} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
-import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
+import {monkeypatch_zzz_for_tests} from './test_helpers.ts';
 
 // Test data
 const TEST_DISKFILE_ID_1 = UuidWithDefault.parse(undefined);
