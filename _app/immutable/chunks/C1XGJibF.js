@@ -1,1 +1,0 @@
-import"./DsnmJJEf.js";import{f as t,b as s,d as e,r as i}from"./vp8LXHGR.js";import{F as d}from"./CLN1his8.js";var m=t('<div class="box py_xl9"><!></div>');function l(r){var o=m(),a=e(o);d(a,{}),i(o),s(r,o)}export{l as P};
