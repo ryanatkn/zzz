@@ -7759,10 +7759,10 @@
 								"type": "string"
 							},
 							{
-								"name": "open_externally",
+								"name": "new_tab",
 								"type": "boolean | undefined",
 								"optional": true,
-								"description": "Set to false to disable external link behavior."
+								"description": "Set to false to open in the same tab."
 							},
 							{
 								"name": "icon",

@@ -29,8 +29,12 @@
 
 	const reorderable = $derived(onreorder ? new Reorderable(reorderable_options) : null);
 
-	if (DEV && !onreorder && !!reorderable_options) {
-		console.error('`reorderable_options` provided to `PartList` without `onreorder`');
+	if (DEV) {
+		$effect(() => {
+			if (!onreorder && !!reorderable_options) {
+				console.error('`reorderable_options` provided to `PartList` without `onreorder`');
+			}
+		});
 	}
 </script>
 

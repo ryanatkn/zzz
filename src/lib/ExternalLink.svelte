@@ -19,15 +19,14 @@
 
 	const {
 		href,
-		open_externally = true,
+		new_tab = true,
 		icon,
 		children,
 		...rest
 	}: SvelteHTMLElements['a'] & {
 		href: string;
-		// TODO maybe dont default to external?
-		/** Set to false to disable external link behavior. */
-		open_externally?: boolean | undefined;
+		/** Set to false to open in the same tab. */
+		new_tab?: boolean | undefined;
 		icon?: Snippet<[known_logo: SvgData | null]> | undefined;
 	} = $props();
 
@@ -42,14 +41,22 @@
 						? logo_gemini
 						: null,
 	);
+
+	const rel: string = $derived.by(() => {
+		const parts: Array<string> = [];
+		if (!rest.rel?.includes('external')) parts.push('external');
+		if (new_tab) parts.push('noopener');
+		if (rest.rel) parts.push(rest.rel);
+		return parts.join(' ');
+	});
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -->
 <a
 	{...rest}
 	{href}
-	target={open_externally ? (rest.target ?? '_blank') : rest.target}
-	rel={open_externally ? (rest.rel ?? 'noopener') : rest.rel}
+	target={new_tab ? (rest.target ?? '_blank') : rest.target}
+	{rel}
 	class:color_i_5={true}
 	>{#if children}{@render children()}{:else}{href}{/if}<ExternalLinkIcon
 		>{#snippet children(text_icon)}{#if icon}{@render icon(known_logo)}{:else if known_logo}<Svg
