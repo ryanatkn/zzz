@@ -170,11 +170,11 @@
 				data={logo_zzz}
 				size="var(--icon_size_sm)"
 				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
-				class="mr_md {app.futuremode ? ' flip_x' : ''}"
+				class="mr_md {app.futuremode ? ' transform:scaleX(-1)' : ''}"
 				style="transition: transform 200ms ease"
 			/>
 			<span
-				><span class="display_inline_block text_align_right" style:width="6ch"
+				><span class="display:inline-block text-align:right" style:width="6ch"
 					>{app.futuremode ? 'disable' : 'enable'}</span
 				>
 				futuremode</span
@@ -183,7 +183,7 @@
 				data={logo_zzz}
 				size="var(--icon_size_sm)"
 				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
-				class="ml_md {app.futuremode ? '' : ' flip_x'}"
+				class="ml_md {app.futuremode ? '' : ' transform:scaleX(-1)'}"
 				style="transition: transform 200ms ease"
 			/>
 		</button>

@@ -20,7 +20,7 @@
 </script>
 
 <div>
-	<small class="px_sm display_flex justify_content_space_between mb_sm">
+	<small class="px_sm display:flex justify-content:space-between mb_sm">
 		<ConfirmButton
 			onconfirm={() => editor_state.clear_history()}
 			position="right"

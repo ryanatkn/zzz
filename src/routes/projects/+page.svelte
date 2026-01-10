@@ -11,9 +11,9 @@
 </script>
 
 {#if projects.previewing}
-	<div class="display_flex">
+	<div class="display:flex">
 		<ProjectSidebar />
-		<main class="flex_1 p_md overflow_auto">
+		<main class="flex:1 p_md overflow:auto">
 			{@render content()}
 			<ProjectList />
 		</main>

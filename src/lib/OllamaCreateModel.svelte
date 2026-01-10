@@ -29,7 +29,7 @@
 </script>
 
 <div class="panel p_md">
-	<header class="display_flex justify_content_space_between align_items_center mb_md">
+	<header class="display:flex justify-content:space-between align-items:center mb_md">
 		<h3 class="mt_0 mb_0">
 			<Glyph glyph={GLYPH_ADD} /> create model
 		</h3>
@@ -38,7 +38,7 @@
 		</button>
 	</header>
 
-	<section class="width_upto_md display_flex flex_direction_column gap_md">
+	<section class="width_upto_md display:flex flex-direction:column gap_md">
 		<p>
 			This creates a new custom modelfile, to download a builtin model see <button
 				type="button"
@@ -118,7 +118,7 @@
 			<p>Custom prompt template using Ollama template syntax</p>
 		</fieldset>
 
-		<div class="display_flex gap_md">
+		<div class="display:flex gap_md">
 			<button
 				type="button"
 				class="color_b"
