@@ -7,7 +7,7 @@
 
 <h3>color scheme</h3>
 <div class="width_upto_sm mb_lg">
-	<!-- TODO wanted to add `flex_1` to the buttons here, maybe add `menu_attrs` and `button_attrs`  -->
+	<!-- TODO wanted to add `flex:1` to the buttons here, maybe add `menu_attrs` and `button_attrs`  -->
 	<ColorSchemeInput />
 </div>
 <p>

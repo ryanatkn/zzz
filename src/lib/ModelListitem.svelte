@@ -21,7 +21,7 @@
 			<div>
 				{model.name}
 			</div>
-			<small class="row justify_content_space_between">
+			<small class="row justify-content:space-between">
 				<span>{model.provider_name}</span>{#if model.context_window_formatted}<span
 						>{model.context_window_formatted}</span
 					>{/if}
@@ -30,9 +30,9 @@
 	</div>
 
 	{#if show_tags && model.tags.length}
-		<ul class="unstyled display_flex flex_wrap_wrap gap_xs2">
+		<ul class="unstyled display:flex flex-wrap:wrap gap_xs2">
 			{#each model.tags as tag (tag)}
-				<small class="chip font_weight_400">{tag}</small>
+				<small class="chip font-weight:400">{tag}</small>
 			{/each}
 		</ul>
 	{/if}

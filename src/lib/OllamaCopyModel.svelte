@@ -29,7 +29,7 @@
 </script>
 
 <div class="panel p_md">
-	<header class="display_flex justify_content_space_between align_items_center mb_md">
+	<header class="display:flex justify-content:space-between align-items:center mb_md">
 		<h3 class="mt_0 mb_0">
 			<Glyph glyph={GLYPH_COPY} /> copy model
 		</h3>
@@ -38,7 +38,7 @@
 		</button>
 	</header>
 
-	<section class="width_upto_md display_flex flex_direction_column gap_md">
+	<section class="width_upto_md display:flex flex-direction:column gap_md">
 		<p>Create a copy of the source model with a new name.</p>
 
 		<fieldset>
@@ -82,7 +82,7 @@
 			</label>
 		</fieldset>
 
-		<div class="display_flex gap_md">
+		<div class="display:flex gap_md">
 			<button
 				type="button"
 				class="color_d"

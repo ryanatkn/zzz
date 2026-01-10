@@ -60,8 +60,8 @@
 </script>
 
 <DiskfileContextmenu {diskfile}>
-	<div class="display_flex height_100">
-		<div class="flex_1 width_atleast_sm height_100 column">
+	<div class="display:flex height_100">
+		<div class="flex:1 width_atleast_sm height_100 column">
 			<ContentEditor
 				bind:this={content_editor}
 				bind:content={editor_state.current_content}
